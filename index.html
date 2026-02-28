@@ -30,7 +30,7 @@
 <meta name="twitter:creator" content="@solariscet">
 
 <!-- SECURITY HEADERS -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://s.tradingview.com https://unpkg.com https://toncenter.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' https: data: https://ipfs.io https://scarlet-past-walrus-15.mypinata.cloud; connect-src 'self' https://toncenter.com https://tonscan.org https://dedust.io https://api.github.com;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://s.tradingview.com https://unpkg.com https://toncenter.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' https: data: https://ipfs.io https://scarlet-past-walrus-15.mypinata.cloud; connect-src 'self' https://toncenter.com https://tonscan.org https://dedust.io https://api.github.com;">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="X-Frame-Options" content="DENY">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
@@ -74,6 +74,7 @@
 <link rel="dns-prefetch" href="https://s.tradingview.com">
 <link rel="dns-prefetch" href="https://unpkg.com">
 <link rel="dns-prefetch" href="https://toncenter.com">
+<link rel="dns-prefetch" href="https://www.google-analytics.com">
 
 <!-- FONTS & ICONS -->
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@600;700;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -1735,6 +1736,15 @@ window.addEventListener('load', () => {
 // navigator.serviceWorker.register('/solaris-cet/sw.js').catch(err => console.log('SW registration failed:', err));
 });
 }
+
+// ===== GOOGLE ANALYTICS PLACEHOLDER =====
+// Uncomment and add your GA4 Measurement ID when ready
+/*
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XXXXXXXXXX');
+*/
 </script>
 </body>
 </html>
