@@ -1,0 +1,15 @@
+// manifest.json (creează în root-ul proiectului)
+{
+  "name": "SOLARIS CET R2A",
+  "short_name": "SOLARIS",
+  "start_url": "/solaris-cet/",
+  "display": "standalone",
+  "background_color": "#0F172A",
+  "theme_color": "#D4AF37",
+  "icons": [{
+    "src": "https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreid6hoewfj66y6wwefhiyp46madxlqtgnvut6tz7y2i4xwbj5yda3a",
+    "sizes": "512x512",
+    "type": "image/png",
+    "purpose": "any maskable"
+  }]
+}
