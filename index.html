@@ -6,8 +6,8 @@
 <meta name="generator" content="SOLARIS CET v3.3">
 <!-- PRIMARY SEO -->
 <title>SOLARIS CET | R2A Protocol | Self-Evolving AI Platform | 1 CET = €250,000</title>
-<meta name="description" content="SOLARIS CET: Hyper-scarce token (9,000 supply) on TON Blockchain. Reason-to-Act protocol for AI agents. Connect wallet, stake, vote, earn rewards. Whitepaper included.">
-<meta name="keywords" content="CET token, TON blockchain, AI agents, R2A protocol, crypto rewards, staking, governance, decentralized AI, whitepaper">
+<meta name="description" content="SOLARIS CET: Hyper-scarce token (9,000 supply) on TON Blockchain. Reason-to-Act protocol for AI agents. Connect wallet, stake, vote, earn rewards.">
+<meta name="keywords" content="CET token, TON blockchain, AI agents, R2A protocol, crypto rewards, staking, governance, decentralized AI">
 <meta name="author" content="BALABAN CLAUDIU">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <link rel="canonical" href="https://aamclaudiu-hash.github.io/solaris-cet/">
@@ -71,7 +71,7 @@
 <link rel="dns-prefetch" href="https://www.google-analytics.com">
 <!-- FONTS & ICONS -->
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@600;700;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmask7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <!-- TON CONNECT SDK -->
 <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js" defer></script>
 <!-- PWA MANIFEST -->
@@ -125,7 +125,7 @@ code, pre, .mono { font-family: var(--font-mono); }
 ::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
 /* ===== UTILITIES ===== */
 .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-.section { padding: 80px 0; content-visibility: auto; contain-intrinsic-size: 1000px; }
+.section { padding: 80px 0; }
 .section-title {
 font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem);
 margin-bottom: 20px; background: var(--gradient-gold); -webkit-background-clip: text;
@@ -181,13 +181,18 @@ color: white; font-family: var(--font-display); font-size: 1.4rem; font-weight: 
 .nav-links { display: flex; align-items: center; gap: 5px; list-style: none; }
 .nav-links a {
 color: var(--text-secondary); text-decoration: none; font-weight: 500;
-transition: var(--transition); padding: 10px 15px; border-radius: 8px;
+transition: var(--transition); padding: 10px 18px; border-radius: 10px;
 font-size: 0.95rem; position: relative;
 }
-.nav-links a:hover, .nav-links a.active { color: var(--gold); background: rgba(212,175,55,0.1); }
+.nav-links a:hover, .nav-links a.active { 
+  color: var(--gold); 
+  background: rgba(212,175,55,0.15);
+  box-shadow: 0 0 15px rgba(212,175,55,0.2);
+}
 .nav-links a.active::after {
-content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
-width: 5px; height: 5px; background: var(--gold); border-radius: 50%;
+content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+width: 6px; height: 6px; background: var(--gold); border-radius: 50%;
+box-shadow: 0 0 10px var(--gold);
 }
 .nav-actions { display: flex; align-items: center; gap: 12px; }
 .cet-value-badge {
@@ -224,16 +229,12 @@ cursor: pointer; transition: var(--transition); font-size: 0.95rem;
 }
 .lang-option:hover, .lang-option.active { background: rgba(212,175,55,0.1); color: var(--gold); }
 .lang-option .flag { margin-right: 8px; }
-.theme-toggle, .mobile-toggle, .chat-toggle {
+.theme-toggle, .mobile-toggle {
 background: none; border: none; color: var(--text-secondary); cursor: pointer;
 font-size: 1.1rem; transition: var(--transition); padding: 8px; position: relative;
 }
-.theme-toggle:hover, .mobile-toggle:hover, .chat-toggle:hover { color: var(--gold); }
+.theme-toggle:hover, .mobile-toggle:hover { color: var(--gold); }
 .mobile-toggle { display: none; }
-.chat-toggle .badge {
-position: absolute; top: -4px; right: -4px; padding: 3px 7px; font-size: 0.7rem;
-background: var(--emerald); color: white; border: none; border-radius: 10px;
-}
 /* TonConnect Button Styling */
 #ton-connect-button { display: flex; align-items: center; }
 #ton-connect-button button {
@@ -243,6 +244,28 @@ font-weight: 600 !important; cursor: pointer !important; transition: var(--trans
 }
 #ton-connect-button button:hover {
 transform: translateY(-2px) !important; box-shadow: var(--shadow-glow) !important;
+}
+/* ===== CHATBOT BUTTON - IMPROVED ===== */
+.chatbot-toggle {
+width: 60px; height: 60px; border-radius: 50%;
+background: var(--gradient-ai); border: 2px solid var(--gold);
+cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+font-size: 1.6rem; color: white; box-shadow: var(--shadow-value);
+transition: var(--transition); position: relative; overflow: hidden;
+}
+.chatbot-toggle:hover { 
+  transform: scale(1.1) rotate(5deg); 
+  box-shadow: 0 0 30px rgba(212,182,55,0.6), var(--shadow-value);
+  border-color: #FFF;
+}
+.chatbot-toggle i {
+filter: drop-shadow(0 0 8px rgba(212,175,55,0.8));
+}
+.chatbot-toggle .badge {
+position: absolute; top: -4px; right: -4px; padding: 3px 7px; font-size: 0.7rem;
+background: var(--emerald); color: white; border: none; border-radius: 10px;
+box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 /* ===== HERO ===== */
 .hero {
@@ -395,23 +418,6 @@ margin-left: auto; margin-right: auto;
 height: 500px; width: 100%; border-radius: 12px; overflow: hidden;
 background: rgba(0,0,0,0.3);
 }
-/* ===== WHITEPAPER SECTION (NEW) ===== */
-.whitepaper-container {
-background: rgba(30, 41, 59, 0.85); border: var(--border-gold);
-border-radius: 20px; padding: 40px; margin: 40px 0; max-width: 1100px;
-margin-left: auto; margin-right: auto;
-}
-.wp-section { margin-bottom: 40px; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-.wp-section:last-child { border-bottom: none; margin-bottom: 0; }
-.wp-title { color: var(--gold); font-family: var(--font-display); font-size: 1.8rem; margin-bottom: 20px; }
-.wp-content { color: var(--text-secondary); line-height: 1.8; font-size: 1.05rem; }
-.wp-content ul { padding-left: 20px; margin: 15px 0; }
-.wp-content li { margin-bottom: 10px; }
-.wp-table { width: 100%; border-collapse: collapse; margin: 20px 0; background: rgba(0,0,0,0.2); border-radius: 10px; overflow: hidden; }
-.wp-table th, .wp-table td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
-.wp-table th { background: rgba(212, 175, 55, 0.1); color: var(--gold); font-weight: 600; }
-.wp-table tr:last-child td { border-bottom: none; }
-.wp-highlight { color: var(--emerald); font-weight: 600; }
 /* ===== FORUM SECTION ===== */
 .forum-container {
 background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(236, 72, 153, 0.3);
@@ -571,19 +577,11 @@ padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; font-weight: 600;
 .status-pending { background: rgba(245, 158, 11, 0.15); color: #F59E0B; }
 .status-developing { background: rgba(6, 182, 212, 0.15); color: var(--cyan); }
 .status-live { background: rgba(16, 185, 129, 0.15); color: var(--emerald); }
-/* ===== CHATBOT ===== */
+/* ===== CHATBOT WINDOW ===== */
 .chatbot-container {
 position: fixed; bottom: 20px; right: 20px; z-index: 3000;
 display: flex; flex-direction: column; align-items: flex-end;
 }
-.chatbot-toggle {
-width: 60px; height: 60px; border-radius: 50%;
-background: var(--gradient-ai); border: none; cursor: pointer;
-display: flex; align-items: center; justify-content: center;
-font-size: 1.5rem; color: white; box-shadow: var(--shadow-value);
-transition: var(--transition);
-}
-.chatbot-toggle:hover { transform: scale(1.05); box-shadow: 0 0 50px rgba(6,182,212,0.6); }
 .chatbot-window {
 width: 380px; max-height: 550px; background: var(--navy-light);
 border: var(--border-gold); border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
@@ -670,7 +668,6 @@ border-bottom: var(--border-gold); display: none;
 .nav-menu.active { display: flex; }
 .nav-links { flex-direction: column; width: 100%; }
 .nav-links a { width: 100%; text-align: center; }
-.wp-table { display: block; overflow-x: auto; }
 }
 /* ===== ACCESSIBILITY ===== */
 a:focus, button:focus, input:focus, select:focus {
@@ -694,16 +691,6 @@ display: block; background: #EF4444; color: white; padding: 20px;
 text-align: center; font-size: 1.1rem; position: fixed; top: 0; left: 0;
 width: 100%; z-index: 9999;
 }
-/* ===== PRINT STYLES (WHITEPAPER) ===== */
-@media print {
-body { background: white; color: black; padding: 0; }
-.navbar, .footer, .chatbot-container, .btn, .nav-actions, .notification { display: none !important; }
-.section { padding: 20px 0; page-break-inside: avoid; }
-.whitepaper-container { border: none; box-shadow: none; background: white; color: black; }
-.wp-content, .wp-title, .wp-section { color: black; }
-.wp-table th { background: #eee; color: black; }
-a { text-decoration: none; color: black; }
-}
 </style>
 <!-- NOSCRYPT FALLBACK -->
 <noscript>
@@ -726,12 +713,13 @@ voting, and interactive features. Please enable JavaScript in your browser setti
 <li><a href="#evolution">Evolution</a></li>
 <li><a href="#chart">Chart</a></li>
 <li><a href="#forum">Forum</a></li>
-<li><a href="#whitepaper">Whitepaper</a></li>
 <li><a href="#team">Team</a></li>
 <li><a href="#audit">Audit</a></li>
 <li><a href="#faq">FAQ</a></li>
 <li><a href="#features">Features</a></li>
 <li><a href="#hi-status">HI Roadmap</a></li>
+<li><a href="https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a" target="_blank" rel="noopener">Whitepaper</a></li>
+<li><a href="https://github.com/aamclaudiu-hash/solaris-cet" target="_blank" rel="noopener">GitHub</a></li>
 </ul>
 </div>
 <div class="nav-actions">
@@ -760,8 +748,8 @@ voting, and interactive features. Please enable JavaScript in your browser setti
 </button>
 <!-- TonConnect Wallet Button -->
 <div id="ton-connect-button"></div>
-<button class="chat-toggle" id="chatToggleMobile" aria-label="Open AI Assistant">
-<i class="fas fa-robot" aria-hidden="true"></i>
+<button class="chatbot-toggle" id="chatbotToggle" aria-label="Open AI Assistant" onclick="toggleChatbot()">
+<i class="fas fa-sun" style="color: #D4AF37; animation: pulse 3s infinite;"></i>
 <span class="badge">AI</span>
 </button>
 <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu" aria-expanded="false">
@@ -985,116 +973,6 @@ Connect via Telegram, Discord, GitHub Discussions, or LinkedIn.
 </div>
 </div>
 </section>
-<!-- WHITEPAPER SECTION (INTEGRATED) -->
-<section id="whitepaper" class="section">
-<div class="container">
-<h2 class="section-title">Official Whitepaper</h2>
-<p class="section-subtitle">
-Technical documentation for SOLARIS CET token and R2A Protocol. Version 1.0 • February 2026
-</p>
-<div class="whitepaper-container">
-<article class="wp-section">
-<h3 class="wp-title">1. Executive Abstract</h3>
-<div class="wp-content">
-<p>SOLARIS CET is a hyper-scarce utility token (fixed supply: 9,000) deployed on TON Blockchain, designed to power the Reason-to-Act (R2A) Protocol—a decentralized incentive framework for autonomous AI agent development and sustainable rural community growth.</p>
-<p>Each CET token represents participation in a dual-purpose ecosystem: (1) incentivizing developers to build and validate AI agents through proportional reward distribution, and (2) funding tangible infrastructure projects in Cetățuia, Romania, including agricultural processing facilities and digital community tools.</p>
-</div>
-</article>
-<article class="wp-section">
-<h3 class="wp-title">2. Project Vision</h3>
-<div class="wp-content">
-<p><strong>Dual Mission:</strong> SOLARIS CET addresses two interconnected challenges:</p>
-<ul>
-<li><strong>AI Development Gap:</strong> Autonomous agents lack sustainable incentive mechanisms for continuous improvement and validation.</li>
-<li><strong>Rural Development Gap:</strong> Communities like Cetățuia (Vaslui, Romania) face digital exclusion and limited access to innovation capital.</li>
-</ul>
-<p><strong>Integrated Solution:</strong> By combining blockchain-based incentives with community-driven project selection, SOLARIS CET creates a replicable model where AI developers earn CET rewards for validated contributions via the R2A Protocol, CET holders vote on which community projects receive funding, and long-term token holders benefit from staking rewards and ecosystem growth.</p>
-</div>
-</article>
-<article class="wp-section">
-<h3 class="wp-title">3. R2A Protocol Mechanism</h3>
-<div class="wp-content">
-<p>The R2A Protocol enables AI agents to submit tasks, stake CET as commitment, receive on-chain validation of outcomes, and earn proportional rewards based on contribution metrics.</p>
-<p><strong>How It Works:</strong></p>
-<ul>
-<li><strong>Task Submission:</strong> Developer submits AI task with CET stake via smart contract.</li>
-<li><strong>On-Chain Validation:</strong> Outcome verified through cryptographic proof or community consensus.</li>
-<li><strong>Reward Calculation:</strong> CET reward = hours × base_rate × complexity × validation_score × impact_multiplier.</li>
-<li><strong>Distribution:</strong> Rewards paid in micro-units (0.000001 CET) for granular contribution tracking.</li>
-</ul>
-</div>
-</article>
-<article class="wp-section">
-<h3 class="wp-title">4. Tokenomics</h3>
-<div class="wp-content">
-<table class="wp-table">
-<thead>
-<tr>
-<th>Category</th>
-<th>Allocation</th>
-<th>Amount (CET)</th>
-<th>Vesting</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Public Sale & Liquidity</td>
-<td>40%</td>
-<td>3,600</td>
-<td>Immediate</td>
-</tr>
-<tr>
-<td>R2A Reward Reserve</td>
-<td>30%</td>
-<td>2,700</td>
-<td>Dynamic</td>
-</tr>
-<tr>
-<td>Team & Advisors</td>
-<td>20%</td>
-<td>1,800</td>
-<td>24 Months</td>
-</tr>
-<tr>
-<td>Community & Marketing</td>
-<td>10%</td>
-<td>900</td>
-<td>Gradual</td>
-</tr>
-</tbody>
-</table>
-<p><span class="wp-highlight">Total Supply:</span> 9,000 CET • <span class="wp-highlight">Blockchain:</span> TON • <span class="wp-highlight">Standard:</span> Jetton</p>
-</div>
-</article>
-<article class="wp-section">
-<h3 class="wp-title">5. Roadmap</h3>
-<div class="wp-content">
-<ul>
-<li><strong>Q1 2026:</strong> Launch & Foundation (Token deployment, Liquidity, R2A v1.0).</li>
-<li><strong>Q2 2026:</strong> Growth & Validation (Beta testing, Audit, Staking module).</li>
-<li><strong>Q3-Q4 2026:</strong> Expansion & Integration (Multi-agent collaboration, Community projects).</li>
-<li><strong>2027+:</strong> Maturation & Scale (DAO transition, Cross-chain integration).</li>
-</ul>
-</div>
-</article>
-<article class="wp-section">
-<h3 class="wp-title">6. Risk Disclosure</h3>
-<div class="wp-content">
-<p>Cryptocurrency investments carry significant risk, including potential loss of principal. This document is for informational purposes only and does not constitute financial, legal, or investment advice. SOLARIS CET is a utility token with no guarantee of future value or functionality.</p>
-<p><strong>Key Risk Factors:</strong> Market Volatility, Technology Risk, Regulatory Uncertainty, Project Execution.</p>
-</div>
-</article>
-<div style="margin-top: 30px; text-align: center;">
-<a href="https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a" target="_blank" class="btn btn-outline">
-<i class="fas fa-file-pdf"></i> Download PDF Version
-</a>
-<button class="btn btn-primary" onclick="window.print()">
-<i class="fas fa-print"></i> Print / Save as PDF
-</button>
-</div>
-</div>
-</div>
-</section>
 <!-- TEAM SECTION -->
 <section id="team" class="section">
 <div class="container">
@@ -1305,7 +1183,8 @@ Vote on features. Top-voted features are prioritized for development.
 <!-- CHATBOT -->
 <div class="chatbot-container">
 <button class="chatbot-toggle" id="chatbotToggle" aria-label="Open AI Assistant" onclick="toggleChatbot()">
-<i class="fas fa-robot"></i>
+<i class="fas fa-sun" style="color: #D4AF37; animation: pulse 3s infinite;"></i>
+<span class="badge">AI</span>
 </button>
 <div class="chatbot-window" id="chatbotWindow" role="dialog" aria-label="SOLARIS AI Assistant">
 <div class="chatbot-header">
@@ -1333,7 +1212,6 @@ Vote on features. Top-voted features are prioritized for development.
 <a href="#evolution"><i class="fas fa-chart-line"></i> Evolution</a>
 <a href="#chart"><i class="fas fa-chart-candlestick"></i> Chart</a>
 <a href="#forum"><i class="fas fa-comments"></i> Forum</a>
-<a href="#whitepaper"><i class="fas fa-file-alt"></i> Whitepaper</a>
 <a href="#team"><i class="fas fa-users"></i> Team</a>
 <a href="#audit"><i class="fas fa-shield-alt"></i> Audit</a>
 <a href="#faq"><i class="fas fa-question-circle"></i> FAQ</a>
@@ -1617,7 +1495,7 @@ if (q.includes('telegram') || q.includes('discord') || q.includes('community')) 
 return 'Join us: Telegram (https://t.me/+tKlfzx7IWopmNWQ0), Discord (https://discord.gg/gKYRvepr), X (@solariscet), LinkedIn (creator profile).';
 }
 if (q.includes('whitepaper') || q.includes('docs')) {
-return 'Whitepaper: ' + WHITEPAPER_URL + ' - Includes tokenomics, R2A Protocol specs, roadmap, and risk disclosure. Also available directly on this page.';
+return 'Whitepaper: ' + WHITEPAPER_URL + ' - Includes tokenomics, R2A Protocol specs, roadmap, and risk disclosure.';
 }
 if (q.includes('audit') || q.includes('security')) {
 return 'Contract verified on TONScan. Liquidity locked 12 months. Third-party audit scheduled Q2 2026. All code open-source on GitHub.';
