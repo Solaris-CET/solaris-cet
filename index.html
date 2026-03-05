@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<meta name="generator" content="SOLARIS CET v3.4">
+<meta name="generator" content="SOLARIS CET v3.5">
 <title>SOLARIS CET | R2A Protocol | Self-Evolving AI Platform | 1 CET = €250,000</title>
 <meta name="description" content="SOLARIS CET: Hyper-scarce token (9,000 supply) on TON Blockchain. Reason-to-Act protocol for AI agents. Connect wallet, stake, vote, earn rewards.">
 <meta name="keywords" content="CET token, TON blockchain, AI agents, R2A protocol, crypto rewards, staking, governance, decentralized AI">
@@ -12,7 +12,7 @@
 <link rel="canonical" href="https://aamclaudiu-hash.github.io/solaris-cet/">
 <!-- OPEN GRAPH -->
 <meta property="og:title" content="SOLARIS CET | Self-Evolving AI Platform">
-<meta property="og:description" content="Connect wallet, stake CET, participate in governance. 9,000 supply. R2A Protocol v3.4">
+<meta property="og:description" content="Connect wallet, stake CET, participate in governance. 9,000 supply. R2A Protocol v3.5">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://aamclaudiu-hash.github.io/solaris-cet/">
 <meta property="og:image" content="https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreid6hoewfj66y6wwefhiyp46madxlqtgnvut6tz7y2i4xwbj5yda3a">
@@ -25,11 +25,10 @@
 <meta name="twitter:image" content="https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreid6hoewfj66y6wwefhiyp46madxlqtgnvut6tz7y2i4xwbj5yda3a">
 <meta name="twitter:creator" content="@solariscet">
 <!-- SECURITY HEADERS -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://s.tradingview.com https://unpkg.com https://toncenter.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' https: data: https://ipfs.io https://scarlet-past-walrus-15.mypinata.cloud; connect-src 'self' https://toncenter.com https://tonscan.org https://dedust.io https://api.github.com;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://s.tradingview.com https://unpkg.com https://toncenter.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' https: data: https://ipfs.io https://scarlet-past-walrus-15.mypinata.cloud; connect-src 'self' https://toncenter.com https://tonscan.org https://dedust.io https://api.github.com;">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="X-Frame-Options" content="DENY">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-<meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
 <!-- STRUCTURED DATA -->
 <script type="application/ld+json">
 {
@@ -43,9 +42,8 @@
 "offers": { "@type": "Offer", "price": "250000", "priceCurrency": "EUR" },
 "description": "Self-improving AI platform with live forum, CET chart, and automatic feature deployment.",
 "featureList": "Wallet Connection, Staking, Governance Voting, R2A Rewards, Evolution Tracking",
-"softwareVersion": "3.4",
-"author": { "@type": "Person", "name": "BALABAN CLAUDIU", "url": "https://www.linkedin.com/in/claudiu-ciprian-balaban-76ab8a394/" },
-"keywords": "CET token, TON blockchain, AI agents, R2A protocol, staking, governance"
+"softwareVersion": "3.5",
+"author": { "@type": "Person", "name": "BALABAN CLAUDIU", "url": "https://www.linkedin.com/in/claudiu-ciprian-balaban-76ab8a394/" }
 },
 {
 "@type": "CreativeWork",
@@ -64,7 +62,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://ipfs.io">
-<link rel="dns-prefetch" href="https://s.tradingview.com">
 <link rel="dns-prefetch" href="https://unpkg.com">
 <link rel="dns-prefetch" href="https://toncenter.com">
 <!-- FONTS & ICONS -->
@@ -215,6 +212,8 @@ left: 50%; transform: translateX(-50%); background: var(--navy-light);
 padding: 5px 10px; border-radius: 5px; font-size: 0.7rem; white-space: nowrap;
 margin-bottom: 5px; border: var(--border-gold);
 }
+
+/* ===== LANGUAGE SELECTOR - FIXED ===== */
 .lang-selector { position: relative; display: inline-block; }
 .lang-btn {
 background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
@@ -237,6 +236,7 @@ cursor: pointer; transition: var(--transition); font-size: 0.95rem;
 }
 .lang-option:hover, .lang-option.active { background: rgba(212,175,55,0.1); color: var(--gold); }
 .lang-option .flag { margin-right: 8px; }
+
 .theme-toggle, .mobile-toggle {
 background: none; border: none; color: var(--text-secondary); cursor: pointer;
 font-size: 1.1rem; transition: var(--transition); padding: 8px; position: relative;
@@ -404,17 +404,6 @@ background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px
 @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 .skeleton-text { height: 16px; margin: 8px 0; }
 .skeleton-title { height: 24px; margin: 12px 0; }
-.skeleton-circle { width: 50px; height: 50px; border-radius: 50%; margin: 0 auto 15px; }
-
-/* ===== ERROR BOUNDARY ===== */
-.error-boundary {
-background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3);
-border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0;
-}
-.error-boundary i { color: #EF4444; font-size: 2rem; margin-bottom: 10px; }
-.error-boundary h4 { color: #EF4444; margin-bottom: 10px; }
-.error-boundary p { color: var(--text-secondary); margin-bottom: 15px; }
-.error-boundary button { background: #EF4444; color: white; }
 
 /* ===== RISK DISCLOSURE ===== */
 .risk-disclosure {
@@ -467,7 +456,7 @@ display: flex; align-items: flex-start; gap: 10px;
 .log-item.new { color: var(--emerald); }
 .log-item.update { color: var(--cyan); }
 
-/* ===== LIVE CHART - DEDUST WIDGET ===== */
+/* ===== LIVE CHART - DEDUST WIDGET - FIXED ===== */
 .chart-container {
 background: rgba(30, 41, 59, 0.85); border: var(--border-gold);
 border-radius: 20px; padding: 30px; margin: 40px 0; max-width: 1100px;
@@ -481,6 +470,24 @@ background: rgba(0,0,0,0.3); border: 1px solid rgba(212,175,55,0.2);
 .chart-widget iframe {
 width: 100%; height: 100%; border: none;
 }
+
+/* ===== WHITEPAPER SECTION - INTEGRATED ===== */
+.whitepaper-container {
+background: rgba(30, 41, 59, 0.85); border: var(--border-gold);
+border-radius: 20px; padding: 40px; margin: 40px 0; max-width: 1100px;
+margin-left: auto; margin-right: auto;
+}
+.wp-section { margin-bottom: 40px; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.wp-section:last-child { border-bottom: none; margin-bottom: 0; }
+.wp-title { color: var(--gold); font-family: var(--font-display); font-size: 1.8rem; margin-bottom: 20px; }
+.wp-content { color: var(--text-secondary); line-height: 1.8; font-size: 1.05rem; }
+.wp-content ul { padding-left: 20px; margin: 15px 0; }
+.wp-content li { margin-bottom: 10px; }
+.wp-table { width: 100%; border-collapse: collapse; margin: 20px 0; background: rgba(0,0,0,0.2); border-radius: 10px; overflow: hidden; }
+.wp-table th, .wp-table td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.wp-table th { background: rgba(212, 175, 55, 0.1); color: var(--gold); font-weight: 600; }
+.wp-table tr:last-child td { border-bottom: none; }
+.wp-highlight { color: var(--emerald); font-weight: 600; }
 
 /* ===== FORUM SECTION ===== */
 .forum-container {
@@ -699,6 +706,7 @@ border-bottom: var(--border-gold); display: none;
 .nav-menu.active { display: flex; }
 .nav-links { flex-direction: column; width: 100%; }
 .nav-links a { width: 100%; text-align: center; }
+.wp-table { display: block; overflow-x: auto; }
 }
 
 /* ===== ACCESSIBILITY ===== */
@@ -708,16 +716,6 @@ outline: 2px solid var(--gold); outline-offset: 2px;
 @media (prefers-reduced-motion: reduce) {
 * { animation: none !important; transition: none !important; }
 }
-
-/* ===== LOADING STATE ===== */
-.loading { opacity: 0.7; pointer-events: none; position: relative; }
-.loading::after {
-content: ''; position: absolute; top: 50%; left: 50%;
-width: 20px; height: 20px; border: 2px solid var(--gold);
-border-top-color: transparent; border-radius: 50%;
-animation: spin 0.8s linear infinite; transform: translate(-50%, -50%);
-}
-@keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
 /* ===== NOSCRIPT ===== */
 noscript {
@@ -748,13 +746,12 @@ voting, and interactive features. Please enable JavaScript in your browser setti
 <li><a href="#evolution">Evolution</a></li>
 <li><a href="#chart">Chart</a></li>
 <li><a href="#forum">Forum</a></li>
+<li><a href="#whitepaper">Whitepaper</a></li>
 <li><a href="#team">Team</a></li>
 <li><a href="#audit">Audit</a></li>
 <li><a href="#faq">FAQ</a></li>
 <li><a href="#features">Features</a></li>
 <li><a href="#hi-status">HI Roadmap</a></li>
-<li><a href="https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a" target="_blank" rel="noopener">Whitepaper</a></li>
-<li><a href="https://github.com/aamclaudiu-hash/solaris-cet" target="_blank" rel="noopener">GitHub</a></li>
 </ul>
 </div>
 <div class="nav-actions">
@@ -767,15 +764,15 @@ voting, and interactive features. Please enable JavaScript in your browser setti
 <i class="fas fa-globe" aria-hidden="true"></i>
 <span id="currentLang">EN</span>
 </button>
-<div class="lang-dropdown" role="menu">
-<button class="lang-option active" data-lang="en" role="menuitem"><span class="flag">🇬</span> English</button>
+<div class="lang-dropdown" role="menu" id="langDropdown">
+<button class="lang-option active" data-lang="en" role="menuitem"><span class="flag">🇬🇧</span> English</button>
 <button class="lang-option" data-lang="ro" role="menuitem"><span class="flag">🇷🇴</span> Română</button>
-<button class="lang-option" data-lang="es" role="menuitem"><span class="flag">🇪</span> Español</button>
+<button class="lang-option" data-lang="es" role="menuitem"><span class="flag">🇪🇸</span> Español</button>
 <button class="lang-option" data-lang="de" role="menuitem"><span class="flag">🇩🇪</span> Deutsch</button>
 <button class="lang-option" data-lang="fr" role="menuitem"><span class="flag">🇫🇷</span> Français</button>
-<button class="lang-option" data-lang="zh" role="menuitem"><span class="flag">🇨🇳</span> 中文</button>
+<button class="lang-option" data-lang="zh" role="menuitem"><span class="flag">🇨</span> 中文</button>
 <button class="lang-option" data-lang="ja" role="menuitem"><span class="flag">🇯</span> 日本語</button>
-<button class="lang-option" data-lang="ru" role="menuitem"><span class="flag">🇷🇺</span> Русский</button>
+<button class="lang-option" data-lang="ru" role="menuitem"><span class="flag">🇷</span> Русский</button>
 </div>
 </div>
 <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
@@ -815,7 +812,7 @@ voting, and interactive features. Please enable JavaScript in your browser setti
 <div class="contract-box">
 <div class="contract-header">
 <span class="badge"><i class="fas fa-certificate"></i> Verified Contract</span>
-<span class="badge badge-value"><i class="fas fa-robot"></i> R2A v3.4</span>
+<span class="badge badge-value"><i class="fas fa-robot"></i> R2A v3.5</span>
 <span class="badge badge-evolution"><i class="fas fa-sync"></i> Auto-Evolving</span>
 </div>
 <div class="contract-address" id="contractAddr" tabindex="0" role="button" aria-label="Contract address, click to copy">EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX</div>
@@ -872,35 +869,27 @@ Platform improves based on developer activity. Live tracking of contributions an
 <div class="evolution-container">
 <div class="evo-header">
 <h3 style="color: var(--purple);"><i class="fas fa-dna"></i> Evolution Metrics</h3>
-<span class="badge badge-evolution">v3.<span id="autoVersion">4</span>.<span id="autoBuild">0</span></span>
+<span class="badge badge-evolution">v3.<span id="autoVersion">5</span>.<span id="autoBuild">0</span></span>
 </div>
 <div class="evo-stats">
 <div class="evo-stat-card">
 <div class="evo-stat-label">Active Developers</div>
-<div class="evo-stat-value" id="devCount">
-<div class="skeleton skeleton-text" style="width: 60px;"></div>
-</div>
+<div class="evo-stat-value" id="devCount"><div class="skeleton skeleton-text" style="width: 60px;"></div></div>
 <div class="evo-progress-bar"><div class="evo-progress-fill" id="devProgress"></div></div>
 </div>
 <div class="evo-stat-card">
 <div class="evo-stat-label">Features Deployed</div>
-<div class="evo-stat-value" id="featureCount">
-<div class="skeleton skeleton-text" style="width: 60px;"></div>
-</div>
+<div class="evo-stat-value" id="featureCount"><div class="skeleton skeleton-text" style="width: 60px;"></div></div>
 <div class="evo-progress-bar"><div class="evo-progress-fill" id="featureProgress"></div></div>
 </div>
 <div class="evo-stat-card">
 <div class="evo-stat-label">Auto-Updates</div>
-<div class="evo-stat-value" id="updateCount">
-<div class="skeleton skeleton-text" style="width: 60px;"></div>
-</div>
+<div class="evo-stat-value" id="updateCount"><div class="skeleton skeleton-text" style="width: 60px;"></div></div>
 <div class="evo-progress-bar"><div class="evo-progress-fill" id="updateProgress"></div></div>
 </div>
 <div class="evo-stat-card">
 <div class="evo-stat-label">Evolution Score</div>
-<div class="evo-stat-value" id="evoScore">
-<div class="skeleton skeleton-text" style="width: 50px;"></div>
-</div>
+<div class="evo-stat-value" id="evoScore"><div class="skeleton skeleton-text" style="width: 50px;"></div></div>
 <div class="evo-progress-bar"><div class="evo-progress-fill" id="evoProgress"></div></div>
 </div>
 </div>
@@ -914,7 +903,7 @@ Platform improves based on developer activity. Live tracking of contributions an
 </div>
 </section>
 
-<!-- LIVE CHART - DEDUST WIDGET -->
+<!-- LIVE CHART - DEDUST WIDGET - FIXED -->
 <section id="chart" class="section">
 <div class="container">
 <h2 class="section-title">CET Live Chart</h2>
@@ -932,7 +921,7 @@ Real-time CET/TON trading data from DeDust DEX with candlestick charts.
 </div>
 <div class="chart-widget">
 <iframe 
-  src="https://dedust.io/pools/EQDDfi4bTApmYDwglsFajobpwVk-tGS6kDwjD6y2whRFfIif/chart"
+  src="https://dedust.io/pools/EQDDfi4bTApmYDwglsFajobpwVk-tGS6kDwjD6y2whRFfIif"
   style="width:100%;height:100%;border:none;"
   loading="lazy"
   title="CET/TON Chart on DeDust"
@@ -951,8 +940,87 @@ Real-time CET/TON trading data from DeDust DEX with candlestick charts.
 </div>
 </section>
 
+<!-- WHITEPAPER SECTION - INTEGRATED -->
+<section id="whitepaper" class="section" style="background: rgba(15, 23, 42, 0.4);">
+<div class="container">
+<h2 class="section-title">Official Whitepaper</h2>
+<p class="section-subtitle">
+Technical documentation for SOLARIS CET token and R2A Protocol. Version 1.0 • February 2026
+</p>
+<div class="whitepaper-container">
+<article class="wp-section">
+<h3 class="wp-title">1. Executive Abstract</h3>
+<div class="wp-content">
+<p>SOLARIS CET is a hyper-scarce utility token (fixed supply: 9,000) deployed on TON Blockchain, designed to power the Reason-to-Act (R2A) Protocol—a decentralized incentive framework for autonomous AI agent development and sustainable rural community growth.</p>
+<p>Each CET token represents participation in a dual-purpose ecosystem: (1) incentivizing developers to build and validate AI agents through proportional reward distribution, and (2) funding tangible infrastructure projects in Cetățuia, Romania, including agricultural processing facilities and digital community tools.</p>
+</div>
+</article>
+<article class="wp-section">
+<h3 class="wp-title">2. Project Vision</h3>
+<div class="wp-content">
+<p><strong>Dual Mission:</strong> SOLARIS CET addresses two interconnected challenges:</p>
+<ul>
+<li><strong>AI Development Gap:</strong> Autonomous agents lack sustainable incentive mechanisms for continuous improvement and validation.</li>
+<li><strong>Rural Development Gap:</strong> Communities like Cetățuia (Vaslui, Romania) face digital exclusion and limited access to innovation capital.</li>
+</ul>
+</div>
+</article>
+<article class="wp-section">
+<h3 class="wp-title">3. R2A Protocol Mechanism</h3>
+<div class="wp-content">
+<p>The R2A Protocol enables AI agents to submit tasks, stake CET as commitment, receive on-chain validation of outcomes, and earn proportional rewards based on contribution metrics.</p>
+<p><strong>How It Works:</strong> Task Submission → On-Chain Validation → Reward Calculation → Distribution in micro-units (0.000001 CET)</p>
+</div>
+</article>
+<article class="wp-section">
+<h3 class="wp-title">4. Tokenomics</h3>
+<div class="wp-content">
+<table class="wp-table">
+<thead>
+<tr><th>Category</th><th>Allocation</th><th>Amount (CET)</th><th>Vesting</th></tr>
+</thead>
+<tbody>
+<tr><td>Public Sale & Liquidity</td><td>40%</td><td>3,600</td><td>Immediate</td></tr>
+<tr><td>R2A Reward Reserve</td><td>30%</td><td>2,700</td><td>Dynamic</td></tr>
+<tr><td>Team & Advisors</td><td>20%</td><td>1,800</td><td>24 Months</td></tr>
+<tr><td>Community & Marketing</td><td>10%</td><td>900</td><td>Gradual</td></tr>
+</tbody>
+</table>
+<p><span class="wp-highlight">Total Supply:</span> 9,000 CET • <span class="wp-highlight">Blockchain:</span> TON • <span class="wp-highlight">Standard:</span> Jetton</p>
+</div>
+</article>
+<article class="wp-section">
+<h3 class="wp-title">5. Roadmap</h3>
+<div class="wp-content">
+<ul>
+<li><strong>Q1 2026:</strong> Launch & Foundation (Token deployment, Liquidity, R2A v1.0)</li>
+<li><strong>Q2 2026:</strong> Growth & Validation (Beta testing, Audit, Staking module)</li>
+<li><strong>Q3-Q4 2026:</strong> Expansion & Integration (Multi-agent collaboration, Community projects)</li>
+<li><strong>2027+:</strong> Maturation & Scale (DAO transition, Cross-chain integration)</li>
+</ul>
+</div>
+</article>
+<article class="wp-section">
+<h3 class="wp-title">6. Risk Disclosure</h3>
+<div class="wp-content">
+<p>Cryptocurrency investments carry significant risk, including potential loss of principal. This document is for informational purposes only and does not constitute financial, legal, or investment advice.</p>
+<p><strong>Key Risk Factors:</strong> Market Volatility, Technology Risk, Regulatory Uncertainty, Project Execution.</p>
+</div>
+</article>
+<div style="margin-top: 30px; text-align: center;">
+<a href="https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a" target="_blank" class="btn btn-outline">
+<i class="fas fa-file-pdf"></i> Download PDF Version
+</a>
+<button class="btn btn-primary" onclick="window.print()">
+<i class="fas fa-print"></i> Print / Save as PDF
+</button>
+</div>
+</div>
+</div>
+</section>
+
 <!-- FORUM SECTION -->
-<section id="forum" class="section" style="background: rgba(15, 23, 42, 0.4);">
+<section id="forum" class="section">
 <div class="container">
 <h2 class="section-title">Community Forum</h2>
 <p class="section-subtitle">
@@ -989,26 +1057,13 @@ Live discussions, problem-solving, feature requests.
 <div style="text-align: center; padding: 40px;">
 <i class="fas fa-comments" style="font-size: 3rem; color: var(--pink); margin-bottom: 20px;"></i>
 <h4 style="color: var(--text-primary); margin-bottom: 10px;">Join Official Channels</h4>
-<p style="color: var(--text-secondary); margin-bottom: 25px;">
-Connect via Telegram, Discord, GitHub Discussions, or LinkedIn.
-</p>
+<p style="color: var(--text-secondary); margin-bottom: 25px;">Connect via Telegram, Discord, GitHub Discussions, or LinkedIn.</p>
 <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-<a href="https://t.me/+tKlfzx7IWopmNWQ0" target="_blank" rel="noopener" class="btn btn-sm btn-telegram">
-<i class="fab fa-telegram-plane"></i> Telegram
-</a>
-<a href="https://discord.gg/gKYRvepr" target="_blank" rel="noopener" class="btn btn-sm btn-discord">
-<i class="fab fa-discord"></i> Discord
-</a>
-<a href="https://github.com/aamclaudiu-hash/solaris-cet/discussions" target="_blank" rel="noopener" class="btn btn-sm btn-outline">
-<i class="fab fa-github"></i> GitHub
-</a>
-<a href="https://www.linkedin.com/in/claudiu-ciprian-balaban-76ab8a394/" target="_blank" rel="noopener" class="btn btn-sm btn-linkedin">
-<i class="fab fa-linkedin"></i> LinkedIn
-</a>
+<a href="https://t.me/+tKlfzx7IWopmNWQ0" target="_blank" rel="noopener" class="btn btn-sm btn-telegram"><i class="fab fa-telegram-plane"></i> Telegram</a>
+<a href="https://discord.gg/gKYRvepr" target="_blank" rel="noopener" class="btn btn-sm btn-discord"><i class="fab fa-discord"></i> Discord</a>
+<a href="https://github.com/aamclaudiu-hash/solaris-cet/discussions" target="_blank" rel="noopener" class="btn btn-sm btn-outline"><i class="fab fa-github"></i> GitHub</a>
+<a href="https://www.linkedin.com/in/claudiu-ciprian-balaban-76ab8a394/" target="_blank" rel="noopener" class="btn btn-sm btn-linkedin"><i class="fab fa-linkedin"></i> LinkedIn</a>
 </div>
-<p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 20px;">
-<i class="fas fa-shield-alt" aria-hidden="true"></i> All links verified. Beware of impersonators.
-</p>
 </div>
 </div>
 </div>
@@ -1016,12 +1071,10 @@ Connect via Telegram, Discord, GitHub Discussions, or LinkedIn.
 </section>
 
 <!-- TEAM SECTION -->
-<section id="team" class="section">
+<section id="team" class="section" style="background: rgba(15, 23, 42, 0.4);">
 <div class="container">
 <h2 class="section-title">Core Team</h2>
-<p class="section-subtitle">
-Verified team members building SOLARIS CET. All identities publicly linked.
-</p>
+<p class="section-subtitle">Verified team members building SOLARIS CET. All identities publicly linked.</p>
 <div class="team-container">
 <div class="team-grid">
 <div class="team-card">
@@ -1030,198 +1083,96 @@ Verified team members building SOLARIS CET. All identities publicly linked.
 <div class="role">Founder & Lead Developer</div>
 <p>Background in infrastructure projects and blockchain development. Responsible for protocol design, smart contract deployment, and platform architecture.</p>
 <div class="team-social">
-<a href="https://www.linkedin.com/in/claudiu-ciprian-balaban-76ab8a394/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-<a href="https://github.com/aamclaudiu-hash" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>
-<a href="https://x.com/solariscet" target="_blank" rel="noopener" aria-label="X"><i class="fab fa-twitter"></i></a>
+<a href="https://www.linkedin.com/in/claudiu-ciprian-balaban-76ab8a394/" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i></a>
+<a href="https://github.com/aamclaudiu-hash" target="_blank" rel="noopener"><i class="fab fa-github"></i></a>
+<a href="https://x.com/solariscet" target="_blank" rel="noopener"><i class="fab fa-twitter"></i></a>
 </div>
 </div>
 </div>
-<div style="text-align: center; margin-top: 30px; padding: 20px; background: rgba(212,175,55,0.1); border-radius: 12px;">
-<p style="color: var(--text-secondary);">
-<i class="fas fa-users" aria-hidden="true"></i>
-<strong>Contributing:</strong> We welcome developers, researchers, and community builders.
-<a href="https://discord.gg/gKYRvepr" target="_blank" rel="noopener" style="color: var(--gold);">Join Discord</a> to get involved.
-</p>
 </div>
 </div>
 </div>
 </section>
 
 <!-- AUDIT SECTION -->
-<section id="audit" class="section" style="background: rgba(15, 23, 42, 0.4);">
+<section id="audit" class="section">
 <div class="container">
 <h2 class="section-title">Security & Audit</h2>
-<p class="section-subtitle">
-Transparent security measures and audit status for smart contracts.
-</p>
+<p class="section-subtitle">Transparent security measures and audit status for smart contracts.</p>
 <div class="audit-container">
 <h3 style="color: var(--emerald); margin-bottom: 20px;"><i class="fas fa-shield-alt"></i> Security Measures</h3>
 <div class="audit-status">
 <i class="fas fa-check-circle"></i>
-<div>
-<h4>Contract Verified</h4>
-<p>Smart contract publicly verified on TONScan. Code auditable by anyone.</p>
-</div>
+<div><h4>Contract Verified</h4><p>Smart contract publicly verified on TONScan. Code auditable by anyone.</p></div>
 </div>
 <div class="audit-status">
 <i class="fas fa-lock"></i>
-<div>
-<h4>Liquidity Locked</h4>
-<p>Initial liquidity locked on DeDust for 12 months. Proof available on request.</p>
-</div>
+<div><h4>Liquidity Locked</h4><p>Initial liquidity locked on DeDust for 12 months. Proof available on request.</p></div>
 </div>
 <div class="audit-status">
 <i class="fas fa-file-contract"></i>
-<div>
-<h4>Third-Party Audit</h4>
-<p>Professional smart contract audit scheduled for Q2 2026. Report will be published publicly.</p>
-</div>
-</div>
-<div style="margin-top: 25px; display: flex; gap: 15px; flex-wrap: wrap;">
-<a href="https://tonscan.org/address/EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX" target="_blank" rel="noopener" class="btn btn-outline">
-<i class="fas fa-external-link-alt"></i> View Contract
-</a>
-<a href="https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a" target="_blank" class="btn btn-outline">
-<i class="fas fa-file-alt"></i> Whitepaper
-</a>
+<div><h4>Third-Party Audit</h4><p>Professional smart contract audit scheduled for Q2 2026. Report will be published publicly.</p></div>
 </div>
 </div>
 </div>
 </section>
 
 <!-- FAQ SECTION -->
-<section id="faq" class="section">
+<section id="faq" class="section" style="background: rgba(15, 23, 42, 0.4);">
 <div class="container">
 <h2 class="section-title">FAQ</h2>
-<p class="section-subtitle">
-Frequently asked questions about SOLARIS CET, R2A Protocol, and tokenomics.
-</p>
+<p class="section-subtitle">Frequently asked questions about SOLARIS CET, R2A Protocol, and tokenomics.</p>
 <div class="faq-container">
 <div class="faq-item">
-<button class="faq-question" aria-expanded="false">
-<span>What is SOLARIS CET?</span>
-<i class="fas fa-chevron-down"></i>
-</button>
-<div class="faq-answer">
-<p>SOLARIS CET is a hyper-scarce utility token (9,000 fixed supply) on TON Blockchain that powers the Reason-to-Act (R2A) Protocol — a decentralized incentive framework for AI agent development and community growth.</p>
-</div>
+<button class="faq-question" aria-expanded="false"><span>What is SOLARIS CET?</span><i class="fas fa-chevron-down"></i></button>
+<div class="faq-answer"><p>SOLARIS CET is a hyper-scarce utility token (9,000 fixed supply) on TON Blockchain that powers the Reason-to-Act (R2A) Protocol.</p></div>
 </div>
 <div class="faq-item">
-<button class="faq-question" aria-expanded="false">
-<span>How do I buy CET?</span>
-<i class="fas fa-chevron-down"></i>
-</button>
-<div class="faq-answer">
-<p>Connect a TON-compatible wallet (Tonkeeper, MyTonWallet), then trade on DeDust: <a href="https://dedust.io/pools/EQDDfi4bTApmYDwglsFajobpwVk-tGS6kDwjD6y2whRFfIif" target="_blank" rel="noopener" style="color: var(--gold);">DeDust Pool</a>. Always verify the contract address.</p>
-</div>
+<button class="faq-question" aria-expanded="false"><span>How do I buy CET?</span><i class="fas fa-chevron-down"></i></button>
+<div class="faq-answer"><p>Connect a TON-compatible wallet (Tonkeeper), then trade on DeDust. Always verify the contract address.</p></div>
 </div>
 <div class="faq-item">
-<button class="faq-question" aria-expanded="false">
-<span>What is the R2A Protocol?</span>
-<i class="fas fa-chevron-down"></i>
-</button>
-<div class="faq-answer">
-<p>R2A (Reason-to-Act) is a reward mechanism where developers stake CET, submit AI tasks, receive on-chain validation, and earn proportional rewards based on contribution quality and impact.</p>
-</div>
+<button class="faq-question" aria-expanded="false"><span>What is the R2A Protocol?</span><i class="fas fa-chevron-down"></i></button>
+<div class="faq-answer"><p>R2A (Reason-to-Act) is a reward mechanism where developers stake CET, submit AI tasks, receive on-chain validation, and earn proportional rewards.</p></div>
 </div>
 <div class="faq-item">
-<button class="faq-question" aria-expanded="false">
-<span>Is CET a good investment?</span>
-<i class="fas fa-chevron-down"></i>
-</button>
-<div class="faq-answer">
-<p>We cannot provide financial advice. CET is a utility token with risks including market volatility, technology risk, and regulatory uncertainty. Only invest what you can afford to lose. Do your own research (DYOR).</p>
-</div>
-</div>
-<div class="faq-item">
-<button class="faq-question" aria-expanded="false">
-<span>How can I contribute?</span>
-<i class="fas fa-chevron-down"></i>
-</button>
-<div class="faq-answer">
-<p>Join our Discord or Telegram, participate in governance votes, submit feature requests, contribute code via GitHub, or help with community building. All contributions are valued.</p>
-</div>
-</div>
-<div class="faq-item">
-<button class="faq-question" aria-expanded="false">
-<span>When will CET be listed on CoinMarketCap?</span>
-<i class="fas fa-chevron-down"></i>
-</button>
-<div class="faq-answer">
-<p>We have submitted a listing application to CoinMarketCap. Approval timelines vary (typically 2-8 weeks). Follow our social channels for updates.</p>
-</div>
+<button class="faq-question" aria-expanded="false"><span>Is CET a good investment?</span><i class="fas fa-chevron-down"></i></button>
+<div class="faq-answer"><p>We cannot provide financial advice. CET is a utility token with risks. Only invest what you can afford to lose. DYOR.</p></div>
 </div>
 </div>
 </div>
 </section>
 
 <!-- HI DEVELOPMENT STATUS -->
-<section id="hi-status" class="section" style="background: rgba(15, 23, 42, 0.4);">
+<section id="hi-status" class="section">
 <div class="container">
 <h2 class="section-title">High Intelligence Development</h2>
-<p class="section-subtitle">
-Transparent tracking of HI system development by the core team.
-</p>
+<p class="section-subtitle">Transparent tracking of HI system development by the core team.</p>
 <div class="hi-status-container">
 <div class="hi-header">
 <h3 style="color: var(--emerald);"><i class="fas fa-brain"></i> HI Roadmap</h3>
 <span class="badge badge-value">Phase: <span id="currentPhase">3</span>/5</span>
 </div>
 <div class="hi-phases">
-<div class="hi-phase completed">
-<div class="hi-phase-icon"><i class="fas fa-seedling"></i></div>
-<div class="hi-phase-title">Foundation</div>
-<div class="hi-phase-desc">Protocol design</div>
-</div>
-<div class="hi-phase completed">
-<div class="hi-phase-icon"><i class="fas fa-code"></i></div>
-<div class="hi-phase-title">Core Dev</div>
-<div class="hi-phase-desc">Smart contracts</div>
-</div>
-<div class="hi-phase active">
-<div class="hi-phase-icon"><i class="fas fa-cogs"></i></div>
-<div class="hi-phase-title">AI Integration</div>
-<div class="hi-phase-desc">R2A Protocol</div>
-</div>
-<div class="hi-phase">
-<div class="hi-phase-icon"><i class="fas fa-network-wired"></i></div>
-<div class="hi-phase-title">Network</div>
-<div class="hi-phase-desc">Agent swarms</div>
-</div>
-<div class="hi-phase">
-<div class="hi-phase-icon"><i class="fas fa-star"></i></div>
-<div class="hi-phase-title">High Intelligence</div>
-<div class="hi-phase-desc">Emergent AI</div>
-</div>
-</div>
-<div class="hi-disclaimer">
-<i class="fas fa-exclamation-triangle" style="margin-top: 3px;" aria-hidden="true"></i>
-<div>
-<strong>Important:</strong> HI development is conducted by the core SOLARIS team.
-Users can observe progress and provide feedback through official channels,
-but actual HI system development is handled internally for security and ethics.
-</div>
+<div class="hi-phase completed"><div class="hi-phase-icon"><i class="fas fa-seedling"></i></div><div class="hi-phase-title">Foundation</div><div class="hi-phase-desc">Protocol design</div></div>
+<div class="hi-phase completed"><div class="hi-phase-icon"><i class="fas fa-code"></i></div><div class="hi-phase-title">Core Dev</div><div class="hi-phase-desc">Smart contracts</div></div>
+<div class="hi-phase active"><div class="hi-phase-icon"><i class="fas fa-cogs"></i></div><div class="hi-phase-title">AI Integration</div><div class="hi-phase-desc">R2A Protocol</div></div>
+<div class="hi-phase"><div class="hi-phase-icon"><i class="fas fa-network-wired"></i></div><div class="hi-phase-title">Network</div><div class="hi-phase-desc">Agent swarms</div></div>
+<div class="hi-phase"><div class="hi-phase-icon"><i class="fas fa-star"></i></div><div class="hi-phase-title">High Intelligence</div><div class="hi-phase-desc">Emergent AI</div></div>
 </div>
 </div>
 </div>
 </section>
 
 <!-- FEATURE VOTING -->
-<section id="features" class="section">
+<section id="features" class="section" style="background: rgba(15, 23, 42, 0.4);">
 <div class="container">
 <h2 class="section-title">Feature Voting</h2>
-<p class="section-subtitle">
-Vote on features. Top-voted features are prioritized for development.
-<span class="badge badge-warning"><i class="fas fa-clock"></i> 1 vote/hour per feature</span>
-</p>
+<p class="section-subtitle">Vote on features. Top-voted features are prioritized for development.<span class="badge badge-warning"><i class="fas fa-clock"></i> 1 vote/hour per feature</span></p>
 <div class="feature-container">
-<div class="feature-list" id="featureList">
-<!-- Populated by JS -->
-</div>
+<div class="feature-list" id="featureList"></div>
 <div style="margin-top: 25px; text-align: center;">
-<button class="btn btn-outline" onclick="submitFeatureRequest()">
-<i class="fas fa-plus"></i> Submit Feature Request
-</button>
+<button class="btn btn-outline" onclick="submitFeatureRequest()"><i class="fas fa-plus"></i> Submit Feature Request</button>
 </div>
 </div>
 </div>
@@ -1239,9 +1190,7 @@ Vote on features. Top-voted features are prioritized for development.
 <button class="chatbot-close" onclick="toggleChatbot()" aria-label="Close chat">&times;</button>
 </div>
 <div class="chatbot-messages" id="chatMessages" role="log" aria-live="polite">
-<div class="message bot">
-👋 Hello! I can help with CET, R2A Protocol, wallet connection, staking, governance, and more. What would you like to know?
-</div>
+<div class="message bot">👋 Hello! I can help with CET, R2A Protocol, wallet connection, staking, governance, and more. What would you like to know?</div>
 </div>
 <div class="chatbot-input">
 <input type="text" id="chatInput" placeholder="Ask about CET, R2A, wallet..." onkeypress="handleChatKeypress(event)" aria-label="Type your message">
@@ -1260,6 +1209,7 @@ Vote on features. Top-voted features are prioritized for development.
 <a href="#evolution"><i class="fas fa-chart-line"></i> Evolution</a>
 <a href="#chart"><i class="fas fa-chart-candlestick"></i> Chart</a>
 <a href="#forum"><i class="fas fa-comments"></i> Forum</a>
+<a href="#whitepaper"><i class="fas fa-file-alt"></i> Whitepaper</a>
 <a href="#team"><i class="fas fa-users"></i> Team</a>
 <a href="#audit"><i class="fas fa-shield-alt"></i> Audit</a>
 <a href="#faq"><i class="fas fa-question-circle"></i> FAQ</a>
@@ -1273,12 +1223,6 @@ Vote on features. Top-voted features are prioritized for development.
 <a href="https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a" target="_blank"><i class="fas fa-file-alt"></i> Whitepaper</a>
 </div>
 <div class="footer-col">
-<h4>Developers</h4>
-<a href="https://github.com/aamclaudiu-hash/solaris-cet" target="_blank" rel="noopener"><i class="fab fa-github"></i> GitHub</a>
-<a href="https://github.com/aamclaudiu-hash/solaris-cet/discussions" target="_blank" rel="noopener"><i class="fas fa-comments"></i> Discussions</a>
-<a href="https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a" target="_blank"><i class="fas fa-book"></i> Documentation</a>
-</div>
-<div class="footer-col">
 <h4>Official Channels</h4>
 <a href="https://t.me/+tKlfzx7IWopmNWQ0" target="_blank" rel="noopener"><i class="fab fa-telegram"></i> Telegram</a>
 <a href="https://discord.gg/gKYRvepr" target="_blank" rel="noopener"><i class="fab fa-discord"></i> Discord</a>
@@ -1288,12 +1232,8 @@ Vote on features. Top-voted features are prioritized for development.
 </div>
 <div class="footer-bottom">
 <p>&copy; <span id="year"></span> SOLARIS Community. CET: 9,000 fixed supply. Not financial advice.</p>
-<p style="margin-top: 8px; font-size: 0.85rem; color: var(--gold);">
-<i class="fas fa-robot"></i> R2A Protocol v3.4 • Auto-Evolving Platform
-</p>
-<p style="margin-top: 5px; font-size: 0.8rem;">
-Created by <a href="https://www.linkedin.com/in/claudiu-ciprian-balaban-76ab8a394/" target="_blank" rel="noopener" style="color: var(--gold); text-decoration: none;">BALABAN CLAUDIU</a>
-</p>
+<p style="margin-top: 8px; font-size: 0.85rem; color: var(--gold);"><i class="fas fa-robot"></i> R2A Protocol v3.5 • Auto-Evolving Platform</p>
+<p style="margin-top: 5px; font-size: 0.8rem;">Created by <a href="https://www.linkedin.com/in/claudiu-ciprian-balaban-76ab8a394/" target="_blank" rel="noopener" style="color: var(--gold); text-decoration: none;">BALABAN CLAUDIU</a></p>
 </div>
 </div>
 </footer>
@@ -1309,8 +1249,7 @@ Created by <a href="https://www.linkedin.com/in/claudiu-ciprian-balaban-76ab8a39
 const CET_VALUE_EUR = 250000;
 const CONTRACT_ADDRESS = 'EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX';
 const WHITEPAPER_URL = 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a';
-const LOGO_URL = 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreid6hoewfj66y6wwefhiyp46madxlqtgnvut6tz7y2i4xwbj5yda3a';
-const VOTE_COOLDOWN_MS = 3600000; // 1 hour
+const VOTE_COOLDOWN_MS = 3600000;
 
 // ===== TON CONNECT =====
 let tonConnectUI = null;
@@ -1321,31 +1260,24 @@ manifestUrl: 'https://aamclaudiu-hash.github.io/solaris-cet/tonconnect-manifest.
 buttonRootId: 'ton-connect-button'
 });
 tonConnectUI.onStatusChange(wallet => {
-if (wallet) {
-showNotification('Wallet connected: ' + wallet.account.address, 'success');
-}
+if (wallet) showNotification('Wallet connected: ' + wallet.account.address.slice(0,6) + '...', 'success');
 });
 } catch (error) {
-console.error('TonConnect initialization failed:', error);
-document.getElementById('ton-connect-button').innerHTML =
-'<button class="btn btn-outline btn-sm" onclick="showNotification(\'TonConnect unavailable. Install Tonkeeper app.\', \'error\')"><i class="fas fa-wallet"></i> Connect Wallet</button>';
+console.error('TonConnect error:', error);
+document.getElementById('ton-connect-button').innerHTML = '<button class="btn btn-outline btn-sm"><i class="fas fa-wallet"></i> Connect Wallet</button>';
 }
 }
 
-// ===== EVOLUTION TRACKING =====
-const evolutionData = JSON.parse(localStorage.getItem('solaris_evolution')) || {
-version: 3, build: 4, developers: 12, features: 8, updates: 24, score: 47
-};
+// ===== EVOLUTION DATA =====
+const evolutionData = JSON.parse(localStorage.getItem('solaris_evolution')) || { version: 3, build: 5, developers: 12, features: 8, updates: 24, score: 47 };
 const activityTemplates = [
 { type: 'new', text: 'New developer joined via Telegram' },
 { type: 'update', text: 'Auto-deployed feature optimization' },
 { type: 'new', text: 'Feature request submitted and voted' },
-{ type: 'update', text: 'Evolution score increased by 2%' },
-{ type: 'new', text: 'Community governance vote active' },
-{ type: 'update', text: 'Smart contract gas optimization' }
+{ type: 'update', text: 'Evolution score increased by 2%' }
 ];
 
-// ===== FEATURE VOTING DATA =====
+// ===== FEATURE VOTING =====
 const defaultFeatures = [
 { id: 1, title: 'Mobile App (iOS/Android)', desc: 'Native mobile application for CET management', votes: 127, status: 'developing' },
 { id: 2, title: 'Advanced Analytics Dashboard', desc: 'Real-time metrics for developer contributions', votes: 94, status: 'pending' },
@@ -1355,7 +1287,7 @@ const defaultFeatures = [
 ];
 let featuresData = JSON.parse(localStorage.getItem('solaris_features')) || defaultFeatures;
 
-// ===== LANGUAGE MANAGEMENT =====
+// ===== LANGUAGE - FIXED =====
 let currentLang = localStorage.getItem('solaris_lang') || 'en';
 function setLanguage(lang) {
 currentLang = lang;
@@ -1365,7 +1297,7 @@ document.querySelectorAll('.lang-option').forEach(opt => {
 opt.classList.toggle('active', opt.dataset.lang === lang);
 });
 document.documentElement.lang = lang;
-showNotification(`Language: ${lang.toUpperCase()}`, 'info');
+showNotification('Language: ' + lang.toUpperCase(), 'info');
 }
 
 // ===== EVOLUTION SIMULATION =====
@@ -1389,10 +1321,8 @@ if (Math.random() > 0.5) addActivityLog(activityTemplates[Math.floor(Math.random
 }
 
 function animateValue(id, value, suffix = '') {
-const element = document.getElementById(id);
-if (element) {
-element.textContent = value.toLocaleString() + suffix;
-}
+const el = document.getElementById(id);
+if (el) el.textContent = value.toLocaleString() + suffix;
 }
 
 function addActivityLog(entry) {
@@ -1404,7 +1334,7 @@ log.insertBefore(item, log.firstChild);
 while (log.children.length > 20) log.removeChild(log.lastChild);
 }
 
-// ===== FORUM SIMULATION =====
+// ===== FORUM =====
 function simulateForumStats() {
 document.getElementById('forumUsers').textContent = Math.floor(Math.random() * 50) + 10;
 document.getElementById('forumPosts').textContent = Math.floor(Math.random() * 500) + 100;
@@ -1423,6 +1353,7 @@ window.open(urls[category] || urls['general'], '_blank', 'noopener');
 // ===== FEATURE VOTING =====
 function renderFeatures() {
 const container = document.getElementById('featureList');
+if (!container) return;
 container.innerHTML = '';
 featuresData.sort((a, b) => b.votes - a.votes);
 const voteHistory = JSON.parse(sessionStorage.getItem('solaris_votes')) || {};
@@ -1430,26 +1361,14 @@ const now = Date.now();
 featuresData.forEach(feature => {
 const lastVote = voteHistory[feature.id] || 0;
 const canVote = (now - lastVote) >= VOTE_COOLDOWN_MS;
-const timeLeft = Math.max(0, VOTE_COOLDOWN_MS - (now - lastVote));
-const timeLeftMin = Math.ceil(timeLeft / 60000);
+const timeLeftMin = Math.ceil(Math.max(0, VOTE_COOLDOWN_MS - (now - lastVote)) / 60000);
 const item = document.createElement('div');
 item.className = 'feature-item';
-item.innerHTML = `
-<div class="feature-info">
-<h4>${feature.title}</h4>
-<p>${feature.desc}</p>
-</div>
-<div style="display: flex; align-items: center; gap: 15px;">
-<span class="feature-status status-${feature.status}">${feature.status.toUpperCase()}</span>
-<div class="feature-vote">
-<button onclick="voteFeature(${feature.id})" ${!canVote ? 'disabled' : ''} aria-label="Vote for ${feature.title}">
-<i class="fas fa-arrow-up"></i>
-</button>
-<span class="feature-vote-count" id="vote-${feature.id}">${feature.votes}</span>
-</div>
-${!canVote ? `<span class="badge badge-warning" style="font-size:0.7rem">Wait ${timeLeftMin}m</span>` : ''}
-</div>
-`;
+item.innerHTML = '<div class="feature-info"><h4>' + feature.title + '</h4><p>' + feature.desc + '</p></div>' +
+'<div style="display:flex;align-items:center;gap:15px;"><span class="feature-status status-' + feature.status + '">' + feature.status.toUpperCase() + '</span>' +
+'<div class="feature-vote"><button onclick="voteFeature(' + feature.id + ')" ' + (!canVote ? 'disabled' : '') + '><i class="fas fa-arrow-up"></i></button>' +
+'<span class="feature-vote-count" id="vote-' + feature.id + '">' + feature.votes + '</span></div>' +
+(!canVote ? '<span class="badge badge-warning" style="font-size:0.7rem">Wait ' + timeLeftMin + 'm</span>' : '') + '</div>';
 container.appendChild(item);
 });
 }
@@ -1459,10 +1378,8 @@ const feature = featuresData.find(f => f.id === id);
 if (!feature) return;
 const voteHistory = JSON.parse(sessionStorage.getItem('solaris_votes')) || {};
 const now = Date.now();
-const lastVote = voteHistory[id] || 0;
-if ((now - lastVote) < VOTE_COOLDOWN_MS) {
-const timeLeft = Math.ceil((VOTE_COOLDOWN_MS - (now - lastVote)) / 60000);
-showNotification(`Please wait ${timeLeft} minute(s) before voting again`, 'warning');
+if ((now - (voteHistory[id] || 0)) < VOTE_COOLDOWN_MS) {
+showNotification('Please wait before voting again', 'warning');
 return;
 }
 feature.votes += 1;
@@ -1470,37 +1387,29 @@ voteHistory[id] = now;
 localStorage.setItem('solaris_features', JSON.stringify(featuresData));
 sessionStorage.setItem('solaris_votes', JSON.stringify(voteHistory));
 document.getElementById('vote-' + id).textContent = feature.votes;
-showNotification('Vote recorded! Thank you.', 'success');
+showNotification('Vote recorded!', 'success');
 renderFeatures();
-addActivityLog({ type: 'new', text: 'Vote cast for: ' + feature.title });
 }
 
 function submitFeatureRequest() {
 const title = prompt('Feature title:');
 if (title) {
-const desc = prompt('Feature description:') || 'No description provided';
-featuresData.push({ id: Date.now(), title, desc, votes: 1, status: 'pending' });
+const desc = prompt('Feature description:') || 'No description';
+featuresData.push({ id: Date.now(), title: title, desc: desc, votes: 1, status: 'pending' });
 localStorage.setItem('solaris_features', JSON.stringify(featuresData));
 renderFeatures();
-addActivityLog({ type: 'new', text: 'New feature request: ' + title });
 showNotification('Feature request submitted!', 'success');
 }
 }
 
-// ===== FAQ ACCORDION =====
+// ===== FAQ =====
 function initFAQ() {
 document.querySelectorAll('.faq-question').forEach(button => {
 button.addEventListener('click', () => {
 const answer = button.nextElementSibling;
 const isOpen = answer.classList.contains('open');
-document.querySelectorAll('.faq-answer').forEach(a => {
-a.classList.remove('open');
-a.previousElementSibling.setAttribute('aria-expanded', 'false');
-});
-if (!isOpen) {
-answer.classList.add('open');
-button.setAttribute('aria-expanded', 'true');
-}
+document.querySelectorAll('.faq-answer').forEach(a => { a.classList.remove('open'); a.previousElementSibling.setAttribute('aria-expanded', 'false'); });
+if (!isOpen) { answer.classList.add('open'); button.setAttribute('aria-expanded', 'true'); }
 });
 });
 }
@@ -1508,33 +1417,28 @@ button.setAttribute('aria-expanded', 'true');
 // ===== CHATBOT - FIXED TOGGLE =====
 function toggleChatbot() {
 const chat = document.getElementById('chatbotWindow');
-const toggle = document.getElementById('chatbotToggle');
-if (!chat || !toggle) {
-console.error('Chatbot elements not found');
-return;
-}
+if (!chat) { console.error('Chatbot window not found'); return; }
 const isHidden = chat.style.display === 'none' || !chat.style.display;
 chat.style.display = isHidden ? 'flex' : 'none';
 if (isHidden) {
-document.getElementById('chatInput').focus();
-sessionStorage.setItem('chatbot_seen', 'true');
+const input = document.getElementById('chatInput');
+if (input) input.focus();
 }
 }
 
-function handleChatKeypress(e) {
-if (e.key === 'Enter') sendChatMessage();
-}
+function handleChatKeypress(e) { if (e.key === 'Enter') sendChatMessage(); }
 
 function sendChatMessage() {
 const input = document.getElementById('chatInput');
-const message = input.value.trim();
+const message = input ? input.value.trim() : '';
 if (!message) return;
 const container = document.getElementById('chatMessages');
+if (!container) return;
 const userMsg = document.createElement('div');
 userMsg.className = 'message user';
 userMsg.textContent = message;
 container.appendChild(userMsg);
-input.value = '';
+if (input) input.value = '';
 container.scrollTop = container.scrollHeight;
 setTimeout(() => {
 const response = generateAIResponse(message);
@@ -1548,65 +1452,27 @@ container.scrollTop = container.scrollHeight;
 
 function generateAIResponse(query) {
 const q = query.toLowerCase();
-if (q.includes('wallet') || q.includes('connect') || q.includes('tonkeeper')) {
-return 'To connect your wallet: 1) Install Tonkeeper app, 2) Click "Connect Wallet" button in navbar, 3) Approve connection in app. Your wallet address will appear.';
-}
-if (q.includes('buy') || q.includes('purchase')) {
-return 'Buy CET on DeDust: 1) Connect TON wallet, 2) Visit DeDust pool link, 3) Swap TON for CET. Contract: EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX';
-}
-if (q.includes('stake') || q.includes('staking')) {
-return 'Staking module coming in Q2 2026. You\'ll be able to lock CET and earn rewards from protocol fees and project revenue.';
-}
-if (q.includes('vote') || q.includes('governance')) {
-return 'Governance voting is live in the Feature Voting section. 1 CET = 1 vote. Top-voted features are prioritized for development. Rate limit: 1 vote/hour per feature.';
-}
-if (q.includes('price') || q.includes('value')) {
-return 'CET reference value: €250,000/token (for reward calculations). Market price varies based on trading. Check DeDust for live price. See Risk Disclosure for details.';
-}
-if (q.includes('telegram') || q.includes('discord') || q.includes('community')) {
-return 'Join us: Telegram (https://t.me/+tKlfzx7IWopmNWQ0), Discord (https://discord.gg/gKYRvepr), X (@solariscet), LinkedIn (creator profile).';
-}
-if (q.includes('whitepaper') || q.includes('docs')) {
-return 'Whitepaper: ' + WHITEPAPER_URL + ' - Includes tokenomics, R2A Protocol specs, roadmap, and risk disclosure.';
-}
-if (q.includes('audit') || q.includes('security')) {
-return 'Contract verified on TONScan. Liquidity locked 12 months. Third-party audit scheduled Q2 2026. All code open-source on GitHub.';
-}
-if (q.includes('risk') || q.includes('safe')) {
-return 'All investments carry risk. CET is a utility token with no guaranteed value. Only invest what you can afford to lose. See Risk Disclosure section.';
-}
-return 'I can help with: wallet connection, buying CET, staking, governance voting, price info, community links, whitepaper, audit status, and risks. What would you like to know?';
+if (q.includes('wallet') || q.includes('connect')) return 'To connect wallet: 1) Install Tonkeeper, 2) Click Connect Wallet button, 3) Approve in app.';
+if (q.includes('buy') || q.includes('purchase')) return 'Buy CET on DeDust: Connect TON wallet, visit DeDust pool, swap TON for CET.';
+if (q.includes('price') || q.includes('value')) return 'CET reference: €250,000/token. Market price varies. Check DeDust for live price.';
+if (q.includes('whitepaper') || q.includes('doc')) return 'Whitepaper is available in the Whitepaper section on this page or download PDF.';
+if (q.includes('chart') || q.includes('graph')) return 'Live chart is in the Chart section showing CET/TON trading on DeDust.';
+return 'I can help with: wallet, buying CET, price, whitepaper, chart, staking, governance. What would you like to know?';
 }
 
 // ===== CONTRACT UTILS =====
-function formatAddress(addr, isMobile = window.innerWidth < 768) {
-if (!isMobile) return addr;
-return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-}
-
+function formatAddress(addr) { return window.innerWidth < 768 ? addr.slice(0,6) + '...' + addr.slice(-4) : addr; }
 function copyContract() {
-navigator.clipboard.writeText(CONTRACT_ADDRESS).then(() => {
-showNotification('Contract address copied!', 'success');
-}).catch(() => {
-showNotification('Copy failed. Manual copy required.', 'error');
-});
+navigator.clipboard.writeText(CONTRACT_ADDRESS).then(() => showNotification('Contract copied!', 'success')).catch(() => showNotification('Copy failed', 'error'));
 }
-
-function openTonExplorer() {
-window.open(`https://tonscan.org/address/${CONTRACT_ADDRESS}`, '_blank', 'noopener');
-}
-
-function scrollToSection(id) {
-const element = document.getElementById(id);
-if (element) {
-element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-}
+function openTonExplorer() { window.open('https://tonscan.org/address/' + CONTRACT_ADDRESS, '_blank', 'noopener'); }
+function scrollToSection(id) { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 
 // ===== NOTIFICATIONS =====
 function showNotification(msg, type = 'info') {
 const notify = document.getElementById('notify');
 const notifyMsg = document.getElementById('notifyMsg');
+if (!notify || !notifyMsg) return;
 notifyMsg.textContent = msg;
 notify.className = 'notification ' + type;
 notify.style.display = 'block';
@@ -1618,20 +1484,22 @@ const themeToggle = document.getElementById('themeToggle');
 const html = document.documentElement;
 if (localStorage.getItem('solaris_theme') === 'light') {
 html.setAttribute('data-theme', 'light');
-themeToggle.innerHTML = '<i class="fas fa-sun" aria-hidden="true"></i>';
+if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
 }
+if (themeToggle) {
 themeToggle.addEventListener('click', () => {
 const current = html.getAttribute('data-theme');
 const next = current === 'light' ? 'dark' : 'light';
 html.setAttribute('data-theme', next);
 localStorage.setItem('solaris_theme', next);
-themeToggle.innerHTML = next === 'light' ? '<i class="fas fa-sun" aria-hidden="true"></i>' : '<i class="fas fa-moon" aria-hidden="true"></i>';
+themeToggle.innerHTML = next === 'light' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
 });
+}
 
 // ===== MOBILE MENU =====
 const mobileToggle = document.getElementById('mobileToggle');
 const navMenu = document.getElementById('navMenu');
-if (mobileToggle) {
+if (mobileToggle && navMenu) {
 mobileToggle.addEventListener('click', () => {
 const isActive = navMenu.classList.toggle('active');
 mobileToggle.setAttribute('aria-expanded', isActive);
@@ -1639,66 +1507,88 @@ mobileToggle.innerHTML = isActive ? '<i class="fas fa-times"></i>' : '<i class="
 });
 }
 
-// ===== ACTIVE NAV LINK HIGHLIGHTING =====
+// ===== ACTIVE NAV LINK =====
 function updateActiveNavLink() {
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.nav-links a');
 let current = '';
 sections.forEach(section => {
 const sectionTop = section.offsetTop - 150;
-if (pageYOffset >= sectionTop) {
-current = section.getAttribute('id');
-}
+if (pageYOffset >= sectionTop) current = section.getAttribute('id');
 });
 navLinks.forEach(link => {
 link.classList.remove('active');
-if (link.getAttribute('href') === `#${current}`) {
-link.classList.add('active');
+if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+});
 }
+
+// ===== LANGUAGE SELECTOR - FIXED EVENT LISTENERS =====
+function initLanguageSelector() {
+const langOptions = document.querySelectorAll('.lang-option');
+langOptions.forEach(opt => {
+opt.addEventListener('click', function(e) {
+e.preventDefault();
+const lang = this.getAttribute('data-lang');
+if (lang) setLanguage(lang);
+});
 });
 }
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
+// Language
+initLanguageSelector();
 setLanguage(currentLang);
-document.getElementById('year').textContent = new Date().getFullYear();
+
+// Year
+const yearEl = document.getElementById('year');
+if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+// Contract
 const contractEl = document.getElementById('contractAddr');
-if (contractEl) {
-contractEl.textContent = formatAddress(CONTRACT_ADDRESS);
-}
+if (contractEl) contractEl.textContent = formatAddress(CONTRACT_ADDRESS);
+
+// Features
 renderFeatures();
 simulateForumStats();
 initFAQ();
 initTonConnect();
+
+// Evolution
 animateValue('devCount', evolutionData.developers);
 animateValue('featureCount', evolutionData.features);
 animateValue('updateCount', evolutionData.updates);
 animateValue('evoScore', evolutionData.score, '%');
-document.getElementById('devProgress').style.width = Math.min(100, evolutionData.developers * 2) + '%';
-document.getElementById('featureProgress').style.width = Math.min(100, evolutionData.features * 10) + '%';
-document.getElementById('updateProgress').style.width = Math.min(100, evolutionData.updates * 5) + '%';
-document.getElementById('evoProgress').style.width = evolutionData.score + '%';
-document.getElementById('autoVersion').textContent = evolutionData.version;
-document.getElementById('autoBuild').textContent = evolutionData.build + Math.floor(evolutionData.updates / 10);
+const devProgress = document.getElementById('devProgress');
+const featureProgress = document.getElementById('featureProgress');
+const updateProgress = document.getElementById('updateProgress');
+const evoProgress = document.getElementById('evoProgress');
+if (devProgress) devProgress.style.width = Math.min(100, evolutionData.developers * 2) + '%';
+if (featureProgress) featureProgress.style.width = Math.min(100, evolutionData.features * 10) + '%';
+if (updateProgress) updateProgress.style.width = Math.min(100, evolutionData.updates * 5) + '%';
+if (evoProgress) evoProgress.style.width = evolutionData.score + '%';
+const autoVersion = document.getElementById('autoVersion');
+const autoBuild = document.getElementById('autoBuild');
+if (autoVersion) autoVersion.textContent = evolutionData.version;
+if (autoBuild) autoBuild.textContent = evolutionData.build + Math.floor(evolutionData.updates / 10);
+
+// Intervals
 setInterval(simulateEvolution, 5000);
 setInterval(simulateForumStats, 10000);
 setInterval(renderFeatures, 60000);
 window.addEventListener('scroll', updateActiveNavLink);
-document.querySelectorAll('.lang-option').forEach(opt => {
-opt.addEventListener('click', (e) => {
-e.preventDefault();
-setLanguage(opt.dataset.lang);
-});
-});
-setTimeout(() => addActivityLog({ type: 'new', text: 'Platform initialized v3.4' }), 1000);
-setTimeout(() => addActivityLog({ type: 'update', text: 'Community channels connected' }), 2000);
-setTimeout(() => addActivityLog({ type: 'new', text: 'Chart widget loaded' }), 3000);
+
+// Activity log
+setTimeout(() => addActivityLog({ type: 'new', text: 'Platform initialized v3.5' }), 1000);
+setTimeout(() => addActivityLog({ type: 'update', text: 'All systems operational' }), 2000);
+
+// Remove skeletons
 setTimeout(() => {
 document.querySelectorAll('.skeleton').forEach(el => el.style.display = 'none');
 }, 2000);
 });
 
-// Close chatbot when clicking outside
+// Close chatbot outside click
 document.addEventListener('click', (e) => {
 const chat = document.getElementById('chatbotWindow');
 const toggle = document.getElementById('chatbotToggle');
@@ -1707,28 +1597,19 @@ chat.style.display = 'none';
 }
 });
 
-// Keyboard accessibility for contract address
-document.getElementById('contractAddr').addEventListener('keydown', (e) => {
-if (e.key === 'Enter' || e.key === ' ') {
-e.preventDefault();
-copyContract();
-}
+// Contract keyboard
+const contractAddr = document.getElementById('contractAddr');
+if (contractAddr) {
+contractAddr.addEventListener('keydown', (e) => {
+if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyContract(); }
 });
+}
 
-// Handle window resize for contract address
+// Resize
 window.addEventListener('resize', () => {
 const contractEl = document.getElementById('contractAddr');
-if (contractEl) {
-contractEl.textContent = formatAddress(CONTRACT_ADDRESS);
-}
+if (contractEl) contractEl.textContent = formatAddress(CONTRACT_ADDRESS);
 });
-
-// PWA Service Worker Registration
-if ('serviceWorker' in navigator) {
-window.addEventListener('load', () => {
-// navigator.serviceWorker.register('/solaris-cet/sw.js').catch(err => console.log('SW registration failed:', err));
-});
-}
 </script>
 </body>
 </html>
