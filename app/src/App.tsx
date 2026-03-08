@@ -11,6 +11,7 @@ import TokenomicsSection from './sections/TokenomicsSection';
 import ComplianceSection from './sections/ComplianceSection';
 import MiningCalculatorSection from './sections/MiningCalculatorSection';
 import SecuritySection from './sections/SecuritySection';
+import WhitepaperSection from './sections/WhitepaperSection';
 import FooterSection from './sections/FooterSection';
 import './App.css';
 
@@ -190,7 +191,12 @@ function App() {
             <SecuritySection />
           </div>
           
-          {/* Section 9: Footer - pin: false */}
+          {/* Section 9: Whitepaper - pin: false */}
+          <div className="relative z-[85]">
+            <WhitepaperSection />
+          </div>
+          
+          {/* Section 10: Footer - pin: false */}
           <div className="relative z-[90]">
             <FooterSection />
           </div>
