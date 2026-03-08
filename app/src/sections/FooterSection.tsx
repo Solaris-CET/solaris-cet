@@ -2,24 +2,27 @@ import { useRef, useLayoutEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { Download, FileText, Mail, ArrowRight, Sun, Github, Twitter, MessageCircle, Send, Globe, Copy, CheckCircle } from 'lucide-react';
 
+// Constants defined once to avoid duplication and maintain a single source of truth
+const GITHUB_URL = 'https://github.com/aamclaudiu-hash/solaris-cet';
+const DEDUST_POOL_ADDRESS = 'EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
+const DEDUST_SWAP_URL = `https://dedust.io/swap/TON/${DEDUST_POOL_ADDRESS}`;
+const WHITEPAPER_URL = 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a';
 
 // Static data defined outside component to avoid re-creation on every render
 const footerLinks = [
   { label: 'Privacy', href: '#' },
   { label: 'Terms', href: '#' },
   { label: 'Contact', href: '#' },
-  { label: 'GitHub', href: 'https://github.com/aamclaudiu-hash/solaris-cet', icon: Github },
+  { label: 'GitHub', href: GITHUB_URL, icon: Github },
 ];
 
 const socialLinks = [
   { icon: Twitter, href: 'https://twitter.com', label: 'Twitter', color: 'hover:text-[#1DA1F2] hover:bg-[#1DA1F2]/10' },
   { icon: MessageCircle, href: 'https://discord.gg', label: 'Discord', color: 'hover:text-[#5865F2] hover:bg-[#5865F2]/10' },
   { icon: Send, href: 'https://t.me/SolarisCET', label: 'Telegram', color: 'hover:text-[#2AABEE] hover:bg-[#2AABEE]/10' },
-  { icon: Github, href: 'https://github.com/aamclaudiu-hash/solaris-cet', label: 'GitHub', color: 'hover:text-solaris-text hover:bg-white/10' },
-  { icon: Globe, href: 'https://dedust.io/swap/TON/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB', label: 'DeDust', color: 'hover:text-solaris-gold hover:bg-solaris-gold/10' },
+  { icon: Github, href: GITHUB_URL, label: 'GitHub', color: 'hover:text-solaris-text hover:bg-white/10' },
+  { icon: Globe, href: DEDUST_SWAP_URL, label: 'DeDust', color: 'hover:text-solaris-gold hover:bg-solaris-gold/10' },
 ];
-
-const DEDUST_POOL_ADDRESS = 'EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
 
 const FooterSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -113,7 +116,7 @@ const FooterSection = () => {
               </button>
               <button
                 className="btn-gold flex items-center gap-2"
-                onClick={() => window.open('https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a', '_blank')}
+                onClick={() => window.open(WHITEPAPER_URL, '_blank', 'noopener,noreferrer')}
               >
                 <FileText className="w-4 h-4" />
                 Read the Whitepaper

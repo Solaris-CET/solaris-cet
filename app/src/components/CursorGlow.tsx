@@ -1,5 +1,14 @@
 import { useEffect, useRef } from 'react';
 
+/**
+ * CursorGlow — a fixed-position radial-gradient spotlight that follows the
+ * mouse cursor using linear interpolation (lerp factor 0.1) for a smooth lag
+ * effect. Rendered with `mix-blend-mode: screen` so it blends additively over
+ * dark backgrounds. Hidden on touch devices via CSS (`@media (max-width: 640px)`).
+ *
+ * @returns A decorative `div` that tracks the cursor. Marked `aria-hidden` so
+ *   it is invisible to assistive technologies.
+ */
 const CursorGlow = () => {
   const glowRef = useRef<HTMLDivElement>(null);
   const posRef = useRef({ x: -300, y: -300 });

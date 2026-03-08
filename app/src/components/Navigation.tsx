@@ -9,6 +9,19 @@ const navLinks = [
   { label: 'Staking', href: '#staking' },
 ];
 
+/**
+ * Navigation — the fixed top navigation bar for the Solaris CET landing page.
+ *
+ * Features:
+ * - Scroll-aware background blur: transparent at the top, frosted-glass when scrolled > 100 px.
+ * - **Scroll progress bar** — a 1 px gradient line (`gold → cyan → gold`) along the
+ *   bottom edge of the header that fills from left to right as the user scrolls.
+ * - **"LIVE" badge** indicating the token is live on the TON mainnet.
+ * - Desktop navigation links with animated underline-gradient hover effect.
+ * - Responsive mobile hamburger menu.
+ *
+ * @returns The `<header>` element containing the full navigation bar.
+ */
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

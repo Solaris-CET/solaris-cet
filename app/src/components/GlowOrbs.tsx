@@ -1,8 +1,27 @@
+/**
+ * Props accepted by {@link GlowOrbs}.
+ */
 interface GlowOrbsProps {
+  /**
+   * Colour palette for the ambient orbs.
+   * - `'gold'`  — two warm-gold orbs
+   * - `'cyan'`  — two cool-cyan orbs
+   * - `'mixed'` — three orbs with both gold and cyan tones (default)
+   */
   variant?: 'gold' | 'cyan' | 'mixed';
+  /** Additional Tailwind/CSS class names applied to the wrapper. */
   className?: string;
 }
 
+/**
+ * GlowOrbs — decorative ambient light blobs rendered as blurred radial
+ * gradients, continuously animated with the `animate-orb-pulse` keyframe.
+ * Each orb is absolutely positioned inside a full-size, pointer-events-none
+ * container so it does not interfere with interactive elements.
+ *
+ * @param props - {@link GlowOrbsProps}
+ * @returns A `div` containing the configured orb elements. Marked `aria-hidden`.
+ */
 const GlowOrbs = ({ variant = 'mixed', className = '' }: GlowOrbsProps) => {
   const orbs =
     variant === 'gold'
