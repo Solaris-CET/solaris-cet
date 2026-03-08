@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌞 Solaris-CET | Fundația Digitală Cetățuia</title>
+    <style>
+        /* --- CONFIGURARE STILURI DE BAZĂ (CSS Moderna) --- */
+        :root {
+            --primary: #FFD700; /* Galben Solar */
+            --background: #0D0D0D; /* Negru Profund */
+            --text: #F2F2F2; /* Alb Murdar */
+            --card-bg: #1A1A1A;
+            --accent: #FF8C00;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: 0.2s ease-in-out;
+        }
+
+        /* --- STILURI GENERALE --- */
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background);
+            color: var(--text);
+            margin: 0;
+            line-height: 1.6;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* --- ANIMATII (Cheie) --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes solarPulse {
+            0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); }
+            100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+        }
+
+        /* --- STRUCTURA PAGINII --- */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #0d0d0d 100%);
+            animation: fadeIn 1s ease-out;
+        }
+
+        header h1 {
+            font-size: 4rem;
+            color: var(--primary);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            animation: solarPulse 3s infinite;
+        }
+
+        header p { font-size: 1.5rem; color: #ccc; margin-top: 10px; }
+
+        section { padding: 100px 20px; max-width: 1200px; margin: 0 auto; opacity: 0; transform: translateY(30px); transition: var(--transition-slow); }
+
+        /* --- CLASA DE ANIMATIE LA SCROLL --- */
+        section.visible { opacity: 1; transform: translateY(0); }
+
+        /* --- CARDURI WHITEPAPER --- */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            transition: var(--transition-fast);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+        }
+
+        /* --- TOKENOMICS TABLE --- */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; animation: fadeIn 0.5s ease-out; }
+        th, td { text-align: left; padding: 15px; border-bottom: 1px solid #333; }
+        th { color: var(--primary); text-transform: uppercase; }
+
+        /* --- BUTON DE CONECTARE TON (Simulare) --- */
+        .ton-button {
+            background-color: #0088CC; /* Culoare TON */
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: var(--transition-fast);
+            display: inline-block;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.3);
+        }
+
+        .ton-button:hover { background-color: #00AEEF; transform: scale(1.05); }
+
+    </style>
+</head>
+<body>
+
+    <header id="hero">
+        <h1>Solaris-CET</h1>
+        <p>Asistent AI Local & Fundația Digitală a Comunității Cetățuia</p>
+        <a href="#about" class="ton-button">Explorează Viziunea</a>
+    </header>
+
+    <section id="about">
+        <div class="card">
+            <h2>📜 Whitepaper Integrat</h2>
+            <p><strong>Solaris-CET</strong> este un asistent AI revoluționar, local-first, conceput pentru a accelera tranziția către energie verde și agricultură sustenabilă. Datele utilizatorului sunt procesate local în browser, garantând o confidențialitate de 100%. În paralel, Solaris servește ca nucleu economic pentru micro-comunitatea Cetățuia prin token-ul CET.</p>
+        </div>
+    </section>
+
+    <section id="tokenomics">
+        <div class="card">
+            <h2>💎 Tokenomics: CET (Solaris Cetățuia)</h2>
+            <table>
+                <tr><th>Parametru</th><th>Valoare</th></tr>
+                <tr><td>Blockchain</td><td>TON (The Open Network)</td></tr>
+                <tr><td>Rezervă Totală (Supply)</td><td>9,000 unități (Hyper-scarce)</td></tr>
+                <tr><td>Utilitate 1</td><td>Acces Premium la AI de Înaltă Precizie</td></tr>
+                <tr><td>Utilitate 2</td><td>Prioritizare Procesare în Unitățile Comunitare</td></tr>
+            </table>
+        </div>
+    </section>
+
+    <section id="blockchain">
+        <div class="card" style="text-align: center;">
+            <h2>🔗 Integrare TON</h2>
+            <p>Conectați-vă portofelul TON (Tonkeeper, MyTonWallet) pentru a valida deținerea token-ului CET și a activa funcțiile AI avansate de farming.</p>
+            <a href="#" class="ton-button" onclick="alert('Funcționalitate de simulare. Integrarea TON reală necesită un provider precum TonAPI.io.')">Connect Wallet</a>
+        </div>
+    </section>
+
+    <script>
+        // Funcție pentru a adăuga clasa 'visible' la scroll
+        const sections = document.querySelectorAll('section');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.2 }); // Declanșează când 20% din secțiune e vizibilă
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
