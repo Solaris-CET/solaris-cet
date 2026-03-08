@@ -1,9 +1,7 @@
 import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Smartphone, Droplets, TrendingUp, Clock, Battery } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
 
 // Static data defined outside component to avoid re-creation on every render
 const tickerItems = [

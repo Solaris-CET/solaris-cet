@@ -1,9 +1,7 @@
 import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ShieldCheck, FileCheck, Globe, Server } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
 
 const ComplianceSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);

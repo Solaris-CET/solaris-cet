@@ -1,9 +1,7 @@
 import { useRef, useLayoutEffect, useState } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Download, FileText, Mail, ArrowRight, Sun, Github, Twitter, MessageCircle } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
 
 // Static data defined outside component to avoid re-creation on every render
 const footerLinks = [

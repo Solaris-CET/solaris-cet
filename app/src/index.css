@@ -218,3 +218,72 @@
 .animate-ticker {
   animation: ticker-scroll 20s linear infinite;
 }
+
+/* Glitch effect */
+@keyframes glitch {
+  0%, 100% { clip-path: inset(0 0 100% 0); transform: translate(0); }
+  20% { clip-path: inset(20% 0 60% 0); transform: translate(-2px, 2px); }
+  40% { clip-path: inset(50% 0 30% 0); transform: translate(2px, -2px); }
+  60% { clip-path: inset(70% 0 10% 0); transform: translate(-1px, 1px); }
+  80% { clip-path: inset(10% 0 80% 0); transform: translate(1px, -1px); }
+}
+
+/* Scan line */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+/* Energy pulse */
+@keyframes energy-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(46, 231, 255, 0.2), 0 0 40px rgba(46, 231, 255, 0.1); }
+  50% { box-shadow: 0 0 40px rgba(46, 231, 255, 0.4), 0 0 80px rgba(46, 231, 255, 0.2); }
+}
+
+/* Number tick */
+@keyframes number-tick {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(46, 231, 255, 0.3), transparent);
+  animation: scanline 4s linear infinite;
+  pointer-events: none;
+}
+
+.animate-energy-pulse {
+  animation: energy-pulse 2.5s ease-in-out infinite;
+}
+
+.circuit-border {
+  border: 1px solid rgba(46, 231, 255, 0.2);
+  position: relative;
+}
+
+.circuit-border::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 10%;
+  width: 30%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #2EE7FF, transparent);
+  animation: shimmer 3s linear infinite;
+}
+
+.circuit-border::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: 10%;
+  width: 30%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #F2C94C, transparent);
+  animation: shimmer 3s linear infinite reverse;
+}

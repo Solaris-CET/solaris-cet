@@ -1,15 +1,31 @@
-import { useRef, useLayoutEffect } from 'react';
+import { useRef, useLayoutEffect, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Brain, Lightbulb, Play, Eye } from 'lucide-react';
+import AgentBridge from '../components/AgentBridge';
 
-gsap.registerPlugin(ScrollTrigger);
+
+const steps = [
+  { phase: 'THOUGHT', icon: '🧠', text: 'Analyzing blockchain data patterns...', color: '#F2C94C' },
+  { phase: 'ACTION', icon: '⚡', text: 'Query DeDust pool liquidity metrics', color: '#2EE7FF' },
+  { phase: 'OBSERVE', icon: '👁', text: 'Pool TVL: $2.4M | 24h Vol: $180K', color: '#34D399' },
+  { phase: 'THOUGHT', icon: '🧠', text: 'High liquidity confirms token utility', color: '#F2C94C' },
+  { phase: 'ACTION', icon: '⚡', text: 'Execute optimal swap route...', color: '#2EE7FF' },
+  { phase: 'OBSERVE', icon: '👁', text: 'Swap completed. Slippage: 0.12%', color: '#34D399' },
+];
 
 const IntelligenceCoreSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const leftCardRef = useRef<HTMLDivElement>(null);
   const rightCardRef = useRef<HTMLDivElement>(null);
   const chipsRef = useRef<HTMLDivElement>(null);
+  const [reactStep, setReactStep] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setReactStep(prev => (prev + 1) % steps.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -134,13 +150,44 @@ const IntelligenceCoreSection = () => {
         className="absolute right-[7vw] top-[24vh] w-[min(36vw,520px)] h-[min(50vh,420px)] z-10"
         style={{ perspective: '1000px' }}
       >
-        <div className="glass-card h-full flex flex-col items-center justify-center relative overflow-hidden">
-          {/* Hologram cube */}
-          <img
-            src="/hologram-cube.png"
-            alt=""
-            className="w-[60%] h-auto animate-coin-rotate drop-shadow-[0_0_40px_rgba(46,231,255,0.3)]"
-          />
+        <div className="glass-card h-full flex flex-col items-center justify-center relative overflow-hidden p-6">
+          {/* Terminal-style ReAct demo */}
+          <div className="w-full font-mono text-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-3 h-3 rounded-full bg-red-500/60" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
+              <div className="w-3 h-3 rounded-full bg-green-500/60" />
+              <span className="ml-2 text-solaris-muted text-xs">ReAct Protocol · Live</span>
+            </div>
+
+            <div className="space-y-3">
+              {steps.map((step, i) => (
+                <div
+                  key={i}
+                  className="transition-all duration-500"
+                  style={{
+                    opacity: i <= reactStep ? (i === reactStep ? 1 : 0.35) : 0,
+                    transform: i === reactStep ? 'translateX(0)' : 'translateX(-4px)',
+                  }}
+                >
+                  <span
+                    className="text-[10px] font-bold px-2 py-0.5 rounded mr-2"
+                    style={{ color: step.color, borderWidth: '1px', borderStyle: 'solid', borderColor: step.color, opacity: i === reactStep ? 1 : 0.7 }}
+                  >
+                    {step.phase}
+                  </span>
+                  <span className="mr-1">{step.icon}</span>
+                  <span className="text-solaris-text text-xs">{step.text}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Cursor blink */}
+            <div className="mt-4 flex items-center gap-1">
+              <span className="text-solaris-cyan text-xs">▶</span>
+              <div className="w-2 h-4 bg-solaris-cyan animate-pulse" />
+            </div>
+          </div>
 
           {/* ReAct label */}
           <div className="absolute bottom-6 left-6 right-6">
@@ -176,6 +223,11 @@ const IntelligenceCoreSection = () => {
           <Eye className="w-4 h-4 text-emerald-400" />
           <span className="font-mono text-sm text-solaris-text">Observation</span>
         </div>
+      </div>
+
+      {/* AgentBridge visualization */}
+      <div className="absolute bottom-[4vh] left-1/2 -translate-x-1/2 w-[min(80vw,800px)] z-10">
+        <AgentBridge />
       </div>
     </section>
   );

@@ -1,9 +1,8 @@
 import { useEffect, useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, Zap, Activity, Globe } from 'lucide-react';
+import ParticleCanvas from '../components/ParticleCanvas';
 
-gsap.registerPlugin(ScrollTrigger);
 
 const HeroSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -157,6 +156,7 @@ const HeroSection = () => {
 
       {/* Particle field background */}
       <div className="absolute inset-0 pointer-events-none">
+        <ParticleCanvas count={80} className="absolute inset-0 pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(242,201,76,0.08)_0%,_transparent_50%)]" />
       </div>
 
@@ -210,13 +210,25 @@ const HeroSection = () => {
         ref={ctaRef}
         className="absolute left-[7vw] top-[58vh] z-20 flex flex-wrap gap-4"
       >
-        <button className="btn-filled-gold flex items-center gap-2 group">
+        <button
+          className="btn-filled-gold flex items-center gap-2 group"
+          onClick={() => window.open('https://t.me/SolarisCET', '_blank')}
+        >
           <Zap className="w-4 h-4" />
           Start Mobile Mining
           <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
         </button>
-        <button className="btn-gold">
+        <button
+          className="btn-gold"
+          onClick={() => document.getElementById('intelligence')?.scrollIntoView({ behavior: 'smooth' })}
+        >
           Explore ReAct Protocol
+        </button>
+        <button
+          className="btn-gold flex items-center gap-2"
+          onClick={() => window.open('https://dedust.io/swap/TON/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB', '_blank')}
+        >
+          Buy CET on DeDust
         </button>
       </div>
 
@@ -226,6 +238,7 @@ const HeroSection = () => {
         className="absolute right-[7vw] top-[28vh] w-[min(28vw,380px)] z-20"
       >
         <div className="glass-card p-5 lg:p-6">
+          <div className="scanline" />
           <div className="hud-label mb-4 flex items-center gap-2">
             <Activity className="w-4 h-4 text-solaris-gold" />
             Network Health

@@ -1,9 +1,7 @@
 import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Shield, Zap, Cpu } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
 
 const HybridEngineSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);

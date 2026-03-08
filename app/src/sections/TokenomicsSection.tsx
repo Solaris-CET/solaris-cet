@@ -1,9 +1,7 @@
 import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Coins, Pickaxe, Users, TrendingDown } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
 
 const TokenomicsSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -136,6 +134,25 @@ const TokenomicsSection = () => {
                   21,000,000
                 </div>
                 <div className="text-solaris-muted text-sm">BTC-S Total Supply</div>
+                <div className="mt-3 pt-3 border-t border-white/10">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="hud-label text-[10px] mb-1">CET (TON Network)</div>
+                      <div className="font-display font-bold text-xl text-solaris-cyan">9,000</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="hud-label text-[10px] mb-1">DeDust Pool</div>
+                      <a
+                        href="https://dedust.io/swap/TON/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-mono text-[10px] text-solaris-cyan hover:text-solaris-gold transition-colors"
+                      >
+                        EQB5…lfnB ↗
+                      </a>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="p-5 rounded-xl bg-white/5">

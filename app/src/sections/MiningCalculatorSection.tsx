@@ -1,9 +1,7 @@
 import { useRef, useLayoutEffect, useState, useEffect, useCallback } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Calculator, Smartphone, Laptop, Monitor, Server, TrendingUp } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
 
 type DeviceType = 'smartphone' | 'laptop' | 'desktop' | 'node';
 
