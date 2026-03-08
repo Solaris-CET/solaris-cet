@@ -46,10 +46,16 @@ const FooterSection = () => {
   };
 
   const handleCopyContract = () => {
-    navigator.clipboard.writeText(DEDUST_POOL_ADDRESS).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
+    navigator.clipboard
+      .writeText(DEDUST_POOL_ADDRESS)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch((error) => {
+        // Handle clipboard write failures gracefully (e.g., non-HTTPS context, denied permissions)
+        console.error('Failed to copy contract address to clipboard:', error);
+      });
   };
 
   useLayoutEffect(() => {

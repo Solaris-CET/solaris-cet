@@ -16,6 +16,9 @@ const CursorGlow = () => {
   const rafRef = useRef<number>(0);
 
   useEffect(() => {
+    // Skip the RAF loop entirely when the user prefers reduced motion
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       targetRef.current = { x: e.clientX, y: e.clientY };
     };

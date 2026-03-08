@@ -117,7 +117,7 @@ const ParticleCanvas = ({
         const dx = p.x - mouse.x;
         const dy = p.y - mouse.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120 && mouseInteraction) {
+        if (dist > 0 && dist < 120 && mouseInteraction) {
           const force = (120 - dist) / 120;
           p.vx += (dx / dist) * force * 0.25;
           p.vy += (dy / dist) * force * 0.25;

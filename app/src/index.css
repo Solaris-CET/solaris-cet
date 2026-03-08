@@ -307,14 +307,6 @@
   animation: energy-pulse 2.5s ease-in-out infinite;
 }
 
-.animate-orb-pulse {
-  animation: orb-pulse 6s ease-in-out infinite;
-}
-
-.animate-gold-pulse {
-  animation: gold-pulse 3s ease-in-out infinite;
-}
-
 .animate-gradient-shift {
   background-size: 200% 200%;
   animation: gradient-shift 6s ease infinite;
