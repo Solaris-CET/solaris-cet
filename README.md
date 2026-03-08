@@ -53,7 +53,13 @@ solaris-cet/
 ├── app/                       # React + TypeScript + Vite source
 │   ├── src/
 │   │   ├── sections/          # Page sections (Hero, Tokenomics, etc.)
-│   │   ├── components/        # Reusable UI components (shadcn/ui)
+│   │   ├── components/        # Reusable UI components
+│   │   │   ├── ui/            # shadcn/ui primitives
+│   │   │   ├── AnimatedCounter.tsx  # GSAP counter triggered by IntersectionObserver
+│   │   │   ├── CursorGlow.tsx       # Mouse-following radial-gradient spotlight
+│   │   │   ├── GlowOrbs.tsx         # Ambient animated glow blobs (gold / cyan / mixed)
+│   │   │   ├── Navigation.tsx       # Fixed nav with scroll-progress bar
+│   │   │   └── ParticleCanvas.tsx   # Interactive particle field (canvas)
 │   │   ├── App.tsx
 │   │   └── main.tsx
 │   ├── public/                # Static assets
@@ -65,6 +71,22 @@ solaris-cet/
 ├── CONTRIBUTING.md
 └── LICENSE
 ```
+
+---
+
+## ✨ UI Features
+
+| Feature | Description |
+|---------|-------------|
+| **CursorGlow** | Fixed radial-gradient spotlight that follows the cursor with lerp(0.1) smoothing. Hidden on touch/mobile. |
+| **GlowOrbs** | Ambient animated blobs per section (`gold \| cyan \| mixed` variants, `animate-orb-pulse` keyframe). |
+| **AnimatedCounter** | GSAP counter from 0 → target, triggered by IntersectionObserver; supports prefix, suffix, and decimal places. |
+| **Scroll progress bar** | Gold→cyan→gold gradient line in the navigation bar that fills as you scroll. |
+| **Loading screen** | 1.8 s overlay with animated logo + progress bar, fades out with GSAP (`LOADING_DURATION_MS = 1800`). |
+| **Hero parallax** | 3-D mouse-driven parallax on the coin and stat cards (`rotateX`/`rotateY` + lerp). |
+| **HybridEngine nodes** | Click-to-expand PoW/DPoS node cards; animated SVG path (`strokeDashoffset` loop). |
+| **Tokenomics ring** | GSAP-animated radial SVG ring showing mined supply (0 % → current %). |
+| **Footer** | Real social links (Twitter, Discord, Telegram, GitHub, DeDust), copy-to-clipboard pool address, IPFS whitepaper link, live-status indicator. |
 
 ---
 
