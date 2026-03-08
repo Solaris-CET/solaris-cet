@@ -114,13 +114,15 @@ const FooterSection = () => {
                 Download Nova App
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </button>
-              <button
+              <a
+                href={WHITEPAPER_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn-gold flex items-center gap-2"
-                onClick={() => window.open(WHITEPAPER_URL, '_blank', 'noopener,noreferrer')}
               >
                 <FileText className="w-4 h-4" />
                 Read the Whitepaper
-              </button>
+              </a>
             </div>
           </div>
         </div>

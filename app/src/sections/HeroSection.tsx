@@ -248,7 +248,6 @@ const HeroSection = () => {
           src="/hero-coin.png"
           alt="Bitcoin Solaris Coin"
           className="w-full h-auto animate-coin-rotate drop-shadow-[0_0_80px_rgba(242,201,76,0.35)]"
-          style={{ filter: 'drop-shadow(0 0 40px rgba(242,201,76,0.25))' }}
         />
         {/* Coin reflection */}
         <div

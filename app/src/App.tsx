@@ -27,8 +27,8 @@ function App() {
     // Loading screen exit
     const loadingEl = loadingRef.current;
     if (!loadingEl) {
-      const t = setTimeout(() => setIsLoaded(true), 0);
-      return () => clearTimeout(t);
+      const timer = setTimeout(() => setIsLoaded(true), 0);
+      return () => clearTimeout(timer);
     }
 
     const timer = setTimeout(() => {

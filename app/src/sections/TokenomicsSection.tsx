@@ -7,6 +7,10 @@ import GlowOrbs from '../components/GlowOrbs';
 const CET_TOTAL_SUPPLY = 9000;
 const CET_MINED_SUPPLY = 9000; // 100% mined on launch - hyper-scarce supply
 
+const RING_RADIUS = 54;
+const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+
+
 const TokenomicsSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -24,13 +28,11 @@ const TokenomicsSection = () => {
     const circle = ringRef.current;
     if (!circle || !ringVisible) return;
 
-    const r = 54;
-    const circumference = 2 * Math.PI * r;
     const progress = CET_MINED_SUPPLY / CET_TOTAL_SUPPLY;
 
-    gsap.set(circle, { strokeDasharray: circumference, strokeDashoffset: circumference });
+    gsap.set(circle, { strokeDasharray: RING_CIRCUMFERENCE, strokeDashoffset: RING_CIRCUMFERENCE });
     gsap.to(circle, {
-      strokeDashoffset: circumference * (1 - progress),
+      strokeDashoffset: RING_CIRCUMFERENCE * (1 - progress),
       duration: 2,
       ease: 'power3.out',
       delay: 0.3,
@@ -92,9 +94,6 @@ const TokenomicsSection = () => {
 
     return () => ctx.revert();
   }, []);
-
-  const r = 54;
-  const circumference = 2 * Math.PI * r;
 
   return (
     <section
@@ -168,18 +167,18 @@ const TokenomicsSection = () => {
               <div className="relative w-36 h-36">
                 <svg className="w-full h-full" viewBox="0 0 128 128" style={{ transform: 'rotate(-90deg)' }}>
                   <circle
-                    cx="64" cy="64" r={r}
+                    cx="64" cy="64" r={RING_RADIUS}
                     className="progress-ring-track"
                     strokeWidth="8"
                   />
                   <circle
                     ref={ringRef}
-                    cx="64" cy="64" r={r}
+                    cx="64" cy="64" r={RING_RADIUS}
                     className="progress-ring-fill"
                     strokeWidth="8"
                     stroke="url(#ringGrad)"
-                    strokeDasharray={circumference}
-                    strokeDashoffset={circumference}
+                    strokeDasharray={RING_CIRCUMFERENCE}
+                    strokeDashoffset={RING_CIRCUMFERENCE}
                     strokeLinecap="round"
                   />
                   <defs>

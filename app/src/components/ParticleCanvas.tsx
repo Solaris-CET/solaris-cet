@@ -150,7 +150,7 @@ const ParticleCanvas = ({
         // Tiny glow
         if (size > 1.5) {
           const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 3);
-          grd.addColorStop(0, p.color.startsWith('#') ? hexToRgba(p.color, 0.25) : 'rgba(242,201,76,0.25)');
+          grd.addColorStop(0, hexToRgba(p.color, 0.25));
           grd.addColorStop(1, 'transparent');
           ctx.beginPath();
           ctx.arc(p.x, p.y, size * 3, 0, Math.PI * 2);

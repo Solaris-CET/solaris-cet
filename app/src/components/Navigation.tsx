@@ -91,7 +91,7 @@ const Navigation = () => {
             </div>
             <button
               className="btn-gold text-sm"
-              onClick={() => window.open('https://t.me/SolarisCET', '_blank')}
+              onClick={() => window.open('https://t.me/SolarisCET', '_blank', 'noopener,noreferrer')}
               aria-label="Start Mining (opens in new window)"
             >
               Start Mining
