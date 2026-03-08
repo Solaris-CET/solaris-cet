@@ -31,12 +31,16 @@ const TokenomicsSection = () => {
     const progress = CET_MINED_SUPPLY / CET_TOTAL_SUPPLY;
 
     gsap.set(circle, { strokeDasharray: RING_CIRCUMFERENCE, strokeDashoffset: RING_CIRCUMFERENCE });
-    gsap.to(circle, {
+    const tween = gsap.to(circle, {
       strokeDashoffset: RING_CIRCUMFERENCE * (1 - progress),
       duration: 2,
       ease: 'power3.out',
       delay: 0.3,
     });
+
+    return () => {
+      tween.kill();
+    };
   }, [ringVisible]);
 
   useLayoutEffect(() => {

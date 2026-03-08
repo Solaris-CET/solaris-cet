@@ -7,7 +7,7 @@ import GlowOrbs from '../components/GlowOrbs';
 
 const HeroSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const coinRef = useRef<HTMLImageElement>(null);
+  const coinRef = useRef<HTMLDivElement>(null);
   const titleCardRef = useRef<HTMLDivElement>(null);
   const hudCardRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
@@ -240,7 +240,7 @@ const HeroSection = () => {
 
       {/* 3D Coin - Center */}
       <div
-        ref={coinRef as React.RefObject<HTMLDivElement>}
+        ref={coinRef}
         className="absolute left-1/2 top-[52%] -translate-x-1/2 -translate-y-1/2 w-[min(42vw,520px)] z-10"
         style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}
       >
