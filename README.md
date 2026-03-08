@@ -1,148 +1,136 @@
-# Reparații Aplicate - Solaris CET
+# Solaris CET
 
-## Data: 8 Martie 2026
+[![Deploy to GitHub Pages](https://github.com/aamclaudiu-hash/solaris-cet/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/aamclaudiu-hash/solaris-cet/actions/workflows/deploy-pages.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
+**Solaris CET** is a decentralized token project built on the TON blockchain. This repository contains the official landing page — a high-performance static web application built with **React 19**, **TypeScript**, **Vite**, **Tailwind CSS**, and **GSAP** animations, deployed automatically via **GitHub Actions** to **GitHub Pages**.
 
 ---
 
-## Rezumat modificări
+## 🚀 One-Click Deploy (Fork & Host Your Own Instance)
 
-### 1. ✅ vite.config.ts
-**Problemă:** Plugin-ul `kimi-plugin-inspect-react` era inclus în configurație.
-**Soluție:** Eliminat importul și utilizarea plugin-ului.
+You can spin up your own hosted instance of Solaris CET in under 2 minutes — no server, no paid hosting, no configuration required.
 
-```diff
-- import { inspectAttr } from 'kimi-plugin-inspect-react'
-- plugins: [inspectAttr(), react()],
-+ plugins: [react()],
+### Step 1 — Fork this repository
+
+Click the **Fork** button at the top-right of this page:
+
+> **[https://github.com/aamclaudiu-hash/solaris-cet/fork](https://github.com/aamclaudiu-hash/solaris-cet/fork)**
+
+### Step 2 — Enable GitHub Pages in your fork
+
+1. Open your forked repository on GitHub.
+2. Go to **Settings** → **Pages**.
+3. Under **Build and deployment** → **Source**, select **GitHub Actions**.
+4. Click **Save**.
+
+### Step 3 — Trigger the deployment
+
+The site is built and deployed automatically on every `git push` to the `main` branch.
+To trigger an immediate deployment without pushing code:
+
+1. Go to **Actions** → **Deploy Solaris CET to GitHub Pages**.
+2. Click **Run workflow** → **Run workflow**.
+
+### Step 4 — Access your live site
+
+After the workflow completes (≈ 2 minutes), your site will be live at:
+
+```
+https://<your-github-username>.github.io/solaris-cet/
 ```
 
 ---
 
-### 2. ✅ package.json
-**Problemă:** Dependența `kimi-plugin-inspect-react` era în devDependencies.
-**Soluție:** Eliminată din lista de dependențe.
+## 🏗️ Project Structure
 
-```diff
-  "devDependencies": {
-    ...
-    "globals": "^16.5.0",
--   "kimi-plugin-inspect-react": "^1.0.3",
-    "postcss": "^8.5.6",
-    ...
-  }
+```text
+solaris-cet/
+├── .github/
+│   ├── workflows/
+│   │   └── deploy-pages.yml   # CI/CD: build + deploy to GitHub Pages
+│   └── PULL_REQUEST_TEMPLATE.md
+├── app/                       # React + TypeScript + Vite source
+│   ├── src/
+│   │   ├── sections/          # Page sections (Hero, Tokenomics, etc.)
+│   │   ├── components/        # Reusable UI components (shadcn/ui)
+│   │   ├── App.tsx
+│   │   └── main.tsx
+│   ├── public/                # Static assets
+│   ├── index.html
+│   ├── vite.config.ts
+│   ├── tailwind.config.js
+│   └── package.json
+├── README.md
+├── CONTRIBUTING.md
+└── LICENSE
 ```
 
 ---
 
-### 3. ✅ HeroSection.tsx
-**Problemă 1:** Tipul `coinRef` era `HTMLImageElement` dar era folosit pe un `div`.
-**Soluție:** Schimbat tipul în `HTMLDivElement`.
+## 🛠️ Local Development
 
-```diff
-- const coinRef = useRef<HTMLImageElement>(null);
-+ const coinRef = useRef<HTMLDivElement>(null);
-```
+### Prerequisites
 
-**Problemă 2:** Type assertion inutil pe ref.
-**Soluție:** Eliminat type assertion.
+- **Node.js** ≥ 20 ([download](https://nodejs.org/))
+- **npm** ≥ 10 (bundled with Node.js)
 
-```diff
-- ref={coinRef as React.RefObject<HTMLDivElement>}
-+ ref={coinRef}
-```
-
-**Problemă 3:** `gsap.registerPlugin(ScrollTrigger)` redundant.
-**Soluție:** Eliminat linia.
-
----
-
-### 4. ✅ Toate fișierele de secțiuni
-Eliminat `gsap.registerPlugin(ScrollTrigger)` din:
-
-| Fișier | Status |
-|--------|--------|
-| HeroSection.tsx | ✅ Reparat |
-| HybridEngineSection.tsx | ✅ Reparat |
-| IntelligenceCoreSection.tsx | ✅ Reparat |
-| NovaAppSection.tsx | ✅ Reparat |
-| TokenomicsSection.tsx | ✅ Reparat |
-| ComplianceSection.tsx | ✅ Reparat |
-| MiningCalculatorSection.tsx | ✅ Reparat |
-| SecuritySection.tsx | ✅ Reparat |
-| FooterSection.tsx | ✅ Reparat |
-
-**Motiv:** GSAP ScrollTrigger este deja înregistrat o singură dată în `App.tsx`. Înregistrarea multiplă poate genera avertismente.
-
----
-
-## Pași următori pentru utilizator
-
-### 1. Șterge node_modules și package-lock.json
-```bash
-cd app
-rm -rf node_modules package-lock.json
-```
-
-### 2. Reinstalează dependențele
-```bash
-npm install
-```
-
-### 3. Rulează build-ul
-```bash
-npm run build
-```
-
-### 4. Testează aplicația
-```bash
-npm run dev
-```
-
----
-
-## Verificare finală
-
-După aplicarea tuturor reparațiilor, verifică:
-
-- [ ] `npm install` rulează fără erori
-- [ ] `npm run build` generează folderul `dist` fără erori
-- [ ] `npm run dev` pornește serverul pe `http://localhost:5173`
-- [ ] Aplicația se încarcă în browser fără erori în consolă
-- [ ] Animațiile GSAP funcționează corect
-- [ ] Scroll-ul între secțiuni funcționează
-
----
-
-## Fișiere modificate (10 fișiere)
-
-1. `app/vite.config.ts`
-2. `app/package.json`
-3. `app/src/sections/HeroSection.tsx`
-4. `app/src/sections/HybridEngineSection.tsx`
-5. `app/src/sections/IntelligenceCoreSection.tsx`
-6. `app/src/sections/NovaAppSection.tsx`
-7. `app/src/sections/TokenomicsSection.tsx`
-8. `app/src/sections/ComplianceSection.tsx`
-9. `app/src/sections/MiningCalculatorSection.tsx`
-10. `app/src/sections/SecuritySection.tsx`
-11. `app/src/sections/FooterSection.tsx`
-
----
-
-## Comenzi utile
+### Setup
 
 ```bash
-# Curăță tot și reinstalează
-cd app
-rm -rf node_modules package-lock.json
+# 1. Clone the repository (or your fork)
+git clone https://github.com/aamclaudiu-hash/solaris-cet.git
+cd solaris-cet/app
+
+# 2. Install dependencies
 npm install
 
-# Build pentru producție
-npm run build
-
-# Development server
+# 3. Start the development server
 npm run dev
+# → Available at http://localhost:5173
+```
 
-# Preview build
+### Build for production
+
+```bash
+cd app
+npm run build
+# Output is generated in app/dist/
+```
+
+### Preview production build locally
+
+```bash
+cd app
 npm run preview
 ```
+
+---
+
+## ⚙️ Tech Stack
+
+| Layer         | Technology                                      |
+|---------------|-------------------------------------------------|
+| UI Framework  | [React 19](https://react.dev/)                  |
+| Language      | [TypeScript 5](https://www.typescriptlang.org/) |
+| Bundler       | [Vite 7](https://vite.dev/)                     |
+| Styling       | [Tailwind CSS 3](https://tailwindcss.com/)      |
+| Components    | [shadcn/ui](https://ui.shadcn.com/)             |
+| Animations    | [GSAP 3](https://gsap.com/)                     |
+| Blockchain    | [TON Network](https://ton.org/)                 |
+| Hosting       | [GitHub Pages](https://pages.github.com/)       |
+| CI/CD         | [GitHub Actions](https://github.com/features/actions) |
+
+---
+
+## 🤝 Contributing
+
+Contributions, bug reports, and feature requests are welcome!
+Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before submitting a pull request.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see [LICENSE](./LICENSE) for details.
+You are free to fork, modify, and host your own instance under the same license terms.
