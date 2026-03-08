@@ -1,0 +1,124 @@
+name: "🐛 Raport de Bug"
+description: "Raportează un comportament neașteptat sau o eroare în Solaris CET"
+title: "[BUG] "
+labels: ["bug", "triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Mulțumim că raportezi un bug! 🙏
+        Te rugăm să completezi toate câmpurile obligatorii pentru a ne ajuta să identificăm și să rezolvăm problema cât mai rapid.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: "✅ Verificări preliminare"
+      description: "Confirmă că ai efectuat verificările de mai jos înainte de a deschide un issue."
+      options:
+        - label: "Am căutat în issue-urile existente și nu am găsit un raport similar."
+          required: true
+        - label: "Am reprodus problema pe ultima versiune din branch-ul `main`."
+          required: true
+        - label: "Am citit documentația și problema nu este un comportament intenționat."
+          required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: "📦 Componenta afectată"
+      description: "Selectează componenta sau secțiunea unde apare bug-ul."
+      options:
+        - "HeroSection"
+        - "HybridEngineSection"
+        - "IntelligenceCoreSection"
+        - "NovaAppSection"
+        - "TokenomicsSection"
+        - "ComplianceSection"
+        - "MiningCalculatorSection"
+        - "SecuritySection"
+        - "FooterSection"
+        - "Navigation"
+        - "QuantumEngine / QuantumAI"
+        - "AgentBridge"
+        - "TokenGate"
+        - "SEOOptimizer"
+        - "Build / Vite Config"
+        - "Altul (specifică în descriere)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: "🚨 Severitate"
+      description: "Cât de grav este impactul bug-ului?"
+      options:
+        - "Critic — aplicația nu pornește sau datele sunt corupte"
+        - "Major — funcționalitate importantă nu funcționează"
+        - "Mediu — funcționalitate parțial afectată, există workaround"
+        - "Minor — problemă vizuală sau de UX minoră"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "📝 Descrierea bug-ului"
+      description: "O descriere clară și concisă a problemei. Ce se întâmplă și ce ar trebui să se întâmple?"
+      placeholder: |
+        Descriere: ...
+        Comportament actual: ...
+        Comportament așteptat: ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: "🔁 Pași pentru reproducere"
+      description: "Descrie pașii exacți pentru a reproduce problema."
+      placeholder: |
+        1. Accesează pagina '...'
+        2. Dă click pe '...'
+        3. Scroll până la '...'
+        4. Observă eroarea '...'
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: "🖥️ Mediu de execuție"
+      description: "Completează detaliile despre mediul în care apare bug-ul."
+      placeholder: |
+        - OS: [ex. Windows 11, macOS 14, Ubuntu 22.04]
+        - Browser: [ex. Chrome 120, Firefox 121, Safari 17]
+        - Node.js: [ex. 20.10.0]
+        - npm: [ex. 10.2.3]
+        - Versiune / commit: [ex. main@abc1234]
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: "📋 Loguri / Mesaje de eroare"
+      description: "Adaugă orice mesaje de eroare din consolă, terminal sau network tab."
+      render: shell
+      placeholder: |
+        Paste error logs here...
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: "📸 Screenshot-uri sau înregistrări video"
+      description: "Dacă este aplicabil, adaugă imagini sau video-uri care ilustrează problema."
+      placeholder: "Drag & drop imagini sau link-uri video..."
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: "ℹ️ Informații suplimentare"
+      description: "Orice alt context relevant pentru înțelegerea sau rezolvarea bug-ului."
+      placeholder: "Context adițional, workaround-uri descoperite, ipoteze..."
