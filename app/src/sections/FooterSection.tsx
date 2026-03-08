@@ -5,6 +5,20 @@ import { Download, FileText, Mail, ArrowRight, Sun, Github, Twitter, MessageCirc
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Static data defined outside component to avoid re-creation on every render
+const footerLinks = [
+  { label: 'Privacy', href: '#' },
+  { label: 'Terms', href: '#' },
+  { label: 'Contact', href: '#' },
+  { label: 'GitHub', href: '#', icon: Github },
+];
+
+const socialLinks = [
+  { icon: Twitter, href: '#', label: 'Twitter' },
+  { icon: MessageCircle, href: '#', label: 'Discord' },
+  { icon: Github, href: '#', label: 'GitHub' },
+];
+
 const FooterSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const ctaCardRef = useRef<HTMLDivElement>(null);
@@ -83,19 +97,6 @@ const FooterSection = () => {
 
     return () => ctx.revert();
   }, []);
-
-  const footerLinks = [
-    { label: 'Privacy', href: '#' },
-    { label: 'Terms', href: '#' },
-    { label: 'Contact', href: '#' },
-    { label: 'GitHub', href: '#', icon: Github },
-  ];
-
-  const socialLinks = [
-    { icon: Twitter, href: '#', label: 'Twitter' },
-    { icon: MessageCircle, href: '#', label: 'Discord' },
-    { icon: Github, href: '#', label: 'GitHub' },
-  ];
 
   return (
     <section

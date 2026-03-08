@@ -1,4 +1,4 @@
-import { useRef, useLayoutEffect, useState, useEffect } from 'react';
+import { useRef, useLayoutEffect, useState, useEffect, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Calculator, Smartphone, Laptop, Monitor, Server, TrendingUp } from 'lucide-react';
@@ -21,6 +21,14 @@ const devices: Record<DeviceType, DeviceConfig> = {
   node: { icon: Server, label: 'Dedicated Node', baseHashrate: 50.0, efficiency: 1.2 },
 };
 
+// Static data defined outside component to avoid re-creation on every render
+const liveStats = [
+  { label: 'Network Hashrate', value: '2.4 EH/s', change: '+12%' },
+  { label: 'Active Miners', value: '18,420', change: '+5%' },
+  { label: 'Avg Block Time', value: '2.0s', change: 'Stable' },
+  { label: 'Reward per Block', value: '6.25 BTC-S', change: '-2%' },
+];
+
 const MiningCalculatorSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
@@ -33,6 +41,10 @@ const MiningCalculatorSection = () => {
   const [stake, setStake] = useState(100);
   const [results, setResults] = useState({ daily: 0, monthly: 0, apy: 0 });
 
+  // Use a stable ref to hold the animated proxy object so GSAP tweens don't
+  // target a stale closure value across renders.
+  const animProxy = useRef({ daily: 0, monthly: 0, apy: 0 });
+
   // Calculate results
   useEffect(() => {
     const deviceConfig = devices[device];
@@ -43,8 +55,10 @@ const MiningCalculatorSection = () => {
     const monthly = daily * 30;
     const apy = 15 + (stake / 1000) + (adjustedHashrate * 0.1);
 
-    // Animate number changes
-    gsap.to(results, {
+    const proxy = animProxy.current;
+
+    // Animate number changes using a stable proxy object to avoid closure staleness
+    const tween = gsap.to(proxy, {
       daily,
       monthly,
       apy,
@@ -52,12 +66,14 @@ const MiningCalculatorSection = () => {
       ease: 'power2.out',
       onUpdate: () => {
         setResults({
-          daily: Number(results.daily.toFixed(4)),
-          monthly: Number(results.monthly.toFixed(2)),
-          apy: Number(results.apy.toFixed(1)),
+          daily: Number(proxy.daily.toFixed(4)),
+          monthly: Number(proxy.monthly.toFixed(2)),
+          apy: Number(proxy.apy.toFixed(1)),
         });
       },
     });
+
+    return () => { tween.kill(); };
   }, [device, hashrate, stake]);
 
   useLayoutEffect(() => {
@@ -137,17 +153,10 @@ const MiningCalculatorSection = () => {
     return () => ctx.revert();
   }, []);
 
-  const handleDeviceChange = (newDevice: DeviceType) => {
+  const handleDeviceChange = useCallback((newDevice: DeviceType) => {
     setDevice(newDevice);
     setHashrate(devices[newDevice].baseHashrate);
-  };
-
-  const liveStats = [
-    { label: 'Network Hashrate', value: '2.4 EH/s', change: '+12%' },
-    { label: 'Active Miners', value: '18,420', change: '+5%' },
-    { label: 'Avg Block Time', value: '2.0s', change: 'Stable' },
-    { label: 'Reward per Block', value: '6.25 BTC-S', change: '-2%' },
-  ];
+  }, []);
 
   return (
     <section

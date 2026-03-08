@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navigation from './components/Navigation';
@@ -26,6 +26,26 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  const buildSnapTo = useCallback((pinnedRanges: { start: number; end: number; center: number }[]) => {
+    return (value: number) => {
+      const inPinned = pinnedRanges.some(
+        r => value >= r.start - 0.02 && value <= r.end + 0.02
+      );
+      if (!inPinned) return value;
+
+      let closest = pinnedRanges[0]?.center ?? 0;
+      let closestDist = Math.abs(closest - value);
+      for (let i = 1; i < pinnedRanges.length; i++) {
+        const dist = Math.abs(pinnedRanges[i].center - value);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closest = pinnedRanges[i].center;
+        }
+      }
+      return closest;
+    };
+  }, []);
+
   useEffect(() => {
     if (!isLoaded) return;
 
@@ -46,21 +66,7 @@ function App() {
 
       ScrollTrigger.create({
         snap: {
-          snapTo: (value: number) => {
-            const inPinned = pinnedRanges.some(
-              r => value >= r.start - 0.02 && value <= r.end + 0.02
-            );
-            if (!inPinned) return value;
-
-            const target = pinnedRanges.reduce(
-              (closest, r) =>
-                Math.abs(r.center - value) < Math.abs(closest - value)
-                  ? r.center
-                  : closest,
-              pinnedRanges[0]?.center ?? 0
-            );
-            return target;
-          },
+          snapTo: buildSnapTo(pinnedRanges),
           duration: { min: 0.15, max: 0.35 },
           delay: 0,
           ease: 'power2.out',
@@ -75,7 +81,7 @@ function App() {
       clearTimeout(snapTimer);
       ScrollTrigger.getAll().forEach(st => st.kill());
     };
-  }, [isLoaded]);
+  }, [isLoaded, buildSnapTo]);
 
   return (
     <div ref={mainRef} className="relative bg-solaris-dark min-h-screen">

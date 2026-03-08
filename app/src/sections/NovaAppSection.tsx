@@ -5,6 +5,17 @@ import { Smartphone, Droplets, TrendingUp, Clock, Battery } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Static data defined outside component to avoid re-creation on every render
+const tickerItems = [
+  { label: 'Hashrate', value: '14.2 TH/s', icon: TrendingUp },
+  { label: 'Earnings', value: '0.0041 BTC-S / hr', icon: Droplets },
+  { label: 'Uptime', value: '99.97%', icon: Battery },
+  { label: 'Next Payout', value: '00:14:22', icon: Clock },
+];
+
+// Pre-build the doubled ticker array once to avoid array spread on every render
+const doubledTickerItems = [...tickerItems, ...tickerItems];
+
 const NovaAppSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const phoneRef = useRef<HTMLDivElement>(null);
@@ -75,13 +86,6 @@ const NovaAppSection = () => {
 
     return () => ctx.revert();
   }, []);
-
-  const tickerItems = [
-    { label: 'Hashrate', value: '14.2 TH/s', icon: TrendingUp },
-    { label: 'Earnings', value: '0.0041 BTC-S / hr', icon: Droplets },
-    { label: 'Uptime', value: '99.97%', icon: Battery },
-    { label: 'Next Payout', value: '00:14:22', icon: Clock },
-  ];
 
   return (
     <section
@@ -201,9 +205,9 @@ const NovaAppSection = () => {
       >
         <div className="glass-card p-4 overflow-hidden">
           <div className="flex animate-ticker">
-            {[...tickerItems, ...tickerItems].map((item, idx) => (
+            {doubledTickerItems.map((item, idx) => (
               <div
-                key={idx}
+                key={`${item.label}-${idx}`}
                 className="flex items-center gap-3 px-6 border-r border-white/10 last:border-r-0 whitespace-nowrap"
               >
                 <item.icon className="w-4 h-4 text-solaris-gold" />

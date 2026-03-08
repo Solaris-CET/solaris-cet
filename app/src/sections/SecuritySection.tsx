@@ -5,6 +5,40 @@ import { Shield, CheckCircle, FileSearch, UserCheck, Code, Lock } from 'lucide-r
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Static data defined outside component to avoid re-creation on every render
+const auditBadges = [
+  {
+    icon: FileSearch,
+    label: 'Cyberscope Audited',
+    description: 'Smart contract security audit completed',
+    color: 'gold',
+  },
+  {
+    icon: CheckCircle,
+    label: 'Freshcoins Verified',
+    description: 'Project verification and due diligence',
+    color: 'cyan',
+  },
+  {
+    icon: UserCheck,
+    label: 'KYC Completed',
+    description: 'Team identity verification',
+    color: 'emerald',
+  },
+  {
+    icon: Code,
+    label: 'Open Source',
+    description: 'Fully transparent codebase',
+    color: 'purple',
+  },
+];
+
+const securityFeatures = [
+  { icon: Lock, text: 'No admin minting' },
+  { icon: Shield, text: 'No hidden proxies' },
+  { icon: Code, text: 'Code is law—published and reproducible' },
+];
+
 const SecuritySection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const leftColumnRef = useRef<HTMLDivElement>(null);
@@ -75,39 +109,6 @@ const SecuritySection = () => {
 
     return () => ctx.revert();
   }, []);
-
-  const auditBadges = [
-    {
-      icon: FileSearch,
-      label: 'Cyberscope Audited',
-      description: 'Smart contract security audit completed',
-      color: 'gold',
-    },
-    {
-      icon: CheckCircle,
-      label: 'Freshcoins Verified',
-      description: 'Project verification and due diligence',
-      color: 'cyan',
-    },
-    {
-      icon: UserCheck,
-      label: 'KYC Completed',
-      description: 'Team identity verification',
-      color: 'emerald',
-    },
-    {
-      icon: Code,
-      label: 'Open Source',
-      description: 'Fully transparent codebase',
-      color: 'purple',
-    },
-  ];
-
-  const securityFeatures = [
-    { icon: Lock, text: 'No admin minting' },
-    { icon: Shield, text: 'No hidden proxies' },
-    { icon: Code, text: 'Code is law—published and reproducible' },
-  ];
 
   return (
     <section

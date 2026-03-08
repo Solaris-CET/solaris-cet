@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Menu, X, Sun } from 'lucide-react';
 
+// Static data defined outside component to avoid re-creation on every render
+const navLinks = [
+  { label: 'Dashboard', href: '#dashboard' },
+  { label: 'Whitepaper', href: '#whitepaper' },
+  { label: 'Nova App', href: '#nova-app' },
+  { label: 'Staking', href: '#staking' },
+];
+
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -13,13 +21,6 @@ const Navigation = () => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const navLinks = [
-    { label: 'Dashboard', href: '#dashboard' },
-    { label: 'Whitepaper', href: '#whitepaper' },
-    { label: 'Nova App', href: '#nova-app' },
-    { label: 'Staking', href: '#staking' },
-  ];
 
   return (
     <header
