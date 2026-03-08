@@ -16,6 +16,8 @@ const CursorGlow = () => {
   const rafRef = useRef<number>(0);
 
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       targetRef.current = { x: e.clientX, y: e.clientY };
     };

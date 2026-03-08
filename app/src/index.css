@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -306,14 +305,6 @@
 
 .animate-energy-pulse {
   animation: energy-pulse 2.5s ease-in-out infinite;
-}
-
-.animate-orb-pulse {
-  animation: orb-pulse 6s ease-in-out infinite;
-}
-
-.animate-gold-pulse {
-  animation: gold-pulse 3s ease-in-out infinite;
 }
 
 .animate-gradient-shift {
