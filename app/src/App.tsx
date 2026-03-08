@@ -9,6 +9,8 @@ import IntelligenceCoreSection from './sections/IntelligenceCoreSection';
 import NovaAppSection from './sections/NovaAppSection';
 import TokenomicsSection from './sections/TokenomicsSection';
 import ComplianceSection from './sections/ComplianceSection';
+import RoadmapSection from './sections/RoadmapSection';
+import HowToBuySection from './sections/HowToBuySection';
 import MiningCalculatorSection from './sections/MiningCalculatorSection';
 import SecuritySection from './sections/SecuritySection';
 import WhitepaperSection from './sections/WhitepaperSection';
@@ -181,23 +183,33 @@ function App() {
             <ComplianceSection />
           </div>
           
-          {/* Section 7: Mining Calculator - pin: false */}
+          {/* Section 7: Roadmap - pin: false */}
           <div className="relative z-[70]">
+            <RoadmapSection />
+          </div>
+
+          {/* Section 8: How to Buy - pin: false */}
+          <div className="relative z-[80]">
+            <HowToBuySection />
+          </div>
+
+          {/* Section 9: Mining Calculator - pin: false */}
+          <div className="relative z-[90]">
             <MiningCalculatorSection />
           </div>
           
-          {/* Section 8: Security - pin: false */}
-          <div className="relative z-[80]">
+          {/* Section 10: Security - pin: false */}
+          <div className="relative z-[100]">
             <SecuritySection />
           </div>
           
-          {/* Section 9: Whitepaper - pin: false */}
-          <div className="relative z-[85]">
+          {/* Section 11: Whitepaper - pin: false */}
+          <div className="relative z-[105]">
             <WhitepaperSection />
           </div>
           
-          {/* Section 10: Footer - pin: false */}
-          <div className="relative z-[90]">
+          {/* Section 12: Footer - pin: false */}
+          <div className="relative z-[110]">
             <FooterSection />
           </div>
         </main>
