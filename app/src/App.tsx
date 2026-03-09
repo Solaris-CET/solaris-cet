@@ -1,21 +1,24 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navigation from './components/Navigation';
 import CursorGlow from './components/CursorGlow';
+import LazyLoadWrapper from './components/LazyLoadWrapper';
+// Pinned sections — loaded eagerly so the snap/scroll setup can find their ScrollTriggers
 import HeroSection from './sections/HeroSection';
 import HybridEngineSection from './sections/HybridEngineSection';
 import IntelligenceCoreSection from './sections/IntelligenceCoreSection';
 import NovaAppSection from './sections/NovaAppSection';
 import TokenomicsSection from './sections/TokenomicsSection';
 import ComplianceSection from './sections/ComplianceSection';
-import RoadmapSection from './sections/RoadmapSection';
-import HowToBuySection from './sections/HowToBuySection';
-import MiningCalculatorSection from './sections/MiningCalculatorSection';
-import SecuritySection from './sections/SecuritySection';
-import WhitepaperSection from './sections/WhitepaperSection';
-import HighIntelligenceSection from './sections/HighIntelligenceSection';
-import FooterSection from './sections/FooterSection';
+// Non-pinned sections — lazy-loaded when they approach the viewport
+const RoadmapSection = lazy(() => import('./sections/RoadmapSection'));
+const HowToBuySection = lazy(() => import('./sections/HowToBuySection'));
+const MiningCalculatorSection = lazy(() => import('./sections/MiningCalculatorSection'));
+const SecuritySection = lazy(() => import('./sections/SecuritySection'));
+const WhitepaperSection = lazy(() => import('./sections/WhitepaperSection'));
+const HighIntelligenceSection = lazy(() => import('./sections/HighIntelligenceSection'));
+const FooterSection = lazy(() => import('./sections/FooterSection'));
 import './App.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -186,37 +189,37 @@ function App() {
           
           {/* Section 7: Roadmap - pin: false */}
           <div className="relative z-[70]">
-            <RoadmapSection />
+            <LazyLoadWrapper><RoadmapSection /></LazyLoadWrapper>
           </div>
 
           {/* Section 8: How to Buy - pin: false */}
           <div className="relative z-[80]">
-            <HowToBuySection />
+            <LazyLoadWrapper><HowToBuySection /></LazyLoadWrapper>
           </div>
 
           {/* Section 9: Mining Calculator - pin: false */}
           <div className="relative z-[90]">
-            <MiningCalculatorSection />
+            <LazyLoadWrapper><MiningCalculatorSection /></LazyLoadWrapper>
           </div>
           
           {/* Section 10: Security - pin: false */}
           <div className="relative z-[100]">
-            <SecuritySection />
+            <LazyLoadWrapper><SecuritySection /></LazyLoadWrapper>
           </div>
           
           {/* Section 11: Whitepaper - pin: false */}
           <div className="relative z-[105]">
-            <WhitepaperSection />
+            <LazyLoadWrapper><WhitepaperSection /></LazyLoadWrapper>
           </div>
           
           {/* Section 12: High Intelligence - pin: false */}
           <div className="relative z-[108]">
-            <HighIntelligenceSection />
+            <LazyLoadWrapper><HighIntelligenceSection /></LazyLoadWrapper>
           </div>
           
           {/* Section 13: Footer - pin: false */}
           <div className="relative z-[110]">
-            <FooterSection />
+            <LazyLoadWrapper><FooterSection /></LazyLoadWrapper>
           </div>
         </main>
       </div>
