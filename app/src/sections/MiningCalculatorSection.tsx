@@ -1,6 +1,7 @@
 import { useRef, useLayoutEffect, useState, useEffect, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { Calculator, Smartphone, Laptop, Monitor, Server, TrendingUp } from 'lucide-react';
+import type { MiningInput, MiningResult } from '../workers/mining.worker';
 
 
 type DeviceType = 'smartphone' | 'laptop' | 'desktop' | 'node';
@@ -43,35 +44,53 @@ const MiningCalculatorSection = () => {
   // target a stale closure value across renders.
   const animProxy = useRef({ daily: 0, monthly: 0, apy: 0 });
 
-  // Calculate results
+  // Web Worker instance — created once, persisted across renders
+  const workerRef = useRef<Worker | null>(null);
+
+  useEffect(() => {
+    workerRef.current = new Worker(
+      new URL('../workers/mining.worker.ts', import.meta.url),
+      { type: 'module' }
+    );
+
+    workerRef.current.onmessage = (
+      event: MessageEvent<{ type: string; payload: MiningResult }>
+    ) => {
+      if (event.data.type === 'REWARDS_RESULT') {
+        const { daily, monthly, apy } = event.data.payload;
+        const proxy = animProxy.current;
+
+        gsap.to(proxy, {
+          daily,
+          monthly,
+          apy,
+          duration: 0.5,
+          ease: 'power2.out',
+          onUpdate: () => {
+            setResults({
+              daily: Number(proxy.daily.toFixed(4)),
+              monthly: Number(proxy.monthly.toFixed(2)),
+              apy: Number(proxy.apy.toFixed(1)),
+            });
+          },
+        });
+      }
+    };
+
+    return () => {
+      workerRef.current?.terminate();
+      workerRef.current = null;
+    };
+  }, []);
+
+  // Send calculation request to the worker whenever inputs change
   useEffect(() => {
     const deviceConfig = devices[device];
-    const adjustedHashrate = hashrate * deviceConfig.efficiency;
-    const stakeMultiplier = 1 + (stake / 10000);
-    
-    const daily = adjustedHashrate * 0.0082 * stakeMultiplier;
-    const monthly = daily * 30;
-    const apy = 15 + (stake / 1000) + (adjustedHashrate * 0.1);
-
-    const proxy = animProxy.current;
-
-    // Animate number changes using a stable proxy object to avoid closure staleness
-    const tween = gsap.to(proxy, {
-      daily,
-      monthly,
-      apy,
-      duration: 0.5,
-      ease: 'power2.out',
-      onUpdate: () => {
-        setResults({
-          daily: Number(proxy.daily.toFixed(4)),
-          monthly: Number(proxy.monthly.toFixed(2)),
-          apy: Number(proxy.apy.toFixed(1)),
-        });
-      },
-    });
-
-    return () => { tween.kill(); };
+    const input: MiningInput = {
+      adjustedHashrate: hashrate * deviceConfig.efficiency,
+      stake,
+    };
+    workerRef.current?.postMessage({ type: 'CALCULATE_REWARDS', payload: input });
   }, [device, hashrate, stake]);
 
   useLayoutEffect(() => {
