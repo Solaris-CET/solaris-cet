@@ -13,8 +13,8 @@ export const SUPPORTED_LANGS: LangCode[] = ['en', 'es', 'zh', 'ru'];
 
 const detectLanguage = (): LangCode => {
   try {
-    const browserLang = navigator.language.slice(0, 2) as LangCode;
-    return SUPPORTED_LANGS.includes(browserLang) ? browserLang : 'en';
+    const browserLang = navigator.language.slice(0, 2);
+    return (SUPPORTED_LANGS as string[]).includes(browserLang) ? (browserLang as LangCode) : 'en';
   } catch {
     return 'en';
   }
