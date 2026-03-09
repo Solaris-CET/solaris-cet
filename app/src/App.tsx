@@ -14,6 +14,7 @@ import HowToBuySection from './sections/HowToBuySection';
 import MiningCalculatorSection from './sections/MiningCalculatorSection';
 import SecuritySection from './sections/SecuritySection';
 import WhitepaperSection from './sections/WhitepaperSection';
+import HighIntelligenceSection from './sections/HighIntelligenceSection';
 import FooterSection from './sections/FooterSection';
 import './App.css';
 
@@ -208,7 +209,12 @@ function App() {
             <WhitepaperSection />
           </div>
           
-          {/* Section 12: Footer - pin: false */}
+          {/* Section 12: High Intelligence - pin: false */}
+          <div className="relative z-[108]">
+            <HighIntelligenceSection />
+          </div>
+          
+          {/* Section 13: Footer - pin: false */}
           <div className="relative z-[110]">
             <FooterSection />
           </div>

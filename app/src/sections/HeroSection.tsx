@@ -4,6 +4,9 @@ import { ArrowRight, Zap, Activity, Globe } from 'lucide-react';
 import ParticleCanvas from '../components/ParticleCanvas';
 import GlowOrbs from '../components/GlowOrbs';
 
+const SOLARIS_LOGO_URL = 'https://github.com/user-attachments/assets/f8caeafa-4f7c-4f59-a149-ba41b2bca701';
+const DEDUST_POOL_URL = 'https://dedust.io/pools/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB/deposit';
+
 
 const HeroSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -246,7 +249,7 @@ const HeroSection = () => {
       >
         <img
           src="/hero-coin.png"
-          alt="Bitcoin Solaris Coin"
+          alt="Solaris CET Coin"
           className="w-full h-auto animate-coin-rotate drop-shadow-[0_0_80px_rgba(242,201,76,0.35)]"
         />
         {/* Coin reflection */}
@@ -264,10 +267,10 @@ const HeroSection = () => {
       {/* Title Card - Left */}
       <div
         ref={titleCardRef}
-        className="absolute left-[7vw] top-[28vh] w-[min(38vw,520px)] z-20"
+        className="absolute left-[7vw] top-[20vh] w-[min(40vw,540px)] z-20"
         style={{ transformStyle: 'preserve-3d' }}
       >
-        <div className="glass-card-gold p-6 lg:p-8 relative overflow-hidden holo-card">
+        <div className="glass-card-gold p-5 lg:p-7 relative overflow-hidden holo-card">
           <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-solaris-gold via-solaris-gold to-transparent" />
           
           {/* Circuit trace decoration */}
@@ -278,31 +281,43 @@ const HeroSection = () => {
               <circle cx="40" cy="40" r="3" fill="#2EE7FF" opacity="0.8" />
             </svg>
           </div>
-          
-          <h1
+
+          {/* Logo + Title row */}
+          <div
             ref={headlineRef}
-            className="font-display font-bold text-[clamp(32px,4vw,56px)] text-solaris-text mb-2"
+            className="flex items-center gap-3 mb-2"
           >
-            <span className="word inline-block">Bitcoin</span>{' '}
-            <span className="word inline-block text-gradient-animated">Solaris</span>
-          </h1>
-          
+            <img
+              src={SOLARIS_LOGO_URL}
+              alt="Solaris CET Logo"
+              className="word shrink-0 w-12 h-12 rounded-xl object-contain"
+            />
+            <h1 className="font-display font-bold text-[clamp(26px,3.5vw,50px)] text-solaris-text leading-none">
+              <span className="word inline-block text-gradient-animated">SOLARIS</span>
+              <span className="word inline-block text-solaris-text/80 ml-2">(CET)</span>
+            </h1>
+          </div>
+
           <p
             ref={subheadlineRef}
-            className="font-display font-semibold text-[clamp(16px,1.5vw,24px)] text-solaris-gold mb-4"
+            className="font-display font-semibold text-[clamp(12px,1.2vw,16px)] text-solaris-gold mb-3 flex items-center gap-2 flex-wrap"
           >
-            The Substrate for High-Intelligence Models
+            <img src="/bitcoin-logo.svg" alt="Bitcoin" className="w-5 h-5 inline-block shrink-0" />
+            Powered by Bitcoin · Bridge Between AI &amp; High Intelligence
           </p>
           
           <p
             ref={bodyRef}
-            className="text-solaris-muted text-sm lg:text-base leading-relaxed"
+            className="text-solaris-muted text-sm leading-relaxed"
           >
-            A hybrid dual-layer blockchain delivering 100,000 TPS and 2-second finality—combining the security of Bitcoin with the speed of the agentic era.
+            100,000 TPS · 2-second finality on <span className="text-solaris-cyan font-medium">TON</span>. Powered by{' '}
+            <span className="text-solaris-gold font-medium">ReAct</span>,{' '}
+            <span className="text-solaris-gold font-medium">BRAID</span> &amp;{' '}
+            <span className="text-solaris-gold font-medium">Quantum OS</span> protocols — the substrate for next-generation High-Intelligence AI agents.
           </p>
 
           {/* Status pill */}
-          <div className="mt-4 flex items-center gap-2">
+          <div className="mt-3 flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="font-mono text-[11px] text-emerald-400">LIVE ON TON MAINNET</span>
           </div>
@@ -312,7 +327,7 @@ const HeroSection = () => {
       {/* CTA Buttons - Left under title */}
       <div
         ref={ctaRef}
-        className="absolute left-[7vw] top-[58vh] z-20 flex flex-wrap gap-4"
+        className="absolute left-[7vw] top-[68vh] z-20 flex flex-wrap gap-3"
       >
         <button
           className="btn-filled-gold flex items-center gap-2 group"
@@ -330,7 +345,7 @@ const HeroSection = () => {
         </button>
         <button
           className="btn-gold flex items-center gap-2"
-          onClick={() => window.open('https://dedust.io/swap/TON/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB', '_blank')}
+          onClick={() => window.open(DEDUST_POOL_URL, '_blank')}
         >
           Buy CET on DeDust
         </button>
@@ -339,7 +354,7 @@ const HeroSection = () => {
       {/* HUD Card - Right */}
       <div
         ref={hudCardRef}
-        className="absolute right-[7vw] top-[28vh] w-[min(28vw,380px)] z-20"
+        className="absolute right-[7vw] top-[20vh] w-[min(28vw,380px)] z-20"
         style={{ transformStyle: 'preserve-3d' }}
       >
         <div className="glass-card p-5 lg:p-6 holo-card">

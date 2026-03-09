@@ -3,7 +3,7 @@ import { Menu, X, Sun } from 'lucide-react';
 
 // Static data defined outside component to avoid re-creation on every render
 const navLinks = [
-  { label: 'Nova App', href: '#nova-app' },
+  { label: 'CET App', href: '#nova-app' },
   { label: 'Tokenomics', href: '#staking' },
   { label: 'Roadmap', href: '#roadmap' },
   { label: 'How to Buy', href: '#how-to-buy' },

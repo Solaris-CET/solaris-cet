@@ -1,13 +1,15 @@
 import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
-import { Smartphone, Droplets, TrendingUp, Clock, Battery } from 'lucide-react';
+import { TrendingUp, Droplets, Clock, Battery } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
+
+const SOLARIS_LOGO_URL = 'https://github.com/user-attachments/assets/f8caeafa-4f7c-4f59-a149-ba41b2bca701';
 
 
 // Static data defined outside component to avoid re-creation on every render
 const tickerItems = [
   { label: 'Hashrate', value: '14.2 TH/s', icon: TrendingUp },
-  { label: 'Earnings', value: '0.0041 BTC-S / hr', icon: Droplets },
+  { label: 'Earnings', value: '0.0041 CET / hr', icon: Droplets },
   { label: 'Uptime', value: '99.97%', icon: Battery },
   { label: 'Next Payout', value: '00:14:22', icon: Clock },
 ];
@@ -115,7 +117,7 @@ const NovaAppSection = () => {
             <div className="flex-1 relative">
               <img
                 src="/phone-mockup.png"
-                alt="Solaris Nova App"
+                alt="Solaris CET App"
                 className="w-full h-full object-contain"
               />
 
@@ -124,8 +126,12 @@ const NovaAppSection = () => {
                 {/* App header */}
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <Smartphone className="w-5 h-5 text-solaris-gold" />
-                    <span className="font-display font-semibold text-solaris-text">Nova</span>
+                    <img
+                      src={SOLARIS_LOGO_URL}
+                      alt="Solaris CET"
+                      className="w-6 h-6 rounded-md object-contain"
+                    />
+                    <span className="font-display font-semibold text-solaris-text text-sm">CET</span>
                   </div>
                   <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 </div>
@@ -150,7 +156,7 @@ const NovaAppSection = () => {
                   </div>
                   <div className="flex justify-between items-center p-3 rounded-lg bg-white/5">
                     <span className="text-solaris-muted text-sm">Earned Today</span>
-                    <span className="font-mono text-solaris-text">0.098 BTC-S</span>
+                    <span className="font-mono text-solaris-text">0.098 CET</span>
                   </div>
                 </div>
               </div>
@@ -166,23 +172,27 @@ const NovaAppSection = () => {
       >
         <div className="glass-card p-6 lg:p-8">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-10 h-10 rounded-lg bg-solaris-gold/10 flex items-center justify-center">
-              <Smartphone className="w-5 h-5 text-solaris-gold" />
+            <div className="w-10 h-10 rounded-lg overflow-hidden">
+              <img
+                src={SOLARIS_LOGO_URL}
+                alt="Solaris CET"
+                className="w-full h-full object-contain"
+              />
             </div>
             <span className="hud-label text-solaris-gold">Mobile Mining</span>
           </div>
 
           <h2 className="font-display font-bold text-[clamp(22px,2.5vw,36px)] text-solaris-text mb-4">
-            Solaris <span className="text-solaris-gold">Nova</span> App
+            Solaris <span className="text-solaris-gold">CET</span> App
           </h2>
 
           <div className="space-y-4 mb-6">
             <p className="text-solaris-muted text-sm lg:text-base leading-relaxed">
-              Mine <span className="text-solaris-gold font-semibold">BTC-S</span> from your smartphone{' '}
+              Mine <span className="text-solaris-gold font-semibold">CET</span> from your smartphone{' '}
               <span className="text-solaris-text font-medium">without draining battery</span>.
             </p>
             <p className="text-solaris-muted text-sm lg:text-base leading-relaxed">
-              <span className="text-solaris-cyan font-semibold">Liquid staking</span> converts rewards into sBTC-S—so you stay liquid while earning.
+              <span className="text-solaris-cyan font-semibold">Liquid staking</span> converts rewards into sCET—so you stay liquid while earning. Powered by the TON blockchain and High-Intelligence AI protocols.
             </p>
           </div>
 
