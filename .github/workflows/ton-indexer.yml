@@ -1,0 +1,97 @@
+name: TON Chain Indexer
+
+on:
+  schedule:
+    # Run every 5 minutes
+    - cron: "*/5 * * * *"
+  workflow_dispatch: # Allow manual triggering
+
+permissions:
+  contents: write
+
+jobs:
+  index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch CET token state and write state.json
+        run: |
+          set -euo pipefail
+
+          CET_CONTRACT="EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX"
+          DEDUST_POOL="EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB"
+
+          # ── 1. Jetton master info ─────────────────────────────────────────────
+          JETTON_JSON=$(curl -sf \
+            "https://tonapi.io/v2/jettons/${CET_CONTRACT}" \
+            -H "Accept: application/json" || echo '{}')
+
+          # ── 2. DeDust pool info ───────────────────────────────────────────────
+          POOL_JSON=$(curl -sf \
+            "https://api.dedust.io/v2/pools/${DEDUST_POOL}" \
+            -H "Accept: application/json" || echo '{}')
+
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          # ── 3. Save raw JSON blobs to temp files, then merge with Python ────────
+          printf '%s' "$JETTON_JSON" > /tmp/jetton.json
+          printf '%s' "$POOL_JSON"   > /tmp/pool.json
+
+          python3 <<PYEOF
+import json
+
+cet_contract = "$CET_CONTRACT"
+dedust_pool  = "$DEDUST_POOL"
+timestamp    = "$TIMESTAMP"
+
+with open("/tmp/jetton.json") as f:
+    jetton = json.load(f)
+
+with open("/tmp/pool.json") as f:
+    pool = json.load(f)
+
+meta         = jetton.get("metadata", {})
+total_supply = jetton.get("total_supply")
+decimals_raw = meta.get("decimals")
+tvl_ton      = pool.get("totalSupply")
+price_usd    = pool.get("price")
+
+state = {
+    "token": {
+        "symbol":      meta.get("symbol") if meta.get("symbol") else "CET",
+        "name":        meta.get("name") if meta.get("name") else "SOLARIS CET",
+        "contract":    cet_contract,
+        "totalSupply": total_supply if total_supply is not None else None,
+        "decimals":    int(decimals_raw) if decimals_raw is not None else 9,
+    },
+    "pool": {
+        "address":  dedust_pool,
+        "tvlTon":   tvl_ton if tvl_ton is not None else None,
+        "priceUsd": price_usd if price_usd is not None else None,
+    },
+    "updatedAt": timestamp,
+}
+
+with open("app/public/api/state.json", "w") as f:
+    json.dump(state, f, indent=2)
+print("state.json written successfully")
+PYEOF
+
+      - name: Commit and push if state changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add app/public/api/state.json
+
+          # Only commit (and trigger a Pages redeploy) when data has actually changed
+          if git diff --cached --quiet; then
+            echo "No changes to state.json — skipping commit."
+          else
+            git commit -m "chore(data): update CET token state"
+            git push
+          fi
