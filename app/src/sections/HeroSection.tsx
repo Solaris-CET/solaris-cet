@@ -244,7 +244,7 @@ const HeroSection = () => {
       {/* 3D Coin - Center */}
       <div
         ref={coinRef}
-        className="absolute left-1/2 top-[52%] -translate-x-1/2 -translate-y-1/2 w-[min(42vw,520px)] z-10"
+        className="absolute left-1/2 top-[70%] sm:top-[52%] -translate-x-1/2 -translate-y-1/2 w-[min(70vw,520px)] sm:w-[min(42vw,520px)] z-10"
         style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}
       >
         <img
@@ -267,7 +267,7 @@ const HeroSection = () => {
       {/* Title Card - Left */}
       <div
         ref={titleCardRef}
-        className="absolute left-[7vw] top-[20vh] w-[min(40vw,540px)] z-20"
+        className="absolute left-[5vw] sm:left-[7vw] top-[12vh] sm:top-[20vh] w-[min(90vw,540px)] sm:w-[min(40vw,540px)] z-20"
         style={{ transformStyle: 'preserve-3d' }}
       >
         <div className="glass-card-gold p-5 lg:p-7 relative overflow-hidden holo-card">
@@ -292,7 +292,7 @@ const HeroSection = () => {
               alt="Solaris CET Logo"
               className="word shrink-0 w-12 h-12 rounded-xl object-contain"
             />
-            <h1 className="font-display font-bold text-[clamp(26px,3.5vw,50px)] text-solaris-text leading-none">
+            <h1 className="font-display font-bold text-[clamp(24px,3.5vw,50px)] text-solaris-text leading-none">
               <span className="word inline-block text-gradient-animated">SOLARIS</span>
               <span className="word inline-block text-solaris-text/80 ml-2">(CET)</span>
             </h1>
@@ -327,7 +327,7 @@ const HeroSection = () => {
       {/* CTA Buttons - Left under title */}
       <div
         ref={ctaRef}
-        className="absolute left-[7vw] top-[68vh] z-20 flex flex-wrap gap-3"
+        className="absolute left-[5vw] sm:left-[7vw] top-[62vh] sm:top-[68vh] z-20 flex flex-wrap gap-3"
       >
         <button
           className="btn-filled-gold flex items-center gap-2 group"
@@ -351,10 +351,10 @@ const HeroSection = () => {
         </button>
       </div>
 
-      {/* HUD Card - Right */}
+      {/* HUD Card - Right (hidden on mobile) */}
       <div
         ref={hudCardRef}
-        className="absolute right-[7vw] top-[20vh] w-[min(28vw,380px)] z-20"
+        className="hidden sm:block absolute right-[7vw] top-[20vh] w-[min(28vw,380px)] z-20"
         style={{ transformStyle: 'preserve-3d' }}
       >
         <div className="glass-card p-5 lg:p-6 holo-card">
