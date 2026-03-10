@@ -7,6 +7,7 @@ export interface Translations {
     roadmap: string;
     howToBuy: string;
     whitepaper: string;
+    resources: string;
   };
   hero: {
     tagline: string;
@@ -29,6 +30,7 @@ const translations: Record<LangCode, Translations> = {
       roadmap: 'Roadmap',
       howToBuy: 'How to Buy',
       whitepaper: 'Whitepaper',
+      resources: 'Resources',
     },
     hero: {
       tagline: 'The Digital Foundation of Cetățuia',
@@ -49,6 +51,7 @@ const translations: Record<LangCode, Translations> = {
       roadmap: 'Hoja de Ruta',
       howToBuy: 'Cómo Comprar',
       whitepaper: 'Libro Blanco',
+      resources: 'Recursos',
     },
     hero: {
       tagline: 'La Base Digital de Cetățuia',
@@ -69,6 +72,7 @@ const translations: Record<LangCode, Translations> = {
       roadmap: '路线图',
       howToBuy: '如何购买',
       whitepaper: '白皮书',
+      resources: '资源',
     },
     hero: {
       tagline: 'Cetățuia 的数字基础',
@@ -89,6 +93,7 @@ const translations: Record<LangCode, Translations> = {
       roadmap: 'Дорожная карта',
       howToBuy: 'Как купить',
       whitepaper: 'Белая книга',
+      resources: 'Ресурсы',
     },
     hero: {
       tagline: 'Цифровая Основа Cetățuia',

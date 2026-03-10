@@ -8,6 +8,7 @@ const navLinks = [
   { label: 'Tokenomics', href: '#staking' },
   { label: 'Roadmap', href: '#roadmap' },
   { label: 'How to Buy', href: '#how-to-buy' },
+  { label: 'Resources', href: '#resources' },
 ];
 
 /**
