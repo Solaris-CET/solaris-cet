@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navigation from './components/Navigation';
 import CursorGlow from './components/CursorGlow';
 import LazyLoadWrapper from './components/LazyLoadWrapper';
+import { ErrorBoundary } from './components/ErrorBoundary';
 // Pinned sections — loaded eagerly so the snap/scroll setup can find their ScrollTriggers
 import HeroSection from './sections/HeroSection';
 import HybridEngineSection from './sections/HybridEngineSection';
@@ -163,77 +164,107 @@ function App() {
         <main className="relative">
           {/* Section 1: Hero - pin: true */}
           <div className="relative z-10">
-            <HeroSection />
+            <ErrorBoundary>
+              <HeroSection />
+            </ErrorBoundary>
           </div>
           
           {/* Section 2: Hybrid Engine - pin: true */}
           <div className="relative z-20">
-            <HybridEngineSection />
+            <ErrorBoundary>
+              <HybridEngineSection />
+            </ErrorBoundary>
           </div>
           
           {/* Section 3: Intelligence Core - pin: true */}
           <div className="relative z-30">
-            <IntelligenceCoreSection />
+            <ErrorBoundary>
+              <IntelligenceCoreSection />
+            </ErrorBoundary>
           </div>
           
           {/* Section 4: Nova App - pin: true */}
           <div className="relative z-40">
-            <NovaAppSection />
+            <ErrorBoundary>
+              <NovaAppSection />
+            </ErrorBoundary>
           </div>
           
           {/* Section 5: Tokenomics - pin: true */}
           <div className="relative z-50">
-            <TokenomicsSection />
+            <ErrorBoundary>
+              <TokenomicsSection />
+            </ErrorBoundary>
           </div>
           
           {/* Section 6: Compliance - pin: true */}
           <div className="relative z-[60]">
-            <ComplianceSection />
+            <ErrorBoundary>
+              <ComplianceSection />
+            </ErrorBoundary>
           </div>
           
           {/* Section 7: Roadmap - pin: false */}
           <div className="relative z-[70]">
-            <LazyLoadWrapper><RoadmapSection /></LazyLoadWrapper>
+            <LazyLoadWrapper>
+              <ErrorBoundary><RoadmapSection /></ErrorBoundary>
+            </LazyLoadWrapper>
           </div>
 
           {/* Section 8: How to Buy - pin: false */}
           <div className="relative z-[80]">
-            <LazyLoadWrapper><HowToBuySection /></LazyLoadWrapper>
+            <LazyLoadWrapper>
+              <ErrorBoundary><HowToBuySection /></ErrorBoundary>
+            </LazyLoadWrapper>
           </div>
 
           {/* Section 9: Mining Calculator - pin: false */}
           <div className="relative z-[90]">
-            <LazyLoadWrapper><MiningCalculatorSection /></LazyLoadWrapper>
+            <LazyLoadWrapper>
+              <ErrorBoundary><MiningCalculatorSection /></ErrorBoundary>
+            </LazyLoadWrapper>
           </div>
           
           {/* Section 10: Security - pin: false */}
           <div className="relative z-[100]">
-            <LazyLoadWrapper><SecuritySection /></LazyLoadWrapper>
+            <LazyLoadWrapper>
+              <ErrorBoundary><SecuritySection /></ErrorBoundary>
+            </LazyLoadWrapper>
           </div>
           
           {/* Section 11: Whitepaper - pin: false */}
           <div className="relative z-[105]">
-            <LazyLoadWrapper><WhitepaperSection /></LazyLoadWrapper>
+            <LazyLoadWrapper>
+              <ErrorBoundary><WhitepaperSection /></ErrorBoundary>
+            </LazyLoadWrapper>
           </div>
           
           {/* Section 12: High Intelligence - pin: false */}
           <div className="relative z-[108]">
-            <LazyLoadWrapper><HighIntelligenceSection /></LazyLoadWrapper>
+            <LazyLoadWrapper>
+              <ErrorBoundary><HighIntelligenceSection /></ErrorBoundary>
+            </LazyLoadWrapper>
           </div>
           
           {/* Section 13: Ecosystem Index - pin: false */}
           <div className="relative z-[109]">
-            <LazyLoadWrapper><EcosystemIndexSection /></LazyLoadWrapper>
+            <LazyLoadWrapper>
+              <ErrorBoundary><EcosystemIndexSection /></ErrorBoundary>
+            </LazyLoadWrapper>
           </div>
 
           {/* Section 14: Resources - pin: false */}
           <div className="relative z-[110]">
-            <LazyLoadWrapper><ResourcesSection /></LazyLoadWrapper>
+            <LazyLoadWrapper>
+              <ErrorBoundary><ResourcesSection /></ErrorBoundary>
+            </LazyLoadWrapper>
           </div>
           
           {/* Section 15: Footer - pin: false */}
           <div className="relative z-[111]">
-            <LazyLoadWrapper><FooterSection /></LazyLoadWrapper>
+            <LazyLoadWrapper>
+              <ErrorBoundary><FooterSection /></ErrorBoundary>
+            </LazyLoadWrapper>
           </div>
         </main>
       </div>

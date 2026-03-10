@@ -9,7 +9,7 @@ interface LanguageContextValue {
   t: Translations;
 }
 
-export const SUPPORTED_LANGS: LangCode[] = ['en', 'es', 'zh', 'ru'];
+export const SUPPORTED_LANGS: LangCode[] = ['en', 'es', 'zh', 'ru', 'ro'];
 
 const detectLanguage = (): LangCode => {
   try {
