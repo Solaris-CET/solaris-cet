@@ -1,6 +1,6 @@
 import { Activity, RefreshCw, ExternalLink } from 'lucide-react';
 import { useLivePoolData } from '../hooks/useLivePoolData';
-import { useLivePoolData as useLivePoolDataUsd } from '../hooks/use-live-pool-data';
+import { useLivePoolData as useUsdPoolMetrics } from '../hooks/use-live-pool-data';
 
 const DEDUST_POOL_URL =
   'https://dedust.io/pools/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
@@ -27,7 +27,7 @@ const formatUsd = (value: number | null, decimals = 2): string => {
 
 const LivePoolStats = () => {
   const { data, loading, error, lastUpdated } = useLivePoolData();
-  const usd = useLivePoolDataUsd();
+  const usd = useUsdPoolMetrics();
 
   const poolStats = data
     ? [
@@ -45,7 +45,7 @@ const LivePoolStats = () => {
   ];
 
   const isLoading = loading || usd.loading;
-  const hasError = error && usd.error;
+  const hasError = error || usd.error;
 
   return (
     <div className="glass-card p-5 lg:p-6">
@@ -108,7 +108,7 @@ const LivePoolStats = () => {
                       : 'text-emerald-400'
                   }`}
                 >
-                  {usd.loading && usd.priceUsd === null ? (
+                  {isLoading && usd.priceUsd === null ? (
                     <span className="animate-pulse">—</span>
                   ) : (
                     stat.value
