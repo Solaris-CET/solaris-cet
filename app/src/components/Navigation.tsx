@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Menu, X, Sun } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
+import WalletConnect from './WalletConnect';
 
 // Static data defined outside component to avoid re-creation on every render
 const navLinks = [
@@ -88,6 +89,7 @@ const Navigation = () => {
           {/* CTA Button */}
           <div className="hidden lg:flex items-center gap-3">
             <LanguageSelector />
+            <WalletConnect />
             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-400/10 border border-emerald-400/20">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span className="font-mono text-[11px] text-emerald-400">LIVE</span>
@@ -106,6 +108,8 @@ const Navigation = () => {
             className="lg:hidden p-2 text-solaris-text"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -114,6 +118,7 @@ const Navigation = () => {
 
       {/* Mobile Menu */}
       <div
+        id="mobile-menu"
         className={`lg:hidden absolute top-full left-0 right-0 bg-solaris-dark/95 backdrop-blur-xl border-b border-white/5 transition-all duration-300 ${
           isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}
@@ -129,6 +134,9 @@ const Navigation = () => {
               {link.label}
             </a>
           ))}
+          <div className="mt-4">
+            <WalletConnect />
+          </div>
           <button className="btn-gold text-sm mt-4">
             Start Mining
           </button>

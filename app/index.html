@@ -32,6 +32,7 @@
 
     <!-- Canonical -->
     <link rel="canonical" href="https://aamclaudiu-hash.github.io/solaris-cet/" />
+    <link rel="sitemap" type="application/xml" href="./sitemap.xml" />
 
     <!-- PWA / Mobile -->
     <meta name="theme-color" content="#05060B" />
@@ -45,11 +46,11 @@
     <!-- Content Security Policy -->
     <meta http-equiv="Content-Security-Policy"
           content="default-src 'self';
-                   script-src 'self' 'unsafe-inline';
+                   script-src 'self' 'unsafe-inline' https://plausible.io;
                    style-src 'self' 'unsafe-inline';
                    img-src 'self' data: https:;
                    font-src 'self' data:;
-                   connect-src 'self' https://toncenter.com https://tonapi.io https://github.com https://api.dedust.io;
+                   connect-src 'self' https://toncenter.com https://tonapi.io https://github.com https://api.dedust.io https://bridge.tonapi.io https://tonconnectapi.com https://plausible.io;
                    frame-src 'none';" />
 
     <!-- Structured Data -->
@@ -71,8 +72,13 @@
     </script>
 
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+
+    <!-- Privacy-friendly analytics (no cookies, GDPR-compliant) -->
+    <script defer data-domain="aamclaudiu-hash.github.io/solaris-cet" src="https://plausible.io/js/script.js"></script>
   </head>
   <body>
+    <!-- Skip to main content (accessibility) -->
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://aamclaudiu-hash.github.io/solaris-cet/sitemap.xml

@@ -1,6 +1,7 @@
 import { lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import Navigation from './components/Navigation';
 import CursorGlow from './components/CursorGlow';
 import LazyLoadWrapper from './components/LazyLoadWrapper';
@@ -115,6 +116,7 @@ function App() {
   }, [isLoaded, buildSnapTo]);
 
   return (
+    <TonConnectUIProvider manifestUrl="https://aamclaudiu-hash.github.io/solaris-cet/tonconnect-manifest.json">
     <LanguageContext.Provider value={langState}>
       {/* Loading overlay */}
       <div ref={loadingRef} className="loading-overlay">
@@ -160,7 +162,7 @@ function App() {
         <Navigation />
         
         {/* Main content */}
-        <main className="relative">
+        <main id="main-content" className="relative">
           {/* Section 1: Hero - pin: true */}
           <div className="relative z-10">
             <HeroSection />
@@ -238,6 +240,7 @@ function App() {
         </main>
       </div>
     </LanguageContext.Provider>
+    </TonConnectUIProvider>
   );
 }
 
