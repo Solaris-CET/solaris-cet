@@ -4,7 +4,7 @@ import { ArrowRight, Zap, Activity, Globe } from 'lucide-react';
 import ParticleCanvas from '../components/ParticleCanvas';
 import GlowOrbs from '../components/GlowOrbs';
 
-const SOLARIS_LOGO_URL = 'https://github.com/user-attachments/assets/f8caeafa-4f7c-4f59-a149-ba41b2bca701';
+const SOLARIS_LOGO_URL = `${import.meta.env.BASE_URL}icon-192.png`;
 const DEDUST_POOL_URL = 'https://dedust.io/pools/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB/deposit';
 
 
@@ -248,7 +248,7 @@ const HeroSection = () => {
         style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}
       >
         <img
-          src="/hero-coin.png"
+          src={`${import.meta.env.BASE_URL}hero-coin.png`}
           alt="Solaris CET Coin"
           className="w-full h-auto animate-coin-rotate drop-shadow-[0_0_80px_rgba(242,201,76,0.35)]"
         />
@@ -302,7 +302,7 @@ const HeroSection = () => {
             ref={subheadlineRef}
             className="font-display font-semibold text-[clamp(12px,1.2vw,16px)] text-solaris-gold mb-3 flex items-center gap-2 flex-wrap"
           >
-            <img src="/bitcoin-logo.svg" alt="Bitcoin" className="w-5 h-5 inline-block shrink-0" />
+            <img src={`${import.meta.env.BASE_URL}bitcoin-logo.svg`} alt="Bitcoin" className="w-5 h-5 inline-block shrink-0" />
             Powered by Bitcoin · Bridge Between AI &amp; High Intelligence
           </p>
           

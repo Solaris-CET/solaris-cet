@@ -3,7 +3,7 @@ import { gsap } from 'gsap';
 import { TrendingUp, Droplets, Clock, Battery } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
 
-const SOLARIS_LOGO_URL = 'https://github.com/user-attachments/assets/f8caeafa-4f7c-4f59-a149-ba41b2bca701';
+const SOLARIS_LOGO_URL = `${import.meta.env.BASE_URL}icon-192.png`;
 
 
 // Static data defined outside component to avoid re-creation on every render
@@ -116,7 +116,7 @@ const NovaAppSection = () => {
           <div className="h-full flex flex-col">
             <div className="flex-1 relative">
               <img
-                src="/phone-mockup.png"
+                src={`${import.meta.env.BASE_URL}phone-mockup.png`}
                 alt="Solaris CET App"
                 className="w-full h-full object-contain"
               />
