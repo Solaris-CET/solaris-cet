@@ -18,6 +18,7 @@ const MiningCalculatorSection = lazy(() => import('./sections/MiningCalculatorSe
 const SecuritySection = lazy(() => import('./sections/SecuritySection'));
 const WhitepaperSection = lazy(() => import('./sections/WhitepaperSection'));
 const HighIntelligenceSection = lazy(() => import('./sections/HighIntelligenceSection'));
+const EcosystemIndexSection = lazy(() => import('./sections/EcosystemIndexSection'));
 const ResourcesSection = lazy(() => import('./sections/ResourcesSection'));
 const FooterSection = lazy(() => import('./sections/FooterSection'));
 import { LanguageContext, useLanguageState } from './hooks/useLanguage';
@@ -220,13 +221,18 @@ function App() {
             <LazyLoadWrapper><HighIntelligenceSection /></LazyLoadWrapper>
           </div>
           
-          {/* Section 13: Resources - pin: false */}
+          {/* Section 13: Ecosystem Index - pin: false */}
           <div className="relative z-[109]">
+            <LazyLoadWrapper><EcosystemIndexSection /></LazyLoadWrapper>
+          </div>
+
+          {/* Section 14: Resources - pin: false */}
+          <div className="relative z-[110]">
             <LazyLoadWrapper><ResourcesSection /></LazyLoadWrapper>
           </div>
           
-          {/* Section 14: Footer - pin: false */}
-          <div className="relative z-[110]">
+          {/* Section 15: Footer - pin: false */}
+          <div className="relative z-[111]">
             <LazyLoadWrapper><FooterSection /></LazyLoadWrapper>
           </div>
         </main>
