@@ -9,7 +9,9 @@
   "pool": {
     "address": "EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB",
     "tvlTon": null,
-    "priceUsd": null
+    "tvlUsd": null,
+    "priceUsd": null,
+    "tonPriceUsd": null
   },
   "updatedAt": "2026-03-10T06:23:33Z"
 }

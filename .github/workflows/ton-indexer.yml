@@ -35,12 +35,18 @@ jobs:
             "https://api.dedust.io/v2/pools/${DEDUST_POOL}" \
             -H "Accept: application/json" || echo '{}')
 
+          # ── 3. DeDust prices (TON + CET in USD) ──────────────────────────────
+          PRICES_JSON=$(curl -sf \
+            "https://api.dedust.io/v2/prices" \
+            -H "Accept: application/json" || echo '[]')
+
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-          # ── 3. Save raw JSON blobs to temp files, then merge with Python ────────
+          # ── 4. Save raw JSON blobs to temp files, then merge with Python ────────
           mkdir -p app/public/api
           printf '%s' "$JETTON_JSON" > /tmp/jetton.json
           printf '%s' "$POOL_JSON"   > /tmp/pool.json
+          printf '%s' "$PRICES_JSON" > /tmp/prices.json
 
           TIMESTAMP="$TIMESTAMP" python3 .github/scripts/update_state.py
 
