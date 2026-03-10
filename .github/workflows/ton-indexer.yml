@@ -2,8 +2,8 @@ name: TON Chain Indexer
 
 on:
   schedule:
-    # Run every 5 minutes
-    - cron: "*/5 * * * *"
+    # Run every hour
+    - cron: "0 * * * *"
   workflow_dispatch: # Allow manual triggering
 
 permissions:
@@ -18,31 +18,20 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Fetch CET token state and write state.json
-        env:
-          CET_CONTRACT: "EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX"
-          DEDUST_POOL: "EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB"
-        run: |
-          set -euo pipefail
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: scripts/package-lock.json
 
-          # ── 1. Jetton master info ─────────────────────────────────────────────
-          JETTON_JSON=$(curl -sf \
-            "https://tonapi.io/v2/jettons/${CET_CONTRACT}" \
-            -H "Accept: application/json" || echo '{}')
+      - name: Install indexer dependencies
+        working-directory: scripts
+        run: npm ci --legacy-peer-deps
 
-          # ── 2. DeDust pool info ───────────────────────────────────────────────
-          POOL_JSON=$(curl -sf \
-            "https://api.dedust.io/v2/pools/${DEDUST_POOL}" \
-            -H "Accept: application/json" || echo '{}')
-
-          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-
-          # ── 3. Save raw JSON blobs to temp files, then merge with Python ────────
-          mkdir -p app/public/api
-          printf '%s' "$JETTON_JSON" > /tmp/jetton.json
-          printf '%s' "$POOL_JSON"   > /tmp/pool.json
-
-          TIMESTAMP="$TIMESTAMP" python3 .github/scripts/update_state.py
+      - name: Run TON indexer
+        working-directory: scripts
+        run: npm run index
 
       - name: Commit and push if state changed
         run: |
@@ -55,6 +44,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to state.json — skipping commit."
           else
-            git commit -m "chore(data): update CET token state"
+            git commit -m "chore(data): update CET token state [skip ci]"
             git push || echo "Push skipped — branch may be protected or up to date."
           fi
