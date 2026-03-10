@@ -36,6 +36,10 @@
 
 import type { InferenceSession, Tensor } from 'onnxruntime-web';
 
+// Keep in sync with the version pinned in package.json.
+const ORT_CDN_BASE =
+  'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.24.3/dist/';
+
 // ---------------------------------------------------------------------------
 // Public types (importable by host components)
 // ---------------------------------------------------------------------------
@@ -117,8 +121,7 @@ async function loadModel(modelUrl: string): Promise<void> {
   const ort = await import('onnxruntime-web');
   const backend = await resolveBackend();
 
-  ort.env.wasm.wasmPaths =
-    'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.24.3/dist/';
+  ort.env.wasm.wasmPaths = ORT_CDN_BASE;
 
   session = await ort.InferenceSession.create(modelUrl, {
     executionProviders: [backend, 'wasm'],
@@ -229,9 +232,9 @@ self.onmessage = async (event: MessageEvent<InboundMessage>): Promise<void> => {
         break;
 
       default: {
-        // Exhaustiveness guard — catches unhandled message types at compile time.
-        const unhandled: never = event.data;
-        void unhandled;
+        // Exhaustiveness guard — causes a compile error for unhandled message types.
+        const _exhaustive: never = event.data;
+        void _exhaustive;
       }
     }
   } catch (err) {

@@ -55,6 +55,9 @@ const IntelligenceCoreSection = () => {
     }, 8_000);
 
     return () => clearInterval(interval);
+  // `runInference` and `queryMemory` are `useCallback` values created with
+  // empty deps in useAiWorker — they are referentially stable for the lifetime
+  // of the component, so this effect runs exactly once after mount.
   }, [runInference, queryMemory]);
 
   useEffect(() => {
