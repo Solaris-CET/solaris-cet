@@ -367,7 +367,7 @@ const HeroSection = () => {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-solaris-muted text-sm">TPS</span>
-              <span className="font-mono text-solaris-gold text-lg font-semibold animate-text-flicker">102,341</span>
+              <span className="font-mono text-solaris-gold text-lg font-semibold animate-text-flicker">~100,000</span>
             </div>
             <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             <div className="flex justify-between items-center">
@@ -379,10 +379,14 @@ const HeroSection = () => {
               <span className="text-solaris-muted text-sm">Active Nodes</span>
               <span className="font-mono text-solaris-text text-lg font-semibold flex items-center gap-2">
                 <Globe className="w-4 h-4" />
-                18,420
+                ~300
               </span>
             </div>
           </div>
+
+          <p className="mt-3 text-[10px] text-solaris-muted/50 text-right">
+            * TON network estimates
+          </p>
 
           {/* Mini chart */}
           <div className="mt-5 h-16 relative">

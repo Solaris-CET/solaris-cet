@@ -1,4 +1,4 @@
-export type LangCode = 'en' | 'es' | 'zh' | 'ru';
+export type LangCode = 'en' | 'es' | 'zh' | 'ru' | 'ro';
 
 export interface Translations {
   nav: {
@@ -105,6 +105,27 @@ const translations: Record<LangCode, Translations> = {
       title: 'Токеномика',
       supply: 'Общий запас',
       poolAddress: 'Адрес пула DeDust',
+    },
+  },
+  ro: {
+    nav: {
+      home: 'Acasă',
+      tokenomics: 'Tokenomică',
+      roadmap: 'Foaie de Parcurs',
+      howToBuy: 'Cum să Cumperi',
+      whitepaper: 'Whitepaper',
+      resources: 'Resurse',
+    },
+    hero: {
+      tagline: 'Fundația Digitală a Cetățuiei',
+      subtitle: 'Un token ultra-rar cu 9.000 CET pe blockchain-ul TON',
+      buyNow: 'Cumpără CET',
+      learnMore: 'Află Mai Mult',
+    },
+    tokenomics: {
+      title: 'Tokenomică',
+      supply: 'Ofertă Totală',
+      poolAddress: 'Adresa Pool-ului DeDust',
     },
   },
 };
