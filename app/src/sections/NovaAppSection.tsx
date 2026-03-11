@@ -118,6 +118,8 @@ const NovaAppSection = () => {
               <img
                 src={`${import.meta.env.BASE_URL}phone-mockup.png`}
                 alt="Solaris CET App"
+                width="360"
+                height="720"
                 className="w-full h-full object-contain"
               />
 
@@ -129,6 +131,8 @@ const NovaAppSection = () => {
                     <img
                       src={SOLARIS_LOGO_URL}
                       alt="Solaris CET"
+                      width="24"
+                      height="24"
                       className="w-6 h-6 rounded-md object-contain"
                     />
                     <span className="font-display font-semibold text-solaris-text text-sm">CET</span>
@@ -176,6 +180,8 @@ const NovaAppSection = () => {
               <img
                 src={SOLARIS_LOGO_URL}
                 alt="Solaris CET"
+                width="40"
+                height="40"
                 className="w-full h-full object-contain"
               />
             </div>

@@ -250,6 +250,8 @@ const HeroSection = () => {
         <img
           src={`${import.meta.env.BASE_URL}hero-coin.png`}
           alt="Solaris CET Coin"
+          width="512"
+          height="512"
           className="w-full h-auto animate-coin-rotate drop-shadow-[0_0_80px_rgba(242,201,76,0.35)]"
         />
         {/* Coin reflection */}
@@ -290,6 +292,8 @@ const HeroSection = () => {
             <img
               src={SOLARIS_LOGO_URL}
               alt="Solaris CET Logo"
+              width="48"
+              height="48"
               className="word shrink-0 w-12 h-12 rounded-xl object-contain"
             />
             <h1 className="font-display font-bold text-[clamp(24px,3.5vw,50px)] text-solaris-text leading-none">
@@ -302,7 +306,7 @@ const HeroSection = () => {
             ref={subheadlineRef}
             className="font-display font-semibold text-[clamp(12px,1.2vw,16px)] text-solaris-gold mb-3 flex items-center gap-2 flex-wrap"
           >
-            <img src={`${import.meta.env.BASE_URL}bitcoin-logo.svg`} alt="Bitcoin" className="w-5 h-5 inline-block shrink-0" />
+            <img src={`${import.meta.env.BASE_URL}bitcoin-logo.svg`} alt="Bitcoin" width="20" height="20" className="w-5 h-5 inline-block shrink-0" />
             Powered by Bitcoin · Bridge Between AI &amp; High Intelligence
           </p>
           

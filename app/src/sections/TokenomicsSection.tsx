@@ -225,7 +225,7 @@ const TokenomicsSection = () => {
                         href="https://dedust.io/swap/TON/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB"
                         target="_blank"
                         rel="noopener noreferrer"
-                        aria-label="View CET token on DeDust exchange"
+                        title="View CET token on DeDust exchange"
                         className="font-mono text-[10px] text-solaris-cyan hover:text-solaris-gold transition-colors"
                       >
                         EQB5…lfnB ↗

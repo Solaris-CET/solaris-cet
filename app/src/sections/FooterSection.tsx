@@ -279,7 +279,7 @@ const FooterSection = () => {
           </div>
           <div className="my-6 holo-line" />
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-            <p className="text-solaris-muted/60 text-sm">
+            <p className="text-solaris-muted text-sm">
               © {new Date().getFullYear()} Solaris CET. AI Bridge to High Intelligence. All rights reserved.
             </p>
           <div className="flex flex-col sm:flex-row items-center gap-3">
