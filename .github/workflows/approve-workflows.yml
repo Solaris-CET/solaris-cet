@@ -51,10 +51,22 @@ jobs:
             const runId = context.payload.workflow_run.id;
             console.log(`Approving workflow run ${runId} for actor "${actor}"`);
 
-            await github.rest.actions.approveWorkflowRun({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: runId,
-            });
-
-            console.log('Approved successfully.');
+            try {
+              await github.rest.actions.approveWorkflowRun({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: runId,
+              });
+              console.log('Approved successfully.');
+            } catch (err) {
+              // HTTP 403 means the run is not waiting for approval (e.g. it was
+              // triggered from the default branch and already approved automatically).
+              // Treat this as a no-op rather than a workflow failure.
+              if (err.status === 403) {
+                console.log(
+                  'Run is not waiting for approval (already approved or not required) — skipping.'
+                );
+                return;
+              }
+              throw err;
+            }
