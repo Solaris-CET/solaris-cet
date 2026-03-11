@@ -1,0 +1,21 @@
+{
+  "name": "solaris-ton-indexer",
+  "private": true,
+  "version": "1.0.0",
+  "description": "TON blockchain indexer for Solaris CET token and DeDust pool state",
+  "type": "module",
+  "scripts": {
+    "index": "npx tsx ton-indexer.ts"
+  },
+  "dependencies": {
+    "@dedust/sdk": "^0.8.7",
+    "@ton/ton": "^16.2.2",
+    "@ton/crypto": "^3.3.0",
+    "@ton/core": "^0.63.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "@types/node": "^22.0.0",
+    "typescript": "~5.9.3"
+  }
+}
