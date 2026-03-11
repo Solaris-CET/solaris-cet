@@ -8,10 +8,10 @@
   },
   "pool": {
     "address": "EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB",
-    "reserveTon": null,
-    "reserveCet": null,
-    "lpSupply": null,
-    "priceTonPerCet": null
+    "tvlTon": null,
+    "tvlUsd": null,
+    "priceUsd": null,
+    "tonPriceUsd": null
   },
   "updatedAt": "2026-03-10T06:23:33Z"
 }
