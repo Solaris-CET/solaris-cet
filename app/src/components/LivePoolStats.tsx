@@ -5,7 +5,7 @@ const DEDUST_POOL_URL =
   'https://dedust.io/pools/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
 
 const formatUsd = (value: number | null): string => {
-  if (value === null || value < 0) return '—';
+  if (value === null || !Number.isFinite(value) || value < 0) return '—';
   if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`;
   if (value >= 1_000) return `$${(value / 1_000).toFixed(2)}K`;
   if (value >= 1) return `$${value.toFixed(2)}`;
