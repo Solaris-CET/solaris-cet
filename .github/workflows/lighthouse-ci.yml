@@ -9,7 +9,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write   # Required to post inline PR comments with score details
 
 jobs:
   # ── 1. Build ──────────────────────────────────────────────────────────────

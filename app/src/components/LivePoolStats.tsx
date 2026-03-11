@@ -21,15 +21,12 @@ const LivePoolStats = () => {
   const { priceUsd, tvlUsd, volume24hUsd, tonPriceUsd, loading, error, lastUpdated } =
     useLivePoolData();
 
-  const stats =
-    !loading && !error
-      ? [
-          { label: 'CET Price', value: formatPrice(priceUsd), color: 'gold' },
-          { label: 'TVL', value: formatUsd(tvlUsd), color: 'cyan' },
-          { label: '24h Volume', value: formatUsd(volume24hUsd), color: 'emerald' },
-          { label: 'TON Price', value: formatUsd(tonPriceUsd), color: 'purple' },
-        ]
-      : [];
+  const stats = [
+    { label: 'CET Price', value: formatPrice(priceUsd), color: 'gold' },
+    { label: 'TVL', value: formatUsd(tvlUsd), color: 'cyan' },
+    { label: '24h Volume', value: formatUsd(volume24hUsd), color: 'emerald' },
+    { label: 'TON Price', value: formatUsd(tonPriceUsd), color: 'purple' },
+  ];
 
   return (
     <div className="glass-card p-5 lg:p-6">

@@ -1,215 +1,246 @@
 /**
  * aiWorker.ts
  *
- * Client-side AI Web Worker using ONNX Runtime Web (WebAssembly/WebGPU backend).
- * Offloads all inference to the user's device — zero server compute required.
+ * Edge-AI Web Worker that offloads on-device ONNX model inference and
+ * token-analytics computations to the client's WebAssembly / WebGPU runtime,
+ * eliminating cloud compute costs and keeping the main thread unblocked.
  *
- * Supported task families:
- *  - SOIL_ANALYSIS  – Soil & climate condition prediction
- *  - TOKEN_SIGNAL   – Simple token price-movement signal (heuristic model)
+ * Supported execution backends (probed in priority order):
+ *   1. webgpu  — GPU-accelerated via navigator.gpu (Chromium 113+)
+ *   2. wasm    — Universal WebAssembly fallback (all modern browsers)
+ *
+ * Memory leak prevention
+ *   ─ InferenceSession is created once per LOAD_MODEL and reused for all
+ *     subsequent RUN_INFERENCE calls.
+ *   ─ Input and output Tensor objects are explicitly disposed after every run
+ *     so WASM heap memory is reclaimed immediately.
+ *   ─ QUERY_MEMORY responds with the current JS-heap snapshot (Chromium) and
+ *     timestamp so the host page can track heap growth over time.
+ *
+ * If the bundle size of the main thread exceeds 500 KB, onnxruntime-web is
+ * only dynamically imported inside the worker (never in main-thread code),
+ * so it never contributes to the initial JS payload. Brotli compression and
+ * lazy-loading in vite.config.ts handle the rest.
  *
  * Message protocol
  * ──────────────────────────────────────────────────────────────────────────
- * Incoming  { type: AiRequestType; id: string; payload: AiRequestPayload }
- * Outgoing  { type: AiResponseType; id: string; payload: AiResponsePayload }
- *           { type: 'ERROR';        id: string; message: string }
+ * Incoming  { type: 'LOAD_MODEL',       payload: { modelUrl: string } }
+ *           { type: 'RUN_INFERENCE',    payload: AnalyticsInput }
+ *           { type: 'QUERY_MEMORY' }
+ *
+ * Outgoing  { type: 'MODEL_READY',      payload: { backend: string } }
+ *           { type: 'INFERENCE_RESULT', payload: AnalyticsOutput }
+ *           { type: 'MEMORY_STATS',     payload: MemoryStats }
+ *           { type: 'ERROR',            message: string }
  */
 
-import * as ort from 'onnxruntime-web';
+import type { InferenceSession, Tensor } from 'onnxruntime-web';
 
-// ── Configure ONNX Runtime ────────────────────────────────────────────────────
-// Prefer WebGPU for GPU-accelerated inference; fall back to Wasm automatically.
-ort.env.wasm.wasmPaths = './ort-wasm/';
+// Keep in sync with the version pinned in package.json.
+const ORT_CDN_BASE =
+  'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.24.3/dist/';
 
-// ── Request / Response types ──────────────────────────────────────────────────
+// ---------------------------------------------------------------------------
+// Public types (importable by host components)
+// ---------------------------------------------------------------------------
 
-export type AiRequestType = 'SOIL_ANALYSIS' | 'TOKEN_SIGNAL';
-export type AiResponseType = 'SOIL_ANALYSIS_RESULT' | 'TOKEN_SIGNAL_RESULT';
-
-export interface SoilAnalysisInput {
-  /** Soil pH (0–14) */
-  ph: number;
-  /** Moisture content percentage (0–100) */
-  moisture: number;
-  /** Temperature °C */
-  temperature: number;
-  /** Nitrogen content ppm */
-  nitrogen: number;
-  /** Phosphorus content ppm */
-  phosphorus: number;
-  /** Potassium content ppm */
-  potassium: number;
+/**
+ * Float32 feature vector describing a single analytics sample.
+ * Typical layout: [price, volume24h, liquidity, priceChange7d, marketCapRatio]
+ */
+export interface AnalyticsInput {
+  features: number[];
+  /** Optional caller-defined label echoed back in the result. */
+  label?: string;
 }
 
-export interface SoilAnalysisResult {
-  /** Predicted crop yield score (0–100) */
-  yieldScore: number;
-  /** Irrigation recommendation */
-  irrigationNeeded: boolean;
-  /** Fertilizer recommendation index (0 = none, 1 = low, 2 = medium, 3 = high) */
-  fertilizerLevel: number;
-  /** Confidence score (0–1) */
-  confidence: number;
+/** Result of one inference run (or the JS fallback computation). */
+export interface AnalyticsOutput {
+  /** Output scores produced by the model or JS fallback. */
+  scores: number[];
+  /** Wall-clock milliseconds consumed by the call. */
+  latencyMs: number;
+  /** Echo of the input label, if provided. */
+  label?: string;
+  /** Name of the execution backend used for this run. */
+  backend: string;
 }
 
-export interface TokenSignalInput {
-  /** Spot price in TON per CET */
-  priceTon: number;
-  /** Relative volume (0–1, normalised against 30-day average) */
-  relativeVolume: number;
-  /** Pool TVL in TON */
-  tvlTon: number;
+/** JS-heap memory snapshot for external leak monitoring. */
+export interface MemoryStats {
+  /**
+   * JS heap used in bytes (Chromium only via `performance.memory`).
+   * Null on Firefox, Safari, and other runtimes.
+   */
+  jsHeapUsedBytes: number | null;
+  /** Unix epoch timestamp of the snapshot. */
+  timestamp: number;
 }
 
-export interface TokenSignalResult {
-  /** Signal direction: 1 = bullish, 0 = neutral, -1 = bearish */
-  signal: 1 | 0 | -1;
-  /** Confidence (0–1) */
-  confidence: number;
+// ---------------------------------------------------------------------------
+// Discriminated-union inbound message types
+// ---------------------------------------------------------------------------
+
+type InboundMessage =
+  | { type: 'LOAD_MODEL';    payload: { modelUrl: string } }
+  | { type: 'RUN_INFERENCE'; payload: AnalyticsInput }
+  | { type: 'QUERY_MEMORY' };
+
+// ---------------------------------------------------------------------------
+// Worker-internal state
+// ---------------------------------------------------------------------------
+
+let session: InferenceSession | null = null;
+let activeBackend: string = 'none';
+
+// ---------------------------------------------------------------------------
+// WebGPU availability probe
+// ---------------------------------------------------------------------------
+
+async function resolveBackend(): Promise<'webgpu' | 'wasm'> {
+  if (typeof navigator === 'undefined' || !('gpu' in navigator)) return 'wasm';
+  try {
+    const gpu = (
+      navigator as unknown as { gpu: { requestAdapter(): Promise<unknown | null> } }
+    ).gpu;
+    const adapter = await gpu.requestAdapter();
+    return adapter !== null ? 'webgpu' : 'wasm';
+  } catch {
+    return 'wasm';
+  }
 }
 
-type AiRequestPayload = SoilAnalysisInput | TokenSignalInput;
-type AiResponsePayload = SoilAnalysisResult | TokenSignalResult;
+// ---------------------------------------------------------------------------
+// Model loading
+// ---------------------------------------------------------------------------
 
-interface AiRequest {
-  type: AiRequestType;
-  id: string;
-  payload: AiRequestPayload;
-}
+async function loadModel(modelUrl: string): Promise<void> {
+  // Dynamic import keeps onnxruntime-web out of the main-thread bundle.
+  // WASM binaries are served from the CDN so the Service Worker can cache
+  // them for fully-offline execution (see vite.config.ts runtimeCaching).
+  const ort = await import('onnxruntime-web');
+  const backend = await resolveBackend();
 
-interface AiResponse {
-  type: AiResponseType | 'ERROR';
-  id: string;
-  payload?: AiResponsePayload;
-  message?: string;
-}
+  ort.env.wasm.wasmPaths = ORT_CDN_BASE;
 
-// ── ONNX session cache ────────────────────────────────────────────────────────
-
-const sessionCache = new Map<string, ort.InferenceSession>();
-
-async function getSession(modelPath: string): Promise<ort.InferenceSession> {
-  const cached = sessionCache.get(modelPath);
-  if (cached) return cached;
-
-  const session = await ort.InferenceSession.create(modelPath, {
-    executionProviders: ['webgpu', 'wasm'],
+  session = await ort.InferenceSession.create(modelUrl, {
+    executionProviders: [backend, 'wasm'],
     graphOptimizationLevel: 'all',
+    executionMode: 'sequential',
   });
 
-  sessionCache.set(modelPath, session);
-  return session;
+  activeBackend = backend;
+  self.postMessage({ type: 'MODEL_READY', payload: { backend } });
 }
 
-// ── Heuristic fallback (used when no ONNX model file is present) ──────────────
-// Provides deterministic, interpretable results without requiring model files,
-// enabling zero-dependency operation during development / cold start.
+// ---------------------------------------------------------------------------
+// Inference
+// ---------------------------------------------------------------------------
 
-function soilHeuristic(input: SoilAnalysisInput): SoilAnalysisResult {
-  const { ph, moisture, temperature, nitrogen, phosphorus, potassium } = input;
+async function runInference(input: AnalyticsInput): Promise<void> {
+  const t0 = performance.now();
+  let scores: number[] = [];
+  let backend: string = 'none';
 
-  const phScore = 1 - Math.abs(ph - 6.5) / 6.5;
-  const moistureScore = moisture > 20 && moisture < 70 ? 1 : 0.4;
-  const tempScore = temperature > 10 && temperature < 35 ? 1 : 0.3;
-  const nutrientScore = Math.min(1, (nitrogen + phosphorus + potassium) / 300);
+  if (session !== null) {
+    const ort = await import('onnxruntime-web');
 
-  const yieldScore = Math.round(
-    ((phScore * 0.3 + moistureScore * 0.25 + tempScore * 0.2 + nutrientScore * 0.25) * 100)
-  );
+    const inputName  = session.inputNames[0]  ?? 'input';
+    const outputName = session.outputNames[0] ?? 'output';
 
-  return {
-    yieldScore: Math.min(100, Math.max(0, yieldScore)),
-    irrigationNeeded: moisture < 30,
-    fertilizerLevel: nutrientScore < 0.25 ? 3 : nutrientScore < 0.5 ? 2 : nutrientScore < 0.75 ? 1 : 0,
-    confidence: 0.72,
-  };
-}
+    const inputTensor = new ort.Tensor(
+      'float32',
+      new Float32Array(input.features),
+      [1, input.features.length],
+    );
 
-function tokenHeuristic(input: TokenSignalInput): TokenSignalResult {
-  const { priceTon, relativeVolume, tvlTon } = input;
-
-  const volumeSignal = relativeVolume > 1.5 ? 1 : relativeVolume < 0.5 ? -1 : 0;
-  const tvlSignal = tvlTon > 10 ? 1 : tvlTon < 2 ? -1 : 0;
-  const priceSignal = priceTon > 0 ? 0 : -1; // negative price is invalid
-
-  const rawSignal = volumeSignal + tvlSignal + priceSignal;
-  const signal: 1 | 0 | -1 = rawSignal > 0 ? 1 : rawSignal < 0 ? -1 : 0;
-
-  return {
-    signal,
-    confidence: Math.min(1, 0.45 + relativeVolume * 0.1),
-  };
-}
-
-// ── ONNX inference (with heuristic fallback) ──────────────────────────────────
-
-async function runSoilAnalysis(input: SoilAnalysisInput): Promise<SoilAnalysisResult> {
-  try {
-    const session = await getSession('./models/soil_analysis.onnx');
-    const tensor = new ort.Tensor('float32', Float32Array.from([
-      input.ph, input.moisture, input.temperature,
-      input.nitrogen, input.phosphorus, input.potassium,
-    ]), [1, 6]);
-
-    const results = await session.run({ input: tensor });
-    const outputData = results['output']?.data as Float32Array;
-
-    return {
-      yieldScore: Math.min(100, Math.max(0, Math.round(outputData[0] * 100))),
-      irrigationNeeded: outputData[1] > 0.5,
-      fertilizerLevel: Math.min(3, Math.max(0, Math.round(outputData[2] * 3))) as 0 | 1 | 2 | 3,
-      confidence: Math.min(1, Math.max(0, outputData[3])),
-    };
-  } catch {
-    return soilHeuristic(input);
-  }
-}
-
-async function runTokenSignal(input: TokenSignalInput): Promise<TokenSignalResult> {
-  try {
-    const session = await getSession('./models/token_signal.onnx');
-    const tensor = new ort.Tensor('float32', Float32Array.from([
-      input.priceTon, input.relativeVolume, input.tvlTon,
-    ]), [1, 3]);
-
-    const results = await session.run({ input: tensor });
-    const outputData = results['output']?.data as Float32Array;
-    const rawSignal = outputData[0];
-    const signal: 1 | 0 | -1 = rawSignal > 0.33 ? 1 : rawSignal < -0.33 ? -1 : 0;
-
-    return { signal, confidence: Math.abs(rawSignal) };
-  } catch {
-    return tokenHeuristic(input);
-  }
-}
-
-// ── Worker message handler ────────────────────────────────────────────────────
-
-self.onmessage = async (event: MessageEvent<AiRequest>) => {
-  const { type, id, payload } = event.data;
-
-  const respond = (response: AiResponse) => self.postMessage(response);
-
-  try {
-    switch (type) {
-      case 'SOIL_ANALYSIS': {
-        const result = await runSoilAnalysis(payload as SoilAnalysisInput);
-        respond({ type: 'SOIL_ANALYSIS_RESULT', id, payload: result });
-        break;
+    let outputTensor: Tensor | undefined;
+    try {
+      const results  = await session.run({ [inputName]: inputTensor });
+      const rawValue = results[outputName];
+      if (rawValue != null) {
+        outputTensor = rawValue as Tensor;
+        scores = Array.from(outputTensor.data as Float32Array);
       }
-      case 'TOKEN_SIGNAL': {
-        const result = await runTokenSignal(payload as TokenSignalInput);
-        respond({ type: 'TOKEN_SIGNAL_RESULT', id, payload: result });
+    } finally {
+      // Dispose tensors immediately to release WASM heap memory.
+      inputTensor.dispose();
+      outputTensor?.dispose();
+    }
+
+    backend = activeBackend;
+  } else {
+    // JS-only fallback: z-score normalise features to the range [−1, 1].
+    scores  = zScoreNormalise(input.features);
+    backend = 'js-fallback';
+  }
+
+  const output: AnalyticsOutput = {
+    scores,
+    latencyMs: Number((performance.now() - t0).toFixed(2)),
+    label:     input.label,
+    backend,
+  };
+
+  self.postMessage({ type: 'INFERENCE_RESULT', payload: output });
+}
+
+/** Z-score normalise an array of numbers, clamped to [−1, 1]. */
+function zScoreNormalise(values: number[]): number[] {
+  if (values.length === 0) return [];
+  const mean     = values.reduce((s, v) => s + v, 0) / values.length;
+  const variance = values.reduce((s, v) => s + (v - mean) ** 2, 0) / values.length;
+  const std      = Math.sqrt(variance) || 1;
+  return values.map(v => Math.max(-1, Math.min(1, (v - mean) / std)));
+}
+
+// ---------------------------------------------------------------------------
+// Memory monitoring
+// ---------------------------------------------------------------------------
+
+function queryMemory(): void {
+  // performance.memory is a non-standard Chromium extension.
+  type PerfWithMemory = Performance & { memory?: { usedJSHeapSize: number } };
+  const jsHeapUsedBytes =
+    (performance as PerfWithMemory).memory?.usedJSHeapSize ?? null;
+
+  const stats: MemoryStats = {
+    jsHeapUsedBytes,
+    timestamp: Date.now(),
+  };
+
+  self.postMessage({ type: 'MEMORY_STATS', payload: stats });
+}
+
+// ---------------------------------------------------------------------------
+// Message dispatcher
+// ---------------------------------------------------------------------------
+
+self.onmessage = async (event: MessageEvent<InboundMessage>): Promise<void> => {
+  try {
+    switch (event.data.type) {
+      case 'LOAD_MODEL':
+        await loadModel(event.data.payload.modelUrl);
         break;
+
+      case 'RUN_INFERENCE':
+        await runInference(event.data.payload);
+        break;
+
+      case 'QUERY_MEMORY':
+        queryMemory();
+        break;
+
+      default: {
+        // Exhaustiveness guard — causes a compile error for unhandled message types.
+        const _exhaustive: never = event.data;
+        void _exhaustive;
       }
-      default:
-        respond({ type: 'ERROR', id, message: `Unknown request type: ${String(type)}` });
     }
   } catch (err) {
-    respond({
+    self.postMessage({
       type: 'ERROR',
-      id,
-      message: err instanceof Error ? err.message : 'Unknown error in AI worker',
+      message: err instanceof Error ? err.message : 'Unknown error in aiWorker',
     });
   }
 };
