@@ -413,8 +413,10 @@ contract MultiSigWrapper with Deployable {
     }
 
     fun internalAddOwner(owner: Address) {
-        let slot: Int = self.nextOwnerSlot + 1;
-        self.nextOwnerSlot = slot;
+        // Increment nextOwnerSlot first, then assign — avoids any confusion
+        // about whether the current slot or the next slot is used.
+        self.nextOwnerSlot = self.nextOwnerSlot + 1;
+        let slot: Int = self.nextOwnerSlot;
         self.ownerBitmap   = self.setBit(self.ownerBitmap, slot);
         self.ownerIndex.set(owner, slot);
         self.ownerByIndex.set(slot, owner);
