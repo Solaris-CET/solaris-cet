@@ -1,7 +1,7 @@
 import { lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { TonConnectUIProvider } from '@tonconnect/ui-react';
+import { TonConnectUIProvider, useTonConnectUI } from '@tonconnect/ui-react';
 import Navigation from './components/Navigation';
 import CursorGlow from './components/CursorGlow';
 import LazyLoadWrapper from './components/LazyLoadWrapper';
@@ -29,12 +29,33 @@ import './App.css';
 gsap.registerPlugin(ScrollTrigger);
 
 const LOADING_DURATION_MS = 1800;
+const TEST_MULTISIG_ADDRESS = "0QCSES0TZYqcVkgoguhIb8iMEo4cvaEwmIrU5qbQgnN8fo2A";
+const TEST_TRANSACTION_AMOUNT_NANOTON = "10000000"; // 0.01 TON
+const TRANSACTION_VALIDITY_SECONDS = 360;
 
-function App() {
+function AppContent() {
+  const [tonConnectUI] = useTonConnectUI();
   const mainRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const langState = useLanguageState();
+
+  useEffect(() => {
+    const btn = document.getElementById('test-multisig-btn');
+    if (!btn) return;
+    const handleClick = () => {
+      const transaction = {
+        validUntil: Math.floor(Date.now() / 1000) + TRANSACTION_VALIDITY_SECONDS,
+        messages: [{
+          address: TEST_MULTISIG_ADDRESS,
+          amount: TEST_TRANSACTION_AMOUNT_NANOTON
+        }]
+      };
+      tonConnectUI.sendTransaction(transaction).catch(console.error);
+    };
+    btn.addEventListener('click', handleClick);
+    return () => btn.removeEventListener('click', handleClick);
+  }, [tonConnectUI]);
 
   useEffect(() => {
     // Loading screen exit
@@ -117,7 +138,6 @@ function App() {
   }, [isLoaded, buildSnapTo]);
 
   return (
-    <TonConnectUIProvider manifestUrl="https://aamclaudiu-hash.github.io/solaris-cet/tonconnect-manifest.json">
     <LanguageContext.Provider value={langState}>
       {/* Loading overlay */}
       <div ref={loadingRef} className="loading-overlay">
@@ -271,6 +291,13 @@ function App() {
         </main>
       </div>
     </LanguageContext.Provider>
+  );
+}
+
+function App() {
+  return (
+    <TonConnectUIProvider manifestUrl="https://aamclaudiu-hash.github.io/solaris-cet/tonconnect-manifest.json">
+      <AppContent />
     </TonConnectUIProvider>
   );
 }
