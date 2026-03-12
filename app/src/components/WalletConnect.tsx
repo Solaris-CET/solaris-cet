@@ -21,8 +21,7 @@ const WalletConnect = () => {
         validUntil: Math.floor(Date.now() / 1000) + 360,
         messages: [{
           address: "UQDUP2y5HBR1tRA3cZ6spDl2PV-KE2Wts_To5JTQQEf2favu",
-          amount: "10000000",
-          payload: "Test"
+          amount: "10000000"
         }]
       });
     } catch (e) {
