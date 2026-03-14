@@ -345,38 +345,41 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* CTA Buttons - Left under title */}
-      <div
-        ref={ctaRef}
-        className="absolute left-[5vw] sm:left-[7vw] top-[62vh] sm:top-[68vh] z-20 flex flex-wrap gap-3"
-      >
-        <button
-          className="btn-filled-gold flex items-center gap-2 group"
-          onClick={() => window.open('https://t.me/SolarisCET', '_blank')}
+      {/* CTA Buttons + AI Oracle Search — stacked column to prevent mobile overlap */}
+      <div className="absolute left-[5vw] sm:left-[7vw] top-[62vh] sm:top-[68vh] z-20 flex flex-col gap-3 w-[min(90vw,540px)] sm:w-[min(40vw,540px)]">
+        {/* CTA Buttons */}
+        <div
+          ref={ctaRef}
+          className="flex flex-wrap gap-3"
         >
-          <Zap className="w-4 h-4" />
-          Start Mobile Mining
-          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-        </button>
-        <button
-          className="btn-gold"
-          onClick={() => document.getElementById('intelligence')?.scrollIntoView({ behavior: 'smooth' })}
-        >
-          Explore ReAct Protocol
-        </button>
-        <button
-          className="btn-gold flex items-center gap-2"
-          onClick={() => window.open(DEDUST_POOL_URL, '_blank')}
-        >
-          Buy CET on DeDust
-        </button>
-      </div>
+          <button
+            className="btn-filled-gold flex items-center gap-2 group"
+            onClick={() => window.open('https://t.me/SolarisCET', '_blank')}
+          >
+            <Zap className="w-4 h-4" />
+            Start Mobile Mining
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </button>
+          <button
+            className="btn-gold"
+            onClick={() => document.getElementById('intelligence')?.scrollIntoView({ behavior: 'smooth' })}
+          >
+            Explore ReAct Protocol
+          </button>
+          <button
+            className="btn-gold flex items-center gap-2"
+            onClick={() => window.open(DEDUST_POOL_URL, '_blank')}
+          >
+            Buy CET on DeDust
+          </button>
+        </div>
 
-      {/* AI Oracle Search Bar */}
-      <AiOracleSearch
-        ref={oracleSearchRef}
-        className="absolute left-[5vw] sm:left-[7vw] top-[72vh] sm:top-[78vh] w-[min(90vw,540px)] sm:w-[min(40vw,540px)] z-20"
-      />
+        {/* AI Oracle Search Bar */}
+        <AiOracleSearch
+          ref={oracleSearchRef}
+          className="w-full"
+        />
+      </div>
 
       {/* HUD Card - Right (hidden on mobile) */}
       <div
