@@ -67,6 +67,13 @@ jobs:
           name: dist
           path: app/dist
 
+      - name: Start preview server
+        working-directory: app
+        run: npm run preview -- --port 4173 &
+
+      - name: Wait for preview server
+        run: npx wait-on http://127.0.0.1:4173 -t 30000
+
       - name: Run Lighthouse CI
         working-directory: app
         env:
