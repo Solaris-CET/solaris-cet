@@ -6,7 +6,7 @@ export default async function handler(
   res: VercelResponse,
 ): Promise<void> {
   console.log('Request received');
-  console.log('Key present: ' + !!process.env.OPENAI_API_KEY);
+  console.log('Key present: ' + !!process.env.GROQ_API_KEY);
 
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
@@ -21,16 +21,19 @@ export default async function handler(
       return;
     }
 
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
-      res.status(500).json({ error: 'OPENAI_API_KEY is not configured' });
+      res.status(500).json({ error: 'GROQ_API_KEY is not configured' });
       return;
     }
 
-    const client = new OpenAI({ apiKey });
+    const client = new OpenAI({
+      apiKey,
+      baseURL: 'https://api.groq.com/openai/v1',
+    });
 
     const completion = await client.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'llama-3.3-70b-versatile',
       messages: [
         {
           role: 'system',
