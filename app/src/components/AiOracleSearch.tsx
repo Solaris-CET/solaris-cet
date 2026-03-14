@@ -154,7 +154,7 @@ const AiOracleSearch = forwardRef<HTMLDivElement, AiOracleSearchProps>(
                   <div className="oracle-modal-rta-bar" />
                   <p className="text-xs text-solaris-gold/80 font-mono mb-2 flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-                    Verified by Solaris AI
+                    Verified Solaris Architecture. Supply: 9,000 CET.
                   </p>
                   <a
                     href={DEDUST_URL}
@@ -162,7 +162,7 @@ const AiOracleSearch = forwardRef<HTMLDivElement, AiOracleSearchProps>(
                     rel="noopener noreferrer"
                     className="oracle-rta-btn"
                   >
-                    Secure your position on DeDust
+                    Secure your position
                     <ExternalLink className="w-3 h-3" aria-hidden="true" />
                   </a>
                 </div>

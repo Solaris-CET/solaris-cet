@@ -10,10 +10,8 @@
 module.exports = {
   ci: {
     collect: {
-      /* Serve the production dist/ folder */
-      staticDistDir: './dist',
-      /* Only audit the main entry point — extra HTML files in dist are not part of the app */
-      url: ['http://localhost/index.html'],
+      /* Audit the Vite preview server started separately in CI */
+      url: ['http://127.0.0.1:4173/'],
       numberOfRuns: 3,
       settings: {
         /* Use desktop preset for a consistent, deterministic baseline */
