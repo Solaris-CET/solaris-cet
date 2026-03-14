@@ -1,3 +1,4 @@
+// System Sync: Vercel Root Directory set to 'app'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
