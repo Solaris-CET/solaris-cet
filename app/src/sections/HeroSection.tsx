@@ -3,6 +3,7 @@ import { gsap } from 'gsap';
 import { ArrowRight, Zap, Activity, Globe } from 'lucide-react';
 import ParticleCanvas from '../components/ParticleCanvas';
 import GlowOrbs from '../components/GlowOrbs';
+import AiOracleSearch from '../components/AiOracleSearch';
 
 const SOLARIS_LOGO_URL = `${import.meta.env.BASE_URL}icon-192.png`;
 const DEDUST_POOL_URL = 'https://dedust.io/pools/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB/deposit';
@@ -18,6 +19,7 @@ const HeroSection = () => {
   const subheadlineRef = useRef<HTMLParagraphElement>(null);
   const bodyRef = useRef<HTMLParagraphElement>(null);
   const statsTickerRef = useRef<HTMLDivElement>(null);
+  const oracleSearchRef = useRef<HTMLDivElement>(null);
 
   // Mouse parallax effect
   useEffect(() => {
@@ -139,6 +141,14 @@ const HeroSection = () => {
         0.75
       );
 
+      // Oracle search bar
+      tl.fromTo(
+        oracleSearchRef.current,
+        { y: 14, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.55 },
+        0.82
+      );
+
       // Stats ticker
       tl.fromTo(
         statsTickerRef.current,
@@ -166,7 +176,7 @@ const HeroSection = () => {
           scrub: 0.5,
           onLeaveBack: () => {
             // Reset all elements to visible when scrolling back
-            gsap.set([coinRef.current, titleCardRef.current, hudCardRef.current, ctaRef.current, statsTickerRef.current], {
+            gsap.set([coinRef.current, titleCardRef.current, hudCardRef.current, ctaRef.current, oracleSearchRef.current, statsTickerRef.current], {
               opacity: 1,
               x: 0,
               y: 0,
@@ -207,6 +217,13 @@ const HeroSection = () => {
         { opacity: 1 },
         { opacity: 0, ease: 'power2.in' },
         0.75
+      );
+
+      scrollTl.fromTo(
+        oracleSearchRef.current,
+        { opacity: 1 },
+        { opacity: 0, ease: 'power2.in' },
+        0.76
       );
 
       scrollTl.fromTo(
@@ -354,6 +371,12 @@ const HeroSection = () => {
           Buy CET on DeDust
         </button>
       </div>
+
+      {/* AI Oracle Search Bar */}
+      <AiOracleSearch
+        ref={oracleSearchRef}
+        className="absolute left-[5vw] sm:left-[7vw] top-[72vh] sm:top-[78vh] w-[min(90vw,540px)] sm:w-[min(40vw,540px)] z-20"
+      />
 
       {/* HUD Card - Right (hidden on mobile) */}
       <div

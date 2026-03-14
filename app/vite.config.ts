@@ -130,7 +130,7 @@ export default defineConfig({
       },
     },
     cssCodeSplit: true,
-    sourcemap: false,
+    sourcemap: true,
     chunkSizeWarningLimit: 1000,
   },
   esbuild: {

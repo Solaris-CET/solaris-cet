@@ -674,3 +674,190 @@
     0 0 20px rgba(46, 231, 255, 0.5),
     0 0 40px rgba(46, 231, 255, 0.3);
 }
+
+/* ─────────────────────────────────────────────
+   AI ORACLE SEARCH BAR
+───────────────────────────────────────────── */
+
+.oracle-search-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(244, 246, 255, 0.04);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(242, 201, 76, 0.22);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.oracle-search-wrapper.oracle-search-active {
+  border-color: rgba(242, 201, 76, 0.55);
+  animation: oracle-border-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes oracle-border-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(242, 201, 76, 0.12), 0 0 18px rgba(242, 201, 76, 0.10);
+  }
+  50% {
+    box-shadow: 0 0 0 1px rgba(242, 201, 76, 0.28), 0 0 30px rgba(242, 201, 76, 0.20);
+  }
+}
+
+.oracle-search-icon {
+  position: absolute;
+  left: 12px;
+  width: 14px;
+  height: 14px;
+  color: rgba(242, 201, 76, 0.65);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.oracle-search-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 10px 36px 10px 34px;
+  font-size: 13px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: rgba(244, 246, 255, 0.9);
+  letter-spacing: 0.015em;
+}
+
+.oracle-search-input::placeholder {
+  color: rgba(244, 246, 255, 0.28);
+}
+
+.oracle-search-input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.oracle-search-loader {
+  position: absolute;
+  right: 12px;
+  width: 14px;
+  height: 14px;
+  color: rgba(242, 201, 76, 0.75);
+}
+
+/* ─────────────────────────────────────────────
+   AI ORACLE MODAL
+───────────────────────────────────────────── */
+
+.oracle-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 6, 14, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: oracle-fade-in 0.2s ease-out;
+}
+
+@keyframes oracle-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.oracle-modal {
+  width: min(92vw, 520px);
+  background: rgba(10, 10, 22, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(242, 201, 76, 0.22);
+  border-radius: 16px;
+  padding: 24px;
+  animation: oracle-slide-up 0.28s cubic-bezier(0.34, 1.46, 0.64, 1);
+  box-shadow:
+    0 0 60px rgba(242, 201, 76, 0.06),
+    0 24px 48px rgba(0, 0, 0, 0.55);
+}
+
+@keyframes oracle-slide-up {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+
+.oracle-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.oracle-modal-close {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: rgba(244, 246, 255, 0.38);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.oracle-modal-close:hover {
+  background: rgba(244, 246, 255, 0.08);
+  color: rgba(244, 246, 255, 0.8);
+}
+
+.oracle-modal-query {
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: rgba(46, 231, 255, 0.72);
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: rgba(46, 231, 255, 0.05);
+  border-left: 2px solid rgba(46, 231, 255, 0.3);
+  border-radius: 0 6px 6px 0;
+}
+
+.oracle-modal-response {
+  min-height: 72px;
+  margin-bottom: 20px;
+}
+
+.oracle-modal-rta {
+  padding-top: 16px;
+  position: relative;
+}
+
+.oracle-modal-rta-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(242, 201, 76, 0.28),
+    transparent
+  );
+}
+
+.oracle-rta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(242, 201, 76, 0.08);
+  border: 1px solid rgba(242, 201, 76, 0.28);
+  border-radius: 8px;
+  color: rgba(242, 201, 76, 0.9);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.oracle-rta-btn:hover {
+  background: rgba(242, 201, 76, 0.16);
+  border-color: rgba(242, 201, 76, 0.48);
+}
