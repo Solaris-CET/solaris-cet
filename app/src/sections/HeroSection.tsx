@@ -323,7 +323,7 @@ const HeroSection = () => {
             ref={subheadlineRef}
             className="font-display font-semibold text-[clamp(12px,1.2vw,16px)] text-solaris-gold mb-3 flex items-center gap-2 flex-wrap"
           >
-            <img src={`${import.meta.env.BASE_URL}bitcoin-logo.svg`} alt="Bitcoin" width="20" height="20" className="w-5 h-5 inline-block shrink-0" />
+            <img src={`${import.meta.env.BASE_URL}bitcoin-logo.svg`} alt="Bitcoin" width="20" height="20" loading="lazy" className="w-5 h-5 inline-block shrink-0" />
             Powered by Bitcoin · Bridge Between AI &amp; High Intelligence
           </p>
           
@@ -346,13 +346,14 @@ const HeroSection = () => {
       </div>
 
       {/* CTA Buttons + AI Oracle Search — stacked column to prevent mobile overlap */}
-      <div className="absolute left-[5vw] sm:left-[7vw] top-[62vh] sm:top-[68vh] z-20 flex flex-col gap-3 w-[min(90vw,540px)] sm:w-[min(40vw,540px)]">
+      <div className="absolute left-[5vw] sm:left-[7vw] top-[62vh] sm:top-[68vh] z-20 flex flex-col gap-y-10 md:flex-row md:gap-x-6 w-[min(90vw,540px)] sm:w-[min(40vw,540px)]">
         {/* CTA Buttons */}
         <div
           ref={ctaRef}
           className="flex flex-wrap gap-3"
         >
           <button
+            aria-label="Start Mobile Mining on Telegram"
             className="btn-filled-gold flex items-center gap-2 group"
             onClick={() => window.open('https://t.me/SolarisCET', '_blank')}
           >
@@ -361,12 +362,14 @@ const HeroSection = () => {
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </button>
           <button
+            aria-label="Explore ReAct Protocol section"
             className="btn-gold"
             onClick={() => document.getElementById('intelligence')?.scrollIntoView({ behavior: 'smooth' })}
           >
             Explore ReAct Protocol
           </button>
           <button
+            aria-label="Buy CET on DeDust exchange"
             className="btn-gold flex items-center gap-2"
             onClick={() => window.open(DEDUST_POOL_URL, '_blank')}
           >
@@ -377,7 +380,7 @@ const HeroSection = () => {
         {/* AI Oracle Search Bar */}
         <AiOracleSearch
           ref={oracleSearchRef}
-          className="w-full"
+          className="w-full mb-12"
         />
       </div>
 
