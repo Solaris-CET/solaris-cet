@@ -724,7 +724,7 @@
   background: transparent;
   border: none;
   outline: none;
-  padding: 10px 36px 10px 34px;
+  padding: 10px 10px 10px 34px;
   font-size: 13px;
   font-family: 'IBM Plex Mono', monospace;
   color: rgba(244, 246, 255, 0.9);
@@ -746,6 +746,35 @@
   width: 14px;
   height: 14px;
   color: rgba(242, 201, 76, 0.75);
+}
+
+.oracle-search-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(242, 201, 76, 0.10);
+  border: 1px solid rgba(242, 201, 76, 0.30);
+  border-radius: 8px;
+  color: rgba(242, 201, 76, 0.85);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 5px 10px;
+  margin-right: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.oracle-search-btn:hover:not(:disabled) {
+  background: rgba(242, 201, 76, 0.20);
+  border-color: rgba(242, 201, 76, 0.55);
+}
+
+.oracle-search-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 /* ─────────────────────────────────────────────

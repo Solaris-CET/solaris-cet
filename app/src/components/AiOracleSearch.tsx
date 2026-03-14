@@ -29,6 +29,7 @@ const AiOracleSearch = forwardRef<HTMLDivElement, AiOracleSearchProps>(
     const [loading, setLoading] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const [responseText, setResponseText] = useState('');
+    const [connectionError, setConnectionError] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const handleSubmit = useCallback(async (q: string) => {
@@ -37,6 +38,7 @@ const AiOracleSearch = forwardRef<HTMLDivElement, AiOracleSearchProps>(
 
       setLoading(true);
       setResponseText('');
+      setConnectionError(false);
       setModalOpen(true);
 
       try {
@@ -46,12 +48,18 @@ const AiOracleSearch = forwardRef<HTMLDivElement, AiOracleSearchProps>(
           body: JSON.stringify({ query: trimmed }),
         });
 
-        if (!res.ok) throw new Error('non-ok');
+        if (!res.ok) {
+          console.error('AI Error:', await res.text());
+          setModalOpen(false);
+          setConnectionError(true);
+          return;
+        }
 
         const data = (await res.json()) as { response?: string; message?: string };
-        setResponseText(data.response ?? data.message ?? '');
+        setResponseText(data.response ?? data.message ?? FALLBACK_RESPONSE);
       } catch {
-        setResponseText(FALLBACK_RESPONSE);
+        setModalOpen(false);
+        setConnectionError(true);
       } finally {
         setLoading(false);
       }
@@ -94,13 +102,29 @@ const AiOracleSearch = forwardRef<HTMLDivElement, AiOracleSearchProps>(
             className="oracle-search-input"
             disabled={loading}
           />
-          {loading && (
-            <Loader2
-              className="oracle-search-loader animate-spin"
-              aria-label="Loading response"
-            />
-          )}
+          <button
+            onClick={() => void handleSubmit(query)}
+            disabled={loading || !query.trim()}
+            className="oracle-search-btn"
+            aria-label="Submit query"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-3 h-3 animate-spin" aria-hidden="true" />
+                Consulting Oracle…
+              </>
+            ) : (
+              'Ask Oracle'
+            )}
+          </button>
         </div>
+
+        {/* Connection error feedback */}
+        {connectionError && (
+          <p className="text-red-500 text-xs mt-2 font-mono" role="alert">
+            Connection to Solaris Core failed.
+          </p>
+        )}
 
         {/* Response Modal */}
         {modalOpen && (
