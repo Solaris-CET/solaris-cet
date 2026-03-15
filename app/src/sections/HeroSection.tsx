@@ -265,7 +265,7 @@ const HeroSection = () => {
       id="hero"
       ref={sectionRef}
       aria-label="Solaris CET Hero"
-      className="section-pinned bg-solaris-dark flex items-center justify-center"
+      className="section-pinned min-h-screen bg-solaris-dark flex items-center justify-center"
       style={{ perspective: '1200px' }}
     >
       {/* Background grid floor */}
