@@ -1,12 +1,18 @@
-import { useEffect, useRef, useLayoutEffect } from 'react';
+import { useEffect, useRef, useLayoutEffect, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
-import { ArrowRight, Zap, Activity, Globe } from 'lucide-react';
+import { ArrowRight, Zap, Activity, Globe, Loader2, CheckCircle } from 'lucide-react';
+
 import ParticleCanvas from '../components/ParticleCanvas';
 import GlowOrbs from '../components/GlowOrbs';
 import AiOracleSearch from '../components/AiOracleSearch';
 
+type MiningState = 'IDLE' | 'PROCESSING' | 'SUCCESS';
+
 const SOLARIS_LOGO_URL = `${import.meta.env.BASE_URL}icon-192.png`;
 const DEDUST_POOL_URL = 'https://dedust.io/pools/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB/deposit';
+const TELEGRAM_BOT_URL = 'https://t.me/SolarisCET';
+const PROCESSING_DURATION_MS = 2000;
+const SUCCESS_DISPLAY_MS = 3000;
 
 
 const HeroSection = () => {
@@ -20,6 +26,23 @@ const HeroSection = () => {
   const bodyRef = useRef<HTMLParagraphElement>(null);
   const statsTickerRef = useRef<HTMLDivElement>(null);
   const oracleSearchRef = useRef<HTMLDivElement>(null);
+
+  const [miningState, setMiningState] = useState<MiningState>('IDLE');
+
+  const handleMiningClick = useCallback(() => {
+    if (miningState !== 'IDLE') return;
+
+    setMiningState('PROCESSING');
+
+    setTimeout(() => {
+      setMiningState('SUCCESS');
+      window.open(TELEGRAM_BOT_URL, '_blank');
+
+      setTimeout(() => {
+        setMiningState('IDLE');
+      }, SUCCESS_DISPLAY_MS);
+    }, PROCESSING_DURATION_MS);
+  }, [miningState]);
 
   // Mouse parallax effect
   useEffect(() => {
@@ -355,13 +378,32 @@ const HeroSection = () => {
           className="flex flex-wrap gap-3"
         >
           <button
-            className="btn-filled-gold flex items-center gap-2 group"
+            className={`btn-filled-gold flex items-center gap-2 group ${
+              miningState === 'PROCESSING' ? 'cursor-wait opacity-80' : ''
+            } ${miningState === 'SUCCESS' ? 'ring-2 ring-emerald-400/50' : ''}`}
             aria-label="Start Mobile Mining on Telegram"
-            onClick={() => window.open('https://t.me/SolarisCET', '_blank')}
+            disabled={miningState === 'PROCESSING'}
+            onClick={handleMiningClick}
           >
-            <Zap className="w-4 h-4" />
-            Start Mobile Mining
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            {miningState === 'IDLE' && (
+              <>
+                <Zap className="w-4 h-4" />
+                Start Mobile Mining
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </>
+            )}
+            {miningState === 'PROCESSING' && (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Connecting to Node...
+              </>
+            )}
+            {miningState === 'SUCCESS' && (
+              <>
+                <CheckCircle className="w-4 h-4 text-emerald-400" />
+                Mining Active
+              </>
+            )}
           </button>
           <button
             className="btn-gold"
