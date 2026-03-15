@@ -62,17 +62,32 @@ const LivePoolStats = () => {
 
       {/* Stats grid */}
       {error ? (
-        <p className="text-solaris-muted text-xs text-center py-4">
-          Live data temporarily unavailable.{' '}
-          <a
-            href={DEDUST_POOL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-solaris-gold hover:underline"
-          >
-            View on DeDust →
-          </a>
-        </p>
+        <div className="text-center py-4 space-y-2">
+          <p className="text-solaris-muted text-xs">
+            Live data temporarily unavailable.{' '}
+            <a
+              href={DEDUST_POOL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-solaris-gold hover:underline inline-flex items-center gap-1"
+            >
+              View on DeDust
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </p>
+          <p className="text-solaris-muted/60 text-[11px]">
+            Follow us on{' '}
+            <a
+              href="https://twitter.com/SolarisCET"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-solaris-cyan hover:underline"
+            >
+              Twitter / X
+            </a>
+            {' '}for real-time updates.
+          </p>
+        </div>
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" aria-busy={loading} aria-label={loading ? 'Loading pool stats' : undefined}>
           {loading

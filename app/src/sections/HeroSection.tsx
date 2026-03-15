@@ -1,10 +1,15 @@
 import { useEffect, useRef, useLayoutEffect, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
-import { ArrowRight, Zap, Activity, Globe, Loader2, CheckCircle } from 'lucide-react';
+import { ArrowRight, Zap, Activity, Globe, Loader2, CheckCircle, ExternalLink, HelpCircle } from 'lucide-react';
 
 import ParticleCanvas from '../components/ParticleCanvas';
 import GlowOrbs from '../components/GlowOrbs';
 import AiOracleSearch from '../components/AiOracleSearch';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '../components/ui/tooltip';
 
 type MiningState = 'IDLE' | 'PROCESSING' | 'SUCCESS';
 
@@ -357,9 +362,39 @@ const HeroSection = () => {
             className="text-solaris-muted text-sm leading-relaxed"
           >
             100,000 TPS · 2-second finality on <span className="text-solaris-cyan font-medium">TON</span>. Powered by{' '}
-            <span className="text-solaris-gold font-medium">ReAct</span>,{' '}
-            <span className="text-solaris-gold font-medium">BRAID</span> &amp;{' '}
-            <span className="text-solaris-gold font-medium">Quantum OS</span> protocols — the substrate for next-generation High-Intelligence AI agents.
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-solaris-gold font-medium cursor-help inline-flex items-center gap-0.5">
+                  ReAct<HelpCircle className="w-3 h-3 opacity-60" />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-[220px] text-center">
+                Reasoning + Acting loop — the AI agent observes, thinks, and acts in iterative cycles to achieve goals autonomously.
+              </TooltipContent>
+            </Tooltip>
+            ,{' '}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-solaris-gold font-medium cursor-help inline-flex items-center gap-0.5">
+                  BRAID<HelpCircle className="w-3 h-3 opacity-60" />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-[220px] text-center">
+                Branching Recursive AI Deliberation — a multi-path reasoning framework that lets agents explore and evaluate parallel decision trees.
+              </TooltipContent>
+            </Tooltip>
+            {' '}&amp;{' '}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-solaris-gold font-medium cursor-help inline-flex items-center gap-0.5">
+                  Quantum OS<HelpCircle className="w-3 h-3 opacity-60" />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-[220px] text-center">
+                A probabilistic orchestration layer that schedules and coordinates AI agent tasks using quantum-inspired superposition principles.
+              </TooltipContent>
+            </Tooltip>
+            {' '}protocols — the substrate for next-generation High-Intelligence AI agents.
           </p>
 
           {/* Status pill */}
@@ -414,10 +449,19 @@ const HeroSection = () => {
           </button>
           <button
             className="btn-gold flex items-center gap-2"
+            aria-label="How to begin — step-by-step guide"
+            onClick={() => document.getElementById('how-to-buy')?.scrollIntoView({ behavior: 'smooth' })}
+          >
+            How to Begin
+            <ArrowRight className="w-4 h-4" />
+          </button>
+          <button
+            className="btn-gold flex items-center gap-2"
             aria-label="Buy CET on DeDust exchange"
-            onClick={() => window.open(DEDUST_POOL_URL, '_blank')}
+            onClick={() => window.open(DEDUST_POOL_URL, '_blank', 'noopener,noreferrer')}
           >
             Buy CET on DeDust
+            <ExternalLink className="w-3.5 h-3.5" />
           </button>
         </div>
 
