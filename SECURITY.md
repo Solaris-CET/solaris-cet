@@ -21,7 +21,9 @@ This project is a static frontend application. The following measures are in pla
 
 - **Content Security Policy (CSP)** — restricts the sources from which scripts, styles, and other resources can be loaded.
 - **No server-side secrets** — all blockchain interactions are read-only via public TON APIs.
-- **Dependabot** — automated dependency vulnerability scanning is enabled for this repository.
+- **Dependabot** — automated dependency vulnerability scanning and version-update pull requests are configured via `.github/dependabot.yml` for both npm (`app/`) and GitHub Actions ecosystems.
+- **CodeQL SAST** — static application security testing via the CodeQL workflow (`.github/workflows/codeql.yml`) runs on every push and pull request targeting `main`, as well as on a weekly schedule, scanning for data-flow vulnerabilities, XSS patterns, and other insecure code patterns.
+- **Native platform APIs** — cryptographically secure randomness is sourced from the Web Crypto API (`crypto.getRandomValues()`) wherever unique values are generated, avoiding non-cryptographic `Math.random()` for such purposes.
 
 ## Scope
 
