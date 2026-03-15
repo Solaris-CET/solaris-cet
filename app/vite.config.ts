@@ -133,10 +133,6 @@ export default defineConfig({
     sourcemap: true,
     chunkSizeWarningLimit: 1000,
   },
-  esbuild: {
-    drop: ['debugger'],
-    legalComments: 'none',
-  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

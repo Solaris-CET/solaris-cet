@@ -140,7 +140,7 @@ async function loadModel(modelUrl: string): Promise<void> {
 async function runInference(input: AnalyticsInput): Promise<void> {
   const t0 = performance.now();
   let scores: number[] = [];
-  let backend: string = 'none';
+  let backend: string;
 
   if (session !== null) {
     const ort = await import('onnxruntime-web');

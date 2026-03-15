@@ -48,28 +48,52 @@ https://<your-github-username>.github.io/solaris-cet/
 solaris-cet/
 ├── .github/
 │   ├── workflows/
-│   │   └── deploy-pages.yml   # CI/CD: build + deploy to GitHub Pages
+│   │   ├── ci.yml              # Quality gate: lint, typecheck, unit tests, E2E
+│   │   ├── deploy-pages.yml    # Build + deploy to GitHub Pages on every push to main
+│   │   ├── codeql.yml          # CodeQL SAST security scanning
+│   │   ├── lighthouse-ci.yml   # Lighthouse performance audit (≥ 85 required)
+│   │   ├── multisig-ci.yml     # TON multi-sig contract build & test
+│   │   └── ton-indexer.yml     # TON blockchain state indexing
+│   ├── ISSUE_TEMPLATE/         # Bug report and feature request forms
 │   └── PULL_REQUEST_TEMPLATE.md
-├── app/                       # React + TypeScript + Vite source
+├── api/                        # Edge API routes (Vercel)
+│   └── chat/route.ts           # AI chat proxy (edge runtime)
+├── app/                        # React + TypeScript + Vite source
 │   ├── src/
-│   │   ├── sections/          # Page sections (Hero, Tokenomics, etc.)
-│   │   ├── components/        # Reusable UI components
-│   │   │   ├── ui/            # shadcn/ui primitives
-│   │   │   ├── AnimatedCounter.tsx  # GSAP counter triggered by IntersectionObserver
-│   │   │   ├── CursorGlow.tsx       # Mouse-following radial-gradient spotlight
-│   │   │   ├── GlowOrbs.tsx         # Ambient animated glow blobs (gold / cyan / mixed)
-│   │   │   ├── Navigation.tsx       # Fixed nav with scroll-progress bar
-│   │   │   └── ParticleCanvas.tsx   # Interactive particle field (canvas)
-│   │   ├── App.tsx
-│   │   └── main.tsx
-│   ├── public/                # Static assets
+│   │   ├── sections/           # Page sections (Hero, Tokenomics, etc.)
+│   │   ├── components/         # Reusable UI components
+│   │   │   ├── ui/             # shadcn/ui primitives (Radix-based)
+│   │   │   ├── AnimatedCounter.tsx   # GSAP counter triggered by IntersectionObserver
+│   │   │   ├── CursorGlow.tsx        # Mouse-following radial-gradient spotlight
+│   │   │   ├── GlowOrbs.tsx          # Ambient animated glow blobs (gold / cyan / mixed)
+│   │   │   ├── Navigation.tsx        # Fixed nav with scroll-progress bar
+│   │   │   ├── ReActTerminal.tsx     # AI reasoning terminal (ReAct protocol)
+│   │   │   └── ParticleCanvas.tsx    # Interactive particle field (canvas)
+│   │   ├── hooks/              # Custom React hooks
+│   │   ├── i18n/               # Internationalization (multi-language support)
+│   │   ├── lib/                # Utility functions & chain-state helpers
+│   │   ├── workers/            # Web Workers (AI inference, mining)
+│   │   ├── App.tsx             # Root component; GSAP ScrollTrigger registration
+│   │   └── main.tsx            # Entry point
+│   ├── api/                    # App-level API routes (Node.js runtime)
+│   │   └── chat/route.ts       # OpenAI-powered chat endpoint
+│   ├── public/                 # Static assets (icons, images, state JSON)
+│   ├── tests/                  # Playwright E2E tests
 │   ├── index.html
 │   ├── vite.config.ts
 │   ├── tailwind.config.js
+│   ├── postcss.config.js
 │   └── package.json
-├── README.md
+├── contracts/                  # TON smart contracts (Tact language)
+├── docs/                       # Additional documentation
+├── scripts/                    # Automation scripts (state updates, etc.)
+├── simulations/                # Financial / tokenomics simulations
+├── CMC_APPLICATION.md          # CoinMarketCap listing application
 ├── CONTRIBUTING.md
-└── LICENSE
+├── LICENSE
+├── README.md
+├── SECURITY.md
+└── WHITEPAPER.md
 ```
 
 ---
@@ -135,13 +159,15 @@ npm run preview
 |---------------|-------------------------------------------------|
 | UI Framework  | [React 19](https://react.dev/)                  |
 | Language      | [TypeScript 5](https://www.typescriptlang.org/) |
-| Bundler       | [Vite 7](https://vite.dev/)                     |
-| Styling       | [Tailwind CSS 3](https://tailwindcss.com/)      |
-| Components    | [shadcn/ui](https://ui.shadcn.com/)             |
+| Bundler       | [Vite 8](https://vite.dev/) + Rolldown          |
+| Styling       | [Tailwind CSS 4](https://tailwindcss.com/)      |
+| Components    | [shadcn/ui](https://ui.shadcn.com/) (Radix)     |
 | Animations    | [GSAP 3](https://gsap.com/)                     |
-| Blockchain    | [TON Network](https://ton.org/)                 |
-| Hosting       | [GitHub Pages](https://pages.github.com/)       |
+| AI/ML         | [ONNX Runtime Web](https://onnxruntime.ai/) + [OpenAI](https://openai.com/) |
+| Blockchain    | [TON Network](https://ton.org/) via TonConnect  |
+| Hosting       | [GitHub Pages](https://pages.github.com/) / [Vercel](https://vercel.com/) |
 | CI/CD         | [GitHub Actions](https://github.com/features/actions) |
+| Security      | CodeQL SAST, Dependabot, npm audit              |
 
 ---
 

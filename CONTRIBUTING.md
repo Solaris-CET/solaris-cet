@@ -42,8 +42,8 @@ Contribuțiile sunt binevenite în mai multe forme:
 
 ### Cerințe preliminare
 
-- **Node.js** >= 18.x
-- **npm** >= 9.x
+- **Node.js** >= 20.x
+- **npm** >= 10.x
 - **Git** >= 2.x
 
 ### Pași de instalare
