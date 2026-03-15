@@ -11,6 +11,7 @@ on:
   workflow_run:
     # Watch every workflow defined in the repository.
     workflows:
+      - "CI — Continuous Integration"
       - "Community Automation"
       - "Deploy Solaris CET to GitHub Pages"
       - "Lighthouse CI — Quality Gate"
