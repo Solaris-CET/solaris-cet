@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Approve if actor is trusted
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             // Actor logins as returned by the GitHub API (actor.login field).
