@@ -1,0 +1,172 @@
+name: CI — Quality Gate
+
+# Runs on every pull request targeting `main` and on direct pushes to `main`.
+# Enforces the quality barrier: lint + unit-tests must both pass (in parallel)
+# before the build is allowed to proceed. E2E tests run against the built
+# artefact, simulating real user behaviour in a headless Chromium browser.
+#
+# Pipeline timing model (see WHITEPAPER §CI):
+#   T_total = T_init + T_cache_download
+#             + max(T_static_analysis, T_unit_tests)
+#             + T_compile
+#             - ΔT_cache_optimisation
+
+on:
+  pull_request:
+    branches: ["main"]
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Stage 1a (parallel): Static analysis ──────────────────────────────────
+  lint:
+    name: Static Analysis (ESLint + TypeScript)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: app
+        run: npm run lint
+
+      - name: TypeScript type-check
+        working-directory: app
+        run: npx tsc --noEmit
+
+  # ── Stage 1b (parallel): Unit tests ───────────────────────────────────────
+  unit-test:
+    name: Unit Tests (Vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Run unit tests
+        working-directory: app
+        run: npm test
+
+  # ── Stage 2: Build (waits for both quality gates) ─────────────────────────
+  build:
+    name: Build application
+    runs-on: ubuntu-latest
+    needs: [lint, unit-test]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: app/package-lock.json
+
+      - name: Restore Vite build cache
+        uses: actions/cache@v4
+        with:
+          path: app/node_modules/.vite
+          key: vite-cache-${{ runner.os }}-${{ hashFiles('app/package-lock.json', 'app/vite.config.ts') }}
+          restore-keys: |
+            vite-cache-${{ runner.os }}-
+
+      - name: Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Build application
+        working-directory: app
+        run: npm run build
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: app/dist
+          retention-days: 1
+
+  # ── Stage 3: E2E tests (waits for build) ──────────────────────────────────
+  e2e:
+    name: E2E Tests (Playwright)
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('app/package-lock.json') }}
+
+      - name: Install Playwright browsers
+        working-directory: app
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright system dependencies
+        working-directory: app
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: app/dist
+
+      - name: Run Playwright E2E tests
+        working-directory: app
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: app/playwright-report
+          retention-days: 30
+          if-no-files-found: warn
