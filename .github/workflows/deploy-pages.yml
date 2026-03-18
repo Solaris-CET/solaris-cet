@@ -59,7 +59,7 @@ jobs:
           cache-dependency-path: app/package-lock.json
 
       - name: Restore Vite build cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: app/node_modules/.vite
           key: vite-cache-${{ runner.os }}-${{ hashFiles('app/package-lock.json', 'app/vite.config.ts') }}
