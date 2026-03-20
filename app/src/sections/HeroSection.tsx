@@ -1,17 +1,13 @@
 "use client"
 
-import React, { useEffect, useRef, useLayoutEffect, useState, useCallback, memo, useMemo } from 'react';
+import React, { useRef, useLayoutEffect, useState, useCallback, memo } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, Zap, Activity, Globe, Loader2, CheckCircle, ExternalLink, HelpCircle } from 'lucide-react';
+import { Zap, Activity, Loader2 } from 'lucide-react';
 
 import ParticleCanvas from '../components/ParticleCanvas';
-import GlowOrbs from '../components/GlowOrbs';
 import AiOracleSearch from '../components/AiOracleSearch';
 import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
   TooltipProvider
 } from '../components/ui/tooltip';
 
