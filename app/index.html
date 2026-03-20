@@ -71,21 +71,31 @@
     }
     </script>
 
-    <!-- Google Fonts: preconnect + preload for zero layout shift -->
+    <!-- Google Fonts: preconnect + non-blocking load to eliminate render-blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Load fonts asynchronously — switch rel from print to all after load -->
     <link
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      />
+    </noscript>
 
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
 
     <!-- Telegram Mini App SDK — enables window.Telegram.WebApp when the app
          runs inside Telegram. The SDK is served from telegram.org's CDN and
          updated by Telegram; SRI is intentionally omitted because pinning a
-         hash would break every time Telegram pushes an update. -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+         hash would break every time Telegram pushes an update.
+         defer ensures the script does not block HTML parsing or first paint. -->
+    <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
 
   </head>
   <body>
