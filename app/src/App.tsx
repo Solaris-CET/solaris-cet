@@ -159,7 +159,7 @@ function AppContent() {
       {/* Touch ripple effect (mobile) */}
       <TouchRipple />
 
-      <div ref={mainRef} className="relative bg-solaris-dark min-h-screen border-2 border-red-500 md:border-0">
+      <div ref={mainRef} className="relative bg-solaris-dark min-h-screen">
         {/* Noise overlay */}
         <div className="noise-overlay" />
         

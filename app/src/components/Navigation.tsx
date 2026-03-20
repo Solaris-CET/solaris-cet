@@ -2,15 +2,15 @@ import { useEffect, useState, useRef } from 'react';
 import { Menu, X, Sun } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
 import WalletConnect from './WalletConnect';
+import { useLanguage } from '../hooks/useLanguage';
 
-// Static data defined outside component to avoid re-creation on every render
-const navLinks = [
-  { label: 'CET App', href: '#nova-app' },
-  { label: 'Tokenomics', href: '#staking' },
-  { label: 'Roadmap', href: '#roadmap' },
-  { label: 'How to Buy', href: '#how-to-buy' },
-  { label: 'Resources', href: '#resources' },
-];
+const NAV_HREFS = [
+  { key: 'cetApp',    href: '#nova-app' },
+  { key: 'tokenomics', href: '#staking' },
+  { key: 'roadmap',  href: '#roadmap' },
+  { key: 'howToBuy', href: '#how-to-buy' },
+  { key: 'resources', href: '#resources' },
+] as const;
 
 /**
  * Navigation — the fixed top navigation bar for the Solaris CET landing page.
@@ -30,6 +30,12 @@ const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const progressBarRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
+
+  const navLinks = NAV_HREFS.map(({ key, href }) => ({
+    label: t.nav[key],
+    href,
+  }));
 
   useEffect(() => {
     const handleScroll = () => {
@@ -134,7 +140,10 @@ const Navigation = () => {
               {link.label}
             </a>
           ))}
-          <div className="mt-4">
+          <div className="mt-2">
+            <LanguageSelector />
+          </div>
+          <div className="mt-2">
             <WalletConnect />
           </div>
           <button className="btn-gold text-sm mt-4">

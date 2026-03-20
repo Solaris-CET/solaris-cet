@@ -3,6 +3,7 @@ export type LangCode = 'en' | 'es' | 'zh' | 'ru' | 'ro';
 export interface Translations {
   nav: {
     home: string;
+    cetApp: string;
     tokenomics: string;
     roadmap: string;
     howToBuy: string;
@@ -26,6 +27,7 @@ const translations: Record<LangCode, Translations> = {
   en: {
     nav: {
       home: 'Home',
+      cetApp: 'CET App',
       tokenomics: 'Tokenomics',
       roadmap: 'Roadmap',
       howToBuy: 'How to Buy',
@@ -47,6 +49,7 @@ const translations: Record<LangCode, Translations> = {
   es: {
     nav: {
       home: 'Inicio',
+      cetApp: 'App CET',
       tokenomics: 'Tokenómica',
       roadmap: 'Hoja de Ruta',
       howToBuy: 'Cómo Comprar',
@@ -68,6 +71,7 @@ const translations: Record<LangCode, Translations> = {
   zh: {
     nav: {
       home: '首页',
+      cetApp: 'CET 应用',
       tokenomics: '代币经济学',
       roadmap: '路线图',
       howToBuy: '如何购买',
@@ -89,6 +93,7 @@ const translations: Record<LangCode, Translations> = {
   ru: {
     nav: {
       home: 'Главная',
+      cetApp: 'Приложение CET',
       tokenomics: 'Токеномика',
       roadmap: 'Дорожная карта',
       howToBuy: 'Как купить',
@@ -110,6 +115,7 @@ const translations: Record<LangCode, Translations> = {
   ro: {
     nav: {
       home: 'Acasă',
+      cetApp: 'Aplicație CET',
       tokenomics: 'Tokenomică',
       roadmap: 'Foaie de Parcurs',
       howToBuy: 'Cum să Cumperi',
