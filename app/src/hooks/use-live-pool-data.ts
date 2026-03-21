@@ -52,7 +52,7 @@ const INITIAL_STATE: PoolData = {
  * Uses `AbortSignal.timeout()` when available (Chrome 103+, Safari 17.4+, Firefox 100+)
  * and falls back to `AbortController + setTimeout` for older runtimes.
  */
-function createTimeoutSignal(ms: number): AbortSignal {
+export function createTimeoutSignal(ms: number): AbortSignal {
   if (typeof AbortSignal.timeout === 'function') {
     return AbortSignal.timeout(ms);
   }

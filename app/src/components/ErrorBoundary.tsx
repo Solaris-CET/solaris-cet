@@ -11,11 +11,19 @@ interface Props {
 interface State {
   hasError: boolean;
   error?: Error;
+  retryCount: number;
 }
+
+/** Maximum number of in-place retries before offering a full page reload. */
+const MAX_RETRIES = 2;
 
 /**
  * ErrorBoundary — catches JavaScript errors anywhere in the child component
  * tree, logs them, and renders a fallback UI instead of crashing the page.
+ *
+ * Up to `MAX_RETRIES` times the user can retry in-place (the boundary resets
+ * its state and attempts to re-render the children). If all retries are
+ * exhausted, only the full-page reload option remains.
  *
  * @example
  * ```tsx
@@ -27,10 +35,10 @@ interface State {
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, retryCount: 0 };
   }
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): Partial<State> {
     return { hasError: true, error };
   }
 
@@ -39,8 +47,12 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   /** Reset the error state so the children are re-rendered without a full page reload. */
-  private handleReset = () => {
-    this.setState({ hasError: false, error: undefined });
+  private handleRetry = () => {
+    this.setState(prev => ({
+      hasError: false,
+      error: undefined,
+      retryCount: prev.retryCount + 1,
+    }));
     this.props.onReset?.();
   };
 
@@ -49,6 +61,8 @@ export class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) {
         return this.props.fallback;
       }
+
+      const canRetry = this.state.retryCount < MAX_RETRIES;
 
       return (
         <div className="py-16 flex items-center justify-center text-white">
@@ -62,17 +76,23 @@ export class ErrorBoundary extends Component<Props, State> {
               aria-label="Error recovery options"
               className="flex items-center justify-center gap-3 flex-wrap"
             >
-              <button
-                type="button"
-                onClick={this.handleReset}
-                className="px-6 py-2 bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors"
-              >
-                Try Again
-              </button>
+              {canRetry && (
+                <button
+                  type="button"
+                  onClick={this.handleRetry}
+                  className="px-6 py-2 bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors"
+                >
+                  Try Again
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => window.location.reload()}
-                className="px-6 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
+                className={`px-6 py-2 rounded-lg transition-colors ${
+                  canRetry
+                    ? 'bg-white/10 hover:bg-white/20 text-gray-300'
+                    : 'bg-cyan-500 hover:bg-cyan-400'
+                }`}
               >
                 Reload Page
               </button>
