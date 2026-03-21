@@ -3,6 +3,7 @@ app/node_modules/
 app/dist/
 app/coverage/
 app/test-results/
+app/coverage/
 contracts/build/
 *.log
 npm-debug.log*

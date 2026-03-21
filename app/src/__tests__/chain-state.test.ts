@@ -118,11 +118,13 @@ describe("fetchChainState (via module re-import with mocked fetch)", () => {
   const originalFetch = globalThis.fetch;
 
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.resetModules();
   });
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
+    vi.useRealTimers();
     vi.resetModules();
   });
 
@@ -144,7 +146,8 @@ describe("fetchChainState (via module re-import with mocked fetch)", () => {
   });
 
   it("rejects when the response status is not ok", async () => {
-    globalThis.fetch = vi.fn().mockResolvedValueOnce({
+    // mockResolvedValue (not Once) so all retry attempts get the same error
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 404,
       json: async () => ({}),
@@ -152,19 +155,32 @@ describe("fetchChainState (via module re-import with mocked fetch)", () => {
 
     const { chainStatePromise } = await import("../lib/chain-state");
 
-    await expect(chainStatePromise).rejects.toThrow(
+    // Attach rejection handler before advancing timers to avoid unhandled-rejection warnings
+    const assertion = expect(chainStatePromise).rejects.toThrow(
       "Failed to fetch chain state: 404"
     );
+
+    // Advance all fake timers so retry delays complete instantly
+    await vi.runAllTimersAsync();
+
+    await assertion;
   });
 
   it("rejects when fetch itself throws a network error", async () => {
+    // mockRejectedValue (not Once) so all retry attempts get the same rejection
     globalThis.fetch = vi
       .fn()
-      .mockRejectedValueOnce(new TypeError("Network request failed"));
+      .mockRejectedValue(new TypeError("Network request failed"));
 
     const { chainStatePromise } = await import("../lib/chain-state");
 
-    await expect(chainStatePromise).rejects.toThrow("Network request failed");
+    // Attach rejection handler before advancing timers to avoid unhandled-rejection warnings
+    const assertion = expect(chainStatePromise).rejects.toThrow("Network request failed");
+
+    // Advance all fake timers so retry delays complete instantly
+    await vi.runAllTimersAsync();
+
+    await assertion;
   });
 });
 
