@@ -60,11 +60,16 @@ const HowToBuySection = () => {
   const stepsRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(CET_CONTRACT_ADDRESS).then(() => {
       setCopied(true);
+      setCopyFailed(false);
       setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {
+      setCopyFailed(true);
+      setTimeout(() => setCopyFailed(false), 2000);
     });
   }, []);
 
@@ -236,14 +241,18 @@ const HowToBuySection = () => {
               <button
                 onClick={handleCopy}
                 aria-label="Copy CET contract address"
-                className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-solaris-gold/10 border border-solaris-gold/30 text-solaris-gold text-xs font-semibold hover:bg-solaris-gold/20 active:scale-95 transition-all duration-150"
+                className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold active:scale-95 transition-all duration-150 ${
+                  copyFailed
+                    ? 'bg-red-400/10 border-red-400/30 text-red-400 hover:bg-red-400/20'
+                    : 'bg-solaris-gold/10 border-solaris-gold/30 text-solaris-gold hover:bg-solaris-gold/20'
+                }`}
               >
                 {copied ? (
                   <Check className="w-3.5 h-3.5" />
                 ) : (
                   <Copy className="w-3.5 h-3.5" />
                 )}
-                {copied ? 'Copied!' : 'Copy'}
+                {copied ? 'Copied!' : copyFailed ? 'Failed' : 'Copy'}
               </button>
             </div>
 
