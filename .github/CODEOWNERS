@@ -1,0 +1,44 @@
+# CODEOWNERS — Solaris CET
+#
+# Each line is a pattern followed by one or more owners (GitHub usernames
+# or team slugs). Owners are automatically requested for review when a
+# pull request changes matching files.
+#
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything not matched by a more specific rule
+* @Solaris-CET/maintainers
+
+# Core application source
+app/src/                    @Solaris-CET/maintainers
+app/src/sections/           @Solaris-CET/maintainers
+app/src/components/         @Solaris-CET/maintainers
+app/src/hooks/              @Solaris-CET/maintainers
+app/src/lib/                @Solaris-CET/maintainers
+app/src/workers/            @Solaris-CET/maintainers
+app/src/i18n/               @Solaris-CET/maintainers
+
+# Tests — require review on any test change
+app/src/__tests__/          @Solaris-CET/maintainers
+app/tests/                  @Solaris-CET/maintainers
+
+# Build & tooling configuration
+app/vite.config.ts          @Solaris-CET/maintainers
+app/tailwind.config.js      @Solaris-CET/maintainers
+app/tsconfig*.json          @Solaris-CET/maintainers
+app/package.json            @Solaris-CET/maintainers
+app/package-lock.json       @Solaris-CET/maintainers
+
+# CI/CD workflows — changes here affect the whole pipeline
+.github/workflows/          @Solaris-CET/maintainers
+.github/dependabot.yml      @Solaris-CET/maintainers
+
+# Smart contracts — critical security surface
+contracts/                  @Solaris-CET/maintainers
+
+# Documentation
+README.md                   @Solaris-CET/maintainers
+CONTRIBUTING.md             @Solaris-CET/maintainers
+SECURITY.md                 @Solaris-CET/maintainers
+WHITEPAPER.md               @Solaris-CET/maintainers
+docs/                       @Solaris-CET/maintainers
