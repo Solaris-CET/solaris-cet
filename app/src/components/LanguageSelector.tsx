@@ -22,7 +22,7 @@ const LanguageSelector = () => {
             key={code}
             onClick={() => setLang(code)}
             aria-label={`Switch language to ${code.toUpperCase()}`}
-            className={`px-1.5 py-0.5 rounded text-[11px] font-mono transition-colors duration-150 ${
+            className={`px-2 py-1.5 rounded text-[11px] font-mono transition-colors duration-150 min-h-[36px] min-w-[36px] flex items-center justify-center ${
               lang === code
                 ? 'text-solaris-gold bg-solaris-gold/10'
                 : 'text-solaris-muted hover:text-solaris-text'

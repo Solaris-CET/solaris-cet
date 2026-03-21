@@ -9,13 +9,14 @@ import {
   TooltipProvider
 } from '../components/ui/tooltip';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { useLanguage } from '../hooks/useLanguage';
 
 // --- CONSTANTS & CONFIGURATION ---
 const APP_CONFIG = {
   LINKS: {
     LOGO: `${import.meta.env.BASE_URL}icon-192.png`,
     DEDUST_POOL: 'https://dedust.io/pools/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB/deposit',
-    TELEGRAM_BOT: 'https://t.me/SolarisCET',
+    TELEGRAM_BOT: 'https://t.me/+tKlfzx7IWopmNWQ0',
     BITCOIN_LOGO: `${import.meta.env.BASE_URL}bitcoin-logo.svg`,
     HERO_COIN: `${import.meta.env.BASE_URL}hero-coin.png`
   },
@@ -55,6 +56,7 @@ const HeroSection: React.FC = () => {
   
   const [miningState, setMiningState] = useState<'IDLE' | 'PROCESSING' | 'SUCCESS'>('IDLE');
   const prefersReducedMotion = useReducedMotion();
+  const { t } = useLanguage();
 
   // --- BUSINESS LOGIC ---
   const handleMiningOperation = useCallback(async () => {
@@ -154,9 +156,7 @@ const HeroSection: React.FC = () => {
               </div>
               
               <p className="text-gray-400 text-lg leading-relaxed mb-8">
-                Token RWA de mare impact ancorat în <span className="text-white font-bold">infrastructura agricolă și AI</span> din Cetățuia. 
-                Fiecare unitate oferă acces la <span className="text-yellow-500 underline decoration-dotted">Solaris Prime Tactical Ecosystem</span>, o ierarhie de raționament alimentată de Gemini 3 Pro Preview.
-                Motorul de raționament dual <span className="text-yellow-500 underline decoration-dotted">Grok × Gemini</span> alimentează protocolul RAV pentru autonomie totală a agenților.
+                {t.hero.description}
               </p>
 
               <div ref={ctaGroupRef} className="flex flex-wrap gap-4">
@@ -167,11 +167,14 @@ const HeroSection: React.FC = () => {
                   aria-label={miningState === 'IDLE' ? 'Start mining' : miningState === 'PROCESSING' ? 'Processing mining operation' : 'Mining initiated successfully'}
                   className="px-8 py-4 bg-yellow-500 text-black font-bold rounded-2xl hover:scale-105 transition-transform flex items-center gap-2"
                 >
-                  {miningState === 'IDLE' ? <><Zap size={20} /> START MINING</> : <Loader2 className="animate-spin" />}
+                  {miningState === 'IDLE' ? <><Zap size={20} /> {t.hero.startMining}</> : <Loader2 className="animate-spin" />}
                 </button>
-                <button className="px-8 py-4 border border-gray-700 text-white font-bold rounded-2xl hover:bg-white/5 transition-colors">
-                  DOCS
-                </button>
+                <a
+                  href="#whitepaper"
+                  className="px-8 py-4 border border-gray-700 text-white font-bold rounded-2xl hover:bg-white/5 transition-colors"
+                >
+                  {t.hero.docs}
+                </a>
               </div>
             </div>
           </div>

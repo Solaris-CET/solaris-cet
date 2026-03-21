@@ -4,6 +4,7 @@ import { Coins, Pickaxe, Users, TrendingDown } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
 import LivePoolStats from '../components/LivePoolStats';
 import ChainStateWidget from '../components/ChainStateWidget';
+import { useLanguage } from '../hooks/useLanguage';
 
 
 const CET_TOTAL_SUPPLY = 9000;
@@ -19,6 +20,7 @@ const TokenomicsSection = () => {
   const pillsRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<SVGCircleElement>(null);
   const [ringVisible, setRingVisible] = useState(false);
+  const { t } = useLanguage();
 
   // Animate ring on mount
   useEffect(() => {
@@ -162,7 +164,7 @@ const TokenomicsSection = () => {
               <Coins className="w-6 h-6 text-solaris-gold" />
             </div>
             <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text">
-              <span className="text-gradient-animated">Tokenomics</span>
+              <span className="text-gradient-animated">{t.tokenomics.title}</span>
             </h2>
           </div>
 
