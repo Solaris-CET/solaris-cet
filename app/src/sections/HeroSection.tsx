@@ -151,8 +151,8 @@ const HeroSection: React.FC = () => {
               </div>
               
               <p className="text-gray-400 text-lg leading-relaxed mb-8">
-                Dezvoltăm un protocol de <span className="text-white font-bold">High Intelligence</span> pe TON. 
-                Sistemul utilizează bucle de execuție <span className="text-yellow-500 underline decoration-dotted">ReAct</span> pentru autonomie totală a agenților AI.
+                Token RWA de mare impact ancorat în <span className="text-white font-bold">infrastructura agricolă și AI</span> din Cetățuia. 
+                Motorul de raționament dual <span className="text-yellow-500 underline decoration-dotted">Grok × Gemini</span> alimentează protocolul RAV pentru autonomie totală a agenților.
               </p>
 
               <div ref={ctaGroupRef} className="flex flex-wrap gap-4">

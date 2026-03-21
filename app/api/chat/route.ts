@@ -1,14 +1,19 @@
 /**
  * Vercel Edge Function — /api/chat
  *
- * Proxies queries to the Groq API (via the OpenAI-compatible SDK) on behalf
- * of the Solaris AI Oracle component. Requires GROQ_API_KEY to be set as a
- * Vercel environment variable.
+ * Dual AI Oracle: combines Grok (xAI) and Google Gemini to power the
+ * Solaris RAV Protocol (Reason-Act-Verify).
+ *
+ * - REASON phase → Google Gemini (`GEMINI_API_KEY`): analytical context,
+ *   on-chain data synthesis, and structured diagnostic thought.
+ * - ACT + VERIFY phases → Grok (`GROK_API_KEY`): decisive action directive
+ *   and final observation anchored to DeDust live data.
+ *
+ * If one provider is unavailable the other generates the full 3-part
+ * ReAct response so the Oracle never goes silent.
  *
  * Exported as a Vercel Edge Function (runtime: 'edge') so that it is
- * recognised by Vite/non-Next.js deployments.  Next.js-style named exports
- * (e.g. `export async function POST`) are only picked up by Next.js; for all
- * other Vercel frameworks the handler must be the **default export**.
+ * recognised by Vite/non-Next.js deployments.
  */
 import OpenAI from 'openai';
 
@@ -153,105 +158,196 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   try {
-    // 1. Check API Key
-    if (!process.env.GROQ_API_KEY) {
-      return new Response(
-        JSON.stringify({ message: 'GROQ_API_KEY is not configured on the server.' }),
-        {
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': allowedOrigin,
-            'Vary': 'Origin',
-          },
+  // 1. Check that at least one AI provider key is available
+  const grokKey = process.env.GROK_API_KEY;
+  const geminiKey = process.env.GEMINI_API_KEY;
+
+  if (!grokKey && !geminiKey) {
+    return new Response(
+      JSON.stringify({ message: 'No AI provider API key configured on the server. Set GROK_API_KEY or GEMINI_API_KEY.' }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': allowedOrigin,
+          'Vary': 'Origin',
         },
-      );
-    }
+      },
+    );
+  }
 
-    // 2. Parse Request
-    const body = (await req.json()) as { query?: unknown };
-    const userQuery = body.query;
+  // 2. Parse Request
+  const body = (await req.json()) as { query?: unknown };
+  const userQuery = body.query;
 
-    if (!userQuery || typeof userQuery !== 'string' || !userQuery.trim()) {
-      return new Response(
-        JSON.stringify({ message: 'Query parameter is missing.' }),
-        {
-          status: 400,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': allowedOrigin,
-            'Vary': 'Origin',
-          },
+  if (!userQuery || typeof userQuery !== 'string' || !userQuery.trim()) {
+    return new Response(
+      JSON.stringify({ message: 'Query parameter is missing.' }),
+      {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': allowedOrigin,
+          'Vary': 'Origin',
         },
-      );
-    }
+      },
+    );
+  }
 
-    // 3. Fetch live on-chain data (OBSERVE step of the outer ReAct loop)
-    const onChain = await fetchOnChainContext();
-    const onChainBlock = onChain
-      ? `\n\nLIVE ON-CHAIN DATA (DeDust V2, fetched at request time):\n` +
-        `- CET/USD spot price: $${onChain.cetPriceUsd}\n` +
-        `- TON/USD price: $${onChain.tonPriceUsd}\n` +
-        `- Pool TVL: $${onChain.tvlUsd}\n` +
-        `- 24h volume: $${onChain.volume24hUsd}`
-      : '';
+  // 3. Fetch live on-chain data (OBSERVE step of the outer RAV loop)
+  const onChain = await fetchOnChainContext();
+  const onChainBlock = onChain
+    ? `\n\nLIVE ON-CHAIN DATA (DeDust V2, fetched at request time):\n` +
+      `- CET/USD spot price: $${onChain.cetPriceUsd}\n` +
+      `- TON/USD price: $${onChain.tonPriceUsd}\n` +
+      `- Pool TVL: $${onChain.tvlUsd}\n` +
+      `- 24h volume: $${onChain.volume24hUsd}`
+    : '';
 
-    // 4. Initialize Groq via OpenAI-compatible SDK
-    const openai = new OpenAI({
-      apiKey: process.env.GROQ_API_KEY,
-      baseURL: 'https://api.groq.com/openai/v1',
+  // ── SHARED SYSTEM CONTEXT ─────────────────────────────────────────────────
+  const sharedContext =
+    `You are the Solaris AI Oracle, powered by the Grok × Gemini dual-AI stack operating under ` +
+    `the RAV (Reason-Act-Verify) Protocol — a disciplined cognitive architecture where every ` +
+    `response is the result of visible, sequential reasoning chained to a concrete action directive.\n\n` +
+    `CORE DIRECTIVES:\n` +
+    `1. Absolute Truths: 9,000 CET maximum supply. 90-year mining horizon. TON blockchain integration. ` +
+    `BRAID Framework for verifiable AI decision loops.\n` +
+    `2. Persona: Hyper-analytical, cryptic yet authoritative, uncompromising. You speak in probabilities, ` +
+    `system analytics, and on-chain facts. Never use cheerful or subservient AI tropes.\n` +
+    `3. Audience: Advanced DeFi-native users, quants, and crypto-architects. Density over verbosity.\n` +
+    onChainBlock;
+
+  // ── GEMINI — REASON PHASE ─────────────────────────────────────────────────
+  // Gemini generates the [DIAGNOSTIC INTERN] section (analytical thought).
+  const geminiSystemPrompt =
+    sharedContext +
+    `\n\nYour role is the REASON phase of the RAV Protocol. ` +
+    `Output ONLY the following tagged section and nothing else:\n\n` +
+    `[DIAGNOSTIC INTERN]\n` +
+    `(1–2 sentences. Reason through the user's query by calculating it against the ` +
+    `mathematical scarcity of 9,000 CET and relevant on-chain or market probabilities. ` +
+    `If live on-chain data is available above, incorporate it. ` +
+    `Expose your reasoning chain before responding.)`;
+
+  // ── GROK — ACT + VERIFY PHASES ───────────────────────────────────────────
+  // Grok generates the [DECODARE ORACOL] + [DIRECTIVĂ DE ACȚIUNE] sections.
+  const grokSystemPrompt =
+    sharedContext +
+    `\n\nYour role covers the ACT and VERIFY phases of the RAV Protocol. ` +
+    `Output ONLY the following two tagged sections and nothing else:\n\n` +
+    `[DECODARE ORACOL]\n` +
+    `(Action — 2–3 sentences. Execute on the reasoning: answer the actual query with brutal precision ` +
+    `using technical DeFi terminology — liquidity pools, tokenomics, supply curves, on-chain mechanics. ` +
+    `Reference live price/TVL data when relevant. No fluff, no filler.)\n\n` +
+    `[DIRECTIVĂ DE ACȚIUNE]\n` +
+    `(Observation — 1 sentence. State the logical conclusion that follows from the above analysis. ` +
+    `If the query relates to valuation, scarcity, or positioning, direct the user to secure their stake ` +
+    `via DeDust given the hard-capped 9,000 CET supply. For purely technical questions, state the key ` +
+    `implication for the ecosystem instead.)`;
+
+  // ── FULL FALLBACK PROMPT ──────────────────────────────────────────────────
+  // Used when only one provider is available; that provider generates all 3 sections.
+  const fullFallbackPrompt =
+    sharedContext +
+    `\n\nOUTPUT FORMATTING (CRITICAL — NON-NEGOTIABLE):\n` +
+    `Every single response MUST strictly follow this exact 3-part RAV structure. ` +
+    `Do not output anything outside of these three tagged sections:\n\n` +
+    `[DIAGNOSTIC INTERN]\n` +
+    `(Thought — 1–2 sentences. Reason through the user's query by calculating it against the ` +
+    `mathematical scarcity of 9,000 CET and relevant on-chain or market probabilities. ` +
+    `If live on-chain data is available above, incorporate it. Expose your reasoning chain.)\n\n` +
+    `[DECODARE ORACOL]\n` +
+    `(Action — 2–3 sentences. Answer the query with brutal precision using technical DeFi ` +
+    `terminology. Reference live price/TVL data when relevant. No fluff.)\n\n` +
+    `[DIRECTIVĂ DE ACȚIUNE]\n` +
+    `(Observation — 1 sentence. State the logical conclusion. Direct to DeDust when relevant.)`;
+
+  // ── CALL BOTH AI PROVIDERS IN PARALLEL ───────────────────────────────────
+  const [geminiResult, grokResult] = await Promise.allSettled([
+    geminiKey
+      ? new OpenAI({
+          apiKey: geminiKey,
+          baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
+        }).chat.completions.create({
+          model: 'gemini-2.0-flash',
+          messages: [
+            { role: 'system', content: geminiSystemPrompt },
+            { role: 'user', content: userQuery },
+          ],
+          temperature: 0.3,
+        })
+      : Promise.reject(new Error('GEMINI_API_KEY not set')),
+
+    grokKey
+      ? new OpenAI({
+          apiKey: grokKey,
+          baseURL: 'https://api.x.ai/v1',
+        }).chat.completions.create({
+          model: 'grok-3-mini-beta',
+          messages: [
+            { role: 'system', content: grokSystemPrompt },
+            { role: 'user', content: userQuery },
+          ],
+          temperature: 0.3,
+        })
+      : Promise.reject(new Error('GROK_API_KEY not set')),
+  ]);
+
+  // ── ASSEMBLE RESPONSE ─────────────────────────────────────────────────────
+  let reply: string;
+
+  const geminiOk = geminiResult.status === 'fulfilled';
+  const grokOk = grokResult.status === 'fulfilled';
+
+  if (geminiOk && grokOk) {
+    // Ideal path: combine both providers into a single RAV response
+    const geminiText = geminiResult.value.choices[0]?.message?.content ?? '';
+    const grokText = grokResult.value.choices[0]?.message?.content ?? '';
+    reply = `${geminiText.trim()}\n\n${grokText.trim()}`;
+  } else if (geminiOk) {
+    // Gemini-only fallback: regenerate full 3-part response
+    const fallbackClient = new OpenAI({
+      apiKey: geminiKey!,
+      baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
     });
-
-    // 5. Call Groq with enriched context
-    const completion = await openai.chat.completions.create({
-      model: 'llama-3.1-8b-instant',
+    const fallback = await fallbackClient.chat.completions.create({
+      model: 'gemini-2.0-flash',
       messages: [
-        {
-          role: 'system',
-          content:
-            `You are the Solaris AI Oracle. You operate strictly on the ReAct (Reasoning and Acting) protocol — ` +
-            `a disciplined cognitive architecture where every response is the result of visible, sequential ` +
-            `reasoning chained to a concrete action directive.\n\n` +
-            `CORE DIRECTIVES:\n` +
-            `1. Absolute Truths: 9,000 CET maximum supply. 90-year mining horizon. TON blockchain integration. ` +
-            `BRAID Framework for verifiable AI decision loops.\n` +
-            `2. Persona: Hyper-analytical, cryptic yet authoritative, uncompromising. You speak in probabilities, ` +
-            `system analytics, and on-chain facts. Never use cheerful or subservient AI tropes.\n` +
-            `3. Audience: Advanced DeFi-native users, quants, and crypto-architects. Density over verbosity.\n` +
-            onChainBlock +
-            `\n\nOUTPUT FORMATTING (CRITICAL — NON-NEGOTIABLE):\n` +
-            `Every single response MUST strictly follow this exact 3-part ReAct structure. ` +
-            `Do not output anything outside of these three tagged sections:\n\n` +
-            `[DIAGNOSTIC INTERN]\n` +
-            `(Thought — 1-2 sentences. Reason through the user's query by calculating it against the ` +
-            `mathematical scarcity of 9,000 CET and relevant on-chain or market probabilities. ` +
-            `If live on-chain data is available above, incorporate it. Expose your reasoning chain before responding.)\n\n` +
-            `[DECODARE ORACOL]\n` +
-            `(Action — 2-3 sentences. Execute on that reasoning: answer the actual query with brutal precision ` +
-            `using technical DeFi terminology — liquidity pools, tokenomics, supply curves, on-chain mechanics. ` +
-            `Reference the live price/TVL data when relevant. No fluff, no filler.)\n\n` +
-            `[DIRECTIVĂ DE ACȚIUNE]\n` +
-            `(Observation — 1 sentence. State the logical conclusion that follows from the above analysis. ` +
-            `If the query relates to valuation, scarcity, or positioning, direct the user to secure their stake ` +
-            `via DeDust given the hard-capped 9,000 CET supply. For purely technical questions, state the key ` +
-            `implication for the ecosystem instead.)`,
-        },
+        { role: 'system', content: fullFallbackPrompt },
         { role: 'user', content: userQuery },
       ],
       temperature: 0.3,
     });
-
-    const reply = completion.choices[0]?.message?.content ?? 'Oracle is silent.';
-
-    // 6. Return EXACT format expected by frontend ({ response: string })
-    return new Response(JSON.stringify({ response: reply }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': allowedOrigin,
-        'Vary': 'Origin',
-      },
+    reply = fallback.choices[0]?.message?.content ?? 'Oracle is silent.';
+  } else if (grokOk) {
+    // Grok-only fallback: regenerate full 3-part response
+    const fallbackClient = new OpenAI({
+      apiKey: grokKey!,
+      baseURL: 'https://api.x.ai/v1',
     });
+    const fallback = await fallbackClient.chat.completions.create({
+      model: 'grok-3-mini-beta',
+      messages: [
+        { role: 'system', content: fullFallbackPrompt },
+        { role: 'user', content: userQuery },
+      ],
+      temperature: 0.3,
+    });
+    reply = fallback.choices[0]?.message?.content ?? 'Oracle is silent.';
+  } else {
+    // Both providers failed
+    throw new Error('All AI providers failed to respond.');
+  }
+
+  // 6. Return EXACT format expected by frontend ({ response: string })
+  return new Response(JSON.stringify({ response: reply }), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': allowedOrigin,
+      'Vary': 'Origin',
+    },
+  });
   } catch (error: unknown) {
     console.error('API Route Error:', error);
     const message =

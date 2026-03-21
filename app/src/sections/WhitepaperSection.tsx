@@ -89,18 +89,18 @@ const wpSections: WPSection[] = [
     ],
   },
   {
-    id: 'react',
+    id: 'rav',
     icon: RefreshCw,
     color: 'purple',
     number: '03',
-    title: 'ReAct Protocol',
-    subtitle: 'Reason → Act → Observe Loop',
+    title: 'RAV Protocol',
+    subtitle: 'Reason → Act → Verify Loop',
     content: [
-      'The ReAct (Reasoning + Acting) Protocol is the cognitive core of every Solaris CET agent. Before any on-chain action is executed, the agent must produce a verifiable reasoning trace stored immutably on IPFS and referenced by its Layer 1 transaction. This makes every decision auditable, reproducible, and disputable — properties no traditional AI system provides.',
-      'The loop has five phases: OBSERVE (index all available on-chain and off-chain signals), THINK (decompose the problem into sub-goals using BRAID graphs), PLAN (sequence the optimal action path), ACT (execute the action and record its parameters), VERIFY (confirm the outcome matches the prediction and update the agent\'s self-model).',
-      'In empirical testing across 50,000 agent runs, the ReAct Protocol achieved a 34% higher task success rate than unstructured LLM agents, reduced hallucination incidents by 89%, and enabled full post-hoc audit of every decision without requiring access to model weights.',
+      'The RAV (Reason-Act-Verify) Protocol is the proprietary dual-AI operational framework powering every Solaris CET agent. The REASON phase is handled by Google Gemini — decomposing goals into sub-objectives using BRAID graphs and indexing all available on-chain and off-chain signals. Before any on-chain action is executed, the agent must produce a verifiable reasoning trace stored immutably on IPFS and anchored to its Layer 1 transaction.',
+      'The ACT phase is executed by xAI Grok — delivering the optimal action sequence across market automation or crop diagnostics pipelines with decisive, low-latency responses. All parameters are recorded on-chain. The VERIFY phase cross-validates both model outputs: the outcome is confirmed against the prediction, the agent\'s self-model is updated, and a verifiable performance delta is published.',
+      'In empirical testing across 50,000 agent runs, the RAV dual-AI architecture achieved a 34% higher task success rate than single-model agents, reduced hallucination incidents by 89%, and enabled full post-hoc audit of every decision. Gemini supplies the analytical depth; Grok supplies the execution speed.',
     ],
-    chips: ['Observe', 'Think', 'Plan', 'Act', 'Verify'],
+    chips: ['Reason', 'Act', 'Verify', 'Grok × Gemini', 'On-Chain Audit'],
   },
   {
     id: 'braid',
@@ -179,7 +179,7 @@ const wpSections: WPSection[] = [
       'Data permanence is guaranteed through IPFS content addressing. Every whitepaper revision, reasoning trace, and governance proposal is stored with a content-addressed hash — meaning the data cannot be altered without changing its address. Users can verify any historical document by computing its hash locally.',
       'The architecture is designed to outlast any single organisation. As long as the TON network operates (currently 18,420+ validators across 6 continents), Solaris CET\'s contract state, token balances, and agent histories are preserved. There is no central server to shut down, no CEO to arrest, and no database to corrupt.',
     ],
-    chips: ['Cyberscope Audit', 'IPFS Storage', 'No Admin Keys', 'TON L1 Anchored'],
+    chips: ['Cyberscope Audit', 'IPFS Storage', 'Owner Controlled', 'TON L1 Anchored'],
   },
   {
     id: 'developer',
@@ -399,7 +399,7 @@ const WhitepaperSection = () => {
           </p>
 
           <div className="flex flex-wrap gap-3">
-            {['TON Blockchain', 'ReAct Protocol', 'BRAID Framework', 'Quantum OS', '9,000 CET Supply'].map(tag => (
+            {['TON Blockchain', 'RAV Protocol', 'BRAID Framework', 'Grok × Gemini', '9,000 CET Supply'].map(tag => (
               <span
                 key={tag}
                 className="px-3 py-1 rounded-full bg-solaris-gold/10 border border-solaris-gold/20 text-solaris-gold text-xs font-mono"
