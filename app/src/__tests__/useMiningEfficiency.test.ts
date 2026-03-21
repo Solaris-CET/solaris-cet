@@ -1,70 +1,154 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { useMiningEfficiency } from '../hooks/useMiningEfficiency';
+// @vitest-environment jsdom
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import { useMiningEfficiency } from "../hooks/useMiningEfficiency";
 
-describe('useMiningEfficiency module', () => {
+describe("useMiningEfficiency", () => {
   afterEach(() => {
-    vi.unstubAllGlobals();
     vi.restoreAllMocks();
+    // Reset document.hidden to its default (visible)
+    Object.defineProperty(document, "hidden", {
+      writable: true,
+      configurable: true,
+      value: false,
+    });
   });
 
-  it('exports useMiningEfficiency as a function', () => {
-    expect(typeof useMiningEfficiency).toBe('function');
-  });
-});
-
-describe('getBatteryInfo standalone logic', () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
-  it('returns 100% charging when getBattery is unavailable', async () => {
-    // Simulate navigator without getBattery (iOS Safari / Firefox)
-    vi.stubGlobal('navigator', { language: 'en' });
-
-    const result = await (async () => {
-      if (!('getBattery' in navigator)) {
-        return { level: 100, charging: true, note: 'Battery API unavailable' };
-      }
-      return { level: 100, charging: true };
-    })();
-
-    expect(result.level).toBe(100);
-    expect(result.charging).toBe(true);
-    expect(result.note).toBe('Battery API unavailable');
-  });
-
-  it('returns battery info when getBattery is available', async () => {
-    vi.stubGlobal('navigator', {
-      language: 'en',
-      getBattery: vi.fn().mockResolvedValue({ level: 0.75, charging: false }),
+  it("starts as not suspended when tab is visible", () => {
+    Object.defineProperty(document, "hidden", {
+      writable: true,
+      configurable: true,
+      value: false,
     });
 
-    const battery = await (navigator as Navigator & {
-      getBattery: () => Promise<{ level: number; charging: boolean }>;
-    }).getBattery();
-
-    expect(Math.round(battery.level * 100)).toBe(75);
-    expect(battery.charging).toBe(false);
+    const { result } = renderHook(() => useMiningEfficiency());
+    expect(result.current.isSuspended).toBe(false);
   });
 
-  it('falls back gracefully when getBattery rejects', async () => {
-    vi.stubGlobal('navigator', {
-      language: 'en',
-      getBattery: vi.fn().mockRejectedValue(new Error('Permission denied')),
+  it("starts as suspended when tab is hidden", () => {
+    Object.defineProperty(document, "hidden", {
+      writable: true,
+      configurable: true,
+      value: true,
     });
 
-    let result: { level: number; charging: boolean; note?: string };
-    try {
-      const battery = await (navigator as Navigator & {
-        getBattery: () => Promise<{ level: number; charging: boolean }>;
-      }).getBattery();
-      result = { level: Math.round(battery.level * 100), charging: battery.charging };
-    } catch {
-      result = { level: 100, charging: true, note: 'Battery API unavailable' };
-    }
+    const { result } = renderHook(() => useMiningEfficiency());
+    expect(result.current.isSuspended).toBe(true);
+  });
 
-    expect(result.level).toBe(100);
-    expect(result.charging).toBe(true);
-    expect(result.note).toBe('Battery API unavailable');
+  it("suspends when visibilitychange fires with hidden=true", () => {
+    Object.defineProperty(document, "hidden", {
+      writable: true,
+      configurable: true,
+      value: false,
+    });
+
+    const { result } = renderHook(() => useMiningEfficiency());
+    expect(result.current.isSuspended).toBe(false);
+
+    act(() => {
+      Object.defineProperty(document, "hidden", {
+        writable: true,
+        configurable: true,
+        value: true,
+      });
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+
+    expect(result.current.isSuspended).toBe(true);
+  });
+
+  it("resumes when visibilitychange fires with hidden=false", () => {
+    Object.defineProperty(document, "hidden", {
+      writable: true,
+      configurable: true,
+      value: true,
+    });
+
+    const { result } = renderHook(() => useMiningEfficiency());
+    expect(result.current.isSuspended).toBe(true);
+
+    act(() => {
+      Object.defineProperty(document, "hidden", {
+        writable: true,
+        configurable: true,
+        value: false,
+      });
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+
+    expect(result.current.isSuspended).toBe(false);
+  });
+
+  it("posts SUSPEND message to worker when tab hides", () => {
+    Object.defineProperty(document, "hidden", {
+      writable: true,
+      configurable: true,
+      value: false,
+    });
+
+    const postMessage = vi.fn();
+    const workerRef = { current: { postMessage } as unknown as Worker };
+
+    renderHook(() => useMiningEfficiency(workerRef));
+
+    act(() => {
+      Object.defineProperty(document, "hidden", {
+        writable: true,
+        configurable: true,
+        value: true,
+      });
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+
+    expect(postMessage).toHaveBeenCalledWith({ type: "SUSPEND" });
+  });
+
+  it("posts RESUME message to worker when tab becomes visible", () => {
+    Object.defineProperty(document, "hidden", {
+      writable: true,
+      configurable: true,
+      value: true,
+    });
+
+    const postMessage = vi.fn();
+    const workerRef = { current: { postMessage } as unknown as Worker };
+
+    renderHook(() => useMiningEfficiency(workerRef));
+
+    act(() => {
+      Object.defineProperty(document, "hidden", {
+        writable: true,
+        configurable: true,
+        value: false,
+      });
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+
+    expect(postMessage).toHaveBeenCalledWith({ type: "RESUME" });
+  });
+
+  describe("getBatteryInfo", () => {
+    it("returns a fallback when Battery API is unavailable", async () => {
+      const { result } = renderHook(() => useMiningEfficiency());
+      const info = await result.current.getBatteryInfo();
+      expect(info).toMatchObject({ level: 100, charging: true });
+    });
+
+    it("returns battery data when Battery API succeeds", async () => {
+      const mockGetBattery = vi.fn().mockResolvedValue({
+        level: 0.75,
+        charging: false,
+      });
+      Object.defineProperty(navigator, "getBattery", {
+        writable: true,
+        configurable: true,
+        value: mockGetBattery,
+      });
+
+      const { result } = renderHook(() => useMiningEfficiency());
+      const info = await result.current.getBatteryInfo();
+      expect(info).toEqual({ level: 75, charging: false });
+    });
   });
 });

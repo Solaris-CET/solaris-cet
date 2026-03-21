@@ -1,7 +1,7 @@
 import { useRef, useLayoutEffect, useState, useEffect, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { Calculator, Smartphone, Laptop, Monitor, Server, TrendingUp } from 'lucide-react';
-import type { MiningInput, MiningResult } from '../workers/mining.worker';
+import type { MiningInput, MiningResult } from '../lib/mining-math';
 
 
 type DeviceType = 'smartphone' | 'laptop' | 'desktop' | 'node';
@@ -213,13 +213,14 @@ const MiningCalculatorSection = () => {
             {/* Device Selection */}
             <div className="mb-6">
               <label className="hud-label mb-3 block">Device Type</label>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" role="group" aria-label="Device type selection">
                 {(Object.keys(devices) as DeviceType[]).map((deviceType) => {
                   const DeviceIcon = devices[deviceType].icon;
                   return (
                     <button
                       key={deviceType}
                       onClick={() => handleDeviceChange(deviceType)}
+                      aria-pressed={device === deviceType}
                       className={`p-3 rounded-xl border transition-all duration-300 flex flex-col items-center gap-2 ${
                         device === deviceType
                           ? 'bg-solaris-gold/10 border-solaris-gold'
@@ -247,10 +248,11 @@ const MiningCalculatorSection = () => {
             {/* Hashrate Slider */}
             <div className="mb-6">
               <div className="flex justify-between items-center mb-3">
-                <label className="hud-label">Hashrate (TH/s)</label>
+                <label htmlFor="hashrate-slider" className="hud-label">Hashrate (TH/s)</label>
                 <span className="font-mono text-solaris-gold">{hashrate.toFixed(1)}</span>
               </div>
               <input
+                id="hashrate-slider"
                 type="range"
                 min={devices[device].baseHashrate * 0.5}
                 max={devices[device].baseHashrate * 3}
@@ -264,10 +266,11 @@ const MiningCalculatorSection = () => {
             {/* Stake Slider */}
             <div>
               <div className="flex justify-between items-center mb-3">
-                <label className="hud-label">Stake (BTC-S)</label>
+                <label htmlFor="stake-slider" className="hud-label">Stake (BTC-S)</label>
                 <span className="font-mono text-solaris-cyan">{stake}</span>
               </div>
               <input
+                id="stake-slider"
                 type="range"
                 min={0}
                 max={10000}
@@ -285,7 +288,7 @@ const MiningCalculatorSection = () => {
               Projected Earnings
             </h3>
 
-            <div className="space-y-6">
+            <div className="space-y-6" aria-live="polite" aria-atomic="true">
               <div className="p-5 rounded-xl bg-white/5">
                 <div className="hud-label mb-2">Daily Yield (est)</div>
                 <div className="flex items-baseline gap-2">

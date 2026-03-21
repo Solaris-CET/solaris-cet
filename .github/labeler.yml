@@ -1,0 +1,70 @@
+# .github/labeler.yml
+# Maps file-path patterns to PR labels for `actions/labeler@v5`.
+# Labels must exist in the repository before this workflow can apply them.
+
+"area: frontend":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/src/**"
+      - "app/index.html"
+      - "app/tailwind.config.js"
+      - "app/vite.config.ts"
+
+"area: sections":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/src/sections/**"
+
+"area: components":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/src/components/**"
+
+"area: hooks":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/src/hooks/**"
+
+"area: i18n":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/src/i18n/**"
+
+"area: contracts":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "contracts/**"
+
+"area: ci":
+  - changed-files:
+    - any-glob-to-any-file:
+      - ".github/workflows/**"
+      - ".github/dependabot.yml"
+
+"area: docs":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "*.md"
+      - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/pull_request_template.md"
+
+"dependencies":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/package.json"
+      - "app/package-lock.json"
+      - "contracts/package.json"
+      - "contracts/package-lock.json"
+
+"area: tests":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/src/**/*.{test,spec}.{ts,tsx}"
+      - "app/tests/**"
+      - "contracts/tests/**"
+
+"area: public":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/public/**"
