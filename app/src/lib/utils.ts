@@ -59,3 +59,54 @@ export function formatPercentage(value: number, decimals = 2): string {
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
+
+/**
+ * Formats a number as a compact USD string using K/M suffixes for large values
+ * and 4 decimal places for small values. Returns `'—'` for non-finite inputs.
+ *
+ * @example
+ * formatUsd(1_234_567)   // "$1.23M"
+ * formatUsd(5_678)       // "$5.68K"
+ * formatUsd(0.0042)      // "$0.0042"
+ * formatUsd(null)        // "—"
+ */
+export function formatUsd(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(value)) return '—';
+  const abs = Math.abs(value);
+  if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`;
+  if (abs >= 1_000) return `$${(value / 1_000).toFixed(2)}K`;
+  return `$${value.toFixed(4)}`;
+}
+
+/**
+ * Formats a token/asset price as a USD string. Values below `0.001` are
+ * rendered in scientific notation; all others use 4 fixed decimal places.
+ * Returns `'—'` for non-finite inputs.
+ *
+ * @example
+ * formatPrice(0.00042)   // "$4.20e-4"
+ * formatPrice(3.1415)    // "$3.1415"
+ * formatPrice(null)      // "—"
+ */
+export function formatPrice(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(value)) return '—';
+  if (value !== 0 && Math.abs(value) < 0.001) return `$${value.toExponential(2)}`;
+  return `$${value.toFixed(4)}`;
+}
+
+/**
+ * Returns a debounced version of `fn` that delays invocation until `delay`
+ * milliseconds have elapsed since the last call.
+ *
+ * @example
+ * const save = debounce(() => saveToServer(), 300);
+ * save(); save(); save(); // server called once after 300 ms
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function debounce<T extends (...args: any[]) => void>(fn: T, delay: number) {
+  let timer: ReturnType<typeof setTimeout>;
+  return (...args: Parameters<T>) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+}

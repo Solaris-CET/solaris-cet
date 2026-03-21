@@ -27,7 +27,7 @@ const MAX_RETRIES = 2;
  *
  * @example
  * ```tsx
- * <ErrorBoundary>
+ * <ErrorBoundary onReset={() => refetch()}>
  *   <MySection />
  * </ErrorBoundary>
  * ```
