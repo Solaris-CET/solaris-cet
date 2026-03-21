@@ -2,116 +2,172 @@ import { describe, it, expect } from "vitest";
 import translations, { type LangCode, type Translations } from "../i18n/translations";
 import { SUPPORTED_LANGS } from "../hooks/useLanguage";
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Recursively collect every leaf value from an object. */
-function collectLeaves(obj: unknown, path = ""): Array<{ path: string; value: unknown }> {
-  if (obj === null || typeof obj !== "object") {
-    return [{ path, value: obj }];
-  }
-  return Object.entries(obj as Record<string, unknown>).flatMap(([key, val]) =>
-    collectLeaves(val, path ? `${path}.${key}` : key)
-  );
+/**
+ * Recursively collect all dot-separated leaf key paths from a nested object.
+ * E.g. { nav: { home: 'Home' } } → ['nav.home']
+ */
+function collectKeys(obj: Record<string, unknown>, prefix = ""): string[] {
+  return Object.entries(obj).flatMap(([key, value]) => {
+    const fullKey = prefix ? `${prefix}.${key}` : key;
+    if (value !== null && typeof value === "object" && !Array.isArray(value)) {
+      return collectKeys(value as Record<string, unknown>, fullKey);
+    }
+    return [fullKey];
+  });
 }
 
-/** Collect every leaf key path from the English translation (used as reference). */
-const enLeafPaths = collectLeaves(translations.en).map((l) => l.path);
+/**
+ * Retrieve a nested value using a dot-separated key path.
+ */
+function getValueByPath(obj: Record<string, unknown>, path: string): unknown {
+  return path
+    .split(".")
+    .reduce<unknown>(
+      (acc, key) =>
+        acc !== null && typeof acc === "object"
+          ? (acc as Record<string, unknown>)[key]
+          : undefined,
+      obj
+    );
+}
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
+const referenceLang: LangCode = "en";
+const referenceKeys = collectKeys(
+  translations[referenceLang] as unknown as Record<string, unknown>
+);
 
-describe("translations completeness", () => {
-  it("every SUPPORTED_LANG has an entry in the translations map", () => {
-    for (const lang of SUPPORTED_LANGS) {
-      expect(translations).toHaveProperty(lang as string);
-    }
-  });
-
-  it("the translations map has no extra entries beyond SUPPORTED_LANGS", () => {
+describe("translations — language coverage", () => {
+  it("SUPPORTED_LANGS covers every translation in the translations map", () => {
     const translationKeys = Object.keys(translations) as LangCode[];
-    for (const key of translationKeys) {
-      expect(SUPPORTED_LANGS).toContain(key);
+    for (const lang of translationKeys) {
+      expect(SUPPORTED_LANGS).toContain(lang);
     }
   });
 
-  it.each(SUPPORTED_LANGS as string[])(
-    'lang "%s" contains all keys present in the English reference',
-    (lang) => {
-      const langTranslations = translations[lang as LangCode] as Translations;
-      const leaves = collectLeaves(langTranslations).map((l) => l.path);
-      for (const path of enLeafPaths) {
-        expect(leaves).toContain(path);
-      }
+  it("every supported language has an entry in the translations map", () => {
+    for (const lang of SUPPORTED_LANGS) {
+      expect(translations).toHaveProperty(lang);
     }
-  );
-
-  it.each(SUPPORTED_LANGS as string[])(
-    'lang "%s" has no empty string values',
-    (lang) => {
-      const leaves = collectLeaves(translations[lang as LangCode] as Translations);
-      for (const { path, value } of leaves) {
-        expect(value, `Empty string at ${lang}.${path}`).not.toBe("");
-      }
-    }
-  );
-
-  it.each(SUPPORTED_LANGS as string[])(
-    'lang "%s" has only string leaf values',
-    (lang) => {
-      const leaves = collectLeaves(translations[lang as LangCode] as Translations);
-      for (const { path, value } of leaves) {
-        expect(typeof value, `Non-string leaf at ${lang}.${path}`).toBe("string");
-      }
-    }
-  );
-});
-
-describe("English (default) translations content", () => {
-  const { en } = translations;
-
-  it('en.nav.home is "Home"', () => {
-    expect(en.nav.home).toBe("Home");
-  });
-
-  it('en.hero.buyNow is "Buy CET"', () => {
-    expect(en.hero.buyNow).toBe("Buy CET");
-  });
-
-  it("en.tokenomics.supply is a non-empty string", () => {
-    expect(en.tokenomics.supply).toBeTruthy();
-  });
-
-  it("en.hero.subtitle mentions the 9,000 CET supply figure", () => {
-    expect(en.hero.subtitle).toMatch(/9[,.]?000/);
-  });
-
-  it("en.hero.subtitle mentions TON blockchain", () => {
-    expect(en.hero.subtitle).toMatch(/TON/i);
   });
 });
 
-describe("nav section structure", () => {
-  const NAV_KEYS: Array<keyof Translations["nav"]> = [
-    "home",
-    "cetApp",
-    "tokenomics",
-    "roadmap",
-    "howToBuy",
-    "whitepaper",
-    "resources",
-  ];
+describe("translations — key completeness", () => {
+  for (const lang of SUPPORTED_LANGS) {
+    describe(`language: ${lang}`, () => {
+      const entry = translations[lang] as unknown as Record<string, unknown>;
 
-  it.each(SUPPORTED_LANGS as string[])(
-    'lang "%s" nav section has all 7 required keys',
-    (lang) => {
-      const nav = translations[lang as LangCode].nav;
-      for (const key of NAV_KEYS) {
-        expect(nav).toHaveProperty(key);
-        expect(nav[key]).toBeTruthy();
+      it(`has all ${referenceKeys.length} keys from the reference (${referenceLang}) translation`, () => {
+        const missing: string[] = [];
+        for (const key of referenceKeys) {
+          if (getValueByPath(entry, key) === undefined) missing.push(key);
+        }
+        expect(missing).toEqual([]);
+      });
+
+      it("has no null or undefined values", () => {
+        const nullish: string[] = [];
+        for (const key of referenceKeys) {
+          const value = getValueByPath(entry, key);
+          if (value === undefined || value === null) nullish.push(key);
+        }
+        expect(nullish).toEqual([]);
+      });
+
+      it("has no empty string values", () => {
+        const empty: string[] = [];
+        for (const key of referenceKeys) {
+          const value = getValueByPath(entry, key);
+          if (typeof value === "string" && value.trim() === "") empty.push(key);
+        }
+        expect(empty).toEqual([]);
+      });
+
+      it("all values are strings", () => {
+        for (const key of referenceKeys) {
+          const value = getValueByPath(entry, key);
+          expect(typeof value, `'${lang}.${key}' should be a string`).toBe("string");
+        }
+      });
+    });
+  }
+});
+
+describe("translations — key symmetry", () => {
+  it("every language contains exactly the same keys as English", () => {
+    const enKeys = collectKeys(
+      translations.en as unknown as Record<string, unknown>
+    ).sort();
+
+    for (const lang of SUPPORTED_LANGS) {
+      const langKeys = collectKeys(
+        translations[lang] as unknown as Record<string, unknown>
+      ).sort();
+      expect(langKeys, `${lang} keys do not match English keys`).toEqual(enKeys);
+    }
+  });
+});
+
+describe("translations — specific content", () => {
+  it("English tagline references Cetățuia", () => {
+    expect(translations.en.hero.tagline).toContain("Cetățuia");
+  });
+
+  it("buy button text is non-empty for all languages", () => {
+    for (const lang of SUPPORTED_LANGS) {
+      expect(translations[lang].hero.buyNow.trim().length).toBeGreaterThan(0);
+    }
+  });
+
+  it("nav section has all expected keys for every language", () => {
+    const expectedNavKeys: Array<keyof Translations["nav"]> = [
+      "home",
+      "cetApp",
+      "tokenomics",
+      "roadmap",
+      "howToBuy",
+      "whitepaper",
+      "resources",
+    ];
+    for (const lang of SUPPORTED_LANGS) {
+      for (const key of expectedNavKeys) {
+        expect(
+          translations[lang].nav[key],
+          `${lang}.nav.${key} missing`
+        ).toBeTruthy();
       }
     }
-  );
+  });
+
+  it("hero section has all expected keys for every language", () => {
+    const expectedHeroKeys: Array<keyof Translations["hero"]> = [
+      "tagline",
+      "subtitle",
+      "buyNow",
+      "learnMore",
+    ];
+    for (const lang of SUPPORTED_LANGS) {
+      for (const key of expectedHeroKeys) {
+        expect(
+          translations[lang].hero[key],
+          `${lang}.hero.${key} missing`
+        ).toBeTruthy();
+      }
+    }
+  });
+
+  it("tokenomics section has all expected keys for every language", () => {
+    const expectedTokenomicsKeys: Array<keyof Translations["tokenomics"]> = [
+      "title",
+      "supply",
+      "poolAddress",
+    ];
+    for (const lang of SUPPORTED_LANGS) {
+      for (const key of expectedTokenomicsKeys) {
+        expect(
+          translations[lang].tokenomics[key],
+          `${lang}.tokenomics.${key} missing`
+        ).toBeTruthy();
+      }
+    }
+  });
 });

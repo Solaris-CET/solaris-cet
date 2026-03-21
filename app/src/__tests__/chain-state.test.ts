@@ -1,182 +1,233 @@
-/**
- * chain-state.test.ts
- *
- * Tests for the chain-state module interfaces and data shapes.
- *
- * `chain-state.ts` creates a module-level promise that calls `fetch` with a
- * relative URL (`/api/state.json`) at module evaluation time.  In a Node test
- * environment the relative URL fails to parse, so we mock the entire module
- * via `vi.mock` (which is hoisted before imports by Vitest) and focus tests on:
- *   - the TypeScript interface shapes (validated at compile time + runtime)
- *   - the exported constants (contract addresses, pool address)
- *   - null-safety of optional fields
- */
-import { describe, it, expect, vi } from "vitest";
-import type { ChainState, ChainTokenState, ChainPoolState } from "../lib/chain-state";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import type {
+  ChainState,
+  ChainTokenState,
+  ChainPoolState,
+} from "../lib/chain-state";
 
 // ---------------------------------------------------------------------------
-// Fixtures — defined with vi.hoisted so they are available inside the
-// vi.mock factory, which is hoisted above all imports and top-level statements.
+// Helpers
 // ---------------------------------------------------------------------------
 
-const { MOCK_STATE } = vi.hoisted(() => {
-  const state: {
-    token: {
-      symbol: string;
-      name: string;
-      contract: string;
-      totalSupply: string | null;
-      decimals: number;
-    };
-    pool: {
-      address: string;
-      reserveTon: string | null;
-      reserveCet: string | null;
-      lpSupply: string | null;
-      priceTonPerCet: string | null;
-    };
-    updatedAt: string;
-  } = {
-    token: {
-      symbol: "CET",
-      name: "Cetățuia",
-      contract: "EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX",
-      totalSupply: "9000.000000000",
-      decimals: 9,
-    },
-    pool: {
-      address: "EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB",
-      reserveTon: "100.5",
-      reserveCet: "4500.0",
-      lpSupply: "2000.0",
-      priceTonPerCet: "0.0223",
-    },
-    updatedAt: "2024-01-01T00:00:00.000Z",
+function makeToken(overrides: Partial<ChainTokenState> = {}): ChainTokenState {
+  return {
+    symbol: "CET",
+    name: "Cetățuia Ecosystem Token",
+    contract: "EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX",
+    totalSupply: "9000.000000000",
+    decimals: 9,
+    ...overrides,
   };
-  return { MOCK_STATE: state };
-});
+}
 
-// Mock the module so the module-level `chainStatePromise` resolves against
-// our fixture instead of attempting a network call in the test environment.
-vi.mock("../lib/chain-state", () => ({
-  chainStatePromise: Promise.resolve(MOCK_STATE),
-}));
+function makePool(overrides: Partial<ChainPoolState> = {}): ChainPoolState {
+  return {
+    address: "EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB",
+    reserveTon: "1000.000000000",
+    reserveCet: "4500.000000000",
+    lpSupply: "2121.320343560",
+    priceTonPerCet: "0.222222222",
+    ...overrides,
+  };
+}
 
-import { chainStatePromise } from "../lib/chain-state";
+function makeChainState(overrides: Partial<ChainState> = {}): ChainState {
+  return {
+    token: makeToken(),
+    pool: makePool(),
+    updatedAt: new Date().toISOString(),
+    ...overrides,
+  };
+}
 
 // ---------------------------------------------------------------------------
-// Tests
+// Type-shape tests (pure TypeScript / data-structure assertions)
 // ---------------------------------------------------------------------------
 
-describe("chain-state module", () => {
-  it("exports chainStatePromise as a native Promise", () => {
-    expect(chainStatePromise).toBeInstanceOf(Promise);
+describe("ChainTokenState shape", () => {
+  it("accepts a fully populated token", () => {
+    const token = makeToken();
+    expect(token.symbol).toBe("CET");
+    expect(token.decimals).toBe(9);
+    expect(token.totalSupply).not.toBeNull();
   });
 
-  it("chainStatePromise resolves with a ChainState object", async () => {
-    const state = await chainStatePromise;
-    expect(state).toStrictEqual(MOCK_STATE);
+  it("allows totalSupply to be null (unknown state)", () => {
+    const token = makeToken({ totalSupply: null });
+    expect(token.totalSupply).toBeNull();
   });
-});
 
-describe("ChainTokenState interface shape", () => {
-  it("token has all required fields with correct types", () => {
-    const token: ChainTokenState = MOCK_STATE.token;
-    expect(typeof token.symbol).toBe("string");
-    expect(typeof token.name).toBe("string");
+  it("contract address is a non-empty string", () => {
+    const token = makeToken();
     expect(typeof token.contract).toBe("string");
-    expect(typeof token.decimals).toBe("number");
-    expect(token.totalSupply === null || typeof token.totalSupply === "string").toBe(true);
-  });
-
-  it("token contract address matches the known CET contract", () => {
-    expect(MOCK_STATE.token.contract).toBe("EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX");
-  });
-
-  it("token symbol is CET", () => {
-    expect(MOCK_STATE.token.symbol).toBe("CET");
-  });
-
-  it("token decimals is 9", () => {
-    expect(MOCK_STATE.token.decimals).toBe(9);
-  });
-
-  it("token totalSupply starts with 9000", () => {
-    expect(MOCK_STATE.token.totalSupply).toMatch(/^9000/);
+    expect(token.contract.length).toBeGreaterThan(0);
   });
 });
 
-describe("ChainPoolState interface shape", () => {
-  it("pool has all required fields with correct types", () => {
-    const pool: ChainPoolState = MOCK_STATE.pool;
-    expect(typeof pool.address).toBe("string");
-    expect(pool.reserveTon === null || typeof pool.reserveTon === "string").toBe(true);
-    expect(pool.reserveCet === null || typeof pool.reserveCet === "string").toBe(true);
-    expect(pool.lpSupply === null || typeof pool.lpSupply === "string").toBe(true);
-    expect(pool.priceTonPerCet === null || typeof pool.priceTonPerCet === "string").toBe(true);
+describe("ChainPoolState shape", () => {
+  it("accepts a fully populated pool", () => {
+    const pool = makePool();
+    expect(pool.address).toBeTruthy();
+    expect(pool.reserveTon).not.toBeNull();
+    expect(pool.reserveCet).not.toBeNull();
+    expect(pool.lpSupply).not.toBeNull();
+    expect(pool.priceTonPerCet).not.toBeNull();
   });
 
-  it("pool address matches the known DeDust pool address", () => {
-    expect(MOCK_STATE.pool.address).toBe("EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB");
-  });
-
-  it("pool reserves are non-null in a healthy state", () => {
-    expect(MOCK_STATE.pool.reserveTon).not.toBeNull();
-    expect(MOCK_STATE.pool.reserveCet).not.toBeNull();
-  });
-});
-
-describe("ChainState updatedAt field", () => {
-  it("updatedAt is a non-empty string", () => {
-    expect(typeof MOCK_STATE.updatedAt).toBe("string");
-    expect(MOCK_STATE.updatedAt.length).toBeGreaterThan(0);
-  });
-
-  it("updatedAt parses as a valid ISO 8601 date", () => {
-    const date = new Date(MOCK_STATE.updatedAt);
-    expect(isNaN(date.getTime())).toBe(false);
-  });
-});
-
-describe("ChainState — null-safe nullable fields", () => {
-  it("ChainTokenState accepts null for totalSupply", () => {
-    const partial: ChainTokenState = {
-      symbol: "CET",
-      name: "Cetățuia",
-      contract: "EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX",
-      totalSupply: null,
-      decimals: 9,
-    };
-    expect(partial.totalSupply).toBeNull();
-  });
-
-  it("ChainPoolState accepts null for all optional fields", () => {
-    const nullablePool: ChainPoolState = {
-      address: "EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB",
+  it("allows all nullable fields to be null (unknown state)", () => {
+    const pool = makePool({
       reserveTon: null,
       reserveCet: null,
       lpSupply: null,
       priceTonPerCet: null,
-    };
-    expect(nullablePool.reserveTon).toBeNull();
-    expect(nullablePool.reserveCet).toBeNull();
-    expect(nullablePool.lpSupply).toBeNull();
-    expect(nullablePool.priceTonPerCet).toBeNull();
+    });
+    expect(pool.reserveTon).toBeNull();
+    expect(pool.reserveCet).toBeNull();
+    expect(pool.lpSupply).toBeNull();
+    expect(pool.priceTonPerCet).toBeNull();
   });
 
-  it("ChainState is fully valid with all-null pool fields", () => {
-    const degradedState: ChainState = {
-      token: { ...MOCK_STATE.token, totalSupply: null },
-      pool: {
-        address: MOCK_STATE.pool.address,
-        reserveTon: null,
-        reserveCet: null,
-        lpSupply: null,
-        priceTonPerCet: null,
-      },
-      updatedAt: MOCK_STATE.updatedAt,
-    };
-    expect(degradedState.token.totalSupply).toBeNull();
-    expect(degradedState.pool.reserveTon).toBeNull();
+  it("pool address matches the known DeDust pool", () => {
+    const pool = makePool();
+    expect(pool.address).toBe(
+      "EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB"
+    );
+  });
+});
+
+describe("ChainState shape", () => {
+  it("includes token, pool, and updatedAt", () => {
+    const state = makeChainState();
+    expect(state.token).toBeDefined();
+    expect(state.pool).toBeDefined();
+    expect(typeof state.updatedAt).toBe("string");
+  });
+
+  it("updatedAt is a valid ISO 8601 date string", () => {
+    const state = makeChainState();
+    const parsed = new Date(state.updatedAt);
+    expect(Number.isNaN(parsed.getTime())).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// fetchChainState — tested by mocking globalThis.fetch
+// ---------------------------------------------------------------------------
+
+describe("fetchChainState (via module re-import with mocked fetch)", () => {
+  const originalFetch = globalThis.fetch;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+    vi.useRealTimers();
+    vi.resetModules();
+  });
+
+  it("resolves with a valid ChainState on a successful fetch", async () => {
+    const mockState = makeChainState();
+    globalThis.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockState,
+    } as unknown as Response);
+
+    const { chainStatePromise } = await import("../lib/chain-state");
+    const result = await chainStatePromise;
+
+    expect(result.token.symbol).toBe("CET");
+    expect(result.pool.address).toBe(
+      "EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB"
+    );
+    expect(typeof result.updatedAt).toBe("string");
+  });
+
+  it("rejects when the response status is not ok", async () => {
+    // mockResolvedValue (not Once) so all retry attempts get the same error
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 404,
+      json: async () => ({}),
+    } as unknown as Response);
+
+    const { chainStatePromise } = await import("../lib/chain-state");
+
+    // Attach rejection handler before advancing timers to avoid unhandled-rejection warnings
+    const assertion = expect(chainStatePromise).rejects.toThrow(
+      "Failed to fetch chain state: 404"
+    );
+
+    // Advance all fake timers so retry delays complete instantly
+    await vi.runAllTimersAsync();
+
+    await assertion;
+  });
+
+  it("rejects when fetch itself throws a network error", async () => {
+    // mockRejectedValue (not Once) so all retry attempts get the same rejection
+    globalThis.fetch = vi
+      .fn()
+      .mockRejectedValue(new TypeError("Network request failed"));
+
+    const { chainStatePromise } = await import("../lib/chain-state");
+
+    // Attach rejection handler before advancing timers to avoid unhandled-rejection warnings
+    const assertion = expect(chainStatePromise).rejects.toThrow("Network request failed");
+
+    // Advance all fake timers so retry delays complete instantly
+    await vi.runAllTimersAsync();
+
+    await assertion;
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Pure display / numeric helpers (no module import required)
+// ---------------------------------------------------------------------------
+
+describe("ChainState display helpers", () => {
+  it("handles null pool reserves — returns em-dash placeholder", () => {
+    const priceTonPerCet: string | null = null;
+    const displayPrice = priceTonPerCet
+      ? `${parseFloat(priceTonPerCet).toFixed(4)} TON`
+      : "—";
+    expect(displayPrice).toBe("—");
+  });
+
+  it("formats a valid price to 4 decimal places", () => {
+    const priceTonPerCet = "0.012345";
+    const displayPrice = `${parseFloat(priceTonPerCet).toFixed(4)} TON`;
+    expect(displayPrice).toBe("0.0123 TON");
+  });
+
+  it("formats totalSupply with en-US locale (9000 → '9,000')", () => {
+    const totalSupply = "9000.000000000";
+    const formatted = parseFloat(totalSupply).toLocaleString("en-US", {
+      maximumFractionDigits: 2,
+    });
+    expect(formatted).toBe("9,000");
+  });
+
+  it("CET_DECIMALS = 9 correctly scales nano-units to whole tokens", () => {
+    const CET_DECIMALS = 9;
+    const rawReserve = "9000000000000"; // 9000 CET in nanotons
+    const scaled = parseFloat(rawReserve) / 10 ** CET_DECIMALS;
+    expect(scaled).toBeCloseTo(9000, 5);
+  });
+
+  it("TON reserve scaling: 1e9 nanotons equals 1 TON", () => {
+    const nanotons = 1_000_000_000;
+    const tons = nanotons / 1e9;
+    expect(tons).toBe(1);
+  });
+
+  it("TVL = 2× the TON side for a symmetric pool", () => {
+    const tonReserve = 500; // TON
+    const tonPriceUsd = 3.5;
+    const tvlUsd = tonReserve * tonPriceUsd * 2;
+    expect(tvlUsd).toBe(3500);
   });
 });

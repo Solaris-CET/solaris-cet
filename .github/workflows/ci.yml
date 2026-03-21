@@ -61,6 +61,8 @@ jobs:
   unit-test:
     name: Unit Tests (Vitest)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -76,15 +78,47 @@ jobs:
         working-directory: app
         run: npm ci
 
-      - name: Run unit tests
+      - name: Run unit tests with coverage
         working-directory: app
-        run: npm test
+        run: npm run test:coverage
 
-  # ── Stage 2: Build (waits for both quality gates) ─────────────────────────
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: app/coverage
+          retention-days: 7
+          if-no-files-found: warn
+
+  # ── Stage 1c (parallel): Dependency security audit ────────────────────────
+  audit:
+    name: Dependency Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Audit for high/critical vulnerabilities
+        working-directory: app
+        run: npm audit --audit-level=high
+
+  # ── Stage 2: Build (waits for all quality gates) ──────────────────────────
   build:
     name: Build application
     runs-on: ubuntu-latest
-    needs: [lint, unit-test]
+    needs: [lint, unit-test, audit]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
