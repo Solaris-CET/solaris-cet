@@ -4,20 +4,28 @@
  * Dual AI Oracle: combines Grok (xAI) and Google Gemini to power the
  * Solaris RAV Protocol (Reason-Act-Verify).
  *
- * - REASON phase → Google Gemini (`GEMINI_API_KEY`): analytical context,
- *   on-chain data synthesis, and structured diagnostic thought.
- * - ACT + VERIFY phases → Grok (`GROK_API_KEY`): decisive action directive
- *   and final observation anchored to DeDust live data.
+ * - REASON phase → Google Gemini (`GEMINI_API_KEY_ENC` / `GEMINI_API_KEY`):
+ *   analytical context, on-chain data synthesis, and structured diagnostic thought.
+ * - ACT + VERIFY phases → Grok (`GROK_API_KEY_ENC` / `GROK_API_KEY`):
+ *   decisive action directive and final observation anchored to DeDust live data.
+ *
+ * API keys are resolved from AES-256-GCM encrypted env vars when available.
+ * See `app/api/lib/crypto.ts` and `scripts/encrypt-key.mjs` for details.
  *
  * If one provider is unavailable the other generates the full 3-part
- * ReAct response so the Oracle never goes silent.
+ * RAV response so the Oracle never goes silent.
  *
  * Exported as a Vercel Edge Function (runtime: 'edge') so that it is
  * recognised by Vite/non-Next.js deployments.
  */
 import OpenAI from 'openai';
+import { resolveApiKey } from '../lib/crypto';
 
 export const config = { runtime: 'edge' };
+
+/** AI model identifiers — update here to change versions across all call sites. */
+const GEMINI_MODEL = 'gemini-2.0-flash';
+const GROK_MODEL = 'grok-3-mini-beta';
 
 const DEDUST_POOL_ADDRESS = 'EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
 const CET_CONTRACT_ADDRESS = 'EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX';
@@ -158,13 +166,17 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   try {
-  // 1. Check that at least one AI provider key is available
-  const grokKey = process.env.GROK_API_KEY;
-  const geminiKey = process.env.GEMINI_API_KEY;
+  // 1. Resolve API keys — prefer AES-256-GCM encrypted variants (*_ENC) when
+  //    ENCRYPTION_SECRET is set; fall back to plaintext variants for local dev.
+  const encryptionSecret = process.env.ENCRYPTION_SECRET;
+  const [grokKey, geminiKey] = await Promise.all([
+    resolveApiKey(process.env.GROK_API_KEY_ENC, process.env.GROK_API_KEY, encryptionSecret),
+    resolveApiKey(process.env.GEMINI_API_KEY_ENC, process.env.GEMINI_API_KEY, encryptionSecret),
+  ]);
 
   if (!grokKey && !geminiKey) {
     return new Response(
-      JSON.stringify({ message: 'No AI provider API key configured on the server. Set GROK_API_KEY or GEMINI_API_KEY.' }),
+      JSON.stringify({ message: 'No AI provider API key configured. Set GROK_API_KEY_ENC/GROK_API_KEY or GEMINI_API_KEY_ENC/GEMINI_API_KEY in Vercel project settings.' }),
       {
         status: 500,
         headers: {
@@ -269,7 +281,7 @@ export default async function handler(req: Request): Promise<Response> {
           apiKey: geminiKey,
           baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
         }).chat.completions.create({
-          model: 'gemini-2.0-flash',
+          model: GEMINI_MODEL,
           messages: [
             { role: 'system', content: geminiSystemPrompt },
             { role: 'user', content: userQuery },
@@ -283,7 +295,7 @@ export default async function handler(req: Request): Promise<Response> {
           apiKey: grokKey,
           baseURL: 'https://api.x.ai/v1',
         }).chat.completions.create({
-          model: 'grok-3-mini-beta',
+          model: GROK_MODEL,
           messages: [
             { role: 'system', content: grokSystemPrompt },
             { role: 'user', content: userQuery },
@@ -311,7 +323,7 @@ export default async function handler(req: Request): Promise<Response> {
       baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
     });
     const fallback = await fallbackClient.chat.completions.create({
-      model: 'gemini-2.0-flash',
+      model: GEMINI_MODEL,
       messages: [
         { role: 'system', content: fullFallbackPrompt },
         { role: 'user', content: userQuery },
@@ -326,7 +338,7 @@ export default async function handler(req: Request): Promise<Response> {
       baseURL: 'https://api.x.ai/v1',
     });
     const fallback = await fallbackClient.chat.completions.create({
-      model: 'grok-3-mini-beta',
+      model: GROK_MODEL,
       messages: [
         { role: 'system', content: fullFallbackPrompt },
         { role: 'user', content: userQuery },
