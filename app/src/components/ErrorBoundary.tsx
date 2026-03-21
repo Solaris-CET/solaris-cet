@@ -4,6 +4,8 @@ interface Props {
   children: ReactNode;
   /** Custom fallback UI shown when an error is caught. */
   fallback?: ReactNode;
+  /** Called after a successful reset so parent components can react (e.g. refetch). */
+  onReset?: () => void;
 }
 
 interface State {
@@ -36,6 +38,12 @@ export class ErrorBoundary extends Component<Props, State> {
     console.error('[ErrorBoundary] Caught error:', error, errorInfo);
   }
 
+  /** Reset the error state so the children are re-rendered without a full page reload. */
+  private handleReset = () => {
+    this.setState({ hasError: false, error: undefined });
+    this.props.onReset?.();
+  };
+
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
@@ -49,13 +57,26 @@ export class ErrorBoundary extends Component<Props, State> {
             <p className="text-gray-400 mb-5 text-sm">
               {this.state.error?.message ?? 'An unexpected error occurred.'}
             </p>
-            <button
-              type="button"
-              onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors"
+            <div
+              role="group"
+              aria-label="Error recovery options"
+              className="flex items-center justify-center gap-3 flex-wrap"
             >
-              Reload Page
-            </button>
+              <button
+                type="button"
+                onClick={this.handleReset}
+                className="px-6 py-2 bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors"
+              >
+                Try Again
+              </button>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="px-6 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
+              >
+                Reload Page
+              </button>
+            </div>
           </div>
         </div>
       );

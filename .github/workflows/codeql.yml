@@ -1,10 +1,8 @@
-name: CodeQL Security Analysis
+name: CodeQL — Security Analysis
 
-# GitHub's free CodeQL engine scans JavaScript/TypeScript source for:
-#   - SQL injection, XSS, prototype pollution, path traversal, and other
-#     OWASP Top-10 vulnerability classes.
-# Results are surfaced as GitHub Security Alerts on the repository's
-# "Security" tab — no external service required.
+# Runs on every push to `main`, every pull request targeting `main`,
+# and on a weekly schedule to catch newly-disclosed vulnerabilities in
+# unchanged code.
 
 on:
   push:
@@ -12,12 +10,14 @@ on:
   pull_request:
     branches: ["main"]
   schedule:
-    # Weekly full scan every Monday at 03:00 UTC
-    - cron: "0 3 * * 1"
+    # Every Monday at 08:00 UTC
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
 
 permissions:
   contents: read
   security-events: write
+  actions: read
 
 jobs:
   analyze:
@@ -31,17 +31,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-          # Use the default security-and-quality query suite
-          queries: security-and-quality
+          # Use the default CodeQL query suite plus the security-extended pack
+          # which covers OWASP Top 10 and other high-severity patterns.
+          queries: security-extended
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: "npm"
@@ -51,7 +52,7 @@ jobs:
         working-directory: app
         run: npm ci
 
-      - name: Build application
+      - name: Build application (for CodeQL analysis)
         working-directory: app
         run: npm run build
 

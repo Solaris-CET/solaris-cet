@@ -6,6 +6,9 @@
  * (e.g. the 90-year smooth-decay mining schedule described in the Solaris
  * CET whitepaper).
  *
+ * The calculation logic lives in `../lib/mining-calc.ts` so it can be
+ * unit-tested independently of the Worker environment.
+ *
  * Message protocol
  * ──────────────────────────────────────────────────────────────────────────
  * Incoming  { type: 'CALCULATE_REWARDS', payload: MiningInput }
@@ -13,51 +16,14 @@
  *           { type: 'ERROR',             message: string }
  */
 
-export interface MiningInput {
-  /** Effective hashrate in TH/s (already adjusted for device efficiency) */
-  adjustedHashrate: number;
-  /** Stake amount in BTC-S */
-  stake: number;
-}
-
-export interface MiningResult {
-  daily: number;
-  monthly: number;
-  apy: number;
-}
-
-// ---------------------------------------------------------------------------
-// Calculation logic (mirrors the formula in MiningCalculatorSection but runs
-// off the main thread so the UI stays responsive during heavy re-renders).
-// ---------------------------------------------------------------------------
-
-function calculateRewards(input: MiningInput): MiningResult {
-  const { adjustedHashrate, stake } = input;
-
-  // Stake multiplier: every 10,000 BTC-S staked adds +100 % to the base yield.
-  // The divisor 10_000 is the maximum stake tier defined in the protocol spec.
-  const stakeMultiplier = 1 + stake / 10_000;
-
-  // 0.0082 is the network-calibrated base yield coefficient (BTC-S per TH/s
-  // per day) derived from the genesis block reward and target block time.
-  const daily = adjustedHashrate * 0.0082 * stakeMultiplier;
-  const monthly = daily * 30;
-
-  // Base APY of 15 % plus 0.1 % per TH/s and 0.1 % per 1,000 BTC-S staked.
-  const apy = 15 + stake / 1_000 + adjustedHashrate * 0.1;
-
-  return {
-    daily: Number(daily.toFixed(4)),
-    monthly: Number(monthly.toFixed(2)),
-    apy: Number(apy.toFixed(1)),
-  };
-}
+import { calculateRewards } from '../lib/mining-calc';
+export type { MiningInput, MiningResult } from '../lib/mining-calc';
 
 // ---------------------------------------------------------------------------
 // Worker message handler
 // ---------------------------------------------------------------------------
 
-self.onmessage = (event: MessageEvent<{ type: string; payload: MiningInput }>) => {
+self.onmessage = (event: MessageEvent<{ type: string; payload: Parameters<typeof calculateRewards>[0] }>) => {
   const { type, payload } = event.data;
 
   if (type === 'CALCULATE_REWARDS') {

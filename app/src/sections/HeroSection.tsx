@@ -8,6 +8,7 @@ import AiOracleSearch from '../components/AiOracleSearch';
 import {
   TooltipProvider
 } from '../components/ui/tooltip';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 // --- CONSTANTS & CONFIGURATION ---
 const APP_CONFIG = {
@@ -53,6 +54,7 @@ const HeroSection: React.FC = () => {
   const tickerContainerRef = useRef<HTMLDivElement>(null);
   
   const [miningState, setMiningState] = useState<'IDLE' | 'PROCESSING' | 'SUCCESS'>('IDLE');
+  const prefersReducedMotion = useReducedMotion();
 
   // --- BUSINESS LOGIC ---
   const handleMiningOperation = useCallback(async () => {
@@ -68,13 +70,15 @@ const HeroSection: React.FC = () => {
 
   // --- ANIMATION CORE (GSAP) ---
   useLayoutEffect(() => {
-    // On mobile (< 768px), skip GSAP animations and leave all elements at their
-    // natural visible state to prevent a blank screen caused by fromTo opacity: 0.
+    // Skip GSAP animations on mobile (< 768px) or when the user has requested
+    // reduced motion via their OS/browser accessibility settings.  Both cases
+    // leave all elements at their natural visible state to prevent a blank
+    // screen caused by `fromTo opacity: 0`.
     const isMobile =
       typeof window !== 'undefined' &&
       window.matchMedia('(max-width: 767px)').matches;
 
-    if (isMobile) {
+    if (isMobile || prefersReducedMotion) {
       // Ensure elements are fully visible without inline-style overrides
       // (no GSAP "from" state is applied, so they remain visible by default).
       const els: (HTMLElement | null)[] = [
@@ -121,7 +125,7 @@ const HeroSection: React.FC = () => {
     }, containerRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   // --- RENDER ---
   return (
