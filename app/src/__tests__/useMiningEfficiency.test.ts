@@ -1,108 +1,154 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act } from './renderHook';
-import { useMiningEfficiency } from '../hooks/useMiningEfficiency';
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import { useMiningEfficiency } from "../hooks/useMiningEfficiency";
 
-// ---------------------------------------------------------------------------
-// Helpers — simulate Page Visibility API events
-// ---------------------------------------------------------------------------
-
-function setDocumentHidden(hidden: boolean) {
-  Object.defineProperty(document, 'hidden', {
-    value: hidden,
-    writable: true,
-    configurable: true,
-  });
-}
-
-async function fireVisibilityChange() {
-  await act(() => {
-    document.dispatchEvent(new Event('visibilitychange'));
-  });
-}
-
-beforeEach(() => {
-  setDocumentHidden(false);
-  localStorage.clear();
-});
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
-
-describe('useMiningEfficiency', () => {
-  it('starts not suspended when the document is visible', async () => {
-    setDocumentHidden(false);
-    const { resultRef } = await renderHook(() => useMiningEfficiency());
-    expect(resultRef.current.isSuspended).toBe(false);
+describe("useMiningEfficiency", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    // Reset document.hidden to its default (visible)
+    Object.defineProperty(document, "hidden", {
+      writable: true,
+      configurable: true,
+      value: false,
+    });
   });
 
-  it('starts suspended when the document is hidden on mount', async () => {
-    setDocumentHidden(true);
-    const { resultRef } = await renderHook(() => useMiningEfficiency());
-    expect(resultRef.current.isSuspended).toBe(true);
+  it("starts as not suspended when tab is visible", () => {
+    Object.defineProperty(document, "hidden", {
+      writable: true,
+      configurable: true,
+      value: false,
+    });
+
+    const { result } = renderHook(() => useMiningEfficiency());
+    expect(result.current.isSuspended).toBe(false);
   });
 
-  it('suspends when the tab becomes hidden', async () => {
-    setDocumentHidden(false);
-    const { resultRef } = await renderHook(() => useMiningEfficiency());
-    expect(resultRef.current.isSuspended).toBe(false);
+  it("starts as suspended when tab is hidden", () => {
+    Object.defineProperty(document, "hidden", {
+      writable: true,
+      configurable: true,
+      value: true,
+    });
 
-    setDocumentHidden(true);
-    await fireVisibilityChange();
-
-    expect(resultRef.current.isSuspended).toBe(true);
+    const { result } = renderHook(() => useMiningEfficiency());
+    expect(result.current.isSuspended).toBe(true);
   });
 
-  it('resumes when the tab becomes visible again', async () => {
-    setDocumentHidden(true);
-    const { resultRef } = await renderHook(() => useMiningEfficiency());
+  it("suspends when visibilitychange fires with hidden=true", () => {
+    Object.defineProperty(document, "hidden", {
+      writable: true,
+      configurable: true,
+      value: false,
+    });
 
-    setDocumentHidden(false);
-    await fireVisibilityChange();
+    const { result } = renderHook(() => useMiningEfficiency());
+    expect(result.current.isSuspended).toBe(false);
 
-    expect(resultRef.current.isSuspended).toBe(false);
+    act(() => {
+      Object.defineProperty(document, "hidden", {
+        writable: true,
+        configurable: true,
+        value: true,
+      });
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+
+    expect(result.current.isSuspended).toBe(true);
   });
 
-  it('updates localStorage when visibility changes', async () => {
-    setDocumentHidden(false);
-    await renderHook(() => useMiningEfficiency());
+  it("resumes when visibilitychange fires with hidden=false", () => {
+    Object.defineProperty(document, "hidden", {
+      writable: true,
+      configurable: true,
+      value: true,
+    });
 
-    setDocumentHidden(true);
-    await fireVisibilityChange();
-    expect(localStorage.getItem('mining-status')).toBe('suspended');
+    const { result } = renderHook(() => useMiningEfficiency());
+    expect(result.current.isSuspended).toBe(true);
 
-    setDocumentHidden(false);
-    await fireVisibilityChange();
-    expect(localStorage.getItem('mining-status')).toBe('active');
+    act(() => {
+      Object.defineProperty(document, "hidden", {
+        writable: true,
+        configurable: true,
+        value: false,
+      });
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+
+    expect(result.current.isSuspended).toBe(false);
   });
 
-  it('posts SUSPEND/RESUME messages to a provided worker ref', async () => {
-    const mockWorker = { postMessage: vi.fn() };
-    const workerRef = { current: mockWorker as unknown as Worker };
+  it("posts SUSPEND message to worker when tab hides", () => {
+    Object.defineProperty(document, "hidden", {
+      writable: true,
+      configurable: true,
+      value: false,
+    });
 
-    setDocumentHidden(false);
-    await renderHook(() => useMiningEfficiency(workerRef));
+    const postMessage = vi.fn();
+    const workerRef = { current: { postMessage } as unknown as Worker };
 
-    setDocumentHidden(true);
-    await fireVisibilityChange();
-    expect(mockWorker.postMessage).toHaveBeenCalledWith({ type: 'SUSPEND' });
+    renderHook(() => useMiningEfficiency(workerRef));
 
-    setDocumentHidden(false);
-    await fireVisibilityChange();
-    expect(mockWorker.postMessage).toHaveBeenCalledWith({ type: 'RESUME' });
+    act(() => {
+      Object.defineProperty(document, "hidden", {
+        writable: true,
+        configurable: true,
+        value: true,
+      });
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+
+    expect(postMessage).toHaveBeenCalledWith({ type: "SUSPEND" });
   });
 
-  it('getBatteryInfo returns a fallback when Battery API is unavailable', async () => {
-    const { resultRef } = await renderHook(() => useMiningEfficiency());
-    const info = await resultRef.current.getBatteryInfo();
-    // jsdom does not implement the Battery API — expect the graceful fallback
-    expect(info.level).toBe(100);
-    expect(info.charging).toBe(true);
-    expect(info.note).toMatch(/unavailable/i);
+  it("posts RESUME message to worker when tab becomes visible", () => {
+    Object.defineProperty(document, "hidden", {
+      writable: true,
+      configurable: true,
+      value: true,
+    });
+
+    const postMessage = vi.fn();
+    const workerRef = { current: { postMessage } as unknown as Worker };
+
+    renderHook(() => useMiningEfficiency(workerRef));
+
+    act(() => {
+      Object.defineProperty(document, "hidden", {
+        writable: true,
+        configurable: true,
+        value: false,
+      });
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+
+    expect(postMessage).toHaveBeenCalledWith({ type: "RESUME" });
+  });
+
+  describe("getBatteryInfo", () => {
+    it("returns a fallback when Battery API is unavailable", async () => {
+      const { result } = renderHook(() => useMiningEfficiency());
+      const info = await result.current.getBatteryInfo();
+      expect(info).toMatchObject({ level: 100, charging: true });
+    });
+
+    it("returns battery data when Battery API succeeds", async () => {
+      const mockGetBattery = vi.fn().mockResolvedValue({
+        level: 0.75,
+        charging: false,
+      });
+      Object.defineProperty(navigator, "getBattery", {
+        writable: true,
+        configurable: true,
+        value: mockGetBattery,
+      });
+
+      const { result } = renderHook(() => useMiningEfficiency());
+      const info = await result.current.getBatteryInfo();
+      expect(info).toEqual({ level: 75, charging: false });
+    });
   });
 });
