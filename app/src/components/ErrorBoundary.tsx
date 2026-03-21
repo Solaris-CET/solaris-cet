@@ -15,6 +15,11 @@ interface State {
  * ErrorBoundary — catches JavaScript errors anywhere in the child component
  * tree, logs them, and renders a fallback UI instead of crashing the page.
  *
+ * The default fallback offers two recovery actions:
+ * - **Try Again** — resets the boundary state so React re-renders the children.
+ *   This is the preferred option for transient errors (e.g. network blips).
+ * - **Reload Page** — falls back to a full page reload for persistent failures.
+ *
  * @example
  * ```tsx
  * <ErrorBoundary>
@@ -26,6 +31,7 @@ export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = { hasError: false };
+    this.handleReset = this.handleReset.bind(this);
   }
 
   static getDerivedStateFromError(error: Error): State {
@@ -34,6 +40,10 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('[ErrorBoundary] Caught error:', error, errorInfo);
+  }
+
+  handleReset() {
+    this.setState({ hasError: false, error: undefined });
   }
 
   render() {
@@ -49,13 +59,22 @@ export class ErrorBoundary extends Component<Props, State> {
             <p className="text-gray-400 mb-5 text-sm">
               {this.state.error?.message ?? 'An unexpected error occurred.'}
             </p>
-            <button
-              type="button"
-              onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors"
-            >
-              Reload Page
-            </button>
+            <div className="flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={this.handleReset}
+                className="px-6 py-2 bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors"
+              >
+                Try Again
+              </button>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="px-6 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors text-gray-300"
+              >
+                Reload Page
+              </button>
+            </div>
           </div>
         </div>
       );
