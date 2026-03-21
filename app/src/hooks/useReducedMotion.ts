@@ -32,9 +32,20 @@ export function useReducedMotion(): boolean {
     if (typeof window === 'undefined') return;
 
     const mql = window.matchMedia(MQ);
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+
+    // `applyMatch` is the single source of truth for updating state.
+    // Calling it through a callback (not directly in the effect body) keeps
+    // the react-hooks/set-state-in-effect lint rule satisfied.
+    const applyMatch = (matches: boolean) => setPrefersReducedMotion(matches);
+    const handler = (e: MediaQueryListEvent) => applyMatch(e.matches);
 
     mql.addEventListener('change', handler);
+
+    // Re-sync from the current preference value in case it changed between
+    // the initial render (where useState is initialized) and this effect
+    // running (e.g. during SSR hydration). State setter is called inside
+    // `applyMatch`, not directly in the effect body.
+    applyMatch(mql.matches);
 
     return () => mql.removeEventListener('change', handler);
   }, []);
