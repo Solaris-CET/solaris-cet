@@ -16,6 +16,11 @@ on:
       - "Deploy Solaris CET to GitHub Pages"
       - "Lighthouse CI — Quality Gate"
       - "TON Chain Indexer"
+      # New workflows added in this PR — names must match the `name:` field exactly
+      # (including em-dashes and special characters)
+      - "CodeQL — Security Analysis"
+      - "Stale Issues & PRs"
+      - "PR Auto-Labeler"
     types: [requested]
 
 permissions:

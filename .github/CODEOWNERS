@@ -1,0 +1,29 @@
+# CODEOWNERS — Automatic review requests for pull requests.
+#
+# Each pattern maps to one or more GitHub users/teams who are automatically
+# requested as reviewers when the matching files are changed.
+# Patterns are evaluated from bottom to top; the last match wins.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# ── Global default ─────────────────────────────────────────────────────────
+*                          @aamclaudiu-hash
+
+# ── CI / GitHub configuration ──────────────────────────────────────────────
+.github/                   @aamclaudiu-hash
+.github/workflows/         @aamclaudiu-hash
+
+# ── App source code ────────────────────────────────────────────────────────
+app/src/                   @aamclaudiu-hash
+app/src/sections/          @aamclaudiu-hash
+app/src/components/        @aamclaudiu-hash
+
+# ── Smart contracts ────────────────────────────────────────────────────────
+contracts/                 @aamclaudiu-hash
+
+# ── Documentation ──────────────────────────────────────────────────────────
+*.md                       @aamclaudiu-hash
+docs/                      @aamclaudiu-hash
+
+# ── Security-sensitive files ───────────────────────────────────────────────
+SECURITY.md                @aamclaudiu-hash
+.github/workflows/codeql.yml  @aamclaudiu-hash

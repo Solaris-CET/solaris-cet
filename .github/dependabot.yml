@@ -1,5 +1,6 @@
 version: 2
 updates:
+  # ── App (npm) ─────────────────────────────────────────────────────────────
   - package-ecosystem: "npm"
     directory: "/app"
     schedule:
@@ -15,16 +16,87 @@ updates:
       prefix: "chore(deps)"
       prefix-development: "chore(deps-dev)"
     groups:
+      # Group all @radix-ui/* packages into one PR
       radix-ui:
         patterns:
           - "@radix-ui/*"
+      # Group React core + types
       react:
         patterns:
           - "react"
           - "react-dom"
           - "@types/react"
           - "@types/react-dom"
+      # Group GSAP and its React adapter
+      gsap:
+        patterns:
+          - "gsap"
+          - "@gsap/*"
+      # Group Lucide icon updates
+      lucide:
+        patterns:
+          - "lucide-react"
+      # Group Vite + all vite plugins
+      vite:
+        patterns:
+          - "vite"
+          - "@vitejs/*"
+          - "vite-plugin-*"
+      # Group Tailwind CSS + related tooling
+      tailwind:
+        patterns:
+          - "tailwindcss"
+          - "tailwindcss-*"
+          - "tw-animate-css"
+          - "@tailwindcss/*"
+          - "autoprefixer"
+          - "postcss"
+      # Group TypeScript + ESLint toolchain
+      typescript-eslint:
+        patterns:
+          - "typescript"
+          - "typescript-eslint"
+          - "eslint"
+          - "eslint-plugin-*"
+          - "@eslint/*"
+          - "globals"
+      # Group testing tools
+      testing:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
+          - "@playwright/test"
+      # Group React Hook Form + Zod resolver
+      forms:
+        patterns:
+          - "react-hook-form"
+          - "@hookform/*"
+          - "zod"
+      # Group TON blockchain packages
+      ton:
+        patterns:
+          - "@tonconnect/*"
+      # Group Recharts
+      recharts:
+        patterns:
+          - "recharts"
 
+  # ── Contracts (npm) ────────────────────────────────────────────────────────
+  - package-ecosystem: "npm"
+    directory: "/contracts"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Bucharest"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "smart-contracts"
+    commit-message:
+      prefix: "chore(contracts-deps)"
+
+  # ── GitHub Actions ─────────────────────────────────────────────────────────
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

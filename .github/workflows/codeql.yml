@@ -1,0 +1,64 @@
+name: CodeQL — Security Analysis
+
+# Runs static application security testing (SAST) on every push and pull
+# request targeting `main`, and on a weekly schedule to catch new advisories
+# in code that has not changed.
+#
+# Scans JavaScript/TypeScript for data-flow vulnerabilities, XSS patterns,
+# prototype pollution, path-traversal, and other insecure code patterns.
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  schedule:
+    # Every Monday at 08:00 UTC
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: CodeQL Analysis (JavaScript / TypeScript)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          # Use the security-extended query suite for a broader set of checks
+          queries: security-extended
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Build application (for CodeQL autobuild context)
+        working-directory: app
+        run: npm run build
+        continue-on-error: true
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript-typescript"
