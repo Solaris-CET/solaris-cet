@@ -158,6 +158,9 @@ const HeroSection: React.FC = () => {
               <div ref={ctaGroupRef} className="flex flex-wrap gap-4">
                 <button 
                   onClick={handleMiningOperation}
+                  aria-live="polite"
+                  aria-busy={miningState === 'PROCESSING'}
+                  aria-label={miningState === 'IDLE' ? 'Start mining' : miningState === 'PROCESSING' ? 'Processing mining operation' : 'Mining initiated successfully'}
                   className="px-8 py-4 bg-yellow-500 text-black font-bold rounded-2xl hover:scale-105 transition-transform flex items-center gap-2"
                 >
                   {miningState === 'IDLE' ? <><Zap size={20} /> START MINING</> : <Loader2 className="animate-spin" />}
