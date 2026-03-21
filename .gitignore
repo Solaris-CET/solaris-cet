@@ -107,3 +107,4 @@ npm-debug.log*
 /vite.config.ts
 /eslint.config.js
 /tailwind.config.js
+app/coverage/
