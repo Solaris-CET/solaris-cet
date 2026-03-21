@@ -1,19 +1,15 @@
 name: Dependency Review
 
-# Blocks PRs that introduce dependencies with known high/critical
-# vulnerabilities by using GitHub's free Dependency Review action.
+# Runs on every pull request to inspect added / changed npm dependencies
+# against the GitHub Advisory Database. Fails if any dependency introduces
+# a vulnerability rated HIGH or CRITICAL.
 #
-# Only runs on pull requests — push events do not change the
-# lockfile in a way that requires re-review.
+# This workflow is free for all public repositories (GitHub Advanced Security
+# is included at no charge for public repos).
 
 on:
   pull_request:
     branches: ["main"]
-    paths:
-      - "app/package.json"
-      - "app/package-lock.json"
-      - "contracts/package.json"
-      - "contracts/package-lock.json"
 
 permissions:
   contents: read
@@ -30,9 +26,9 @@ jobs:
       - name: Dependency Review
         uses: actions/dependency-review-action@v4
         with:
-          # Fail on high and critical severity vulnerabilities
+          # Block merge if HIGH or CRITICAL vulnerabilities are introduced
           fail-on-severity: high
-          # Post a summary comment on the PR
+          # Post a summary comment on the PR with a full vulnerability report
           comment-summary-in-pr: always
-          # Deny explicitly listed licenses that are incompatible with the project
-          deny-licenses: GPL-2.0, GPL-3.0, AGPL-3.0
+          # Deny any dependency with a known license incompatible with this project
+          deny-licenses: GPL-2.0, GPL-3.0, LGPL-2.0, LGPL-2.1, LGPL-3.0

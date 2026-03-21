@@ -1,4 +1,18 @@
+/**
+ * Vercel Edge Function — /api/chat
+ *
+ * Proxies queries to the Groq API (via the OpenAI-compatible SDK) on behalf
+ * of the Solaris AI Oracle component. Requires GROQ_API_KEY to be set as a
+ * Vercel environment variable.
+ *
+ * Exported as a Vercel Edge Function (runtime: 'edge') so that it is
+ * recognised by Vite/non-Next.js deployments.  Next.js-style named exports
+ * (e.g. `export async function POST`) are only picked up by Next.js; for all
+ * other Vercel frameworks the handler must be the **default export**.
+ */
 import OpenAI from 'openai';
+
+export const config = { runtime: 'edge' };
 
 const DEDUST_POOL_ADDRESS = 'EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
 const CET_CONTRACT_ADDRESS = 'EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX';
@@ -95,13 +109,62 @@ async function fetchOnChainContext(): Promise<OnChainContext | null> {
   }
 }
 
-export async function POST(req: Request): Promise<Response> {
+const ALLOWED_ORIGINS = new Set([
+  'https://solaris-cet.vercel.app',
+  'https://solaris-cet.github.io',
+]);
+
+/** Returns the CORS origin to reflect back, or null when the origin is not allowed. */
+function getAllowedOrigin(origin: string | null): string {
+  if (origin && ALLOWED_ORIGINS.has(origin)) return origin;
+  // Allow Vercel preview deployments (*.vercel.app) and localhost in development
+  if (origin && (origin.endsWith('.vercel.app') || origin.startsWith('http://localhost'))) {
+    return origin;
+  }
+  return 'https://solaris-cet.vercel.app';
+}
+
+export default async function handler(req: Request): Promise<Response> {
+  const origin = req.headers.get('origin');
+  const allowedOrigin = getAllowedOrigin(origin);
+
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Vary': 'Origin',
+      },
+    });
+  }
+
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Vary': 'Origin',
+      },
+    });
+  }
+
   try {
     // 1. Check API Key
     if (!process.env.GROQ_API_KEY) {
-      return Response.json(
-        { message: 'GROQ_API_KEY is not configured on the server.' },
-        { status: 500 },
+      return new Response(
+        JSON.stringify({ message: 'GROQ_API_KEY is not configured on the server.' }),
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': allowedOrigin,
+            'Vary': 'Origin',
+          },
+        },
       );
     }
 
@@ -110,9 +173,16 @@ export async function POST(req: Request): Promise<Response> {
     const userQuery = body.query;
 
     if (!userQuery || typeof userQuery !== 'string' || !userQuery.trim()) {
-      return Response.json(
-        { message: 'Query parameter is missing.' },
-        { status: 400 },
+      return new Response(
+        JSON.stringify({ message: 'Query parameter is missing.' }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': allowedOrigin,
+            'Vary': 'Origin',
+          },
+        },
       );
     }
 
@@ -174,13 +244,27 @@ export async function POST(req: Request): Promise<Response> {
     const reply = completion.choices[0]?.message?.content ?? 'Oracle is silent.';
 
     // 6. Return EXACT format expected by frontend ({ response: string })
-    return Response.json({ response: reply }, { status: 200 });
+    return new Response(JSON.stringify({ response: reply }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Vary': 'Origin',
+      },
+    });
   } catch (error: unknown) {
     console.error('API Route Error:', error);
     const message =
       error instanceof Error
         ? error.message
         : 'An unexpected error occurred in the Oracle Core.';
-    return Response.json({ message }, { status: 500 });
+    return new Response(JSON.stringify({ message }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Vary': 'Origin',
+      },
+    });
   }
 }
