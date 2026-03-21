@@ -163,7 +163,7 @@ export default function AiOracleSearch() {
 
     // ── PHASE 1: OBSERVE ──────────────────────────────────────────
     setPhase('observe_parse');
-    addLog('INFO', `PROTOCOL_INIT: Reason-To-Act v2.1 · Session [${hash}]`);
+    addLog('INFO', `RAV_INIT: Grok × Gemini Oracle v3.0 · Session [${hash}]`);
     addLog('INFO', `INPUT_STREAM: "${q}" · Tokens: ${tokenCount}`);
 
     schedule(() => {
@@ -176,7 +176,7 @@ export default function AiOracleSearch() {
     // ── PHASE 2: THINK ────────────────────────────────────────────
     schedule(() => {
       setPhase('think_route');
-      addLog('INFO', `QUANTUM_OS: Routing query to optimal reasoning pathway`);
+      addLog('INFO', `GEMINI_REASON: Routing query to Google Gemini analytical pathway`);
       addLog('QUANTUM', `HYPOTHESIS_GEN: 6 parallel logical paths instantiated in superposition`);
       setMetrics(prev => ({ ...prev, latency: Math.round(performance.now() - startMs) }));
     }, 2800);
@@ -196,8 +196,8 @@ export default function AiOracleSearch() {
     // ── PHASE 3: ACT ──────────────────────────────────────────────
     schedule(() => {
       setPhase('act_execute');
-      addLog('INFO', `SOLARIS_BRIDGE: Connecting to High Intelligence oracle node`);
-      addLog('QUANTUM', `RESPONSE_COMPILE: Synthesizing answer payload · Entropy seed applied`);
+      addLog('INFO', `GROK_ACT: Connecting to xAI Grok action directive pipeline`);
+      addLog('QUANTUM', `RESPONSE_COMPILE: Grok × Gemini synthesizing answer payload · Entropy seed applied`);
       addLog('SEC', `SIGN: Payload signed with Quantum OS key · Hash: 0x${generateHash()}${generateHash()}`);
       setMetrics(prev => ({
         ...prev,
@@ -210,7 +210,7 @@ export default function AiOracleSearch() {
       setPhase('act_consensus');
       addLog('SEC', `TON_CONSENSUS: Payload broadcast · 3-of-3 validators confirmed`);
       addLog('INFO', `INTEGRITY: Output cross-validated against on-chain oracle state`);
-      addLog('QUANTUM', `PROTOCOL_COMPLETE: High Intelligence loop closed · Confidence: ${confidence.toFixed(1)}%`);
+      addLog('QUANTUM', `RAV_COMPLETE: Grok × Gemini loop closed · Confidence: ${confidence.toFixed(1)}%`);
       setMetrics(prev => ({
         ...prev,
         confidence: Math.round(confidence),
@@ -269,8 +269,13 @@ export default function AiOracleSearch() {
           Solaris Oracle
         </h2>
         <p className="text-gray-400 text-sm mt-1 tracking-widest uppercase">
-          High Intelligence · Reason-To-Act Bridge
+          Grok × Gemini · RAV Protocol Bridge
         </p>
+        <div className="flex items-center gap-2 mt-2">
+          <span className="text-xs font-mono bg-gray-900 border border-gray-700 px-2 py-0.5 rounded text-blue-400">Gemini REASON</span>
+          <span className="text-gray-600 text-xs">×</span>
+          <span className="text-xs font-mono bg-gray-900 border border-gray-700 px-2 py-0.5 rounded text-purple-400">Grok ACT</span>
+        </div>
       </div>
 
       {/* Input Area */}
@@ -334,7 +339,7 @@ export default function AiOracleSearch() {
         >
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-lg uppercase tracking-wider">2. Think</h3>
-            <span className="text-xs font-mono bg-gray-900 px-2 py-1 rounded">QUANTUM OS</span>
+            <span className="text-xs font-mono bg-gray-900 px-2 py-1 rounded">GEMINI REASON</span>
           </div>
           <div className="text-sm space-y-2 opacity-80">
             <div className="flex items-center gap-2">
@@ -354,7 +359,7 @@ export default function AiOracleSearch() {
         >
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-lg uppercase tracking-wider">3. Act</h3>
-            <span className="text-xs font-mono bg-gray-900 px-2 py-1 rounded">SOLARIS CET</span>
+            <span className="text-xs font-mono bg-gray-900 px-2 py-1 rounded">GROK ACT</span>
           </div>
           <div className="text-sm space-y-2 opacity-80">
             <div className="flex items-center gap-2">
@@ -375,7 +380,7 @@ export default function AiOracleSearch() {
           {/* Telemetry Terminal */}
           <div className="lg:col-span-3 bg-gray-950 border border-gray-800 rounded-xl p-4 font-mono text-xs overflow-hidden flex flex-col h-56 shadow-inner">
             <div className="flex items-center justify-between mb-2 pb-2 border-b border-gray-800 text-gray-500">
-              <span>&gt;_ QUANTUM_TERMINAL · Reason-To-Act v2.1</span>
+              <span>&gt;_ RAV_TERMINAL · Grok × Gemini v3.0</span>
               <span className={isProcessing ? 'text-yellow-500 animate-pulse' : 'text-green-500'}>
                 {isProcessing ? 'PROCESSING' : '● DONE'}
               </span>

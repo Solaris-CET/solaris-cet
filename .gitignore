@@ -113,3 +113,7 @@ pulls/
 /eslint.config.js
 /tailwind.config.js
 app/coverage/
+
+# Local environment variables (never commit)
+.env.local
+.env.*.local

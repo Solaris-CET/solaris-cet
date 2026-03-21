@@ -11,6 +11,11 @@ beforeEach(() => {
     writable: true,
     configurable: true,
   });
+  Object.defineProperty(navigator, 'languages', {
+    value: ['en-US'],
+    writable: true,
+    configurable: true,
+  });
 });
 
 describe('useLanguageState', () => {
@@ -42,6 +47,11 @@ describe('useLanguageState', () => {
       writable: true,
       configurable: true,
     });
+    Object.defineProperty(navigator, 'languages', {
+      value: ['zh-TW'],
+      writable: true,
+      configurable: true,
+    });
     const { resultRef } = await renderHook(() => useLanguageState());
     expect(resultRef.current.lang).toBe('zh');
   });
@@ -61,8 +71,8 @@ describe('useLanguageState', () => {
   });
 
   it('exposes all supported languages', () => {
-    expect(SUPPORTED_LANGS).toEqual(expect.arrayContaining(['en', 'es', 'zh', 'ru', 'ro']));
-    expect(SUPPORTED_LANGS).toHaveLength(5);
+    expect(SUPPORTED_LANGS).toEqual(expect.arrayContaining(['en', 'es', 'zh', 'ru', 'ro', 'pt']));
+    expect(SUPPORTED_LANGS).toHaveLength(6);
   });
 
   it('setLang accepts every supported language without throwing', async () => {
