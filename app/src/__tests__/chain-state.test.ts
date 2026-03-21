@@ -118,7 +118,6 @@ describe("fetchChainState (via module re-import with mocked fetch)", () => {
   const originalFetch = globalThis.fetch;
 
   beforeEach(() => {
-    // Reset the module registry so the module-level promise is re-evaluated
     vi.resetModules();
   });
 
@@ -168,26 +167,10 @@ describe("fetchChainState (via module re-import with mocked fetch)", () => {
     await expect(chainStatePromise).rejects.toThrow("Network request failed");
   });
 });
-import { describe, it, expect } from "vitest";
 
-// chain-state.ts has a module-level `fetch` that runs when the module is
-// imported, which fails in the node test environment (no server running).
-// We therefore test only the pure helper logic that surrounds the fetch — no
-// import of chain-state.ts itself.
-
-describe("chain-state URL construction", () => {
-  it("appends api/state.json to the base URL", () => {
-    const base = "./";
-    const url = `${base}api/state.json`;
-    expect(url).toBe("./api/state.json");
-  });
-
-  it("constructs a valid absolute URL with a trailing slash base", () => {
-    const base = "https://example.com/";
-    const url = `${base}api/state.json`;
-    expect(url).toBe("https://example.com/api/state.json");
-  });
-});
+// ---------------------------------------------------------------------------
+// Pure display / numeric helpers (no module import required)
+// ---------------------------------------------------------------------------
 
 describe("ChainState display helpers", () => {
   it("handles null pool reserves — returns em-dash placeholder", () => {
@@ -232,4 +215,3 @@ describe("ChainState display helpers", () => {
     expect(tvlUsd).toBe(3500);
   });
 });
-
