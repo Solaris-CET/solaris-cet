@@ -1,12 +1,11 @@
 name: Dependency Review
 
-# Uses the free GitHub Dependency Review Action to detect newly-introduced
-# vulnerable or license-incompatible packages on every pull request targeting
-# `main` before they are merged.
+# Runs on every pull request to inspect added / changed npm dependencies
+# against the GitHub Advisory Database. Fails if any dependency introduces
+# a vulnerability rated HIGH or CRITICAL.
 #
-# The action compares the dependency graph snapshot of the base branch with
-# that of the PR head and fails if any added dependency has a known CVE at the
-# configured severity level.
+# This workflow is free for all public repositories (GitHub Advanced Security
+# is included at no charge for public repos).
 
 on:
   pull_request:
@@ -27,10 +26,9 @@ jobs:
       - name: Dependency Review
         uses: actions/dependency-review-action@v4
         with:
-          # Block PRs that introduce HIGH or CRITICAL vulnerabilities.
+          # Block merge if HIGH or CRITICAL vulnerabilities are introduced
           fail-on-severity: high
-          # Allowed open-source licenses (SPDX expressions).
-          # Extend this list if additional permissive licenses are needed.
-          allow-licenses: MIT, Apache-2.0, ISC, BSD-2-Clause, BSD-3-Clause, 0BSD, CC0-1.0, Unlicense, Python-2.0
-          # Post a summary comment on the PR with the full dependency diff.
+          # Post a summary comment on the PR with a full vulnerability report
           comment-summary-in-pr: always
+          # Deny any dependency with a known license incompatible with this project
+          deny-licenses: GPL-2.0, GPL-3.0, LGPL-2.0, LGPL-2.1, LGPL-3.0

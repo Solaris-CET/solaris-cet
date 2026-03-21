@@ -1,10 +1,8 @@
-name: CodeQL Security Analysis
+name: CodeQL — Security Analysis
 
-# Scans JavaScript/TypeScript source for security vulnerabilities using GitHub's
-# CodeQL engine (GitHub Advanced Security — free for public repositories).
-#
-# Runs on every push and pull request targeting `main`, and on a weekly
-# schedule to catch newly-published CVEs in previously-clean code.
+# Runs on every push to `main`, every pull request targeting `main`,
+# and on a weekly schedule to catch newly-disclosed vulnerabilities in
+# unchanged code.
 
 on:
   push:
@@ -12,8 +10,9 @@ on:
   pull_request:
     branches: ["main"]
   schedule:
-    # Run every Monday at 08:00 UTC
+    # Every Monday at 08:00 UTC
     - cron: "0 8 * * 1"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -22,32 +21,42 @@ permissions:
 
 jobs:
   analyze:
-    name: Analyze (JavaScript / TypeScript)
+    name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ["javascript-typescript"]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      # Initialise CodeQL tools for the JavaScript/TypeScript language pack.
-      # This also sets up a code-scanning database that the subsequent
-      # auto-build step populates.
-      - name: Initialise CodeQL
+      - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: javascript-typescript
-          # Use the security-extended query suite for broader coverage beyond
-          # the default set — catches additional CWEs without requiring a paid
-          # GHAS licence on public repos.
+          languages: ${{ matrix.language }}
+          # Use the default CodeQL query suite plus the security-extended pack
+          # which covers OWASP Top 10 and other high-severity patterns.
           queries: security-extended
 
-      # CodeQL can auto-build JavaScript/TypeScript projects without explicit
-      # build commands.  The autobuild step is included here for completeness
-      # and future-proofing (e.g. if native modules are added later).
-      - name: Auto-build
-        uses: github/codeql-action/autobuild@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Build application (for CodeQL analysis)
+        working-directory: app
+        run: npm run build
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
-          category: "/language:javascript-typescript"
+          category: "/language:${{ matrix.language }}"
