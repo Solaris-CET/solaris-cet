@@ -129,16 +129,15 @@ function MarkdownText({ text }: { text: string }) {
 
   const renderInline = (text: string): React.ReactNode => {
     const parts: React.ReactNode[] = [];
-    const remaining = text;
     let idx = 0;
     // Pattern: **bold**, *italic*, `code`
     const pattern = /(\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`)/g;
     let match: RegExpExecArray | null;
     let lastIndex = 0;
     pattern.lastIndex = 0;
-    while ((match = pattern.exec(remaining)) !== null) {
+    while ((match = pattern.exec(text)) !== null) {
       if (match.index > lastIndex) {
-        parts.push(<span key={idx}>{remaining.slice(lastIndex, match.index)}</span>);
+        parts.push(<span key={idx}>{text.slice(lastIndex, match.index)}</span>);
         idx += 1;
       }
       if (match[2]) {
@@ -151,8 +150,8 @@ function MarkdownText({ text }: { text: string }) {
       idx += 1;
       lastIndex = pattern.lastIndex;
     }
-    if (lastIndex < remaining.length) {
-      parts.push(<span key={idx}>{remaining.slice(lastIndex)}</span>);
+    if (lastIndex < text.length) {
+      parts.push(<span key={idx}>{text.slice(lastIndex)}</span>);
     }
     return parts;
   };
@@ -565,7 +564,7 @@ export default function AiOracleSearch() {
                   {/* Terminal & Metrics */}
                   <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                     {/* Telemetry terminal */}
-                    <div className="lg:col-span-3 bg-gray-950 border border-gray-800 rounded-xl p-4 font-mono text-xs overflow-hidden flex flex-col h-56 shadow-inner">
+                    <div className="lg:col-span-3 bg-gray-950 border border-gray-800 rounded-xl p-3 md:p-4 font-mono text-xs overflow-hidden flex flex-col h-40 md:h-56 shadow-inner">
                       <div className="flex items-center justify-between mb-2 pb-2 border-b border-gray-800 text-gray-500">
                         <span>&gt;_ RAV_TERMINAL · Grok × Gemini v3.0</span>
                         <span className={isProcessing ? 'text-yellow-500 animate-pulse' : 'text-green-500'}>
@@ -591,7 +590,7 @@ export default function AiOracleSearch() {
                     </div>
 
                     {/* Live metrics */}
-                    <div className="bg-gray-950 border border-gray-800 rounded-xl p-4 flex flex-col justify-between h-56">
+                    <div className="bg-gray-950 border border-gray-800 rounded-xl p-4 flex flex-col justify-between h-40 md:h-56">
                       <h4 className="text-gray-500 font-mono text-xs mb-3 border-b border-gray-800 pb-2">
                         SYS_METRICS
                       </h4>

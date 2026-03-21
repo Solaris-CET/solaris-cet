@@ -143,6 +143,14 @@
     height: 100vh;
     overflow: hidden;
   }
+
+  @media (max-width: 767px) {
+    .section-pinned {
+      height: auto;
+      min-height: 100svh;
+      overflow: visible;
+    }
+  }
   
   .btn-gold {
     @apply px-6 py-3 rounded-xl font-medium transition-all duration-300;

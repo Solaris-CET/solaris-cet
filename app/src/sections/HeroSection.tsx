@@ -143,7 +143,7 @@ const HeroSection: React.FC = () => {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(242,201,76,0.05),transparent)]" />
         </div>
 
-        <div className="w-full max-w-7xl mx-auto relative z-10 px-4 lg:px-8 flex flex-col gap-4 lg:gap-6 pb-16 lg:pb-0">
+        <div className="w-full max-w-7xl mx-auto relative z-10 px-4 lg:px-8 flex flex-col gap-4 lg:gap-6 pb-16 lg:pb-0 pt-20 lg:pt-0">
           {/* 3-column grid: title | coin | HUD */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-center">
           
