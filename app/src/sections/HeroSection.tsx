@@ -121,6 +121,7 @@ const HeroSection: React.FC = () => {
           .to(coinWrapperRef.current, { x: "-25vw", rotateY: 90, opacity: 0 })
           .to(titleContainerRef.current, { x: "-100%", opacity: 0 }, 0)
           .to(hudWrapperRef.current, { x: "100%", opacity: 0 }, 0)
+          .to(oracleWrapperRef.current, { y: 40, opacity: 0 }, 0)
       });
     }, containerRef);
 
@@ -140,10 +141,12 @@ const HeroSection: React.FC = () => {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(242,201,76,0.05),transparent)]" />
         </div>
 
-        <div className="container relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 px-6">
+        <div className="w-full max-w-7xl mx-auto relative z-10 px-6 lg:px-8 flex flex-col gap-6">
+          {/* 3-column grid: title | coin | HUD */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
           
           {/* LEFT COLUMN: ARCHITECTURE TITLE */}
-          <div ref={titleContainerRef} className="lg:col-span-5 flex flex-col justify-center space-y-6">
+          <div ref={titleContainerRef} className="lg:col-span-5 flex flex-col justify-center">
             <div className="glass-card-gold p-8 rounded-3xl border border-yellow-500/20 backdrop-blur-xl">
               <div className="flex items-center gap-4 mb-6">
                 <img src={APP_CONFIG.LINKS.LOGO} className="w-16 h-16 rounded-2xl shadow-[0_0_30px_rgba(242,201,76,0.3)]" alt="Solaris" />
@@ -170,11 +173,6 @@ const HeroSection: React.FC = () => {
                   DOCS
                 </button>
               </div>
-            </div>
-
-            {/* AI ORACLE INTEGRATION - FIXED WRAPPER */}
-            <div ref={oracleWrapperRef} className="w-full transform-gpu">
-              <AiOracleSearch />
             </div>
           </div>
 
@@ -208,6 +206,12 @@ const HeroSection: React.FC = () => {
                 </div>
               </div>
             </div>
+          </div>
+          </div>{/* end 3-column grid */}
+
+          {/* AI ORACLE INTEGRATION — full width below the 3-column grid */}
+          <div ref={oracleWrapperRef} className="w-full transform-gpu overflow-hidden">
+            <AiOracleSearch />
           </div>
         </div>
 
