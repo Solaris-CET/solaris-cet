@@ -46,7 +46,7 @@ const phases: Phase[] = [
     id: 'q3',
     quarter: 'Q3 2025',
     title: 'Growth',
-    status: 'active',
+    status: 'done',
     milestones: [
       { text: 'AI-driven precision farming pilot in Puiești' },
       { text: 'Developer SDK and API beta release' },
@@ -56,14 +56,38 @@ const phases: Phase[] = [
   },
   {
     id: 'q4',
-    quarter: 'Q4 2025+',
+    quarter: 'Q4 2025',
     title: 'Scale',
-    status: 'upcoming',
+    status: 'done',
     milestones: [
       { text: 'Next-gen processing units deployment' },
       { text: 'Self-Actualization Protocol mainnet' },
       { text: 'Cross-chain bridge exploration' },
       { text: 'Ecosystem grants program launch' },
+    ],
+  },
+  {
+    id: 'q1-2026',
+    quarter: 'Q1 2026',
+    title: 'Expand',
+    status: 'active',
+    milestones: [
+      { text: 'Multi-chain liquidity integration' },
+      { text: 'Community governance portal launch' },
+      { text: 'AI oracle public API v1 release' },
+      { text: 'Mobile wallet deep-link support' },
+    ],
+  },
+  {
+    id: 'q2-2026',
+    quarter: 'Q2 2026+',
+    title: 'Evolve',
+    status: 'upcoming',
+    milestones: [
+      { text: 'Decentralized autonomous organization (DAO)' },
+      { text: 'Cross-chain bridge mainnet launch' },
+      { text: 'Ecosystem grants program expansion' },
+      { text: 'Real-world asset (RWA) tokenisation pilot' },
     ],
   },
 ];
@@ -191,7 +215,7 @@ const RoadmapSection = () => {
         {/* Phase cards */}
         <div
           ref={cardsRef}
-          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {phases.map((phase) => {
             const cfg = statusConfig[phase.status];
