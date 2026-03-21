@@ -82,7 +82,6 @@ jobs:
         with:
           name: coverage-report
           path: app/coverage
-          retention-days: 14
           retention-days: 7
           if-no-files-found: warn
 
