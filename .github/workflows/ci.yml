@@ -82,7 +82,7 @@ jobs:
         with:
           name: coverage-report
           path: app/coverage
-          retention-days: 30
+          retention-days: 7
           if-no-files-found: warn
 
   # ── Stage 2: Build (waits for both quality gates) ─────────────────────────
