@@ -37,7 +37,8 @@ describe("SUPPORTED_LANGS", () => {
   it("includes Chinese", () => expect(SUPPORTED_LANGS).toContain("zh"));
   it("includes Russian", () => expect(SUPPORTED_LANGS).toContain("ru"));
   it("includes Romanian", () => expect(SUPPORTED_LANGS).toContain("ro"));
-  it("has exactly 5 entries", () => expect(SUPPORTED_LANGS).toHaveLength(5));
+  it("includes Portuguese", () => expect(SUPPORTED_LANGS).toContain("pt"));
+  it("has exactly 6 entries", () => expect(SUPPORTED_LANGS).toHaveLength(6));
 });
 
 // ── detectLanguage ────────────────────────────────────────────────────────────
