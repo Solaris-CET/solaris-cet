@@ -1,0 +1,10 @@
+Load the following skill documents into your active context before beginning any task in this session.
+Each document defines a cognitive module; treat their contracts as hard constraints throughout.
+
+Skills to load (in order):
+1. .claude/skills/metacognition/SKILL.md
+2. .claude/skills/active_inference/SKILL.md
+3. .claude/skills/tree_search/SKILL.md
+4. .claude/skills/memory/SKILL.md
+
+After loading, confirm with a one-line summary of each module, then proceed with the user's task.
