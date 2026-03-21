@@ -151,8 +151,8 @@ const HeroSection: React.FC = () => {
               </div>
               
               <p className="text-gray-400 text-lg leading-relaxed mb-8">
-                Dezvoltăm un protocol de <span className="text-white font-bold">High Intelligence</span> pe TON. 
-                Sistemul utilizează bucle de execuție <span className="text-yellow-500 underline decoration-dotted">ReAct</span> pentru autonomie totală a agenților AI.
+                Token RWA de mare impact ancorat în <span className="text-white font-bold">infrastructura agricolă și AI</span> din Cetățuia. 
+                Fiecare unitate oferă acces la <span className="text-yellow-500 underline decoration-dotted">Solaris Prime Tactical Ecosystem</span>, o ierarhie de raționament alimentată de Gemini 3 Pro Preview.
               </p>
 
               <div ref={ctaGroupRef} className="flex flex-wrap gap-4">
