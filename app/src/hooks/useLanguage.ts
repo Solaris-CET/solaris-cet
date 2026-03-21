@@ -9,7 +9,7 @@ interface LanguageContextValue {
   t: Translations;
 }
 
-export const SUPPORTED_LANGS: LangCode[] = ['en', 'es', 'zh', 'ru', 'ro'];
+export const SUPPORTED_LANGS: LangCode[] = ['en', 'es', 'zh', 'ru', 'ro', 'pt'];
 
 const detectLanguage = (): LangCode => {
   try {
@@ -17,8 +17,19 @@ const detectLanguage = (): LangCode => {
     if (stored && (SUPPORTED_LANGS as string[]).includes(stored)) {
       return stored as LangCode;
     }
-    const browserLang = navigator.language.slice(0, 2);
-    return (SUPPORTED_LANGS as string[]).includes(browserLang) ? (browserLang as LangCode) : 'en';
+    // Check navigator.languages (ordered preference list) before falling back
+    // to navigator.language so a secondary preferred language is honoured.
+    const candidates = [
+      ...(navigator.languages ?? []),
+      navigator.language,
+    ];
+    for (const lang of candidates) {
+      const code = lang.slice(0, 2);
+      if ((SUPPORTED_LANGS as string[]).includes(code)) {
+        return code as LangCode;
+      }
+    }
+    return 'en';
   } catch {
     return 'en';
   }

@@ -1,4 +1,4 @@
-export type LangCode = 'en' | 'es' | 'zh' | 'ru' | 'ro';
+export type LangCode = 'en' | 'es' | 'zh' | 'ru' | 'ro' | 'pt';
 
 export interface Translations {
   nav: {
@@ -132,6 +132,28 @@ const translations: Record<LangCode, Translations> = {
       title: 'Tokenomică',
       supply: 'Ofertă Totală',
       poolAddress: 'Adresa Pool-ului DeDust',
+    },
+  },
+  pt: {
+    nav: {
+      home: 'Início',
+      cetApp: 'App CET',
+      tokenomics: 'Tokenomia',
+      roadmap: 'Roteiro',
+      howToBuy: 'Como Comprar',
+      whitepaper: 'White Paper',
+      resources: 'Recursos',
+    },
+    hero: {
+      tagline: 'A Fundação Digital da Cetățuia',
+      subtitle: 'Um token ultra-escasso com oferta de 9.000 CET na blockchain TON',
+      buyNow: 'Comprar CET',
+      learnMore: 'Saiba Mais',
+    },
+    tokenomics: {
+      title: 'Tokenomia',
+      supply: 'Oferta Total',
+      poolAddress: 'Endereço do Pool DeDust',
     },
   },
 };
