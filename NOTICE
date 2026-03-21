@@ -1,0 +1,86 @@
+Solaris CET
+Copyright (c) 2025–2026 Solaris CET Team
+
+This product includes software developed by the Solaris CET Team
+(https://github.com/Solaris-CET/solaris-cet).
+
+---
+
+## Project Attribution
+
+**Name:** Solaris CET
+**Symbol:** CET
+**Blockchain:** TON (The Open Network)
+**Contract:** EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX
+**DeDust Pool:** EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB
+**Supply:** 9,000 CET (fixed, no mint authority)
+**Whitepaper (IPFS):** bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a
+
+---
+
+## Third-Party Software Notices
+
+This product includes or depends upon the following third-party open-source
+software. Full license texts are available in the respective packages.
+
+### React
+Copyright (c) Meta Platforms, Inc. and affiliates.
+Licensed under the MIT License.
+https://github.com/facebook/react
+
+### GSAP (GreenSock Animation Platform)
+Copyright (c) 2008–2024, GreenSock
+Licensed under the GSAP Standard License (free for qualifying use).
+https://gsap.com/licensing/
+
+### Tailwind CSS
+Copyright (c) Tailwind Labs, Inc.
+Licensed under the MIT License.
+https://github.com/tailwindlabs/tailwindcss
+
+### Radix UI (shadcn/ui)
+Copyright (c) 2022 WorkOS
+Licensed under the MIT License.
+https://github.com/radix-ui/primitives
+
+### Vite
+Copyright (c) 2019–present, VoidZero Inc. and Vite contributors
+Licensed under the MIT License.
+https://github.com/vitejs/vite
+
+### ONNX Runtime Web
+Copyright (c) Microsoft Corporation
+Licensed under the MIT License.
+https://github.com/microsoft/onnxruntime
+
+### TonConnect UI React
+Copyright (c) 2023 TON Foundation
+Licensed under the Apache License 2.0.
+https://github.com/ton-connect/sdk
+
+### Lucide React
+Copyright (c) 2020 Lucide Contributors
+Licensed under the ISC License.
+https://github.com/lucide-icons/lucide
+
+---
+
+## Fonts
+
+**Space Grotesk**, **Inter**, **IBM Plex Mono** are served via Google Fonts.
+Fonts are licensed under the SIL Open Font License 1.1.
+
+---
+
+## Brand Assets
+
+The Solaris CET logo, hero coin image, and associated graphic assets
+(app/public/logo.png, app/public/hero-coin.png, app/public/icon-192.png,
+app/public/icon-512.png, app/public/og-image.png) are copyright
+(c) 2025–2026 Solaris CET Team. All rights reserved.
+These assets may NOT be redistributed or modified without explicit written
+permission from the Solaris CET Team.
+
+---
+
+For licensing inquiries: security@solaris-cet.io

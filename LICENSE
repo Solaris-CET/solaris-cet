@@ -1,6 +1,9 @@
 MIT License
 
-Copyright (c) 2026 Solaris CET
+Copyright (c) 2025–2026 Solaris CET Team
+Project: Solaris CET — Real-World Asset Token on the TON Blockchain
+Repository: https://github.com/Solaris-CET/solaris-cet
+Contact: security@solaris-cet.io
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +22,21 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+## Trademark Notice
+
+"Solaris CET", "CET", the Solaris CET logo, and the RAV Protocol name are
+proprietary trademarks of the Solaris CET Team. This MIT License does **not**
+grant permission to use these trademarks, trade names, service marks, or
+product names, except as required for reasonable and customary use in
+describing the origin of the Software (e.g., in attribution notices).
+
+## Token Disclaimer
+
+The CET token (contract address: EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX
+on the TON blockchain) is a utility and governance token for the Solaris
+Ecosystem. Nothing in this license constitutes financial, investment, or legal
+advice. Token holders assume all risks associated with participation in the
+Solaris CET ecosystem.

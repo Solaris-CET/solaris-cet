@@ -1,7 +1,33 @@
 {
-  "name": "my-app",
+  "name": "solaris-cet",
+  "description": "Solaris CET — Real-World Asset Token landing page on TON Blockchain. Powered by the RAV Protocol with dual-AI: Grok × Gemini.",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.0",
+  "license": "MIT",
+  "author": {
+    "name": "Solaris CET Team",
+    "url": "https://github.com/Solaris-CET"
+  },
+  "homepage": "https://Solaris-CET.github.io/solaris-cet/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Solaris-CET/solaris-cet.git"
+  },
+  "keywords": [
+    "solaris",
+    "cet",
+    "ton",
+    "blockchain",
+    "rwa",
+    "real-world-asset",
+    "defi",
+    "token",
+    "dedust",
+    "rav-protocol",
+    "react",
+    "typescript",
+    "vite"
+  ],
   "type": "module",
   "engines": {
     "node": ">=20"

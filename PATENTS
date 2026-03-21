@@ -1,0 +1,67 @@
+Solaris CET — Patent Grant
+
+Copyright (c) 2025–2026 Solaris CET Team
+Repository: https://github.com/Solaris-CET/solaris-cet
+
+---
+
+## Patent License Grant
+
+Subject to the terms and conditions of the MIT License under which this
+software is distributed, each contributor hereby grants to you a perpetual,
+worldwide, non-exclusive, no-charge, royalty-free, irrevocable (except as
+stated in this section) patent license to make, have made, use, offer to sell,
+sell, import, and otherwise transfer the Software, where such license applies
+only to those patent claims licensable by such contributor that are necessarily
+infringed by their contribution(s) alone or by combination of their
+contribution(s) with the Software.
+
+If you institute patent litigation against any entity (including a cross-claim
+or counterclaim in a lawsuit) alleging that the Software or a contribution
+incorporated within the Software constitutes direct or contributory patent
+infringement, then any patent licenses granted to you under this grant for
+that Software shall terminate as of the date such litigation is filed.
+
+---
+
+## RAV Protocol
+
+The **RAV Protocol** (Real Asset Verification Protocol) — the dual-AI
+consensus mechanism combining Grok (xAI) and Google Gemini for on-chain
+agricultural asset valuation — is an original design of the Solaris CET Team.
+
+As of the copyright date above, **no patent applications** have been filed for
+the RAV Protocol or any other component of this Software. The Solaris CET Team
+has chosen to make the RAV Protocol available under the MIT License and
+contributes it to the public domain of open-source software.
+
+Should patent applications be filed in the future, the Solaris CET Team
+commits to providing a royalty-free patent license to all users of the
+Software consistent with the terms of this grant.
+
+---
+
+## DCBM Model
+
+The **DCBM** (Distributed Circular Block Model) tokenomics model, which
+governs the 9,000 CET fixed supply, 90-year emission schedule, and
+hyper-scarcity mechanics implemented in this repository, is an original
+contribution of the Solaris CET Team and is likewise contributed under the
+MIT License with no reserved patent rights.
+
+---
+
+## Third-Party Patents
+
+This software incorporates open-source libraries whose contributors may hold
+patents on their respective contributions. The grant above does not extend to
+those third-party contributions. Refer to each library's own license and patent
+grant for details:
+
+- GSAP (GreenSock Animation Platform) — see https://gsap.com/licensing/
+- TON SDK / TonConnect — see https://github.com/ton-blockchain/ton
+- ONNX Runtime Web — see https://github.com/microsoft/onnxruntime
+
+---
+
+For questions regarding this patent grant, contact: security@solaris-cet.io

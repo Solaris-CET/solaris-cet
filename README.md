@@ -2,6 +2,7 @@
 
 [![Deploy to GitHub Pages](https://github.com/aamclaudiu-hash/solaris-cet/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/aamclaudiu-hash/solaris-cet/actions/workflows/deploy-pages.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Patents](https://img.shields.io/badge/Patents-None%20Reserved-blue.svg)](./PATENTS)
 
 **Solaris CET** is a decentralized token project built on the TON blockchain. This repository contains the official landing page — a high-performance static web application built with **React 19**, **TypeScript**, **Vite**, **Tailwind CSS**, and **GSAP** animations, deployed automatically via **GitHub Actions** to **GitHub Pages**.
 
@@ -91,6 +92,8 @@ solaris-cet/
 ├── CMC_APPLICATION.md          # CoinMarketCap listing application
 ├── CONTRIBUTING.md
 ├── LICENSE
+├── NOTICE
+├── PATENTS
 ├── README.md
 ├── SECURITY.md
 └── WHITEPAPER.md
@@ -182,4 +185,8 @@ Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before submitting a pull reques
 
 This project is licensed under the **MIT License** — see [LICENSE](./LICENSE) for details.
 You are free to fork, modify, and host your own instance under the same license terms.
+
+The **"Solaris CET"** name, logo, and CET token brand are proprietary trademarks
+of the Solaris CET Team and are not covered by the MIT License.
+See [NOTICE](./NOTICE) for third-party attributions and [PATENTS](./PATENTS) for the patent grant.
 
