@@ -1,7 +1,7 @@
 import { useRef, useLayoutEffect, useState, useEffect, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { Calculator, Smartphone, Laptop, Monitor, Server, TrendingUp } from 'lucide-react';
-import type { MiningInput, MiningResult } from '../workers/mining.worker';
+import type { MiningInput, MiningResult } from '../lib/mining-math';
 
 
 type DeviceType = 'smartphone' | 'laptop' | 'desktop' | 'node';
