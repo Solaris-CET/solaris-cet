@@ -57,6 +57,8 @@ jobs:
   unit-test:
     name: Unit Tests (Vitest)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6

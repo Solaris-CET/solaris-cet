@@ -8,6 +8,9 @@ contracts/build/
 *.log
 npm-debug.log*
 
+# Agent coordination files (created by the GitHub Copilot agent system)
+pulls/
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Root-level stray files & build artifacts
 #
