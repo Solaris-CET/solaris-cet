@@ -4,28 +4,26 @@ interface Props {
   children: ReactNode;
   /** Custom fallback UI shown when an error is caught. */
   fallback?: ReactNode;
-  /**
-   * Optional callback fired after the boundary resets its error state.
-   * Use this to clear any external error state or refetch data.
-   */
+  /** Called after a successful reset so parent components can react (e.g. refetch). */
   onReset?: () => void;
 }
 
 interface State {
   hasError: boolean;
   error?: Error;
-  /** Incremented on every reset to remount children after recovery. */
-  resetKey: number;
+  retryCount: number;
 }
+
+/** Maximum number of in-place retries before offering a full page reload. */
+const MAX_RETRIES = 2;
 
 /**
  * ErrorBoundary — catches JavaScript errors anywhere in the child component
  * tree, logs them, and renders a fallback UI instead of crashing the page.
  *
- * Supports two recovery paths:
- * 1. **Try again** — resets the boundary's error state and remounts the child
- *    tree without a full-page reload.
- * 2. **Reload Page** — falls back to a hard refresh for unrecoverable errors.
+ * Up to `MAX_RETRIES` times the user can retry in-place (the boundary resets
+ * its state and attempts to re-render the children). If all retries are
+ * exhausted, only the full-page reload option remains.
  *
  * @example
  * ```tsx
@@ -37,8 +35,7 @@ interface State {
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, resetKey: 0 };
-    this.handleReset = this.handleReset.bind(this);
+    this.state = { hasError: false, retryCount: 0 };
   }
 
   static getDerivedStateFromError(error: Error): Partial<State> {
@@ -49,16 +46,23 @@ export class ErrorBoundary extends Component<Props, State> {
     console.error('[ErrorBoundary] Caught error:', error, errorInfo);
   }
 
-  handleReset() {
-    this.setState(prev => ({ hasError: false, error: undefined, resetKey: prev.resetKey + 1 }));
+  /** Reset the error state so the children are re-rendered without a full page reload. */
+  private handleRetry = () => {
+    this.setState(prev => ({
+      hasError: false,
+      error: undefined,
+      retryCount: prev.retryCount + 1,
+    }));
     this.props.onReset?.();
-  }
+  };
 
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback;
       }
+
+      const canRetry = this.state.retryCount < MAX_RETRIES;
 
       return (
         <div className="py-16 flex items-center justify-center text-white">
@@ -67,18 +71,28 @@ export class ErrorBoundary extends Component<Props, State> {
             <p className="text-gray-400 mb-5 text-sm">
               {this.state.error?.message ?? 'An unexpected error occurred.'}
             </p>
-            <div className="flex items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={this.handleReset}
-                className="px-6 py-2 bg-solaris-gold/80 rounded-lg hover:bg-solaris-gold transition-colors text-black font-medium"
-              >
-                Try Again
-              </button>
+            <div
+              role="group"
+              aria-label="Error recovery options"
+              className="flex items-center justify-center gap-3 flex-wrap"
+            >
+              {canRetry && (
+                <button
+                  type="button"
+                  onClick={this.handleRetry}
+                  className="px-6 py-2 bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors"
+                >
+                  Try Again
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => window.location.reload()}
-                className="px-6 py-2 bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors"
+                className={`px-6 py-2 rounded-lg transition-colors ${
+                  canRetry
+                    ? 'bg-white/10 hover:bg-white/20 text-gray-300'
+                    : 'bg-cyan-500 hover:bg-cyan-400'
+                }`}
               >
                 Reload Page
               </button>

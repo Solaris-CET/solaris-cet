@@ -1,7 +1,9 @@
 node_modules/
 app/node_modules/
 app/dist/
+app/coverage/
 app/test-results/
+app/coverage/
 contracts/build/
 *.log
 npm-debug.log*
@@ -107,3 +109,4 @@ npm-debug.log*
 /vite.config.ts
 /eslint.config.js
 /tailwind.config.js
+app/coverage/

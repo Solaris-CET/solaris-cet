@@ -40,13 +40,35 @@ export interface ChainState {
 // Stable module-level promise — safe to pass to React 19 `use()`
 // ---------------------------------------------------------------------------
 
-function fetchChainState(): Promise<ChainState> {
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 1000;
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetry(url: string, retries = MAX_RETRIES): Promise<Response> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) return res;
+      lastError = new Error(`Failed to fetch chain state: ${res.status}`);
+    } catch (err) {
+      lastError = err;
+    }
+    if (attempt < retries) {
+      await delay(RETRY_DELAY_MS * (attempt + 1));
+    }
+  }
+  throw lastError;
+}
+
+async function fetchChainState(): Promise<ChainState> {
   const base = import.meta.env.BASE_URL ?? './';
   const url  = `${base}api/state.json`;
-  return fetch(url).then((res) => {
-    if (!res.ok) throw new Error(`Failed to fetch chain state: ${res.status}`);
-    return res.json() as Promise<ChainState>;
-  });
+  const res = await fetchWithRetry(url);
+  return res.json() as Promise<ChainState>;
 }
 
 export const chainStatePromise: Promise<ChainState> = fetchChainState();

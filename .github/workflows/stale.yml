@@ -1,0 +1,56 @@
+name: Stale Issues & PRs
+
+# Runs daily at 01:00 UTC.
+# Labels issues/PRs that have had no activity for 30 days as "stale",
+# then closes them after a further 7 days of inactivity — keeping the
+# backlog clean without manual triage.
+
+on:
+  schedule:
+    # Every day at 01:00 UTC
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    name: Mark and close stale items
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          # ── Issues ──────────────────────────────────────────────────────────
+          days-before-issue-stale: 30
+          days-before-issue-close: 7
+          stale-issue-label: "stale"
+          stale-issue-message: >
+            👋 This issue has been open for 30 days with no recent activity.
+            It will be closed automatically in **7 days** unless there is a
+            new comment. Feel free to re-open if it is still relevant!
+          close-issue-message: >
+            🔒 Closing due to prolonged inactivity. Please re-open or reference
+            this issue in a new one if you encounter the problem again. Thank you!
+
+          # ── Pull Requests ───────────────────────────────────────────────────
+          days-before-pr-stale: 21
+          days-before-pr-close: 7
+          stale-pr-label: "stale"
+          stale-pr-message: >
+            👋 This pull request has had no activity for 21 days.
+            It will be closed automatically in **7 days** unless there is a
+            new review, comment, or push. Reopen it if you resume work on it!
+          close-pr-message: >
+            🔒 Closing this PR due to prolonged inactivity. You can always
+            re-open it or open a new one when you are ready to continue. Thank you!
+
+          # ── Common ──────────────────────────────────────────────────────────
+          # Never stale items with these labels
+          exempt-issue-labels: "pinned,security,bug,in-progress"
+          exempt-pr-labels: "pinned,security,in-progress,do-not-close"
+          # Do not count comments from bots as activity
+          exempt-all-assignees: false
+          remove-stale-when-updated: true
+          operations-per-run: 100
