@@ -95,6 +95,49 @@ export function formatPrice(value: number | null | undefined): string {
 }
 
 /**
+ * Truncates a blockchain address for display, e.g.:
+ *   "EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB" → "EQB5…lfnB"
+ *
+ * @param address - Full address string
+ * @param chars   - Number of characters to keep on each side (default: 4)
+ * @returns Truncated address with an ellipsis in the middle, or the original
+ *          address if it is too short to truncate.
+ *
+ * @example
+ * truncateAddress("EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB") // "EQB5…lfnB"
+ * truncateAddress("EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB", 6) // "EQB5_h…IelfnB"
+ */
+export function truncateAddress(address: string, chars = 4): string {
+  const n = Math.max(1, Math.floor(chars));
+  if (address.length <= n * 2 + 1) return address;
+  return `${address.slice(0, n)}…${address.slice(-n)}`;
+}
+
+/**
+ * Formats a raw token amount string (as returned by on-chain APIs) for display.
+ *
+ * Parses the decimal string and formats it with locale-aware thousands
+ * separators. Returns `'—'` when the input is `null` or cannot be parsed.
+ *
+ * @param amount   - Human-readable decimal string, e.g. "9000.000000000" or null
+ * @param decimals - Number of decimal places to show (default: 2)
+ *
+ * @example
+ * formatTokenAmount("9000.000000000")   // "9,000.00"
+ * formatTokenAmount(null)              // "—"
+ * formatTokenAmount("not-a-number")    // "—"
+ */
+export function formatTokenAmount(amount: string | null, decimals = 2): string {
+  if (amount === null) return '—';
+  const n = Number(amount);
+  if (!Number.isFinite(n)) return '—';
+  return n.toLocaleString('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
+/**
  * Returns a debounced version of `fn` that delays invocation until `delay`
  * milliseconds have elapsed since the last call.
  *
