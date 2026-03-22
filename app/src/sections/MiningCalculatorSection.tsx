@@ -20,6 +20,9 @@ const devices: Record<DeviceType, DeviceConfig> = {
   node: { icon: Server, label: 'Dedicated Node', baseHashrate: 50.0, efficiency: 1.2 },
 };
 
+const HIGH_EFFICIENCY_THRESHOLD = 0.01;
+const STANDARD_EFFICIENCY_THRESHOLD = 0.001;
+
 // Static data defined outside component to avoid re-creation on every render
 const liveStats = [
   { label: 'Network Hashrate', value: '2.4 EH/s', change: '+12%' },
@@ -321,11 +324,11 @@ const MiningCalculatorSection = () => {
 
               {/* Mining Efficiency Tier */}
               <div className="flex justify-center pt-1">
-                {results.daily >= 0.01 ? (
+                {results.daily >= HIGH_EFFICIENCY_THRESHOLD ? (
                   <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-solaris-gold/10 border border-solaris-gold/30 text-solaris-gold text-xs font-semibold tracking-wide">
                     ⚡ High Efficiency
                   </span>
-                ) : results.daily >= 0.001 ? (
+                ) : results.daily >= STANDARD_EFFICIENCY_THRESHOLD ? (
                   <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-solaris-cyan/10 border border-solaris-cyan/30 text-solaris-cyan text-xs font-semibold tracking-wide">
                     ✓ Standard
                   </span>
