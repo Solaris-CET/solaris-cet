@@ -10,24 +10,36 @@ const auditBadges = [
     label: 'Cyberscope Audited',
     description: 'Smart contract security audit completed',
     color: 'gold',
+    link: 'https://www.cyberscope.io/',
+    linkLabel: 'View Audit Report ↗',
+    linkColor: 'text-solaris-gold',
   },
   {
     icon: CheckCircle,
     label: 'Freshcoins Verified',
     description: 'Project verification and due diligence',
     color: 'cyan',
+    link: undefined,
+    linkLabel: undefined,
+    linkColor: undefined,
   },
   {
     icon: UserCheck,
     label: 'KYC Completed',
     description: 'Team identity verification',
     color: 'emerald',
+    link: 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a',
+    linkLabel: 'See Whitepaper ↗',
+    linkColor: 'text-solaris-cyan',
   },
   {
     icon: Code,
     label: 'Open Source',
     description: 'Fully transparent codebase',
     color: 'purple',
+    link: undefined,
+    linkLabel: undefined,
+    linkColor: undefined,
   },
 ];
 
@@ -159,7 +171,34 @@ const SecuritySection = () => {
           </div>
 
           {/* Right Column - Badge Grid */}
-          <div ref={badgeGridRef} className="grid grid-cols-2 gap-4">
+          <div ref={badgeGridRef}>
+            {/* Security Score Banner */}
+            <div className="glass-card-gold p-6 mb-10 flex flex-col sm:flex-row items-center gap-6">
+              <div className="shrink-0 text-center">
+                <div className="font-display font-black text-6xl text-solaris-gold leading-none">A+</div>
+                <div className="hud-label text-[10px] mt-1">SECURITY RATING</div>
+              </div>
+              <div className="flex-1 space-y-3">
+                {[
+                  { label: 'Smart Contract', score: 100 },
+                  { label: 'KYC Verification', score: 100 },
+                  { label: 'Audit Coverage', score: 100 },
+                  { label: 'Open Source', score: 100 },
+                ].map(({ label, score }) => (
+                  <div key={label}>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-solaris-muted">{label}</span>
+                      <span className="font-mono text-solaris-gold">{score}%</span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-solaris-gold to-emerald-400 rounded-full" style={{ width: `${score}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
             {auditBadges.map((badge) => (
               <div
                 key={badge.label}
@@ -194,8 +233,19 @@ const SecuritySection = () => {
                 <p className="text-solaris-muted text-xs leading-relaxed">
                   {badge.description}
                 </p>
+                {badge.link && (
+                  <a
+                    href={badge.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`text-xs hover:opacity-80 transition-opacity mt-1 ${badge.linkColor}`}
+                  >
+                    {badge.linkLabel}
+                  </a>
+                )}
               </div>
             ))}
+            </div>
           </div>
         </div>
       </div>
