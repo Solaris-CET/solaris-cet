@@ -6,7 +6,7 @@ interface CryptoProject {
   name: string;
   symbol: string;
   href: string;
-  category: 'l1' | 'stablecoin' | 'defi' | 'meme' | 'other';
+  category: 'l1' | 'stablecoin' | 'defi' | 'ai' | 'meme' | 'other';
 }
 
 const projects: CryptoProject[] = [
@@ -39,6 +39,15 @@ const projects: CryptoProject[] = [
   { name: 'Aave', symbol: 'AAVE', href: 'https://aave.com/', category: 'defi' },
   { name: 'Hyperliquid', symbol: 'HYPE', href: 'https://hyperliquid.xyz/', category: 'defi' },
   { name: 'Mantle', symbol: 'MNT', href: 'https://group.mantle.xyz/', category: 'defi' },
+  // AI Tokens — Solaris CET's direct competitive space
+  { name: 'Solaris CET', symbol: 'CET',   href: 'https://solaris-cet.vercel.app/',       category: 'ai' },
+  { name: 'Fetch.ai',    symbol: 'FET',   href: 'https://fetch.ai/',                      category: 'ai' },
+  { name: 'Bittensor',   symbol: 'TAO',   href: 'https://bittensor.com',                  category: 'ai' },
+  { name: 'SingularityNET', symbol: 'AGIX', href: 'https://singularitynet.io/',           category: 'ai' },
+  { name: 'Ocean Protocol', symbol: 'OCEAN', href: 'https://oceanprotocol.com/',          category: 'ai' },
+  { name: 'ASI Alliance', symbol: 'ASI',  href: 'https://superintelligence.io/',          category: 'ai' },
+  { name: 'Render',      symbol: 'RNDR',  href: 'https://rendernetwork.com/',             category: 'ai' },
+  { name: 'Akash',       symbol: 'AKT',   href: 'https://akash.network/',                 category: 'ai' },
   { name: 'Bittensor', symbol: 'TAO', href: 'https://bittensor.com', category: 'defi' },
   { name: 'Sky', symbol: 'SKY', href: 'https://sky.money/', category: 'defi' },
   { name: 'Aster', symbol: 'ATR', href: 'https://www.asterdex.com/', category: 'defi' },
@@ -80,6 +89,13 @@ const categoryConfig: CategoryConfig[] = [
     color: 'text-solaris-gold',
     badgeBg: 'bg-solaris-gold/15',
     badgeText: 'text-solaris-gold',
+  },
+  {
+    id: 'ai',
+    label: 'AI & Agent Tokens',
+    color: 'text-purple-400',
+    badgeBg: 'bg-purple-400/15',
+    badgeText: 'text-purple-400',
   },
   {
     id: 'defi',

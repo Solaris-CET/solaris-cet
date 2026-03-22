@@ -18,6 +18,7 @@ import ComplianceSection from './sections/ComplianceSection';
 // Non-pinned sections — lazy-loaded when they approach the viewport
 const RoadmapSection = lazy(() => import('./sections/RoadmapSection'));
 const AITeamSection = lazy(() => import('./sections/AITeamSection'));
+const CompetitionSection = lazy(() => import('./sections/CompetitionSection'));
 const HowToBuySection = lazy(() => import('./sections/HowToBuySection'));
 const MiningCalculatorSection = lazy(() => import('./sections/MiningCalculatorSection'));
 const SecuritySection = lazy(() => import('./sections/SecuritySection'));
@@ -232,63 +233,70 @@ function AppContent() {
             </LazyLoadWrapper>
           </div>
 
-          {/* Section 9: How to Buy - pin: false */}
+          {/* Section 9: Competition - pin: false */}
+          <div className="relative z-[78]">
+            <LazyLoadWrapper>
+              <ErrorBoundary><CompetitionSection /></ErrorBoundary>
+            </LazyLoadWrapper>
+          </div>
+
+          {/* Section 11: How to Buy - pin: false */}
           <div className="relative z-[80]">
             <LazyLoadWrapper>
               <ErrorBoundary><HowToBuySection /></ErrorBoundary>
             </LazyLoadWrapper>
           </div>
 
-          {/* Section 10: Mining Calculator - pin: false */}
+          {/* Section 12: Mining Calculator - pin: false */}
           <div className="relative z-[90]">
             <LazyLoadWrapper>
               <ErrorBoundary><MiningCalculatorSection /></ErrorBoundary>
             </LazyLoadWrapper>
           </div>
 
-          {/* Section 11: Security - pin: false */}
+          {/* Section 13: Security - pin: false */}
           <div className="relative z-[100]">
             <LazyLoadWrapper>
               <ErrorBoundary><SecuritySection /></ErrorBoundary>
             </LazyLoadWrapper>
           </div>
           
-          {/* Section 12: Whitepaper - pin: false */}
+          {/* Section 14: Whitepaper - pin: false */}
           <div className="relative z-[105]">
             <LazyLoadWrapper>
               <ErrorBoundary><WhitepaperSection /></ErrorBoundary>
             </LazyLoadWrapper>
           </div>
 
-          {/* Section 13: High Intelligence - pin: false */}
+          {/* Section 15: High Intelligence - pin: false */}
           <div className="relative z-[108]">
             <LazyLoadWrapper>
               <ErrorBoundary><HighIntelligenceSection /></ErrorBoundary>
             </LazyLoadWrapper>
           </div>
           
-          {/* Section 14: Ecosystem Index - pin: false */}
+          {/* Section 16: Ecosystem Index - pin: false */}
           <div className="relative z-[109]">
             <LazyLoadWrapper>
               <ErrorBoundary><EcosystemIndexSection /></ErrorBoundary>
             </LazyLoadWrapper>
           </div>
 
-          {/* Section 15: Resources - pin: false */}
+          {/* Section 17: Resources - pin: false */}
           <div className="relative z-[110]">
             <LazyLoadWrapper>
               <ErrorBoundary><ResourcesSection /></ErrorBoundary>
             </LazyLoadWrapper>
           </div>
 
-          {/* Section 16: FAQ - pin: false */}
+          {/* Section 18: FAQ - pin: false */}
           <div className="relative z-[112]">
             <LazyLoadWrapper>
               <ErrorBoundary><FAQSection /></ErrorBoundary>
             </LazyLoadWrapper>
           </div>
           
-          {/* Section 17: Footer - pin: false */}
+          {/* Section 19: Footer - pin: false */}
           <div className="relative z-[113]">
             <LazyLoadWrapper>
               <ErrorBoundary><FooterSection /></ErrorBoundary>
