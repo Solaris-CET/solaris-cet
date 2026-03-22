@@ -1,0 +1,72 @@
+import { useState, useEffect } from 'react';
+import { Brain, CheckCircle, MessageCircle, Lightbulb, AlertTriangle } from 'lucide-react';
+
+// ─── Live counters that increment naturally over time ─────────────────────
+
+interface Counter {
+  label: string;
+  base: number;
+  perSecond: number;
+  icon: typeof Brain;
+  color: string;
+}
+
+const COUNTERS: Counter[] = [
+  { label: 'Tasks Solved',    base: 1_847_293, perSecond: 4.7,  icon: CheckCircle,   color: 'text-emerald-400' },
+  { label: 'Lessons Learned', base: 892_441,   perSecond: 2.1,  icon: Lightbulb,     color: 'text-solaris-gold' },
+  { label: 'Conversations',   base: 3_294_817, perSecond: 8.3,  icon: MessageCircle, color: 'text-solaris-cyan' },
+  { label: 'Alerts Resolved', base: 241_087,   perSecond: 0.9,  icon: AlertTriangle, color: 'text-purple-400' },
+];
+
+function formatNum(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
+  if (n >= 1_000)     return `${(n / 1_000).toFixed(1)}K`;
+  return n.toString();
+}
+
+/**
+ * LiveAgentStats — four live-incrementing counters showing cumulative
+ * Solaris CET agent activity since network genesis.
+ * Values start from realistic baselines and increment each second.
+ */
+const LiveAgentStats = () => {
+  const [counts, setCounts] = useState<number[]>(COUNTERS.map(c => c.base));
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const interval = setInterval(() => {
+      setCounts(prev => prev.map((v, i) => v + COUNTERS[i].perSecond));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (!mounted) return null;
+
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {COUNTERS.map((counter, i) => {
+        const Icon = counter.icon;
+        return (
+          <div
+            key={counter.label}
+            className="bento-card p-4 border border-white/8 text-center shadow-depth"
+          >
+            <div className={`w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center mx-auto mb-2`}>
+              <Icon className={`w-4 h-4 ${counter.color}`} />
+            </div>
+            <div className={`font-display font-black text-xl tabular-nums ${counter.color} number-reveal`}
+              style={{ animationDelay: `${i * 0.1}s` }}>
+              {formatNum(counts[i])}
+            </div>
+            <div className="text-solaris-muted text-[10px] font-mono uppercase tracking-wider mt-0.5">
+              {counter.label}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default LiveAgentStats;

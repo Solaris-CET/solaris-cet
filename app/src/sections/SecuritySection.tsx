@@ -10,6 +10,9 @@ const auditBadges = [
     label: 'Cyberscope Audited',
     description: 'Smart contract security audit completed',
     color: 'gold',
+    link: 'https://www.cyberscope.io/',
+    linkLabel: 'View Audit Report ↗',
+    linkColor: 'text-solaris-gold',
   },
   {
     icon: CheckCircle,
@@ -22,6 +25,9 @@ const auditBadges = [
     label: 'KYC Completed',
     description: 'Team identity verification',
     color: 'emerald',
+    link: 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a',
+    linkLabel: 'See Whitepaper ↗',
+    linkColor: 'text-solaris-cyan',
   },
   {
     icon: Code,
@@ -110,12 +116,15 @@ const SecuritySection = () => {
 
   return (
     <section
+      id="security"
       ref={sectionRef}
-      className="relative bg-solaris-dark py-24 lg:py-32"
+      aria-label="Security and Compliance"
+      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden"
     >
-      {/* Background grid */}
+      {/* Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute bottom-0 left-0 right-0 h-[40vh] grid-floor opacity-15" />
+        <div className="absolute inset-0 aurora-bg opacity-40" />
       </div>
 
       <div className="relative z-10 px-6 lg:px-12 max-w-7xl mx-auto">
@@ -131,7 +140,7 @@ const SecuritySection = () => {
             </div>
 
             <h2 className="font-display font-bold text-[clamp(28px,3.5vw,44px)] text-solaris-text mb-4">
-              Security <span className="text-emerald-400">First</span>
+              Security <span className="text-gradient-aurora">First</span>
             </h2>
 
             <p className="text-solaris-muted text-base lg:text-lg leading-relaxed mb-6">
@@ -159,11 +168,38 @@ const SecuritySection = () => {
           </div>
 
           {/* Right Column - Badge Grid */}
-          <div ref={badgeGridRef} className="grid grid-cols-2 gap-4">
+          <div ref={badgeGridRef}>
+            {/* Security Score Banner */}
+            <div className="bento-card p-6 mb-10 flex flex-col sm:flex-row items-center gap-6 border border-solaris-gold/30">
+              <div className="shrink-0 text-center">
+                <div className="font-display font-black text-6xl text-solaris-gold leading-none">A+</div>
+                <div className="hud-label text-[10px] mt-1">SECURITY RATING</div>
+              </div>
+              <div className="flex-1 space-y-3">
+                {[
+                  { label: 'Smart Contract', score: 100 },
+                  { label: 'KYC Verification', score: 100 },
+                  { label: 'Audit Coverage', score: 100 },
+                  { label: 'Open Source', score: 100 },
+                ].map(({ label, score }) => (
+                  <div key={label}>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-solaris-muted">{label}</span>
+                      <span className="font-mono text-solaris-gold">{score}%</span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-solaris-gold to-emerald-400 rounded-full" style={{ width: `${score}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
             {auditBadges.map((badge) => (
               <div
                 key={badge.label}
-                className="audit-badge glass-card p-5 hover:border-solaris-gold/30 transition-all duration-300 group"
+                className="audit-badge bento-card p-5 hover:border-solaris-gold/30 transition-all duration-300 group"
               >
                 <div
                   className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${
@@ -194,8 +230,19 @@ const SecuritySection = () => {
                 <p className="text-solaris-muted text-xs leading-relaxed">
                   {badge.description}
                 </p>
+                {badge.link && (
+                  <a
+                    href={badge.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`text-xs hover:opacity-80 transition-opacity mt-1 ${badge.linkColor}`}
+                  >
+                    {badge.linkLabel}
+                  </a>
+                )}
               </div>
             ))}
+            </div>
           </div>
         </div>
       </div>

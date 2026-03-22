@@ -138,7 +138,7 @@ const HowToBuySection = () => {
     <section
       id="how-to-buy"
       ref={sectionRef}
-      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden"
+      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden mesh-bg"
     >
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -158,7 +158,7 @@ const HowToBuySection = () => {
           </div>
 
           <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text mb-4">
-            Get <span className="text-solaris-gold">Solaris CET</span>{' '}
+            Get <span className="text-gradient-gold">Solaris CET</span>{' '}
             in 3 Steps
           </h2>
 
@@ -180,7 +180,7 @@ const HowToBuySection = () => {
             return (
               <div
                 key={step.id}
-                className={`step-card glass-card p-6 border ${c.border} flex flex-col gap-4 group hover:border-opacity-60 transition-all duration-300`}
+                className={`step-card bento-card p-6 border ${c.border} flex flex-col gap-4 group transition-all duration-300`}
               >
                 {/* Step number */}
                 <span className={`font-mono font-bold text-3xl ${c.text} opacity-40`}>
@@ -219,10 +219,28 @@ const HowToBuySection = () => {
           })}
         </div>
 
+        {/* Verified Safe trust bar */}
+        <div className="mb-6 flex flex-wrap items-center gap-3">
+          {[
+            { label: 'Cyberscope Audited', color: 'text-solaris-gold border-solaris-gold/30 bg-solaris-gold/5' },
+            { label: 'KYC Verified',        color: 'text-emerald-400 border-emerald-400/30 bg-emerald-400/5' },
+            { label: 'Freshcoins Listed',   color: 'text-solaris-cyan border-solaris-cyan/30 bg-solaris-cyan/5' },
+            { label: 'Open Source',         color: 'text-purple-400 border-purple-400/30 bg-purple-400/5' },
+          ].map(({ label, color }) => (
+            <span
+              key={label}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold ${color}`}
+            >
+              <Check className="w-3 h-3" />
+              {label}
+            </span>
+          ))}
+        </div>
+
         {/* Contract address CTA */}
         <div
           ref={ctaRef}
-          className="glass-card p-6 lg:p-8 border border-solaris-gold/20"
+          className="bento-card p-6 lg:p-8 border border-solaris-gold/20"
         >
           <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8">
             {/* Warning label */}

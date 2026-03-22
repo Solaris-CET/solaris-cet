@@ -1,0 +1,249 @@
+import { useRef, useLayoutEffect } from 'react';
+import { gsap } from 'gsap';
+import { Users, Coins, Zap, Clock, Shield, TrendingUp, Globe, ArrowRight } from 'lucide-react';
+import AnimatedCounter from '../components/AnimatedCounter';
+import GlowOrbs from '../components/GlowOrbs';
+
+// ─── Stat data ────────────────────────────────────────────────────────────
+
+const STATS = [
+  {
+    id: 'agents',
+    value: 200_000,
+    label: 'Autonomous AI Agents',
+    sublabel: 'Across 10 enterprise departments · 24/7 · $0 marginal cost',
+    suffix: '',
+    icon: Users,
+    color: 'text-solaris-gold',
+    border: 'border-solaris-gold/20',
+    glow: 'rgba(242,201,76,0.12)',
+    size: 'lg',          // large bento cell
+    accentClass: 'text-gradient-gold',
+    badge: 'LIVE',
+    badgeColor: 'bg-emerald-400/10 text-emerald-400 border-emerald-400/30',
+  },
+  {
+    id: 'supply',
+    value: 9_000,
+    label: 'Fixed Total Supply',
+    sublabel: 'Forever. No minting. No inflation. Each CET = 0.011% of all value.',
+    suffix: ' CET',
+    icon: Coins,
+    color: 'text-solaris-cyan',
+    border: 'border-solaris-cyan/20',
+    glow: 'rgba(46,231,255,0.10)',
+    size: 'sm',
+    accentClass: 'text-gradient-cyan',
+    badge: 'SCARCE',
+    badgeColor: 'bg-solaris-cyan/10 text-solaris-cyan border-solaris-cyan/30',
+  },
+  {
+    id: 'tps',
+    value: 100_000,
+    label: 'Max TPS on TON',
+    sublabel: '100× faster than Ethereum · 2s finality',
+    suffix: '',
+    icon: Zap,
+    color: 'text-purple-400',
+    border: 'border-purple-400/20',
+    glow: 'rgba(139,92,246,0.10)',
+    size: 'sm',
+    accentClass: 'text-gradient-aurora',
+    badge: 'FASTEST',
+    badgeColor: 'bg-purple-400/10 text-purple-400 border-purple-400/30',
+  },
+  {
+    id: 'years',
+    value: 90,
+    label: 'Year Mining Horizon',
+    sublabel: 'Decaying reward curve · Bitcoin-style emission',
+    suffix: '',
+    icon: Clock,
+    color: 'text-emerald-400',
+    border: 'border-emerald-400/20',
+    glow: 'rgba(16,185,129,0.10)',
+    size: 'sm',
+    accentClass: '',
+    badge: 'LONG TERM',
+    badgeColor: 'bg-emerald-400/10 text-emerald-400 border-emerald-400/30',
+  },
+] as const;
+
+const TRUST_BADGES = [
+  { icon: Shield,    label: 'Cyberscope Audited',  color: 'text-solaris-gold' },
+  { icon: TrendingUp, label: 'KYC Verified',       color: 'text-emerald-400'  },
+  { icon: Globe,     label: 'Open Source',          color: 'text-solaris-cyan' },
+];
+
+// ─── Component ────────────────────────────────────────────────────────────
+
+/**
+ * StatsBento — a bento-grid layout displaying the 4 core Solaris CET numbers
+ * with animated counters, badge labels, and a trust bar.
+ * Placed between HeroSection and HybridEngineSection for immediate impact.
+ */
+const StatsBento = () => {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const bentoRef   = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const ctx = gsap.context(() => {
+      const cards = bentoRef.current?.querySelectorAll('.bento-stat');
+      if (cards) {
+        gsap.fromTo(cards,
+          { y: 48, opacity: 0, scale: 0.95 },
+          {
+            y: 0, opacity: 1, scale: 1,
+            stagger: { each: 0.1, from: 'start' },
+            duration: 0.9,
+            ease: 'expo.out',
+            scrollTrigger: {
+              trigger: bentoRef.current,
+              start: 'top 82%',
+              end: 'top 40%',
+              scrub: false,
+            },
+          }
+        );
+      }
+    }, section);
+    return () => ctx.revert();
+  }, []);
+
+  const [agentStat, ...smallStats] = STATS;
+
+  return (
+    <section
+      id="stats"
+      ref={sectionRef}
+      aria-label="Solaris CET core statistics"
+      className="relative bg-solaris-dark py-20 lg:py-28 overflow-hidden mesh-bg"
+    >
+      {/* Aurora + orbs background */}
+      <div className="absolute inset-0 aurora-bg opacity-60 pointer-events-none" aria-hidden="true" />
+      <GlowOrbs variant="aurora" />
+
+      <div className="relative z-10 px-6 lg:px-12 max-w-7xl mx-auto">
+
+        {/* Section tag */}
+        <div className="flex items-center gap-3 mb-10">
+          <span className="live-dot" />
+          <span className="hud-label text-solaris-gold">NETWORK AT A GLANCE</span>
+        </div>
+
+        {/* Bento grid */}
+        <div ref={bentoRef} className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+          {/* ── Large hero stat — AI Agents ── */}
+          <div className={`bento-stat bento-card lg:col-span-5 p-8 lg:p-10 ${agentStat.border} shadow-depth`}>
+            {/* Ambient glow */}
+            <div
+              className="absolute top-0 right-0 w-64 h-64 rounded-full pointer-events-none"
+              style={{ background: `radial-gradient(circle, ${agentStat.glow} 0%, transparent 70%)`, filter: 'blur(40px)', transform: 'translate(30%, -30%)' }}
+              aria-hidden="true"
+            />
+
+            {/* Badge */}
+            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-semibold mb-6 ${agentStat.badgeColor}`}>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
+              {agentStat.badge}
+            </div>
+
+            {/* Icon */}
+            <div className="w-14 h-14 rounded-2xl bg-solaris-gold/10 border border-solaris-gold/20 flex items-center justify-center mb-6">
+              <agentStat.icon className="w-7 h-7 text-solaris-gold" />
+            </div>
+
+            {/* Number */}
+            <div className="font-display font-black text-[clamp(56px,8vw,96px)] leading-none tracking-tighter mb-2">
+              <AnimatedCounter
+                end={agentStat.value}
+                duration={2.5}
+                className="text-shimmer"
+              />
+            </div>
+
+            {/* Label */}
+            <h3 className="font-display font-bold text-xl text-solaris-text mb-2">{agentStat.label}</h3>
+            <p className="text-solaris-muted text-sm leading-relaxed">{agentStat.sublabel}</p>
+
+            {/* CTA */}
+            <a
+              href="#team"
+              className="mt-6 inline-flex items-center gap-2 text-solaris-gold text-sm font-semibold hover:gap-3 transition-all duration-200"
+            >
+              Meet the agents <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+
+          {/* ── 3 smaller stats stacked right ── */}
+          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-5">
+            {/* Top row: 3 small stats */}
+            <div className="sm:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-5">
+              {smallStats.map(stat => {
+                const Icon = stat.icon;
+                return (
+                  <div
+                    key={stat.id}
+                    className={`bento-stat bento-card p-6 ${stat.border} shadow-depth`}
+                  >
+                    <div
+                      className="absolute top-0 left-0 w-32 h-32 rounded-full pointer-events-none"
+                      style={{ background: `radial-gradient(circle, ${stat.glow} 0%, transparent 70%)`, filter: 'blur(24px)', transform: 'translate(-30%, -30%)' }}
+                      aria-hidden="true"
+                    />
+
+                    {/* Badge */}
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[9px] font-bold mb-4 ${stat.badgeColor}`}>
+                      {stat.badge}
+                    </span>
+
+                    {/* Icon */}
+                    <div className={`w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center mb-3`}>
+                      <Icon className={`w-[18px] h-[18px] ${stat.color}`} />
+                    </div>
+
+                    {/* Number */}
+                    <div className="font-display font-black text-[clamp(28px,4vw,44px)] leading-none tracking-tighter mb-1">
+                      <AnimatedCounter
+                        end={stat.value}
+                        duration={2}
+                        suffix={stat.suffix}
+                        className={stat.accentClass || stat.color}
+                      />
+                    </div>
+
+                    <p className="text-solaris-text text-sm font-semibold mb-1">{stat.label}</p>
+                    <p className="text-solaris-muted text-xs leading-relaxed">{stat.sublabel}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Trust bar */}
+            <div className="sm:col-span-3 bento-card p-5 border border-white/5 shadow-depth flex flex-col sm:flex-row items-center gap-5">
+              <p className="text-solaris-muted text-xs font-mono uppercase tracking-widest shrink-0">Verified by</p>
+              <div className="flex flex-wrap items-center gap-4 flex-1">
+                {TRUST_BADGES.map(({ icon: Icon, label, color }) => (
+                  <span key={label} className={`inline-flex items-center gap-2 text-xs font-semibold ${color}`}>
+                    <Icon className="w-3.5 h-3.5" />
+                    {label}
+                  </span>
+                ))}
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
+                <span className="text-emerald-400 text-xs font-mono font-bold">ALL SYSTEMS LIVE</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default StatsBento;

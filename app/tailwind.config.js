@@ -116,6 +116,7 @@ module.exports = {
         "ticker": "ticker 20s linear infinite",
         "orb-pulse": "orb-pulse 6s ease-in-out infinite",
         "gold-pulse": "gold-pulse 3s ease-in-out infinite",
+        "spin-slow": "spin 8s linear infinite",
       },
     },
   },

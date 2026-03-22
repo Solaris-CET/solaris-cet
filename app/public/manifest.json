@@ -1,0 +1,42 @@
+{
+  "name": "Solaris CET — AI-Native TON Token",
+  "short_name": "Solaris CET",
+  "description": "The world's first AI-native corporate token on TON. 9,000 CET supply. 200,000 autonomous agents. Powered by BRAID Framework and RAV Protocol.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#05060B",
+  "theme_color": "#F2C94C",
+  "orientation": "portrait-primary",
+  "categories": ["finance", "business", "utilities"],
+  "lang": "en",
+  "icons": [
+    {
+      "src": "./hero-coin.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./hero-coin.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Buy CET",
+      "short_name": "Buy",
+      "description": "Trade CET on DeDust DEX",
+      "url": "./#how-to-buy",
+      "icons": [{ "src": "./hero-coin.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "AI Oracle",
+      "short_name": "Oracle",
+      "description": "Ask the Solaris AI Oracle anything",
+      "url": "./#oracle",
+      "icons": [{ "src": "./hero-coin.png", "sizes": "96x96" }]
+    }
+  ]
+}

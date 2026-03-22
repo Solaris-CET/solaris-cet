@@ -126,6 +126,12 @@ const categories: ResourceCategory[] = [
         href: 'https://github.com/dair-ai/Prompt-Engineering-Guide',
         tag: 'github.com/dair-ai',
       },
+      {
+        name: 'Solaris CET on GitHub',
+        description: 'Official open-source repository for the Solaris CET landing page — explore the code, open issues, or contribute to the project.',
+        href: 'https://github.com/Solaris-CET/solaris-cet',
+        tag: 'github.com/Solaris-CET',
+      },
     ],
   },
 ];
@@ -215,7 +221,7 @@ const ResourcesSection = () => {
     <section
       id="resources"
       ref={sectionRef}
-      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden"
+      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden mesh-bg"
     >
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -247,6 +253,26 @@ const ResourcesSection = () => {
           </p>
         </div>
 
+        {/* Quick Links bar */}
+        <div className="bento-card p-4 mb-10 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { label: 'Buy CET', href: 'https://dedust.io/swap/TON/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB', color: 'text-solaris-gold' },
+            { label: 'Whitepaper', href: 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a', color: 'text-solaris-cyan' },
+            { label: 'GitHub', href: 'https://github.com/Solaris-CET/solaris-cet', color: 'text-solaris-text' },
+            { label: 'Telegram', href: 'https://t.me/SolarisCET', color: 'text-[#2AABEE]' },
+          ].map(({ label, href, color }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center justify-center gap-2 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-sm font-semibold ${color}`}
+            >
+              {label} ↗
+            </a>
+          ))}
+        </div>
+
         {/* Resource columns */}
         <div
           ref={gridRef}
@@ -258,7 +284,7 @@ const ResourcesSection = () => {
             return (
               <div key={cat.id} className={`resource-column flex flex-col gap-4`}>
                 {/* Category header */}
-                <div className={`glass-card p-5 border ${c.border}`}>
+                <div className={`bento-card p-5 border ${c.border}`}>
                   <div className="flex items-center gap-3 mb-2">
                     <div className={`w-9 h-9 rounded-lg ${c.bg} flex items-center justify-center`}>
                       <Icon className={`w-5 h-5 ${c.text}`} />
@@ -277,7 +303,7 @@ const ResourcesSection = () => {
                     href={res.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`resource-card glass-card p-5 border border-white/5 ${c.hoverBorder} flex flex-col gap-2 group transition-all duration-300`}
+                    className={`resource-card bento-card p-5 border border-white/5 ${c.hoverBorder} flex flex-col gap-2 group transition-all duration-300`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <span className="font-display font-semibold text-solaris-text group-hover:text-solaris-gold transition-colors">

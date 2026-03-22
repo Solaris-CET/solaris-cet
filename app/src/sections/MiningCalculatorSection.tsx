@@ -20,6 +20,9 @@ const devices: Record<DeviceType, DeviceConfig> = {
   node: { icon: Server, label: 'Dedicated Node', baseHashrate: 50.0, efficiency: 1.2 },
 };
 
+const HIGH_EFFICIENCY_THRESHOLD = 0.01;
+const STANDARD_EFFICIENCY_THRESHOLD = 0.001;
+
 // Static data defined outside component to avoid re-creation on every render
 const liveStats = [
   { label: 'Network Hashrate', value: '2.4 EH/s', change: '+12%' },
@@ -178,7 +181,7 @@ const MiningCalculatorSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative bg-solaris-dark py-24 lg:py-32"
+      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden mesh-bg"
     >
       {/* Background grid */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -205,7 +208,7 @@ const MiningCalculatorSection = () => {
         {/* Calculator Grid */}
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 mb-12">
           {/* Input Card */}
-          <div ref={calculatorRef} className="glass-card p-6 lg:p-8">
+          <div ref={calculatorRef} className="bento-card p-6 lg:p-8">
             <h3 className="font-display font-semibold text-lg text-solaris-text mb-6">
               Configure Your Setup
             </h3>
@@ -318,6 +321,23 @@ const MiningCalculatorSection = () => {
                   <TrendingUp className="w-5 h-5 text-emerald-400" />
                 </div>
               </div>
+
+              {/* Mining Efficiency Tier */}
+              <div className="flex justify-center pt-1">
+                {results.daily >= HIGH_EFFICIENCY_THRESHOLD ? (
+                  <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-solaris-gold/10 border border-solaris-gold/30 text-solaris-gold text-xs font-semibold tracking-wide">
+                    ⚡ High Efficiency
+                  </span>
+                ) : results.daily >= STANDARD_EFFICIENCY_THRESHOLD ? (
+                  <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-solaris-cyan/10 border border-solaris-cyan/30 text-solaris-cyan text-xs font-semibold tracking-wide">
+                    ✓ Standard
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-solaris-muted text-xs font-semibold tracking-wide">
+                    ○ Conservative
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -325,7 +345,7 @@ const MiningCalculatorSection = () => {
         {/* Live Stats Row */}
         <div
           ref={statsRef}
-          className="glass-card p-5 lg:p-6"
+          className="bento-card p-5 lg:p-6"
         >
           <div className="hud-label mb-4">Live Network Stats</div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -350,6 +370,10 @@ const MiningCalculatorSection = () => {
             ))}
           </div>
         </div>
+
+        <p className="text-solaris-muted text-[11px] leading-relaxed mt-4 text-center opacity-60">
+          * Estimates are indicative only. Actual earnings depend on network hashrate, difficulty adjustment, and mining period. Not financial advice.
+        </p>
       </div>
     </section>
   );

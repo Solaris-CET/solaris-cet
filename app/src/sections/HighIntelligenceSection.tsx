@@ -143,7 +143,7 @@ const NeuralReasoningEngine = () => {
   };
 
   return (
-    <div className="glass-card p-6 h-full flex flex-col gap-4">
+    <div className="bento-card p-6 h-full flex flex-col gap-4">
       <div className="flex items-center gap-3 mb-1">
         <div className="w-10 h-10 rounded-xl bg-solaris-gold/10 flex items-center justify-center">
           <Brain className="w-5 h-5 text-solaris-gold" />
@@ -356,7 +356,7 @@ const QuantumEntropyOracle = () => {
   const colorsCollapsed = ['#34D399', '#F2C94C'];
 
   return (
-    <div className="glass-card p-6 h-full flex flex-col gap-4">
+    <div className="bento-card p-6 h-full flex flex-col gap-4">
       <div className="flex items-center gap-3 mb-1">
         <div className="w-10 h-10 rounded-xl bg-solaris-cyan/10 flex items-center justify-center">
           <Atom className="w-5 h-5 text-solaris-cyan" />
@@ -543,7 +543,7 @@ const HighIntelligenceSection = () => {
     <section
       ref={sectionRef}
       id="high-intelligence"
-      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden"
+      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden mesh-bg"
     >
       {/* Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -564,7 +564,7 @@ const HighIntelligenceSection = () => {
 
           <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text mb-4">
             Experience{' '}
-            <span className="text-gradient-animated">High Intelligence</span>
+            <span className="text-gradient-aurora">High Intelligence</span>
             {' '}&amp; Quantum OS
           </h2>
 
@@ -586,7 +586,7 @@ const HighIntelligenceSection = () => {
         </div>
 
         {/* Bottom explainer */}
-        <div className="mt-12 glass-card p-6 lg:p-8 border border-solaris-gold/20">
+        <div className="mt-12 bento-card p-6 lg:p-8 border border-solaris-gold/20">
           <div className="grid sm:grid-cols-3 gap-6 text-center">
             {[
               {

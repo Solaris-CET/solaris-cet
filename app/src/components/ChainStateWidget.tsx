@@ -55,7 +55,7 @@ function ChainStateContent() {
   ];
 
   return (
-    <div className="glass-card p-5 lg:p-6">
+    <div className="bento-card p-5 lg:p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -103,7 +103,7 @@ function ChainStateContent() {
 
 function ChainStateSkeleton() {
   return (
-    <div className="glass-card p-5 lg:p-6">
+    <div className="bento-card p-5 lg:p-6">
       <div className="flex items-center gap-2 mb-4">
         <div className="w-8 h-8 rounded-lg bg-solaris-gold/10 flex items-center justify-center">
           <Database className="w-4 h-4 text-solaris-gold opacity-50" />

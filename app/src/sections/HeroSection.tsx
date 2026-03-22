@@ -26,13 +26,29 @@ const APP_CONFIG = {
   }
 } as const;
 
+// Wave visualizer heights — 20 bars with a natural-looking rhythm pattern
+const WAVE_BAR_HEIGHTS = [
+  0.4, 0.7, 0.5, 0.9, 0.6,
+  1.0, 0.8, 0.7, 0.5, 0.9,
+  0.6, 1.0, 0.8, 0.4, 0.7,
+  0.5, 0.9, 0.6, 1.0, 0.8,
+] as const;
+
 const TICKER_DATA = [
-  { label: 'SUPPLY', value: '9,000 CET' },
-  { label: 'NETWORK', value: 'TON' },
-  { label: 'MAX TPS', value: '100,000' },
-  { label: 'FINALITY', value: '2.0s' },
-  { label: 'POOL', value: 'DeDust' },
-  { label: 'MINING', value: '90 YEARS' }
+  { label: 'AI AGENTS',    value: '200,000+'    },
+  { label: 'SUPPLY',       value: '9,000 CET'   },
+  { label: 'NETWORK',      value: 'TON'          },
+  { label: 'MAX TPS',      value: '100,000'      },
+  { label: 'FINALITY',     value: '2.0s'         },
+  { label: 'POOL',         value: 'DeDust'       },
+  { label: 'MINING',       value: '90 YEARS'     },
+  { label: 'DEPARTMENTS',  value: '10'           },
+  { label: 'UPTIME',       value: '24/7'         },
+  { label: 'AUDIT',        value: 'CYBERSCOPE'   },
+  { label: 'CHAIN',        value: 'MAINNET'      },
+  { label: 'PROTOCOL',     value: 'RAV v3.0'     },
+  { label: 'DUAL-AI',      value: 'GROK × GEMINI'},
+  { label: 'RWA BACKING',  value: 'CETĂȚUIA, RO' },
 ];
 
 // --- SUB-COMPONENTS (Optimized via Memoization) ---
@@ -199,12 +215,14 @@ const HeroSection: React.FC = () => {
 
           {/* RIGHT COLUMN: TELEMETRY HUD */}
           <div ref={hudWrapperRef} className="lg:col-span-5 flex flex-col justify-center">
-            <div className="glass-card p-5 md:p-8 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md">
+            <div className="bento-card p-5 md:p-8 rounded-3xl border border-white/10">
               <div className="flex items-center gap-2 mb-5 md:mb-8 text-yellow-500 font-mono text-xs md:text-sm tracking-widest">
                 <Activity size={14} /> NETWORK TELEMETRY
               </div>
               
               <div className="space-y-4 md:space-y-6">
+                <StatRow label="AI AGENTS DEPLOYED" value="200,000+" colorClass="text-yellow-500" />
+                <div className="h-px bg-white/5 w-full" />
                 <StatRow label="THROUGHPUT" value="~100,000 TPS" />
                 <div className="h-px bg-white/5 w-full" />
                 <StatRow label="LATENCY" value="2.0s" colorClass="text-cyan-400" />
@@ -212,11 +230,21 @@ const HeroSection: React.FC = () => {
                 <StatRow label="NODES" value="ACTIVE [300+]" colorClass="text-white" />
               </div>
 
-              <div className="mt-6 md:mt-12 h-16 md:h-24 w-full bg-black/40 rounded-2xl border border-white/5 relative overflow-hidden">
-                <div className="absolute inset-0 flex items-end">
-                   {/* Simplified Dynamic Wave Visualizer */}
-                   <div className="w-full h-full bg-gradient-to-t from-yellow-500/10 to-transparent" />
-                </div>
+              <div className="mt-5 md:mt-10 flex items-center justify-between text-[10px] font-mono text-solaris-muted">
+                <span>HASHRATE MONITOR</span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
+                  LIVE
+                </span>
+              </div>
+              <div className="mt-2 h-14 md:h-20 w-full bg-black/40 rounded-2xl border border-white/5 overflow-hidden flex items-end gap-px px-2 pb-1.5">
+                {WAVE_BAR_HEIGHTS.map((h, i) => (
+                  <div
+                    key={i}
+                    className="wave-bar flex-1 text-solaris-gold"
+                    style={{ height: `${h * 100}%`, animationDelay: `${i * 0.08}s` }}
+                  />
+                ))}
               </div>
             </div>
           </div>

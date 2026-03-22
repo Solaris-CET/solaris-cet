@@ -1,10 +1,10 @@
 import { useRef, useLayoutEffect, useState } from 'react';
 import { gsap } from 'gsap';
-import { Download, FileText, Mail, ArrowRight, Sun, Github, Twitter, MessageCircle, Send, Globe, Copy, CheckCircle } from 'lucide-react';
+import { Download, FileText, ArrowRight, Sun, Github, Twitter, Send, Globe, Copy, CheckCircle, Zap } from 'lucide-react';
 import SocialShare from '../components/SocialShare';
 
 // Constants defined once to avoid duplication and maintain a single source of truth
-const GITHUB_URL = 'https://github.com/aamclaudiu-hash/solaris-cet';
+const GITHUB_URL = 'https://github.com/Solaris-CET/solaris-cet';
 const DEDUST_POOL_ADDRESS = 'EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
 const DEDUST_POOL_DEPOSIT_URL = `https://dedust.io/pools/${DEDUST_POOL_ADDRESS}/deposit`;
 const CET_CONTRACT_ADDRESS = 'EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX';
@@ -13,15 +13,14 @@ const WHITEPAPER_URL = 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkr
 
 // Static data defined outside component to avoid re-creation on every render
 const footerLinks = [
-  { label: 'Privacy', href: '#' },
-  { label: 'Terms', href: '#' },
-  { label: 'Contact', href: '#' },
+  { label: 'Privacy', href: WHITEPAPER_URL, icon: undefined },
+  { label: 'Terms', href: WHITEPAPER_URL, icon: undefined },
+  { label: 'Contact', href: 'https://t.me/SolarisCET', icon: undefined },
   { label: 'GitHub', href: GITHUB_URL, icon: Github },
 ];
 
 const socialLinks = [
-  { icon: Twitter, href: 'https://twitter.com', label: 'Twitter', color: 'hover:text-[#1DA1F2] hover:bg-[#1DA1F2]/10' },
-  { icon: MessageCircle, href: 'https://discord.gg', label: 'Discord', color: 'hover:text-[#5865F2] hover:bg-[#5865F2]/10' },
+  { icon: Twitter, href: 'https://twitter.com/SolarisCET', label: 'Twitter', color: 'hover:text-[#1DA1F2] hover:bg-[#1DA1F2]/10' },
   { icon: Send, href: 'https://t.me/SolarisCET', label: 'Telegram', color: 'hover:text-[#2AABEE] hover:bg-[#2AABEE]/10' },
   { icon: Github, href: GITHUB_URL, label: 'GitHub', color: 'hover:text-solaris-text hover:bg-white/10' },
   { icon: Globe, href: DEDUST_SWAP_URL, label: 'DeDust', color: 'hover:text-solaris-gold hover:bg-solaris-gold/10' },
@@ -33,21 +32,8 @@ const FooterSection = () => {
   const newsletterRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
 
-  const [email, setEmail] = useState('');
-  const [isSubscribed, setIsSubscribed] = useState(false);
   const [copiedPool, setCopiedPool] = useState(false);
   const [copiedContract, setCopiedContract] = useState(false);
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      setIsSubscribed(true);
-      setTimeout(() => {
-        setIsSubscribed(false);
-        setEmail('');
-      }, 3000);
-    }
-  };
 
   const handleCopyPool = () => {
     navigator.clipboard.writeText(DEDUST_POOL_ADDRESS).then(() => {
@@ -106,7 +92,7 @@ const FooterSection = () => {
 
       <div className="relative z-10 px-6 lg:px-12 max-w-6xl mx-auto">
         {/* CTA Card */}
-        <div ref={ctaCardRef} className="glass-card-gold p-8 lg:p-12 mb-12 text-center relative overflow-hidden holo-card">
+        <div ref={ctaCardRef} className="bento-card p-8 lg:p-12 mb-12 text-center relative overflow-hidden holo-card border border-solaris-gold/30 shadow-depth">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(242,201,76,0.06)_0%,_transparent_70%)] pointer-events-none" />
           <div className="relative z-10">
             <div className="hud-label text-solaris-gold mb-4 flex items-center justify-center gap-2">
@@ -114,17 +100,22 @@ const FooterSection = () => {
               AI BRIDGE TO HIGH INTELLIGENCE
             </div>
             <h2 className="font-display font-bold text-[clamp(28px,3.5vw,44px)] text-solaris-text mb-4">
-              Start mining in <span className="text-gradient-animated">minutes</span>.
+              Start mining in <span className="text-gradient-gold">minutes</span>.
             </h2>
             <p className="text-solaris-muted text-base lg:text-lg mb-8 max-w-lg mx-auto">
               Download the Solaris CET App. Connect a wallet. Begin earning on the bridge between current AI and High Intelligence.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <button className="btn-filled-gold flex items-center gap-2 group">
+              <a
+                href="https://t.me/+tKlfzx7IWopmNWQ0"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-filled-gold flex items-center gap-2 group"
+              >
                 <Download className="w-4 h-4" />
-                Download Solaris CET App
+                Start Mining on Telegram
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </button>
+              </a>
               <a
                 href={WHITEPAPER_URL}
                 target="_blank"
@@ -139,7 +130,7 @@ const FooterSection = () => {
         </div>
 
         {/* Founder Card */}
-        <div className="glass-card p-6 mb-6 flex flex-col sm:flex-row items-center gap-5">
+        <div className="bento-card p-6 mb-6 flex flex-col sm:flex-row items-center gap-5">
           <div className="shrink-0 w-16 h-16 rounded-2xl overflow-hidden border-2 border-solaris-gold/30 bg-solaris-gold/10 flex items-center justify-center">
             {/* Founder avatar — LinkedIn profile */}
             <span className="font-display font-bold text-2xl text-solaris-gold">CB</span>
@@ -167,7 +158,7 @@ const FooterSection = () => {
         </div>
 
         {/* Contract address */}
-        <div className="glass-card p-4 mb-3 flex items-center justify-between gap-4">
+        <div className="bento-card p-4 mb-3 flex items-center justify-between gap-4">
           <div className="min-w-0">
             <div className="hud-label text-[10px] mb-1">CET Contract Address (TON)</div>
             <div className="font-mono text-xs text-solaris-muted truncate">{CET_CONTRACT_ADDRESS}</div>
@@ -185,7 +176,7 @@ const FooterSection = () => {
         </div>
 
         {/* DeDust Pool address */}
-        <div className="glass-card p-4 mb-6 flex items-center justify-between gap-4">
+        <div className="bento-card p-4 mb-6 flex items-center justify-between gap-4">
           <div className="min-w-0">
             <div className="hud-label text-[10px] mb-1">
               <a
@@ -212,30 +203,36 @@ const FooterSection = () => {
         </div>
 
         {/* Newsletter */}
-        <div ref={newsletterRef} className="glass-card p-6 lg:p-8 mb-12">
+        <div ref={newsletterRef} className="bento-card p-6 lg:p-8 mb-12">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Mail className="w-4 h-4 text-solaris-gold" />
-                <span className="hud-label text-solaris-gold">Stay Updated</span>
+                <Send className="w-4 h-4 text-[#2AABEE]" />
+                <span className="hud-label text-[#2AABEE]">Join the Community</span>
               </div>
-              <p className="text-solaris-text">Get network updates (no spam).</p>
+              <p className="text-solaris-text">Get live updates, talk to the team, and follow the 200,000-agent build in real time.</p>
+              <p className="text-solaris-muted text-xs mt-1">Telegram · Free · No spam · Instant access</p>
             </div>
-            <form onSubmit={handleSubscribe} className="flex gap-3 w-full lg:w-auto">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email address"
-                className="flex-1 lg:w-64 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-solaris-text placeholder:text-solaris-muted/50 focus:outline-none focus:border-solaris-gold/50 transition-colors"
-              />
-              <button
-                type="submit"
-                className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${isSubscribed ? 'bg-emerald-400 text-solaris-dark' : 'btn-gold'}`}
+            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+              <a
+                href="https://t.me/SolarisCET"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#2AABEE]/10 border border-[#2AABEE]/30 text-[#2AABEE] font-semibold text-sm hover:bg-[#2AABEE]/20 transition-all duration-200 active:scale-95"
               >
-                {isSubscribed ? 'Subscribed!' : 'Subscribe'}
-              </button>
-            </form>
+                <Send className="w-4 h-4" />
+                Join Telegram Channel
+              </a>
+              <a
+                href="https://t.me/+tKlfzx7IWopmNWQ0"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-solaris-gold/10 border border-solaris-gold/30 text-solaris-gold font-semibold text-sm hover:bg-solaris-gold/20 transition-all duration-200 active:scale-95"
+              >
+                <Zap className="w-4 h-4" />
+                Start Mining Bot
+              </a>
+            </div>
           </div>
         </div>
 

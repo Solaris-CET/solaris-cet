@@ -6,7 +6,7 @@ interface CryptoProject {
   name: string;
   symbol: string;
   href: string;
-  category: 'l1' | 'stablecoin' | 'defi' | 'meme' | 'other';
+  category: 'l1' | 'stablecoin' | 'defi' | 'ai' | 'meme' | 'other';
 }
 
 const projects: CryptoProject[] = [
@@ -39,6 +39,15 @@ const projects: CryptoProject[] = [
   { name: 'Aave', symbol: 'AAVE', href: 'https://aave.com/', category: 'defi' },
   { name: 'Hyperliquid', symbol: 'HYPE', href: 'https://hyperliquid.xyz/', category: 'defi' },
   { name: 'Mantle', symbol: 'MNT', href: 'https://group.mantle.xyz/', category: 'defi' },
+  // AI Tokens — Solaris CET's direct competitive space
+  { name: 'Solaris CET', symbol: 'CET',   href: 'https://solaris-cet.vercel.app/',       category: 'ai' },
+  { name: 'Fetch.ai',    symbol: 'FET',   href: 'https://fetch.ai/',                      category: 'ai' },
+  { name: 'Bittensor',   symbol: 'TAO',   href: 'https://bittensor.com',                  category: 'ai' },
+  { name: 'SingularityNET', symbol: 'AGIX', href: 'https://singularitynet.io/',           category: 'ai' },
+  { name: 'Ocean Protocol', symbol: 'OCEAN', href: 'https://oceanprotocol.com/',          category: 'ai' },
+  { name: 'ASI Alliance', symbol: 'ASI',  href: 'https://superintelligence.io/',          category: 'ai' },
+  { name: 'Render',      symbol: 'RNDR',  href: 'https://rendernetwork.com/',             category: 'ai' },
+  { name: 'Akash',       symbol: 'AKT',   href: 'https://akash.network/',                 category: 'ai' },
   { name: 'Bittensor', symbol: 'TAO', href: 'https://bittensor.com', category: 'defi' },
   { name: 'Sky', symbol: 'SKY', href: 'https://sky.money/', category: 'defi' },
   { name: 'Aster', symbol: 'ATR', href: 'https://www.asterdex.com/', category: 'defi' },
@@ -80,6 +89,13 @@ const categoryConfig: CategoryConfig[] = [
     color: 'text-solaris-gold',
     badgeBg: 'bg-solaris-gold/15',
     badgeText: 'text-solaris-gold',
+  },
+  {
+    id: 'ai',
+    label: 'AI & Agent Tokens',
+    color: 'text-purple-400',
+    badgeBg: 'bg-purple-400/15',
+    badgeText: 'text-purple-400',
   },
   {
     id: 'defi',
@@ -175,7 +191,8 @@ const EcosystemIndexSection = () => {
     <section
       id="ecosystem-index"
       ref={sectionRef}
-      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden"
+      aria-label="Ecosystem Index"
+      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden mesh-bg"
     >
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -196,7 +213,7 @@ const EcosystemIndexSection = () => {
 
           <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text mb-4">
             The{' '}
-            <span className="text-solaris-gold">Crypto Landscape</span>{' '}
+            <span className="text-gradient-gold">Crypto Landscape</span>{' '}
             CET Operates In
           </h2>
 
@@ -207,13 +224,28 @@ const EcosystemIndexSection = () => {
           </p>
         </div>
 
+        {/* CET unique value callout */}
+        <div className="glass-card-gold p-5 mb-8 flex items-start gap-4">
+          <div className="shrink-0 w-10 h-10 rounded-xl bg-solaris-gold/10 flex items-center justify-center">
+            <TrendingUp className="w-5 h-5 text-solaris-gold" />
+          </div>
+          <div>
+            <div className="hud-label text-solaris-gold mb-1">UNIQUE POSITION</div>
+            <p className="text-solaris-muted text-sm leading-relaxed">
+              Unlike any other token in this index, <span className="text-solaris-text font-semibold">Solaris CET</span> combines
+              a fixed supply of 9,000 tokens, Real-World Asset backing, and a fully AI-native corporate structure —
+              making it the only token in the ecosystem that operates an autonomous workforce of 200,000 agents.
+            </p>
+          </div>
+        </div>
+
         {/* CMC20 Index featured card */}
         <div ref={featuredRef} className="mb-14">
           <a
             href="https://app.reserve.org/bsc/index-dtf/0x2f8a339b5889ffac4c5a956787cda593b3c36867/overview"
             target="_blank"
             rel="noopener noreferrer"
-            className="group glass-card p-6 lg:p-8 border border-solaris-gold/30 hover:border-solaris-gold/60 flex flex-col md:flex-row md:items-center gap-6 transition-all duration-300"
+            className="group bento-card p-6 lg:p-8 border border-solaris-gold/30 hover:border-solaris-gold/60 flex flex-col md:flex-row md:items-center gap-6 transition-all duration-300"
           >
             <div className="flex items-center gap-4 shrink-0">
               <div className="w-14 h-14 rounded-2xl bg-solaris-gold/10 border border-solaris-gold/20 flex items-center justify-center">

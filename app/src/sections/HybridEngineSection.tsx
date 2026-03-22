@@ -126,7 +126,7 @@ const HybridEngineSection = () => {
       <img
         ref={coinRef}
         src={`${import.meta.env.BASE_URL}hero-coin.png`}
-        alt=""
+        alt="Solaris CET token coin"
         width="400"
         height="400"
         className="absolute left-[60%] top-[45%] -translate-x-1/2 -translate-y-1/2 w-[min(35vw,400px)] opacity-0 pointer-events-none"
@@ -138,7 +138,7 @@ const HybridEngineSection = () => {
         className="relative z-10 w-[min(72vw,980px)]"
         style={{ perspective: '1200px' }}
       >
-        <div className="glass-card p-8 lg:p-12 shimmer-border relative holo-card">
+        <div className="bento-card p-8 lg:p-12 shimmer-border relative holo-card border border-solaris-gold/20 shadow-depth">
           {/* Circuit decoration top right */}
           <div className="absolute top-0 right-0 w-32 h-32 opacity-15 pointer-events-none overflow-hidden rounded-[18px]">
             <svg viewBox="0 0 128 128" className="w-full h-full">
@@ -159,7 +159,7 @@ const HybridEngineSection = () => {
               className="font-display font-bold text-[clamp(24px,3vw,40px)] text-solaris-text"
             >
               <span className="word inline-block">The</span>{' '}
-              <span className="word inline-block text-gradient-animated">Hybrid</span>{' '}
+              <span className="word inline-block text-gradient-gold">Hybrid</span>{' '}
               <span className="word inline-block">Engine</span>
             </h2>
           </div>

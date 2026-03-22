@@ -10,6 +10,8 @@
     --popover: 222 25% 6%;
     --popover-foreground: 230 60% 98%;
     --primary: 45 87% 62%;
+    /* Solaris CET bento-card background — deep space blue at 85% opacity */
+    --bento-bg: rgba(11, 14, 22, 0.85);
     --primary-foreground: 225 33% 3%;
     --secondary: 222 20% 10%;
     --secondary-foreground: 230 60% 98%;
@@ -920,4 +922,254 @@
 .oracle-rta-btn:hover {
   background: rgba(242, 201, 76, 0.16);
   border-color: rgba(242, 201, 76, 0.48);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SOLARIS CET — 2026 DESIGN SYSTEM UPGRADE
+   High-intelligence visual language: aurora, bento, 3D, neon, mesh
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Aurora gradient animation ─────────────────────────────────────────── */
+@keyframes aurora-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.aurora-bg {
+  background: linear-gradient(
+    -45deg,
+    rgba(242,201,76,0.12),
+    rgba(46,231,255,0.08),
+    rgba(139,92,246,0.10),
+    rgba(16,185,129,0.07),
+    rgba(242,201,76,0.10)
+  );
+  background-size: 400% 400%;
+  animation: aurora-shift 12s ease infinite;
+}
+
+/* ── Text shimmer effect ─────────────────────────────────────────────────── */
+@keyframes text-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    #F2C94C 0%,
+    #fff6cc 40%,
+    #F2C94C 60%,
+    #d4a017 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: text-shimmer 4s linear infinite;
+}
+
+/* ── Neon border glow ────────────────────────────────────────────────────── */
+@keyframes neon-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(242,201,76,0.3), inset 0 0 8px rgba(242,201,76,0.05); }
+  50%       { box-shadow: 0 0 24px rgba(242,201,76,0.6), 0 0 48px rgba(242,201,76,0.2), inset 0 0 16px rgba(242,201,76,0.08); }
+}
+
+.neon-gold {
+  animation: neon-pulse 3s ease-in-out infinite;
+}
+
+@keyframes neon-cyan {
+  0%, 100% { box-shadow: 0 0 8px rgba(46,231,255,0.3), inset 0 0 8px rgba(46,231,255,0.05); }
+  50%       { box-shadow: 0 0 24px rgba(46,231,255,0.5), 0 0 48px rgba(46,231,255,0.15), inset 0 0 16px rgba(46,231,255,0.08); }
+}
+
+.neon-cyan {
+  animation: neon-cyan 4s ease-in-out infinite;
+}
+
+/* ── Bento card base ─────────────────────────────────────────────────────── */
+.bento-card {
+  position: relative;
+  background: var(--bento-bg);
+  border: 1px solid rgba(244, 246, 255, 0.08);
+  border-radius: 24px;
+  backdrop-filter: blur(24px) saturate(180%);
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1),
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+.bento-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at top left,
+    rgba(242,201,76,0.06) 0%,
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.bento-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  border-color: rgba(242,201,76,0.25);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(242,201,76,0.08);
+}
+
+.bento-card:hover::before {
+  opacity: 1;
+}
+
+/* ── Mesh grid background ────────────────────────────────────────────────── */
+.mesh-bg {
+  background-image:
+    radial-gradient(circle at 25% 25%, rgba(242,201,76,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(46,231,255,0.04) 0%, transparent 50%),
+    linear-gradient(rgba(244,246,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(244,246,255,0.018) 1px, transparent 1px);
+  background-size: auto, auto, 48px 48px, 48px 48px;
+}
+
+/* ── Gradient border (no pseudo-element trick) ───────────────────────────── */
+.gradient-border {
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  position: relative;
+}
+
+.gradient-border::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(242,201,76,0.4) 0%,
+    rgba(46,231,255,0.2) 50%,
+    rgba(242,201,76,0.1) 100%
+  );
+  z-index: -1;
+}
+
+/* ── Float animation ─────────────────────────────────────────────────────── */
+@keyframes float-subtle {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33%       { transform: translateY(-8px) rotate(0.5deg); }
+  66%       { transform: translateY(-4px) rotate(-0.5deg); }
+}
+
+.animate-float-subtle {
+  animation: float-subtle 6s ease-in-out infinite;
+}
+
+/* ── Scan line overlay (HUD aesthetic) ──────────────────────────────────── */
+@keyframes scan {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+.scan-overlay::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(46,231,255,0.3),
+    transparent
+  );
+  animation: scan 8s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Number reveal animation ─────────────────────────────────────────────── */
+@keyframes number-reveal {
+  from { opacity: 0; transform: translateY(20px) scale(0.9); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+.number-reveal {
+  animation: number-reveal 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+
+/* ── Gradient text utilities ─────────────────────────────────────────────── */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #F2C94C 0%, #FFD700 50%, #F2C94C 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-cyan {
+  background: linear-gradient(135deg, #2EE7FF 0%, #87F0FF 50%, #2EE7FF 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-aurora {
+  background: linear-gradient(135deg, #F2C94C 0%, #2EE7FF 50%, #a78bfa 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Card depth shadow ───────────────────────────────────────────────────── */
+.shadow-depth {
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.3),
+    0 4px 8px rgba(0,0,0,0.3),
+    0 16px 32px rgba(0,0,0,0.3),
+    0 32px 64px rgba(0,0,0,0.2),
+    0 0 0 1px rgba(244,246,255,0.06);
+}
+
+/* ── Live indicator dot ──────────────────────────────────────────────────── */
+@keyframes live-ping {
+  0%   { transform: scale(1); opacity: 1; }
+  75%, 100% { transform: scale(2.5); opacity: 0; }
+}
+
+.live-dot {
+  position: relative;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.live-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #10b981;
+  animation: live-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* ── Horizontal scroll fade ─────────────────────────────────────────────── */
+.scroll-fade-x {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
 }

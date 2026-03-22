@@ -24,8 +24,12 @@ const WalletConnect = () => {
           amount: "10000000"
         }]
       });
-    } catch (e) {
-      console.error(e);
+    } catch (err) {
+      // Transaction cancelled or rejected by user — no user-facing action needed.
+      // Log only in development to aid debugging without polluting production logs.
+      if (import.meta.env.DEV) {
+        console.warn('[WalletConnect] sendTransaction:', err);
+      }
     }
   };
 

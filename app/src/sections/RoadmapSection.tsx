@@ -70,24 +70,36 @@ const phases: Phase[] = [
     id: 'q1-2026',
     quarter: 'Q1 2026',
     title: 'Expand',
-    status: 'active',
+    status: 'done',
     milestones: [
-      { text: 'Multi-chain liquidity integration' },
-      { text: 'Community governance portal launch' },
-      { text: 'AI oracle public API v1 release' },
-      { text: 'Mobile wallet deep-link support' },
+      { text: 'Multi-chain liquidity integration completed' },
+      { text: 'Community governance portal launched' },
+      { text: 'AI oracle public API v1 released' },
+      { text: 'Mobile wallet deep-link support deployed' },
     ],
   },
   {
     id: 'q2-2026',
     quarter: 'Q2 2026+',
     title: 'Evolve',
-    status: 'upcoming',
+    status: 'active',
     milestones: [
       { text: 'Decentralized autonomous organization (DAO)' },
       { text: 'Cross-chain bridge mainnet launch' },
       { text: 'Ecosystem grants program expansion' },
       { text: 'Real-world asset (RWA) tokenisation pilot' },
+    ],
+  },
+  {
+    id: 'q3-2026',
+    quarter: 'Q3 2026+',
+    title: 'Transcend',
+    status: 'upcoming',
+    milestones: [
+      { text: 'AI-to-AI autonomous contract execution' },
+      { text: 'Solaris Prime mainnet neural mesh' },
+      { text: 'Zero-knowledge proof layer integration' },
+      { text: 'Global agriculture data oracle network' },
     ],
   },
 ];
@@ -182,7 +194,8 @@ const RoadmapSection = () => {
     <section
       id="roadmap"
       ref={sectionRef}
-      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden"
+      aria-label="Project Roadmap"
+      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden mesh-bg"
     >
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -203,13 +216,39 @@ const RoadmapSection = () => {
 
           <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text mb-4">
             The Path to{' '}
-            <span className="text-solaris-gold">Sustainable Growth</span>
+            <span className="text-gradient-gold">Sustainable Growth</span>
           </h2>
 
           <p className="text-solaris-muted text-base lg:text-lg leading-relaxed">
             From the initial token launch to a full-scale AI-powered agricultural
             ecosystem — every milestone is publicly trackable and immutably recorded.
           </p>
+
+          {/* Overall progress bar: 5 done + 1 active (0.5) of 7 = ~79% */}
+          <div className="mt-6 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-solaris-muted text-[11px] uppercase tracking-wider">Overall Progress</span>
+              <span className="font-mono text-solaris-gold text-xs font-bold">79%</span>
+            </div>
+            <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-solaris-gold to-solaris-cyan"
+                style={{ width: '79%', boxShadow: '0 0 12px rgba(242,201,76,0.4)' }}
+              />
+            </div>
+            <div className="flex items-center justify-between text-[10px] font-mono text-solaris-muted">
+              <span>5 phases complete</span>
+              <span>1 active · 1 upcoming</span>
+            </div>
+          </div>
+
+          {/* Live progress indicator */}
+          <div className="mt-4 inline-flex items-center gap-3 px-4 py-2 rounded-full bg-solaris-gold/10 border border-solaris-gold/30">
+            <span className="w-2 h-2 rounded-full bg-solaris-gold animate-pulse inline-block" />
+            <span className="font-mono text-solaris-gold text-xs font-semibold">
+              NOW: Q2 2026 — DAO &amp; Cross-Chain Bridge in Progress
+            </span>
+          </div>
         </div>
 
         {/* Phase cards */}
@@ -224,7 +263,7 @@ const RoadmapSection = () => {
             return (
               <div
                 key={phase.id}
-                className={`roadmap-card glass-card p-6 border ${cfg.borderClass} flex flex-col gap-4 group hover:border-opacity-60 transition-all duration-300`}
+                className={`roadmap-card bento-card p-6 border ${cfg.borderClass} flex flex-col gap-4 group hover:border-opacity-60 transition-all duration-300`}
               >
                 {/* Quarter + status badge */}
                 <div className="flex items-center justify-between">

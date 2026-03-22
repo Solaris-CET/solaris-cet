@@ -112,6 +112,7 @@ const IntelligenceCoreSection = () => {
     <section
       ref={sectionRef}
       id="intelligence"
+      aria-label="Intelligence Core"
       className="section-pinned bg-solaris-dark flex items-center justify-center"
     >
       {/* Background grid */}
@@ -128,7 +129,7 @@ const IntelligenceCoreSection = () => {
         ref={leftCardRef}
         className="absolute left-[7vw] top-[26vh] w-[min(34vw,480px)] z-10"
       >
-        <div className="glass-card p-6 lg:p-8 holo-card">
+        <div className="bento-card p-6 lg:p-8 holo-card border border-solaris-gold/20">
           <div className="flex items-center gap-3 mb-5">
             <div className="w-10 h-10 rounded-lg bg-solaris-cyan/10 flex items-center justify-center animate-energy-pulse">
               <Brain className="w-5 h-5 text-solaris-cyan" />
@@ -138,7 +139,7 @@ const IntelligenceCoreSection = () => {
 
           <h2 className="font-display font-bold text-[clamp(22px,2.5vw,36px)] text-solaris-text mb-4">
             The Intelligence{' '}
-            <span className="text-gradient-animated">Core</span>
+            <span className="text-gradient-cyan">Core</span>
           </h2>
 
           <div className="space-y-4">
@@ -186,7 +187,7 @@ const IntelligenceCoreSection = () => {
         className="absolute right-[7vw] top-[24vh] w-[min(36vw,520px)] h-[min(50vh,420px)] z-10"
         style={{ perspective: '1000px' }}
       >
-        <div className="glass-card h-full flex flex-col items-center justify-center relative overflow-hidden p-6">
+        <div className="bento-card h-full flex flex-col items-center justify-center relative overflow-hidden p-6">
           {/* Terminal-style ReAct demo */}
           <div className="w-full font-mono text-sm">
             <div className="flex items-center gap-2 mb-4">
@@ -251,19 +252,19 @@ const IntelligenceCoreSection = () => {
 
       {/* HUD Chips */}
       <div ref={chipsRef} className="absolute inset-0 pointer-events-none z-20">
-        <div className="hud-chip absolute right-[12vw] top-[18vh] glass-card px-4 py-2 flex items-center gap-2 animate-float">
+        <div className="hud-chip absolute right-[12vw] top-[18vh] bento-card px-4 py-2 flex items-center gap-2 animate-float shadow-depth">
           <Lightbulb className="w-4 h-4 text-solaris-gold" />
           <span className="font-mono text-sm text-solaris-text">Thought</span>
         </div>
         <div
-          className="hud-chip absolute right-[6vw] top-[44vh] glass-card px-4 py-2 flex items-center gap-2 animate-float"
+          className="hud-chip absolute right-[6vw] top-[44vh] bento-card px-4 py-2 flex items-center gap-2 animate-float shadow-depth"
           style={{ animationDelay: '0.5s' }}
         >
           <Play className="w-4 h-4 text-solaris-cyan" />
           <span className="font-mono text-sm text-solaris-text">Action</span>
         </div>
         <div
-          className="hud-chip absolute right-[14vw] top-[66vh] glass-card px-4 py-2 flex items-center gap-2 animate-float"
+          className="hud-chip absolute right-[14vw] top-[66vh] bento-card px-4 py-2 flex items-center gap-2 animate-float shadow-depth"
           style={{ animationDelay: '1s' }}
         >
           <Eye className="w-4 h-4 text-emerald-400" />

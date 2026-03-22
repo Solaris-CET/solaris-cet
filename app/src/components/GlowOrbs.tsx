@@ -4,11 +4,12 @@
 interface GlowOrbsProps {
   /**
    * Colour palette for the ambient orbs.
-   * - `'gold'`  — two warm-gold orbs
-   * - `'cyan'`  — two cool-cyan orbs
-   * - `'mixed'` — three orbs with both gold and cyan tones (default)
+   * - `'gold'`   — two warm-gold orbs
+   * - `'cyan'`   — two cool-cyan orbs
+   * - `'mixed'`  — three orbs with both gold and cyan tones (default)
+   * - `'aurora'` — five multi-colour orbs: gold, cyan, purple, emerald, pink
    */
-  variant?: 'gold' | 'cyan' | 'mixed';
+  variant?: 'gold' | 'cyan' | 'mixed' | 'aurora';
   /** Additional Tailwind/CSS class names applied to the wrapper. */
   className?: string;
 }
@@ -33,6 +34,14 @@ const GlowOrbs = ({ variant = 'mixed', className = '' }: GlowOrbsProps) => {
       ? [
           { color: 'rgba(46,231,255,0.10)', size: 360, x: '65%', y: '25%', delay: '1s' },
           { color: 'rgba(46,231,255,0.06)', size: 280, x: '15%', y: '65%', delay: '3s' },
+        ]
+      : variant === 'aurora'
+      ? [
+          { color: 'rgba(242,201,76,0.10)', size: 480, x: '10%',  y: '20%', delay: '0s'  },
+          { color: 'rgba(46,231,255,0.08)', size: 380, x: '80%',  y: '15%', delay: '1.5s' },
+          { color: 'rgba(139,92,246,0.09)', size: 340, x: '50%',  y: '60%', delay: '3s'  },
+          { color: 'rgba(16,185,129,0.07)', size: 300, x: '20%',  y: '75%', delay: '4.5s' },
+          { color: 'rgba(236,72,153,0.06)', size: 260, x: '75%',  y: '80%', delay: '2s'  },
         ]
       : [
           { color: 'rgba(242,201,76,0.10)', size: 420, x: '15%', y: '40%', delay: '0s' },

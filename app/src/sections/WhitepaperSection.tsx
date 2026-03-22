@@ -232,7 +232,7 @@ const WPSectionCard = ({ section }: { section: WPSection }) => {
   const c = colorMap[section.color];
 
   return (
-    <div className={`rounded-2xl border ${c.border} bg-white/[0.02] overflow-hidden transition-all duration-300`}>
+    <div id={`wp-card-${section.id}`} className={`rounded-2xl border ${c.border} bg-white/[0.02] overflow-hidden transition-all duration-300`}>
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center gap-4 p-5 text-left hover:bg-white/[0.03] transition-colors"
@@ -369,7 +369,8 @@ const WhitepaperSection = () => {
     <section
       ref={sectionRef}
       id="whitepaper"
-      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden"
+      aria-label="Whitepaper"
+      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden mesh-bg"
     >
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -391,7 +392,7 @@ const WhitepaperSection = () => {
 
           <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text mb-4">
             Solaris CET —{' '}
-            <span className="text-solaris-gold">Technical Overview</span>
+            <span className="text-gradient-gold">Technical Overview</span>
           </h2>
 
           <p className="text-solaris-muted text-base lg:text-lg leading-relaxed mb-4">
@@ -410,6 +411,33 @@ const WhitepaperSection = () => {
           </div>
         </div>
 
+        {/* Table of Contents */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
+          {wpSections.map(section => {
+            const Icon = section.icon;
+            const c = colorMap[section.color];
+            return (
+              <button
+                key={section.id}
+                onClick={() => {
+                  document.getElementById(`wp-card-${section.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }}
+                className={`flex flex-col items-start gap-2 p-3 rounded-xl border ${c.border} bg-white/[0.02] hover:bg-white/[0.05] transition-colors text-left group`}
+              >
+                <div className={`w-8 h-8 rounded-lg ${c.bg} flex items-center justify-center shrink-0`}>
+                  <Icon className={`w-4 h-4 ${c.text}`} />
+                </div>
+                <div>
+                  <div className={`font-mono text-[9px] font-bold ${c.text} opacity-60 mb-0.5`}>{section.number}</div>
+                  <div className="text-solaris-text text-xs font-semibold leading-tight group-hover:text-white transition-colors">
+                    {section.title}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
         {/* Inline whitepaper sections */}
         <div ref={contentRef} className="space-y-3 mb-16">
           {wpSections.map(section => (
@@ -418,7 +446,7 @@ const WhitepaperSection = () => {
         </div>
 
         {/* CTA — IPFS archive */}
-        <div ref={ctaRef} className="glass-card p-6 lg:p-8 border border-solaris-gold/20">
+        <div ref={ctaRef} className="bento-card p-6 lg:p-8 border border-solaris-gold/20">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div>
               <div className="flex items-center gap-2 mb-2">

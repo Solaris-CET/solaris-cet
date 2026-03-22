@@ -17,7 +17,7 @@ const LivePoolStats = () => {
   ];
 
   return (
-    <div className="glass-card p-5 lg:p-6">
+    <div className="bento-card p-5 lg:p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
