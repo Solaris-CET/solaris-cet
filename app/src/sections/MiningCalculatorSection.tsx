@@ -318,6 +318,23 @@ const MiningCalculatorSection = () => {
                   <TrendingUp className="w-5 h-5 text-emerald-400" />
                 </div>
               </div>
+
+              {/* Mining Efficiency Tier */}
+              <div className="flex justify-center pt-1">
+                {results.daily >= 0.01 ? (
+                  <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-solaris-gold/10 border border-solaris-gold/30 text-solaris-gold text-xs font-semibold tracking-wide">
+                    ⚡ High Efficiency
+                  </span>
+                ) : results.daily >= 0.001 ? (
+                  <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-solaris-cyan/10 border border-solaris-cyan/30 text-solaris-cyan text-xs font-semibold tracking-wide">
+                    ✓ Standard
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-solaris-muted text-xs font-semibold tracking-wide">
+                    ○ Conservative
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -350,6 +367,10 @@ const MiningCalculatorSection = () => {
             ))}
           </div>
         </div>
+
+        <p className="text-solaris-muted text-[11px] leading-relaxed mt-4 text-center opacity-60">
+          * Estimates are indicative only. Actual earnings depend on network hashrate, difficulty adjustment, and mining period. Not financial advice.
+        </p>
       </div>
     </section>
   );
