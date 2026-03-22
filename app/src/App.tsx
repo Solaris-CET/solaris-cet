@@ -16,6 +16,7 @@ import TokenomicsSection from './sections/TokenomicsSection';
 import ComplianceSection from './sections/ComplianceSection';
 // Non-pinned sections — lazy-loaded when they approach the viewport
 const RoadmapSection = lazy(() => import('./sections/RoadmapSection'));
+const AITeamSection = lazy(() => import('./sections/AITeamSection'));
 const HowToBuySection = lazy(() => import('./sections/HowToBuySection'));
 const MiningCalculatorSection = lazy(() => import('./sections/MiningCalculatorSection'));
 const SecuritySection = lazy(() => import('./sections/SecuritySection'));
@@ -222,14 +223,21 @@ function AppContent() {
             </LazyLoadWrapper>
           </div>
 
-          {/* Section 8: How to Buy - pin: false */}
+          {/* Section 8: AI Team - pin: false */}
+          <div className="relative z-[75]">
+            <LazyLoadWrapper>
+              <ErrorBoundary><AITeamSection /></ErrorBoundary>
+            </LazyLoadWrapper>
+          </div>
+
+          {/* Section 9: How to Buy - pin: false */}
           <div className="relative z-[80]">
             <LazyLoadWrapper>
               <ErrorBoundary><HowToBuySection /></ErrorBoundary>
             </LazyLoadWrapper>
           </div>
 
-          {/* Section 9: Mining Calculator - pin: false */}
+          {/* Section 10: Mining Calculator - pin: false */}
           <div className="relative z-[90]">
             <LazyLoadWrapper>
               <ErrorBoundary><MiningCalculatorSection /></ErrorBoundary>

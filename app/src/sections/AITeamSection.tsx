@@ -161,7 +161,7 @@ const AITeamSection = () => {
 
           <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text mb-4">
             Powered by{' '}
-            <span className="text-solaris-gold">AI Intelligence</span>
+            <span className="text-solaris-gold">Autonomous Intelligence</span>
           </h2>
 
           <p className="text-solaris-muted text-base lg:text-lg leading-relaxed">
