@@ -126,6 +126,12 @@ const categories: ResourceCategory[] = [
         href: 'https://github.com/dair-ai/Prompt-Engineering-Guide',
         tag: 'github.com/dair-ai',
       },
+      {
+        name: 'Solaris CET on GitHub',
+        description: 'Official open-source repository for the Solaris CET landing page — explore the code, open issues, or contribute to the project.',
+        href: 'https://github.com/Solaris-CET/solaris-cet',
+        tag: 'github.com/Solaris-CET',
+      },
     ],
   },
 ];
@@ -245,6 +251,26 @@ const ResourcesSection = () => {
             latest research, and learning to build AI agents — these are the trusted platforms
             used by the Solaris community.
           </p>
+        </div>
+
+        {/* Quick Links bar */}
+        <div className="glass-card p-4 mb-10 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { label: 'Buy CET', href: 'https://dedust.io/swap/TON/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB', color: 'text-solaris-gold' },
+            { label: 'Whitepaper', href: 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a', color: 'text-solaris-cyan' },
+            { label: 'GitHub', href: 'https://github.com/Solaris-CET/solaris-cet', color: 'text-solaris-text' },
+            { label: 'Telegram', href: 'https://t.me/SolarisCET', color: 'text-[#2AABEE]' },
+          ].map(({ label, href, color }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center justify-center gap-2 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-sm font-semibold ${color}`}
+            >
+              {label} ↗
+            </a>
+          ))}
         </div>
 
         {/* Resource columns */}
