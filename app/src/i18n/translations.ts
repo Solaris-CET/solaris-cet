@@ -18,6 +18,7 @@ export interface Translations {
     cetApp: string;
     tokenomics: string;
     roadmap: string;
+    team: string;
     howToBuy: string;
     whitepaper: string;
     resources: string;
@@ -58,6 +59,7 @@ const translations: Record<LangCode, Translations> = {
       cetApp: 'CET App',
       tokenomics: 'Tokenomics',
       roadmap: 'Roadmap',
+      team: 'AI Team',
       howToBuy: 'How to Buy',
       whitepaper: 'Whitepaper',
       resources: 'Resources',
@@ -107,6 +109,7 @@ const translations: Record<LangCode, Translations> = {
       cetApp: 'App CET',
       tokenomics: 'Tokenómica',
       roadmap: 'Hoja de Ruta',
+      team: 'Equipo IA',
       howToBuy: 'Cómo Comprar',
       whitepaper: 'Libro Blanco',
       resources: 'Recursos',
@@ -156,6 +159,7 @@ const translations: Record<LangCode, Translations> = {
       cetApp: 'CET 应用',
       tokenomics: '代币经济学',
       roadmap: '路线图',
+      team: 'AI团队',
       howToBuy: '如何购买',
       whitepaper: '白皮书',
       resources: '资源',
@@ -205,6 +209,7 @@ const translations: Record<LangCode, Translations> = {
       cetApp: 'Приложение CET',
       tokenomics: 'Токеномика',
       roadmap: 'Дорожная карта',
+      team: 'AI Команда',
       howToBuy: 'Как купить',
       whitepaper: 'Белая книга',
       resources: 'Ресурсы',
@@ -254,6 +259,7 @@ const translations: Record<LangCode, Translations> = {
       cetApp: 'Aplicație CET',
       tokenomics: 'Tokenomică',
       roadmap: 'Foaie de Parcurs',
+      team: 'Echipa AI',
       howToBuy: 'Cum să Cumperi',
       whitepaper: 'Whitepaper',
       resources: 'Resurse',
@@ -303,6 +309,7 @@ const translations: Record<LangCode, Translations> = {
       cetApp: 'App CET',
       tokenomics: 'Tokenomia',
       roadmap: 'Roteiro',
+      team: 'Equipa IA',
       howToBuy: 'Como Comprar',
       whitepaper: 'White Paper',
       resources: 'Recursos',
@@ -352,6 +359,7 @@ const translations: Record<LangCode, Translations> = {
       cetApp: 'CET App',
       tokenomics: 'Tokenomik',
       roadmap: 'Fahrplan',
+      team: 'KI-Team',
       howToBuy: 'Wie Kaufen',
       whitepaper: 'Whitepaper',
       resources: 'Ressourcen',
