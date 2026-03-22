@@ -288,7 +288,7 @@ function AppContent() {
           </div>
           
           {/* Section 16: Footer - pin: false */}
-          <div className="relative z-[111]">
+          <div className="relative z-[113]">
             <LazyLoadWrapper>
               <ErrorBoundary><FooterSection /></ErrorBoundary>
             </LazyLoadWrapper>
