@@ -24,6 +24,7 @@ const WhitepaperSection = lazy(() => import('./sections/WhitepaperSection'));
 const HighIntelligenceSection = lazy(() => import('./sections/HighIntelligenceSection'));
 const EcosystemIndexSection = lazy(() => import('./sections/EcosystemIndexSection'));
 const ResourcesSection = lazy(() => import('./sections/ResourcesSection'));
+const FAQSection = lazy(() => import('./sections/FAQSection'));
 const FooterSection = lazy(() => import('./sections/FooterSection'));
 import { LanguageContext, useLanguageState } from './hooks/useLanguage';
 import { Analytics } from '@vercel/analytics/react';
@@ -278,8 +279,15 @@ function AppContent() {
               <ErrorBoundary><ResourcesSection /></ErrorBoundary>
             </LazyLoadWrapper>
           </div>
+
+          {/* Section 15: FAQ - pin: false */}
+          <div className="relative z-[112]">
+            <LazyLoadWrapper>
+              <ErrorBoundary><FAQSection /></ErrorBoundary>
+            </LazyLoadWrapper>
+          </div>
           
-          {/* Section 15: Footer - pin: false */}
+          {/* Section 16: Footer - pin: false */}
           <div className="relative z-[111]">
             <LazyLoadWrapper>
               <ErrorBoundary><FooterSection /></ErrorBoundary>

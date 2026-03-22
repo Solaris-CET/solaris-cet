@@ -11,6 +11,7 @@ const NAV_HREFS = [
   { key: 'team',     href: '#team' },
   { key: 'howToBuy', href: '#how-to-buy' },
   { key: 'resources', href: '#resources' },
+  { key: 'faq',      href: '#faq' },
 ] as const;
 
 /**

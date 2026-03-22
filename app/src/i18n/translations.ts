@@ -22,6 +22,7 @@ export interface Translations {
     howToBuy: string;
     whitepaper: string;
     resources: string;
+    faq: string;
   };
   hero: {
     tagline: string;
@@ -63,6 +64,7 @@ const translations: Record<LangCode, Translations> = {
       howToBuy: 'How to Buy',
       whitepaper: 'Whitepaper',
       resources: 'Resources',
+      faq: 'FAQ',
     },
     hero: {
       tagline: 'The Digital Foundation of Cetățuia',
@@ -113,6 +115,7 @@ const translations: Record<LangCode, Translations> = {
       howToBuy: 'Cómo Comprar',
       whitepaper: 'Libro Blanco',
       resources: 'Recursos',
+      faq: 'Preguntas',
     },
     hero: {
       tagline: 'La Base Digital de Cetățuia',
@@ -163,6 +166,7 @@ const translations: Record<LangCode, Translations> = {
       howToBuy: '如何购买',
       whitepaper: '白皮书',
       resources: '资源',
+      faq: '常见问题',
     },
     hero: {
       tagline: 'Cetățuia 的数字基础',
@@ -213,6 +217,7 @@ const translations: Record<LangCode, Translations> = {
       howToBuy: 'Как купить',
       whitepaper: 'Белая книга',
       resources: 'Ресурсы',
+      faq: 'FAQ',
     },
     hero: {
       tagline: 'Цифровая Основа Cetățuia',
@@ -263,6 +268,7 @@ const translations: Record<LangCode, Translations> = {
       howToBuy: 'Cum să Cumperi',
       whitepaper: 'Whitepaper',
       resources: 'Resurse',
+      faq: 'Întrebări',
     },
     hero: {
       tagline: 'Fundația Digitală a Cetățuiei',
@@ -313,6 +319,7 @@ const translations: Record<LangCode, Translations> = {
       howToBuy: 'Como Comprar',
       whitepaper: 'White Paper',
       resources: 'Recursos',
+      faq: 'FAQ',
     },
     hero: {
       tagline: 'A Fundação Digital da Cetățuia',
@@ -363,6 +370,7 @@ const translations: Record<LangCode, Translations> = {
       howToBuy: 'Wie Kaufen',
       whitepaper: 'Whitepaper',
       resources: 'Ressourcen',
+      faq: 'FAQ',
     },
     hero: {
       tagline: 'Das digitale Fundament von Cetățuia',
