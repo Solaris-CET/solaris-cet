@@ -3,9 +3,16 @@ import { gsap } from 'gsap';
 import { ChevronDown, HelpCircle } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
 
+interface FAQLink {
+  label: string;
+  href: string;
+}
+
 interface FAQ {
   question: string;
   answer: string;
+  link?: FAQLink;
+  links?: FAQLink[];
 }
 
 const faqs: FAQ[] = [
@@ -32,7 +39,7 @@ const faqs: FAQ[] = [
   {
     question: 'How does CET mining work?',
     answer:
-      '66.66% of the BTC-S supply (the broader ecosystem token) enters circulation via Proof-of-Work mining over a 90-year schedule with a decaying reward curve — similar to Bitcoin\'s halving model. The Zero-Battery constraint ensures mining approaches 0% battery drain on participating devices.',
+      "66.66% of the BTC-S supply (the broader ecosystem token) enters circulation via Proof-of-Work mining over a 90-year schedule with a decaying reward curve — similar to Bitcoin's halving model. The Zero-Battery constraint ensures mining approaches 0% battery drain on participating devices.",
   },
   {
     question: 'What is the DCBM mechanism?',
@@ -42,22 +49,30 @@ const faqs: FAQ[] = [
   {
     question: 'What blockchain does CET run on?',
     answer:
-      'CET is deployed on the TON (The Open Network) mainnet — one of the fastest L1 blockchains, with ~100,000 TPS throughput and 2-second transaction finality. TON\'s sharded architecture provides virtually unlimited scalability.',
+      "CET is deployed on the TON (The Open Network) mainnet — one of the fastest L1 blockchains, with ~100,000 TPS throughput and 2-second transaction finality. TON's sharded architecture provides virtually unlimited scalability.",
   },
   {
     question: 'What is the ReAct Protocol?',
     answer:
-      'ReAct (Reasoning + Acting) is Solaris CET\'s on-chain AI reasoning standard. Every AI agent action goes through a 5-phase loop: Observe → Think → Plan → Act → Verify. All reasoning traces are anchored on-chain, making every AI decision transparent, auditable, and hallucination-resistant.',
+      "ReAct (Reasoning + Acting) is Solaris CET's on-chain AI reasoning standard. Every AI agent action goes through a 5-phase loop: Observe → Think → Plan → Act → Verify. All reasoning traces are anchored on-chain, making every AI decision transparent, auditable, and hallucination-resistant.",
   },
   {
     question: 'Where can I find the whitepaper?',
     answer:
-      'The whitepaper is permanently published on IPFS (CID: bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a) and accessible at https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a — immutable and censorship-resistant.',
+      'The whitepaper is permanently published on IPFS — immutable and censorship-resistant.',
+    link: {
+      label: 'Open Whitepaper on IPFS ↗',
+      href: 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a',
+    },
   },
   {
     question: 'How do I join the Solaris CET community?',
     answer:
-      'Join the official Telegram community at https://t.me/SolarisCET for news, updates, and direct communication with the team. The full source code is also open on GitHub: https://github.com/Solaris-CET/solaris-cet',
+      'Join the official Telegram community for news, updates, and direct communication with the team. The source code is also open on GitHub.',
+    links: [
+      { label: 'Join Telegram ↗', href: 'https://t.me/SolarisCET' },
+      { label: 'View on GitHub ↗', href: 'https://github.com/Solaris-CET/solaris-cet' },
+    ],
   },
 ];
 
@@ -112,6 +127,25 @@ const FAQSection = () => {
     return () => ctx.revert();
   }, []);
 
+  const handleKeyDown = (e: React.KeyboardEvent, i: number) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const triggers = listRef.current?.querySelectorAll<HTMLButtonElement>('.faq-trigger');
+      triggers?.[Math.min(i + 1, faqs.length - 1)]?.focus();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const triggers = listRef.current?.querySelectorAll<HTMLButtonElement>('.faq-trigger');
+      triggers?.[Math.max(i - 1, 0)]?.focus();
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      listRef.current?.querySelectorAll<HTMLButtonElement>('.faq-trigger')[0]?.focus();
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      const triggers = listRef.current?.querySelectorAll<HTMLButtonElement>('.faq-trigger');
+      triggers?.[faqs.length - 1]?.focus();
+    }
+  };
+
   return (
     <section
       id="faq"
@@ -142,15 +176,16 @@ const FAQSection = () => {
         </div>
 
         {/* FAQ accordion */}
-        <div ref={listRef} className="flex flex-col gap-3">
+        <div ref={listRef} className="flex flex-col gap-3" role="list">
           {faqs.map((faq, i) => (
-            <div key={i} className="faq-item glass-card border border-white/10 overflow-hidden">
+            <div key={i} className="faq-item glass-card border border-white/10 overflow-hidden" role="listitem">
               <button
                 id={`faq-btn-${i}`}
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="w-full flex items-center justify-between p-6 text-left group"
+                className="faq-trigger w-full flex items-center justify-between p-6 text-left group"
                 aria-expanded={openIndex === i}
                 aria-controls={`faq-panel-${i}`}
+                onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                onKeyDown={(e) => handleKeyDown(e, i)}
               >
                 <span className="font-display font-semibold text-solaris-text text-base group-hover:text-solaris-gold transition-colors pr-4">
                   {faq.question}
@@ -169,9 +204,34 @@ const FAQSection = () => {
                   openIndex === i ? 'max-h-96' : 'max-h-0'
                 }`}
               >
-                <p className="px-6 pb-6 text-solaris-muted text-sm leading-relaxed">
-                  {faq.answer}
-                </p>
+                <div className="px-6 pb-6 space-y-3">
+                  <p className="text-solaris-muted text-sm leading-relaxed">{faq.answer}</p>
+                  {faq.link && (
+                    <a
+                      href={faq.link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center text-sm font-semibold text-solaris-gold hover:opacity-80 transition-opacity"
+                    >
+                      {faq.link.label}
+                    </a>
+                  )}
+                  {faq.links && (
+                    <div className="flex flex-wrap gap-4">
+                      {faq.links.map((l) => (
+                        <a
+                          key={l.href}
+                          href={l.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-sm font-semibold text-solaris-cyan hover:opacity-80 transition-opacity"
+                        >
+                          {l.label}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}

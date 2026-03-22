@@ -7,6 +7,7 @@ import CursorGlow from './components/CursorGlow';
 import TouchRipple from './components/TouchRipple';
 import LazyLoadWrapper from './components/LazyLoadWrapper';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import BackToTop from './components/BackToTop';
 // Pinned sections — loaded eagerly so the snap/scroll setup can find their ScrollTriggers
 import HeroSection from './sections/HeroSection';
 import HybridEngineSection from './sections/HybridEngineSection';
@@ -244,29 +245,29 @@ function AppContent() {
               <ErrorBoundary><MiningCalculatorSection /></ErrorBoundary>
             </LazyLoadWrapper>
           </div>
-          
-          {/* Section 10: Security - pin: false */}
+
+          {/* Section 11: Security - pin: false */}
           <div className="relative z-[100]">
             <LazyLoadWrapper>
               <ErrorBoundary><SecuritySection /></ErrorBoundary>
             </LazyLoadWrapper>
           </div>
           
-          {/* Section 11: Whitepaper - pin: false */}
+          {/* Section 12: Whitepaper - pin: false */}
           <div className="relative z-[105]">
             <LazyLoadWrapper>
               <ErrorBoundary><WhitepaperSection /></ErrorBoundary>
             </LazyLoadWrapper>
           </div>
-          
-          {/* Section 12: High Intelligence - pin: false */}
+
+          {/* Section 13: High Intelligence - pin: false */}
           <div className="relative z-[108]">
             <LazyLoadWrapper>
               <ErrorBoundary><HighIntelligenceSection /></ErrorBoundary>
             </LazyLoadWrapper>
           </div>
           
-          {/* Section 13: Ecosystem Index - pin: false */}
+          {/* Section 14: Ecosystem Index - pin: false */}
           <div className="relative z-[109]">
             <LazyLoadWrapper>
               <ErrorBoundary><EcosystemIndexSection /></ErrorBoundary>
@@ -295,13 +296,14 @@ function AppContent() {
           </div>
         </main>
       </div>
+      <BackToTop />
     </LanguageContext.Provider>
   );
 }
 
 function App() {
   return (
-    <TonConnectUIProvider manifestUrl="https://aamclaudiu-hash.github.io/solaris-cet/tonconnect-manifest.json">
+    <TonConnectUIProvider manifestUrl="https://solaris-cet.vercel.app/tonconnect-manifest.json">
       <AppContent />
       <Analytics />
     </TonConnectUIProvider>

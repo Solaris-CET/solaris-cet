@@ -24,7 +24,7 @@ export default defineConfig({
       manifest: {
         name: 'Solaris CET',
         short_name: 'Solaris',
-        description: 'Next-Gen Decentralized TON Ecosystem Token',
+        description: 'Solaris CET — hyper-scarce RWA token on TON with 200,000 AI agents, 9,000 CET supply, 90-year mining, and the BRAID Framework.',
         theme_color: '#05060B',
         background_color: '#05060B',
         display: 'standalone',
@@ -53,6 +53,11 @@ export default defineConfig({
             name: 'Buy CET on DeDust',
             short_name: 'Buy CET',
             url: 'https://dedust.io/pools/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB/deposit',
+          },
+          {
+            name: 'Start Mining on Telegram',
+            short_name: 'Mine CET',
+            url: 'https://t.me/+tKlfzx7IWopmNWQ0',
           },
         ],
       },

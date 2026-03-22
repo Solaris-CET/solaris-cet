@@ -4,7 +4,7 @@ import { Download, FileText, Mail, ArrowRight, Sun, Github, Twitter, Send, Globe
 import SocialShare from '../components/SocialShare';
 
 // Constants defined once to avoid duplication and maintain a single source of truth
-const GITHUB_URL = 'https://github.com/aamclaudiu-hash/solaris-cet';
+const GITHUB_URL = 'https://github.com/Solaris-CET/solaris-cet';
 const DEDUST_POOL_ADDRESS = 'EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
 const DEDUST_POOL_DEPOSIT_URL = `https://dedust.io/pools/${DEDUST_POOL_ADDRESS}/deposit`;
 const CET_CONTRACT_ADDRESS = 'EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX';
