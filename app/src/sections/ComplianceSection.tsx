@@ -110,7 +110,7 @@ const ComplianceSection = () => {
         ref={leftCardRef}
         className="absolute left-[7vw] top-[26vh] w-[min(38vw,520px)] z-10"
       >
-        <div className="glass-card p-6 lg:p-8 holo-card">
+        <div className="bento-card p-6 lg:p-8 holo-card border border-white/10">
           <div className="flex items-center gap-3 mb-5">
             <div className="w-10 h-10 rounded-lg bg-emerald-400/10 flex items-center justify-center">
               <ShieldCheck className="w-5 h-5 text-emerald-400" />
@@ -154,7 +154,7 @@ const ComplianceSection = () => {
         className="absolute right-[7vw] top-[24vh] w-[min(38vw,540px)] h-[min(52vh,440px)] z-10"
         style={{ perspective: '1000px' }}
       >
-        <div className="glass-card h-full flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="bento-card h-full flex flex-col items-center justify-center relative overflow-hidden">
           {/* Central icon */}
           <div className="relative">
             <div className="w-24 h-24 rounded-2xl bg-emerald-400/10 flex items-center justify-center mb-4">
@@ -194,12 +194,12 @@ const ComplianceSection = () => {
 
       {/* Badge Chips */}
       <div ref={badgesRef} className="absolute inset-0 pointer-events-none z-20">
-        <div className="badge-chip absolute right-[10vw] top-[16vh] glass-card px-4 py-2 flex items-center gap-2 animate-float">
+        <div className="badge-chip absolute right-[10vw] top-[16vh] bento-card px-4 py-2 flex items-center gap-2 animate-float shadow-depth">
           <FileCheck className="w-4 h-4 text-emerald-400" />
           <span className="font-mono text-sm text-solaris-text">Audit Ready</span>
         </div>
         <div
-          className="badge-chip absolute right-[14vw] top-[70vh] glass-card px-4 py-2 flex items-center gap-2 animate-float"
+          className="badge-chip absolute right-[14vw] top-[70vh] bento-card px-4 py-2 flex items-center gap-2 animate-float shadow-depth"
           style={{ animationDelay: '0.5s' }}
         >
           <Globe className="w-4 h-4 text-solaris-cyan" />

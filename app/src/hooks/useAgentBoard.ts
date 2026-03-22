@@ -109,7 +109,7 @@ export function defaultGenerateEvent(): AgentEvent {
     const others = DEPARTMENTS.filter(d => d !== dept);
     const collabDept = others[Math.floor(Math.random() * others.length)];
     collab = randomAgentId(collabDept);
-    finalMsg = msg.replace('$COLLAB', collab);
+    finalMsg = msg.replaceAll('$COLLAB', collab);
   }
 
   return {

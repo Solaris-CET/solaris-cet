@@ -120,7 +120,7 @@ const NovaAppSection = () => {
         ref={phoneRef}
         className="absolute left-[8vw] top-[18vh] w-[min(28vw,380px)] h-[min(62vh,520px)] z-10"
       >
-        <div className="glass-card h-full p-4 relative overflow-hidden">
+        <div className="bento-card h-full p-4 relative overflow-hidden">
           {/* Gold accent bar */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-solaris-gold via-solaris-gold to-transparent" />
 
@@ -186,7 +186,7 @@ const NovaAppSection = () => {
         ref={textPanelRef}
         className="absolute right-[8vw] top-[26vh] w-[min(32vw,420px)] z-10"
       >
-        <div className="glass-card p-6 lg:p-8">
+        <div className="bento-card p-6 lg:p-8">
           <div className="flex items-center gap-3 mb-5">
             <div className="w-10 h-10 rounded-lg overflow-hidden">
               <img
@@ -235,7 +235,7 @@ const NovaAppSection = () => {
         ref={tickerRef}
         className="absolute left-1/2 top-[78vh] -translate-x-1/2 w-[min(80vw,1100px)] z-10"
       >
-        <div className="glass-card p-4 overflow-hidden">
+        <div className="bento-card p-4 overflow-hidden">
           <div className="flex animate-ticker">
             {doubledTickerItems.map((item, idx) => (
               <div

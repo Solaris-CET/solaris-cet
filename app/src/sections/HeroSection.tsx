@@ -26,6 +26,14 @@ const APP_CONFIG = {
   }
 } as const;
 
+// Wave visualizer heights — 20 bars with a natural-looking rhythm pattern
+const WAVE_BAR_HEIGHTS = [
+  0.4, 0.7, 0.5, 0.9, 0.6,
+  1.0, 0.8, 0.7, 0.5, 0.9,
+  0.6, 1.0, 0.8, 0.4, 0.7,
+  0.5, 0.9, 0.6, 1.0, 0.8,
+] as const;
+
 const TICKER_DATA = [
   { label: 'AI AGENTS',    value: '200,000+'    },
   { label: 'SUPPLY',       value: '9,000 CET'   },
@@ -230,7 +238,7 @@ const HeroSection: React.FC = () => {
                 </span>
               </div>
               <div className="mt-2 h-14 md:h-20 w-full bg-black/40 rounded-2xl border border-white/5 overflow-hidden flex items-end gap-px px-2 pb-1.5">
-                {[0.4, 0.7, 0.5, 0.9, 0.6, 1.0, 0.8, 0.7, 0.5, 0.9, 0.6, 1.0, 0.8, 0.4, 0.7, 0.5, 0.9, 0.6, 1.0, 0.8].map((h, i) => (
+                {WAVE_BAR_HEIGHTS.map((h, i) => (
                   <div
                     key={i}
                     className="wave-bar flex-1 text-solaris-gold"

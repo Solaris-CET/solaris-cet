@@ -4,7 +4,20 @@ import { CheckCircle, XCircle, Minus, Trophy, Zap, Shield, Brain, Coins } from '
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import GlowOrbs from '../components/GlowOrbs';
 
-// ─── Types ────────────────────────────────────────────────────────────────
+// ─── Shared chart Y-axis formatters ──────────────────────────────────────
+
+/** Format TPS values: 1000 → "1k", 100000 → "100k" */
+function formatTpsAxis(v: number): string {
+  return v >= 1000 ? `${v / 1000}k` : String(v);
+}
+
+/** Format supply values: 1B → "1B", 1M → "1M", 1K → "1K" */
+function formatSupplyAxis(v: number): string {
+  if (v >= 1e9) return `${(v / 1e9).toFixed(0)}B`;
+  if (v >= 1e6) return `${(v / 1e6).toFixed(0)}M`;
+  if (v >= 1e3) return `${(v / 1e3).toFixed(0)}K`;
+  return String(v);
+}
 
 interface Competitor {
   name: string;
@@ -328,7 +341,7 @@ const CompetitionSection = () => {
                 margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
               >
                 <XAxis dataKey="name" tick={{ fill: '#A6A9B6', fontSize: 11, fontFamily: 'monospace' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#A6A9B6', fontSize: 10, fontFamily: 'monospace' }} axisLine={false} tickLine={false} tickFormatter={(v: number) => v >= 1000 ? `${v/1000}k` : String(v)} />
+                <YAxis tick={{ fill: '#A6A9B6', fontSize: 10, fontFamily: 'monospace' }} axisLine={false} tickLine={false} tickFormatter={formatTpsAxis} />
                 <Tooltip
                   contentStyle={{ background: '#0D0E17', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12 }}
                   labelStyle={{ color: '#F4F6FF', fontFamily: 'monospace' }}
@@ -370,7 +383,7 @@ const CompetitionSection = () => {
                 margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
               >
                 <XAxis dataKey="name" tick={{ fill: '#A6A9B6', fontSize: 11, fontFamily: 'monospace' }} axisLine={false} tickLine={false} />
-                <YAxis scale="log" domain={['auto', 'auto']} tick={{ fill: '#A6A9B6', fontSize: 10, fontFamily: 'monospace' }} axisLine={false} tickLine={false} tickFormatter={(v: number) => v >= 1e9 ? `${(v/1e9).toFixed(0)}B` : v >= 1e6 ? `${(v/1e6).toFixed(0)}M` : v >= 1e3 ? `${(v/1e3).toFixed(0)}K` : String(v)} />
+                <YAxis scale="log" domain={['auto', 'auto']} tick={{ fill: '#A6A9B6', fontSize: 10, fontFamily: 'monospace' }} axisLine={false} tickLine={false} tickFormatter={formatSupplyAxis} />
                 <Tooltip
                   contentStyle={{ background: '#0D0E17', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12 }}
                   labelStyle={{ color: '#F4F6FF', fontFamily: 'monospace' }}

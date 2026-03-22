@@ -74,6 +74,30 @@ const faqs: FAQ[] = [
       { label: 'View on GitHub ↗', href: 'https://github.com/Solaris-CET/solaris-cet' },
     ],
   },
+  {
+    question: 'How does Solaris CET compare to Fetch.ai, Bittensor and SingularityNET?',
+    answer:
+      'CET has 9,000 total supply vs billions for competitors. TON delivers 100,000 TPS vs under 1,000 for Fetch.ai and Bittensor. CET operates 200,000 deployed autonomous agents — not just a marketplace. Only CET uses Grok × Gemini dual-AI simultaneously. And only CET is backed by real-world agricultural assets in Romania.',
+    links: [{ label: 'Full comparison ↗', href: '#competition' }],
+  },
+  {
+    question: 'What is the BRAID Framework?',
+    answer:
+      'BRAID (Blockchain-Recursive AI Decision) serialises agent reasoning paths as Mermaid notation graphs, stores them on IPFS, and anchors them in every CET transaction. This means any decision made by any agent can be reconstructed and audited months or years later — with complete traceability and zero trust assumptions.',
+    links: [],
+  },
+  {
+    question: 'What are the RAV Protocol phases?',
+    answer:
+      'RAV = Reason · Act · Verify. Phase 1 (REASON): Google Gemini decomposes the goal into sub-objectives using a BRAID graph. Phase 2 (ACT): xAI Grok executes the optimised action plan and generates TON transactions. Phase 3 (VERIFY): An independent model reviews the action and its on-chain trace before finalisation. Every phase is timestamped and stored immutably on IPFS.',
+    links: [],
+  },
+  {
+    question: 'What is the Zero-Battery Constraint?',
+    answer:
+      'CET mining is engineered to approach zero battery drain on mobile devices. Unlike Bitcoin mining, CET\'s Zero-Battery Constraint limits CPU utilisation to background-idle levels, meaning mining can run passively without heating your device or reducing battery life measurably.',
+    links: [],
+  },
 ];
 
 const FAQSection = () => {

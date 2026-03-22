@@ -92,7 +92,7 @@ const FooterSection = () => {
 
       <div className="relative z-10 px-6 lg:px-12 max-w-6xl mx-auto">
         {/* CTA Card */}
-        <div ref={ctaCardRef} className="glass-card-gold p-8 lg:p-12 mb-12 text-center relative overflow-hidden holo-card">
+        <div ref={ctaCardRef} className="bento-card p-8 lg:p-12 mb-12 text-center relative overflow-hidden holo-card border border-solaris-gold/30 shadow-depth">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(242,201,76,0.06)_0%,_transparent_70%)] pointer-events-none" />
           <div className="relative z-10">
             <div className="hud-label text-solaris-gold mb-4 flex items-center justify-center gap-2">
@@ -100,7 +100,7 @@ const FooterSection = () => {
               AI BRIDGE TO HIGH INTELLIGENCE
             </div>
             <h2 className="font-display font-bold text-[clamp(28px,3.5vw,44px)] text-solaris-text mb-4">
-              Start mining in <span className="text-gradient-animated">minutes</span>.
+              Start mining in <span className="text-gradient-gold">minutes</span>.
             </h2>
             <p className="text-solaris-muted text-base lg:text-lg mb-8 max-w-lg mx-auto">
               Download the Solaris CET App. Connect a wallet. Begin earning on the bridge between current AI and High Intelligence.
@@ -130,7 +130,7 @@ const FooterSection = () => {
         </div>
 
         {/* Founder Card */}
-        <div className="glass-card p-6 mb-6 flex flex-col sm:flex-row items-center gap-5">
+        <div className="bento-card p-6 mb-6 flex flex-col sm:flex-row items-center gap-5">
           <div className="shrink-0 w-16 h-16 rounded-2xl overflow-hidden border-2 border-solaris-gold/30 bg-solaris-gold/10 flex items-center justify-center">
             {/* Founder avatar — LinkedIn profile */}
             <span className="font-display font-bold text-2xl text-solaris-gold">CB</span>
@@ -158,7 +158,7 @@ const FooterSection = () => {
         </div>
 
         {/* Contract address */}
-        <div className="glass-card p-4 mb-3 flex items-center justify-between gap-4">
+        <div className="bento-card p-4 mb-3 flex items-center justify-between gap-4">
           <div className="min-w-0">
             <div className="hud-label text-[10px] mb-1">CET Contract Address (TON)</div>
             <div className="font-mono text-xs text-solaris-muted truncate">{CET_CONTRACT_ADDRESS}</div>
@@ -176,7 +176,7 @@ const FooterSection = () => {
         </div>
 
         {/* DeDust Pool address */}
-        <div className="glass-card p-4 mb-6 flex items-center justify-between gap-4">
+        <div className="bento-card p-4 mb-6 flex items-center justify-between gap-4">
           <div className="min-w-0">
             <div className="hud-label text-[10px] mb-1">
               <a
@@ -203,7 +203,7 @@ const FooterSection = () => {
         </div>
 
         {/* Newsletter */}
-        <div ref={newsletterRef} className="glass-card p-6 lg:p-8 mb-12">
+        <div ref={newsletterRef} className="bento-card p-6 lg:p-8 mb-12">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div>
               <div className="flex items-center gap-2 mb-2">

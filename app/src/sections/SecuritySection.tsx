@@ -170,7 +170,7 @@ const SecuritySection = () => {
           {/* Right Column - Badge Grid */}
           <div ref={badgeGridRef}>
             {/* Security Score Banner */}
-            <div className="glass-card-gold p-6 mb-10 flex flex-col sm:flex-row items-center gap-6">
+            <div className="bento-card p-6 mb-10 flex flex-col sm:flex-row items-center gap-6 border border-solaris-gold/30">
               <div className="shrink-0 text-center">
                 <div className="font-display font-black text-6xl text-solaris-gold leading-none">A+</div>
                 <div className="hud-label text-[10px] mt-1">SECURITY RATING</div>
