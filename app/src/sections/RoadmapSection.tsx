@@ -223,6 +223,14 @@ const RoadmapSection = () => {
             From the initial token launch to a full-scale AI-powered agricultural
             ecosystem — every milestone is publicly trackable and immutably recorded.
           </p>
+
+          {/* Live progress indicator */}
+          <div className="mt-6 inline-flex items-center gap-3 px-4 py-2 rounded-full bg-solaris-gold/10 border border-solaris-gold/30">
+            <span className="w-2 h-2 rounded-full bg-solaris-gold animate-pulse inline-block" />
+            <span className="font-mono text-solaris-gold text-xs font-semibold">
+              NOW: Q2 2026 — DAO &amp; Cross-Chain Bridge in Progress
+            </span>
+          </div>
         </div>
 
         {/* Phase cards */}

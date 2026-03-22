@@ -146,6 +146,9 @@ describe("translations — specific content", () => {
       "subtitle",
       "buyNow",
       "learnMore",
+      "description",
+      "startMining",
+      "docs",
     ];
     for (const lang of SUPPORTED_LANGS) {
       for (const key of expectedHeroKeys) {

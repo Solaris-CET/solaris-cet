@@ -72,7 +72,7 @@ const translations: Record<LangCode, Translations> = {
       buyNow: 'Buy CET',
       learnMore: 'Learn More',
       description:
-        'High-impact RWA token anchored in the agricultural and AI infrastructure of Cetățuia. Each unit grants access to the Solaris Prime Tactical Ecosystem, a reasoning hierarchy powered by Gemini 3 Pro Preview. The dual reasoning engine Grok × Gemini drives the RAV protocol for full agent autonomy.',
+        '200,000 autonomous AI agents across 10 enterprise departments — operating 24/7 at zero marginal cost. The world\'s first AI-native RWA token on TON, powered by the Grok × Gemini dual-AI RAV Protocol and anchored in the real-world infrastructure of Cetățuia, Romania.',
       startMining: 'START MINING',
       docs: 'DOCS',
     },
@@ -123,7 +123,7 @@ const translations: Record<LangCode, Translations> = {
       buyNow: 'Comprar CET',
       learnMore: 'Saber Más',
       description:
-        'Token RWA de alto impacto anclado en la infraestructura agrícola e IA de Cetățuia. Cada unidad otorga acceso al Solaris Prime Tactical Ecosystem, una jerarquía de razonamiento impulsada por Gemini 3 Pro Preview. El motor de razonamiento dual Grok × Gemini impulsa el protocolo RAV para la plena autonomía de agentes.',
+        '200,000 agentes autónomos en 10 departamentos empresariales — operando 24/7 a costo marginal cero. El primer token RWA nativo de IA en TON, impulsado por el protocolo RAV dual-IA Grok × Gemini y anclado en la infraestructura real de Cetățuia, Rumanía.',
       startMining: 'INICIAR MINERÍA',
       docs: 'DOCUMENTOS',
     },
@@ -174,7 +174,7 @@ const translations: Record<LangCode, Translations> = {
       buyNow: '购买 CET',
       learnMore: '了解更多',
       description:
-        '锚定在 Cetățuia 农业和 AI 基础设施中的高影响力 RWA 代币。每个单元授予对 Solaris Prime Tactical Ecosystem 的访问权限，这是由 Gemini 3 Pro Preview 驱动的推理层次结构。双推理引擎 Grok × Gemini 驱动 RAV 协议，实现代理完全自主。',
+        '200,000个自主AI智能体遍布10个企业部门，24/7运行，零边际成本。全球首个TON链上AI原生RWA代币，由Grok × Gemini双AI RAV协议驱动，根植于罗马尼亚Cetățuia的真实基础设施。',
       startMining: '开始挖矿',
       docs: '文档',
     },
@@ -225,7 +225,7 @@ const translations: Record<LangCode, Translations> = {
       buyNow: 'Купить CET',
       learnMore: 'Узнать больше',
       description:
-        'Высокоэффективный RWA-токен, основанный на сельскохозяйственной и ИИ-инфраструктуре Cetățuia. Каждая единица предоставляет доступ к Solaris Prime Tactical Ecosystem — иерархии рассуждений на базе Gemini 3 Pro Preview. Двойной движок рассуждений Grok × Gemini обеспечивает протокол RAV для полной автономии агентов.',
+        '200 000 автономных агентов в 10 корпоративных отделах — работают 24/7 при нулевых предельных издержках. Первый в мире AI-нативный RWA-токен на TON, работающий на двойном AI-протоколе RAV Grok × Gemini, привязанном к реальной инфраструктуре Cetățuia, Румыния.',
       startMining: 'НАЧАТЬ МАЙНИНГ',
       docs: 'ДОКУМЕНТЫ',
     },
@@ -276,7 +276,7 @@ const translations: Record<LangCode, Translations> = {
       buyNow: 'Cumpără CET',
       learnMore: 'Află Mai Mult',
       description:
-        'Token RWA de mare impact ancorat în infrastructura agricolă și AI din Cetățuia. Fiecare unitate oferă acces la Solaris Prime Tactical Ecosystem, o ierarhie de raționament alimentată de Gemini 3 Pro Preview. Motorul de raționament dual Grok × Gemini alimentează protocolul RAV pentru autonomie totală a agenților.',
+        '200.000 de agenți autonomi AI în 10 departamente enterprise — operând 24/7 la cost marginal zero. Primul token RWA nativ AI din lume pe TON, alimentat de protocolul RAV cu IA duală Grok × Gemini și ancorat în infrastructura reală din Cetățuia, România.',
       startMining: 'ÎNCEPE MINAREA',
       docs: 'DOCUMENTE',
     },
@@ -327,7 +327,7 @@ const translations: Record<LangCode, Translations> = {
       buyNow: 'Comprar CET',
       learnMore: 'Saiba Mais',
       description:
-        'Token RWA de alto impacto ancorado na infraestrutura agrícola e de IA de Cetățuia. Cada unidade concede acesso ao Solaris Prime Tactical Ecosystem, uma hierarquia de raciocínio alimentada pelo Gemini 3 Pro Preview. O motor de raciocínio dual Grok × Gemini impulsiona o protocolo RAV para total autonomia de agentes.',
+        '200.000 agentes autônomos de IA em 10 departamentos empresariais — operando 24/7 a custo marginal zero. O primeiro token RWA nativo de IA do mundo na TON, alimentado pelo protocolo RAV dual-IA Grok × Gemini e ancorado na infraestrutura real de Cetățuia, Romênia.',
       startMining: 'INICIAR MINERAÇÃO',
       docs: 'DOCUMENTOS',
     },
@@ -378,7 +378,7 @@ const translations: Record<LangCode, Translations> = {
       buyNow: 'CET kaufen',
       learnMore: 'Mehr erfahren',
       description:
-        'Wirkungsstarker RWA-Token, verankert in der landwirtschaftlichen und KI-Infrastruktur von Cetățuia. Jede Einheit gewährt Zugang zum Solaris Prime Tactical Ecosystem, einer Reasoning-Hierarchie, die von Gemini 3 Pro Preview angetrieben wird. Das duale Reasoning-Modul Grok × Gemini treibt das RAV-Protokoll für volle Agentenautonomie an.',
+        '200.000 autonome KI-Agenten in 10 Unternehmensabteilungen — 24/7 betrieben bei null Grenzkosten. Das weltweit erste KI-native RWA-Token auf TON, angetrieben durch das duale KI-RAV-Protokoll Grok × Gemini, verankert in der realen Infrastruktur von Cetățuia, Rumänien.',
       startMining: 'MINING STARTEN',
       docs: 'DOKUMENTE',
     },

@@ -24,8 +24,8 @@ const WalletConnect = () => {
           amount: "10000000"
         }]
       });
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // Transaction cancelled or failed — no action needed
     }
   };
 

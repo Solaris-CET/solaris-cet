@@ -219,6 +219,24 @@ const HowToBuySection = () => {
           })}
         </div>
 
+        {/* Verified Safe trust bar */}
+        <div className="mb-6 flex flex-wrap items-center gap-3">
+          {[
+            { label: 'Cyberscope Audited', color: 'text-solaris-gold border-solaris-gold/30 bg-solaris-gold/5' },
+            { label: 'KYC Verified',        color: 'text-emerald-400 border-emerald-400/30 bg-emerald-400/5' },
+            { label: 'Freshcoins Listed',   color: 'text-solaris-cyan border-solaris-cyan/30 bg-solaris-cyan/5' },
+            { label: 'Open Source',         color: 'text-purple-400 border-purple-400/30 bg-purple-400/5' },
+          ].map(({ label, color }) => (
+            <span
+              key={label}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold ${color}`}
+            >
+              <Check className="w-3 h-3" />
+              {label}
+            </span>
+          ))}
+        </div>
+
         {/* Contract address CTA */}
         <div
           ref={ctaRef}

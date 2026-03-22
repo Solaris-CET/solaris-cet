@@ -274,21 +274,21 @@ function AppContent() {
             </LazyLoadWrapper>
           </div>
 
-          {/* Section 14: Resources - pin: false */}
+          {/* Section 15: Resources - pin: false */}
           <div className="relative z-[110]">
             <LazyLoadWrapper>
               <ErrorBoundary><ResourcesSection /></ErrorBoundary>
             </LazyLoadWrapper>
           </div>
 
-          {/* Section 15: FAQ - pin: false */}
+          {/* Section 16: FAQ - pin: false */}
           <div className="relative z-[112]">
             <LazyLoadWrapper>
               <ErrorBoundary><FAQSection /></ErrorBoundary>
             </LazyLoadWrapper>
           </div>
           
-          {/* Section 16: Footer - pin: false */}
+          {/* Section 17: Footer - pin: false */}
           <div className="relative z-[113]">
             <LazyLoadWrapper>
               <ErrorBoundary><FooterSection /></ErrorBoundary>

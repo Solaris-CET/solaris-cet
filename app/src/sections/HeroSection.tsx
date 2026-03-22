@@ -27,12 +27,15 @@ const APP_CONFIG = {
 } as const;
 
 const TICKER_DATA = [
+  { label: 'AI AGENTS', value: '200,000+' },
   { label: 'SUPPLY', value: '9,000 CET' },
   { label: 'NETWORK', value: 'TON' },
   { label: 'MAX TPS', value: '100,000' },
   { label: 'FINALITY', value: '2.0s' },
   { label: 'POOL', value: 'DeDust' },
-  { label: 'MINING', value: '90 YEARS' }
+  { label: 'MINING', value: '90 YEARS' },
+  { label: 'DEPARTMENTS', value: '10' },
+  { label: 'UPTIME', value: '24/7' },
 ];
 
 // --- SUB-COMPONENTS (Optimized via Memoization) ---
@@ -205,6 +208,8 @@ const HeroSection: React.FC = () => {
               </div>
               
               <div className="space-y-4 md:space-y-6">
+                <StatRow label="AI AGENTS DEPLOYED" value="200,000+" colorClass="text-yellow-500" />
+                <div className="h-px bg-white/5 w-full" />
                 <StatRow label="THROUGHPUT" value="~100,000 TPS" />
                 <div className="h-px bg-white/5 w-full" />
                 <StatRow label="LATENCY" value="2.0s" colorClass="text-cyan-400" />
