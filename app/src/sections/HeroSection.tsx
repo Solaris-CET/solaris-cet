@@ -106,13 +106,23 @@ const HeroSection: React.FC = () => {
       const mainTl = gsap.timeline({ defaults: { ease: 'expo.out', duration: 1.2 } });
 
       // Intro Sequence
+      // Note: opacity is intentionally omitted from fromTo pairs here.
+      // The scroll-exit timeline below is a scrubbed ScrollTrigger that also controls
+      // opacity on the same elements. If the intro sets opacity:0 as an immediate "from"
+      // state, the scrubbed tween captures that 0 and holds the elements invisible at
+      // scroll position 0 — producing a blank hero on desktop. By keeping opacity at its
+      // CSS default (1) and animating only scale/rotation/position in the intro, the
+      // scroll-exit fromTo can declare opacity:1 as its explicit start state without
+      // any conflict, guaranteeing visibility before the user scrolls.
       mainTl
-        .fromTo(coinWrapperRef.current, { scale: 0.5, opacity: 0, rotateY: -45 }, { scale: 1, opacity: 1, rotateY: 0, duration: 1.5 })
-        .fromTo([titleContainerRef.current, hudWrapperRef.current], { y: 50, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.2 }, "-=1")
-        .fromTo(oracleWrapperRef.current, { width: "0%", opacity: 0 }, { width: "100%", opacity: 1, duration: 0.8 }, "-=0.5")
+        .fromTo(coinWrapperRef.current, { scale: 0.5, rotateY: -45 }, { scale: 1, rotateY: 0, duration: 1.5 })
+        .fromTo([titleContainerRef.current, hudWrapperRef.current], { y: 50 }, { y: 0, stagger: 0.2 }, "-=1")
+        .fromTo(oracleWrapperRef.current, { width: "0%" }, { width: "100%", duration: 0.8 }, "-=0.5")
         .fromTo(tickerContainerRef.current, { y: 100 }, { y: 0 }, "-=0.5");
 
       // Scroll Orchestration (desktop only)
+      // Uses fromTo with explicit opacity:1 "from" values so the scrubbed timeline
+      // guarantees elements are fully visible at scroll position 0.
       ScrollTrigger.create({
         trigger: containerRef.current,
         start: "top top",
@@ -120,10 +130,10 @@ const HeroSection: React.FC = () => {
         pin: true,
         scrub: 1,
         animation: gsap.timeline()
-          .to(coinWrapperRef.current, { x: "-25vw", rotateY: 90, opacity: 0 })
-          .to(titleContainerRef.current, { x: "-100%", opacity: 0 }, 0)
-          .to(hudWrapperRef.current, { x: "100%", opacity: 0 }, 0)
-          .to(oracleWrapperRef.current, { y: 40, opacity: 0 }, 0)
+          .fromTo(coinWrapperRef.current, { opacity: 1 }, { x: "-25vw", rotateY: 90, opacity: 0 })
+          .fromTo(titleContainerRef.current, { opacity: 1 }, { x: "-100%", opacity: 0 }, 0)
+          .fromTo(hudWrapperRef.current, { opacity: 1 }, { x: "100%", opacity: 0 }, 0)
+          .fromTo(oracleWrapperRef.current, { opacity: 1 }, { y: 40, opacity: 0 }, 0)
       });
     }, containerRef);
 

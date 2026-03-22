@@ -73,22 +73,22 @@ const Navigation = () => {
         style={{ width: `${scrollProgress}%` }}
       />
 
-      <div className="w-full px-6 lg:px-12">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+      <div className="w-full px-6 xl:px-12">
+        <div className="flex items-center justify-between h-16 xl:h-20">
           {/* Logo */}
           <a href="#" className="flex items-center gap-3 group">
-            <div className="relative w-8 h-8 lg:w-10 lg:h-10">
+            <div className="relative w-8 h-8 xl:w-10 xl:h-10">
               <Sun className="w-full h-full text-solaris-gold transition-transform duration-700 group-hover:rotate-180" />
               {/* Logo glow */}
               <div className="absolute inset-0 rounded-full bg-solaris-gold/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
-            <span className="font-display font-semibold text-lg lg:text-xl text-solaris-text tracking-tight">
+            <span className="font-display font-semibold text-lg xl:text-xl text-solaris-text tracking-tight">
               Solaris <span className="text-solaris-gold">CET</span>
             </span>
           </a>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8">
+          {/* Desktop Navigation — shown only at xl (≥1280 px) to avoid overflow */}
+          <nav className="hidden xl:flex items-center gap-6">
             {navLinks.map((link) => (
               <a
                 key={link.label}
@@ -102,7 +102,7 @@ const Navigation = () => {
           </nav>
 
           {/* CTA Button */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden xl:flex items-center gap-3">
             <LanguageSelector />
             <WalletConnect />
             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-400/10 border border-emerald-400/20">
@@ -118,9 +118,9 @@ const Navigation = () => {
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile / Tablet Menu Button — shown below xl (1280 px) */}
           <button
-            className="lg:hidden p-2 text-solaris-text"
+            className="xl:hidden p-2 text-solaris-text"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
             aria-expanded={isMobileMenuOpen}
@@ -131,10 +131,10 @@ const Navigation = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile / Tablet Menu — shown below xl (1280 px) */}
       <div
         id="mobile-menu"
-        className={`lg:hidden absolute top-full left-0 right-0 bg-solaris-dark/95 backdrop-blur-xl border-b border-white/5 transition-all duration-300 ${
+        className={`xl:hidden absolute top-full left-0 right-0 bg-solaris-dark/95 backdrop-blur-xl border-b border-white/5 transition-all duration-300 ${
           isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}
       >
