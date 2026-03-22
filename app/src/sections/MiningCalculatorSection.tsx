@@ -181,7 +181,7 @@ const MiningCalculatorSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative bg-solaris-dark py-24 lg:py-32"
+      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden mesh-bg"
     >
       {/* Background grid */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

@@ -370,7 +370,7 @@ const WhitepaperSection = () => {
       ref={sectionRef}
       id="whitepaper"
       aria-label="Whitepaper"
-      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden"
+      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden mesh-bg"
     >
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

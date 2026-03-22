@@ -151,7 +151,7 @@ const FAQSection = () => {
       id="faq"
       ref={sectionRef}
       aria-label="Frequently Asked Questions"
-      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden"
+      className="relative bg-solaris-dark py-24 lg:py-32 overflow-hidden mesh-bg"
     >
       <GlowOrbs variant="cyan" />
 

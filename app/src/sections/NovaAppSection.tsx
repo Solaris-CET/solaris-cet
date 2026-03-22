@@ -104,7 +104,7 @@ const NovaAppSection = () => {
     <section
       ref={sectionRef}
       id="nova-app"
-      className="section-pinned bg-solaris-dark flex items-center justify-center"
+      className="section-pinned bg-solaris-dark flex items-center justify-center overflow-hidden mesh-bg"
     >
       {/* Background grid */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
