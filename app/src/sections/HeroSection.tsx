@@ -166,9 +166,8 @@ const HeroSection: React.FC = () => {
   // --- RENDER ---
   return (
     <TooltipProvider>
-      <section 
+      <section
         ref={containerRef}
-        className="relative min-h-screen bg-solaris-dark overflow-x-clip flex flex-col justify-center items-center"
         className="relative min-h-screen bg-[#0b1324] sm:bg-[#020202] overflow-x-hidden lg:overflow-hidden flex flex-col justify-center items-center"
       >
         {/* Background Layer (Hardware Accelerated) */}
@@ -273,17 +272,18 @@ const HeroSection: React.FC = () => {
         </div>
 
         {/* FOOTER TICKER — on mobile, position relative so it doesn't overlay AI oracle */}
-        <div ref={tickerContainerRef} className="lg:absolute lg:bottom-0 w-full overflow-hidden py-4 md:py-6 border-t border-white/5 bg-black/80 backdrop-blur-lg mt-6 lg:mt-0">
-           <div className="flex min-w-max animate-ticker whitespace-nowrap">
-        <div ref={tickerContainerRef} className="lg:absolute lg:bottom-0 w-full py-4 md:py-6 border-t border-white/5 bg-[#0b1324]/85 sm:bg-black/80 backdrop-blur-lg mt-4 lg:mt-0">
-           <div className="flex animate-ticker whitespace-nowrap">
+        <div
+          ref={tickerContainerRef}
+          className="lg:absolute lg:bottom-0 w-full overflow-hidden py-4 md:py-6 border-t border-white/5 bg-[#0b1324]/85 sm:bg-black/80 backdrop-blur-lg mt-4 lg:mt-0"
+        >
+          <div className="flex min-w-max animate-ticker whitespace-nowrap">
               {[...TICKER_DATA, ...TICKER_DATA].map((item, i) => (
                 <div key={i} className="inline-flex items-center px-6 sm:px-8 md:px-10 gap-3 md:gap-4">
                   <span className="text-[10px] text-gray-500 font-mono">{item.label}</span>
                   <span className="text-yellow-500 font-bold text-sm">{item.value}</span>
                 </div>
               ))}
-           </div>
+          </div>
         </div>
       </section>
     </TooltipProvider>
