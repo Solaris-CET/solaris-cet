@@ -34,8 +34,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "start": "vite preview --host 0.0.0.0 --port 4173",
+    "build": "npm exec -- tsc -b && vite build",
+    "start": "vite preview",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
