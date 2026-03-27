@@ -97,12 +97,19 @@ const HeroSection: React.FC = () => {
       window.matchMedia('(max-width: 767px)').matches;
 
     if (isMobile || prefersReducedMotion) {
+      // Defensive cleanup: if a hero trigger exists (e.g. after viewport changes),
+      // remove it so mobile never inherits pinned/hidden timeline states.
+      ScrollTrigger.getAll().forEach((st) => {
+        if (st.trigger === containerRef.current) st.kill();
+      });
+
       // Ensure elements are fully visible without inline-style overrides
       // (no GSAP "from" state is applied, so they remain visible by default).
       const els: (HTMLElement | null)[] = [
         coinWrapperRef.current,
         titleContainerRef.current,
         hudWrapperRef.current,
+        ctaGroupRef.current,
         tickerContainerRef.current,
       ];
       els.forEach(el => {
@@ -161,11 +168,19 @@ const HeroSection: React.FC = () => {
     <TooltipProvider>
       <section 
         ref={containerRef}
-        className="relative min-h-screen bg-[#020202] overflow-x-hidden lg:overflow-hidden flex flex-col justify-center items-center"
+        className="relative min-h-screen bg-[#0b1324] sm:bg-[#020202] overflow-x-hidden lg:overflow-hidden flex flex-col justify-center items-center"
       >
         {/* Background Layer (Hardware Accelerated) */}
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <ParticleCanvas count={120} />
+          {/* Mobile gets a deep navy gradient instead of a flat black fill. */}
+          <div
+            className="absolute inset-0 sm:hidden"
+            style={{
+              background:
+                'radial-gradient(circle at 20% 15%, rgba(46,231,255,0.18), transparent 45%), radial-gradient(circle at 80% 10%, rgba(242,201,76,0.20), transparent 42%), linear-gradient(180deg, #0f1a33 0%, #0b1324 45%, #070d1a 100%)',
+            }}
+          />
+          <ParticleCanvas count={120} className="hidden sm:block" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(242,201,76,0.05),transparent)]" />
         </div>
 
@@ -257,7 +272,7 @@ const HeroSection: React.FC = () => {
         </div>
 
         {/* FOOTER TICKER — on mobile, position relative so it doesn't overlay AI oracle */}
-        <div ref={tickerContainerRef} className="lg:absolute lg:bottom-0 w-full py-4 md:py-6 border-t border-white/5 bg-black/80 backdrop-blur-lg mt-4 lg:mt-0">
+        <div ref={tickerContainerRef} className="lg:absolute lg:bottom-0 w-full py-4 md:py-6 border-t border-white/5 bg-[#0b1324]/85 sm:bg-black/80 backdrop-blur-lg mt-4 lg:mt-0">
            <div className="flex animate-ticker whitespace-nowrap">
               {[...TICKER_DATA, ...TICKER_DATA].map((item, i) => (
                 <div key={i} className="inline-flex items-center px-8 md:px-12 gap-3 md:gap-4">
