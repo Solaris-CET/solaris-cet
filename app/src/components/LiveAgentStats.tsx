@@ -31,17 +31,13 @@ function formatNum(n: number): string {
  */
 const LiveAgentStats = () => {
   const [counts, setCounts] = useState<number[]>(COUNTERS.map(c => c.base));
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const interval = setInterval(() => {
       setCounts(prev => prev.map((v, i) => v + COUNTERS[i].perSecond));
     }, 1000);
     return () => clearInterval(interval);
   }, []);
-
-  if (!mounted) return null;
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
