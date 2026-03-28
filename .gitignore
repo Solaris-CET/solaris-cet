@@ -117,3 +117,6 @@ app/coverage/
 # Local environment variables (never commit)
 .env.local
 .env.*.local
+
+# Claude Code — personal project overrides (team shares .claude/settings.json)
+.claude/settings.local.json
