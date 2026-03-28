@@ -52,7 +52,7 @@ npm run dev          # Start dev server at http://localhost:5173
 npm run build        # Production build → app/dist/
 npm run preview      # Preview production build locally
 npm run lint         # Run ESLint
-npx tsc --noEmit     # TypeScript type-check without emitting files
+npm run typecheck    # TypeScript (app + vite/api configs), same as CI
 ```
 
 ---

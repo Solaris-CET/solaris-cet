@@ -22,7 +22,7 @@ Run these from the `app/` directory unless only contracts/scripts changed.
 
 - [ ] `npm run build` succeeds
 - [ ] `npm run lint` passes
-- [ ] `npx tsc --noEmit` passes (when TypeScript changed)
+- [ ] `npm run typecheck` passes (when TypeScript changed)
 - [ ] Automated tests pass (`npm run test` in `app/` where relevant)
 - [ ] Tested manually in a browser when UI behaviour changed
 - [ ] No unjustified `any`, no stray `console.log` / debug code in production paths

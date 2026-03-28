@@ -374,7 +374,17 @@ export default function AiOracleSearch() {
     setMetrics({ confidence: 0, latency: 0, cetCost: 0 });
     setChatHistory([]);
     setSubmittedQuestion('');
-  }, []);
+  }, [
+    setIsModalOpen,
+    setPhase,
+    setQuery,
+    setLogs,
+    setFinalResponse,
+    setOracleConfidence,
+    setMetrics,
+    setChatHistory,
+    setSubmittedQuestion,
+  ]);
 
   // Escape key closes the modal
   useEffect(() => {

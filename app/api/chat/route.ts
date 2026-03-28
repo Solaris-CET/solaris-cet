@@ -19,6 +19,7 @@
  * recognised by Vite/non-Next.js deployments.
  */
 import OpenAI from 'openai';
+import { getAllowedOrigin } from '../lib/cors';
 import { resolveApiKey } from '../lib/crypto';
 
 export const config = { runtime: 'edge' };
@@ -120,23 +121,6 @@ async function fetchOnChainContext(): Promise<OnChainContext | null> {
   } catch {
     return null;
   }
-}
-
-const ALLOWED_ORIGINS = new Set([
-  'https://solaris-cet.com',
-  'https://www.solaris-cet.com',
-  'https://solaris-cet.vercel.app',
-  'https://solaris-cet.github.io',
-]);
-
-/** Returns the CORS origin to reflect back, or null when the origin is not allowed. */
-function getAllowedOrigin(origin: string | null): string {
-  if (origin && ALLOWED_ORIGINS.has(origin)) return origin;
-  // Allow Vercel preview deployments (*.vercel.app) and localhost in development
-  if (origin && (origin.endsWith('.vercel.app') || origin.startsWith('http://localhost'))) {
-    return origin;
-  }
-  return 'https://solaris-cet.com';
 }
 
 export default async function handler(req: Request): Promise<Response> {

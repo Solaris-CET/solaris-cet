@@ -75,8 +75,8 @@ npm run preview
 # Linting
 npm run lint
 
-# Verificare TypeScript
-npx tsc --noEmit
+# Verificare TypeScript (același lucru ca în CI)
+npm run typecheck
 ```
 
 ---

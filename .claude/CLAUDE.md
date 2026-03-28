@@ -9,7 +9,7 @@ cd app
 npm ci              # install (matches CI)
 npm run dev         # Vite — port 5173
 npm run lint
-npx tsc --noEmit
+npm run typecheck
 npm run test        # Vitest
 npx playwright test # E2E (requires browsers; see .devcontainer)
 npm run build

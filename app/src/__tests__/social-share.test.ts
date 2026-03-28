@@ -47,7 +47,7 @@ describe('SocialShare — native share logic', () => {
 
   it('calls navigator.share when available', async () => {
     const mockShare = vi.fn().mockResolvedValue(undefined);
-    vi.stubGlobal('navigator', { ...navigator, share: mockShare });
+    vi.stubGlobal('navigator', { share: mockShare } as unknown as Navigator);
 
     if (navigator.share) {
       await navigator.share({ title: 'Solaris CET', text: SHARE_TEXT, url: SITE_URL });
@@ -63,10 +63,9 @@ describe('SocialShare — native share logic', () => {
   it('falls back to clipboard when share is unavailable', async () => {
     const mockWriteText = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', {
-      ...navigator,
       share: undefined,
       clipboard: { writeText: mockWriteText },
-    });
+    } as unknown as Navigator);
     // Simulate clipboard fallback
     await navigator.clipboard.writeText(`${SHARE_TEXT} ${SITE_URL}`);
     expect(mockWriteText).toHaveBeenCalledWith(`${SHARE_TEXT} ${SITE_URL}`);
