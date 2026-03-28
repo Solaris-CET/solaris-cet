@@ -8,36 +8,36 @@ export async function POST(req: Request) {
     const { walletAddress } = await req.json();
 
     if (!walletAddress) {
-      return NextResponse.json({ error: 'Adresa portofelului lipsește' }, { status: 400 });
+      return NextResponse.json({ error: 'Adresa lipsește' }, { status: 400 });
     }
 
     const db = getDb();
 
-    // 1. Căutăm dacă userul există deja după adresa de portofel
-    const [existingUser] = await db
+    // Căutăm userul în baza de date
+    const [user] = await db
       .select()
       .from(schema.users)
       .where(eq(schema.users.walletAddress, walletAddress));
 
-    if (existingUser) {
-      console.log("User existent găsit:", walletAddress);
-      return NextResponse.json(existingUser);
+    // Dacă există, îl trimitem înapoi la frontend
+    if (user) {
+      return NextResponse.json(user);
     }
 
-    // 2. Dacă nu există, îl creăm acum (New User)
-    console.log("Creăm un user nou pentru:", walletAddress);
+    // Dacă nu există, creăm un rând nou în tabelul 'users'
     const [newUser] = await db
       .insert(schema.users)
       .values({
         walletAddress: walletAddress,
-        referralCode: nanoid(8).toUpperCase(), // Generăm un cod scurt de 8 caractere
+        referralCode: nanoid(8).toUpperCase(), // Exemplu: 'A1B2C3D4'
         points: 0,
+        createdAt: new Date(),
       })
       .returning();
 
     return NextResponse.json(newUser);
-  } catch (error) {
-    console.error('Eroare la autentificare:', error);
-    return NextResponse.json({ error: 'Eroare internă de server' }, { status: 500 });
+  } catch (err) {
+    console.error("Eroare Auth API:", err);
+    return NextResponse.json({ error: 'Eroare la baza de date' }, { status: 500 });
   }
 }
