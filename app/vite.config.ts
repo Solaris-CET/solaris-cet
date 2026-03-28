@@ -5,8 +5,12 @@ import { compression } from "vite-plugin-compression2"
 import { VitePWA } from 'vite-plugin-pwa'
 
 /**
- * Coolify / PaaS often set `PORT`. `0` is valid for Vite (pick a free port);
- * avoid `||` so `0` is not replaced by the fallback.
+ * Resolves `preview.port` for Coolify / `vite preview`.
+ * - Unset or empty `PORT` → `fallback` (default 4173).
+ * - `PORT=0` → kept (Vite may pick a free port); `||` would wrongly replace `0`.
+ * - Invalid values → `fallback` (`parseInt` + finite check).
+ * Note: `NaN` is falsy, so `Number(x) || fallback` would still pick the fallback when
+ * unset — but `Number(undefined) ?? fallback` is wrong (`NaN` is not nullish).
  */
 function resolvePreviewPort(fallback = 4173): number {
   const raw = process.env.PORT

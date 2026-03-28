@@ -34,7 +34,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "npm exec -- tsc -b && vite build",
+    "build": "npm exec --package=typescript -- tsc -b && vite build",
     "start": "vite preview",
     "lint": "eslint .",
     "preview": "vite preview",
