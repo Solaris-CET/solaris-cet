@@ -17,7 +17,7 @@ solaris-cet/
 ├── .github/
 │   ├── workflows/deploy-pages.yml   # CI/CD: build + deploy to GitHub Pages
 │   ├── ISSUE_TEMPLATE/              # Bug report and feature request forms
-│   ├── pull_request_template.md     # PR checklist template
+│   ├── PULL_REQUEST_TEMPLATE.md     # PR checklist template
 │   └── copilot-instructions.md      # This file
 ├── app/                             # ← ALL source code lives here
 │   ├── src/
@@ -107,7 +107,7 @@ Before opening a PR, verify:
 
 1. `npm run build` passes without errors (run from `app/`)
 2. `npm run lint` passes without errors (run from `app/`)
-3. The PR description follows the `.github/pull_request_template.md` checklist
+3. The PR description follows the `.github/PULL_REQUEST_TEMPLATE.md` checklist
 
 ---
 

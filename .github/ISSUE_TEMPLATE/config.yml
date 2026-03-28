@@ -1,11 +1,11 @@
 blank_issues_enabled: false
 contact_links:
-  - name: "📖 Documentație Solaris CET"
-    url: https://github.com/aamclaudiu-hash/solaris-cet/blob/main/README.md
-    about: "Consultă documentația proiectului înainte de a deschide un issue."
-  - name: "🤝 Ghid de Contribuție"
-    url: https://github.com/aamclaudiu-hash/solaris-cet/blob/main/CONTRIBUTING.md
-    about: "Citește ghidul de contribuție pentru a înțelege procesul."
-  - name: "🔒 Raportare Vulnerabilitate de Securitate"
+  - name: Project documentation
+    url: https://github.com/Solaris-CET/solaris-cet/blob/main/README.md
+    about: Read the README before opening an issue.
+  - name: Contributing guide
+    url: https://github.com/Solaris-CET/solaris-cet/blob/main/CONTRIBUTING.md
+    about: Contribution process and standards.
+  - name: Security contact
     url: mailto:security@solaris-cet.io
-    about: "Pentru vulnerabilități de securitate, contactează-ne direct — nu deschide un issue public."
+    about: Report security issues privately — do not use a public issue.

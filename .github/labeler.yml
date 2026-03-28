@@ -1,11 +1,5 @@
-# PR Auto-Labeler Configuration
-# Maps labels to changed file path patterns.
-# Used by .github/workflows/labeler.yml (actions/labeler@v5).
-
-"frontend":
-# .github/labeler.yml
-# Maps file-path patterns to PR labels for `actions/labeler@v5`.
-# Labels must exist in the repository before this workflow can apply them.
+# Path → label mapping for actions/labeler@v6.
+# Labels must exist in the repository (create them once under Issues → Labels).
 
 "area: frontend":
   - changed-files:
@@ -13,65 +7,6 @@
       - "app/src/**"
       - "app/index.html"
       - "app/public/**"
-
-"ci":
-  - changed-files:
-    - any-glob-to-any-file:
-      - ".github/workflows/**"
-      - ".github/dependabot.yml"
-      - ".github/labeler.yml"
-
-"dependencies":
-  - changed-files:
-    - any-glob-to-any-file:
-      - "app/package.json"
-      - "app/package-lock.json"
-      - "contracts/package.json"
-      - "contracts/package-lock.json"
-
-"documentation":
-  - changed-files:
-    - any-glob-to-any-file:
-      - "**/*.md"
-      - "docs/**"
-      - ".github/ISSUE_TEMPLATE/**"
-      - ".github/pull_request_template.md"
-      - ".github/PULL_REQUEST_TEMPLATE.md"
-
-"config":
-  - changed-files:
-    - any-glob-to-any-file:
-      - "app/vite.config.ts"
-      - "app/tailwind.config.js"
-      - "app/tsconfig*.json"
-      - "app/eslint.config.js"
-      - "app/vitest.config.ts"
-      - "app/postcss.config.js"
-      - "app/lighthouserc.cjs"
-      - "app/components.json"
-
-"testing":
-  - changed-files:
-    - any-glob-to-any-file:
-      # Vitest unit tests use .test.{ts,tsx}; Playwright E2E tests use .spec.{ts,tsx}
-      - "app/src/**/*.test.ts"
-      - "app/src/**/*.test.tsx"
-      - "app/tests/**/*.spec.ts"
-      - "app/tests/**/*.spec.tsx"
-      - "contracts/tests/**"
-
-"security":
-  - changed-files:
-    - any-glob-to-any-file:
-      - "SECURITY.md"
-      - ".github/workflows/codeql.yml"
-
-"smart-contracts":
-  - changed-files:
-    - any-glob-to-any-file:
-      - "contracts/**"
-      - "app/tailwind.config.js"
-      - "app/vite.config.ts"
 
 "area: sections":
   - changed-files:
@@ -93,32 +28,15 @@
     - any-glob-to-any-file:
       - "app/src/i18n/**"
 
+"area: public":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/public/**"
+
 "area: contracts":
   - changed-files:
     - any-glob-to-any-file:
       - "contracts/**"
-
-"area: ci":
-  - changed-files:
-    - any-glob-to-any-file:
-      - ".github/workflows/**"
-      - ".github/dependabot.yml"
-
-"area: docs":
-  - changed-files:
-    - any-glob-to-any-file:
-      - "*.md"
-      - "docs/**"
-      - ".github/ISSUE_TEMPLATE/**"
-      - ".github/pull_request_template.md"
-
-"dependencies":
-  - changed-files:
-    - any-glob-to-any-file:
-      - "app/package.json"
-      - "app/package-lock.json"
-      - "contracts/package.json"
-      - "contracts/package-lock.json"
 
 "area: tests":
   - changed-files:
@@ -127,7 +45,59 @@
       - "app/tests/**"
       - "contracts/tests/**"
 
-"area: public":
+"ci":
   - changed-files:
     - any-glob-to-any-file:
-      - "app/public/**"
+      - ".github/workflows/**"
+      - ".github/dependabot.yml"
+      - ".github/labeler.yml"
+
+"config":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/vite.config.ts"
+      - "app/tailwind.config.js"
+      - "app/tsconfig*.json"
+      - "app/eslint.config.js"
+      - "app/vitest.config.ts"
+      - "app/postcss.config.js"
+      - "app/lighthouserc.cjs"
+      - "app/components.json"
+
+"dependencies":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/package.json"
+      - "app/package-lock.json"
+      - "contracts/package.json"
+      - "contracts/package-lock.json"
+      - "scripts/package.json"
+      - "scripts/package-lock.json"
+
+"documentation":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "**/*.md"
+      - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/PULL_REQUEST_TEMPLATE.md"
+
+"security":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "SECURITY.md"
+      - ".github/workflows/codeql.yml"
+
+"smart-contracts":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "contracts/**"
+
+"testing":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/src/**/*.test.ts"
+      - "app/src/**/*.test.tsx"
+      - "app/tests/**/*.spec.ts"
+      - "app/tests/**/*.spec.tsx"
+      - "contracts/tests/**"

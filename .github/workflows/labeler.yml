@@ -1,10 +1,7 @@
 name: PR Auto-Labeler
 
-# Automatically applies labels to pull requests based on the file paths that
-# were changed. Uses the official `actions/labeler` action (free for all repos).
-# Labels are configured in `.github/labeler.yml`.
-# Automatically applies labels to pull requests based on the files changed.
-# Uses the free GitHub `actions/labeler` action.
+# Applies labels from `.github/labeler.yml` based on changed file paths.
+# https://github.com/actions/labeler
 
 on:
   pull_request:
@@ -23,12 +20,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Apply labels
-        uses: actions/labeler@v5
-    name: Label PR by changed files
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/labeler@v6
+        uses: actions/labeler@v6
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           configuration-path: .github/labeler.yml

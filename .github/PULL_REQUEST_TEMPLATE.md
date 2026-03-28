@@ -1,26 +1,38 @@
-## Description
+## Summary
 
-<!-- Describe what this PR does and why. -->
+<!-- What does this PR change and why? -->
 
-## Related Issues
+## Related issues
 
-<!-- Reference any related issues, e.g. "Closes #42" -->
+<!-- e.g. Closes #42 -->
 
-## Type of Change
+## Type of change
 
 - [ ] Bug fix
 - [ ] New feature
-- [ ] Documentation update
-- [ ] Refactor / code quality
-- [ ] Chore (build, tooling, dependencies)
+- [ ] Documentation only
+- [ ] Refactor / quality (no behaviour change)
+- [ ] Tests
+- [ ] CI / tooling / dependencies
+- [ ] Breaking change (describe migration below)
 
 ## Checklist
 
-- [ ] `npm run build` passes without errors
-- [ ] `npm run lint` passes without errors
-- [ ] I have tested the change locally in a browser
-- [ ] I have updated documentation if necessary
+Run these from the `app/` directory unless only contracts/scripts changed.
 
-## Screenshots (if applicable)
+- [ ] `npm run build` succeeds
+- [ ] `npm run lint` passes
+- [ ] `npx tsc --noEmit` passes (when TypeScript changed)
+- [ ] Automated tests pass (`npm run test` in `app/` where relevant)
+- [ ] Tested manually in a browser when UI behaviour changed
+- [ ] No unjustified `any`, no stray `console.log` / debug code in production paths
+- [ ] New UI uses existing Tailwind / component patterns; GSAP plugins registered only where the project already does (e.g. `App.tsx`)
+- [ ] Docs updated if user-facing behaviour or setup changed
 
-<!-- Add before/after screenshots for UI changes -->
+## Screenshots / recordings
+
+<!-- For visual changes, add before/after or a short clip. -->
+
+## Breaking changes
+
+<!-- If applicable: what breaks and how consumers should migrate. -->
