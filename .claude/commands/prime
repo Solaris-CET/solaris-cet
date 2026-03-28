@@ -1,10 +1,17 @@
+# Prime — load project cognitive modules
+#
+# Paste this block at the start of a session, or run from repo root:
+#   cat .claude/commands/prime
+#
+# Then ask the assistant to read each listed SKILL.md in order.
+
 Load the following skill documents into your active context before beginning any task in this session.
 Each document defines a cognitive module; treat their contracts as hard constraints throughout.
 
-Skills to load (in order):
+Skills to load (in order — metacognition first so monitoring applies to all subsequent reasoning):
 1. .claude/skills/metacognition/SKILL.md
 2. .claude/skills/active_inference/SKILL.md
 3. .claude/skills/tree_search/SKILL.md
 4. .claude/skills/memory/SKILL.md
 
-After loading, confirm with a one-line summary of each module, then proceed with the user's task.
+After loading, confirm with a one-line summary of each module (name + main idea), then proceed with the user's task.
