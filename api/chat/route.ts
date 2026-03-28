@@ -1,30 +1,34 @@
 /**
- * Vercel Edge Function — POST /api/chat
+ * Vercel Edge — POST `/api/chat` (OpenAI-only fallback path).
  *
- * Proxies queries to the OpenAI chat completions API on behalf of the
- * Solaris AI Oracle search component. Requires OPENAI_API_KEY to be set
- * as a Vercel environment variable.
+ * **Production Oracle** (Grok × Gemini, RAV, DeDust context) lives in
+ * `app/api/chat/route.ts`. Configure the Vercel project **Root Directory** to
+ * `app` so that route is the one that ships. This file exists for deployments
+ * that use the repository root as the Vercel root; see `api/README.md`.
+ *
+ * Env: `OPENAI_API_KEY`
  */
+import { corsJsonHeaders, corsPreflightHeaders, getAllowedOrigin } from '../lib/cors';
 
 export const config = { runtime: 'edge' };
 
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Content-Type': 'application/json',
-};
+const MAX_QUERY_LENGTH = 8_000;
+
+const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
+const MODEL = 'gpt-4o-mini';
 
 export default async function handler(request: Request): Promise<Response> {
-  // Handle CORS preflight
+  const origin = request.headers.get('origin');
+  const allowedOrigin = getAllowedOrigin(origin);
+
   if (request.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: CORS_HEADERS });
+    return new Response(null, { status: 204, headers: corsPreflightHeaders(allowedOrigin) });
   }
 
   if (request.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+    return new Response(JSON.stringify({ message: 'Method not allowed' }), {
       status: 405,
-      headers: CORS_HEADERS,
+      headers: corsJsonHeaders(allowedOrigin),
     });
   }
 
@@ -32,9 +36,10 @@ export default async function handler(request: Request): Promise<Response> {
   if (!apiKey) {
     return new Response(
       JSON.stringify({
-        response: 'Solaris Intelligence Offline: Missing Credentials.',
+        response:
+          'Solaris Intelligence Offline: Missing Credentials.',
       }),
-      { status: 503, headers: CORS_HEADERS },
+      { status: 503, headers: corsJsonHeaders(allowedOrigin) },
     );
   }
 
@@ -43,28 +48,38 @@ export default async function handler(request: Request): Promise<Response> {
     const body = (await request.json()) as { query?: string };
     query = (body.query ?? '').trim();
   } catch {
-    return new Response(JSON.stringify({ error: 'Invalid request body' }), {
+    return new Response(JSON.stringify({ message: 'Invalid request body' }), {
       status: 400,
-      headers: CORS_HEADERS,
+      headers: corsJsonHeaders(allowedOrigin),
     });
   }
 
   if (!query) {
-    return new Response(JSON.stringify({ error: 'Query is required' }), {
+    return new Response(JSON.stringify({ message: 'Query is required' }), {
       status: 400,
-      headers: CORS_HEADERS,
+      headers: corsJsonHeaders(allowedOrigin),
     });
   }
 
+  if (query.length > MAX_QUERY_LENGTH) {
+    return new Response(
+      JSON.stringify({ message: `Query must be at most ${MAX_QUERY_LENGTH} characters` }),
+      {
+        status: 400,
+        headers: corsJsonHeaders(allowedOrigin),
+      },
+    );
+  }
+
   try {
-    const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+    const openaiRes = await fetch(OPENAI_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: MODEL,
         messages: [
           {
             role: 'system',
@@ -83,10 +98,10 @@ export default async function handler(request: Request): Promise<Response> {
 
     if (!openaiRes.ok) {
       const errText = await openaiRes.text();
-      console.error('OpenAI API error:', errText);
-      return new Response(JSON.stringify({ error: 'AI provider error' }), {
+      console.error('OpenAI API error:', openaiRes.status, errText.slice(0, 200));
+      return new Response(JSON.stringify({ message: 'AI provider error' }), {
         status: 502,
-        headers: CORS_HEADERS,
+        headers: corsJsonHeaders(allowedOrigin),
       });
     }
 
@@ -97,13 +112,13 @@ export default async function handler(request: Request): Promise<Response> {
 
     return new Response(JSON.stringify({ response }), {
       status: 200,
-      headers: CORS_HEADERS,
+      headers: corsJsonHeaders(allowedOrigin),
     });
   } catch (err) {
     console.error('Handler error:', err);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+    return new Response(JSON.stringify({ message: 'Internal server error' }), {
       status: 500,
-      headers: CORS_HEADERS,
+      headers: corsJsonHeaders(allowedOrigin),
     });
   }
 }
