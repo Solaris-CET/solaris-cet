@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useNearScreen } from '@/hooks/useNearScreen';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { skillCaptionForDept } from '@/lib/meshSkillFeed';
 
 interface DeptIntel {
   id: string;
@@ -44,6 +45,16 @@ const DepartmentIntelligenceScores = () => {
   );
 
   const [scores, setScores] = useState<Record<string, number>>(initial);
+  const [skillTick, setSkillTick] = useState(0);
+
+  // Rotating recombinant captions per department (mesh-bound)
+  useEffect(() => {
+    if (!isNearScreen || prefersReducedMotion) return;
+    const id = window.setInterval(() => {
+      setSkillTick((t) => t + 1);
+    }, 5200);
+    return () => window.clearInterval(id);
+  }, [isNearScreen, prefersReducedMotion]);
 
   // Ramp from base → target when section nears viewport
   useEffect(() => {
@@ -106,6 +117,7 @@ const DepartmentIntelligenceScores = () => {
           const Icon = d.icon;
           const v = scores[d.id] ?? d.base;
           const pct = Math.min(100, Math.max(0, v));
+          const skillLine = skillCaptionForDept(d.id, skillTick);
           return (
             <li key={d.id} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
               <div className="flex items-center gap-2 min-w-0 sm:w-[200px] shrink-0">
@@ -114,16 +126,21 @@ const DepartmentIntelligenceScores = () => {
                 </div>
                 <span className="text-[11px] sm:text-xs text-solaris-text truncate">{d.name}</span>
               </div>
-              <div className="flex-1 flex items-center gap-2 min-w-0">
-                <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden border border-white/5">
-                  <div
-                    className={`h-full rounded-full ${d.bar} transition-[width] duration-500 ease-out shadow-[0_0_12px_rgba(242,201,76,0.15)]`}
-                    style={{ width: `${pct}%` }}
-                  />
+              <div className="flex-1 flex flex-col gap-1 min-w-0">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden border border-white/5">
+                    <div
+                      className={`h-full rounded-full ${d.bar} transition-[width] duration-500 ease-out shadow-[0_0_12px_rgba(242,201,76,0.15)]`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <span className={`font-mono text-xs tabular-nums w-12 text-right shrink-0 ${d.color}`}>
+                    {pct.toFixed(1)}
+                  </span>
                 </div>
-                <span className={`font-mono text-xs tabular-nums w-12 text-right shrink-0 ${d.color}`}>
-                  {pct.toFixed(1)}
-                </span>
+                <p className="text-[9px] font-mono text-white/35 leading-snug truncate pl-0 sm:pl-9" title={skillLine}>
+                  {skillLine}
+                </p>
               </div>
             </li>
           );

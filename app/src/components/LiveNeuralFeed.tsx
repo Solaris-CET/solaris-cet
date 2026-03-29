@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Activity } from 'lucide-react';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { expressSkillForFeed } from '@/lib/skillGenome';
+import { expressMeshSkillForFeed } from '@/lib/meshSkillFeed';
 
 const DEPTS = [
   'customer-ops',
@@ -31,14 +32,18 @@ function rand<T>(arr: readonly T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]!;
 }
 
-function makeLine(skillSeqRef: { n: number }): string {
+function makeLine(skillSeqRef: { n: number }, meshSeqRef: { n: number }): string {
   const t = new Date().toISOString().slice(11, 23);
   const r = Math.random();
-  if (r < 0.055) {
+  if (r < 0.048) {
     const { line } = expressSkillForFeed(skillSeqRef.n++);
     return line;
   }
-  if (r < 0.095) {
+  if (r < 0.096) {
+    const { line } = expressMeshSkillForFeed(meshSeqRef.n++);
+    return line;
+  }
+  if (r < 0.132) {
     const sparks = ['✦', '◇', '◈', '✧'];
     return `[${t}] [CHIME] mesh_resonance=${rand(sparks)} observer=you latency_ms=0.0 (almost)`;
   }
@@ -70,11 +75,12 @@ const LiveNeuralFeed = () => {
   ]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const skillSeqRef = useRef({ n: 0 });
+  const meshSeqRef = useRef({ n: 0 });
   const prefersReducedMotion = useReducedMotion();
 
   const tick = useCallback(() => {
     setLines(prev => {
-      const next = [...prev, makeLine(skillSeqRef.current)];
+      const next = [...prev, makeLine(skillSeqRef.current, meshSeqRef.current)];
       return next.length > MAX_LINES ? next.slice(-MAX_LINES) : next;
     });
   }, []);
@@ -122,9 +128,11 @@ const LiveNeuralFeed = () => {
             className={
               line.includes('[CHIME]')
                 ? 'text-solaris-gold whitespace-pre-wrap break-all drop-shadow-[0_0_8px_rgba(242,201,76,0.35)]'
-                : i === lines.length - 1
-                  ? 'text-solaris-text whitespace-pre-wrap break-all'
-                  : 'text-solaris-muted/85 whitespace-pre-wrap break-all'
+                : line.includes('[SKILL_MESH]') || line.includes('[SKILL_EXPR]')
+                  ? 'text-fuchsia-300/90 whitespace-pre-wrap break-all drop-shadow-[0_0_6px_rgba(217,70,239,0.22)]'
+                  : i === lines.length - 1
+                    ? 'text-solaris-text whitespace-pre-wrap break-all'
+                    : 'text-solaris-muted/85 whitespace-pre-wrap break-all'
             }
           >
             {line}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { shortSkillWhisper } from '@/lib/meshSkillFeed';
 
 const WHISPERS = [
   'Undeva între Grok și Gemini, un agent tocmai a legat un fir de date de dealul cu pământul din Cetățuia.',
@@ -13,17 +14,20 @@ const WHISPERS = [
   'Cât timp ești aici, tastatura e un al doilea canal — unii își amintesc un ritual din anii ’80.',
 ];
 
+const SKILL_WHISPERS = Array.from({ length: 36 }, (_, n) => shortSkillWhisper(n));
+const WHISPERS_ALL = [...WHISPERS, ...SKILL_WHISPERS];
+
 /**
  * Rotating micro-poetry strip — human warmth in a technical section.
  */
 const AgenticWhispers = () => {
-  const [i, setI] = useState(() => Math.floor(Math.random() * WHISPERS.length));
+  const [i, setI] = useState(() => Math.floor(Math.random() * WHISPERS_ALL.length));
   const reduce = useReducedMotion();
 
   useEffect(() => {
     if (reduce) return;
     const id = window.setInterval(() => {
-      setI(prev => (prev + 1) % WHISPERS.length);
+      setI(prev => (prev + 1) % WHISPERS_ALL.length);
     }, 8200);
     return () => window.clearInterval(id);
   }, [reduce]);
@@ -37,10 +41,14 @@ const AgenticWhispers = () => {
           <div className="hud-label text-[9px] text-solaris-gold/90 mb-1 tracking-[0.2em]">MESH WHISPER</div>
           <p
             key={i}
-            className="text-sm sm:text-base text-solaris-text/90 leading-snug font-display italic transition-opacity duration-700"
+            className={
+              i >= WHISPERS.length
+                ? 'text-xs sm:text-sm text-fuchsia-200/85 leading-snug font-mono transition-opacity duration-700'
+                : 'text-sm sm:text-base text-solaris-text/90 leading-snug font-display italic transition-opacity duration-700'
+            }
             style={{ animation: reduce ? undefined : 'whisper-in 0.9s ease-out' }}
           >
-            {WHISPERS[i]}
+            {WHISPERS_ALL[i]}
           </p>
         </div>
       </div>
