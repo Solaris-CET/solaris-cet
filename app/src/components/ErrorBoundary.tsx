@@ -80,7 +80,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 <button
                   type="button"
                   onClick={this.handleRetry}
-                  className="px-6 py-2 bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors"
+                  className="px-6 py-2 bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-all duration-200"
                 >
                   Try Again
                 </button>
@@ -88,7 +88,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <button
                 type="button"
                 onClick={() => window.location.reload()}
-                className={`px-6 py-2 rounded-lg transition-colors ${
+                className={`px-6 py-2 rounded-lg transition-all duration-200 ${
                   canRetry
                     ? 'bg-white/10 hover:bg-white/20 text-gray-300'
                     : 'bg-cyan-500 hover:bg-cyan-400'

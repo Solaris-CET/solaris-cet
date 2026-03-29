@@ -101,7 +101,7 @@ const Navigation = () => {
           {/* Logo */}
           <a href="#main-content" className="flex items-center gap-2 sm:gap-3 group min-w-0 shrink">
             <div className="relative w-8 h-8 xl:w-10 xl:h-10">
-              <Sun className="w-full h-full text-solaris-gold transition-transform duration-700 group-hover:rotate-180" />
+              <Sun className="solaris-icon-glow w-full h-full text-solaris-gold transition-transform duration-700 group-hover:rotate-180" />
               {/* Logo glow */}
               <div className="absolute inset-0 rounded-full bg-solaris-gold/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>

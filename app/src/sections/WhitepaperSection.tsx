@@ -235,7 +235,7 @@ const WPSectionCard = ({ section }: { section: WPSection }) => {
     <div id={`wp-card-${section.id}`} className={`rounded-2xl border ${c.border} bg-white/[0.02] overflow-hidden transition-all duration-300`}>
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center gap-4 p-5 text-left hover:bg-white/[0.03] transition-colors"
+        className="w-full flex items-center gap-4 p-5 text-left hover:bg-white/[0.03] transition-all duration-200"
         aria-expanded={open}
       >
         <div className={`shrink-0 w-10 h-10 rounded-xl ${c.bg} flex items-center justify-center`}>
@@ -422,7 +422,7 @@ const WhitepaperSection = () => {
                 onClick={() => {
                   document.getElementById(`wp-card-${section.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }}
-                className={`flex flex-col items-start gap-2 p-3 rounded-xl border ${c.border} bg-white/[0.02] hover:bg-white/[0.05] transition-colors text-left group`}
+                className={`flex flex-col items-start gap-2 p-3 rounded-xl border ${c.border} bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-200 text-left group`}
               >
                 <div className={`w-8 h-8 rounded-lg ${c.bg} flex items-center justify-center shrink-0`}>
                   <Icon className={`w-4 h-4 ${c.text}`} />

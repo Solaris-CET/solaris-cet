@@ -162,7 +162,7 @@ function AppContent() {
           {/* Animated logo */}
           <div className="relative">
             <div className="w-16 h-16 rounded-2xl bg-solaris-gold/10 flex items-center justify-center animate-gold-pulse">
-              <svg viewBox="0 0 32 32" className="w-8 h-8 text-solaris-gold" fill="currentColor">
+              <svg viewBox="0 0 32 32" className="solaris-icon-glow w-8 h-8 text-solaris-gold" fill="currentColor">
                 <circle cx="16" cy="16" r="6" opacity="0.9" />
                 <path d="M16 4 L17.2 12 L16 10 L14.8 12 Z" opacity="0.7" />
                 <path d="M16 28 L17.2 20 L16 22 L14.8 20 Z" opacity="0.7" />

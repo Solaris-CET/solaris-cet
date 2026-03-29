@@ -98,8 +98,8 @@ input[type="range"]::-moz-range-thumb {
   background: radial-gradient(circle, var(--tw-gradient-from), var(--tw-gradient-to));
 }
 
-/* Smooth transitions for all interactive elements */
-button, a, input {
+/* Smooth transitions for links & inputs (buttons: index.css @layer base + Tailwind Button) */
+a, input {
   transition: all 0.3s ease;
 }
 

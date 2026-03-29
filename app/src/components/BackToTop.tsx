@@ -35,7 +35,7 @@ const BackToTop = () => {
           : 'opacity-0 translate-y-6 pointer-events-none'}
       `}
     >
-      <Sun className="w-5 h-5 animate-spin-slow" strokeWidth={2} />
+      <Sun className="solaris-icon-glow w-5 h-5 animate-spin-slow" strokeWidth={2} />
     </button>
   );
 };

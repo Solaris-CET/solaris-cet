@@ -735,7 +735,7 @@ export default function AiOracleSearch() {
                   onClick={() => setChatHistory([])}
                   aria-label="Clear chat history"
                   title="Clear history"
-                  className="p-2 rounded-lg text-gray-600 hover:text-red-400 hover:bg-gray-800 transition-colors"
+                  className="p-2 rounded-lg text-gray-600 hover:text-red-400 hover:bg-gray-800 transition-all duration-200"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -743,7 +743,7 @@ export default function AiOracleSearch() {
               <button
                 onClick={handleClose}
                 aria-label="Close Oracle"
-                className="ml-1 min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors touch-manipulation"
+                className="ml-1 min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all duration-200 touch-manipulation"
               >
                 <X className="w-5 h-5" />
               </button>

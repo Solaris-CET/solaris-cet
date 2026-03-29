@@ -145,7 +145,7 @@ const NovaAppSection = () => {
                       alt="Solaris CET"
                       width="24"
                       height="24"
-                      className="w-6 h-6 rounded-md object-contain"
+                      className="solaris-icon-glow w-6 h-6 rounded-md object-contain"
                     />
                     <span className="font-display font-semibold text-solaris-text text-sm">CET</span>
                   </div>
@@ -194,7 +194,7 @@ const NovaAppSection = () => {
                 alt="Solaris CET"
                 width="40"
                 height="40"
-                className="w-full h-full object-contain"
+                className="solaris-icon-glow w-full h-full object-contain"
               />
             </div>
             <span className="hud-label text-solaris-gold">Mobile Mining</span>

@@ -205,7 +205,7 @@ const FAQSection = () => {
             <div key={i} className="faq-item bento-card border border-white/8 overflow-hidden" role="listitem">
               <button
                 id={`faq-btn-${i}`}
-                className="faq-trigger w-full flex items-center justify-between p-5 sm:p-6 md:p-7 text-left group"
+                className="faq-trigger w-full flex items-center justify-between p-5 sm:p-6 md:p-7 text-left group transition-all duration-300"
                 aria-expanded={openIndex === i}
                 aria-controls={`faq-panel-${i}`}
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}

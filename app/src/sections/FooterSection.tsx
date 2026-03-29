@@ -165,7 +165,7 @@ const FooterSection = () => {
           </div>
           <button
             onClick={handleCopyContract}
-            className="shrink-0 p-2 rounded-lg bg-white/5 hover:bg-solaris-gold/10 transition-colors"
+            className="shrink-0 p-2 rounded-lg bg-white/5 hover:bg-solaris-gold/10 transition-all duration-200"
             aria-label="Copy CET contract address"
           >
             {copiedContract
@@ -192,7 +192,7 @@ const FooterSection = () => {
           </div>
           <button
             onClick={handleCopyPool}
-            className="shrink-0 p-2 rounded-lg bg-white/5 hover:bg-solaris-gold/10 transition-colors"
+            className="shrink-0 p-2 rounded-lg bg-white/5 hover:bg-solaris-gold/10 transition-all duration-200"
             aria-label="Copy DeDust pool address"
           >
             {copiedPool
@@ -240,7 +240,7 @@ const FooterSection = () => {
         <footer ref={footerRef} className="pt-8 border-t border-white/10">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="flex items-center gap-3">
-              <Sun className="w-8 h-8 text-solaris-gold animate-spin-slow" />
+              <Sun className="solaris-icon-glow w-8 h-8 text-solaris-gold animate-spin-slow" />
               <span className="font-display font-semibold text-lg text-solaris-text">
                 Solaris <span className="text-solaris-gold">CET</span>
               </span>
