@@ -518,6 +518,7 @@ export default function AiOracleSearch() {
       'INFO',
       `SKILL_LOCUS: ${observeLocusClip(q, observeLocusBranchFromTopic(detected))} · topic=${detected}`
     );
+    addLog('INFO', `PARSE_MESH: ${deepLatticeLineForQuery(`${q}|observeParse`)}`);
 
     schedule(() => {
       setPhase('observe_context');
@@ -845,7 +846,8 @@ export default function AiOracleSearch() {
                             log.message.startsWith('CROSS_MESH:') ||
                             log.message.startsWith('CONSENSUS_BURST:') ||
                             log.message.startsWith('VALIDATE_MESH:') ||
-                            log.message.startsWith('ACT_MESH:');
+                            log.message.startsWith('ACT_MESH:') ||
+                            log.message.startsWith('PARSE_MESH:');
                           return (
                             <div
                               key={log.id}

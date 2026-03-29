@@ -36,6 +36,7 @@ const FooterSection = lazy(() => import('./sections/FooterSection'));
 import { LanguageContext, useLanguageState } from './hooks/useLanguage';
 import { Analytics } from '@vercel/analytics/react';
 import './App.css';
+import { shortSkillWhisper, skillSeedFromLabel } from './lib/meshSkillFeed';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -187,6 +188,10 @@ function AppContent() {
           <div className="loading-bar-track">
             <div className="loading-bar-fill" />
           </div>
+
+          <p className="max-w-[min(92vw,320px)] text-center text-[9px] font-mono text-fuchsia-200/40 leading-snug line-clamp-2 px-2">
+            {shortSkillWhisper(skillSeedFromLabel('appLoader|meshWarm'))}
+          </p>
         </div>
       </div>
 

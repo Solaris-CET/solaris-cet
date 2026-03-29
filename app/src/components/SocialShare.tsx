@@ -1,5 +1,6 @@
 import { Share2, X } from 'lucide-react';
 import { useTelegram } from '../hooks/useTelegram';
+import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 
 const SITE_URL = 'https://solaris-cet.vercel.app/';
 const SHARE_TEXT =
@@ -39,7 +40,8 @@ const SocialShare = () => {
   };
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
+    <div className="flex flex-col gap-2 w-full sm:w-auto">
+      <div className="flex items-center gap-2 flex-wrap">
       <button
         onClick={shareToX}
         aria-label="Share on X / X"
@@ -56,6 +58,13 @@ const SocialShare = () => {
         <Share2 className="w-3.5 h-3.5" />
         <span>Share</span>
       </button>
+      </div>
+      <p
+        className="text-[9px] font-mono text-fuchsia-200/55 leading-snug line-clamp-2 border-t border-fuchsia-500/10 pt-2 text-center sm:text-left max-w-md"
+        title={shortSkillWhisper(skillSeedFromLabel('socialShare|mesh'))}
+      >
+        {shortSkillWhisper(skillSeedFromLabel('socialShare|mesh'))}
+      </p>
     </div>
   );
 };

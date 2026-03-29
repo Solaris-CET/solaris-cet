@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { TonConnectButton, useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
+import { standardSkillBurst, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 
 /**
  * WalletConnect — thin wrapper around the TonConnect UI button.
@@ -59,7 +60,10 @@ const WalletConnect = () => {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div
+      className="flex items-center gap-2"
+      title={standardSkillBurst(skillSeedFromLabel('walletConnect|tonMesh'))}
+    >
       <TonConnectButton className="ton-connect-btn" />
       {wallet && (
         <button className="btn-gold text-sm" onClick={handleTestTransaction}>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Sun } from 'lucide-react';
+import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 
 /**
  * BackToTop — a floating golden sun button that appears after 600px scroll.
@@ -18,6 +19,7 @@ const BackToTop = () => {
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       aria-label="Back to top"
+      title={shortSkillWhisper(skillSeedFromLabel('backToTop|scrollAnchor'))}
       aria-hidden={!visible}
       className={`
         fixed bottom-6 right-6 z-[999]
