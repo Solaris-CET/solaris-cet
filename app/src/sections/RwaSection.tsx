@@ -1,7 +1,30 @@
 import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
-import { MapPin, Leaf, Shield, TrendingUp, Layers, Sun } from 'lucide-react';
+import { MapPin, Leaf, Shield, TrendingUp, Layers, Sun, Landmark } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
+
+/** Inline SVG placeholder — replace with on-site photography of Cetățuia land when available */
+const PHYSICAL_ASSET_PLACEHOLDER_BG =
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 800" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="pa" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0a1410"/>
+          <stop offset="55%" stop-color="#12261c"/>
+          <stop offset="100%" stop-color="#0d1f16"/>
+        </linearGradient>
+        <pattern id="grain" width="4" height="4" patternUnits="userSpaceOnUse">
+          <rect width="4" height="4" fill="rgba(255,255,255,0.02)"/>
+        </pattern>
+      </defs>
+      <rect fill="url(#pa)" width="1920" height="800"/>
+      <rect fill="url(#grain)" width="1920" height="800"/>
+      <ellipse cx="960" cy="620" rx="900" ry="120" fill="rgba(16,185,129,0.08)"/>
+      <text x="960" y="380" text-anchor="middle" fill="rgba(110,231,183,0.35)" font-family="ui-sans-serif,system-ui,sans-serif" font-size="22" font-weight="600">Physical asset image — placeholder</text>
+      <text x="960" y="420" text-anchor="middle" fill="rgba(148,163,184,0.45)" font-family="ui-monospace,monospace" font-size="14">Cetățuia, Romania · agricultural land</text>
+    </svg>`
+  );
 
 // ─── RWA stats ────────────────────────────────────────────────────────────
 
@@ -58,6 +81,7 @@ const RWA_PILLARS = [
 const RwaSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const gridRef    = useRef<HTMLDivElement>(null);
+  const physicalAssetRef = useRef<HTMLDivElement>(null);
   const pillarsRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -74,6 +98,18 @@ const RwaSection = () => {
           duration: 0.7,
           ease: 'expo.out',
           scrollTrigger: { trigger: gridRef.current, start: 'top 82%', toggleActions: 'play none none none' },
+        }
+      );
+      // Physical asset panel
+      gsap.fromTo(
+        physicalAssetRef.current?.querySelectorAll('.physical-asset-animate') ?? [],
+        { y: 28, opacity: 0 },
+        {
+          y: 0, opacity: 1,
+          stagger: { each: 0.08 },
+          duration: 0.75,
+          ease: 'expo.out',
+          scrollTrigger: { trigger: physicalAssetRef.current, start: 'top 85%', toggleActions: 'play none none none' },
         }
       );
       // Pillars entrance
@@ -121,6 +157,49 @@ const RwaSection = () => {
             Productive agricultural land in Cetățuia, Romania — managed by 200,000 AI agents —
             provides structural backing that no competitor can replicate.
           </p>
+        </div>
+
+        {/* Physical asset — token ↔ land (not digital air) */}
+        <div
+          id="physical-asset"
+          ref={physicalAssetRef}
+          className="relative mb-12 rounded-2xl overflow-hidden border border-emerald-400/25 shadow-depth min-h-[min(52vh,420px)]"
+          aria-labelledby="physical-asset-heading"
+        >
+          <div
+            className="absolute inset-0 bg-cover bg-center scale-105 motion-safe:transition-transform duration-700"
+            style={{
+              backgroundImage: `linear-gradient(105deg, rgba(2,12,8,0.92) 0%, rgba(2,12,8,0.72) 38%, rgba(2,12,8,0.55) 65%, rgba(2,12,8,0.78) 100%), url(${PHYSICAL_ASSET_PLACEHOLDER_BG})`,
+            }}
+            aria-hidden="true"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none" aria-hidden="true" />
+          <div className="relative z-10 p-7 md:p-10 lg:p-12 flex flex-col justify-end min-h-[min(52vh,420px)] max-w-3xl">
+            <div className="physical-asset-animate flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-400/15 border border-emerald-400/25 flex items-center justify-center">
+                <Landmark className="w-5 h-5 text-emerald-300" aria-hidden="true" />
+              </div>
+              <span className="hud-label text-emerald-300/90">PHYSICAL ASSET · LAND ANCHOR</span>
+            </div>
+            <h3
+              id="physical-asset-heading"
+              className="physical-asset-animate font-display font-bold text-2xl md:text-3xl text-white mb-4 drop-shadow-sm"
+            >
+              The token is tied to{' '}
+              <span className="text-emerald-300">real soil</span>, not screens
+            </h3>
+            <p className="physical-asset-animate text-solaris-muted text-sm md:text-base leading-relaxed mb-3">
+              CET is designed as a claim on productive agricultural land in{' '}
+              <strong className="text-solaris-text font-semibold">Cetățuia, Romania</strong>
+              — the same jurisdiction and asset class referenced in RWA documentation. Each unit in the 9,000 CET supply maps to a
+              fractional economic interest in that land-backed stack: crop yield, verified operations, and on-chain attestations
+              (IPFS + TON) are the bridge between the token and the field.
+            </p>
+            <p className="physical-asset-animate text-emerald-200/85 text-sm md:text-[15px] leading-relaxed border-l-2 border-emerald-400/40 pl-4">
+              This is structural backing: the project is not &ldquo;digital air&rdquo; — it is explicitly anchored in a named
+              location and a tangible asset class you can verify independently.
+            </p>
+          </div>
         </div>
 
         {/* Stats grid */}
