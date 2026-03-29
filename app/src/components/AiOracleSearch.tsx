@@ -559,6 +559,7 @@ export default function AiOracleSearch() {
       setPhase('act_execute');
       addLog('INFO', `GROK_ACT: Action directive pipeline · live /api/chat merge pending`);
       addLog('QUANTUM', `RESPONSE_COMPILE: dual-model payload · entropy seed`);
+      addLog('INFO', `ACT_MESH: ${deepLatticeLineForQuery(`${q}|actExecute`)}`);
       addLog('INFO', `DEEP_LATTICE: ${deepLatticeLineForQuery(q)}`);
       addLog('SEC', `SIGN: Quantum OS key · Hash: 0x${generateHash()}${generateHash()}`);
       setMetrics(prev => ({
@@ -843,7 +844,8 @@ export default function AiOracleSearch() {
                             log.message.startsWith('ROUTE_MESH:') ||
                             log.message.startsWith('CROSS_MESH:') ||
                             log.message.startsWith('CONSENSUS_BURST:') ||
-                            log.message.startsWith('VALIDATE_MESH:');
+                            log.message.startsWith('VALIDATE_MESH:') ||
+                            log.message.startsWith('ACT_MESH:');
                           return (
                             <div
                               key={log.id}

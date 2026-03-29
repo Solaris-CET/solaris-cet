@@ -1,5 +1,6 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { Coins } from 'lucide-react';
+import { skillSeedFromLabel, standardSkillBurst } from '@/lib/meshSkillFeed';
 
 const BENTO_TILE_INTERACTION =
   'transition-all duration-300 hover:!-translate-y-1 hover:!scale-100 hover:!shadow-[0_0_15px_rgba(234,179,8,0.2)]';
@@ -23,12 +24,19 @@ interface TooltipProps {
 const CustomTooltip = ({ active, payload }: TooltipProps) => {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
+  const skill = standardSkillBurst(skillSeedFromLabel(`tokenomics|pie|${d.name}`));
   return (
-    <div className="bg-[#0D0E17] border border-white/10 rounded-xl px-4 py-3 text-xs font-mono shadow-depth max-w-[220px]">
+    <div className="bg-[#0D0E17] border border-white/10 rounded-xl px-4 py-3 text-xs font-mono shadow-depth max-w-[min(90vw,260px)]">
       <div className="font-bold mb-1" style={{ color: d.color }}>{d.name}</div>
       <div className="text-solaris-text text-base font-bold">{d.pct.toFixed(2)}%</div>
       <div className="text-solaris-muted mt-1 text-[10px] leading-relaxed">{d.description}</div>
       <div className="text-solaris-muted mt-1">{((d.pct / 100) * 9000).toFixed(0)} CET</div>
+      <p
+        className="mt-2 pt-2 border-t border-fuchsia-500/20 text-[9px] text-fuchsia-200/85 leading-snug line-clamp-3"
+        title={skill}
+      >
+        {skill}
+      </p>
     </div>
   );
 };

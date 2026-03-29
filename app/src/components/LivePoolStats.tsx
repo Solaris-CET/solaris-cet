@@ -1,6 +1,7 @@
 import { Activity, RefreshCw, ExternalLink } from 'lucide-react';
 import { useLivePoolData } from '../hooks/use-live-pool-data';
 import { formatUsd, formatPrice } from '../lib/utils';
+import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 
 const DEDUST_POOL_URL =
   'https://dedust.io/pools/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
@@ -106,6 +107,12 @@ const LivePoolStats = () => {
                   >
                     {stat.value}
                   </div>
+                  <p
+                    className="mt-2 text-[9px] font-mono text-fuchsia-200/65 leading-snug line-clamp-2 border-t border-fuchsia-500/10 pt-1.5"
+                    title={shortSkillWhisper(skillSeedFromLabel(`dedust|${stat.label}`))}
+                  >
+                    {shortSkillWhisper(skillSeedFromLabel(`dedust|${stat.label}`))}
+                  </p>
                 </div>
               ))}
         </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useSyncExternalStore } from 'react';
 import { Brain, CheckCircle, MessageCircle, Lightbulb, AlertTriangle, Dna } from 'lucide-react';
+import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 
 // ─── Live counters that increment naturally over time ─────────────────────
 
@@ -77,6 +78,12 @@ const LiveAgentStats = () => {
             <div className="text-solaris-muted text-[10px] font-mono uppercase tracking-wider mt-0.5">
               {counter.label}
             </div>
+            <p
+              className="mt-2 text-[9px] font-mono text-fuchsia-200/65 leading-snug line-clamp-2 border-t border-fuchsia-500/10 pt-1.5"
+              title={shortSkillWhisper(skillSeedFromLabel(`liveAgentStats|${counter.label}`))}
+            >
+              {shortSkillWhisper(skillSeedFromLabel(`liveAgentStats|${counter.label}`))}
+            </p>
           </div>
         );
       })}

@@ -11,6 +11,7 @@
 
 import { use, Suspense } from 'react';
 import { Database, ExternalLink } from 'lucide-react';
+import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 import { chainStatePromise } from '../lib/chain-state';
 import type { ChainState } from '../lib/chain-state';
 
@@ -87,6 +88,12 @@ function ChainStateContent() {
             <div className={`font-mono font-semibold text-sm ${row.color}`}>
               {row.value}
             </div>
+            <p
+              className="mt-2 text-[9px] font-mono text-fuchsia-200/65 leading-snug line-clamp-2 border-t border-fuchsia-500/10 pt-1.5"
+              title={shortSkillWhisper(skillSeedFromLabel(`chainIndex|${row.label}`))}
+            >
+              {shortSkillWhisper(skillSeedFromLabel(`chainIndex|${row.label}`))}
+            </p>
           </div>
         ))}
       </div>

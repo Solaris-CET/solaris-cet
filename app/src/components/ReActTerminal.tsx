@@ -1,5 +1,6 @@
-import { useEffect, useCallback, useReducer } from 'react';
+import { useEffect, useCallback, useReducer, useMemo } from 'react';
 import { Brain, Zap, Eye, CheckCircle2, XCircle, ExternalLink } from 'lucide-react';
+import { shortSkillWhisper, skillSaltFromQuery } from '@/lib/meshSkillFeed';
 
 const DEDUST_POOL_URL =
   'https://dedust.io/pools/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB/deposit';
@@ -172,6 +173,14 @@ const ReActTerminal = ({ responseText, isLoading }: ReActTerminalProps) => {
 
   const allDone = visibleCount >= steps.length && steps.length > 0;
 
+  const meshTrace = useMemo(
+    () =>
+      shortSkillWhisper(
+        skillSaltFromQuery(`${responseText.slice(0, 240)}|react|${visibleCount}|${steps.length}`)
+      ),
+    [responseText, visibleCount, steps.length]
+  );
+
   return (
     <div className="font-mono text-sm bg-white/5 backdrop-blur-lg rounded-xl border border-white/10 overflow-hidden">
       {/* Terminal title bar */}
@@ -302,6 +311,14 @@ const ReActTerminal = ({ responseText, isLoading }: ReActTerminalProps) => {
         <div className="border-t border-red-500/20 bg-red-500/5 px-4 py-2.5 flex items-center gap-2">
           <XCircle className="w-3.5 h-3.5 text-red-400" />
           <span className="text-[11px] text-red-400">Action rejected · No transaction executed</span>
+        </div>
+      )}
+
+      {steps.length > 0 && (
+        <div className="border-t border-fuchsia-500/15 px-4 py-2 bg-fuchsia-950/[0.12]">
+          <p className="text-[10px] font-mono text-fuchsia-200/75 leading-snug line-clamp-2" title={meshTrace}>
+            {meshTrace}
+          </p>
         </div>
       )}
     </div>
