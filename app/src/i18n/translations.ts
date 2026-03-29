@@ -32,6 +32,8 @@ export interface Translations {
     resources: string;
     faq: string;
     competition: string;
+    /** Sticky header primary CTA — opens official DeDust swap. */
+    buyOnDedust: string;
   };
   hero: {
     tagline: string;
@@ -93,6 +95,7 @@ const translations: Record<LangCode, Translations> = {
       resources: 'Resources',
       faq: 'FAQ',
       competition: 'Compare',
+      buyOnDedust: 'Buy on DeDust',
     },
     hero: {
       tagline: 'The Digital Foundation of Cetățuia',
@@ -179,6 +182,7 @@ const translations: Record<LangCode, Translations> = {
       resources: 'Recursos',
       faq: 'Preguntas',
       competition: 'Comparar',
+      buyOnDedust: 'Comprar en DeDust',
     },
     hero: {
       tagline: 'La Base Digital de Cetățuia',
@@ -265,6 +269,7 @@ const translations: Record<LangCode, Translations> = {
       resources: '资源',
       faq: '常见问题',
       competition: '对比',
+      buyOnDedust: '在 DeDust 购买',
     },
     hero: {
       tagline: 'Cetățuia 的数字基础',
@@ -351,6 +356,7 @@ const translations: Record<LangCode, Translations> = {
       resources: 'Ресурсы',
       faq: 'FAQ',
       competition: 'Сравнить',
+      buyOnDedust: 'Купить на DeDust',
     },
     hero: {
       tagline: 'Цифровая Основа Cetățuia',
@@ -437,6 +443,7 @@ const translations: Record<LangCode, Translations> = {
       resources: 'Resurse',
       faq: 'Întrebări',
       competition: 'Comparare',
+      buyOnDedust: 'Cumpără pe DeDust',
     },
     hero: {
       tagline: 'Fundația Digitală a Cetățuiei',
@@ -523,6 +530,7 @@ const translations: Record<LangCode, Translations> = {
       resources: 'Recursos',
       faq: 'FAQ',
       competition: 'Comparar',
+      buyOnDedust: 'Comprar na DeDust',
     },
     hero: {
       tagline: 'A Fundação Digital da Cetățuia',
@@ -609,6 +617,7 @@ const translations: Record<LangCode, Translations> = {
       resources: 'Ressourcen',
       faq: 'FAQ',
       competition: 'Vergleich',
+      buyOnDedust: 'Auf DeDust kaufen',
     },
     hero: {
       tagline: 'Das digitale Fundament von Cetățuia',

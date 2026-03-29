@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { Menu, Sun } from 'lucide-react';
+import { ExternalLink, Menu, Sun } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
 import WalletConnect from './WalletConnect';
 import { useLanguage } from '../hooks/useLanguage';
@@ -11,6 +11,10 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
+
+/** Official CET/TON pool on DeDust — same target as HowToBuySection / Footer. */
+const DEDUST_POOL_ADDRESS = 'EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
+const DEDUST_SWAP_URL = `https://dedust.io/swap/TON/${DEDUST_POOL_ADDRESS}`;
 
 const NAV_HREFS = [
   { key: 'cetApp',      href: '#nova-app'    },
@@ -27,7 +31,7 @@ const NAV_HREFS = [
  * Navigation — the fixed top navigation bar for the Solaris CET landing page.
  *
  * Features:
- * - Scroll-aware background blur: transparent at the top, frosted-glass when scrolled > 100 px.
+ * - **Always-on frosted header** — light blur at the top, stronger glass + shadow after 100 px scroll.
  * - **Scroll progress bar** — a 1 px gradient line (`gold → cyan → gold`) along the
  *   bottom edge of the header that fills from left to right as the user scrolls.
  * - **"LIVE" badge** indicating the token is live on the TON mainnet.
@@ -56,6 +60,7 @@ const Navigation = () => {
       setScrollProgress(docHeight > 0 ? (scrollTop / docHeight) * 100 : 0);
     };
 
+    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -71,11 +76,12 @@ const Navigation = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-[1000] transition-all duration-500 ${
+      className={cn(
+        'fixed top-0 left-0 right-0 z-[1000] border-b transition-all duration-500',
         isScrolled
-          ? 'bg-zinc-950/88 backdrop-blur-2xl border-b border-white/6 shadow-[0_1px_0_rgba(242,201,76,0.06),0_8px_32px_rgba(0,0,0,0.4)]'
-          : 'bg-transparent'
-      }`}
+          ? 'bg-zinc-950/88 backdrop-blur-2xl border-white/6 shadow-[0_1px_0_rgba(242,201,76,0.06),0_8px_32px_rgba(0,0,0,0.4)]'
+          : 'bg-zinc-950/50 backdrop-blur-xl border-white/[0.05]',
+      )}
     >
       {/* Scroll progress bar — animated shimmer */}
       <div
@@ -91,9 +97,9 @@ const Navigation = () => {
       />
 
       <div className="w-full section-padding-x xl:px-12">
-        <div className="flex items-center justify-between h-16 xl:h-20">
+        <div className="flex items-center justify-between h-16 xl:h-20 gap-2 sm:gap-3">
           {/* Logo */}
-          <a href="#main-content" className="flex items-center gap-3 group">
+          <a href="#main-content" className="flex items-center gap-2 sm:gap-3 group min-w-0 shrink">
             <div className="relative w-8 h-8 xl:w-10 xl:h-10">
               <Sun className="w-full h-full text-solaris-gold transition-transform duration-700 group-hover:rotate-180" />
               {/* Logo glow */}
@@ -118,33 +124,60 @@ const Navigation = () => {
             ))}
           </nav>
 
-          {/* CTA Button */}
-          <div className="hidden xl:flex items-center gap-3">
-            <LanguageSelector />
-            <WalletConnect />
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-400/10 border border-emerald-400/20">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-mono text-[11px] text-emerald-400">LIVE</span>
-            </div>
-            <button
-              className="btn-gold text-sm"
-              onClick={() => window.open('https://t.me/+tKlfzx7IWopmNWQ0', '_blank', 'noopener,noreferrer')}
-              aria-label="Start Mining (opens in new window)"
+          {/* CTAs: persistent Buy on DeDust (< xl) + full desktop rail */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <a
+              href={DEDUST_SWAP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                'btn-filled-gold inline-flex items-center justify-center gap-1.5 text-xs sm:text-sm px-3 py-2 sm:px-4 sm:py-2.5 min-h-[44px] xl:min-h-0',
+                'xl:hidden',
+              )}
+              aria-label={`${t.nav.buyOnDedust} (opens in new window)`}
             >
-              Start Mining
+              <span className="truncate max-w-[11rem] sm:max-w-none">{t.nav.buyOnDedust}</span>
+              <ExternalLink className="w-3.5 h-3.5 shrink-0 opacity-90" aria-hidden />
+            </a>
+
+            <div className="hidden xl:flex items-center gap-3">
+              <LanguageSelector />
+              <WalletConnect />
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-400/10 border border-emerald-400/20">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="font-mono text-[11px] text-emerald-400">LIVE</span>
+              </div>
+              <a
+                href={DEDUST_SWAP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-filled-gold text-sm inline-flex items-center gap-1.5 px-5 py-2.5"
+                aria-label={`${t.nav.buyOnDedust} (opens in new window)`}
+              >
+                {t.nav.buyOnDedust}
+                <ExternalLink className="w-3.5 h-3.5 opacity-90" aria-hidden />
+              </a>
+              <button
+                className="btn-gold text-sm"
+                onClick={() => window.open('https://t.me/+tKlfzx7IWopmNWQ0', '_blank', 'noopener,noreferrer')}
+                aria-label="Start Mining (opens in new window)"
+              >
+                Start Mining
+              </button>
+            </div>
+
+            {/* Mobile / Tablet Menu Button — shown below xl (1280 px) */}
+            <button
+              type="button"
+              className="xl:hidden p-2 text-solaris-text shrink-0"
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Open menu"
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-menu"
+            >
+              <Menu className="w-6 h-6" />
             </button>
           </div>
-
-          {/* Mobile / Tablet Menu Button — shown below xl (1280 px) */}
-          <button
-            className="xl:hidden p-2 text-solaris-text"
-            onClick={() => setIsMobileMenuOpen(true)}
-            aria-label="Open menu"
-            aria-expanded={isMobileMenuOpen}
-            aria-controls="mobile-menu"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
         </div>
       </div>
 
@@ -183,6 +216,17 @@ const Navigation = () => {
             ))}
 
             <div className="w-full max-w-[16rem] flex flex-col items-center gap-6 mt-8 pt-8 border-t border-white/8">
+              <a
+                href={DEDUST_SWAP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-filled-gold text-sm w-full max-w-[16rem] min-h-[48px] inline-flex items-center justify-center gap-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-label={`${t.nav.buyOnDedust} (opens in new window)`}
+              >
+                {t.nav.buyOnDedust}
+                <ExternalLink className="w-4 h-4 shrink-0 opacity-90" aria-hidden />
+              </a>
               <div className="w-full flex flex-col items-center gap-4">
                 <LanguageSelector />
                 <WalletConnect />
@@ -192,6 +236,7 @@ const Navigation = () => {
                 <span className="font-mono text-[11px] text-emerald-400">LIVE</span>
               </div>
               <button
+                type="button"
                 className="btn-gold text-sm w-full max-w-[16rem] min-h-[48px]"
                 onClick={() => {
                   setIsMobileMenuOpen(false);
