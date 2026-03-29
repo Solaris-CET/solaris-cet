@@ -84,7 +84,7 @@ const TRUST_BADGES = [
 /**
  * StatsBento — a bento-grid layout displaying the 4 core Solaris CET numbers
  * with animated counters, badge labels, and a trust bar.
- * Placed between HeroSection and HybridEngineSection for immediate impact.
+ * Placed after Hero, before Intelligence Core (problem narrative).
  */
 const StatsBento = () => {
   const sectionRef = useRef<HTMLDivElement>(null);

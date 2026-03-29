@@ -231,7 +231,7 @@ function AppContent() {
         
         {/* Main content */}
         <main id="main-content" className="relative w-full overflow-x-clip">
-          {/* Section 1: Hero - pin: true */}
+          {/* 1. Hero — pin: true */}
           <div className="relative z-10">
             <ErrorBoundary>
               <ScrollFadeUp>
@@ -240,7 +240,7 @@ function AppContent() {
             </ErrorBoundary>
           </div>
 
-          {/* Section 1.5: Stats Bento — immediate impact numbers */}
+          {/* 2. Problema (Agricultural AI) — impact + AI gap + hybrid infra */}
           <div className="relative z-[15]">
             <LazyLoadWrapper>
               <ScrollFadeUp>
@@ -249,25 +249,23 @@ function AppContent() {
             </LazyLoadWrapper>
           </div>
 
-          {/* Section 2: Hybrid Engine - pin: true */}
           <div className="relative z-20">
-            <ErrorBoundary>
-              <ScrollFadeUp>
-                <HybridEngineSection />
-              </ScrollFadeUp>
-            </ErrorBoundary>
-          </div>
-          
-          {/* Section 3: Intelligence Core - pin: true */}
-          <div className="relative z-30">
             <ErrorBoundary>
               <ScrollFadeUp>
                 <IntelligenceCoreSection />
               </ScrollFadeUp>
             </ErrorBoundary>
           </div>
-          
-          {/* Section 4: Nova App - pin: true */}
+
+          <div className="relative z-30">
+            <ErrorBoundary>
+              <ScrollFadeUp>
+                <HybridEngineSection />
+              </ScrollFadeUp>
+            </ErrorBoundary>
+          </div>
+
+          {/* 3. Soluția (Solaris) — app + RWA land anchor */}
           <div className="relative z-40">
             <ErrorBoundary>
               <ScrollFadeUp>
@@ -275,8 +273,16 @@ function AppContent() {
               </ScrollFadeUp>
             </ErrorBoundary>
           </div>
-          
-          {/* Section 5: Tokenomics - pin: true */}
+
+          <div className="relative z-[45]">
+            <LazyLoadWrapper>
+              <ScrollFadeUp>
+                <ErrorBoundary><RwaSection /></ErrorBoundary>
+              </ScrollFadeUp>
+            </LazyLoadWrapper>
+          </div>
+
+          {/* 4. Tokenomics — pin: true */}
           <div className="relative z-50">
             <ErrorBoundary>
               <ScrollFadeUp>
@@ -284,23 +290,23 @@ function AppContent() {
               </ScrollFadeUp>
             </ErrorBoundary>
           </div>
-          
-          {/* Section 6: Compliance - pin: true */}
-          <div className="relative z-[60]">
-            <ErrorBoundary>
-              <ScrollFadeUp>
-                <ComplianceSection />
-              </ScrollFadeUp>
-            </ErrorBoundary>
-          </div>
-          
-          {/* Section 7: Roadmap - pin: false */}
+
+          {/* 5. Roadmap — pin: false */}
           <div className="relative z-[70]">
             <LazyLoadWrapper>
               <ScrollFadeUp>
                 <ErrorBoundary><RoadmapSection /></ErrorBoundary>
               </ScrollFadeUp>
             </LazyLoadWrapper>
+          </div>
+
+          {/* Compliance — after core story arc (z above Roadmap so stacking matches DOM order) */}
+          <div className="relative z-[72]">
+            <ErrorBoundary>
+              <ScrollFadeUp>
+                <ComplianceSection />
+              </ScrollFadeUp>
+            </ErrorBoundary>
           </div>
 
           {/* Section 8: AI Team - pin: false */}
@@ -380,15 +386,6 @@ function AppContent() {
             <LazyLoadWrapper>
               <ScrollFadeUp>
                 <ErrorBoundary><EcosystemIndexSection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </div>
-
-          {/* Section 15.5: RWA — Real World Assets */}
-          <div className="relative z-[109.5]">
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><RwaSection /></ErrorBoundary>
               </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
