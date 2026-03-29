@@ -195,7 +195,7 @@ function AppContent() {
       {/* Touch ripple effect (mobile) */}
       <TouchRipple />
 
-      <div ref={mainRef} className="relative min-h-screen overflow-x-clip bg-zinc-950">
+      <div ref={mainRef} className="relative min-h-screen overflow-x-clip bg-slate-950 text-white/90">
         {/* Ambient solar glow — fixed, behind sections */}
         <div
           className="pointer-events-none fixed inset-0 z-[1] overflow-hidden"

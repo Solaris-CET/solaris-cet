@@ -16,7 +16,7 @@ export default function DualAiFusionGraphic() {
         {/* Grok — Act lane */}
         <div className="flex min-w-0 flex-[0_0_26%] flex-col items-center gap-1.5">
           <div
-            className="relative w-full max-w-[100px] rounded-2xl border border-amber-500/35 bg-gradient-to-b from-amber-950/80 to-zinc-950/90 px-2 py-2.5 text-center shadow-[0_0_24px_-4px_rgba(245,158,11,0.35)] backdrop-blur-sm sm:max-w-[110px] sm:py-3"
+            className="relative w-full max-w-[100px] rounded-2xl border border-amber-500/35 bg-gradient-to-b from-amber-950/80 to-slate-950/90 px-2 py-2.5 text-center shadow-[0_0_24px_-4px_rgba(245,158,11,0.35)] backdrop-blur-sm sm:max-w-[110px] sm:py-3"
             title="xAI Grok — Act"
           >
             <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-amber-200/90">
@@ -41,7 +41,7 @@ export default function DualAiFusionGraphic() {
           <div className="relative z-10 flex flex-col items-center">
             {/* Outer RAV ring */}
             <div
-              className="relative flex h-[min(28vw,120px)] w-[min(28vw,120px)] items-center justify-center rounded-full border border-solaris-gold/25 bg-zinc-950/60 shadow-[0_0_40px_-8px_rgba(242,201,76,0.45),inset_0_0_32px_rgba(46,231,255,0.06)] backdrop-blur-md sm:h-[128px] sm:w-[128px]"
+              className="relative flex h-[min(28vw,120px)] w-[min(28vw,120px)] items-center justify-center rounded-full border border-solaris-gold/25 bg-slate-950/60 shadow-[0_0_40px_-8px_rgba(242,201,76,0.45),inset_0_0_32px_rgba(46,231,255,0.06)] backdrop-blur-md sm:h-[128px] sm:w-[128px]"
               title="Solaris — Dual-AI core"
             >
               <div className="absolute inset-1 rounded-full border border-dashed border-solaris-cyan/20" />
@@ -67,7 +67,7 @@ export default function DualAiFusionGraphic() {
 
               {/* Solaris glyph */}
               <div className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-solaris-gold/30 via-amber-200/20 to-solaris-cyan/25 shadow-[0_0_28px_rgba(242,201,76,0.5)] ring-2 ring-solaris-gold/40 sm:h-16 sm:w-16">
-                <div className="absolute inset-1 rounded-full bg-gradient-to-t from-zinc-950/90 to-zinc-900/40" />
+                <div className="absolute inset-1 rounded-full bg-gradient-to-t from-slate-950/90 to-slate-900/40" />
                 <svg
                   viewBox="0 0 32 32"
                   className="relative z-[1] h-8 w-8 text-solaris-gold drop-shadow-[0_0_12px_rgba(242,201,76,0.8)]"
@@ -100,7 +100,7 @@ export default function DualAiFusionGraphic() {
         {/* Gemini — Reason lane */}
         <div className="flex min-w-0 flex-[0_0_26%] flex-col items-center gap-1.5">
           <div
-            className="relative w-full max-w-[100px] rounded-2xl border border-blue-500/40 bg-gradient-to-b from-blue-950/85 to-zinc-950/90 px-2 py-2.5 text-center shadow-[0_0_24px_-4px_rgba(59,130,246,0.4)] backdrop-blur-sm sm:max-w-[110px] sm:py-3"
+            className="relative w-full max-w-[100px] rounded-2xl border border-blue-500/40 bg-gradient-to-b from-blue-950/85 to-slate-950/90 px-2 py-2.5 text-center shadow-[0_0_24px_-4px_rgba(59,130,246,0.4)] backdrop-blur-sm sm:max-w-[110px] sm:py-3"
             title="Google Gemini — Reason"
           >
             <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-200/95">

@@ -3,9 +3,9 @@
 
 @layer base {
   :root {
-    /* zinc-950 (#09090b) — deep Crypto/AI canvas */
-    --background: 240 6% 4%;
-    --foreground: 230 60% 98%;
+    /* Premium Dark & Gold — slate-950 canvas (#020617) */
+    --background: 222.2 84% 4.9%;
+    --foreground: 0 0% 100%;
     --card: 240 6% 8%;
     --card-foreground: 230 60% 98%;
     --popover: 240 6% 6%;
@@ -26,28 +26,14 @@
     --ring: 43 88% 58%;
     --radius: 0.75rem;
 
-    --gradient-solar: linear-gradient(
-      135deg,
-      #f7e7b4 0%,
-      #e8b84a 18%,
-      #f5d76e 42%,
-      #c9a227 68%,
-      #fde68a 100%
-    );
-    --gradient-solar-text: linear-gradient(
-      120deg,
-      #fff9e6 0%,
-      #f2c94c 28%,
-      #ffd666 52%,
-      #d4a017 78%,
-      #fff4cc 100%
-    );
+    --gradient-solar: linear-gradient(135deg, #f2c94c 0%, #d4af37 100%);
+    --gradient-solar-text: linear-gradient(120deg, #f2c94c 0%, #d4af37 50%, #e8c547 100%);
 
     --solaris-gold: #f2c94c;
     --solaris-cyan: #2ee7ff;
-    --solaris-dark: #09090b;
-    --solaris-card: rgba(0, 0, 0, 0.4);
-    --solaris-text: #f4f6ff;
+    --solaris-dark: #020617;
+    --solaris-card: rgba(255, 255, 255, 0.05);
+    --solaris-text: rgba(255, 255, 255, 0.9);
     --solaris-muted: #a6a9b6;
   }
 }
@@ -59,11 +45,11 @@
   
   html {
     scroll-behavior: auto;
-    @apply min-h-dvh bg-zinc-950;
+    @apply min-h-dvh bg-slate-950;
   }
   
   body {
-    @apply min-h-dvh bg-zinc-950 font-sans text-[#F4F6FF] antialiased;
+    @apply min-h-dvh bg-slate-950 font-sans text-white/90 antialiased;
     overflow-x: hidden;
     font-feature-settings: "ss01" on, "cv01" on;
   }
@@ -86,18 +72,17 @@
 
 @layer components {
   /**
-   * Global glass surface — Crypto/AI premium
-   * Matches Tailwind: bg-black/40 backdrop-blur-xl border border-white/10
+   * Premium Dark & Gold — glass cards (unified with Tailwind tokens)
    */
   .glass-container,
   .section-glass {
     position: relative;
-    @apply bg-black/40 backdrop-blur-xl backdrop-saturate-150 border border-white/10;
+    @apply bg-white/5 backdrop-blur-lg backdrop-saturate-150 border border-white/10;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   }
 
   .glass-card {
-    @apply bg-black/40 backdrop-blur-xl backdrop-saturate-150 border border-white/10;
+    @apply bg-white/5 backdrop-blur-lg backdrop-saturate-150 border border-white/10;
     border-radius: 18px;
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, 0.04) inset,
@@ -109,7 +94,7 @@
    * (restores branding; name implies gold frame, not neutral white/10)
    */
   .glass-card-gold {
-    @apply bg-black/40 backdrop-blur-xl backdrop-saturate-150;
+    @apply bg-white/5 backdrop-blur-lg backdrop-saturate-150;
     border: 1px solid rgba(242, 201, 76, 0.28);
     border-radius: 18px;
     box-shadow:
@@ -260,9 +245,18 @@
     text-wrap: balance;
   }
 
+  /** Premium gold accent — use for fills, strokes, or `text-transparent` + bg-clip-text */
+  .accent-gradient-gold {
+    @apply bg-gradient-to-br from-[#F2C94C] to-[#D4AF37];
+  }
+
+  .text-accent-gradient-gold {
+    @apply bg-gradient-to-br from-[#F2C94C] to-[#D4AF37] bg-clip-text text-transparent;
+  }
+
   /** Reusable glass surface — matches bento-card / shadcn Card */
   .glass-panel {
-    @apply bg-black/40 backdrop-blur-xl backdrop-saturate-150 border border-white/10;
+    @apply bg-white/5 backdrop-blur-lg backdrop-saturate-150 border border-white/10;
   }
 
   /**
@@ -665,7 +659,7 @@
 .loading-overlay {
   position: fixed;
   inset: 0;
-  background: #09090b;
+  background: #020617;
   z-index: 10000;
   display: flex;
   align-items: center;
@@ -1082,7 +1076,7 @@
 /* ── Bento card base (global glass surface) ─────────────────────────────── */
 .bento-card {
   position: relative;
-  @apply bg-black/40 backdrop-blur-xl backdrop-saturate-150 border border-white/10;
+  @apply bg-white/5 backdrop-blur-lg backdrop-saturate-150 border border-white/10;
   border-radius: 24px;
   overflow: hidden;
   box-shadow:

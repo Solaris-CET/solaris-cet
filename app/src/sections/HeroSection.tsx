@@ -140,7 +140,7 @@ const HeroSection: React.FC = () => {
     <TooltipProvider>
       <section
         ref={containerRef}
-        className="relative min-h-screen bg-zinc-950 overflow-x-hidden lg:overflow-hidden flex flex-col justify-center items-center"
+        className="relative min-h-screen bg-slate-950 overflow-x-hidden lg:overflow-hidden flex flex-col justify-center items-center"
       >
         {/* Ambient background: gradient mesh + orbs + particles */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden>
@@ -192,7 +192,7 @@ const HeroSection: React.FC = () => {
           </Suspense>
 
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_55%_at_50%_0%,rgba(255,200,120,0.1),transparent_60%)]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-zinc-950/90" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-950/90" />
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-7xl section-padding-x xl:px-12 flex flex-col gap-8 lg:gap-10 pb-16 lg:pb-24 pt-24 lg:pt-16">
@@ -207,12 +207,12 @@ const HeroSection: React.FC = () => {
               </p>
 
               <h1 className="w-full font-black tracking-[-0.045em] leading-[0.92] text-balance">
-                <span className="block text-5xl sm:text-6xl md:text-7xl text-transparent bg-clip-text bg-gradient-to-br from-amber-100 via-yellow-400 to-amber-600">
+                <span className="block text-5xl sm:text-6xl md:text-7xl text-transparent bg-clip-text bg-gradient-to-br from-[#F2C94C] to-[#D4AF37]">
                   SOLARIS CET
                 </span>
               </h1>
 
-              <p className="mt-5 md:mt-6 max-w-xl text-base sm:text-lg md:text-xl text-slate-300 font-medium leading-snug">
+              <p className="mt-5 md:mt-6 max-w-xl text-base sm:text-lg md:text-xl text-white/90 font-medium leading-snug">
                 {t.hero.subtitle}
               </p>
 
@@ -237,7 +237,7 @@ const HeroSection: React.FC = () => {
                           ? 'Processing mining operation'
                           : 'Mining initiated successfully'
                     }
-                    className="group relative w-full md:w-auto min-h-[52px] px-8 py-4 rounded-2xl bg-yellow-500 text-zinc-950 font-bold text-sm md:text-base tracking-wide shadow-[0_0_28px_rgba(234,179,8,0.35)] transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-[0_0_50px_rgba(250,204,21,0.55),0_0_100px_rgba(234,179,8,0.28)] hover:-translate-y-0.5 active:scale-[0.99] flex items-center justify-center gap-2.5 overflow-hidden"
+                    className="group relative w-full md:w-auto min-h-[52px] px-8 py-4 rounded-2xl bg-gradient-to-br from-[#F2C94C] to-[#D4AF37] text-slate-950 font-bold text-sm md:text-base tracking-wide shadow-[0_0_28px_rgba(234,179,8,0.35)] transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-[0_0_50px_rgba(250,204,21,0.55),0_0_100px_rgba(234,179,8,0.28)] hover:-translate-y-0.5 active:scale-[0.99] flex items-center justify-center gap-2.5 overflow-hidden"
                   >
                     <span className="absolute inset-0 rounded-2xl bg-gradient-to-t from-yellow-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                     {miningState === 'IDLE' ? (
@@ -322,7 +322,7 @@ const HeroSection: React.FC = () => {
 
         <div
           ref={tickerContainerRef}
-          className="lg:absolute lg:bottom-0 w-full overflow-hidden py-4 md:py-6 border-t border-white/10 bg-zinc-950/75 backdrop-blur-2xl mt-6 lg:mt-0 shadow-[0_-24px_80px_-28px_rgba(255,200,100,0.07)]"
+          className="lg:absolute lg:bottom-0 w-full overflow-hidden py-4 md:py-6 border-t border-white/10 bg-slate-950/75 backdrop-blur-2xl mt-6 lg:mt-0 shadow-[0_-24px_80px_-28px_rgba(255,200,100,0.07)]"
         >
           <div className="flex min-w-max animate-ticker whitespace-nowrap">
             {[...TICKER_DATA, ...TICKER_DATA].map((item, i) => (

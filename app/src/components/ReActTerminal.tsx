@@ -173,7 +173,7 @@ const ReActTerminal = ({ responseText, isLoading }: ReActTerminalProps) => {
   const allDone = visibleCount >= steps.length && steps.length > 0;
 
   return (
-    <div className="font-mono text-sm bg-black/40 rounded-xl border border-white/8 overflow-hidden">
+    <div className="font-mono text-sm bg-white/5 backdrop-blur-lg rounded-xl border border-white/10 overflow-hidden">
       {/* Terminal title bar */}
       <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/8 bg-white/[0.03]">
         <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />

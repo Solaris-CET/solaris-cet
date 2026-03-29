@@ -60,8 +60,8 @@ module.exports = {
         solaris: {
           gold: "#F2C94C",
           cyan: "#2EE7FF",
-          dark: "#09090b",
-          void: "#09090b",
+          dark: "#020617",
+          void: "#020617",
           card: "#0B0E16",
           text: "#F4F6FF",
           muted: "#A6A9B6",
@@ -96,7 +96,7 @@ module.exports = {
         'solar-sm': '0 0 48px -8px rgba(255, 210, 140, 0.28)',
       },
       backgroundImage: {
-        'gradient-solar': 'linear-gradient(135deg, #f7e7b4 0%, #e8b84a 18%, #f5d76e 42%, #c9a227 68%, #fde68a 100%)',
+        'gradient-solar': 'linear-gradient(135deg, #F2C94C 0%, #D4AF37 100%)',
         'gradient-solar-soft': 'linear-gradient(120deg, rgba(255,224,160,0.95) 0%, rgba(232,184,74,0.98) 40%, rgba(201,162,39,1) 100%)',
       },
       keyframes: {

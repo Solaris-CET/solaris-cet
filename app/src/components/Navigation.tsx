@@ -79,8 +79,8 @@ const Navigation = () => {
       className={cn(
         'fixed top-0 left-0 right-0 z-[1000] border-b transition-all duration-500',
         isScrolled
-          ? 'bg-zinc-950/88 backdrop-blur-2xl border-white/6 shadow-[0_1px_0_rgba(242,201,76,0.06),0_8px_32px_rgba(0,0,0,0.4)]'
-          : 'bg-zinc-950/50 backdrop-blur-xl border-white/[0.05]',
+          ? 'bg-slate-950/88 backdrop-blur-2xl border-white/6 shadow-[0_1px_0_rgba(242,201,76,0.06),0_8px_32px_rgba(0,0,0,0.4)]'
+          : 'bg-slate-950/50 backdrop-blur-xl border-white/[0.05]',
       )}
     >
       {/* Scroll progress bar — animated shimmer */}
@@ -186,9 +186,9 @@ const Navigation = () => {
         <SheetContent
           id="mobile-menu"
           side="right"
-          overlayClassName="backdrop-blur-xl bg-zinc-950/50"
+          overlayClassName="backdrop-blur-xl bg-slate-950/50"
           className={cn(
-            'border-l border-white/10 bg-zinc-950/92 backdrop-blur-2xl p-0 gap-0 shadow-[0_0_80px_rgba(0,0,0,0.65)]',
+            'border-l border-white/10 bg-slate-950/92 backdrop-blur-2xl p-0 gap-0 shadow-[0_0_80px_rgba(0,0,0,0.65)]',
             'flex flex-col overflow-y-auto overscroll-contain',
             '[&>button]:top-5 [&>button]:right-5 [&>button]:size-10 [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center',
           )}
