@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 
 interface Node {
   x: number;
@@ -122,21 +123,33 @@ const AgenticNeuralCanvas = () => {
     };
   }, [reduce]);
 
+  const meshCaption = (
+    <p
+      className="absolute bottom-2 left-2 right-2 z-[1] text-center text-[8px] font-mono text-fuchsia-200/35 line-clamp-1"
+      aria-hidden
+    >
+      {shortSkillWhisper(skillSeedFromLabel('neuralCanvas|synapse'))}
+    </p>
+  );
+
   if (reduce) {
     return (
-      <div
-        className="absolute inset-0 opacity-[0.07] pointer-events-none bg-[radial-gradient(ellipse_at_50%_40%,rgba(46,231,255,0.5),transparent_55%),radial-gradient(ellipse_at_70%_70%,rgba(242,201,76,0.35),transparent_50%)]"
-        aria-hidden
-      />
+      <div className="absolute inset-0 pointer-events-none" aria-hidden>
+        <div className="absolute inset-0 opacity-[0.07] bg-[radial-gradient(ellipse_at_50%_40%,rgba(46,231,255,0.5),transparent_55%),radial-gradient(ellipse_at_70%_70%,rgba(242,201,76,0.35),transparent_50%)]" />
+        {meshCaption}
+      </div>
     );
   }
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.55] mix-blend-screen"
-      aria-hidden
-    />
+    <div className="absolute inset-0 pointer-events-none">
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full opacity-[0.55] mix-blend-screen"
+        aria-hidden
+      />
+      {meshCaption}
+    </div>
   );
 };
 

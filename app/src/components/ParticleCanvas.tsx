@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 
 interface Particle {
   x: number;
@@ -198,11 +199,17 @@ const ParticleCanvas = ({
   }, [count, connectionRadius, mouseInteraction]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={`w-full h-full ${className}`}
-      style={{ display: 'block' }}
-    />
+    <div className={`relative h-full w-full ${className}`}>
+      <canvas ref={canvasRef} className="block h-full w-full" />
+      <div
+        className="pointer-events-none absolute bottom-2 left-1 right-1 z-[1] flex justify-center"
+        aria-hidden
+      >
+        <span className="max-w-full truncate text-center text-[8px] font-mono text-fuchsia-200/28">
+          {shortSkillWhisper(skillSeedFromLabel('particleField|hero'))}
+        </span>
+      </div>
+    </div>
   );
 };
 

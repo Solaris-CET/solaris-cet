@@ -842,6 +842,7 @@ export default function AiOracleSearch() {
                       <div ref={terminalRef} className="flex-1 overflow-y-auto space-y-1 pr-1">
                         {logs.map(log => {
                           const isSkillLine =
+                            log.message.startsWith('TASK_MESH:') ||
                             log.message.startsWith('SKILL_LOCUS:') ||
                             log.message.startsWith('EXPRESSOME_BURST:') ||
                             log.message.startsWith('DEEP_LATTICE:') ||
