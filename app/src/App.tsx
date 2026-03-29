@@ -18,6 +18,7 @@ import NovaAppSection from './sections/NovaAppSection';
 import TokenomicsSection from './sections/TokenomicsSection';
 import ComplianceSection from './sections/ComplianceSection';
 // Non-pinned sections — lazy-loaded when they approach the viewport
+const AgenticEngineSection = lazy(() => import('./sections/AgenticEngineSection'));
 const RoadmapSection = lazy(() => import('./sections/RoadmapSection'));
 const AITeamSection = lazy(() => import('./sections/AITeamSection'));
 const CompetitionSection = lazy(() => import('./sections/CompetitionSection'));
@@ -270,6 +271,15 @@ function AppContent() {
                   <HybridEngineSection />
                 </ScrollFadeUp>
               </ErrorBoundary>
+            </div>
+            <div className="relative z-[32]">
+              <LazyLoadWrapper>
+                <ScrollFadeUp>
+                  <ErrorBoundary>
+                    <AgenticEngineSection />
+                  </ErrorBoundary>
+                </ScrollFadeUp>
+              </LazyLoadWrapper>
             </div>
           </section>
 

@@ -1,131 +1,17 @@
 import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
-import {
-  Crown, Code2, Palette, Brain, Shield, Globe,
-  Users, TrendingUp, Coins, FileCheck,
-} from 'lucide-react';
+import { Brain, TrendingUp, ChevronDown } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
 import AnimatedCounter from '../components/AnimatedCounter';
 import AgentBoard from '../components/AgentBoard';
 import LiveAgentStats from '../components/LiveAgentStats';
 import AgentDepartmentChart from '../components/AgentDepartmentChart';
+import { solarisDepartments } from '@/data/solarisDepartments';
+import RoleSynthesizedSkills from '@/components/RoleSynthesizedSkills';
 
-// Total: 48 000 + 34 000 + 27 000 + 21 000 + 18 000 + 17 000 + 13 000 + 10 000 + 7 000 + 5 000 = 200 000
-interface Department {
-  id: string;
-  name: string;
-  agentCount: number;
-  roles: string[];
-  icon: typeof Crown;
-  iconBg: string;
-  iconColor: string;
-  countColor: string;
-}
+const departments = solarisDepartments;
 
-const departments: Department[] = [
-  {
-    id: 'customer-ops',
-    name: 'Customer Operations',
-    agentCount: 48_000,
-    roles: ['Tier-1 Support', 'Tier-2 Escalation', 'Account Success', 'Onboarding', 'Retention', 'Feedback Analysis'],
-    icon: Users,
-    iconBg: 'bg-cyan-400/10',
-    iconColor: 'text-cyan-400',
-    countColor: 'text-cyan-400',
-  },
-  {
-    id: 'engineering',
-    name: 'Engineering',
-    agentCount: 34_000,
-    roles: ['Frontend', 'Backend', 'Infrastructure', 'Mobile', 'QA & Testing', 'Performance', 'Platform'],
-    icon: Code2,
-    iconBg: 'bg-blue-400/10',
-    iconColor: 'text-blue-400',
-    countColor: 'text-blue-400',
-  },
-  {
-    id: 'sales',
-    name: 'Sales & Growth',
-    agentCount: 27_000,
-    roles: ['SDR', 'Account Executive', 'Partner Manager', 'Deal Intelligence', 'Pipeline Ops', 'Forecasting'],
-    icon: TrendingUp,
-    iconBg: 'bg-emerald-400/10',
-    iconColor: 'text-emerald-400',
-    countColor: 'text-emerald-400',
-  },
-  {
-    id: 'data-intelligence',
-    name: 'Data & Intelligence',
-    agentCount: 21_000,
-    roles: ['ML Research', 'Data Pipeline', 'AI Oracle', 'Model Ops', 'BI Analyst', 'Synthetic Data'],
-    icon: Brain,
-    iconBg: 'bg-purple-400/10',
-    iconColor: 'text-purple-400',
-    countColor: 'text-purple-400',
-  },
-  {
-    id: 'finance',
-    name: 'Finance & Analytics',
-    agentCount: 18_000,
-    roles: ['FP&A', 'Treasury', 'Tax Compliance', 'Accounting', 'Risk Modelling', 'Payroll'],
-    icon: Coins,
-    iconBg: 'bg-solaris-gold/10',
-    iconColor: 'text-solaris-gold',
-    countColor: 'text-solaris-gold',
-  },
-  {
-    id: 'marketing',
-    name: 'Marketing & Content',
-    agentCount: 17_000,
-    roles: ['Copywriting', 'SEO', 'Social Media', 'Paid Ads', 'Email Campaigns', 'Brand Strategy'],
-    icon: Globe,
-    iconBg: 'bg-orange-400/10',
-    iconColor: 'text-orange-400',
-    countColor: 'text-orange-400',
-  },
-  {
-    id: 'product-design',
-    name: 'Product & Design',
-    agentCount: 13_000,
-    roles: ['Product Manager', 'UX Researcher', 'UI Designer', 'Prototyping', 'A/B Testing', 'Roadmap Planning'],
-    icon: Palette,
-    iconBg: 'bg-pink-400/10',
-    iconColor: 'text-pink-400',
-    countColor: 'text-pink-400',
-  },
-  {
-    id: 'security',
-    name: 'Security & Compliance',
-    agentCount: 10_000,
-    roles: ['SOC Analyst', 'Smart Contract Auditor', 'Pen Tester', 'GDPR/KYC', 'Threat Intel', 'Incident Response'],
-    icon: Shield,
-    iconBg: 'bg-red-400/10',
-    iconColor: 'text-red-400',
-    countColor: 'text-red-400',
-  },
-  {
-    id: 'legal',
-    name: 'Legal & Risk',
-    agentCount: 7_000,
-    roles: ['Contract Review', 'IP Management', 'Regulatory Watch', 'Litigation Support', 'Policy Drafting'],
-    icon: FileCheck,
-    iconBg: 'bg-amber-400/10',
-    iconColor: 'text-amber-400',
-    countColor: 'text-amber-400',
-  },
-  {
-    id: 'research',
-    name: 'Research & Innovation',
-    agentCount: 5_000,
-    roles: ['Quantum Research', 'Advanced AI R&D', 'Blockchain Protocol', 'Agricultural Science', 'Patent Analysis'],
-    icon: Crown,
-    iconBg: 'bg-solaris-cyan/10',
-    iconColor: 'text-solaris-cyan',
-    countColor: 'text-solaris-cyan',
-  },
-];
-
-const TOTAL_AGENTS = 200_000;
+const TOTAL_AGENTS = departments.reduce((s, d) => s + d.agentCount, 0);
 
 const AITeamSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -296,12 +182,47 @@ const AITeamSection = () => {
                   <div className="hud-label text-[10px] mt-0.5">AGENTS</div>
                 </div>
 
-                {/* Role list */}
-                <ul className="space-y-1 flex-1">
+                {/* Role + unique skill vectors (expandable) */}
+                <ul className="space-y-2 flex-1 min-h-0">
                   {dept.roles.map((role) => (
-                    <li key={role} className="flex items-center gap-1.5">
-                      <span className={`w-1 h-1 rounded-full bg-current shrink-0 ${dept.iconColor}`} />
-                      <span className="text-solaris-muted text-xs leading-tight">{role}</span>
+                    <li key={role.title}>
+                      <details className="group rounded-lg border border-white/[0.06] bg-black/20 open:border-white/12 open:bg-white/[0.03] transition-colors">
+                        <summary className="flex cursor-pointer list-none items-center justify-between gap-2 py-1.5 px-2 select-none [&::-webkit-details-marker]:hidden">
+                          <span className="flex min-w-0 items-center gap-1.5">
+                            <span className={`h-1 w-1 shrink-0 rounded-full bg-current ${dept.iconColor}`} />
+                            <span className="text-xs font-medium leading-tight text-solaris-text truncate">
+                              {role.title}
+                            </span>
+                          </span>
+                          <span className="flex shrink-0 items-center gap-1 text-[9px] font-mono text-solaris-muted">
+                            <span>
+                              {role.skills.length}+
+                            </span>
+                            <ChevronDown className="h-3 w-3 transition-transform group-open:rotate-180 opacity-70" aria-hidden />
+                          </span>
+                        </summary>
+                        <div className="border-t border-white/[0.06] px-2 pb-2 pt-2 space-y-2">
+                          <div className="text-[8px] font-mono uppercase tracking-wider text-solaris-muted/80">
+                            Curated genes
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {role.skills.map((skill) => (
+                              <span
+                                key={skill}
+                                className="max-w-full rounded border border-white/10 bg-white/[0.04] px-1.5 py-0.5 text-[8px] sm:text-[9px] leading-snug text-solaris-muted"
+                                title={skill}
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                          <RoleSynthesizedSkills
+                            deptId={dept.id}
+                            roleTitle={role.title}
+                            canonicalSkills={role.skills}
+                          />
+                        </div>
+                      </details>
                     </li>
                   ))}
                 </ul>
