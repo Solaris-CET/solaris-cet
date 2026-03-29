@@ -85,3 +85,19 @@ export function skillSaltFromQuery(q: string): number {
   }
   return Math.abs(h) % 600;
 }
+
+export type ObserveLocusBranch = 'ai' | 'price' | 'mining' | 'ton' | 'default';
+
+const LOCUS_BRANCH_BIAS: Record<ObserveLocusBranch, number> = {
+  ai: 0,
+  price: 19,
+  mining: 37,
+  ton: 53,
+  default: 71,
+};
+
+/** Truncated flash whisper for reasoning OBSERVE step — stable per query + branch. */
+export function observeLocusClip(q: string, branch: ObserveLocusBranch): string {
+  const frag = shortSkillWhisper(skillSaltFromQuery(q) + LOCUS_BRANCH_BIAS[branch]);
+  return frag.length > 76 ? `${frag.slice(0, 73)}…` : frag;
+}

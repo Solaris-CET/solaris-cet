@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { TrendingUp, Droplets, Clock, Battery } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
+import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 const SOLARIS_LOGO_URL = `${import.meta.env.BASE_URL}icon-192.png`;
@@ -247,6 +248,7 @@ const NovaAppSection = () => {
               </div>
             ))}
           </div>
+          <MeshSkillRibbon variant="compact" saltOffset={220} className="mt-3 border-t border-white/8 rounded-none border-x-0 border-b-0 bg-fuchsia-500/[0.03]" />
         </div>
       </div>
     </div>

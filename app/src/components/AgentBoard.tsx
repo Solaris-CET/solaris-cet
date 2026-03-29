@@ -1,9 +1,11 @@
+import { useEffect, useState } from 'react';
 import {
   Users, Code2, TrendingUp, Brain, Coins,
   Globe, Palette, Shield, FileCheck, Crown,
   MessageCircle, Lightbulb, CheckCircle, AlertTriangle, Dna,
 } from 'lucide-react';
 import { useAgentBoard, type EventKind } from '../hooks/useAgentBoard';
+import { shortSkillWhisper } from '@/lib/meshSkillFeed';
 
 // ─── Department display config ───────────────────────────────────────────
 
@@ -52,6 +54,14 @@ function timeSince(ts: number): string {
  */
 const AgentBoard = () => {
   const events = useAgentBoard({ maxEvents: 7, intervalMs: 2200 });
+  const [footTick, setFootTick] = useState(0);
+
+  useEffect(() => {
+    const id = window.setInterval(() => setFootTick((n) => n + 1), 7200);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const footerSkill = shortSkillWhisper(900 + footTick);
 
   return (
     <div className="bento-card border border-white/8 overflow-hidden shadow-depth">
@@ -126,9 +136,19 @@ const AgentBoard = () => {
       </ul>
 
       {/* Footer */}
-      <div className="px-5 py-2.5 border-t border-white/6 bg-black/20 flex items-center justify-between">
-        <span className="text-solaris-muted/50 text-[10px] font-mono">Powered by RAV Protocol · Grok × Gemini</span>
-        <div className="flex gap-1">
+      <div className="px-5 py-2.5 border-t border-white/6 bg-black/20 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="flex flex-col gap-1 min-w-0 sm:flex-row sm:items-center sm:gap-4 sm:flex-1 sm:min-w-0">
+          <span className="text-solaris-muted/50 text-[10px] font-mono shrink-0">
+            Powered by RAV Protocol · Grok × Gemini
+          </span>
+          <span
+            className="text-[9px] font-mono text-fuchsia-300/70 truncate min-w-0"
+            title={footerSkill}
+          >
+            {footerSkill}
+          </span>
+        </div>
+        <div className="flex gap-1 shrink-0 self-end sm:self-auto">
           {Array.from({ length: 10 }).map((_, i) => (
             <div
               key={i}

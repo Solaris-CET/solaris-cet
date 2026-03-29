@@ -7,6 +7,7 @@ import {
   skillFlashForBoardDept,
   skillSaltFromQuery,
   skillSeedFromLabel,
+  observeLocusClip,
 } from '@/lib/meshSkillFeed';
 
 function stripFeedTimestamp(line: string): string {
@@ -32,6 +33,14 @@ describe('meshSkillFeed', () => {
 
   it('skillCaptionForDept returns empty for unknown id', () => {
     expect(skillCaptionForDept('no-such-dept', 0)).toBe('');
+  });
+
+  it('observeLocusClip is deterministic per branch and bounded', () => {
+    const a = observeLocusClip('test query locus', 'price');
+    const b = observeLocusClip('test query locus', 'price');
+    expect(a).toBe(b);
+    expect(a.length).toBeLessThanOrEqual(84);
+    expect(observeLocusClip('test query locus', 'mining')).not.toBe(a);
   });
 
   it('skillSaltFromQuery is deterministic', () => {
