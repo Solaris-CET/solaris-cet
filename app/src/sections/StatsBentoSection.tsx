@@ -4,6 +4,10 @@ import { Users, Coins, Zap, Clock, Shield, TrendingUp, Globe, ArrowRight } from 
 import AnimatedCounter from '../components/AnimatedCounter';
 import GlowOrbs from '../components/GlowOrbs';
 
+/** Overrides global `.bento-card:hover` (translate/scale/shadow) with the bento gold glow spec. */
+const BENTO_TILE_INTERACTION =
+  'transition-all duration-300 hover:!-translate-y-1 hover:!scale-100 hover:!shadow-[0_0_15px_rgba(234,179,8,0.2)]';
+
 // ─── Stat data ────────────────────────────────────────────────────────────
 
 const STATS = [
@@ -70,9 +74,9 @@ const STATS = [
 ] as const;
 
 const TRUST_BADGES = [
-  { icon: Shield,    label: 'Cyberscope Audited',  color: 'text-solaris-gold' },
-  { icon: TrendingUp, label: 'KYC Verified',       color: 'text-emerald-400'  },
-  { icon: Globe,     label: 'Open Source',          color: 'text-solaris-cyan' },
+  { icon: Shield, label: 'Cyberscope Audited' },
+  { icon: TrendingUp, label: 'KYC Verified' },
+  { icon: Globe, label: 'Open Source' },
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────
@@ -133,11 +137,12 @@ const StatsBento = () => {
           <span className="hud-label text-solaris-gold">NETWORK AT A GLANCE</span>
         </div>
 
-        {/* Bento grid */}
-        <div ref={bentoRef} className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-
+        {/* Bento grid — asymmetric 12-col layout */}
+        <div ref={bentoRef} className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 auto-rows-min">
           {/* ── Large hero stat — AI Agents ── */}
-          <div className={`bento-stat bento-card lg:col-span-5 p-8 lg:p-10 ${agentStat.border} shadow-depth`}>
+          <div
+            className={`bento-stat bento-card lg:col-span-6 lg:row-span-2 p-8 lg:p-10 ${agentStat.border} shadow-depth ${BENTO_TILE_INTERACTION}`}
+          >
             {/* Ambient glow */}
             <div
               className="absolute top-0 right-0 w-64 h-64 rounded-full pointer-events-none"
@@ -174,20 +179,19 @@ const StatsBento = () => {
               href="#team"
               className="mt-6 inline-flex items-center gap-2 text-solaris-gold text-sm font-semibold hover:gap-3 transition-all duration-200"
             >
-              Meet the agents <ArrowRight className="w-4 h-4" />
+              Meet the agents <ArrowRight className="w-4 h-4 text-solaris-gold" />
             </a>
           </div>
 
-          {/* ── 3 smaller stats stacked right ── */}
-          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-5">
-            {/* Top row: 3 small stats */}
-            <div className="sm:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {/* ── 3 stats + trust — right stack ── */}
+          <div className="lg:col-span-6 flex flex-col gap-4 lg:gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-5">
               {smallStats.map(stat => {
                 const Icon = stat.icon;
                 return (
                   <div
                     key={stat.id}
-                    className={`bento-stat bento-card p-6 ${stat.border} shadow-depth`}
+                    className={`bento-stat bento-card p-6 ${stat.border} shadow-depth ${BENTO_TILE_INTERACTION}`}
                   >
                     <div
                       className="absolute top-0 left-0 w-32 h-32 rounded-full pointer-events-none"
@@ -201,8 +205,8 @@ const StatsBento = () => {
                     </span>
 
                     {/* Icon */}
-                    <div className={`w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center mb-3`}>
-                      <Icon className={`w-[18px] h-[18px] ${stat.color}`} />
+                    <div className="w-9 h-9 rounded-xl bg-solaris-gold/10 border border-solaris-gold/15 flex items-center justify-center mb-3">
+                      <Icon className="w-[18px] h-[18px] text-solaris-gold" />
                     </div>
 
                     {/* Number */}
@@ -223,12 +227,14 @@ const StatsBento = () => {
             </div>
 
             {/* Trust bar */}
-            <div className="sm:col-span-3 bento-card p-5 border border-white/5 shadow-depth flex flex-col sm:flex-row items-center gap-5">
+            <div
+              className={`bento-stat bento-card p-5 border border-white/5 shadow-depth flex flex-col sm:flex-row items-center gap-5 ${BENTO_TILE_INTERACTION}`}
+            >
               <p className="text-solaris-muted text-xs font-mono uppercase tracking-widest shrink-0">Verified by</p>
               <div className="flex flex-wrap items-center gap-4 flex-1">
-                {TRUST_BADGES.map(({ icon: Icon, label, color }) => (
-                  <span key={label} className={`inline-flex items-center gap-2 text-xs font-semibold ${color}`}>
-                    <Icon className="w-3.5 h-3.5" />
+                {TRUST_BADGES.map(({ icon: Icon, label }) => (
+                  <span key={label} className="inline-flex items-center gap-2 text-xs font-semibold text-solaris-text">
+                    <Icon className="w-3.5 h-3.5 text-solaris-gold shrink-0" />
                     {label}
                   </span>
                 ))}

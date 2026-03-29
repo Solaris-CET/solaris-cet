@@ -1,6 +1,9 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { Coins } from 'lucide-react';
 
+const BENTO_TILE_INTERACTION =
+  'transition-all duration-300 hover:!-translate-y-1 hover:!scale-100 hover:!shadow-[0_0_15px_rgba(234,179,8,0.2)]';
+
 // ─── CET Token Distribution Data ─────────────────────────────────────────
 
 const DISTRIBUTION = [
@@ -38,7 +41,7 @@ const CustomTooltip = ({ active, payload }: TooltipProps) => {
  */
 const TokenomicsChart = () => {
   return (
-    <div className="bento-card p-6 border border-solaris-gold/20 shadow-depth">
+    <div className={`bento-card p-6 border border-solaris-gold/20 shadow-depth ${BENTO_TILE_INTERACTION}`}>
       <div className="flex items-center gap-2.5 mb-5">
         <div className="w-7 h-7 rounded-lg bg-solaris-gold/10 flex items-center justify-center">
           <Coins className="w-3.5 h-3.5 text-solaris-gold" />
