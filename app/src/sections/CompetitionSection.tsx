@@ -213,7 +213,7 @@ const CompetitionSection = () => {
     >
       <GlowOrbs variant="gold" />
 
-      <div className="relative z-10 px-6 lg:px-12 max-w-7xl mx-auto">
+      <div className="relative z-10 section-padding-x max-w-7xl mx-auto w-full">
 
         {/* Heading */}
         <div ref={headingRef} className="max-w-3xl mb-16">

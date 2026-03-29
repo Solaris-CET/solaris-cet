@@ -201,7 +201,7 @@ const EcosystemIndexSection = () => {
         <div className="absolute bottom-1/3 -right-48 w-[600px] h-[600px] rounded-full bg-solaris-cyan/4 blur-[160px]" />
       </div>
 
-      <div className="relative z-10 px-6 lg:px-12 max-w-7xl mx-auto">
+      <div className="relative z-10 section-padding-x max-w-7xl mx-auto w-full">
         {/* Section heading */}
         <div ref={headingRef} className="max-w-2xl mb-12">
           <div className="flex items-center gap-3 mb-4">

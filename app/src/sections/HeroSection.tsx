@@ -195,7 +195,7 @@ const HeroSection: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-zinc-950/90" />
         </div>
 
-        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 xl:px-10 flex flex-col gap-8 lg:gap-10 pb-16 lg:pb-24 pt-24 lg:pt-16">
+        <div className="relative z-10 mx-auto w-full max-w-7xl section-padding-x xl:px-12 flex flex-col gap-8 lg:gap-10 pb-16 lg:pb-24 pt-24 lg:pt-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 lg:gap-10 xl:gap-12 items-center gap-10">
             {/* Center column: headline + CTAs */}
             <div

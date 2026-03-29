@@ -230,7 +230,7 @@ const ResourcesSection = () => {
         <div className="absolute bottom-1/4 -left-32 w-[500px] h-[500px] rounded-full bg-solaris-gold/5 blur-[140px]" />
       </div>
 
-      <div className="relative z-10 px-6 lg:px-12 max-w-7xl mx-auto">
+      <div className="relative z-10 section-padding-x max-w-7xl mx-auto w-full">
         {/* Section heading */}
         <div ref={headingRef} className="max-w-2xl mb-16">
           <div className="flex items-center gap-3 mb-4">

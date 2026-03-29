@@ -179,10 +179,10 @@ const FAQSection = () => {
     >
       <GlowOrbs variant="cyan" />
 
-      <div className="relative z-10 px-6 lg:px-12 max-w-4xl mx-auto">
+      <div className="relative z-10 section-padding-x max-w-4xl mx-auto w-full">
         {/* Section heading */}
-        <div ref={headingRef} className="max-w-2xl mb-16">
-          <div className="flex items-center gap-3 mb-4">
+        <div ref={headingRef} className="max-w-2xl mb-16 max-md:mx-auto max-md:text-center">
+          <div className="flex items-center gap-3 mb-4 max-md:justify-center">
             <div className="w-10 h-10 rounded-xl bg-cyan-400/10 flex items-center justify-center">
               <HelpCircle className="w-5 h-5 text-cyan-400" />
             </div>
@@ -205,7 +205,7 @@ const FAQSection = () => {
             <div key={i} className="faq-item bento-card border border-white/8 overflow-hidden" role="listitem">
               <button
                 id={`faq-btn-${i}`}
-                className="faq-trigger w-full flex items-center justify-between p-6 text-left group"
+                className="faq-trigger w-full flex items-center justify-between p-5 sm:p-6 md:p-7 text-left group"
                 aria-expanded={openIndex === i}
                 aria-controls={`faq-panel-${i}`}
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
@@ -228,7 +228,7 @@ const FAQSection = () => {
                   openIndex === i ? 'max-h-96' : 'max-h-0'
                 }`}
               >
-                <div className="px-6 pb-6 space-y-3">
+                <div className="px-5 sm:px-6 md:px-7 pb-6 space-y-3">
                   <p className="text-solaris-muted text-sm leading-relaxed">{faq.answer}</p>
                   {faq.link && (
                     <a

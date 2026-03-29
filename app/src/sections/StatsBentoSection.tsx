@@ -129,16 +129,16 @@ const StatsBento = () => {
       <div className="absolute inset-0 aurora-bg opacity-60 pointer-events-none" aria-hidden="true" />
       <GlowOrbs variant="aurora" />
 
-      <div className="relative z-10 px-6 lg:px-12 max-w-7xl mx-auto">
+      <div className="relative z-10 section-padding-x max-w-7xl mx-auto w-full">
 
         {/* Section tag */}
-        <div className="flex items-center gap-3 mb-10">
+        <div className="flex items-center gap-3 mb-10 justify-center md:justify-start">
           <span className="live-dot" />
           <span className="hud-label text-solaris-gold">NETWORK AT A GLANCE</span>
         </div>
 
         {/* Bento grid — asymmetric 12-col layout */}
-        <div ref={bentoRef} className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 auto-rows-min">
+        <div ref={bentoRef} className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 auto-rows-min w-full">
           {/* ── Large hero stat — AI Agents ── */}
           <div
             className={`bento-stat bento-card lg:col-span-6 lg:row-span-2 p-8 lg:p-10 ${agentStat.border} shadow-depth ${BENTO_TILE_INTERACTION}`}

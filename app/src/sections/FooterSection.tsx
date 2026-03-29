@@ -90,7 +90,7 @@ const FooterSection = () => {
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-solaris-gold/20 to-transparent" />
       </div>
 
-      <div className="relative z-10 px-6 lg:px-12 max-w-6xl mx-auto">
+      <div className="relative z-10 section-padding-x max-w-6xl mx-auto w-full">
         {/* CTA Card */}
         <div ref={ctaCardRef} className="bento-card p-8 lg:p-12 mb-12 text-center relative overflow-hidden holo-card border border-solaris-gold/30 shadow-depth">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(242,201,76,0.06)_0%,_transparent_70%)] pointer-events-none" />

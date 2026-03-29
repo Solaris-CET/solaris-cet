@@ -102,7 +102,7 @@ const RwaSection = () => {
       <GlowOrbs variant="gold" />
       <div className="scan-overlay absolute inset-0 pointer-events-none" aria-hidden="true" />
 
-      <div className="relative z-10 px-6 lg:px-12 max-w-7xl mx-auto">
+      <div className="relative z-10 section-padding-x max-w-7xl mx-auto w-full">
 
         {/* Header */}
         <div className="mb-14">

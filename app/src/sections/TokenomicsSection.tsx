@@ -120,7 +120,7 @@ const TokenomicsSection = () => {
     <section
       ref={sectionRef}
       id="staking"
-      className="section-pinned section-glass flex items-center justify-center overflow-hidden mesh-bg"
+      className="section-pinned section-glass flex items-center justify-center overflow-hidden mesh-bg section-padding-x"
     >
       {/* Background grid */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -165,7 +165,7 @@ const TokenomicsSection = () => {
       </div>
 
       {/* Main tokenomics — Bento grid */}
-      <div ref={cardRef} className="relative z-10 w-[min(92vw,1100px)] px-4">
+      <div ref={cardRef} className="relative z-10 w-full max-w-[1100px]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5">
           {/* Title tile */}
           <div

@@ -380,7 +380,7 @@ const WhitepaperSection = () => {
         <div className="absolute bottom-1/4 -right-32 w-96 h-96 rounded-full bg-solaris-cyan/5 blur-[120px]" />
       </div>
 
-      <div className="relative z-10 px-6 lg:px-12 max-w-5xl mx-auto">
+      <div className="relative z-10 section-padding-x max-w-5xl mx-auto w-full">
         {/* Section heading */}
         <div ref={headingRef} className="max-w-3xl mb-12">
           <div className="flex items-center gap-3 mb-4">

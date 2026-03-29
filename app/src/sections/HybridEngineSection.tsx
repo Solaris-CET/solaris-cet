@@ -111,7 +111,7 @@ const HybridEngineSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="section-pinned section-glass flex items-center justify-center"
+      className="section-pinned section-glass flex items-center justify-center section-padding-x"
     >
       {/* Background grid */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -135,10 +135,10 @@ const HybridEngineSection = () => {
       {/* Feature Card - Center */}
       <div
         ref={cardRef}
-        className="relative z-10 w-[min(72vw,980px)]"
+        className="relative z-10 w-full max-w-[980px]"
         style={{ perspective: '1200px' }}
       >
-        <div className="bento-card p-8 lg:p-12 shimmer-border relative holo-card border border-solaris-gold/20 shadow-depth">
+        <div className="bento-card p-6 sm:p-8 lg:p-12 shimmer-border relative holo-card border border-solaris-gold/20 shadow-depth">
           {/* Circuit decoration top right */}
           <div className="absolute top-0 right-0 w-32 h-32 opacity-15 pointer-events-none overflow-hidden rounded-[18px]">
             <svg viewBox="0 0 128 128" className="w-full h-full">

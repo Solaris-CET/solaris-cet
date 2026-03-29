@@ -1,8 +1,16 @@
 import { useEffect, useState, useRef } from 'react';
-import { Menu, X, Sun } from 'lucide-react';
+import { Menu, Sun } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
 import WalletConnect from './WalletConnect';
 import { useLanguage } from '../hooks/useLanguage';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 
 const NAV_HREFS = [
   { key: 'cetApp',      href: '#nova-app'    },
@@ -24,7 +32,7 @@ const NAV_HREFS = [
  *   bottom edge of the header that fills from left to right as the user scrolls.
  * - **"LIVE" badge** indicating the token is live on the TON mainnet.
  * - Desktop navigation links with animated underline-gradient hover effect.
- * - Responsive mobile hamburger menu.
+ * - Below xl: hamburger opens a **right off-canvas sheet** with blurred backdrop (not an inline dropdown).
  *
  * @returns The `<header>` element containing the full navigation bar.
  */
@@ -82,7 +90,7 @@ const Navigation = () => {
         }}
       />
 
-      <div className="w-full px-6 xl:px-12">
+      <div className="w-full section-padding-x xl:px-12">
         <div className="flex items-center justify-between h-16 xl:h-20">
           {/* Logo */}
           <a href="#main-content" className="flex items-center gap-3 group">
@@ -130,49 +138,73 @@ const Navigation = () => {
           {/* Mobile / Tablet Menu Button — shown below xl (1280 px) */}
           <button
             className="xl:hidden p-2 text-solaris-text"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle menu"
+            onClick={() => setIsMobileMenuOpen(true)}
+            aria-label="Open menu"
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-menu"
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            <Menu className="w-6 h-6" />
           </button>
         </div>
       </div>
 
-      {/* Mobile / Tablet Menu — shown below xl (1280 px) */}
-      <div
-        id="mobile-menu"
-        className={`xl:hidden absolute top-full left-0 right-0 bg-zinc-950/92 backdrop-blur-xl border-b border-white/5 transition-all duration-300 ${
-          isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-        }`}
-      >
-        <nav className="flex flex-col p-6 gap-4">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="text-solaris-muted hover:text-solaris-text transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              {link.label}
-            </a>
-          ))}
-          <div className="mt-2">
-            <LanguageSelector />
-          </div>
-          <div className="mt-2">
-            <WalletConnect />
-          </div>
-          <button
-            className="btn-gold text-sm mt-4"
-            onClick={() => window.open('https://t.me/+tKlfzx7IWopmNWQ0', '_blank', 'noopener,noreferrer')}
-            aria-label="Start Mining (opens in new window)"
+      {/* Off-canvas navigation — blur handled by Sheet overlay + sheet panel */}
+      <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+        <SheetContent
+          id="mobile-menu"
+          side="right"
+          overlayClassName="backdrop-blur-xl bg-zinc-950/50"
+          className={cn(
+            'border-l border-white/10 bg-zinc-950/92 backdrop-blur-2xl p-0 gap-0 shadow-[0_0_80px_rgba(0,0,0,0.65)]',
+            'flex flex-col overflow-y-auto overscroll-contain',
+            '[&>button]:top-5 [&>button]:right-5 [&>button]:size-10 [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center',
+          )}
+        >
+          <SheetHeader className="p-6 sm:p-8 pb-4 border-b border-white/6 text-left shrink-0">
+            <SheetTitle className="font-display text-lg text-solaris-text tracking-tight">
+              Solaris <span className="text-solaris-gold">CET</span>
+            </SheetTitle>
+            <SheetDescription className="sr-only">Main navigation</SheetDescription>
+          </SheetHeader>
+
+          <nav
+            className="flex flex-col flex-1 items-center px-6 sm:px-8 md:px-10 py-8 gap-1 min-h-0 w-full max-w-full"
+            aria-label="Primary"
           >
-            Start Mining
-          </button>
-        </nav>
-      </div>
+            {navLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="w-full max-w-[16rem] text-center py-3.5 text-base text-solaris-muted hover:text-solaris-text transition-colors rounded-xl hover:bg-white/[0.04]"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {link.label}
+              </a>
+            ))}
+
+            <div className="w-full max-w-[16rem] flex flex-col items-center gap-6 mt-8 pt-8 border-t border-white/8">
+              <div className="w-full flex flex-col items-center gap-4">
+                <LanguageSelector />
+                <WalletConnect />
+              </div>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-400/10 border border-emerald-400/20">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="font-mono text-[11px] text-emerald-400">LIVE</span>
+              </div>
+              <button
+                className="btn-gold text-sm w-full max-w-[16rem] min-h-[48px]"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  window.open('https://t.me/+tKlfzx7IWopmNWQ0', '_blank', 'noopener,noreferrer');
+                }}
+                aria-label="Start Mining (opens in new window)"
+              >
+                Start Mining
+              </button>
+            </div>
+          </nav>
+        </SheetContent>
+      </Sheet>
     </header>
   );
 };

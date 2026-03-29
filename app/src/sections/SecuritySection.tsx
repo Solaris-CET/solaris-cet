@@ -127,7 +127,7 @@ const SecuritySection = () => {
         <div className="absolute inset-0 aurora-bg opacity-40" />
       </div>
 
-      <div className="relative z-10 px-6 lg:px-12 max-w-7xl mx-auto">
+      <div className="relative z-10 section-padding-x max-w-7xl mx-auto w-full">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Column */}
           <div ref={leftColumnRef}>
