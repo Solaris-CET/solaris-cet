@@ -229,77 +229,100 @@ function AppContent() {
         {/* Navigation */}
         <Navigation />
         
-        {/* Main content */}
+        {/* Main content — conversion flow: Hero → Problem → Solution → Tokenomics → RWA → Roadmap → Footer */}
         <main id="main-content" className="relative w-full overflow-x-clip">
-          {/* 1. Hero — pin: true */}
-          <div className="relative z-10">
+          {/* 1. Hero — Atenție */}
+          <section
+            id="hero"
+            aria-label="Hero"
+            className="relative z-10 py-24"
+          >
             <ErrorBoundary>
               <ScrollFadeUp>
                 <HeroSection />
               </ScrollFadeUp>
             </ErrorBoundary>
-          </div>
+          </section>
 
-          {/* 2. Problema (Agricultural AI) — impact + AI gap + hybrid infra */}
-          <div className="relative z-[15]">
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <StatsBentoSection />
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </div>
+          {/* 2. Problema agriculturii — impact, gap AI, infrastructură hibridă */}
+          <section
+            id="problem-agriculture"
+            aria-label="Problema agriculturii"
+            className="relative z-[15] py-24"
+          >
+            <div className="relative z-[15]">
+              <LazyLoadWrapper>
+                <ScrollFadeUp>
+                  <StatsBentoSection />
+                </ScrollFadeUp>
+              </LazyLoadWrapper>
+            </div>
+            <div className="relative z-20">
+              <ErrorBoundary>
+                <ScrollFadeUp>
+                  <IntelligenceCoreSection />
+                </ScrollFadeUp>
+              </ErrorBoundary>
+            </div>
+            <div className="relative z-30">
+              <ErrorBoundary>
+                <ScrollFadeUp>
+                  <HybridEngineSection />
+                </ScrollFadeUp>
+              </ErrorBoundary>
+            </div>
+          </section>
 
-          <div className="relative z-20">
-            <ErrorBoundary>
-              <ScrollFadeUp>
-                <IntelligenceCoreSection />
-              </ScrollFadeUp>
-            </ErrorBoundary>
-          </div>
-
-          <div className="relative z-30">
-            <ErrorBoundary>
-              <ScrollFadeUp>
-                <HybridEngineSection />
-              </ScrollFadeUp>
-            </ErrorBoundary>
-          </div>
-
-          {/* 3. Soluția (Solaris) — app + RWA land anchor */}
-          <div className="relative z-40">
+          {/* 3. Soluția Solaris AI — aplicația & motorul */}
+          <section
+            id="solution-solaris"
+            aria-label="Soluția Solaris AI"
+            className="relative z-40 py-24"
+          >
             <ErrorBoundary>
               <ScrollFadeUp>
                 <NovaAppSection />
               </ScrollFadeUp>
             </ErrorBoundary>
-          </div>
+          </section>
 
-          <div className="relative z-[45]">
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><RwaSection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </div>
-
-          {/* 4. Tokenomics — pin: true */}
-          <div className="relative z-50">
+          {/* 4. Tokenomics — 9,000 CET dashboard */}
+          <section
+            aria-label="Tokenomics — 9,000 CET"
+            className="relative z-50 py-24"
+          >
             <ErrorBoundary>
               <ScrollFadeUp>
                 <TokenomicsSection />
               </ScrollFadeUp>
             </ErrorBoundary>
-          </div>
+          </section>
 
-          {/* 5. Roadmap — pin: false */}
-          <div className="relative z-[70]">
+          {/* 5. RWA — Cetățuia, real estate */}
+          <section
+            aria-label="RWA — Cetățuia"
+            className="relative z-[55] py-24"
+          >
+            <LazyLoadWrapper>
+              <ScrollFadeUp>
+                <ErrorBoundary><RwaSection /></ErrorBoundary>
+              </ScrollFadeUp>
+            </LazyLoadWrapper>
+          </section>
+
+          {/* 6. Roadmap */}
+          <section
+            aria-label="Roadmap"
+            className="relative z-[70] py-24"
+          >
             <LazyLoadWrapper>
               <ScrollFadeUp>
                 <ErrorBoundary><RoadmapSection /></ErrorBoundary>
               </ScrollFadeUp>
             </LazyLoadWrapper>
-          </div>
+          </section>
 
+          {/* Secțiuni suport (nav / mining / FAQ) — după roadmap, înainte de footer */}
           {/* Compliance — after core story arc (z above Roadmap so stacking matches DOM order) */}
           <div className="relative z-[72]">
             <ErrorBoundary>
@@ -407,15 +430,18 @@ function AppContent() {
               </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
-          
-          {/* Section 18: Footer - pin: false */}
-          <div className="relative z-[113]">
+
+          {/* 7. Footer */}
+          <section
+            aria-label="Footer"
+            className="relative z-[113] py-24"
+          >
             <LazyLoadWrapper>
               <ScrollFadeUp>
                 <ErrorBoundary><FooterSection /></ErrorBoundary>
               </ScrollFadeUp>
             </LazyLoadWrapper>
-          </div>
+          </section>
         </main>
       </div>
       <BackToTop />
