@@ -172,6 +172,7 @@ button, .btn-gold, .btn-filled-gold {
   .animate-ticker,
   .animate-orb-pulse,
   .animate-gold-pulse,
+  .animate-hero-aurora,
   .cursor-glow {
     animation: none !important;
   }

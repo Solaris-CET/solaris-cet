@@ -131,6 +131,11 @@ module.exports = {
           "0%, 100%": { boxShadow: "0 0 20px rgba(242, 201, 76, 0.15)" },
           "50%": { boxShadow: "0 0 50px rgba(242, 201, 76, 0.4), 0 0 100px rgba(242, 201, 76, 0.2)" },
         },
+        /** Slow ambient drift for hero gradient orbs (keeps transform origin stable). */
+        "hero-aurora": {
+          "0%, 100%": { transform: "translate(-48%, -42%) scale(1)" },
+          "50%": { transform: "translate(-52%, -46%) scale(1.08)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -143,6 +148,7 @@ module.exports = {
         "orb-pulse": "orb-pulse 6s ease-in-out infinite",
         "gold-pulse": "gold-pulse 3s ease-in-out infinite",
         "spin-slow": "spin 8s linear infinite",
+        "hero-aurora": "hero-aurora 28s ease-in-out infinite",
       },
     },
   },
