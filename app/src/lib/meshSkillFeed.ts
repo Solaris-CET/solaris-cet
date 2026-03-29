@@ -101,3 +101,12 @@ export function observeLocusClip(q: string, branch: ObserveLocusBranch): string 
   const frag = shortSkillWhisper(skillSaltFromQuery(q) + LOCUS_BRANCH_BIAS[branch]);
   return frag.length > 76 ? `${frag.slice(0, 73)}…` : frag;
 }
+
+/** Map Oracle / topic detector labels to locus branches. */
+export function observeLocusBranchFromTopic(topic: string): ObserveLocusBranch {
+  if (topic === 'price') return 'price';
+  if (topic === 'mining') return 'mining';
+  if (topic === 'ton') return 'ton';
+  if (topic === 'ai' || topic === 'rav' || topic === 'braid' || topic === 'team') return 'ai';
+  return 'default';
+}

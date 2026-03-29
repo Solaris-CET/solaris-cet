@@ -6,6 +6,7 @@ import { Zap, Activity, Loader2 } from 'lucide-react';
 const ParticleCanvas = lazy(() => import('../components/ParticleCanvas'));
 import GlowOrbs from '../components/GlowOrbs';
 import AiOracleSearch from '../components/AiOracleSearch';
+import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { TooltipProvider } from '../components/ui/tooltip';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useLanguage } from '../hooks/useLanguage';
@@ -294,6 +295,12 @@ const HeroSection: React.FC = () => {
                   <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent w-full" />
                   <StatRow label="NODES" value="ACTIVE [300+]" colorClass="text-white" />
                 </div>
+
+                <MeshSkillRibbon
+                  variant="compact"
+                  saltOffset={340}
+                  className="mt-5 border-fuchsia-500/12 bg-fuchsia-500/[0.04]"
+                />
 
                 <div className="mt-6 flex items-center justify-between text-[10px] font-mono text-solaris-muted">
                   <span>HASHRATE MONITOR</span>

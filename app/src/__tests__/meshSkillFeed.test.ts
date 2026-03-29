@@ -7,6 +7,7 @@ import {
   skillFlashForBoardDept,
   skillSaltFromQuery,
   skillSeedFromLabel,
+  observeLocusBranchFromTopic,
   observeLocusClip,
 } from '@/lib/meshSkillFeed';
 
@@ -33,6 +34,13 @@ describe('meshSkillFeed', () => {
 
   it('skillCaptionForDept returns empty for unknown id', () => {
     expect(skillCaptionForDept('no-such-dept', 0)).toBe('');
+  });
+
+  it('observeLocusBranchFromTopic maps oracle topics', () => {
+    expect(observeLocusBranchFromTopic('price')).toBe('price');
+    expect(observeLocusBranchFromTopic('mining')).toBe('mining');
+    expect(observeLocusBranchFromTopic('rav')).toBe('ai');
+    expect(observeLocusBranchFromTopic('unknown')).toBe('default');
   });
 
   it('observeLocusClip is deterministic per branch and bounded', () => {

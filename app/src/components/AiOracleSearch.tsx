@@ -7,6 +7,7 @@ import { X, Send, Copy, Check, ExternalLink, ChevronRight, Sparkles, Trash2, Bot
 import { useLanguage } from '../hooks/useLanguage';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { OracleKnowledge, Translations } from '../i18n/translations';
+import { observeLocusBranchFromTopic, observeLocusClip } from '@/lib/meshSkillFeed';
 
 // --- TYPE DEFINITIONS ---
 type ReActPhase =
@@ -506,6 +507,10 @@ export default function AiOracleSearch() {
     addLog('INFO', `RAV_INIT: Grok × Gemini Oracle v3.1 · Session [${hash}]`);
     addLog('INFO', `TASK_MESH: ~200k task agents · delegated sub-queries · Oracle consolidation`);
     addLog('INFO', `INPUT_STREAM: "${q}" · Tokens: ${tokenCount}`);
+    addLog(
+      'INFO',
+      `SKILL_LOCUS: ${observeLocusClip(q, observeLocusBranchFromTopic(detected))} · topic=${detected}`
+    );
 
     schedule(() => {
       setPhase('observe_context');
