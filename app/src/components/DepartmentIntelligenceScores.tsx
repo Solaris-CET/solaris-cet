@@ -5,7 +5,11 @@ import {
 } from 'lucide-react';
 import { useNearScreen } from '@/hooks/useNearScreen';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
-import { skillCaptionForDept } from '@/lib/meshSkillFeed';
+import {
+  skillCaptionForDept,
+  meshStandardBurstFromKey,
+  meshWhisperFromKey,
+} from '@/lib/meshSkillFeed';
 
 interface DeptIntel {
   id: string;
@@ -118,13 +122,27 @@ const DepartmentIntelligenceScores = () => {
           const v = scores[d.id] ?? d.base;
           const pct = Math.min(100, Math.max(0, v));
           const skillLine = skillCaptionForDept(d.id, skillTick);
+          const rowMeshTitle = [
+            meshStandardBurstFromKey(`deptIntel|row|${d.id}`),
+            meshWhisperFromKey(`deptIntel|whisper|${d.id}`),
+          ].join('\n—\n');
+          const captionTitle = `${skillLine}\n—\n${meshWhisperFromKey(`deptIntel|caption|${d.id}|${skillTick}`)}`;
           return (
-            <li key={d.id} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
+            <li
+              key={d.id}
+              className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3"
+              title={rowMeshTitle}
+            >
               <div className="flex items-center gap-2 min-w-0 sm:w-[200px] shrink-0">
                 <div className={`w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center shrink-0 ${d.color}`}>
                   <Icon className="w-3.5 h-3.5" />
                 </div>
-                <span className="text-[11px] sm:text-xs text-solaris-text truncate">{d.name}</span>
+                <span
+                  className="text-[11px] sm:text-xs text-solaris-text truncate"
+                  title={meshWhisperFromKey(`deptIntel|name|${d.id}`)}
+                >
+                  {d.name}
+                </span>
               </div>
               <div className="flex-1 flex flex-col gap-1 min-w-0">
                 <div className="flex items-center gap-2 min-w-0">
@@ -138,7 +156,10 @@ const DepartmentIntelligenceScores = () => {
                     {pct.toFixed(1)}
                   </span>
                 </div>
-                <p className="text-[9px] font-mono text-white/35 leading-snug truncate pl-0 sm:pl-9" title={skillLine}>
+                <p
+                  className="text-[9px] font-mono text-white/35 leading-snug truncate pl-0 sm:pl-9"
+                  title={captionTitle}
+                >
                   {skillLine}
                 </p>
               </div>

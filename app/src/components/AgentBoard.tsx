@@ -12,6 +12,7 @@ import {
   meshWhisperForBoardLiveAgent,
   meshStandardBurstForBoardLiveAgent,
   meshWhisperForBoardCollab,
+  meshStandardBurstForBoardCollab,
 } from '@/lib/meshSkillFeed';
 
 // ─── Department display config ───────────────────────────────────────────
@@ -106,19 +107,28 @@ const AgentBoard = () => {
             ev.agentId,
             ev.dept,
             ev.kind,
-            ev.roleTitle
+            ev.roleTitle,
+            ev.message
           );
           const rowTitle = [
             ev.message,
             instanceBurst,
-            ev.collab ? `↔ ${ev.collab}: ${meshWhisperForBoardCollab(ev.collab)}` : '',
+            ev.collab
+              ? `↔ ${ev.collab}\n${meshStandardBurstForBoardCollab(ev.collab)}\n${meshWhisperForBoardCollab(ev.collab)}`
+              : '',
           ]
             .filter(Boolean)
             .join('\n—\n');
           const agentBadgeTitle =
             ev.roleTitle && meshDeptId
               ? meshWhisperForAiTeamRoleAgent(meshDeptId, ev.roleTitle)
-              : meshWhisperForBoardLiveAgent(ev.agentId, ev.dept, ev.kind, ev.roleTitle);
+              : meshWhisperForBoardLiveAgent(
+                  ev.agentId,
+                  ev.dept,
+                  ev.kind,
+                  ev.roleTitle,
+                  ev.message
+                );
 
           return (
             <li

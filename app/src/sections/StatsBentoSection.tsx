@@ -4,6 +4,7 @@ import { Users, Coins, Zap, Clock, Shield, TrendingUp, Globe, ArrowRight } from 
 import AnimatedCounter from '../components/AnimatedCounter';
 import GlowOrbs from '../components/GlowOrbs';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
+import { meshStandardBurstFromKey, meshWhisperFromKey } from '@/lib/meshSkillFeed';
 
 /** Overrides global `.bento-card:hover` (translate/scale/shadow) with the bento gold glow spec. */
 const BENTO_TILE_INTERACTION =
@@ -143,6 +144,7 @@ const StatsBento = () => {
           {/* ── Large hero stat — AI Agents ── */}
           <div
             className={`bento-stat bento-card lg:col-span-6 lg:row-span-2 p-8 lg:p-10 ${agentStat.border} shadow-depth ${BENTO_TILE_INTERACTION}`}
+            title={`${meshStandardBurstFromKey('statsBento|agents|heroPanel')}\n—\n${meshWhisperFromKey('statsBento|agents|heroWhisper')}`}
           >
             {/* Ambient glow */}
             <div

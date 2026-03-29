@@ -23,6 +23,7 @@ import {
   meshWhisperForBoardLiveAgent,
   meshStandardBurstForBoardLiveAgent,
   meshWhisperForBoardCollab,
+  meshStandardBurstForBoardCollab,
 } from '@/lib/meshSkillFeed';
 
 function stripFeedTimestamp(line: string): string {
@@ -148,6 +149,10 @@ describe('meshSkillFeed', () => {
     expect(agentBoardLiveAgentKey('ENG-00001', 'Engineering', 'solved')).toBe(
       'agentBoard|liveAgent|ENG-00001|Engineering|solved|—'
     );
+    const fp = 'resolved: pool liquidity';
+    expect(agentBoardLiveAgentKey('ENG-00001', 'Engineering', 'solved', undefined, fp)).toBe(
+      `agentBoard|liveAgent|ENG-00001|Engineering|solved|—|msg${skillSeedFromLabel(fp)}`
+    );
     expect(meshWhisperForBoardLiveAgent('AI-00003', 'Data & AI', 'learned')).toBe(
       meshWhisperFromKey(agentBoardLiveAgentKey('AI-00003', 'Data & AI', 'learned'))
     );
@@ -156,6 +161,9 @@ describe('meshSkillFeed', () => {
     );
     expect(meshWhisperForBoardCollab('SEC-00001')).toBe(
       meshWhisperFromKey('agentBoard|collab|SEC-00001')
+    );
+    expect(meshStandardBurstForBoardCollab('SEC-00001')).toBe(
+      meshStandardBurstFromKey('agentBoard|collab|SEC-00001')
     );
   });
 });

@@ -183,36 +183,54 @@ export function meshWhisperForAiTeamSynth(
 
 // ─── Live AgentBoard: numeric instance id + dept + kind (+ role when known) ───
 
-/** Stable key for one simulated agent row (e.g. CX-00423 + Customer Ops + learned). */
+/**
+ * Stable key for one simulated agent row (e.g. CX-00423 + Customer Ops + learned).
+ * Optional `messageFingerprint` (e.g. event message) differentiates two rows with the same id/kind.
+ */
 export function agentBoardLiveAgentKey(
   agentId: string,
   deptDisplayName: string,
   kind: string,
-  roleTitle?: string
+  roleTitle?: string,
+  messageFingerprint?: string
 ): string {
   const role = roleTitle ?? '—';
-  return `agentBoard|liveAgent|${agentId}|${deptDisplayName}|${kind}|${role}`;
+  const msg =
+    messageFingerprint != null && messageFingerprint.length > 0
+      ? `|msg${skillSeedFromLabel(messageFingerprint)}`
+      : '';
+  return `agentBoard|liveAgent|${agentId}|${deptDisplayName}|${kind}|${role}${msg}`;
 }
 
 export function meshWhisperForBoardLiveAgent(
   agentId: string,
   deptDisplayName: string,
   kind: string,
-  roleTitle?: string
+  roleTitle?: string,
+  messageFingerprint?: string
 ): string {
-  return meshWhisperFromKey(agentBoardLiveAgentKey(agentId, deptDisplayName, kind, roleTitle));
+  return meshWhisperFromKey(
+    agentBoardLiveAgentKey(agentId, deptDisplayName, kind, roleTitle, messageFingerprint)
+  );
 }
 
 export function meshStandardBurstForBoardLiveAgent(
   agentId: string,
   deptDisplayName: string,
   kind: string,
-  roleTitle?: string
+  roleTitle?: string,
+  messageFingerprint?: string
 ): string {
-  return meshStandardBurstFromKey(agentBoardLiveAgentKey(agentId, deptDisplayName, kind, roleTitle));
+  return meshStandardBurstFromKey(
+    agentBoardLiveAgentKey(agentId, deptDisplayName, kind, roleTitle, messageFingerprint)
+  );
 }
 
 /** Peer agent in learned/collab lines — second identity stream. */
 export function meshWhisperForBoardCollab(peerAgentId: string): string {
   return meshWhisperFromKey(`agentBoard|collab|${peerAgentId}`);
+}
+
+export function meshStandardBurstForBoardCollab(peerAgentId: string): string {
+  return meshStandardBurstFromKey(`agentBoard|collab|${peerAgentId}`);
 }
