@@ -16,6 +16,7 @@ import {
   Network,
   Atom,
 } from 'lucide-react';
+import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 
 const WHITEPAPER_URL =
   'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a';
@@ -473,6 +474,10 @@ const WhitepaperSection = () => {
               Download PDF (IPFS)
             </a>
           </div>
+        </div>
+
+        <div className="mt-10 max-w-3xl">
+          <MeshSkillRibbon variant="compact" saltOffset={2030} className="border-fuchsia-500/12 bg-fuchsia-500/[0.03]" />
         </div>
       </div>
     </section>

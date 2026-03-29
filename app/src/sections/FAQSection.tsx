@@ -2,6 +2,7 @@ import { useState, useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { ChevronDown, HelpCircle } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
+import MeshSkillRibbon from '../components/MeshSkillRibbon';
 
 interface FAQLink {
   label: string;
@@ -259,6 +260,10 @@ const FAQSection = () => {
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="mt-10 max-w-3xl mx-auto">
+          <MeshSkillRibbon variant="compact" saltOffset={1920} className="border-fuchsia-500/12 bg-fuchsia-500/[0.03]" />
         </div>
       </div>
     </section>

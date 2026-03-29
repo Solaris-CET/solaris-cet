@@ -543,6 +543,7 @@ export default function AiOracleSearch() {
       addLog('QUANTUM', `PATH_COLLAPSE: Highest-confidence path (p=${(confidence / 100).toFixed(4)})`);
       addLog('SEC', `CONSTRAINT_CHECK: Zero-hallucination bounds · fact anchors`);
       addLog('INFO', `BRAID_FRAME: Reasoning graph · depth 7 · nodes 1,204`);
+      addLog('INFO', `VALIDATE_MESH: ${deepLatticeLineForQuery(`${q}|thinkValidate`)}`);
       addLog(
         'QUANTUM',
         `EXPRESSOME_BURST: ${standardSkillBurst(skillSeedFromLabel(`${q}|expressome`))}`
@@ -841,7 +842,8 @@ export default function AiOracleSearch() {
                             log.message.startsWith('FLASH_GLINT:') ||
                             log.message.startsWith('ROUTE_MESH:') ||
                             log.message.startsWith('CROSS_MESH:') ||
-                            log.message.startsWith('CONSENSUS_BURST:');
+                            log.message.startsWith('CONSENSUS_BURST:') ||
+                            log.message.startsWith('VALIDATE_MESH:');
                           return (
                             <div
                               key={log.id}

@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { ShieldCheck, FileCheck, Globe, Server } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
+import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 
@@ -205,6 +206,10 @@ const ComplianceSection = () => {
           <Globe className="w-4 h-4 text-solaris-cyan" />
           <span className="font-mono text-sm text-solaris-text">Sovereign AI</span>
         </div>
+      </div>
+
+      <div className="absolute bottom-4 left-4 right-4 z-[25] max-w-3xl mx-auto pointer-events-auto">
+        <MeshSkillRibbon variant="compact" saltOffset={1580} className="border-fuchsia-500/12 bg-fuchsia-500/[0.03]" />
       </div>
     </section>
   );

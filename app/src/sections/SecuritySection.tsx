@@ -11,6 +11,7 @@ import {
   BadgeCheck,
   Anchor,
 } from 'lucide-react';
+import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 
 
 // Static data defined outside component to avoid re-creation on every render
@@ -302,6 +303,10 @@ const SecuritySection = () => {
             ))}
             </div>
           </div>
+        </div>
+
+        <div className="mt-12 max-w-3xl">
+          <MeshSkillRibbon variant="compact" saltOffset={1470} className="border-fuchsia-500/12 bg-fuchsia-500/[0.03]" />
         </div>
       </div>
     </section>

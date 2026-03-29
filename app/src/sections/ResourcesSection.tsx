@@ -1,6 +1,7 @@
 import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { BarChart2, BookOpen, Brain, Globe, ExternalLink } from 'lucide-react';
+import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 
 interface Resource {
   name: string;
@@ -322,6 +323,10 @@ const ResourcesSection = () => {
               </div>
             );
           })}
+        </div>
+
+        <div className="mt-12 max-w-3xl">
+          <MeshSkillRibbon variant="compact" saltOffset={1810} className="border-fuchsia-500/12 bg-fuchsia-500/[0.03]" />
         </div>
       </div>
     </section>

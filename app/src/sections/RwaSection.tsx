@@ -2,6 +2,8 @@ import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { MapPin, Leaf, Shield, TrendingUp, Layers, Sun, Landmark } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
+import MeshSkillRibbon from '../components/MeshSkillRibbon';
+import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 
 /** Inline SVG placeholder — replace with on-site photography of Cetățuia land when available */
 const PHYSICAL_ASSET_PLACEHOLDER_BG =
@@ -211,9 +213,15 @@ const RwaSection = () => {
                 <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
                   <Icon className={`w-[18px] h-[18px] ${stat.color}`} />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className={`font-display font-bold text-sm ${stat.color}`}>{stat.value}</div>
                   <div className="text-solaris-muted text-[10px] font-mono uppercase">{stat.label}</div>
+                  <p
+                    className="mt-2 text-[10px] font-mono text-fuchsia-200/70 leading-snug line-clamp-2 border-t border-fuchsia-500/10 pt-2"
+                    title={shortSkillWhisper(skillSeedFromLabel(`rwa|${stat.label}`))}
+                  >
+                    {shortSkillWhisper(skillSeedFromLabel(`rwa|${stat.label}`))}
+                  </p>
                 </div>
               </div>
             );
@@ -260,6 +268,10 @@ const RwaSection = () => {
           >
             View IPFS Proof ↗
           </a>
+        </div>
+
+        <div className="mt-10 max-w-3xl">
+          <MeshSkillRibbon variant="compact" saltOffset={2140} className="border-fuchsia-500/12 bg-fuchsia-500/[0.03]" />
         </div>
 
       </div>

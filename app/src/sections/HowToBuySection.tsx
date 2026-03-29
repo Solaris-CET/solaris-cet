@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { Wallet, ArrowRightLeft, Coins, Copy, Check, ExternalLink } from 'lucide-react';
 import LivePoolStats from '../components/LivePoolStats';
+import MeshSkillRibbon from '../components/MeshSkillRibbon';
 
 const CET_CONTRACT_ADDRESS = 'EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX';
 const DEDUST_POOL_ADDRESS = 'EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
@@ -290,6 +291,10 @@ const HowToBuySection = () => {
         {/* Live DeDust pool stats */}
         <div className="mt-6">
           <LivePoolStats />
+        </div>
+
+        <div className="mt-8 max-w-3xl">
+          <MeshSkillRibbon variant="compact" saltOffset={1690} className="border-fuchsia-500/12 bg-fuchsia-500/[0.03]" />
         </div>
       </div>
     </section>
