@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { Brain, Lightbulb, Play, Eye, Zap } from 'lucide-react';
 import AgentBridge from '../components/AgentBridge';
+import DualAiFusionGraphic from '../components/DualAiFusionGraphic';
 import GlowOrbs from '../components/GlowOrbs';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -123,6 +124,9 @@ const IntelligenceCoreSection = () => {
 
       {/* Glow orbs */}
       <GlowOrbs variant="cyan" />
+
+      {/* Grok × Gemini → Solaris (RAV) — dual-AI fusion diagram */}
+      <DualAiFusionGraphic />
 
       {/* Left Info Card */}
       <div
