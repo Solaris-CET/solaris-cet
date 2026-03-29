@@ -23,16 +23,8 @@ export function ScrollFadeUp({
 }: ScrollFadeUpProps) {
   const prefersReducedMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(prefersReducedMotion);
-
-  useEffect(() => {
-    if (prefersReducedMotion) {
-      setVisible(true);
-    } else {
-      // User turned off reduced motion: allow scroll-driven fade-up again.
-      setVisible(false);
-    }
-  }, [prefersReducedMotion]);
+  /** Intersection-driven visibility; ignored when `prefersReducedMotion` (always shown). */
+  const [scrollVisible, setScrollVisible] = useState(false);
 
   useEffect(() => {
     if (prefersReducedMotion) return;
@@ -44,7 +36,7 @@ export function ScrollFadeUp({
       (entries) => {
         const entry = entries[0];
         if (entry?.isIntersecting) {
-          setVisible(true);
+          setScrollVisible(true);
           observer.disconnect();
         }
       },
@@ -54,6 +46,8 @@ export function ScrollFadeUp({
     observer.observe(el);
     return () => observer.disconnect();
   }, [prefersReducedMotion, threshold, rootMargin]);
+
+  const visible = prefersReducedMotion || scrollVisible;
 
   return (
     <div
