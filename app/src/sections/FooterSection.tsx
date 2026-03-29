@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { Download, FileText, ArrowRight, Sun, Globe, X, Send, Copy, CheckCircle, Zap } from 'lucide-react';
 import SocialShare from '../components/SocialShare';
+import MeshSkillRibbon from '../components/MeshSkillRibbon';
 
 // Constants defined once to avoid duplication and maintain a single source of truth
 const GITHUB_URL = 'https://github.com/Solaris-CET/solaris-cet';
@@ -292,6 +293,13 @@ const FooterSection = () => {
                 <span className="font-mono text-[11px] text-emerald-400">LIVE ON TON MAINNET</span>
               </div>
             </div>
+          </div>
+          <div className="mt-6 max-w-2xl mx-auto w-full">
+            <MeshSkillRibbon
+              variant="compact"
+              saltOffset={880}
+              className="border-fuchsia-500/12 bg-fuchsia-500/[0.03]"
+            />
           </div>
           <p className="mt-6 text-center font-mono text-[10px] tracking-[0.3em] uppercase text-white/20 hover:text-solaris-gold/90 transition-all duration-700 cursor-default select-none">
             Architected by Claudiu

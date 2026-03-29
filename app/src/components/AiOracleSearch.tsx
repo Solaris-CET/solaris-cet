@@ -11,6 +11,7 @@ import {
   deepLatticeLineForQuery,
   observeLocusBranchFromTopic,
   observeLocusClip,
+  shortSkillWhisper,
   skillSeedFromLabel,
   standardSkillBurst,
 } from '@/lib/meshSkillFeed';
@@ -521,6 +522,10 @@ export default function AiOracleSearch() {
     schedule(() => {
       setPhase('observe_context');
       addLog('QUANTUM', `INTENT_EXTRACTION: Semantic vector computed. Ambiguity score: 0.${Math.floor(Math.random() * 30 + 10)}`);
+      addLog(
+        'QUANTUM',
+        `FLASH_GLINT: ${shortSkillWhisper(skillSeedFromLabel(`${q}|observeCtx`))}`
+      );
       addLog('INFO', `CONTEXT_MAP: Knowledge graph traversal · Nodes visited: 2,847`);
       setMetrics(prev => ({ ...prev, latency: Math.round(performance.now() - startMs) }));
     }, ORACLE_PHASE_MS[0]);
@@ -826,7 +831,8 @@ export default function AiOracleSearch() {
                             log.message.startsWith('SKILL_LOCUS:') ||
                             log.message.startsWith('EXPRESSOME_BURST:') ||
                             log.message.startsWith('DEEP_LATTICE:') ||
-                            log.message.startsWith('MESH_SEAL:');
+                            log.message.startsWith('MESH_SEAL:') ||
+                            log.message.startsWith('FLASH_GLINT:');
                           return (
                             <div
                               key={log.id}

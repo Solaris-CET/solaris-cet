@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect, useState, useEffect, useCallback } from 'react
 import { gsap } from 'gsap';
 import { Calculator, Smartphone, Laptop, Monitor, Server, TrendingUp } from 'lucide-react';
 import type { MiningInput, MiningResult } from '../lib/mining-math';
+import MeshSkillRibbon from '../components/MeshSkillRibbon';
 
 
 type DeviceType = 'smartphone' | 'laptop' | 'desktop' | 'node';
@@ -370,6 +371,11 @@ const MiningCalculatorSection = () => {
               </div>
             ))}
           </div>
+          <MeshSkillRibbon
+            variant="compact"
+            saltOffset={480}
+            className="mt-4 border-t border-white/8 rounded-none border-x-0 border-b-0 bg-fuchsia-500/[0.03] pt-3"
+          />
         </div>
 
         <p className="text-solaris-muted text-[11px] leading-relaxed mt-4 text-center opacity-60">
