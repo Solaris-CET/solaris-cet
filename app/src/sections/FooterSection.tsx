@@ -1,6 +1,6 @@
 import { useRef, useLayoutEffect, useState } from 'react';
 import { gsap } from 'gsap';
-import { Download, FileText, ArrowRight, Sun, Github, Twitter, Send, Globe, Copy, CheckCircle, Zap } from 'lucide-react';
+import { Download, FileText, ArrowRight, Sun, Globe, X, Send, Copy, CheckCircle, Zap } from 'lucide-react';
 import SocialShare from '../components/SocialShare';
 
 // Constants defined once to avoid duplication and maintain a single source of truth
@@ -16,13 +16,13 @@ const footerLinks = [
   { label: 'Privacy', href: WHITEPAPER_URL, icon: undefined },
   { label: 'Terms', href: WHITEPAPER_URL, icon: undefined },
   { label: 'Contact', href: 'https://t.me/SolarisCET', icon: undefined },
-  { label: 'GitHub', href: GITHUB_URL, icon: Github },
+  { label: 'GitHub', href: GITHUB_URL, icon: Globe },
 ];
 
 const socialLinks = [
-  { icon: Twitter, href: 'https://twitter.com/SolarisCET', label: 'Twitter', color: 'hover:text-[#1DA1F2] hover:bg-[#1DA1F2]/10' },
+  { icon: X, href: 'https://twitter.com/SolarisCET', label: 'X', color: 'hover:text-[#1DA1F2] hover:bg-[#1DA1F2]/10' },
   { icon: Send, href: 'https://t.me/SolarisCET', label: 'Telegram', color: 'hover:text-[#2AABEE] hover:bg-[#2AABEE]/10' },
-  { icon: Github, href: GITHUB_URL, label: 'GitHub', color: 'hover:text-solaris-text hover:bg-white/10' },
+  { icon: Globe, href: GITHUB_URL, label: 'GitHub', color: 'hover:text-solaris-text hover:bg-white/10' },
   { icon: Globe, href: DEDUST_SWAP_URL, label: 'DeDust', color: 'hover:text-solaris-gold hover:bg-solaris-gold/10' },
 ];
 

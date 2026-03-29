@@ -1,4 +1,4 @@
-import { Share2, Twitter } from 'lucide-react';
+import { Share2, X } from 'lucide-react';
 import { useTelegram } from '../hooks/useTelegram';
 
 const SITE_URL = 'https://solaris-cet.vercel.app/';
@@ -8,7 +8,7 @@ const SHARE_TEXT =
 const SocialShare = () => {
   const { haptic } = useTelegram();
 
-  const shareToTwitter = () => {
+  const shareToX = () => {
     haptic('light');
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
       SHARE_TEXT
@@ -41,11 +41,11 @@ const SocialShare = () => {
   return (
     <div className="flex items-center gap-2 flex-wrap">
       <button
-        onClick={shareToTwitter}
-        aria-label="Share on X / Twitter"
+        onClick={shareToX}
+        aria-label="Share on X / X"
         className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-solaris-muted hover:text-solaris-text hover:border-white/20 transition-all duration-200 text-xs"
       >
-        <Twitter className="w-3.5 h-3.5" />
+        <X className="w-3.5 h-3.5" />
         <span>Share on X</span>
       </button>
       <button
