@@ -206,13 +206,13 @@ const HeroSection: React.FC = () => {
                 {t.hero.tagline}
               </p>
 
-              <h1 className="w-full font-black tracking-[-0.045em] leading-[0.88] text-balance">
-                <span className="block text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[5.5rem] 2xl:text-[6rem] text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-200">
+              <h1 className="w-full font-black tracking-[-0.045em] leading-[0.92] text-balance">
+                <span className="block text-5xl sm:text-6xl md:text-7xl text-transparent bg-clip-text bg-gradient-to-br from-amber-100 via-yellow-400 to-amber-600">
                   SOLARIS CET
                 </span>
               </h1>
 
-              <p className="mt-5 md:mt-6 max-w-xl text-base sm:text-lg md:text-xl text-zinc-300/95 font-medium leading-snug">
+              <p className="mt-5 md:mt-6 max-w-xl text-base sm:text-lg md:text-xl text-slate-300 font-medium leading-snug">
                 {t.hero.subtitle}
               </p>
 
@@ -220,38 +220,43 @@ const HeroSection: React.FC = () => {
                 {t.hero.description}
               </p>
 
-              <div ref={ctaGroupRef} className="mt-8 md:mt-10 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 w-full sm:w-auto justify-center lg:justify-start">
-                <button
-                  type="button"
-                  onClick={handleMiningOperation}
-                  aria-live="polite"
-                  aria-busy={miningState === 'PROCESSING'}
-                  aria-label={
-                    miningState === 'IDLE'
-                      ? 'Start mining'
-                      : miningState === 'PROCESSING'
-                        ? 'Processing mining operation'
-                        : 'Mining initiated successfully'
-                  }
-                  className="group relative w-full sm:w-auto min-h-[52px] px-8 py-4 rounded-2xl bg-yellow-500 text-zinc-950 font-bold text-sm sm:text-base tracking-wide shadow-[0_0_28px_rgba(234,179,8,0.35)] transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-[0_0_50px_rgba(250,204,21,0.55),0_0_100px_rgba(234,179,8,0.28)] hover:-translate-y-0.5 active:scale-[0.99] flex items-center justify-center gap-2.5 overflow-hidden"
+              <div className="mt-8 md:mt-10 w-full max-w-xl mx-auto lg:mx-0">
+                <div
+                  ref={ctaGroupRef}
+                  className="rounded-2xl sm:rounded-3xl border border-white/15 bg-white/[0.04] backdrop-blur-2xl shadow-[0_8px_40px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.08)] p-4 sm:p-6 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center lg:justify-start ring-1 ring-white/5"
                 >
-                  <span className="absolute inset-0 rounded-2xl bg-gradient-to-t from-yellow-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                  {miningState === 'IDLE' ? (
-                    <>
-                      <Zap size={20} className="shrink-0" strokeWidth={2.25} />
-                      {t.hero.startMining}
-                    </>
-                  ) : (
-                    <Loader2 className="animate-spin" size={22} />
-                  )}
-                </button>
+                  <button
+                    type="button"
+                    onClick={handleMiningOperation}
+                    aria-live="polite"
+                    aria-busy={miningState === 'PROCESSING'}
+                    aria-label={
+                      miningState === 'IDLE'
+                        ? 'Start mining'
+                        : miningState === 'PROCESSING'
+                          ? 'Processing mining operation'
+                          : 'Mining initiated successfully'
+                    }
+                    className="group relative w-full sm:w-auto min-h-[52px] px-8 py-4 rounded-2xl bg-yellow-500 text-zinc-950 font-bold text-sm sm:text-base tracking-wide shadow-[0_0_28px_rgba(234,179,8,0.35)] transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-[0_0_50px_rgba(250,204,21,0.55),0_0_100px_rgba(234,179,8,0.28)] hover:-translate-y-0.5 active:scale-[0.99] flex items-center justify-center gap-2.5 overflow-hidden"
+                  >
+                    <span className="absolute inset-0 rounded-2xl bg-gradient-to-t from-yellow-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                    {miningState === 'IDLE' ? (
+                      <>
+                        <Zap size={20} className="shrink-0" strokeWidth={2.25} />
+                        {t.hero.startMining}
+                      </>
+                    ) : (
+                      <Loader2 className="animate-spin" size={22} />
+                    )}
+                  </button>
 
-                <a
-                  href="#whitepaper"
-                  className="w-full sm:w-auto min-h-[52px] px-8 py-4 rounded-2xl border border-white/15 bg-white/[0.03] text-white font-semibold text-sm sm:text-base text-center backdrop-blur-sm transition-all duration-300 hover:bg-white/[0.07] hover:border-yellow-500/35 hover:text-white"
-                >
-                  {t.hero.docs}
-                </a>
+                  <a
+                    href="#whitepaper"
+                    className="w-full sm:w-auto min-h-[52px] px-8 py-4 rounded-2xl border border-white/20 bg-white/[0.06] text-white font-semibold text-sm sm:text-base text-center backdrop-blur-md transition-all duration-300 hover:bg-white/[0.1] hover:border-yellow-500/40 hover:text-white"
+                  >
+                    {t.hero.docs}
+                  </a>
+                </div>
               </div>
             </div>
 
