@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { Activity, Layers, Cpu, Globe, Lock, TrendingUp } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
+import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 
 // ─── Live network stats that increment over time ──────────────────────────
 
@@ -203,6 +204,12 @@ const NetworkPulseSection = () => {
 
                 <div className="text-solaris-text text-sm font-semibold mb-1">{stat.label}</div>
                 <div className="text-solaris-muted text-xs leading-relaxed">{stat.description}</div>
+                <p
+                  className="mt-2 text-[10px] font-mono text-fuchsia-200/70 leading-snug line-clamp-2 border-t border-fuchsia-500/10 pt-2"
+                  title={shortSkillWhisper(skillSeedFromLabel(`pulse|${stat.label}`))}
+                >
+                  {shortSkillWhisper(skillSeedFromLabel(`pulse|${stat.label}`))}
+                </p>
 
                 {/* Pulse dot for incrementing stats */}
                 {stat.perSecond > 0 && (

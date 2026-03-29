@@ -4,6 +4,7 @@ import { Brain, Lightbulb, Play, Eye, Zap } from 'lucide-react';
 import AgentBridge from '../components/AgentBridge';
 import DualAiFusionGraphic from '../components/DualAiFusionGraphic';
 import GlowOrbs from '../components/GlowOrbs';
+import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 
@@ -237,6 +238,12 @@ const IntelligenceCoreSection = () => {
               <span className="text-solaris-cyan text-xs">▶</span>
               <div className="w-2 h-4 bg-solaris-cyan animate-pulse" />
             </div>
+            <p
+              className="mt-3 text-[10px] font-mono text-fuchsia-200/70 leading-snug line-clamp-2 border-t border-fuchsia-500/15 pt-2"
+              title={shortSkillWhisper(skillSeedFromLabel(`intelcore|react|${reactStep}`))}
+            >
+              {shortSkillWhisper(skillSeedFromLabel(`intelcore|react|${reactStep}`))}
+            </p>
           </div>
 
           {/* ReAct label */}

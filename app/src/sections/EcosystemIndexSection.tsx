@@ -1,6 +1,7 @@
 import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { TrendingUp, ExternalLink, BarChart2 } from 'lucide-react';
+import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 
 interface CryptoProject {
   name: string;
@@ -307,6 +308,10 @@ const EcosystemIndexSection = () => {
               </div>
             );
           })}
+        </div>
+
+        <div className="mt-10 max-w-3xl">
+          <MeshSkillRibbon variant="compact" saltOffset={1180} className="border-fuchsia-500/12 bg-fuchsia-500/[0.03]" />
         </div>
       </div>
     </section>

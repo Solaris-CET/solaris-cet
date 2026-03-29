@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { Shield, Zap, Cpu, ArrowLeftRight } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
+import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 
@@ -271,6 +272,10 @@ const HybridEngineSection = () => {
                 99.95<span className="text-lg">%</span>
               </div>
             </div>
+          </div>
+
+          <div className="mt-6 pt-4 border-t border-fuchsia-500/15">
+            <MeshSkillRibbon variant="compact" saltOffset={740} className="border-fuchsia-500/12 bg-fuchsia-500/[0.03]" />
           </div>
         </div>
       </div>

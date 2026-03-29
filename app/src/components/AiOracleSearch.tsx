@@ -594,6 +594,10 @@ export default function AiOracleSearch() {
         );
         addLog('SEC', `TON_CONSENSUS: Payload validated · quorum OK`);
         addLog('QUANTUM', `RAV_COMPLETE: loop closed · Confidence: ${conf.toFixed(1)}%`);
+        addLog(
+          'QUANTUM',
+          `CONSENSUS_BURST: ${standardSkillBurst(skillSeedFromLabel(`${q}|consensus`))}`
+        );
         setMetrics(prev => ({
           ...prev,
           confidence: Math.round(conf),
@@ -609,6 +613,7 @@ export default function AiOracleSearch() {
       setPhase('verify_cross');
       addLog('SEC', `VERIFY_INIT: Cross-model review · Grok↔Gemini`);
       addLog('QUANTUM', `ZK_PROOF: integrity bundle · Hash: 0x${generateHash()}`);
+      addLog('INFO', `CROSS_MESH: ${deepLatticeLineForQuery(`${q}|verifyCross`)}`);
     }, ORACLE_PHASE_MS[5]);
 
     schedule(() => {
@@ -834,7 +839,9 @@ export default function AiOracleSearch() {
                             log.message.startsWith('DEEP_LATTICE:') ||
                             log.message.startsWith('MESH_SEAL:') ||
                             log.message.startsWith('FLASH_GLINT:') ||
-                            log.message.startsWith('ROUTE_MESH:');
+                            log.message.startsWith('ROUTE_MESH:') ||
+                            log.message.startsWith('CROSS_MESH:') ||
+                            log.message.startsWith('CONSENSUS_BURST:');
                           return (
                             <div
                               key={log.id}

@@ -9,6 +9,7 @@ import AgenticBenchmarkDashboard from '@/components/AgenticBenchmarkDashboard';
 import AgenticNeuralCanvas from '@/components/AgenticNeuralCanvas';
 import AgenticWhispers from '@/components/AgenticWhispers';
 import AgenticSignalUnlock from '@/components/AgenticSignalUnlock';
+import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 
 /**
  * Agentic engine narrative: live neural simulation, department IQ, RAV internet mesh, benchmark dashboard.
@@ -95,6 +96,10 @@ const AgenticEngineSection = () => {
         </div>
 
         <AgenticWhispers />
+
+        <div className="mb-6 max-w-4xl">
+          <MeshSkillRibbon variant="compact" saltOffset={480} className="border-fuchsia-500/12 bg-fuchsia-500/[0.03]" />
+        </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8 mb-8">
           <LiveNeuralFeed />

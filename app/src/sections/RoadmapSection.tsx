@@ -1,6 +1,7 @@
 import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { CheckCircle, Loader, Circle } from 'lucide-react';
+import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 
 type PhaseStatus = 'done' | 'active' | 'upcoming';
 
@@ -289,6 +290,10 @@ const RoadmapSection = () => {
               </div>
             );
           })}
+        </div>
+
+        <div className="mt-12 max-w-3xl">
+          <MeshSkillRibbon variant="compact" saltOffset={910} className="border-fuchsia-500/12 bg-fuchsia-500/[0.03]" />
         </div>
       </div>
     </div>
