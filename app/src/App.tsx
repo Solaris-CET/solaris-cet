@@ -8,6 +8,7 @@ import TouchRipple from './components/TouchRipple';
 import LazyLoadWrapper from './components/LazyLoadWrapper';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import BackToTop from './components/BackToTop';
+import { ScrollFadeUp } from './components/ScrollFadeUp';
 // Pinned sections — loaded eagerly so the snap/scroll setup can find their ScrollTriggers
 import HeroSection from './sections/HeroSection';
 import HybridEngineSection from './sections/HybridEngineSection';
@@ -233,147 +234,189 @@ function AppContent() {
           {/* Section 1: Hero - pin: true */}
           <div className="relative z-10">
             <ErrorBoundary>
-              <HeroSection />
+              <ScrollFadeUp>
+                <HeroSection />
+              </ScrollFadeUp>
             </ErrorBoundary>
           </div>
 
           {/* Section 1.5: Stats Bento — immediate impact numbers */}
           <div className="relative z-[15]">
             <LazyLoadWrapper>
-              <StatsBentoSection />
+              <ScrollFadeUp>
+                <StatsBentoSection />
+              </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
 
           {/* Section 2: Hybrid Engine - pin: true */}
           <div className="relative z-20">
             <ErrorBoundary>
-              <HybridEngineSection />
+              <ScrollFadeUp>
+                <HybridEngineSection />
+              </ScrollFadeUp>
             </ErrorBoundary>
           </div>
           
           {/* Section 3: Intelligence Core - pin: true */}
           <div className="relative z-30">
             <ErrorBoundary>
-              <IntelligenceCoreSection />
+              <ScrollFadeUp>
+                <IntelligenceCoreSection />
+              </ScrollFadeUp>
             </ErrorBoundary>
           </div>
           
           {/* Section 4: Nova App - pin: true */}
           <div className="relative z-40">
             <ErrorBoundary>
-              <NovaAppSection />
+              <ScrollFadeUp>
+                <NovaAppSection />
+              </ScrollFadeUp>
             </ErrorBoundary>
           </div>
           
           {/* Section 5: Tokenomics - pin: true */}
           <div className="relative z-50">
             <ErrorBoundary>
-              <TokenomicsSection />
+              <ScrollFadeUp>
+                <TokenomicsSection />
+              </ScrollFadeUp>
             </ErrorBoundary>
           </div>
           
           {/* Section 6: Compliance - pin: true */}
           <div className="relative z-[60]">
             <ErrorBoundary>
-              <ComplianceSection />
+              <ScrollFadeUp>
+                <ComplianceSection />
+              </ScrollFadeUp>
             </ErrorBoundary>
           </div>
           
           {/* Section 7: Roadmap - pin: false */}
           <div className="relative z-[70]">
             <LazyLoadWrapper>
-              <ErrorBoundary><RoadmapSection /></ErrorBoundary>
+              <ScrollFadeUp>
+                <ErrorBoundary><RoadmapSection /></ErrorBoundary>
+              </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
 
           {/* Section 8: AI Team - pin: false */}
           <div className="relative z-[75]">
             <LazyLoadWrapper>
-              <ErrorBoundary><AITeamSection /></ErrorBoundary>
+              <ScrollFadeUp>
+                <ErrorBoundary><AITeamSection /></ErrorBoundary>
+              </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
 
           {/* Section 9: Competition - pin: false */}
           <div className="relative z-[78]">
             <LazyLoadWrapper>
-              <ErrorBoundary><CompetitionSection /></ErrorBoundary>
+              <ScrollFadeUp>
+                <ErrorBoundary><CompetitionSection /></ErrorBoundary>
+              </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
 
           {/* Section 9.5: Network Pulse — live TON + CET stats */}
           <div className="relative z-[79]">
             <LazyLoadWrapper>
-              <ErrorBoundary><NetworkPulseSection /></ErrorBoundary>
+              <ScrollFadeUp>
+                <ErrorBoundary><NetworkPulseSection /></ErrorBoundary>
+              </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
 
           {/* Section 10: How to Buy - pin: false */}
           <div className="relative z-[80]">
             <LazyLoadWrapper>
-              <ErrorBoundary><HowToBuySection /></ErrorBoundary>
+              <ScrollFadeUp>
+                <ErrorBoundary><HowToBuySection /></ErrorBoundary>
+              </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
 
           {/* Section 11: Mining Calculator - pin: false */}
           <div className="relative z-[90]">
             <LazyLoadWrapper>
-              <ErrorBoundary><MiningCalculatorSection /></ErrorBoundary>
+              <ScrollFadeUp>
+                <ErrorBoundary><MiningCalculatorSection /></ErrorBoundary>
+              </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
 
           {/* Section 12: Security - pin: false */}
           <div className="relative z-[100]">
             <LazyLoadWrapper>
-              <ErrorBoundary><SecuritySection /></ErrorBoundary>
+              <ScrollFadeUp>
+                <ErrorBoundary><SecuritySection /></ErrorBoundary>
+              </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
           
           {/* Section 13: Whitepaper - pin: false */}
           <div className="relative z-[105]">
             <LazyLoadWrapper>
-              <ErrorBoundary><WhitepaperSection /></ErrorBoundary>
+              <ScrollFadeUp>
+                <ErrorBoundary><WhitepaperSection /></ErrorBoundary>
+              </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
 
           {/* Section 14: High Intelligence - pin: false */}
           <div className="relative z-[108]">
             <LazyLoadWrapper>
-              <ErrorBoundary><HighIntelligenceSection /></ErrorBoundary>
+              <ScrollFadeUp>
+                <ErrorBoundary><HighIntelligenceSection /></ErrorBoundary>
+              </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
           
           {/* Section 15: Ecosystem Index - pin: false */}
           <div className="relative z-[109]">
             <LazyLoadWrapper>
-              <ErrorBoundary><EcosystemIndexSection /></ErrorBoundary>
+              <ScrollFadeUp>
+                <ErrorBoundary><EcosystemIndexSection /></ErrorBoundary>
+              </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
 
           {/* Section 15.5: RWA — Real World Assets */}
           <div className="relative z-[109.5]">
             <LazyLoadWrapper>
-              <ErrorBoundary><RwaSection /></ErrorBoundary>
+              <ScrollFadeUp>
+                <ErrorBoundary><RwaSection /></ErrorBoundary>
+              </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
 
           {/* Section 16: Resources - pin: false */}
           <div className="relative z-[110]">
             <LazyLoadWrapper>
-              <ErrorBoundary><ResourcesSection /></ErrorBoundary>
+              <ScrollFadeUp>
+                <ErrorBoundary><ResourcesSection /></ErrorBoundary>
+              </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
 
           {/* Section 17: FAQ - pin: false */}
           <div className="relative z-[112]">
             <LazyLoadWrapper>
-              <ErrorBoundary><FAQSection /></ErrorBoundary>
+              <ScrollFadeUp>
+                <ErrorBoundary><FAQSection /></ErrorBoundary>
+              </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
           
           {/* Section 18: Footer - pin: false */}
           <div className="relative z-[113]">
             <LazyLoadWrapper>
-              <ErrorBoundary><FooterSection /></ErrorBoundary>
+              <ScrollFadeUp>
+                <ErrorBoundary><FooterSection /></ErrorBoundary>
+              </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
         </main>
