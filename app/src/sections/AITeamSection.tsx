@@ -8,6 +8,7 @@ import LiveAgentStats from '../components/LiveAgentStats';
 import AgentDepartmentChart from '../components/AgentDepartmentChart';
 import { solarisDepartments } from '@/data/solarisDepartments';
 import RoleSynthesizedSkills from '@/components/RoleSynthesizedSkills';
+import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 
 const departments = solarisDepartments;
 
@@ -118,6 +119,8 @@ const AITeamSection = () => {
             operating 24/7, across 10 departments, at the speed of thought.
           </p>
         </div>
+
+        <MeshSkillRibbon saltOffset={60} />
 
         {/* Grand-total stat bar */}
         <div ref={statsRef} className="glass-card-gold p-6 mb-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">

@@ -5,14 +5,20 @@ import {
   skillCaptionForDept,
   standardSkillBurst,
   skillFlashForBoardDept,
+  skillSaltFromQuery,
   skillSeedFromLabel,
 } from '@/lib/meshSkillFeed';
 
+function stripFeedTimestamp(line: string): string {
+  return line.replace(/\[\d{2}:\d{2}:\d{2}\.\d{3}\]/, '[TS]');
+}
+
 describe('meshSkillFeed', () => {
-  it('expressMeshSkillForFeed is deterministic and tags SKILL_MESH', () => {
+  it('expressMeshSkillForFeed is deterministic aside from clock and tags SKILL_MESH', () => {
     const a = expressMeshSkillForFeed(11);
     const b = expressMeshSkillForFeed(11);
-    expect(a).toEqual(b);
+    expect(a.dept).toBe(b.dept);
+    expect(stripFeedTimestamp(a.line)).toBe(stripFeedTimestamp(b.line));
     expect(a.line).toContain('[SKILL_MESH]');
     expect(a.line).toContain('dept=');
     expect(a.line).toMatch(/tier=(flash|deep|standard)/);
@@ -26,6 +32,11 @@ describe('meshSkillFeed', () => {
 
   it('skillCaptionForDept returns empty for unknown id', () => {
     expect(skillCaptionForDept('no-such-dept', 0)).toBe('');
+  });
+
+  it('skillSaltFromQuery is deterministic', () => {
+    expect(skillSaltFromQuery('What are AI agents?')).toBe(skillSaltFromQuery('What are AI agents?'));
+    expect(skillSaltFromQuery('aaa')).not.toBe(skillSaltFromQuery('aab'));
   });
 
   it('skillSeedFromLabel is stable per string', () => {

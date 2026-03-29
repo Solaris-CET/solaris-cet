@@ -1,6 +1,7 @@
 import { useRef, useLayoutEffect, useState, useEffect, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { Brain, Atom, ChevronRight, RotateCcw, Zap, Eye, Cpu } from 'lucide-react';
+import { shortSkillWhisper, skillSaltFromQuery } from '@/lib/meshSkillFeed';
 
 // Realistic TON mainnet block height range (as of 2025)
 const TON_MAINNET_BLOCK_MIN = 40_000_000;
@@ -39,6 +40,15 @@ function buildReasoningSteps(query: string): ReasoningStep[] {
     : isTon
     ? 'TON mainnet state sync · Block height confirmed · Smart contract ABI loaded'
     : 'Indexing query tokens · Context window populated · Knowledge graph traversal started';
+
+  const observeText =
+    isAI
+      ? (() => {
+          const frag = shortSkillWhisper(skillSaltFromQuery(q));
+          const clip = frag.length > 76 ? `${frag.slice(0, 73)}…` : frag;
+          return `${observe} · Locus: ${clip}`;
+        })()
+      : observe;
 
   const think = isPrice
     ? 'Correlating pool liquidity with 9,000 CET fixed supply → scarcity premium calculated'
@@ -83,7 +93,7 @@ function buildReasoningSteps(query: string): ReasoningStep[] {
     : 'Output cross-validated against on-chain facts · Integrity score: 99.2% ✓';
 
   return [
-    { phase: 'OBSERVE', text: observe, color: phaseColors.OBSERVE },
+    { phase: 'OBSERVE', text: observeText, color: phaseColors.OBSERVE },
     { phase: 'THINK', text: think, color: phaseColors.THINK },
     { phase: 'PLAN', text: plan, color: phaseColors.PLAN },
     { phase: 'ACT', text: act, color: phaseColors.ACT },
