@@ -7,7 +7,6 @@ import {
 import { useAgentBoard, type EventKind } from '../hooks/useAgentBoard';
 import { AGENT_BOARD_DEPT_TO_MESH_ID } from '@/lib/agentBoardSkillMix';
 import {
-  shortSkillWhisper,
   meshWhisperFromKey,
   meshStandardBurstFromKey,
   meshWhisperForAiTeamRoleAgent,
@@ -71,7 +70,7 @@ const AgentBoard = () => {
     return () => window.clearInterval(id);
   }, []);
 
-  const footerSkill = shortSkillWhisper(900 + footTick);
+  const footerSkill = meshWhisperFromKey(`agentBoard|footer|${footTick}`);
 
   return (
     <div className="bento-card border border-white/8 overflow-hidden shadow-depth">

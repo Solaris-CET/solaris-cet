@@ -11,12 +11,11 @@ import {
   deepLatticeLineForQuery,
   observeLocusBranchFromTopic,
   observeLocusClip,
-  meshStandardBurstFromKey,
-  meshWhisperFromKey,
   shortSkillWhisper,
   skillSeedFromLabel,
   standardSkillBurst,
 } from '@/lib/meshSkillFeed';
+import { buildAgentPoolMeshLogMessage, buildTeamAgentMeshLogMessage } from '@/lib/oracleMeshLines';
 
 // --- TYPE DEFINITIONS ---
 type ReActPhase =
@@ -519,15 +518,9 @@ export default function AiOracleSearch() {
       `RAV_BURST: ${standardSkillBurst(skillSeedFromLabel(`${q}|ravInit`))}`
     );
     addLog('INFO', `TASK_MESH: ~200k task agents · delegated sub-queries · Oracle consolidation`);
-    addLog(
-      'INFO',
-      `AGENT_POOL_MESH: ${meshStandardBurstFromKey(`oracle|agentPool|${detected}|${skillSeedFromLabel(q)}`)}`
-    );
+    addLog('INFO', buildAgentPoolMeshLogMessage(detected, q));
     if (detected === 'team' || detected === 'ai') {
-      addLog(
-        'INFO',
-        `TEAM_AGENT_MESH: ${meshWhisperFromKey(`oracle|teamAgent|${q}|${detected}`)}`
-      );
+      addLog('INFO', buildTeamAgentMeshLogMessage(q, detected));
     }
     addLog('INFO', `INPUT_STREAM: "${q}" · Tokens: ${tokenCount}`);
     addLog('INFO', `INPUT_MESH: ${deepLatticeLineForQuery(`${q}|inputStream`)}`);
