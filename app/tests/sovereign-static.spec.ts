@@ -17,7 +17,10 @@ test.describe('OMEGA sovereign static surface', () => {
 
   test('self-hosted JetBrains Mono woff2 is reachable', async ({ page }) => {
     const res = await page.request.get('/sovereign/fonts/jetbrains-mono-400.woff2');
-    expect(res.ok()).toBeTruthy();
+    expect(res.status(), `expected 200 for vendored woff2 under static/sovereign/fonts/`).toBe(200);
+    const body = await res.body();
+    // Real latin-400 woff2 ~21 KiB; catches 404 HTML or empty responses mis-served as 200.
+    expect(body.byteLength, 'JetBrains Mono woff2 must be present in repo + dist').toBeGreaterThan(10_000);
     const ct = res.headers()['content-type'] ?? '';
     expect(ct.includes('woff2') || ct.includes('octet-stream') || ct.includes('font')).toBeTruthy();
   });
