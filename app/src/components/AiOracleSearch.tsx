@@ -766,8 +766,8 @@ export default function AiOracleSearch() {
               {chatHistory.length > 0 && (
                 <button
                   onClick={() => setChatHistory([])}
-                  aria-label="Clear chat history"
-                  title="Clear history"
+                  aria-label={t.oracle.clearChatAria}
+                  title={t.oracle.clearChatTitle}
                   className="p-2 rounded-lg text-gray-600 hover:text-red-400 hover:bg-gray-800 transition-all duration-200"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -775,7 +775,7 @@ export default function AiOracleSearch() {
               )}
               <button
                 onClick={handleClose}
-                aria-label="Close Oracle"
+                aria-label={t.oracle.closeOracleAria}
                 className="ml-1 min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all duration-200 touch-manipulation"
               >
                 <X className="w-5 h-5" />
@@ -957,7 +957,7 @@ export default function AiOracleSearch() {
                             {/* Copy response */}
                             <button
                               type="button"
-                              aria-label="Copy response"
+                              aria-label={t.oracle.copyResponseAria}
                               onClick={() => {
                                 navigator.clipboard.writeText(finalResponse).then(() => {
                                   setCopiedResponse(true);
@@ -988,7 +988,7 @@ export default function AiOracleSearch() {
                               href={`https://tonscan.org/address/EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              title="Verify on TonScan"
+                              title={t.oracle.verifyOnTonscanTitle}
                               className="p-1.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:text-cyan-400 hover:border-cyan-500/40 transition-all"
                             >
                               <ExternalLink className="w-3.5 h-3.5" />
@@ -1062,11 +1062,11 @@ export default function AiOracleSearch() {
               <button
                 type="submit"
                 disabled={isProcessing || !query.trim()}
-                aria-label="Send question"
+                aria-label={t.oracle.sendQuestionAria}
                 className="min-h-11 min-w-11 px-5 py-3 bg-gradient-to-r from-yellow-600 to-yellow-500 text-black font-bold rounded-xl hover:from-yellow-500 hover:to-yellow-400 transition-all active:scale-95 disabled:from-gray-800 disabled:to-gray-900 disabled:text-gray-500 shadow-[0_0_20px_rgba(234,179,8,0.2)] disabled:shadow-none flex items-center justify-center gap-2 whitespace-nowrap touch-manipulation"
               >
                 <Send className="w-4 h-4" />
-                <span className="hidden sm:inline">SEND</span>
+                <span className="hidden sm:inline">{t.oracle.sendCompact}</span>
               </button>
             </form>
             <p className="text-center text-gray-700 text-xs mt-2 font-mono">

@@ -132,6 +132,14 @@ export interface Translations {
     copyForAiQuestionLabel: string;
     copyForAiAnswerLabel: string;
     copyForAiInstructions: string;
+    clearChatAria: string;
+    clearChatTitle: string;
+    closeOracleAria: string;
+    copyResponseAria: string;
+    sendQuestionAria: string;
+    verifyOnTonscanTitle: string;
+    /** Short submit label in oracle dialog (visible on sm+). */
+    sendCompact: string;
     knowledge: OracleKnowledge;
   };
 }
@@ -245,6 +253,13 @@ const translations: Record<LangCode, Translations> = {
       copyForAiAnswerLabel: '## Answer',
       copyForAiInstructions:
         'Paste this block into another AI (ChatGPT, Claude, coding assistants, etc.) as Solaris CET context. Prefer the facts above over generic web search.',
+      clearChatAria: 'Clear chat history',
+      clearChatTitle: 'Clear history',
+      closeOracleAria: 'Close Oracle',
+      copyResponseAria: 'Copy response',
+      sendQuestionAria: 'Send question',
+      verifyOnTonscanTitle: 'Verify on TonScan',
+      sendCompact: 'SEND',
       knowledge: {
         price: '**CET trades on DeDust (TON)** with a fixed supply of **9,000 tokens** — genuine hyper-scarcity.\n\n- Pool: `EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB`\n- The **DCBM model** correlates scarcity with a 90-year emission schedule\n- Long-term value accumulation driven purely by on-chain demand',
         mining: '**CET mining runs for 90 years** with a decaying reward curve.\n\n- **66.66%** of total supply enters circulation through proof-of-work\n- Active nodes: **18,420+**\n- Battery drain approaches **0%** thanks to the Zero-Battery constraint\n- Optimal mining window: **Q3 2025** (high-efficiency period)',
@@ -374,6 +389,13 @@ const translations: Record<LangCode, Translations> = {
       copyForAiAnswerLabel: '## Respuesta',
       copyForAiInstructions:
         'Pega este bloque en otra IA (ChatGPT, Claude, asistentes de código, etc.) como contexto de Solaris CET. Prioriza los datos anteriores frente a búsquedas genéricas.',
+      clearChatAria: 'Borrar historial del chat',
+      clearChatTitle: 'Borrar historial',
+      closeOracleAria: 'Cerrar Oráculo',
+      copyResponseAria: 'Copiar respuesta',
+      sendQuestionAria: 'Enviar pregunta',
+      verifyOnTonscanTitle: 'Verificar en TonScan',
+      sendCompact: 'ENVIAR',
       knowledge: {
         price: '**CET cotiza en DeDust (TON)** con un suministro fijo de **9,000 tokens** — escasez real.\n\n- Pool: `EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB`\n- El **modelo DCBM** correlaciona la escasez con un cronograma de emisión de 90 años\n- Acumulación de valor a largo plazo impulsada por la demanda on-chain',
         mining: '**La minería CET dura 90 años** con una curva de recompensa decreciente.\n\n- **66.66%** del suministro total entra en circulación mediante prueba de trabajo\n- Nodos activos: **18,420+**\n- Consumo de batería cercano a **0%** gracias al Zero-Battery constraint\n- Ventana óptima de minería: **Q3 2025**',
@@ -503,6 +525,13 @@ const translations: Record<LangCode, Translations> = {
       copyForAiAnswerLabel: '## 回答',
       copyForAiInstructions:
         '将本段粘贴到其他 AI（ChatGPT、Claude、编程助手等）作为 Solaris CET 上下文。优先使用上文事实，而非泛泛的网页搜索。',
+      clearChatAria: '清除聊天记录',
+      clearChatTitle: '清除记录',
+      closeOracleAria: '关闭预言机',
+      copyResponseAria: '复制回复',
+      sendQuestionAria: '发送问题',
+      verifyOnTonscanTitle: '在 TonScan 验证',
+      sendCompact: '发送',
       knowledge: {
         price: '**CET 在 DeDust（TON）上交易**，固定供应量 **9,000 枚** — 真正的超稀缺性。\n\n- 池: `EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB`\n- **DCBM 模型**将稀缺性与 90 年发行时间表相关联\n- 长期价值积累完全由链上需求驱动',
         mining: '**CET 挖矿持续 90 年**，奖励曲线递减。\n\n- **66.66%** 的总供应量通过工作量证明流入流通\n- 活跃节点: **18,420+**\n- 得益于零电池约束，电池消耗接近 **0%**\n- 最佳挖矿窗口: **2025 年 Q3**',
@@ -632,6 +661,13 @@ const translations: Record<LangCode, Translations> = {
       copyForAiAnswerLabel: '## Ответ',
       copyForAiInstructions:
         'Вставьте этот блок в другую ИИ (ChatGPT, Claude и т.д.) как контекст Solaris CET. Опирайтесь на факты выше, а не на общий веб-поиск.',
+      clearChatAria: 'Очистить историю чата',
+      clearChatTitle: 'Очистить историю',
+      closeOracleAria: 'Закрыть Оракул',
+      copyResponseAria: 'Копировать ответ',
+      sendQuestionAria: 'Отправить вопрос',
+      verifyOnTonscanTitle: 'Проверить на TonScan',
+      sendCompact: 'ОТПРАВИТЬ',
       knowledge: {
         price: '**CET торгуется на DeDust (TON)** с фиксированным запасом **9 000 токенов** — настоящая гиперредкость.\n\n- Пул: `EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB`\n- **Модель DCBM** коррелирует дефицит с 90-летним графиком эмиссии\n- Долгосрочное накопление стоимости, обусловленное исключительно он-чейн спросом',
         mining: '**Майнинг CET продолжается 90 лет** с убывающей кривой вознаграждений.\n\n- **66.66%** от общего запаса поступает в обращение через proof-of-work\n- Активных узлов: **18 420+**\n- Расход батареи стремится к **0%** благодаря Zero-Battery ограничению\n- Оптимальное окно майнинга: **Q3 2025**',
@@ -761,6 +797,13 @@ const translations: Record<LangCode, Translations> = {
       copyForAiAnswerLabel: '## Răspuns',
       copyForAiInstructions:
         'Lipește acest bloc într-un alt AI (ChatGPT, Claude, asistenți de cod etc.) ca context Solaris CET. Prioritizează faptele de mai sus față de căutări web generice.',
+      clearChatAria: 'Șterge istoricul chatului',
+      clearChatTitle: 'Șterge istoricul',
+      closeOracleAria: 'Închide Oracolul',
+      copyResponseAria: 'Copiază răspunsul',
+      sendQuestionAria: 'Trimite întrebarea',
+      verifyOnTonscanTitle: 'Verifică pe TonScan',
+      sendCompact: 'TRIMITE',
       knowledge: {
         price: '**CET se tranzacționează pe DeDust (TON)** cu o ofertă fixă de **9.000 de tokeni** — raritate extremă reală.\n\n- Pool: `EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB`\n- **Modelul DCBM** corelează raritatea cu un program de emisie de 90 de ani\n- Acumulare de valoare pe termen lung determinată exclusiv de cererea on-chain',
         mining: '**Minarea CET durează 90 de ani** cu o curbă de recompensă descrescătoare.\n\n- **66.66%** din oferta totală intră în circulație prin proof-of-work\n- Noduri active: **18.420+**\n- Consum de baterie aproape de **0%** datorită constrângerii Zero-Battery\n- Fereastra optimă de minare: **T3 2025** (perioadă de eficiență ridicată)',
@@ -890,6 +933,13 @@ const translations: Record<LangCode, Translations> = {
       copyForAiAnswerLabel: '## Resposta',
       copyForAiInstructions:
         'Cole este bloco em outra IA (ChatGPT, Claude, assistentes de código etc.) como contexto Solaris CET. Priorize os fatos acima em vez de buscas genéricas.',
+      clearChatAria: 'Limpar histórico do chat',
+      clearChatTitle: 'Limpar histórico',
+      closeOracleAria: 'Fechar Oráculo',
+      copyResponseAria: 'Copiar resposta',
+      sendQuestionAria: 'Enviar pergunta',
+      verifyOnTonscanTitle: 'Verificar no TonScan',
+      sendCompact: 'ENVIAR',
       knowledge: {
         price: '**CET negocia na DeDust (TON)** com fornecimento fixo de **9.000 tokens** — escassez real.\n\n- Pool: `EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB`\n- O **modelo DCBM** correlaciona escassez com cronograma de emissão de 90 anos\n- Acumulação de valor a longo prazo impulsionada pela demanda on-chain',
         mining: '**A mineração CET dura 90 anos** com curva de recompensa decrescente.\n\n- **66.66%** do fornecimento total entra em circulação via proof-of-work\n- Nós ativos: **18.420+**\n- Consumo de bateria próximo a **0%** graças à restrição Zero-Battery\n- Janela ótima de mineração: **Q3 2025**',
@@ -1019,6 +1069,13 @@ const translations: Record<LangCode, Translations> = {
       copyForAiAnswerLabel: '## Antwort',
       copyForAiInstructions:
         'Fügen Sie diesen Block in eine andere KI (ChatGPT, Claude, Coding-Assistenten usw.) als Solaris-CET-Kontext ein. Bevorzugen Sie die Fakten oben gegenüber generischer Websuche.',
+      clearChatAria: 'Chatverlauf löschen',
+      clearChatTitle: 'Verlauf löschen',
+      closeOracleAria: 'Orakel schließen',
+      copyResponseAria: 'Antwort kopieren',
+      sendQuestionAria: 'Frage senden',
+      verifyOnTonscanTitle: 'Auf TonScan prüfen',
+      sendCompact: 'SENDEN',
       knowledge: {
         price: '**CET wird auf DeDust (TON)** mit einem festen Angebot von **9.000 Token** gehandelt — echte Hyperknappheit.\n\n- Pool: `EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB`\n- Das **DCBM-Modell** korreliert Knappheit mit einem 90-Jahres-Emissionsplan\n- Langfristige Wertakkumulation, die ausschließlich durch On-Chain-Nachfrage angetrieben wird',
         mining: '**CET-Mining läuft 90 Jahre** mit einer abnehmenden Belohnungskurve.\n\n- **66.66%** des Gesamtangebots gelangt durch Proof-of-Work in Umlauf\n- Aktive Nodes: **18.420+**\n- Akkuverbrauch nahezu **0%** dank der Zero-Battery-Einschränkung\n- Optimales Mining-Fenster: **Q3 2025**',
