@@ -60,8 +60,13 @@ function buildFaqs(f: FaqContent): FAQ[] {
 }
 
 const FAQSection = () => {
-  const { t } = useLanguage();
-  const faqs = useMemo(() => buildFaqs(t.faqContent), [t.faqContent]);
+  const { t, lang } = useLanguage();
+  /* FAQ copy is keyed only by `lang` via `translations[lang]` in useLanguageState — not `t.faqContent`
+   * (object identity can change). eslint-disable: exhaustive-deps wants `t.faqContent` in the array.
+   */
+  /* eslint-disable react-hooks/exhaustive-deps */
+  const faqs = useMemo(() => buildFaqs(t.faqContent), [lang]);
+  /* eslint-enable react-hooks/exhaustive-deps */
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
