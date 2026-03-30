@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Sun } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 
 /**
@@ -7,6 +8,7 @@ import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
  * Features neon-gold pulsing glow, smooth entrance animation, and ARIA.
  */
 const BackToTop = () => {
+  const { t } = useLanguage();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -18,7 +20,7 @@ const BackToTop = () => {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      aria-label="Back to top"
+      aria-label={t.common.backToTop}
       title={shortSkillWhisper(skillSeedFromLabel('backToTop|scrollAnchor'))}
       aria-hidden={!visible}
       className={`

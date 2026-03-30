@@ -13,7 +13,7 @@ const LANG_LABELS: Record<LangCode, string> = {
 };
 
 const LanguageSelector = () => {
-  const { lang, setLang } = useLanguage();
+  const { lang, setLang, t } = useLanguage();
 
   return (
     <div
@@ -26,7 +26,7 @@ const LanguageSelector = () => {
           <button
             key={code}
             onClick={() => setLang(code)}
-            aria-label={`Switch language to ${code.toUpperCase()}`}
+            aria-label={`${t.common.switchLanguagePrefix} ${LANG_LABELS[code]}`}
             className={`px-2 py-1.5 rounded text-[11px] font-mono transition-all duration-150 min-h-[36px] min-w-[36px] flex items-center justify-center ${
               lang === code
                 ? 'text-solaris-gold bg-solaris-gold/10'

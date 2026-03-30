@@ -50,6 +50,20 @@ export interface Translations {
     /** Appended to external link names in `aria-label`, e.g. "Buy … (opens in new window)". */
     opensInNewWindow: string;
   };
+  /** Floating controls and language switcher strings. */
+  common: {
+    backToTop: string;
+    /** Prepended to language label in selector `aria-label` (e.g. "Switch language to EN"). */
+    switchLanguagePrefix: string;
+  };
+  /** Footer / resource strip social actions. */
+  social: {
+    shareOnX: string;
+    shareLink: string;
+    shareOrCopyAria: string;
+    linkCopied: string;
+    nativeShareTitle: string;
+  };
   hero: {
     tagline: string;
     subtitle: string;
@@ -119,6 +133,17 @@ const translations: Record<LangCode, Translations> = {
       openMenu: 'Open menu',
       primaryNavigation: 'Primary navigation',
       opensInNewWindow: '(opens in new window)',
+    },
+    common: {
+      backToTop: 'Back to top',
+      switchLanguagePrefix: 'Switch language to',
+    },
+    social: {
+      shareOnX: 'Share on X',
+      shareLink: 'Share',
+      shareOrCopyAria: 'Share or copy link',
+      linkCopied: 'Link copied to clipboard!',
+      nativeShareTitle: 'Solaris CET — Next-Gen TON Token',
     },
     hero: {
       tagline: 'The Digital Foundation of Cetățuia',
@@ -215,6 +240,17 @@ const translations: Record<LangCode, Translations> = {
       primaryNavigation: 'Navegación principal',
       opensInNewWindow: '(se abre en una ventana nueva)',
     },
+    common: {
+      backToTop: 'Volver arriba',
+      switchLanguagePrefix: 'Cambiar idioma a',
+    },
+    social: {
+      shareOnX: 'Compartir en X',
+      shareLink: 'Compartir',
+      shareOrCopyAria: 'Compartir o copiar enlace',
+      linkCopied: '¡Enlace copiado al portapapeles!',
+      nativeShareTitle: 'Solaris CET — token TON de nueva generación',
+    },
     hero: {
       tagline: 'La Base Digital de Cetățuia',
       subtitle: 'Un token de escasez extrema con 9.000 CET en la blockchain TON',
@@ -309,6 +345,17 @@ const translations: Record<LangCode, Translations> = {
       openMenu: '打开菜单',
       primaryNavigation: '主导航',
       opensInNewWindow: '（在新窗口打开）',
+    },
+    common: {
+      backToTop: '返回顶部',
+      switchLanguagePrefix: '切换语言为',
+    },
+    social: {
+      shareOnX: '在 X 分享',
+      shareLink: '分享',
+      shareOrCopyAria: '分享或复制链接',
+      linkCopied: '链接已复制到剪贴板！',
+      nativeShareTitle: 'Solaris CET — 新一代 TON 代币',
     },
     hero: {
       tagline: 'Cetățuia 的数字基础',
@@ -405,6 +452,17 @@ const translations: Record<LangCode, Translations> = {
       primaryNavigation: 'Основная навигация',
       opensInNewWindow: '(открывается в новом окне)',
     },
+    common: {
+      backToTop: 'Наверх',
+      switchLanguagePrefix: 'Переключить язык на',
+    },
+    social: {
+      shareOnX: 'Поделиться в X',
+      shareLink: 'Поделиться',
+      shareOrCopyAria: 'Поделиться или скопировать ссылку',
+      linkCopied: 'Ссылка скопирована в буфер обмена!',
+      nativeShareTitle: 'Solaris CET — токен TON нового поколения',
+    },
     hero: {
       tagline: 'Цифровая Основа Cetățuia',
       subtitle: 'Гиперредкий токен с запасом 9 000 CET на блокчейне TON',
@@ -499,6 +557,17 @@ const translations: Record<LangCode, Translations> = {
       openMenu: 'Deschide meniul',
       primaryNavigation: 'Navigare principală',
       opensInNewWindow: '(se deschide într-o fereastră nouă)',
+    },
+    common: {
+      backToTop: 'Înapoi sus',
+      switchLanguagePrefix: 'Schimbă limba la',
+    },
+    social: {
+      shareOnX: 'Distribuie pe X',
+      shareLink: 'Distribuie',
+      shareOrCopyAria: 'Distribuie sau copiază linkul',
+      linkCopied: 'Link copiat în clipboard!',
+      nativeShareTitle: 'Solaris CET — token TON nouă generație',
     },
     hero: {
       tagline: 'Fundația Digitală a Cetățuiei',
@@ -595,6 +664,17 @@ const translations: Record<LangCode, Translations> = {
       primaryNavigation: 'Navegação principal',
       opensInNewWindow: '(abre numa nova janela)',
     },
+    common: {
+      backToTop: 'Voltar ao topo',
+      switchLanguagePrefix: 'Mudar idioma para',
+    },
+    social: {
+      shareOnX: 'Partilhar no X',
+      shareLink: 'Partilhar',
+      shareOrCopyAria: 'Partilhar ou copiar link',
+      linkCopied: 'Link copiado para a área de transferência!',
+      nativeShareTitle: 'Solaris CET — token TON de nova geração',
+    },
     hero: {
       tagline: 'A Fundação Digital da Cetățuia',
       subtitle: 'Um token ultra-escasso com oferta de 9.000 CET na blockchain TON',
@@ -689,6 +769,17 @@ const translations: Record<LangCode, Translations> = {
       openMenu: 'Menü öffnen',
       primaryNavigation: 'Hauptnavigation',
       opensInNewWindow: '(öffnet in neuem Fenster)',
+    },
+    common: {
+      backToTop: 'Nach oben',
+      switchLanguagePrefix: 'Sprache wechseln zu',
+    },
+    social: {
+      shareOnX: 'Auf X teilen',
+      shareLink: 'Teilen',
+      shareOrCopyAria: 'Teilen oder Link kopieren',
+      linkCopied: 'Link in die Zwischenablage kopiert!',
+      nativeShareTitle: 'Solaris CET — TON-Token der nächsten Generation',
     },
     hero: {
       tagline: 'Das digitale Fundament von Cetățuia',
