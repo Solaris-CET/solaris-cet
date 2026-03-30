@@ -135,7 +135,7 @@ const Navigation = () => {
                 'btn-filled-gold inline-flex items-center justify-center gap-1.5 text-xs sm:text-sm px-3 py-2 sm:px-4 sm:py-2.5 min-h-[44px] xl:min-h-0',
                 'xl:hidden',
               )}
-              aria-label={`${t.nav.buyOnDedust} (opens in new window)`}
+              aria-label={`${t.nav.buyOnDedust} ${t.nav.opensInNewWindow}`}
             >
               <span className="truncate max-w-[11rem] sm:max-w-none">{t.nav.buyOnDedust}</span>
               <ExternalLink className="w-3.5 h-3.5 shrink-0 opacity-90" aria-hidden />
@@ -156,7 +156,7 @@ const Navigation = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-filled-gold text-sm inline-flex items-center gap-1.5 px-5 py-2.5"
-                aria-label={`${t.nav.buyOnDedust} (opens in new window)`}
+                aria-label={`${t.nav.buyOnDedust} ${t.nav.opensInNewWindow}`}
               >
                 {t.nav.buyOnDedust}
                 <ExternalLink className="w-3.5 h-3.5 opacity-90" aria-hidden />
@@ -164,9 +164,9 @@ const Navigation = () => {
               <button
                 className="btn-gold text-sm"
                 onClick={() => window.open('https://t.me/+tKlfzx7IWopmNWQ0', '_blank', 'noopener,noreferrer')}
-                aria-label="Start Mining (opens in new window)"
+                aria-label={`${t.hero.startMining} ${t.nav.opensInNewWindow}`}
               >
-                Start Mining
+                {t.hero.startMining}
               </button>
             </div>
 
@@ -175,7 +175,7 @@ const Navigation = () => {
               type="button"
               className="xl:hidden p-2 text-solaris-text shrink-0"
               onClick={() => setIsMobileMenuOpen(true)}
-              aria-label="Open menu"
+              aria-label={t.nav.openMenu}
               aria-expanded={isMobileMenuOpen}
               aria-controls="mobile-menu"
             >
@@ -201,12 +201,12 @@ const Navigation = () => {
             <SheetTitle className="font-display text-lg text-solaris-text tracking-tight">
               Solaris <span className="text-solaris-gold">CET</span>
             </SheetTitle>
-            <SheetDescription className="sr-only">Main navigation</SheetDescription>
+            <SheetDescription className="sr-only">{t.nav.sheetDescription}</SheetDescription>
           </SheetHeader>
 
           <nav
             className="flex flex-col flex-1 items-center px-6 sm:px-8 md:px-10 py-8 gap-1 min-h-0 w-full max-w-full"
-            aria-label="Primary"
+            aria-label={t.nav.primaryNavigation}
           >
             {navLinks.map((link) => (
               <a
@@ -226,7 +226,7 @@ const Navigation = () => {
                 rel="noopener noreferrer"
                 className="btn-filled-gold text-sm w-full max-w-[16rem] min-h-[48px] inline-flex items-center justify-center gap-2"
                 onClick={() => setIsMobileMenuOpen(false)}
-                aria-label={`${t.nav.buyOnDedust} (opens in new window)`}
+                aria-label={`${t.nav.buyOnDedust} ${t.nav.opensInNewWindow}`}
               >
                 {t.nav.buyOnDedust}
                 <ExternalLink className="w-4 h-4 shrink-0 opacity-90" aria-hidden />
@@ -249,9 +249,9 @@ const Navigation = () => {
                   setIsMobileMenuOpen(false);
                   window.open('https://t.me/+tKlfzx7IWopmNWQ0', '_blank', 'noopener,noreferrer');
                 }}
-                aria-label="Start Mining (opens in new window)"
+                aria-label={`${t.hero.startMining} ${t.nav.opensInNewWindow}`}
               >
-                Start Mining
+                {t.hero.startMining}
               </button>
             </div>
           </nav>

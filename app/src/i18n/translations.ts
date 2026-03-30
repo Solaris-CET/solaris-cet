@@ -41,6 +41,14 @@ export interface Translations {
     competition: string;
     /** Sticky header primary CTA — opens official DeDust swap. */
     buyOnDedust: string;
+    /** Mobile sheet — screen reader description (Radix SheetDescription). */
+    sheetDescription: string;
+    /** Hamburger control (below xl). */
+    openMenu: string;
+    /** Landmark label for the mobile `<nav>`. */
+    primaryNavigation: string;
+    /** Appended to external link names in `aria-label`, e.g. "Buy … (opens in new window)". */
+    opensInNewWindow: string;
   };
   hero: {
     tagline: string;
@@ -107,6 +115,10 @@ const translations: Record<LangCode, Translations> = {
       faq: 'FAQ',
       competition: 'Compare',
       buyOnDedust: 'Buy on DeDust',
+      sheetDescription: 'Main navigation',
+      openMenu: 'Open menu',
+      primaryNavigation: 'Primary navigation',
+      opensInNewWindow: '(opens in new window)',
     },
     hero: {
       tagline: 'The Digital Foundation of Cetățuia',
@@ -198,6 +210,10 @@ const translations: Record<LangCode, Translations> = {
       faq: 'Preguntas',
       competition: 'Comparar',
       buyOnDedust: 'Comprar en DeDust',
+      sheetDescription: 'Navegación principal',
+      openMenu: 'Abrir menú',
+      primaryNavigation: 'Navegación principal',
+      opensInNewWindow: '(se abre en una ventana nueva)',
     },
     hero: {
       tagline: 'La Base Digital de Cetățuia',
@@ -289,6 +305,10 @@ const translations: Record<LangCode, Translations> = {
       faq: '常见问题',
       competition: '对比',
       buyOnDedust: '在 DeDust 购买',
+      sheetDescription: '主导航',
+      openMenu: '打开菜单',
+      primaryNavigation: '主导航',
+      opensInNewWindow: '（在新窗口打开）',
     },
     hero: {
       tagline: 'Cetățuia 的数字基础',
@@ -380,6 +400,10 @@ const translations: Record<LangCode, Translations> = {
       faq: 'FAQ',
       competition: 'Сравнить',
       buyOnDedust: 'Купить на DeDust',
+      sheetDescription: 'Главная навигация',
+      openMenu: 'Открыть меню',
+      primaryNavigation: 'Основная навигация',
+      opensInNewWindow: '(открывается в новом окне)',
     },
     hero: {
       tagline: 'Цифровая Основа Cetățuia',
@@ -471,6 +495,10 @@ const translations: Record<LangCode, Translations> = {
       faq: 'Întrebări',
       competition: 'Comparare',
       buyOnDedust: 'Cumpără pe DeDust',
+      sheetDescription: 'Navigare principală',
+      openMenu: 'Deschide meniul',
+      primaryNavigation: 'Navigare principală',
+      opensInNewWindow: '(se deschide într-o fereastră nouă)',
     },
     hero: {
       tagline: 'Fundația Digitală a Cetățuiei',
@@ -562,6 +590,10 @@ const translations: Record<LangCode, Translations> = {
       faq: 'FAQ',
       competition: 'Comparar',
       buyOnDedust: 'Comprar na DeDust',
+      sheetDescription: 'Navegação principal',
+      openMenu: 'Abrir menu',
+      primaryNavigation: 'Navegação principal',
+      opensInNewWindow: '(abre numa nova janela)',
     },
     hero: {
       tagline: 'A Fundação Digital da Cetățuia',
@@ -653,6 +685,10 @@ const translations: Record<LangCode, Translations> = {
       faq: 'FAQ',
       competition: 'Vergleich',
       buyOnDedust: 'Auf DeDust kaufen',
+      sheetDescription: 'Hauptnavigation',
+      openMenu: 'Menü öffnen',
+      primaryNavigation: 'Hauptnavigation',
+      opensInNewWindow: '(öffnet in neuem Fenster)',
     },
     hero: {
       tagline: 'Das digitale Fundament von Cetățuia',

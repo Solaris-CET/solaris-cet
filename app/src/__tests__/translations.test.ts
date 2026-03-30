@@ -136,6 +136,12 @@ describe("translations — specific content", () => {
       "whitepaper",
       "resources",
       "faq",
+      "competition",
+      "buyOnDedust",
+      "sheetDescription",
+      "openMenu",
+      "primaryNavigation",
+      "opensInNewWindow",
     ];
     for (const lang of SUPPORTED_LANGS) {
       for (const key of expectedNavKeys) {
