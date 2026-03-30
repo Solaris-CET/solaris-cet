@@ -1,0 +1,37 @@
+import { test, expect } from '@playwright/test';
+
+/**
+ * OMEGA sovereign HTML — zero client JS, self-hosted font, supply invariant.
+ * Dist includes /sovereign/ via prebuild sync (see scripts/sync-sovereign-to-public.mjs).
+ */
+test.describe('OMEGA sovereign static surface', () => {
+  test('serves /sovereign/ with supply anchor and no script tags', async ({ page }) => {
+    await page.goto('/sovereign/');
+    await expect(page).toHaveTitle(/Sovereign static node/i);
+    await expect(page.getByRole('heading', { name: /Sovereign static node/i })).toBeVisible();
+    await expect(page.getByText(/9,000/)).toBeVisible();
+    await expect(page.getByText(/Cetățuia, Romania/i)).toBeVisible();
+    const scripts = await page.locator('script').count();
+    expect(scripts).toBe(0);
+  });
+
+  test('self-hosted JetBrains Mono woff2 is reachable', async ({ page }) => {
+    const res = await page.request.get('/sovereign/fonts/jetbrains-mono-400.woff2');
+    expect(res.ok()).toBeTruthy();
+    const ct = res.headers()['content-type'] ?? '';
+    expect(ct.includes('woff2') || ct.includes('octet-stream') || ct.includes('font')).toBeTruthy();
+  });
+
+  test('main site footer navigates to sovereign surface', async ({ page }) => {
+    // ?lang=en matches useLanguage E2E pattern so landmarks.footer is "Site footer".
+    await page.goto('/?lang=en');
+    await page.locator('.loading-overlay').waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+    // Inner footer is lazy-loaded (LazyLoadWrapper + Suspense); scroll the outer section into view first.
+    await page.locator('section[aria-label="Site footer"]').scrollIntoViewIfNeeded();
+    const link = page.getByRole('link', { name: /Sovereign \(no JS\)/i });
+    await link.waitFor({ state: 'visible', timeout: 20_000 });
+    await link.click();
+    await expect(page).toHaveURL(/\/sovereign\/?$/);
+    await expect(page.getByRole('heading', { name: /Sovereign static node/i })).toBeVisible();
+  });
+});
