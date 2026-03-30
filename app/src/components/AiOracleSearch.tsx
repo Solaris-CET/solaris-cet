@@ -7,7 +7,6 @@ import { X, Send, Copy, Check, ExternalLink, ChevronRight, Sparkles, Trash2, Bot
 import { useLanguage } from '../hooks/useLanguage';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { OracleKnowledge, Translations } from '../i18n/translations';
-import { shortSkillWhisper, skillSeedFromLabel, standardSkillBurst } from '@/lib/meshSkillFeed';
 import {
   buildAgentPoolMeshLogMessage,
   buildTeamAgentMeshLogMessage,
@@ -16,6 +15,13 @@ import {
   buildSkillLocusLogMessage,
   ORACLE_LATTICE_PHASE,
 } from '@/lib/oracleMeshLines';
+import {
+  buildRavBurstLogMessage,
+  buildFlashGlintLogMessage,
+  buildExpressomeBurstLogMessage,
+  buildConsensusBurstLogMessage,
+  buildLoopCompleteBurstLogMessage,
+} from '@/lib/oracleBurstLines';
 
 // --- TYPE DEFINITIONS ---
 type ReActPhase =
@@ -513,10 +519,7 @@ export default function AiOracleSearch() {
 
     setPhase('observe_parse');
     addLog('INFO', `RAV_INIT: Grok × Gemini Oracle v3.1 · Session [${hash}]`);
-    addLog(
-      'QUANTUM',
-      `RAV_BURST: ${standardSkillBurst(skillSeedFromLabel(`${q}|ravInit`))}`
-    );
+    addLog('QUANTUM', buildRavBurstLogMessage(q));
     addLog('INFO', `TASK_MESH: ~200k task agents · delegated sub-queries · Oracle consolidation`);
     addLog('INFO', buildAgentPoolMeshLogMessage(detected, q));
     if (detected === 'team' || detected === 'ai') {
@@ -530,10 +533,7 @@ export default function AiOracleSearch() {
     schedule(() => {
       setPhase('observe_context');
       addLog('QUANTUM', `INTENT_EXTRACTION: Semantic vector computed. Ambiguity score: 0.${Math.floor(Math.random() * 30 + 10)}`);
-      addLog(
-        'QUANTUM',
-        `FLASH_GLINT: ${shortSkillWhisper(skillSeedFromLabel(`${q}|observeCtx`))}`
-      );
+      addLog('QUANTUM', buildFlashGlintLogMessage(q));
       addLog('INFO', `CONTEXT_MAP: Knowledge graph traversal · Nodes visited: 2,847`);
       addLog('INFO', buildDeepLatticeMeshLogMessage('CONTEXT_MESH', q, ORACLE_LATTICE_PHASE.observeContext));
       setMetrics(prev => ({ ...prev, latency: Math.round(performance.now() - startMs) }));
@@ -553,10 +553,7 @@ export default function AiOracleSearch() {
       addLog('SEC', `CONSTRAINT_CHECK: Zero-hallucination bounds · fact anchors`);
       addLog('INFO', `BRAID_FRAME: Reasoning graph · depth 7 · nodes 1,204`);
       addLog('INFO', buildDeepLatticeMeshLogMessage('VALIDATE_MESH', q, ORACLE_LATTICE_PHASE.thinkValidate));
-      addLog(
-        'QUANTUM',
-        `EXPRESSOME_BURST: ${standardSkillBurst(skillSeedFromLabel(`${q}|expressome`))}`
-      );
+      addLog('QUANTUM', buildExpressomeBurstLogMessage(q));
       setMetrics(prev => ({
         ...prev,
         confidence: Math.round(confidence * 0.7),
@@ -605,10 +602,7 @@ export default function AiOracleSearch() {
         );
         addLog('SEC', `TON_CONSENSUS: Payload validated · quorum OK`);
         addLog('QUANTUM', `RAV_COMPLETE: loop closed · Confidence: ${conf.toFixed(1)}%`);
-        addLog(
-          'QUANTUM',
-          `CONSENSUS_BURST: ${standardSkillBurst(skillSeedFromLabel(`${q}|consensus`))}`
-        );
+        addLog('QUANTUM', buildConsensusBurstLogMessage(q));
         setMetrics(prev => ({
           ...prev,
           confidence: Math.round(conf),
@@ -638,10 +632,7 @@ export default function AiOracleSearch() {
     schedule(() => {
       setPhase('complete');
       addLog('INFO', buildDeepLatticeMeshLogMessage('SESSION_MESH', q, ORACLE_LATTICE_PHASE.sessionClose));
-      addLog(
-        'QUANTUM',
-        `LOOP_COMPLETE_BURST: ${standardSkillBurst(skillSeedFromLabel(`${q}|oracleComplete`))}`
-      );
+      addLog('QUANTUM', buildLoopCompleteBurstLogMessage(q));
     }, ORACLE_PHASE_MS[7]);
   }, [generateHash, addLog, t.oracle.knowledge]);
 
