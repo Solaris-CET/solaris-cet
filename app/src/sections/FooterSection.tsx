@@ -22,12 +22,13 @@ const socialLinks = [
 
 const FooterSection = () => {
   const { t } = useLanguage();
+  /** Stable `key`s for React (not translated labels). Privacy + Terms share `href` so we cannot key by URL alone. */
   const footerLinks = [
-    { label: t.footerNav.privacy, href: WHITEPAPER_URL, icon: undefined },
-    { label: t.footerNav.terms, href: WHITEPAPER_URL, icon: undefined },
-    { label: t.footerNav.contact, href: 'https://t.me/SolarisCET', icon: undefined },
-    { label: t.footerNav.sovereignNoJs, href: '/sovereign/', icon: Shield },
-    { label: t.footerNav.github, href: GITHUB_URL, icon: Globe },
+    { id: 'privacy', label: t.footerNav.privacy, href: WHITEPAPER_URL, icon: undefined },
+    { id: 'terms', label: t.footerNav.terms, href: WHITEPAPER_URL, icon: undefined },
+    { id: 'contact', label: t.footerNav.contact, href: 'https://t.me/SolarisCET', icon: undefined },
+    { id: 'sovereign', label: t.footerNav.sovereignNoJs, href: '/sovereign/', icon: Shield },
+    { id: 'github', label: t.footerNav.github, href: GITHUB_URL, icon: Globe },
   ];
   const sectionRef = useRef<HTMLDivElement>(null);
   const ctaCardRef = useRef<HTMLDivElement>(null);
@@ -251,7 +252,7 @@ const FooterSection = () => {
             <nav className="flex flex-wrap items-center gap-6">
               {footerLinks.map((link) => (
                 <a
-                  key={link.label}
+                  key={link.id}
                   href={link.href}
                   data-testid={link.href === '/sovereign/' ? 'footer-sovereign-link' : undefined}
                   target={link.href.startsWith('http') ? '_blank' : undefined}
