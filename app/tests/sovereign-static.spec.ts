@@ -28,7 +28,8 @@ test.describe('OMEGA sovereign static surface', () => {
     await page.locator('.loading-overlay').waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
     // Inner footer is lazy-loaded (LazyLoadWrapper + Suspense); scroll the outer section into view first.
     await page.locator('section[aria-label="Site footer"]').scrollIntoViewIfNeeded();
-    const link = page.getByRole('link', { name: /Sovereign \(no JS\)/i });
+    // Stable across locales (copy lives in i18n `footerNav.sovereignNoJs`).
+    const link = page.getByTestId('footer-sovereign-link');
     await link.waitFor({ state: 'visible', timeout: 20_000 });
     await link.click();
     await expect(page).toHaveURL(/\/sovereign\/?$/);

@@ -252,6 +252,7 @@ const FooterSection = () => {
                 <a
                   key={link.label}
                   href={link.href}
+                  data-testid={link.href === '/sovereign/' ? 'footer-sovereign-link' : undefined}
                   target={link.href.startsWith('http') ? '_blank' : undefined}
                   rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                   className="text-sm text-solaris-muted hover:text-solaris-text transition-colors duration-300 flex items-center gap-1"
