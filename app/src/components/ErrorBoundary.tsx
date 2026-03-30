@@ -1,5 +1,19 @@
 import { Component, type ReactNode, type ErrorInfo } from 'react';
+import translations, { type LangCode } from '../i18n/translations';
+import { SUPPORTED_LANGS } from '../hooks/useLanguage';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+
+/** Matches `useLanguage` / `localStorage` so the boundary UI respects the selected locale. */
+function getLang(): LangCode {
+  if (typeof window === 'undefined') return 'en';
+  try {
+    const s = localStorage.getItem('solaris_lang');
+    if (s && (SUPPORTED_LANGS as readonly string[]).includes(s)) return s as LangCode;
+  } catch {
+    /* ignore */
+  }
+  return 'en';
+}
 
 interface Props {
   children: ReactNode;
@@ -64,20 +78,21 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       const canRetry = this.state.retryCount < MAX_RETRIES;
+      const eb = translations[getLang()].errorBoundary;
 
       return (
         <div role="alert" className="py-16 flex items-center justify-center text-white">
           <div className="text-center px-6">
-            <h1 className="text-2xl font-bold mb-3">Something went wrong</h1>
+            <h1 className="text-2xl font-bold mb-3">{eb.title}</h1>
             <p className="text-gray-400 mb-5 text-sm">
-              {this.state.error?.message ?? 'An unexpected error occurred.'}
+              {this.state.error?.message ?? eb.unexpectedMessage}
             </p>
             <p className="text-fuchsia-200/70 mb-5 text-[11px] font-mono leading-snug max-w-md mx-auto">
               {shortSkillWhisper(skillSeedFromLabel('errorBoundary|recovery'))}
             </p>
             <div
               role="group"
-              aria-label="Error recovery options"
+              aria-label={eb.recoveryGroupAria}
               className="flex items-center justify-center gap-3 flex-wrap"
             >
               {canRetry && (
@@ -86,7 +101,7 @@ export class ErrorBoundary extends Component<Props, State> {
                   onClick={this.handleRetry}
                   className="px-6 py-2 bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-all duration-200"
                 >
-                  Try Again
+                  {eb.tryAgain}
                 </button>
               )}
               <button
@@ -98,7 +113,7 @@ export class ErrorBoundary extends Component<Props, State> {
                     : 'bg-cyan-500 hover:bg-cyan-400'
                 }`}
               >
-                Reload Page
+                {eb.reloadPage}
               </button>
             </div>
           </div>

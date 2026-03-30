@@ -64,6 +64,31 @@ export interface Translations {
     linkCopied: string;
     nativeShareTitle: string;
   };
+  /** Live DeDust pool stats widget (`LivePoolStats`). */
+  livePool: {
+    title: string;
+    liveBadge: string;
+    labelCetPrice: string;
+    labelTvl: string;
+    labelVolume24h: string;
+    labelTonPrice: string;
+    loadingAria: string;
+    errorUnavailable: string;
+    viewOnDedust: string;
+    lastCachedPrefix: string;
+    followPrefix: string;
+    twitterX: string;
+    followSuffix: string;
+    updatedPrefix: string;
+  };
+  /** Default fallback UI for `ErrorBoundary` (class component reads via `getLang()` + map). */
+  errorBoundary: {
+    title: string;
+    unexpectedMessage: string;
+    recoveryGroupAria: string;
+    tryAgain: string;
+    reloadPage: string;
+  };
   hero: {
     tagline: string;
     subtitle: string;
@@ -144,6 +169,29 @@ const translations: Record<LangCode, Translations> = {
       shareOrCopyAria: 'Share or copy link',
       linkCopied: 'Link copied to clipboard!',
       nativeShareTitle: 'Solaris CET — Next-Gen TON Token',
+    },
+    livePool: {
+      title: 'Live DeDust Pool',
+      liveBadge: 'LIVE',
+      labelCetPrice: 'CET Price',
+      labelTvl: 'TVL',
+      labelVolume24h: '24h Volume',
+      labelTonPrice: 'TON Price',
+      loadingAria: 'Loading pool stats',
+      errorUnavailable: 'Live data temporarily unavailable.',
+      viewOnDedust: 'View on DeDust',
+      lastCachedPrefix: 'Last cached:',
+      followPrefix: 'Follow us on',
+      twitterX: 'Twitter / X',
+      followSuffix: 'for real-time updates.',
+      updatedPrefix: 'Updated',
+    },
+    errorBoundary: {
+      title: 'Something went wrong',
+      unexpectedMessage: 'An unexpected error occurred.',
+      recoveryGroupAria: 'Error recovery options',
+      tryAgain: 'Try Again',
+      reloadPage: 'Reload Page',
     },
     hero: {
       tagline: 'The Digital Foundation of Cetățuia',
@@ -251,6 +299,29 @@ const translations: Record<LangCode, Translations> = {
       linkCopied: '¡Enlace copiado al portapapeles!',
       nativeShareTitle: 'Solaris CET — token TON de nueva generación',
     },
+    livePool: {
+      title: 'Pool DeDust en vivo',
+      liveBadge: 'EN VIVO',
+      labelCetPrice: 'Precio CET',
+      labelTvl: 'TVL',
+      labelVolume24h: 'Volumen 24h',
+      labelTonPrice: 'Precio TON',
+      loadingAria: 'Cargando estadísticas del pool',
+      errorUnavailable: 'Datos en vivo no disponibles temporalmente.',
+      viewOnDedust: 'Ver en DeDust',
+      lastCachedPrefix: 'Última caché:',
+      followPrefix: 'Síguenos en',
+      twitterX: 'Twitter / X',
+      followSuffix: 'para actualizaciones en tiempo real.',
+      updatedPrefix: 'Actualizado',
+    },
+    errorBoundary: {
+      title: 'Algo salió mal',
+      unexpectedMessage: 'Ocurrió un error inesperado.',
+      recoveryGroupAria: 'Opciones de recuperación',
+      tryAgain: 'Reintentar',
+      reloadPage: 'Recargar página',
+    },
     hero: {
       tagline: 'La Base Digital de Cetățuia',
       subtitle: 'Un token de escasez extrema con 9.000 CET en la blockchain TON',
@@ -356,6 +427,29 @@ const translations: Record<LangCode, Translations> = {
       shareOrCopyAria: '分享或复制链接',
       linkCopied: '链接已复制到剪贴板！',
       nativeShareTitle: 'Solaris CET — 新一代 TON 代币',
+    },
+    livePool: {
+      title: 'DeDust 池 · 实时',
+      liveBadge: '实时',
+      labelCetPrice: 'CET 价格',
+      labelTvl: 'TVL',
+      labelVolume24h: '24h 成交量',
+      labelTonPrice: 'TON 价格',
+      loadingAria: '正在加载池统计数据',
+      errorUnavailable: '实时数据暂时不可用。',
+      viewOnDedust: '在 DeDust 查看',
+      lastCachedPrefix: '上次缓存：',
+      followPrefix: '在',
+      twitterX: 'Twitter / X',
+      followSuffix: '关注我们获取实时更新。',
+      updatedPrefix: '更新于',
+    },
+    errorBoundary: {
+      title: '出了点问题',
+      unexpectedMessage: '发生意外错误。',
+      recoveryGroupAria: '恢复选项',
+      tryAgain: '重试',
+      reloadPage: '刷新页面',
     },
     hero: {
       tagline: 'Cetățuia 的数字基础',
@@ -463,6 +557,29 @@ const translations: Record<LangCode, Translations> = {
       linkCopied: 'Ссылка скопирована в буфер обмена!',
       nativeShareTitle: 'Solaris CET — токен TON нового поколения',
     },
+    livePool: {
+      title: 'Пул DeDust — live',
+      liveBadge: 'LIVE',
+      labelCetPrice: 'Цена CET',
+      labelTvl: 'TVL',
+      labelVolume24h: 'Объём 24ч',
+      labelTonPrice: 'Цена TON',
+      loadingAria: 'Загрузка статистики пула',
+      errorUnavailable: 'Live-данные временно недоступны.',
+      viewOnDedust: 'Открыть на DeDust',
+      lastCachedPrefix: 'Последний кэш:',
+      followPrefix: 'Следите за нами в',
+      twitterX: 'Twitter / X',
+      followSuffix: 'для актуальных обновлений.',
+      updatedPrefix: 'Обновлено',
+    },
+    errorBoundary: {
+      title: 'Что-то пошло не так',
+      unexpectedMessage: 'Произошла непредвиденная ошибка.',
+      recoveryGroupAria: 'Варианты восстановления',
+      tryAgain: 'Повторить',
+      reloadPage: 'Перезагрузить страницу',
+    },
     hero: {
       tagline: 'Цифровая Основа Cetățuia',
       subtitle: 'Гиперредкий токен с запасом 9 000 CET на блокчейне TON',
@@ -568,6 +685,29 @@ const translations: Record<LangCode, Translations> = {
       shareOrCopyAria: 'Distribuie sau copiază linkul',
       linkCopied: 'Link copiat în clipboard!',
       nativeShareTitle: 'Solaris CET — token TON nouă generație',
+    },
+    livePool: {
+      title: 'Pool DeDust live',
+      liveBadge: 'LIVE',
+      labelCetPrice: 'Preț CET',
+      labelTvl: 'TVL',
+      labelVolume24h: 'Volum 24h',
+      labelTonPrice: 'Preț TON',
+      loadingAria: 'Se încarcă statisticile pool-ului',
+      errorUnavailable: 'Datele live sunt temporar indisponibile.',
+      viewOnDedust: 'Vezi pe DeDust',
+      lastCachedPrefix: 'Ultima cache:',
+      followPrefix: 'Urmărește-ne pe',
+      twitterX: 'Twitter / X',
+      followSuffix: 'pentru actualizări în timp real.',
+      updatedPrefix: 'Actualizat',
+    },
+    errorBoundary: {
+      title: 'Ceva nu a funcționat',
+      unexpectedMessage: 'A apărut o eroare neașteptată.',
+      recoveryGroupAria: 'Opțiuni de recuperare',
+      tryAgain: 'Încearcă din nou',
+      reloadPage: 'Reîncarcă pagina',
     },
     hero: {
       tagline: 'Fundația Digitală a Cetățuiei',
@@ -675,6 +815,29 @@ const translations: Record<LangCode, Translations> = {
       linkCopied: 'Link copiado para a área de transferência!',
       nativeShareTitle: 'Solaris CET — token TON de nova geração',
     },
+    livePool: {
+      title: 'Pool DeDust ao vivo',
+      liveBadge: 'AO VIVO',
+      labelCetPrice: 'Preço CET',
+      labelTvl: 'TVL',
+      labelVolume24h: 'Volume 24h',
+      labelTonPrice: 'Preço TON',
+      loadingAria: 'A carregar estatísticas do pool',
+      errorUnavailable: 'Dados em tempo real temporariamente indisponíveis.',
+      viewOnDedust: 'Ver no DeDust',
+      lastCachedPrefix: 'Última cache:',
+      followPrefix: 'Siga-nos em',
+      twitterX: 'Twitter / X',
+      followSuffix: 'para atualizações em tempo real.',
+      updatedPrefix: 'Atualizado',
+    },
+    errorBoundary: {
+      title: 'Algo correu mal',
+      unexpectedMessage: 'Ocorreu um erro inesperado.',
+      recoveryGroupAria: 'Opções de recuperação',
+      tryAgain: 'Tentar novamente',
+      reloadPage: 'Recarregar página',
+    },
     hero: {
       tagline: 'A Fundação Digital da Cetățuia',
       subtitle: 'Um token ultra-escasso com oferta de 9.000 CET na blockchain TON',
@@ -780,6 +943,29 @@ const translations: Record<LangCode, Translations> = {
       shareOrCopyAria: 'Teilen oder Link kopieren',
       linkCopied: 'Link in die Zwischenablage kopiert!',
       nativeShareTitle: 'Solaris CET — TON-Token der nächsten Generation',
+    },
+    livePool: {
+      title: 'Live DeDust-Pool',
+      liveBadge: 'LIVE',
+      labelCetPrice: 'CET-Preis',
+      labelTvl: 'TVL',
+      labelVolume24h: '24h-Volumen',
+      labelTonPrice: 'TON-Preis',
+      loadingAria: 'Pool-Statistiken werden geladen',
+      errorUnavailable: 'Live-Daten vorübergehend nicht verfügbar.',
+      viewOnDedust: 'Auf DeDust ansehen',
+      lastCachedPrefix: 'Zuletzt gecacht:',
+      followPrefix: 'Folgen Sie uns auf',
+      twitterX: 'Twitter / X',
+      followSuffix: 'für Echtzeit-Updates.',
+      updatedPrefix: 'Aktualisiert',
+    },
+    errorBoundary: {
+      title: 'Etwas ist schiefgelaufen',
+      unexpectedMessage: 'Ein unerwarteter Fehler ist aufgetreten.',
+      recoveryGroupAria: 'Wiederherstellungsoptionen',
+      tryAgain: 'Erneut versuchen',
+      reloadPage: 'Seite neu laden',
     },
     hero: {
       tagline: 'Das digitale Fundament von Cetățuia',
