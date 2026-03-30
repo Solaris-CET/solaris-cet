@@ -4,8 +4,6 @@ import { useTelegram } from '../hooks/useTelegram';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 
 const SITE_URL = 'https://solaris-cet.vercel.app/';
-const SHARE_TEXT =
-  '🚀 Just discovered $CET on #TON blockchain! Fixed supply of 9,000 CET — mine, trade & stake. Check it out 👇';
 
 const SocialShare = () => {
   const { t } = useLanguage();
@@ -14,7 +12,7 @@ const SocialShare = () => {
   const shareToX = () => {
     haptic('light');
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-      SHARE_TEXT
+      t.social.shareBody
     )}&url=${encodeURIComponent(SITE_URL)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
@@ -25,7 +23,7 @@ const SocialShare = () => {
       try {
         await navigator.share({
           title: t.social.nativeShareTitle,
-          text: SHARE_TEXT,
+          text: t.social.shareBody,
           url: SITE_URL,
         });
       } catch {
@@ -33,7 +31,7 @@ const SocialShare = () => {
       }
     } else {
       try {
-        await navigator.clipboard.writeText(`${SHARE_TEXT} ${SITE_URL}`);
+        await navigator.clipboard.writeText(`${t.social.shareBody} ${SITE_URL}`);
         alert(t.social.linkCopied);
       } catch {
         // clipboard unavailable

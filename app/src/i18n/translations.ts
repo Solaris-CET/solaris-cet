@@ -63,6 +63,8 @@ export interface Translations {
     shareOrCopyAria: string;
     linkCopied: string;
     nativeShareTitle: string;
+    /** Tweet / Web Share API body ($CET and #TON keep global discoverability). */
+    shareBody: string;
   };
   /** Live DeDust pool stats widget (`LivePoolStats`). */
   livePool: {
@@ -177,6 +179,8 @@ const translations: Record<LangCode, Translations> = {
       shareOrCopyAria: 'Share or copy link',
       linkCopied: 'Link copied to clipboard!',
       nativeShareTitle: 'Solaris CET — Next-Gen TON Token',
+      shareBody:
+        '🚀 Just discovered $CET on #TON blockchain! Fixed supply of 9,000 CET — mine, trade & stake. Check it out 👇',
     },
     livePool: {
       title: 'Live DeDust Pool',
@@ -313,6 +317,8 @@ const translations: Record<LangCode, Translations> = {
       shareOrCopyAria: 'Compartir o copiar enlace',
       linkCopied: '¡Enlace copiado al portapapeles!',
       nativeShareTitle: 'Solaris CET — token TON de nueva generación',
+      shareBody:
+        '🚀 ¡Acabo de descubrir $CET en la blockchain #TON! Oferta fija de 9.000 CET — mina, intercambia y haz staking. ¡Mira! 👇',
     },
     livePool: {
       title: 'Pool DeDust en vivo',
@@ -449,6 +455,8 @@ const translations: Record<LangCode, Translations> = {
       shareOrCopyAria: '分享或复制链接',
       linkCopied: '链接已复制到剪贴板！',
       nativeShareTitle: 'Solaris CET — 新一代 TON 代币',
+      shareBody:
+        '🚀 刚发现 $CET（#TON）！固定供应 9,000 CET — 挖矿、交易与质押。查看 👇',
     },
     livePool: {
       title: 'DeDust 池 · 实时',
@@ -585,6 +593,8 @@ const translations: Record<LangCode, Translations> = {
       shareOrCopyAria: 'Поделиться или скопировать ссылку',
       linkCopied: 'Ссылка скопирована в буфер обмена!',
       nativeShareTitle: 'Solaris CET — токен TON нового поколения',
+      shareBody:
+        '🚀 Узнал про $CET в #TON! Фиксированная эмиссия 9 000 CET — майнинг, торги, стейкинг. Смотри 👇',
     },
     livePool: {
       title: 'Пул DeDust — live',
@@ -721,6 +731,8 @@ const translations: Record<LangCode, Translations> = {
       shareOrCopyAria: 'Distribuie sau copiază linkul',
       linkCopied: 'Link copiat în clipboard!',
       nativeShareTitle: 'Solaris CET — token TON nouă generație',
+      shareBody:
+        '🚀 Tocmai am descoperit $CET pe #TON! Ofertă fixă 9.000 CET — minare, trade și staking. Vezi 👇',
     },
     livePool: {
       title: 'Pool DeDust live',
@@ -857,6 +869,8 @@ const translations: Record<LangCode, Translations> = {
       shareOrCopyAria: 'Partilhar ou copiar link',
       linkCopied: 'Link copiado para a área de transferência!',
       nativeShareTitle: 'Solaris CET — token TON de nova geração',
+      shareBody:
+        '🚀 Acabei de descobrir $CET na #TON! Oferta fixa de 9.000 CET — mineração, trade e stake. Vê 👇',
     },
     livePool: {
       title: 'Pool DeDust ao vivo',
@@ -993,6 +1007,8 @@ const translations: Record<LangCode, Translations> = {
       shareOrCopyAria: 'Teilen oder Link kopieren',
       linkCopied: 'Link in die Zwischenablage kopiert!',
       nativeShareTitle: 'Solaris CET — TON-Token der nächsten Generation',
+      shareBody:
+        '🚀 Gerade $CET auf #TON entdeckt! Festes Angebot 9.000 CET — Mining, Trading & Staking. Mehr 👇',
     },
     livePool: {
       title: 'Live DeDust-Pool',
