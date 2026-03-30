@@ -1,11 +1,12 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`oracleTelemetry barrel > observe_parse mesh sequence is deterministic for fixed q + topic 1`] = `
+exports[`oracleTelemetry barrel > observe_parse sequence matches buildOracleObserveParseSequence (snapshot) 1`] = `
 [
   "RAV_BURST: SEO: DNA-3 across|Topical|index · v1.9 topoisomerase · sancțiuni & screening · seal epoch-rotating nonce",
   "TASK_MESH: ~200k task agents · delegated sub-queries · Oracle consolidation",
   "AGENT_POOL_MESH: SDR: DNA-3 domain|monitoring|Signal-triggered · v4.9 integrase · latență percepută · seal epoch-rotating nonce",
   "TEAM_AGENT_MESH: Synthetic Data — monthly allele refresh ⌁ Grok×Gemini ca juri ⌁ Latency-gated ⌁ v4.9 integrase",
+  "INPUT_STREAM: "How do 200k agents route tasks?" · Tokens: 6",
   "INPUT_MESH: marketing · rollback-ready locus · Attention-sparsified customer-trust surfaces · using spectra…",
   "SKILL_LOCUS: Agricultural Science — EOFY finance crunch ⌁ agronomie + DeFi ⌁ Lyapunov-… · topic=team",
   "PARSE_MESH: product-design · harvest-season agritech boost · Policy-saturated regulatory hyperplanes · under gam…",

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Activity } from 'lucide-react';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { expressSkillForFeed } from '@/lib/skillGenome';
-import { expressMeshSkillForFeed } from '@/lib/meshSkillFeed';
+import { expressMeshSkillForFeed, meshStandardBurstFromKey, meshWhisperFromKey } from '@/lib/meshSkillFeed';
 
 const DEPTS = [
   'customer-ops',
@@ -109,12 +109,18 @@ const LiveNeuralFeed = () => {
         className="pointer-events-none absolute inset-0 z-[1] opacity-[0.11] mix-blend-overlay neural-feed-scanlines"
         aria-hidden
       />
-      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/10 bg-solaris-cyan/5 relative z-[2]">
+      <div
+        className="flex items-center gap-2 px-4 py-2.5 border-b border-white/10 bg-solaris-cyan/5 relative z-[2]"
+        title={`${meshStandardBurstFromKey('liveNeuralFeed|header')}\n—\n${meshWhisperFromKey('liveNeuralFeed|header|w')}`}
+      >
         <Activity className="w-4 h-4 text-solaris-cyan shrink-0 animate-pulse" />
         <span className="hud-label text-solaris-cyan text-[10px] tracking-wider">
           LIVE NEURAL FEED · DATA TRAINING SIMULATION
         </span>
-        <span className="ml-auto font-mono text-[10px] text-emerald-400/90 tabular-nums">
+        <span
+          className="ml-auto font-mono text-[10px] text-emerald-400/90 tabular-nums"
+          title={meshWhisperFromKey('liveNeuralFeed|meshBadge')}
+        >
           GROK × GEMINI · 200K MESH
         </span>
       </div>
@@ -139,7 +145,10 @@ const LiveNeuralFeed = () => {
           </div>
         ))}
       </div>
-      <p className="relative z-[2] px-3 pb-2 text-[9px] text-solaris-muted/50 font-mono border-t border-white/5 pt-1.5">
+      <p
+        className="relative z-[2] px-3 pb-2 text-[9px] text-solaris-muted/50 font-mono border-t border-white/5 pt-1.5"
+        title={meshWhisperFromKey('liveNeuralFeed|disclaimer')}
+      >
         Illustrative simulation — models the aggregate throughput of the distributed agent mesh, not a live log.
       </p>
       <style>{`

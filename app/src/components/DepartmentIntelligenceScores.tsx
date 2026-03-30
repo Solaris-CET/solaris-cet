@@ -60,14 +60,18 @@ const DepartmentIntelligenceScores = () => {
     return () => window.clearInterval(id);
   }, [isNearScreen, prefersReducedMotion]);
 
+  // Reduced motion: snap bars to target when section is visible (no animation).
+  useEffect(() => {
+    if (!prefersReducedMotion || !isNearScreen) return;
+    const id = requestAnimationFrame(() => {
+      setScores(Object.fromEntries(departments.map(d => [d.id, d.target])) as Record<string, number>);
+    });
+    return () => cancelAnimationFrame(id);
+  }, [prefersReducedMotion, isNearScreen]);
+
   // Ramp from base → target when section nears viewport
   useEffect(() => {
-    if (!isNearScreen || prefersReducedMotion) {
-      if (prefersReducedMotion && isNearScreen) {
-        setScores(Object.fromEntries(departments.map(d => [d.id, d.target])) as Record<string, number>);
-      }
-      return;
-    }
+    if (!isNearScreen || prefersReducedMotion) return;
 
     const duration = 2400;
     const start = performance.now();

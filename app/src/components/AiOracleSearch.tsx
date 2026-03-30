@@ -8,14 +8,10 @@ import { useLanguage } from '../hooks/useLanguage';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { OracleKnowledge, Translations } from '../i18n/translations';
 import {
-  ORACLE_TASK_MESH_LINE,
-  buildAgentPoolMeshLogMessage,
-  buildTeamAgentMeshLogMessage,
+  buildOracleObserveParseSequence,
   buildDeepLatticeMeshLogMessage,
   buildDeepLatticeMeshLogMessageRawQuery,
-  buildSkillLocusLogMessage,
   ORACLE_LATTICE_PHASE,
-  buildRavBurstLogMessage,
   buildFlashGlintLogMessage,
   buildExpressomeBurstLogMessage,
   buildConsensusBurstLogMessage,
@@ -518,16 +514,11 @@ export default function AiOracleSearch() {
 
     setPhase('observe_parse');
     addLog('INFO', `RAV_INIT: Grok × Gemini Oracle v3.1 · Session [${hash}]`);
-    addLog('QUANTUM', buildRavBurstLogMessage(q));
-    addLog('INFO', ORACLE_TASK_MESH_LINE);
-    addLog('INFO', buildAgentPoolMeshLogMessage(detected, q));
-    if (detected === 'team' || detected === 'ai') {
-      addLog('INFO', buildTeamAgentMeshLogMessage(q, detected));
+    const observeParseSeq = buildOracleObserveParseSequence(q, detected, tokenCount);
+    addLog('QUANTUM', observeParseSeq[0]!);
+    for (const line of observeParseSeq.slice(1)) {
+      addLog('INFO', line);
     }
-    addLog('INFO', `INPUT_STREAM: "${q}" · Tokens: ${tokenCount}`);
-    addLog('INFO', buildDeepLatticeMeshLogMessage('INPUT_MESH', q, ORACLE_LATTICE_PHASE.inputStream));
-    addLog('INFO', buildSkillLocusLogMessage(q, detected));
-    addLog('INFO', buildDeepLatticeMeshLogMessage('PARSE_MESH', q, ORACLE_LATTICE_PHASE.observeParse));
 
     schedule(() => {
       setPhase('observe_context');

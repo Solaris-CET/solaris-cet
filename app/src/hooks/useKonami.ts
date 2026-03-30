@@ -19,7 +19,10 @@ const SEQUENCE = [
 export function useKonami(onUnlock: () => void, enabled = true) {
   const idxRef = useRef(0);
   const onUnlockRef = useRef(onUnlock);
-  onUnlockRef.current = onUnlock;
+
+  useEffect(() => {
+    onUnlockRef.current = onUnlock;
+  }, [onUnlock]);
 
   useEffect(() => {
     if (!enabled) {

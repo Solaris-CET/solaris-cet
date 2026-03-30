@@ -1,12 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import {
   ORACLE_TASK_MESH_LINE,
-  buildAgentPoolMeshLogMessage,
+  buildOracleObserveParseSequence,
   buildDeepLatticeMeshLogMessage,
   buildDeepLatticeMeshLogMessageRawQuery,
-  buildRavBurstLogMessage,
   buildSkillLocusLogMessage,
-  buildTeamAgentMeshLogMessage,
   ORACLE_LATTICE_PHASE,
 } from '@/lib/oracleTelemetry';
 
@@ -16,19 +14,15 @@ describe('oracleTelemetry barrel', () => {
     expect(ORACLE_TASK_MESH_LINE).toContain('200k');
   });
 
-  it('observe_parse mesh sequence is deterministic for fixed q + topic', () => {
+  it('observe_parse sequence matches buildOracleObserveParseSequence (snapshot)', () => {
     const q = 'How do 200k agents route tasks?';
     const detected = 'team';
-    const lines = [
-      buildRavBurstLogMessage(q),
-      ORACLE_TASK_MESH_LINE,
-      buildAgentPoolMeshLogMessage(detected, q),
-      buildTeamAgentMeshLogMessage(q, detected),
-      buildDeepLatticeMeshLogMessage('INPUT_MESH', q, ORACLE_LATTICE_PHASE.inputStream),
-      buildSkillLocusLogMessage(q, detected),
-      buildDeepLatticeMeshLogMessage('PARSE_MESH', q, ORACLE_LATTICE_PHASE.observeParse),
-    ];
-    expect(lines).toMatchSnapshot();
+    const tokenCount = q.split(/\s+/).length;
+    const seq = buildOracleObserveParseSequence(q, detected, tokenCount);
+    expect(seq[0]).toMatch(/^RAV_BURST: /);
+    expect(seq[1]).toBe(ORACLE_TASK_MESH_LINE);
+    expect(seq.some((l) => l.startsWith('INPUT_STREAM:'))).toBe(true);
+    expect(seq).toMatchSnapshot();
   });
 
   it('deep lattice + act phase lines stay stable', () => {
