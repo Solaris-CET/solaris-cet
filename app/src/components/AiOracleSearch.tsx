@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { track } from '@vercel/analytics/react';
@@ -189,6 +187,16 @@ function getReActPhaseStatus(phase: ReActPhase, targetPhases: ReActPhase[]): str
   return currentIndex > targetIndex
     ? 'text-green-400 border-green-400/30'
     : 'text-gray-600 border-gray-800';
+}
+
+/** Linear index through ReAct phases — drives dot states in `ReActPanels`. */
+function phaseOrderIndex(currentPhase: string): number {
+  const phases: ReActPhase[] = [
+    'idle', 'observe_parse', 'observe_context',
+    'think_route', 'think_validate',
+    'act_execute', 'act_consensus', 'verify_cross', 'verify_anchor', 'complete',
+  ];
+  return phases.indexOf(currentPhase as ReActPhase);
 }
 
 // --- Markdown renderer for oracle responses ---
@@ -1071,15 +1079,3 @@ export default function AiOracleSearch() {
     </>
   );
 }
-
-// Helper — linear progress index through phases
-function phaseOrderIndex(currentPhase: string): number {
-  const phases: ReActPhase[] = [
-    'idle', 'observe_parse', 'observe_context',
-    'think_route', 'think_validate',
-    'act_execute', 'act_consensus', 'verify_cross', 'verify_anchor', 'complete',
-  ];
-  return phases.indexOf(currentPhase as ReActPhase);
-}
-
-
