@@ -7,6 +7,7 @@ const ParticleCanvas = lazy(() => import('../components/ParticleCanvas'));
 import GlowOrbs from '../components/GlowOrbs';
 import CetAiSearch from '../components/CetAiSearch';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
+import { SolarisLogoMark } from '../components/SolarisLogoMark';
 import { TooltipProvider } from '../components/ui/tooltip';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useLanguage } from '../hooks/useLanguage';
@@ -203,12 +204,26 @@ const HeroSection: React.FC = () => {
               ref={titleContainerRef}
               className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left order-2 lg:order-1"
             >
-              <p className="mb-4 md:mb-5 font-mono text-[10px] sm:text-xs uppercase tracking-[0.35em] text-yellow-500/90">
-                {t.hero.tagline}
-              </p>
+              <div className="mb-4 md:mb-5 flex flex-col items-center lg:items-start gap-3 w-full">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <span
+                    className="hidden sm:flex w-10 h-10 md:w-11 md:h-11 shrink-0 items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.03] shadow-[0_0_28px_rgba(242,201,76,0.14)] p-2 animate-logo-breathe motion-reduce:animate-none"
+                    aria-hidden
+                  >
+                    <SolarisLogoMark className="drop-shadow-[0_0_10px_rgba(242,201,76,0.4)]" />
+                  </span>
+                  <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.35em] text-yellow-500/90 text-center lg:text-left leading-snug">
+                    {t.hero.tagline}
+                  </p>
+                </div>
+                <div
+                  className="h-px w-full max-w-md mx-auto lg:mx-0 bg-gradient-to-r from-transparent via-solaris-gold/40 to-transparent opacity-90"
+                  aria-hidden
+                />
+              </div>
 
               <h1 className="w-full font-black tracking-[-0.045em] leading-[0.92] text-balance">
-                <span className="block text-5xl sm:text-6xl md:text-7xl text-transparent bg-clip-text bg-gradient-to-br from-[#F2C94C] to-[#D4AF37]">
+                <span className="block text-5xl sm:text-6xl md:text-7xl text-transparent bg-clip-text bg-gradient-to-br from-[#FFF8E7] via-[#F2C94C] to-[#B8860B] [text-shadow:0_4px_48px_rgba(0,0,0,0.55)] drop-shadow-[0_0_32px_rgba(242,201,76,0.18)]">
                   SOLARIS CET
                 </span>
               </h1>

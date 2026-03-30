@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
-import { ExternalLink, Menu, Sun } from 'lucide-react';
+import { ExternalLink, Menu } from 'lucide-react';
+import { SolarisLogoMark } from './SolarisLogoMark';
 import LanguageSelector from './LanguageSelector';
 import WalletConnect from './WalletConnect';
 import { useLanguage } from '../hooks/useLanguage';
@@ -49,6 +50,7 @@ const Navigation = () => {
   const { t } = useLanguage();
 
   const navLinks = NAV_HREFS.map(({ key, href }) => ({
+    navKey: key,
     label: t.nav[key],
     href,
   }));
@@ -101,10 +103,9 @@ const Navigation = () => {
         <div className="flex items-center justify-between h-16 xl:h-20 gap-2 sm:gap-3">
           {/* Logo */}
           <a href="#main-content" className="flex items-center gap-2 sm:gap-3 group min-w-0 shrink">
-            <div className="relative w-8 h-8 xl:w-10 xl:h-10">
-              <Sun className="solaris-icon-glow w-full h-full text-solaris-gold transition-transform duration-700 group-hover:rotate-180" />
-              {/* Logo glow */}
-              <div className="absolute inset-0 rounded-full bg-solaris-gold/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="relative w-8 h-8 xl:w-10 xl:h-10 flex items-center justify-center transition-transform duration-500 ease-out group-hover:scale-[1.06]">
+              <SolarisLogoMark className="drop-shadow-[0_0_14px_rgba(242,201,76,0.35)]" />
+              <div className="pointer-events-none absolute inset-[-2px] rounded-full bg-solaris-gold/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
             <span className="font-display font-semibold text-lg xl:text-xl text-solaris-text tracking-tight">
               Solaris <span className="text-solaris-gold">CET</span>
@@ -115,7 +116,7 @@ const Navigation = () => {
           <nav className="hidden xl:flex items-center gap-6">
             {navLinks.map((link) => (
               <a
-                key={link.label}
+                key={link.navKey}
                 href={link.href}
                 className="text-sm text-solaris-muted hover:text-solaris-text transition-colors duration-300 relative group"
               >
@@ -198,8 +199,13 @@ const Navigation = () => {
           )}
         >
           <SheetHeader className="p-6 sm:p-8 pb-4 border-b border-white/6 text-left shrink-0">
-            <SheetTitle className="font-display text-lg text-solaris-text tracking-tight">
-              Solaris <span className="text-solaris-gold">CET</span>
+            <SheetTitle className="font-display text-lg text-solaris-text tracking-tight flex items-center gap-3">
+              <span className="relative w-9 h-9 shrink-0 flex items-center justify-center">
+                <SolarisLogoMark />
+              </span>
+              <span>
+                Solaris <span className="text-solaris-gold">CET</span>
+              </span>
             </SheetTitle>
             <SheetDescription className="sr-only">{t.nav.sheetDescription}</SheetDescription>
           </SheetHeader>
@@ -210,7 +216,7 @@ const Navigation = () => {
           >
             {navLinks.map((link) => (
               <a
-                key={link.label}
+                key={link.navKey}
                 href={link.href}
                 className="w-full max-w-[16rem] text-center py-3.5 text-base text-solaris-muted hover:text-solaris-text transition-colors rounded-xl hover:bg-white/[0.04]"
                 onClick={() => setIsMobileMenuOpen(false)}

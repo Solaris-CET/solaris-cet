@@ -3,6 +3,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import Navigation from './components/Navigation';
+import { SolarisLogoMark } from './components/SolarisLogoMark';
 import CursorGlow from './components/CursorGlow';
 import TouchRipple from './components/TouchRipple';
 import LazyLoadWrapper from './components/LazyLoadWrapper';
@@ -173,25 +174,10 @@ function AppContent() {
           {langState.t.appLoader.statusLine}
         </span>
         <div className="flex flex-col items-center gap-6" aria-hidden>
-          {/* Animated logo */}
-          <div className="relative">
-            <div className="w-16 h-16 rounded-2xl bg-solaris-gold/10 flex items-center justify-center animate-gold-pulse">
-              <svg
-                viewBox="0 0 32 32"
-                className="solaris-icon-glow w-8 h-8 text-solaris-gold"
-                fill="currentColor"
-                aria-hidden
-              >
-                <circle cx="16" cy="16" r="6" opacity="0.9" />
-                <path d="M16 4 L17.2 12 L16 10 L14.8 12 Z" opacity="0.7" />
-                <path d="M16 28 L17.2 20 L16 22 L14.8 20 Z" opacity="0.7" />
-                <path d="M4 16 L12 17.2 L10 16 L12 14.8 Z" opacity="0.7" />
-                <path d="M28 16 L20 17.2 L22 16 L20 14.8 Z" opacity="0.7" />
-                <path d="M7.5 7.5 L13 12.5 L11.5 11 L12.5 13 Z" opacity="0.5" />
-                <path d="M24.5 24.5 L19 19.5 L20.5 21 L19.5 19 Z" opacity="0.5" />
-                <path d="M24.5 7.5 L19.5 13 L21 11.5 L19 12.5 Z" opacity="0.5" />
-                <path d="M7.5 24.5 L12.5 19 L11 20.5 L13 19.5 Z" opacity="0.5" />
-              </svg>
+          <div className="relative w-20 h-20 flex items-center justify-center">
+            <div className="absolute inset-0 rounded-3xl bg-solaris-gold/[0.08] blur-xl animate-gold-pulse" />
+            <div className="relative w-14 h-14 rounded-2xl bg-slate-950/80 border border-white/[0.08] shadow-[0_0_40px_rgba(242,201,76,0.12)] flex items-center justify-center p-2.5">
+              <SolarisLogoMark className="drop-shadow-[0_0_12px_rgba(242,201,76,0.4)]" />
             </div>
           </div>
           

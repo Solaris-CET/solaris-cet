@@ -1,6 +1,7 @@
 import { useRef, useLayoutEffect, useState } from 'react';
 import { gsap } from 'gsap';
-import { Download, FileText, ArrowRight, Sun, Globe, X, Send, Copy, CheckCircle, Zap, Shield } from 'lucide-react';
+import { Download, FileText, ArrowRight, Globe, X, Send, Copy, CheckCircle, Zap, Shield } from 'lucide-react';
+import { SolarisLogoMark } from '../components/SolarisLogoMark';
 import SocialShare from '../components/SocialShare';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useLanguage } from '../hooks/useLanguage';
@@ -244,7 +245,12 @@ const FooterSection = () => {
         <footer ref={footerRef} className="pt-8 border-t border-white/10">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="flex items-center gap-3">
-              <Sun className="solaris-icon-glow w-8 h-8 text-solaris-gold animate-spin-slow" />
+              <div
+                className="relative w-9 h-9 shrink-0 flex items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.03] shadow-[0_0_24px_rgba(242,201,76,0.12)] solaris-icon-glow motion-reduce:animate-none animate-logo-breathe p-1.5"
+                aria-hidden
+              >
+                <SolarisLogoMark className="drop-shadow-[0_0_8px_rgba(242,201,76,0.35)]" />
+              </div>
               <span className="font-display font-semibold text-lg text-solaris-text">
                 Solaris <span className="text-solaris-gold">CET</span>
               </span>
