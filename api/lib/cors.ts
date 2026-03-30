@@ -1,5 +1,5 @@
 /**
- * CORS helpers for root-level Vercel serverless routes (`/api/*`).
+ * CORS helpers for root-level `/api/*` routes (optional repo-root deploy).
  * Mirrors the allowlist in `app/api/chat/route.ts` and `app/api/auth/route.ts`.
  */
 

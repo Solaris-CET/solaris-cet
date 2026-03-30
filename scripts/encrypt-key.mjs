@@ -3,7 +3,7 @@
  * scripts/encrypt-key.mjs
  *
  * CLI utility for encrypting a raw API key with AES-256-GCM before storing
- * it in a Vercel environment variable.
+ * it in production environment variables (Coolify, Vercel, etc.).
  *
  * Usage:
  *   node scripts/encrypt-key.mjs <ENCRYPTION_SECRET> <RAW_API_KEY>
@@ -12,10 +12,10 @@
  *   node scripts/encrypt-key.mjs "my-strong-secret-passphrase" "AIzaSyA-..."
  *
  * The printed base64url blob is what you paste as the value of
- * GEMINI_API_KEY_ENC (or GROK_API_KEY_ENC) in the Vercel project settings.
+ * GEMINI_API_KEY_ENC (or GROK_API_KEY_ENC) in your host’s env (e.g. Coolify).
  *
  * The same ENCRYPTION_SECRET must be set as the ENCRYPTION_SECRET env var
- * in Vercel so the Edge Function can decrypt the key at runtime.
+ * on the server so the Edge Function can decrypt the key at runtime.
  *
  * Algorithm:
  *   PBKDF2-SHA-256(secret, salt="solaris-cet-api-key-v1", 100,000 iters)
@@ -90,5 +90,5 @@ console.log('✅  Encrypted API key (base64url, AES-256-GCM):');
 console.log('');
 console.log(encrypted);
 console.log('');
-console.log('→  Set this as GEMINI_API_KEY_ENC or GROK_API_KEY_ENC in Vercel project settings.');
+console.log('→  Set this as GEMINI_API_KEY_ENC or GROK_API_KEY_ENC in your host env (e.g. Coolify).');
 console.log('→  Set ENCRYPTION_SECRET to the passphrase you used above.');

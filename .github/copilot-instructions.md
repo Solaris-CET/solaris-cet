@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**Solaris CET** is a decentralized token project on the TON blockchain. This repository contains the official landing page: a static web application built with **React 19**, **TypeScript**, **Vite**, **Tailwind CSS**, and **GSAP** animations, deployed automatically to **GitHub Pages** via GitHub Actions.
+**Solaris CET** is a decentralized RWA token project on the TON blockchain. This repository contains the official landing page: **React 19**, **TypeScript**, **Vite**, **Tailwind CSS**, and **GSAP**. **Production:** [https://solaris-cet.com](https://solaris-cet.com) via **Coolify** on the project VPS (pushes to `main`); optional **GitHub Pages** mirrors use `.github/workflows/deploy-pages.yml`.
 
 - Token supply: 9,000 CET on TON blockchain
 - DeDust pool address: `EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB`
@@ -15,7 +15,7 @@
 ```
 solaris-cet/
 ├── .github/
-│   ├── workflows/deploy-pages.yml   # CI/CD: build + deploy to GitHub Pages
+│   ├── workflows/deploy-pages.yml   # Optional: build + deploy to GitHub Pages (forks)
 │   ├── ISSUE_TEMPLATE/              # Bug report and feature request forms
 │   ├── PULL_REQUEST_TEMPLATE.md     # PR checklist template
 │   └── copilot-instructions.md      # This file
@@ -113,6 +113,6 @@ Before opening a PR, verify:
 
 ## Deployment
 
-- The GitHub Actions workflow (`.github/workflows/deploy-pages.yml`) builds the app from `app/` and uploads `app/dist` as the GitHub Pages artifact.
-- The Vite config uses `base: './'` for correct relative asset paths on GitHub Pages.
-- Every push to `main` triggers an automatic deployment.
+- **Coolify (production):** build `app/` → `app/dist`; deploy to VPS; domain **solaris-cet.com**.
+- **GitHub Pages (optional):** `.github/workflows/deploy-pages.yml` uploads `app/dist` as a Pages artifact for forks.
+- The Vite config uses `base: './'` for correct relative asset paths on static hosts.

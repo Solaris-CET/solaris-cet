@@ -1,5 +1,7 @@
 # Docker / static hosting
 
+Production uses **Coolify** on the project VPS; this folder is a **reference** for serving `app/dist` with nginx (or any reverse proxy) in front of the same API process if you build a custom image.
+
 ## `nginx.conf`
 
 Example **SPA** config for serving a Vite production build (e.g. `app/dist` copied into the image as `/usr/share/nginx/html`):

@@ -16,9 +16,9 @@ Add the following block inside the top-level array in `jettons.json`:
   "name": "Solaris CET",
   "symbol": "CET",
   "description": "Official utility and governance token for the Solaris Ecosystem.",
-  "image": "https://Solaris-CET.github.io/solaris-cet/logo.png",
+  "image": "https://solaris-cet.com/logo.png",
   "websites": [
-    "https://Solaris-CET.github.io/solaris-cet/"
+    "https://solaris-cet.com/"
   ],
   "social": [
     "https://t.me/solaris_cet_channel"
@@ -26,9 +26,9 @@ Add the following block inside the top-level array in `jettons.json`:
 }
 ```
 
-> **Image URL verification:** `https://Solaris-CET.github.io/solaris-cet/logo.png`
-> resolves to `app/public/logo.png` in this repository, which is deployed to GitHub Pages
-> on every push to `main` via the `.github/workflows/deploy-pages.yml` workflow.
+> **Image URL verification:** `https://solaris-cet.com/logo.png` resolves to `app/public/logo.png`
+> in this repository (production is deployed from `main` via **Coolify** to **solaris-cet.com**;
+> optional GitHub Pages mirrors may also serve the same asset).
 
 ---
 
@@ -94,8 +94,8 @@ feat: add Solaris CET (CET) jetton
 | Address     | EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX |
 | Name        | Solaris CET |
 | Symbol      | CET |
-| Website     | https://Solaris-CET.github.io/solaris-cet/ |
-| Logo        | https://Solaris-CET.github.io/solaris-cet/logo.png |
+| Website     | https://solaris-cet.com/ |
+| Logo        | https://solaris-cet.com/logo.png |
 
 Verified that the image URL resolves correctly and the website is live.
 ```

@@ -1,6 +1,6 @@
 # Solaris CET — frontend (`app/`)
 
-Vite + React 19 + TypeScript landing for Solaris CET on TON (RAV Oracle UI, TON Connect, PWA). Parent repo docs: [../README.md](../README.md), [../CONTRIBUTING.md](../CONTRIBUTING.md).
+Vite + React 19 + TypeScript landing for Solaris CET on TON (RAV Oracle UI, TON Connect, PWA). **Production URL:** [https://solaris-cet.com](https://solaris-cet.com) (VPS + Coolify auto-deploy from `main`). Parent repo docs: [../README.md](../README.md), [../CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ## Commands
 
@@ -20,17 +20,18 @@ E2E (Chromium): from `app/`, `npx playwright test` (install browsers once: `npx 
 | Path | Purpose |
 |------|---------|
 | `src/` | UI, hooks, workers, i18n |
-| `api/` | Vercel serverless: `chat` (Edge), `auth` (Node + Postgres) |
+| `api/` | Oracle `chat` (Edge) + `auth` (Node + Postgres) — run beside the static build on Coolify/VPS or any Node host |
 | `db/` | Drizzle schema / client (used by `api/auth`) |
 | `public/` | Static assets; `public/api/state.json` for client state |
 | `tests/` | Playwright specs |
 
-## Env (Vercel / local)
+## Env (Coolify / production / local)
 
 - **Oracle:** `GROK_API_KEY` / `GEMINI_API_KEY` (or `*_ENC` + `ENCRYPTION_SECRET`) — see `api/lib/crypto.ts` and `scripts/encrypt-key.mjs` in the repo root.
 - **Auth API:** database URL expected by `db/client` (see Drizzle config).
 
 ## Deploy notes
 
-- **GitHub Pages:** static export only; serverless routes in `api/` need **Vercel** (or similar) with project root **`app`**.
-- `vercel.json` maps `/api/chat` and `/api/auth` to the handlers under `api/`.
+- **Coolify (production):** build `app/` (output `dist/`), serve the SPA; wire `/api/*` to the same app’s API routes or a companion Node service. Set the same env vars as below.
+- **GitHub Pages:** static `dist/` only; `/api/chat` and `/api/auth` need a separate backend unless you disable those features.
+- `vercel.json` exists for teams that still deploy on Vercel; it maps `/api/chat` and `/api/auth` when the project root is **`app`**.

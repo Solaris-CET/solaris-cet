@@ -6,7 +6,7 @@ Small Node utilities used from the **repository root** (not the Vite app in `app
 
 | File | Purpose |
 |------|---------|
-| [encrypt-key.mjs](./encrypt-key.mjs) | Encrypt API keys for Vercel (`*_ENC` + `ENCRYPTION_SECRET`); see header comment for usage |
+| [encrypt-key.mjs](./encrypt-key.mjs) | Encrypt API keys for production env (`*_ENC` + `ENCRYPTION_SECRET`); see header comment for usage |
 | [ton-indexer.ts](./ton-indexer.ts) | DeDust / TON indexer (used by `.github/workflows/ton-indexer.yml`) |
 
 ## Commands

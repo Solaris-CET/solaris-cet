@@ -2,6 +2,8 @@
 
 Concise instructions for this repository. The main application lives in **`app/`** (Vite, React, TypeScript). CI is defined in `.github/workflows/ci.yml` (Node 22, `npm ci` in `app/`).
 
+**Production:** [https://solaris-cet.com](https://solaris-cet.com) — deploy via **Coolify** on the project VPS from `main` (not GitHub Pages).
+
 ## Commands (from repository root)
 
 ```bash

@@ -1,10 +1,10 @@
 /**
- * Vercel Edge — POST `/api/chat` (OpenAI-only fallback path).
+ * Edge — POST `/api/chat` (OpenAI-only fallback path).
  *
  * **Production Oracle** (Grok × Gemini, RAV, DeDust context) lives in
- * `app/api/chat/route.ts`. Configure the Vercel project **Root Directory** to
- * `app` so that route is the one that ships. This file exists for deployments
- * that use the repository root as the Vercel root; see `api/README.md`.
+ * `app/api/chat/route.ts`. Prefer deploying with **`app/` as the build root**
+ * (Coolify, Vercel, etc.) so that route ships. This file exists for deployments
+ * that use the **repository root** as the deploy root; see `api/README.md`.
  *
  * Env: `OPENAI_API_KEY`
  */

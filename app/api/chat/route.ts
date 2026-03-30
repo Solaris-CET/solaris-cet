@@ -1,5 +1,5 @@
 /**
- * Vercel Edge Function — /api/chat
+ * Edge runtime — POST `/api/chat`
  *
  * Dual AI Oracle: combines Grok (xAI) and Google Gemini to power the
  * Solaris RAV Protocol (Reason-Act-Verify).
@@ -15,8 +15,7 @@
  * If one provider is unavailable the other generates the full 3-part
  * RAV response so the Oracle never goes silent.
  *
- * Exported as a Vercel Edge Function (runtime: 'edge') so that it is
- * recognised by Vite/non-Next.js deployments.
+ * `runtime: 'edge'` matches Vercel-style adapters and compatible hosts (e.g. Coolify).
  */
 import OpenAI from 'openai';
 import { getAllowedOrigin } from '../lib/cors';
@@ -162,7 +161,7 @@ export default async function handler(req: Request): Promise<Response> {
 
   if (!grokKey && !geminiKey) {
     return new Response(
-      JSON.stringify({ message: 'No AI provider API key configured. Set GROK_API_KEY_ENC/GROK_API_KEY or GEMINI_API_KEY_ENC/GEMINI_API_KEY in Vercel project settings.' }),
+      JSON.stringify({ message: 'No AI provider API key configured. Set GROK_API_KEY_ENC/GROK_API_KEY or GEMINI_API_KEY_ENC/GEMINI_API_KEY in the server environment.' }),
       {
         status: 500,
         headers: {

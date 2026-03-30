@@ -1,41 +1,38 @@
 # Solaris CET
 
+[![CI](https://github.com/aamclaudiu-hash/solaris-cet/actions/workflows/ci.yml/badge.svg)](https://github.com/aamclaudiu-hash/solaris-cet/actions/workflows/ci.yml)
 [![Deploy to GitHub Pages](https://github.com/aamclaudiu-hash/solaris-cet/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/aamclaudiu-hash/solaris-cet/actions/workflows/deploy-pages.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Patents](https://img.shields.io/badge/Patents-None%20Reserved-blue.svg)](./PATENTS)
 
-**Solaris CET** is a decentralized token project built on the TON blockchain. This repository contains the official landing page — a high-performance static web application built with **React 19**, **TypeScript**, **Vite**, **Tailwind CSS**, and **GSAP** animations, deployed automatically via **GitHub Actions** to **GitHub Pages**.
+**Solaris CET** is a Real-World Asset (RWA) token on **TON** with a fixed supply of **9,000 CET**, anchored in **Cetățuia, Romania**. This repository contains the official landing — a **Vite** + **React 19** + **TypeScript** app styled with **Tailwind CSS** and **GSAP**.
+
+### Production (authoritative)
+
+- **Live site:** [https://solaris-cet.com](https://solaris-cet.com)
+- **CI/CD:** pushes to `origin` **`main`** trigger **Coolify** (self-hosted) to build and deploy the **`app/`** bundle to the project **VPS** (Debian/Ubuntu). Broken builds affect production — treat `main` as release-ready.
+
+Optional **GitHub Pages** (workflow `deploy-pages.yml`) remains available for **forks** or mirrors; it does not replace the production domain above.
 
 ---
 
-## 🚀 One-Click Deploy (Fork & Host Your Own Instance)
+## 🚀 Fork mirror (optional — GitHub Pages)
 
-You can spin up your own hosted instance of Solaris CET in under 2 minutes — no server, no paid hosting, no configuration required.
+You can host a read-only mirror from a fork using **GitHub Actions** → **GitHub Pages** (no Coolify required).
 
 ### Step 1 — Fork this repository
 
-Click the **Fork** button at the top-right of this page:
-
-> **[https://github.com/aamclaudiu-hash/solaris-cet/fork](https://github.com/aamclaudiu-hash/solaris-cet/fork)**
+Click **Fork** (top-right): **[https://github.com/aamclaudiu-hash/solaris-cet/fork](https://github.com/aamclaudiu-hash/solaris-cet/fork)**
 
 ### Step 2 — Enable GitHub Pages in your fork
 
-1. Open your forked repository on GitHub.
-2. Go to **Settings** → **Pages**.
-3. Under **Build and deployment** → **Source**, select **GitHub Actions**.
-4. Click **Save**.
+1. **Settings** → **Pages** → **Source** → **GitHub Actions** → **Save**.
 
-### Step 3 — Trigger the deployment
+### Step 3 — Deploy
 
-The site is built and deployed automatically on every `git push` to the `main` branch.
-To trigger an immediate deployment without pushing code:
+On every `git push` to `main`, or manually: **Actions** → **Deploy Solaris CET to GitHub Pages** → **Run workflow**.
 
-1. Go to **Actions** → **Deploy Solaris CET to GitHub Pages**.
-2. Click **Run workflow** → **Run workflow**.
-
-### Step 4 — Access your live site
-
-After the workflow completes (≈ 2 minutes), your site will be live at:
+### Step 4 — URL
 
 ```
 https://<your-github-username>.github.io/solaris-cet/
@@ -50,14 +47,14 @@ solaris-cet/
 ├── .github/
 │   ├── workflows/
 │   │   ├── ci.yml              # Quality gate: lint, typecheck, unit tests, E2E
-│   │   ├── deploy-pages.yml    # Build + deploy to GitHub Pages on every push to main
+│   │   ├── deploy-pages.yml    # Optional: GitHub Pages (forks); production uses Coolify
 │   │   ├── codeql.yml          # CodeQL SAST security scanning
 │   │   ├── lighthouse-ci.yml   # Lighthouse performance audit (≥ 85 required)
 │   │   ├── multisig-ci.yml     # TON multi-sig contract build & test
 │   │   └── ton-indexer.yml     # TON blockchain state indexing
 │   ├── ISSUE_TEMPLATE/         # Bug report and feature request forms
 │   └── PULL_REQUEST_TEMPLATE.md
-├── api/                        # Edge API routes (Vercel)
+├── api/                        # Optional root-level serverless chat (same handlers as app/api)
 │   └── chat/route.ts           # AI chat proxy (edge runtime)
 ├── app/                        # React + TypeScript + Vite source
 │   ├── src/
@@ -76,7 +73,7 @@ solaris-cet/
 │   │   ├── workers/            # Web Workers (AI inference, mining)
 │   │   ├── App.tsx             # Root component; GSAP ScrollTrigger registration
 │   │   └── main.tsx            # Entry point
-│   ├── api/                    # Vercel routes (Edge chat + Node auth)
+│   ├── api/                    # Oracle chat (Edge) + auth (Node); deploy with app on Coolify or similar
 │   │   ├── chat/route.ts       # Oracle (Grok × Gemini) + DeDust context
 │   │   └── auth/route.ts       # Wallet sync (Postgres)
 │   ├── public/                 # Static assets (icons, images, state JSON)
@@ -181,8 +178,8 @@ npm run preview
 | Animations    | [GSAP 3](https://gsap.com/)                     |
 | AI/ML         | [ONNX Runtime Web](https://onnxruntime.ai/) + [OpenAI](https://openai.com/) |
 | Blockchain    | [TON Network](https://ton.org/) via TonConnect  |
-| Hosting       | [GitHub Pages](https://pages.github.com/) / [Vercel](https://vercel.com/) |
-| CI/CD         | [GitHub Actions](https://github.com/features/actions) |
+| Hosting       | **Production:** VPS + [Coolify](https://coolify.io/) → **solaris-cet.com** · optional [GitHub Pages](https://pages.github.com/) forks |
+| CI/CD         | Coolify (deploy) + [GitHub Actions](https://github.com/features/actions) (quality gates, optional Pages) |
 | Security      | CodeQL SAST, Dependabot, npm audit              |
 
 ---

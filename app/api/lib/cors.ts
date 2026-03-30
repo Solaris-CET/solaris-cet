@@ -1,6 +1,6 @@
 /**
- * Shared CORS allowlist for Vercel serverless routes under `app/api/`.
- * Keep in sync with deployment origins (production, previews, local dev).
+ * Shared CORS allowlist for API routes under `app/api/`.
+ * Keep in sync with deployment origins (solaris-cet.com, previews, local dev).
  */
 
 const ALLOWED_ORIGINS = new Set([

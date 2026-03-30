@@ -488,7 +488,7 @@ export default function AiOracleSearch() {
     timersRef.current.push(id);
   };
 
-  // --- CORE LOGIC: RAV + optional live /api/chat (Vercel) with local knowledge fallback ---
+  // --- CORE LOGIC: RAV + optional live /api/chat (Coolify/VPS) with local knowledge fallback ---
   const processQuestion = useCallback((q: string) => {
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];

@@ -1,12 +1,12 @@
 /**
- * AES-256-GCM encryption utilities for Vercel Edge runtime.
+ * AES-256-GCM encryption utilities for Edge runtime (Web Crypto).
  *
- * API keys are stored as AES-256-GCM encrypted blobs in Vercel environment
- * variables.  A separate `ENCRYPTION_SECRET` env var holds the master
+ * API keys are stored as AES-256-GCM encrypted blobs in host environment
+ * variables. A separate `ENCRYPTION_SECRET` env var holds the master
  * passphrase used to derive the 256-bit AES key via PBKDF2-SHA-256.
  *
  * This provides two independent layers of protection:
- *   1. Vercel's built-in env-var encryption (at rest / in transit).
+ *   1. Host-level env-var protection (at rest / in transit).
  *   2. Application-level AES-256-GCM encryption decrypted only at request
  *      time inside the Edge Function — the plaintext key is never persisted.
  *
@@ -17,10 +17,10 @@
  * automatically by the Web Crypto API and verified on decryption.
  *
  * Usage:
- *   # Encrypt a raw API key before adding it to Vercel env vars:
+ *   # Encrypt a raw API key before adding it to host env:
  *   node scripts/encrypt-key.mjs "$ENCRYPTION_SECRET" "raw-api-key"
  *
- *   # In Vercel, set:
+ *   # On the server (e.g. Coolify), set:
  *   ENCRYPTION_SECRET = <your-32+-char-random-passphrase>
  *   GROK_API_KEY_ENC  = <output of encrypt-key.mjs>
  *   GEMINI_API_KEY_ENC= <output of encrypt-key.mjs>

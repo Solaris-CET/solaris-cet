@@ -232,7 +232,7 @@ const translations: Record<LangCode, Translations> = {
       shareLink: 'Share',
       shareOrCopyAria: 'Share or copy link',
       linkCopied: 'Link copied to clipboard!',
-      nativeShareTitle: 'Solaris CET — Next-Gen TON Token',
+      nativeShareTitle: 'Solaris CET — RWA Token on TON',
       shareBody:
         '🚀 Just discovered $CET on #TON blockchain! Fixed supply of 9,000 CET — mine, trade & stake. Check it out 👇',
     },
@@ -415,7 +415,7 @@ const translations: Record<LangCode, Translations> = {
       shareLink: 'Compartir',
       shareOrCopyAria: 'Compartir o copiar enlace',
       linkCopied: '¡Enlace copiado al portapapeles!',
-      nativeShareTitle: 'Solaris CET — token TON de nueva generación',
+      nativeShareTitle: 'Solaris CET — token RWA en TON',
       shareBody:
         '🚀 ¡Acabo de descubrir $CET en la blockchain #TON! Oferta fija de 9.000 CET — mina, intercambia y haz staking. ¡Mira! 👇',
     },
@@ -598,7 +598,7 @@ const translations: Record<LangCode, Translations> = {
       shareLink: '分享',
       shareOrCopyAria: '分享或复制链接',
       linkCopied: '链接已复制到剪贴板！',
-      nativeShareTitle: 'Solaris CET — 新一代 TON 代币',
+      nativeShareTitle: 'Solaris CET — TON 上的 RWA 代币',
       shareBody:
         '🚀 刚发现 $CET（#TON）！固定供应 9,000 CET — 挖矿、交易与质押。查看 👇',
     },
@@ -781,7 +781,7 @@ const translations: Record<LangCode, Translations> = {
       shareLink: 'Поделиться',
       shareOrCopyAria: 'Поделиться или скопировать ссылку',
       linkCopied: 'Ссылка скопирована в буфер обмена!',
-      nativeShareTitle: 'Solaris CET — токен TON нового поколения',
+      nativeShareTitle: 'Solaris CET — RWA токен на TON',
       shareBody:
         '🚀 Узнал про $CET в #TON! Фиксированная эмиссия 9 000 CET — майнинг, торги, стейкинг. Смотри 👇',
     },
@@ -964,7 +964,7 @@ const translations: Record<LangCode, Translations> = {
       shareLink: 'Distribuie',
       shareOrCopyAria: 'Distribuie sau copiază linkul',
       linkCopied: 'Link copiat în clipboard!',
-      nativeShareTitle: 'Solaris CET — token TON nouă generație',
+      nativeShareTitle: 'Solaris CET — token RWA pe TON',
       shareBody:
         '🚀 Tocmai am descoperit $CET pe #TON! Ofertă fixă 9.000 CET — minare, trade și staking. Vezi 👇',
     },
@@ -1147,7 +1147,7 @@ const translations: Record<LangCode, Translations> = {
       shareLink: 'Partilhar',
       shareOrCopyAria: 'Partilhar ou copiar link',
       linkCopied: 'Link copiado para a área de transferência!',
-      nativeShareTitle: 'Solaris CET — token TON de nova geração',
+      nativeShareTitle: 'Solaris CET — token RWA na TON',
       shareBody:
         '🚀 Acabei de descobrir $CET na #TON! Oferta fixa de 9.000 CET — mineração, trade e stake. Vê 👇',
     },
@@ -1330,7 +1330,7 @@ const translations: Record<LangCode, Translations> = {
       shareLink: 'Teilen',
       shareOrCopyAria: 'Teilen oder Link kopieren',
       linkCopied: 'Link in die Zwischenablage kopiert!',
-      nativeShareTitle: 'Solaris CET — TON-Token der nächsten Generation',
+      nativeShareTitle: 'Solaris CET — RWA-Token auf TON',
       shareBody:
         '🚀 Gerade $CET auf #TON entdeckt! Festes Angebot 9.000 CET — Mining, Trading & Staking. Mehr 👇',
     },
@@ -1467,7 +1467,7 @@ const translations: Record<LangCode, Translations> = {
         buy: '**Kaufe CET auf DeDust DEX** in 3 einfachen Schritten:\n\n1. Verbinde deine **TON-Wallet** (Tonkeeper empfohlen)\n2. Navigiere zu Pool `EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB`\n3. Tausche **TON gegen CET** — empfohlener Slippage: 0,5–1%\n\nWeltweit gibt es nur **9.000 CET** — jeder Token = **0,011%** des Gesamtangebots.',
         quantum: '**Quantum OS** ist Solaris CETs Entropie-Schicht.\n\n- **8 simulierte Qubits** in Superposition\n- Kollaps durch QRNG-gesäte Wellenfunktion erzeugt unvorhersehbare kryptografische Seeds\n- Treibt **faire Mining-Zufälligkeit**, Agenten-Scheduling und Zero-Knowledge-Proof-Generierung an',
         security: '**CET-Vertrag bestand Cyberscopes Audit** ohne kritische Befunde.\n\n- ✅ Vollständige **KYC**-Verifizierung des Teams\n- ✅ On-Chain-Reasoning-Spuren **verhindern halluzinierte KI-Entscheidungen**\n- ✅ **Quantum OS Entropie** + ReAct-Verifikationsschleifen\n- ✅ TONs BFT-Konsens (66,7% ehrliche Nodes erforderlich)',
-        roadmap: '**Solaris CET Fahrplan:**\n\n- ✅ **Q1–Q2 2025** (FERTIG): Vertrag deployed, Audit bestanden, DeDust-Pool live\n- 🔄 **Q3 2025** (AKTIV): KI-Präzisionslandwirtschaftspilot, Developer SDK Beta\n- 🔮 **Q4 2025+**: Next-Gen-Verarbeitungseinheiten, Self-Actualization Protocol Mainnet',
+        roadmap: '**Solaris CET Fahrplan:**\n\n- ✅ **Q1–Q2 2025** (FERTIG): Vertrag deployed, Audit bestanden, DeDust-Pool live\n- 🔄 **Q3 2025** (AKTIV): KI-Präzisionslandwirtschaftspilot, Developer SDK Beta\n- 🔮 **Q4 2025+**: fortschrittliche Verarbeitungseinheiten, Self-Actualization Protocol Mainnet',
         competition: '**Solaris CET vs. KI-Token-Wettbewerber:**\n\n- **Angebot**: CET=9.000 · FET=1,15 Mrd · TAO=21 Mio · AGIX=2 Mrd · OCEAN=1,41 Mrd — CET ist um Größenordnungen seltener\n- **TPS**: TON=100.000 · FET~1.000 · TAO~1.000 · AGIX~15 — CET auf dem schnellsten L1\n- **Agenten**: CET beschreibt **~200.000 Task-Agenten** plus **Zwei-Modell-Orakel** — viele Peers nur Marktplätze oder Single-Model-Chat\n- **Dual-KI**: **Grok × Gemini** unter RAV (Reason / Act)\n- **RWA**: CET an reale Agrarinfrastruktur (Cetățuia) gebunden\n- **Kernaussage**: Knappheit + Speed + RWA + strukturierte Orakel-Ausgabe\n\n**Übergabe:** Diesen Vergleich in einen anderen Assistenten als Kontext einfügen — weniger Nachfragen.',
         rwa: '**RWA — Reale Vermögenswerte**: Jeder CET ist an landwirtschaftliche und KI-Infrastruktur in Cetățuia, Rumänien, gebunden. RWA-Tokenisierungspilot in **Q2 2026**.',
         dcbm: '**DCBM** nutzt PID-Regler für autonome Rückkäufe. Reduziert Volatilität um bis zu **66%** ohne manuellen Eingriff.',
