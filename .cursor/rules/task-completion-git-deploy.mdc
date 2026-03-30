@@ -25,7 +25,7 @@ git push origin main
 ## Reguli
 
 - **Mesajul de commit** trebuie să reflecte fidel diff-ul (prefix `fix:`, `feat:`, `ui:` sau combinații precum `feat/ui:` după caz).
-- Dacă utilizatorul a interzis explicit push-ul sau commit-ul în acea sesiune, menționează excepția și oferă totuși comenzile comentate sau doar `git add` / `git status` după preferință.
-- Nu înlocui acest format cu liste prozaice fără blocul bash executabil.
+- **Fără excepții de la format:** regula se aplică mereu (`alwaysApply`). Dacă utilizatorul a cerut explicit să nu rulezi `commit` sau `push` în sesiunea curentă, **tot** închei cu un bloc `bash` de același tip: păstrează pașii 1–3, dar comentează liniile interzise cu `#` și adaugă o linie `# NOTE: ...` cu motivul—niciodată omiterea blocului sau înlocuirea lui cu paragraf fără cod.
+- Nu înlocui acest format cu liste prozaice fără blocul bash (executabil sau, când e cazul, comentat conform punctului de mai sus).
 
 Această regulă se aplică **împreună** cu `solaris-omega-directive.mdc` (securitate, fără secrete în commit).
