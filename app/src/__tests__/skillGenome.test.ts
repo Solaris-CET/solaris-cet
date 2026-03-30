@@ -49,10 +49,11 @@ describe('skillGenome', () => {
     expect(s1.join('|')).not.toBe(s2.join('|'));
   });
 
-  it('expressSkillForFeed returns SKILL_EXPR line with dept', () => {
+  it('expressSkillForFeed returns SKILL_EXPR line with dept and tier', () => {
     const { dept, line } = expressSkillForFeed(42);
     expect(dept.length).toBeGreaterThan(3);
     expect(line).toContain('[SKILL_EXPR]');
     expect(line).toContain(`dept=${dept}`);
+    expect(line).toMatch(/tier=(flash|deep|standard)/);
   });
 });

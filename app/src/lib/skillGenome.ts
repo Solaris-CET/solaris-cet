@@ -3,6 +3,8 @@
  * The Cartesian product is in the hundreds of quadrillions; only samples are materialised.
  */
 
+import { solarisDepartments } from '@/data/solarisDepartments';
+
 const LOCUS_A = [
   'Adversarially hardened', 'Cross-sharded', 'Spectrally decomposed', 'RAV-braided',
   'Zero-trust wrapped', 'Latency-gated', 'Entropy-aware', 'Consensus-anchored',
@@ -334,30 +336,23 @@ export function synthesizeMeshSkills(
   return out;
 }
 
-/** Dept ids aligned with LiveNeuralFeed for log lines. */
-const FEED_DEPTS = [
-  'customer-ops',
-  'engineering',
-  'sales',
-  'data-intelligence',
-  'finance',
-  'marketing',
-  'product-design',
-  'security',
-  'legal',
-  'research',
-] as const;
+/** Rotating synthesis tier for feed lines — aligned with meshSkillFeed.expressMeshSkillForFeed. */
+const FEED_TIERS: SynthesisTier[] = ['flash', 'deep', 'standard'];
 
 /**
  * One-line skill expression for simulated logs (deterministic per seq).
+ * Uses `synthesizeMeshSkills` with `tier = FEED_TIERS[seq % FEED_TIERS.length]` (same pattern as mesh feed).
  */
 export function expressSkillForFeed(seq: number): { dept: string; line: string } {
-  const dept = FEED_DEPTS[seq % FEED_DEPTS.length]!;
-  const seed = hash32(`skill-feed|${seq}|${dept}`);
-  const inner = composeDeepPhrase(seed);
+  const d = solarisDepartments[seq % solarisDepartments.length]!;
+  const role = d.roles[seq % d.roles.length]!;
+  const tier = FEED_TIERS[seq % FEED_TIERS.length]!;
+  const inner = synthesizeMeshSkills(d.id, role.title, role.skills, 1, tier)[0] ?? '';
   const t = new Date().toISOString().slice(11, 23);
+  const expr = inner.slice(0, 220);
+  const ell = inner.length > 220 ? '…' : '';
   return {
-    dept,
-    line: `[${t}] [SKILL_EXPR] dept=${dept} loci=10 isomers=${TEMPLATE_ISOMER_COUNT} expr="${inner.slice(0, 220)}${inner.length > 220 ? '…' : ''}"`,
+    dept: d.id,
+    line: `[${t}] [SKILL_EXPR] dept=${d.id} tier=${tier} loci=10 isomers=${TEMPLATE_ISOMER_COUNT} expr="${expr}${ell}"`,
   };
 }
