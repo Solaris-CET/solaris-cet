@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Solaris CET — RWA on TON. Fixed 9,000 CET. Cetățuia, Romania. Tactical static surface (no JavaScript)."
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; img-src 'self' data:; style-src 'unsafe-inline'; font-src 'self'"
+    />
+    <title>Solaris CET — Sovereign static node</title>
+    <style>
+      :root {
+        --bg-void: #020617;
+        --bg-elevation-1: #0f172a;
+        --accent-sovereign: #f2c94c;
+        --accent-gold-dim: #b7860b;
+        --accent-glow: rgba(242, 201, 76, 0.15);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-surface: rgba(255, 255, 255, 0.05);
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --text-mono: #cbd5e1;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        background: var(--bg-void);
+        color: var(--text-primary);
+        line-height: 1.6;
+      }
+
+      .skip {
+        position: absolute;
+        left: -9999px;
+      }
+      .skip:focus {
+        left: 1rem;
+        top: 1rem;
+        z-index: 100;
+        padding: 0.5rem 1rem;
+        background: var(--bg-elevation-1);
+        border: 1px solid var(--glass-border);
+        color: var(--text-primary);
+      }
+
+      header {
+        padding: 1.5rem clamp(1rem, 4vw, 2rem);
+        border-bottom: 1px solid var(--glass-border);
+        background: var(--bg-elevation-1);
+      }
+
+      .micro-label {
+        font-size: 0.625rem;
+        text-transform: uppercase;
+        letter-spacing: 0.35em;
+        color: var(--text-secondary);
+        margin: 0 0 0.25rem;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.75rem, 5vw, 2.5rem);
+        font-weight: 200;
+        letter-spacing: -0.02em;
+      }
+
+      main {
+        max-width: 42rem;
+        margin: 0 auto;
+        padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 2rem);
+      }
+
+      .solaris-panel {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(1.5rem, 4vw, 2rem);
+        background: var(--glass-surface);
+        backdrop-filter: blur(12px) saturate(180%);
+        border: 1px solid var(--glass-border);
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 0.75rem;
+        box-shadow:
+          0 25px 50px -12px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 0 rgba(255, 255, 255, 0.1),
+          0 0 30px var(--accent-glow);
+      }
+
+      .solaris-panel::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          45deg,
+          transparent 30%,
+          rgba(242, 201, 76, 0.03) 50%,
+          transparent 70%
+        );
+        animation: scan 8s linear infinite;
+        pointer-events: none;
+      }
+
+      @keyframes scan {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .solaris-panel > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .data-mono {
+        font-family: ui-monospace, "Cascadia Code", monospace;
+        font-variant-numeric: tabular-nums;
+        color: var(--text-mono);
+      }
+
+      .accent {
+        color: var(--accent-sovereign);
+        text-shadow: 0 0 24px var(--accent-glow);
+      }
+
+      details {
+        margin-top: 1.25rem;
+        border: 1px solid var(--glass-border);
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: rgba(15, 23, 42, 0.6);
+      }
+
+      summary {
+        cursor: pointer;
+        color: var(--accent-sovereign);
+        font-weight: 500;
+      }
+
+      details[open] summary {
+        margin-bottom: 0.5rem;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 1.25rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+      }
+
+      footer {
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--glass-border);
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+      }
+
+      .pulse {
+        display: inline-block;
+        margin-top: 0.75rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        border: 1px solid var(--accent-gold-dim);
+        color: var(--accent-sovereign);
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          box-shadow: 0 0 0 0 var(--accent-glow);
+        }
+        50% {
+          opacity: 0.85;
+          box-shadow: 0 0 20px 2px var(--accent-glow);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header role="banner">
+      <p class="micro-label">Solaris CET · TON · RWA</p>
+      <h1>Sovereign static node</h1>
+    </header>
+    <main id="main" role="main">
+      <article class="solaris-panel" aria-labelledby="panel-title">
+        <h2 id="panel-title" class="micro-label">Supply invariant</h2>
+        <p class="data-mono" style="font-size: 1.5rem; margin: 0.5rem 0">
+          <span class="accent">9,000</span> CET
+        </p>
+        <p style="margin: 0; color: var(--text-secondary); font-size: 0.95rem">
+          Fixed supply. Anchor: agricultural land, <strong>Cetățuia, Romania</strong>.
+        </p>
+        <p class="pulse" role="status">No JavaScript · Tor-safe surface</p>
+        <details>
+          <summary>Operational notes</summary>
+          <ul>
+            <li>Serve this file from your edge or Coolify as a secondary route when migrating off SPA-only delivery.</li>
+            <li>Prefer local fonts under <span class="data-mono">/fonts/</span> and a built Tailwind bundle for production parity with OMEGA spec.</li>
+          </ul>
+        </details>
+      </article>
+      <footer role="contentinfo">
+        <p class="data-mono">solaris-cet.com · static/sovereign/</p>
+      </footer>
+    </main>
+  </body>
+</html>

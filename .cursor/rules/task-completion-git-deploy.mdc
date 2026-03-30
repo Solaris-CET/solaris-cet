@@ -1,0 +1,31 @@
+---
+description: Obligatoriu — la sfârșitul modificărilor de cod, emite blocul Git pentru deploy (Coolify)
+alwaysApply: true
+---
+
+# Finalizare task-uri — deploy Git (Solaris CET)
+
+După **orice** modificare de cod, refactorizare sau reparație în acest repository, la **sfârșitul răspunsului** către utilizator ești obligat să incluzi un bloc de cod **bash** cu pașii de versionare și push spre producție.
+
+## Format obligatoriu (copiază structura; adaptează mesajul de commit)
+
+Imediat după ce rezumi ce s-a schimbat, printează **exact** acest șablon (cu `commit`-ul adaptat la task):
+
+```bash
+# 1. Adaugă toate fișierele modificate de agent
+git add .
+
+# 2. Creează commit-ul descriptiv (adaptează mesajul la task-ul tocmai executat)
+git commit -m "fix/feat/ui: [descrierea exactă a modificării curente]"
+
+# 3. Trimite pe server pentru a declanșa build-ul în Coolify
+git push origin main
+```
+
+## Reguli
+
+- **Mesajul de commit** trebuie să reflecte fidel diff-ul (prefix `fix:`, `feat:`, `ui:` sau combinații precum `feat/ui:` după caz).
+- Dacă utilizatorul a interzis explicit push-ul sau commit-ul în acea sesiune, menționează excepția și oferă totuși comenzile comentate sau doar `git add` / `git status` după preferință.
+- Nu înlocui acest format cu liste prozaice fără blocul bash executabil.
+
+Această regulă se aplică **împreună** cu `solaris-omega-directive.mdc` (securitate, fără secrete în commit).

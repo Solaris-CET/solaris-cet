@@ -1,0 +1,83 @@
+---
+description: Solaris CET OMEGA-CLASS — sovereign RWA DNA, security, design, deploy (always)
+alwaysApply: true
+---
+
+# Solaris CET — OMEGA-CLASS SYSTEM DIRECTIVE (v1.0-FINAL)
+
+**Classification:** CNI-grade RWA / project DNA for all code generation.  
+**Authority:** Align every change with sovereign infrastructure discipline—not generic “web app” defaults.
+
+## Identity & scope
+
+- **Project:** Solaris CET — RWA tokenization on **TON**, fixed **9,000 CET** supply (immutable), geographic/legal anchor **Cetățuia, Romania** (do not change or dilute this reference).
+- **Production:** `main` → Coolify webhook → VPS (**solaris-cet.com**). **A broken `main` breaks live production**—atomic deploy mindset, fast rollback expectation.
+- **Secrets:** Coolify environment variables only—**never** commit keys, API secrets, or genesis-related material.
+
+## Threat & crypto posture (engineering)
+
+- Assume **hostile networks** and **supply-chain risk**: prefer minimal dependencies, audited paths, reproducible builds; **no third-party browser CDNs** (no Google Fonts, no `cdn.jsdelivr` for runtime assets, no Tailwind CDN in HTML).
+- **Post-quantum & ZK** are directional requirements for *new* crypto-touching code: prefer established PQC (e.g. CRYSTALS family) where applicable; document non-trivial crypto with threat-model-relevant comments (not obvious line noise).
+- **Keys:** genesis / high-value keys **never** on networked dev machines in plaintext; use Shamir/MPC patterns in design docs and real vaults in operations—not the repo.
+
+## Frontend: OMEGA target (Tor-first, JS-off)
+
+**Non-negotiable for any surface that claims “OMEGA / sovereign / tactical” compliance:**
+
+- **Zero client JavaScript required** for core reading and navigation: must be usable with **Tor Browser “Safest”** (JS disabled). Interactivity = **CSS only** (`:target`, `:checked`, `details/summary`, animations)—no React/Vue/Angular/Svelte for **that** surface.
+- **Canonical static pattern:** single-file or modular **semantic HTML5** + **locally built** Tailwind (e.g. `tailwindcss -i ./src/input.css -o ./dist/output.css --minify --content './*.html'`), assets under project-controlled paths (e.g. `/fonts/`, `/assets/`), **WebP** images with dimensions + `loading="lazy"` where appropriate.
+- **SRI** on any external-origin resource if ever unavoidable; prefer **no external runtime deps**.
+- **CSP-minded markup:** strict server/meta CSP compatibility; avoid inline script. **WCAG 2.1** semantics and ARIA where interactive.
+
+## Visual system: “Agentic Era Luxury” / glass (when styling CET UI)
+
+Use this token set unless an existing file already defines tokens—then **extend**, don’t fork palettes:
+
+```css
+:root {
+  --bg-void: #020617;
+  --bg-elevation-1: #0f172a;
+  --accent-sovereign: #F2C94C;
+  --accent-gold-dim: #B7860B;
+  --accent-glow: rgba(242, 201, 76, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-surface: rgba(255, 255, 255, 0.05);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-mono: #cbd5e1;
+}
+```
+
+- **Panels:** glassmorphism (`bg-white/5`, `backdrop-blur`, `border-white/10`), gold accent glow sparingly; **financial figures** in monospaced tabular style (e.g. JetBrains Mono, **self-hosted**).
+- **RAV dashboard (CSS-only):** ten department nodes may use states like `status-idle` / `status-processing` / `status-consensus` with CSS animations—**no JS** for state toggles on the OMEGA surface.
+
+## Domain logic (do not contradict)
+
+- **Supply:** exactly **9,000 CET**; no accidental UI or contract copy implying a different cap.
+- **Chain:** **TON**; tokenomics / routing copy stays consistent with repo facts unless a tracked migration says otherwise.
+- **RAV narrative:** dual-AI / departmental structure is **presentational** unless wired to real contracts—don’t invent on-chain guarantees in code comments.
+
+## Repository reality (fusion with current tree)
+
+- **Reference zero-JS surface:** `static/sovereign/index.html` — semantic HTML, embedded CSS (no CDN), CSP meta, glass tokens aligned with OMEGA; extend with local fonts + built Tailwind when ready.
+- Today, **`app/`** is **Vite + React + TypeScript** (see root `README.md`) and is what Coolify typically builds. Treat edits there as **high blast radius** for production.
+- **Directive alignment strategy:**
+  - For **new** OMEGA-compliant public pages, prefer **static HTML + CSS** (e.g. dedicated `*.html` + built CSS) as the **source of truth** for no-JS requirements; do not add frameworks to those files.
+  - For **existing React** code: preserve CI/build; **do not** add external script CDNs, fingerprinting, or nonessential client telemetry; keep changes minimal and production-safe.
+  - When requirements conflict (React vs zero-JS), **flag the conflict** and implement the smallest change that moves toward the directive (e.g. static subsection) unless the user explicitly chooses otherwise.
+
+## Absolute “don’t” list
+
+1. No **hardcoded production secrets** or private keys.  
+2. No **external font/script/style CDNs** for shipped UI assets.  
+3. No **IP logging** or browser fingerprinting in user-facing code.  
+4. Do not **weaken** CSP or integrity posture for convenience.  
+5. Do not **change** Cetățuia / 9,000 CET / TON pillars without explicit product/legal intent.
+
+## Output discipline
+
+- Prefer **self-documenting names**; reserve comments for **security, crypto, and invariants** (supply, chain, legal anchors).
+- **Deterministic builds** where the stack allows—same inputs → reproducible artifacts.
+- Match existing project style, imports, and file layout; **minimal diffs** unless migrating toward OMEGA static surfaces.
+
+*Directive status: ACTIVE. Instance: solaris-vps-production · Domain: solaris-cet.com · Supply cap: 9,000 CET (immutable)*
