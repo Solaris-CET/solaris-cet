@@ -63,6 +63,13 @@ describe('useLanguageState', () => {
     expect(localStorage.getItem('solaris_lang')).toBe('ru');
   });
 
+  it('syncs document.documentElement lang and dir when language changes', async () => {
+    const { resultRef } = await renderHook(() => useLanguageState());
+    await act(() => { resultRef.current.setLang('ro'); });
+    expect(document.documentElement.lang).toBe('ro');
+    expect(document.documentElement.dir).toBe('ltr');
+  });
+
   it('returns a translations object for the selected language', async () => {
     const { resultRef } = await renderHook(() => useLanguageState());
     await act(() => { resultRef.current.setLang('es'); });

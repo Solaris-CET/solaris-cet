@@ -128,5 +128,11 @@ export const useLanguageState = (): LanguageContextValue => {
     });
   }, []);
 
+  // Keep <html lang> in sync for screen readers, SEO, and hyphenation (WCAG 3.1.2).
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = 'ltr';
+  }, [lang]);
+
   return { lang, setLang, t: translations[lang] };
 };
