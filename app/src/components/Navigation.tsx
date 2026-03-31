@@ -174,6 +174,7 @@ const Navigation = () => {
             {/* Mobile / Tablet Menu Button — shown below xl (1280 px) */}
             <button
               type="button"
+              data-testid="mobile-menu-toggle"
               className="xl:hidden p-2 text-solaris-text shrink-0"
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label={t.nav.openMenu}

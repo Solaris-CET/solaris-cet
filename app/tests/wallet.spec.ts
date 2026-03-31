@@ -102,7 +102,7 @@ test.describe('Wallet Connection', () => {
   test('connect wallet button is accessible in mobile nav', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     // Open the hamburger menu
-    const hamburger = page.locator('button[aria-label="Toggle menu"]');
+    const hamburger = page.locator('button[aria-controls="mobile-menu"]');
     await hamburger.waitFor({ state: 'visible', timeout: 5000 });
     await hamburger.click();
 
