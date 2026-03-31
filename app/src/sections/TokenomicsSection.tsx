@@ -192,7 +192,7 @@ const TokenomicsSection = () => {
               <p className="text-[11px] text-solaris-muted mb-1">
                 {t.tokenomics.cetCapLabel}
               </p>
-              <p className="font-mono tabular-nums text-4xl sm:text-5xl font-bold text-amber-300 tracking-tight">
+              <p className="font-mono tabular-nums text-4xl sm:text-5xl font-bold text-amber-300 tracking-tight breathing-tabular">
                 {CET_TOTAL_SUPPLY.toLocaleString()}
                 <span className="text-lg sm:text-xl text-amber-400/80 ml-2">CET</span>
               </p>
@@ -204,7 +204,7 @@ const TokenomicsSection = () => {
             </div>
 
             <div
-              className={`p-5 sm:p-6 bg-gradient-to-br from-cyan-950/35 via-violet-950/20 to-[#0a0b0f] ${BENTO_TILE_INTERACTION}`}
+              className={`p-5 sm:p-6 bg-gradient-to-br from-cyan-950/35 via-violet-950/20 to-[#0a0b0f] crt-terminal ${BENTO_TILE_INTERACTION}`}
             >
               <div className="flex items-center gap-2 mb-4">
                 <Cpu className="w-4 h-4 text-cyan-300" aria-hidden />

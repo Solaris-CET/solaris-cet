@@ -1,0 +1,267 @@
+/**
+ * Solaris CET — OMEGA sovereign surface (100% CSS, no JS).
+ * Innovation Sprint 3: holographic depth, living gold, CRT scan, magnetic buttons.
+ * All animations respect prefers-reduced-motion.
+ */
+
+/* ─── Task 9 — Hologram depth (static page) ─── */
+.solaris-hologram {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .solaris-hologram:hover {
+    transform: perspective(960px) rotateX(2deg) rotateY(-2deg) translateZ(12px);
+  }
+}
+
+.solaris-hologram::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(242, 201, 76, 0.12);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent 55%);
+  opacity: 0;
+  transition: opacity 0.55s ease;
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: screen;
+}
+
+@media (hover: hover) {
+  .solaris-hologram:hover::after {
+    opacity: 1;
+  }
+}
+
+/* ─── Task 10 — Living gold (text) ─── */
+.living-gold-text {
+  background: linear-gradient(
+    110deg,
+    #f2c94c 0%,
+    #fff6cc 22%,
+    #f2c94c 48%,
+    #b7860b 72%,
+    #f2c94c 100%
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .living-gold-text {
+    animation: sovereign-shine 10s linear infinite;
+  }
+}
+
+@keyframes sovereign-shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* ─── Task 11 — Breathing data (JetBrains Mono: opacity + glow, not variable wght) ─── */
+.breathing-mono {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .breathing-mono {
+    animation: sovereign-breathe-mono 3.5s ease-in-out infinite;
+  }
+}
+
+@keyframes sovereign-breathe-mono {
+  0%,
+  100% {
+    opacity: 0.94;
+    text-shadow: none;
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 14px rgba(242, 201, 76, 0.35);
+  }
+}
+
+/* ─── Task 12 — CRT / terminal strip (sovereign demo block) ─── */
+.crt-terminal {
+  position: relative;
+  margin-top: 1.25rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.5rem;
+  background: rgba(2, 6, 23, 0.92);
+  border: 1px solid rgba(242, 201, 76, 0.22);
+  box-shadow:
+    inset 0 0 32px rgba(242, 201, 76, 0.04),
+    0 0 0 1px rgba(242, 201, 76, 0.08);
+  overflow: hidden;
+}
+
+.crt-terminal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.11) 2px,
+    rgba(0, 0, 0, 0.11) 4px
+  );
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .crt-terminal::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -40%;
+    height: 28%;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      rgba(242, 201, 76, 0.04),
+      transparent
+    );
+    animation: sovereign-crt-scan 5.5s steps(24) infinite;
+    pointer-events: none;
+    opacity: 0.55;
+  }
+}
+
+@keyframes sovereign-crt-scan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(420%);
+  }
+}
+
+.crt-terminal > * {
+  position: relative;
+  z-index: 1;
+}
+
+.terminal-cursor::after {
+  content: "█";
+  margin-left: 0.15em;
+  color: #f2c94c;
+  animation: sovereign-blink 1s step-end infinite;
+}
+
+@keyframes sovereign-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ─── Task 14 — Magnetic-style button (CSS-only) ─── */
+.solaris-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 1rem;
+  padding: 0.65rem 1.35rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #f2c94c;
+  background: transparent;
+  border: 1px solid rgba(242, 201, 76, 0.45);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    transform 0.45s cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 0.45s ease,
+    border-color 0.35s ease,
+    letter-spacing 0.45s ease;
+}
+
+.solaris-button:hover {
+  transform: scale(1.04);
+  border-color: #f2c94c;
+  box-shadow:
+    0 0 22px rgba(242, 201, 76, 0.28),
+    inset 0 0 12px rgba(242, 201, 76, 0.08);
+  letter-spacing: 0.16em;
+}
+
+.solaris-button:active {
+  transform: scale(0.98);
+  transition-duration: 0.1s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .solaris-button:hover,
+  .solaris-button:active {
+    transform: none;
+  }
+}
+
+.solaris-button--primary {
+  background: #f2c94c;
+  color: #020617;
+  border-color: #f2c94c;
+}
+
+.solaris-button--primary:hover {
+  background: #fff6cc;
+  box-shadow: 0 0 28px rgba(242, 201, 76, 0.45);
+}
+
+/* Ambient body wash (optional, very subtle) */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes sovereign-ambient {
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 0.72;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .living-gold-text {
+    animation: none !important;
+    background: none !important;
+    -webkit-text-fill-color: #f2c94c !important;
+    color: #f2c94c !important;
+  }
+
+  .breathing-mono {
+    animation: none !important;
+  }
+
+  .solaris-hologram:hover {
+    transform: none !important;
+  }
+
+  .crt-terminal::after {
+    display: none !important;
+  }
+
+  .terminal-cursor::after {
+    animation: none !important;
+    opacity: 0.65;
+  }
+}

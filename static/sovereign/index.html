@@ -9,7 +9,7 @@
     />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; img-src 'self' data:; style-src 'unsafe-inline'; font-src 'self'"
+      content="default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'"
     />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
@@ -18,6 +18,7 @@
     <link rel="mask-icon" href="./safari-pinned-tab.svg" color="#F2C94C" />
     <meta name="msapplication-TileColor" content="#020617" />
     <meta name="theme-color" content="#F2C94C" />
+    <link rel="stylesheet" href="css/sovereign-ui.css" />
     <link rel="stylesheet" href="css/print.css" media="print" />
     <title>Solaris CET — Sovereign static node</title>
     <style>
@@ -239,18 +240,26 @@
     <a class="skip" href="#main">Skip to content</a>
     <header role="banner">
       <p class="micro-label">Solaris CET · TON · RWA</p>
-      <h1>Sovereign static node</h1>
+      <h1 class="living-gold-text">Sovereign static node</h1>
     </header>
     <main id="main" role="main">
-      <article class="solaris-panel" aria-labelledby="panel-title">
+      <article class="solaris-panel solaris-hologram" aria-labelledby="panel-title">
         <h2 id="panel-title" class="micro-label">Supply invariant</h2>
         <p class="data-mono" style="font-size: 1.5rem; margin: 0.5rem 0">
-          <span class="accent">9,000</span> CET
+          <span class="accent breathing-mono">9,000</span> CET
         </p>
         <p style="margin: 0; color: var(--text-secondary); font-size: 0.95rem">
           Fixed supply. Anchor: agricultural land, <strong>Cetățuia, Romania</strong>.
         </p>
         <p class="pulse" role="status">No JavaScript · Tor-safe surface</p>
+        <div class="crt-terminal">
+          <p class="data-mono" style="margin: 0; font-size: 0.75rem; color: var(--text-secondary)">
+            RAV · REASON · ACT · VERIFY
+          </p>
+          <p class="data-mono terminal-cursor" style="margin: 0.35rem 0 0; font-size: 0.82rem; color: var(--text-primary)">
+            STATUS: NOMINAL
+          </p>
+        </div>
         <details>
           <summary>Visual layer (Tor-safe)</summary>
           <ul>
@@ -268,6 +277,9 @@
       </article>
       <footer role="contentinfo">
         <p class="data-mono">solaris-cet.com/sovereign/</p>
+        <p style="margin: 1rem 0 0">
+          <a class="solaris-button solaris-button--primary" href="/">Full Solaris CET experience</a>
+        </p>
       </footer>
     </main>
   </body>

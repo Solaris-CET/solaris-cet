@@ -194,7 +194,7 @@ const IntelligenceCoreSection = () => {
         className="absolute right-[7vw] top-[24vh] w-[min(36vw,520px)] h-[min(50vh,420px)] z-10"
         style={{ perspective: '1000px' }}
       >
-        <div className="bento-card h-full flex flex-col items-center justify-center relative overflow-hidden p-6">
+        <div className="bento-card crt-terminal h-full flex flex-col items-center justify-center relative overflow-hidden p-6">
           {/* Terminal-style ReAct demo */}
           <div className="w-full font-mono text-sm">
             <div className="flex items-center gap-2 mb-4">

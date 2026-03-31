@@ -274,7 +274,12 @@
   }
 
   .btn-filled-gold {
-    @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300;
+    @apply px-6 py-3 rounded-xl font-semibold;
+    transition:
+      transform 0.45s cubic-bezier(0.23, 1, 0.32, 1),
+      box-shadow 0.45s ease,
+      filter 0.35s ease,
+      letter-spacing 0.45s ease;
     background: var(--gradient-solar);
     color: #0a0a0a;
     border: 1px solid rgba(255, 230, 160, 0.35);
@@ -287,8 +292,17 @@
     filter: brightness(1.06);
     box-shadow:
       0 0 56px rgba(255, 210, 130, 0.5),
-      0 16px 40px rgba(0, 0, 0, 0.4);
-    transform: translateY(-2px);
+      0 16px 40px rgba(0, 0, 0, 0.4),
+      inset 0 0 14px rgba(255, 255, 255, 0.12);
+    transform: translateY(-2px) scale(1.03);
+    letter-spacing: 0.02em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn-filled-gold:hover {
+      transform: none;
+      letter-spacing: normal;
+    }
   }
 
   /**
@@ -617,6 +631,152 @@
 
 .holo-card:hover::before {
   opacity: 1;
+}
+
+/**
+ * Sprint 3 — 3D tilt on hover.
+ * Do not use on: (1) any element that GSAP tweens with `transform`, or (2) the same
+ * node as a `ref` passed to ScrollTrigger/scrub `y`/`x`/`rotate` tweens — causes jitter.
+ * Pinned sections (Compliance, Hybrid, Intelligence) should keep `holo-card` only.
+ */
+.holo-card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .holo-card-3d:hover {
+    transform: perspective(1000px) rotateX(1.5deg) rotateY(-1.5deg) translateZ(0);
+  }
+}
+
+/* Living gold — animated metallic sheen (no external fonts) */
+.living-gold-text {
+  background: linear-gradient(
+    110deg,
+    #f2c94c 0%,
+    #fff6cc 22%,
+    #f2c94c 48%,
+    #b7860b 72%,
+    #f2c94c 100%
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .living-gold-text {
+    animation: living-gold-shine 10s linear infinite;
+  }
+}
+
+@keyframes living-gold-shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .living-gold-text {
+    animation: none !important;
+    background: none !important;
+    -webkit-text-fill-color: #f2c94c !important;
+    color: #f2c94c !important;
+  }
+}
+
+/* Kinetic data — tabular numerals breathe via opacity (JetBrains is single-weight here) */
+.breathing-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .breathing-tabular {
+    animation: breathe-tabular 3.5s ease-in-out infinite;
+  }
+}
+
+@keyframes breathe-tabular {
+  0%,
+  100% {
+    opacity: 0.94;
+    text-shadow: none;
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 14px rgba(242, 201, 76, 0.28);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .breathing-tabular {
+    animation: none !important;
+  }
+}
+
+/* CRT scanlines — overlay above content; pointer-events none */
+.crt-terminal {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.crt-terminal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.14) 2px,
+    rgba(0, 0, 0, 0.14) 4px
+  );
+  pointer-events: none;
+  opacity: 0.28;
+  mix-blend-mode: overlay;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .crt-terminal::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -35%;
+    height: 26%;
+    z-index: 2;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      rgba(242, 201, 76, 0.06),
+      transparent
+    );
+    animation: crt-scan-beam 5.5s steps(24) infinite;
+    pointer-events: none;
+    opacity: 0.4;
+    mix-blend-mode: soft-light;
+  }
+}
+
+@keyframes crt-scan-beam {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(420%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-terminal::after {
+    animation: none !important;
+    display: none;
+  }
 }
 
 /* ─────────────────────────────────────────────

@@ -215,7 +215,7 @@ const HeroSection: React.FC = () => {
               </div>
 
               <h1 className="w-full font-black tracking-[-0.045em] leading-[0.92] text-balance">
-                <span className="relative block text-5xl sm:text-6xl md:text-7xl text-transparent bg-clip-text bg-gradient-to-br from-[#FFF8E7] via-[#F2C94C] to-[#A67C00] drop-shadow-[0_2px_24px_rgba(0,0,0,0.55)]">
+                <span className="relative block text-5xl sm:text-6xl md:text-7xl living-gold-text drop-shadow-[0_2px_24px_rgba(0,0,0,0.55)]">
                   <span
                     className="absolute -inset-x-8 -inset-y-3 -z-10 rounded-[2rem] bg-gradient-to-r from-transparent via-amber-400/[0.07] to-transparent blur-2xl motion-safe:animate-hero-mesh-shift"
                     aria-hidden
