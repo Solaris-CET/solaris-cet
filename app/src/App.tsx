@@ -72,6 +72,13 @@ function AppContent() {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    // Ensure all ScrollTriggers are released if AppContent unmounts (HMR, route-level remounts).
+    return () => {
+      ScrollTrigger.getAll().forEach((st) => st.kill());
+    };
+  }, []);
+
   /** When the server serves `index.html` for `/mining`, scroll to the calculator after lazy sections mount. */
   useEffect(() => {
     if (!isLoaded) return;

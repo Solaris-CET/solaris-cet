@@ -58,7 +58,7 @@ const TokenomicsSection = () => {
     const section = sectionRef.current;
     if (!section) return;
 
-    const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches;
+    const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 1279px)').matches;
     if (isMobile || prefersReducedMotion) {
       [cardRef.current, pillsRef.current].forEach(el => {
         if (el) {

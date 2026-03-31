@@ -19,7 +19,7 @@ const ComplianceSection = () => {
     const section = sectionRef.current;
     if (!section) return;
 
-    const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches;
+    const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 1279px)').matches;
     if (isMobile || prefersReducedMotion) {
       [leftCardRef.current, rightCardRef.current, badgesRef.current].forEach(el => {
         if (el) { el.style.opacity = '1'; el.style.transform = 'none'; }
