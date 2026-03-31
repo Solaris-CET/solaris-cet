@@ -67,6 +67,11 @@ pulls/
 !app/public/hero-coin.png
 !app/public/hologram-cube.png
 !app/public/phone-mockup.png
+!static/sovereign/favicon.svg
+!static/sovereign/favicon-16x16.png
+!static/sovereign/favicon-32x32.png
+!static/sovereign/apple-touch-icon.png
+!static/sovereign/safari-pinned-tab.svg
 
 # Zip archives and deployment bundles
 *.zip
