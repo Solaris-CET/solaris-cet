@@ -73,8 +73,8 @@ module.exports = {
         "solaris-cyan": "rgb(46 231 255 / <alpha-value>)",
       },
       fontFamily: {
-        sans: ['"Avenir Next"', '"Segoe UI"', "Inter", "system-ui", "sans-serif"],
-        display: ['"Avenir Next"', '"Segoe UI"', "Inter", "system-ui", "sans-serif"],
+        sans: ["system-ui", "-apple-system", '"Segoe UI"', "Roboto", "Helvetica", "Arial", "sans-serif"],
+        display: ["system-ui", "-apple-system", '"Segoe UI"', "Roboto", "Helvetica", "Arial", "sans-serif"],
         mono: ['"JetBrains Mono"', "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
       borderRadius: {

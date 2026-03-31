@@ -88,23 +88,28 @@ const Navigation = () => {
     const content = mobileMenuContentRef.current;
     if (!content) return;
 
-    const focusable = content.querySelectorAll<HTMLElement>(
-      'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-    );
-    const first = focusable[0] ?? null;
-    const last = focusable[focusable.length - 1] ?? null;
+    const focusableSelector =
+      'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const getFocusable = () => content.querySelectorAll<HTMLElement>(focusableSelector);
+    const initialFocusable = getFocusable();
+    const first = initialFocusable[0] ?? null;
     first?.focus();
 
     const trapTab = (event: KeyboardEvent) => {
-      if (event.key !== 'Tab' || focusable.length === 0) return;
+      if (event.key !== 'Tab') return;
+      const focusable = getFocusable();
+      if (focusable.length === 0) return;
+
+      const firstFocusable = focusable[0] ?? null;
+      const lastFocusable = focusable[focusable.length - 1] ?? null;
       const active = document.activeElement as HTMLElement | null;
 
-      if (event.shiftKey && active === first) {
+      if (event.shiftKey && active === firstFocusable) {
         event.preventDefault();
-        last?.focus();
-      } else if (!event.shiftKey && active === last) {
+        lastFocusable?.focus();
+      } else if (!event.shiftKey && active === lastFocusable) {
         event.preventDefault();
-        first?.focus();
+        firstFocusable?.focus();
       }
     };
 
