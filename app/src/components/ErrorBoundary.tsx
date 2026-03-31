@@ -69,25 +69,38 @@ export class ErrorBoundary extends Component<Props, State> {
       const eb = translations[getActiveLangSync()].errorBoundary;
 
       return (
-        <div role="alert" className="py-16 flex items-center justify-center text-white">
-          <div className="text-center px-6">
-            <h1 className="text-2xl font-bold mb-3">{eb.title}</h1>
-            <p className="text-gray-400 mb-5 text-sm">
+        <div
+          role="alert"
+          className="min-h-dvh flex items-center justify-center bg-slate-950 text-white px-4 py-12"
+        >
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl shadow-[0_24px_80px_rgba(0,0,0,0.55)] p-8 text-center">
+            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-solaris-gold/90 mb-3">
+              SYSTEM
+            </p>
+            <h1 className="text-xl font-bold text-solaris-text mb-2">{eb.title}</h1>
+            <p className="text-solaris-muted text-sm mb-4 break-words">
               {this.state.error?.message ?? eb.unexpectedMessage}
             </p>
-            <p className="text-fuchsia-200/70 mb-5 text-[11px] font-mono leading-snug max-w-md mx-auto">
+            <p className="text-fuchsia-200/70 mb-6 text-[11px] font-mono leading-snug">
               {shortSkillWhisper(skillSeedFromLabel('errorBoundary|recovery'))}
             </p>
+            <a
+              href="/sovereign/"
+              className="mb-5 block rounded-xl border border-solaris-gold/35 bg-solaris-gold/10 px-4 py-3 text-sm font-semibold text-solaris-gold hover:bg-solaris-gold/15 transition-colors"
+            >
+              {eb.sovereignLink}
+            </a>
+            <p className="text-solaris-muted/80 text-[11px] mb-6 leading-relaxed">{eb.sovereignHint}</p>
             <div
               role="group"
               aria-label={eb.recoveryGroupAria}
-              className="flex items-center justify-center gap-3 flex-wrap"
+              className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3"
             >
               {canRetry && (
                 <button
                   type="button"
                   onClick={this.handleRetry}
-                  className="px-6 py-2 bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-all duration-200"
+                  className="px-6 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold transition-colors"
                 >
                   {eb.tryAgain}
                 </button>
@@ -95,10 +108,10 @@ export class ErrorBoundary extends Component<Props, State> {
               <button
                 type="button"
                 onClick={() => window.location.reload()}
-                className={`px-6 py-2 rounded-lg transition-all duration-200 ${
+                className={`px-6 py-2.5 rounded-xl font-semibold transition-colors ${
                   canRetry
-                    ? 'bg-white/10 hover:bg-white/20 text-gray-300'
-                    : 'bg-cyan-500 hover:bg-cyan-400'
+                    ? 'bg-white/10 hover:bg-white/15 text-solaris-text'
+                    : 'bg-cyan-500 hover:bg-cyan-400 text-slate-950'
                 }`}
               >
                 {eb.reloadPage}

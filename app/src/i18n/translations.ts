@@ -95,6 +95,9 @@ export interface Translations {
     recoveryGroupAria: string;
     tryAgain: string;
     reloadPage: string;
+    /** Link to `/sovereign/` when the React tree has crashed (OMEGA zero-JS surface). */
+    sovereignLink: string;
+    sovereignHint: string;
   };
   /** Main `<section>` region labels for page outline (screen readers). */
   landmarks: {
@@ -267,6 +270,8 @@ const translations: Record<LangCode, Translations> = {
       recoveryGroupAria: 'Error recovery options',
       tryAgain: 'Try Again',
       reloadPage: 'Reload Page',
+      sovereignLink: 'Open OMEGA surface (no JavaScript)',
+      sovereignHint: 'Tor-safe static page with CET supply and anchor facts.',
     },
     landmarks: {
       hero: 'Hero',
@@ -457,6 +462,8 @@ const translations: Record<LangCode, Translations> = {
       recoveryGroupAria: 'Opciones de recuperación',
       tryAgain: 'Reintentar',
       reloadPage: 'Recargar página',
+      sovereignLink: 'Abrir superficie OMEGA (sin JavaScript)',
+      sovereignHint: 'Página estática compatible con Tor: datos CET y ancla.',
     },
     landmarks: {
       hero: 'Hero',
@@ -647,6 +654,8 @@ const translations: Record<LangCode, Translations> = {
       recoveryGroupAria: '恢复选项',
       tryAgain: '重试',
       reloadPage: '刷新页面',
+      sovereignLink: '打开 OMEGA 静态页面（无 JavaScript）',
+      sovereignHint: '兼容 Tor 的静态页，含 CET 供应量与锚定信息。',
     },
     landmarks: {
       hero: '首屏',
@@ -837,6 +846,8 @@ const translations: Record<LangCode, Translations> = {
       recoveryGroupAria: 'Варианты восстановления',
       tryAgain: 'Повторить',
       reloadPage: 'Перезагрузить страницу',
+      sovereignLink: 'Открыть OMEGA-страницу (без JavaScript)',
+      sovereignHint: 'Статическая страница, дружественная к Tor: факты о CET и якоре.',
     },
     landmarks: {
       hero: 'Герой',
@@ -1027,6 +1038,8 @@ const translations: Record<LangCode, Translations> = {
       recoveryGroupAria: 'Opțiuni de recuperare',
       tryAgain: 'Încearcă din nou',
       reloadPage: 'Reîncarcă pagina',
+      sovereignLink: 'Deschide suprafața OMEGA (fără JavaScript)',
+      sovereignHint: 'Pagină statică compatibilă Tor — ofertă CET și ancoră.',
     },
     landmarks: {
       hero: 'Hero',
@@ -1217,6 +1230,8 @@ const translations: Record<LangCode, Translations> = {
       recoveryGroupAria: 'Opções de recuperação',
       tryAgain: 'Tentar novamente',
       reloadPage: 'Recarregar página',
+      sovereignLink: 'Abrir superfície OMEGA (sem JavaScript)',
+      sovereignHint: 'Página estática compatível com Tor — dados CET e âncora.',
     },
     landmarks: {
       hero: 'Hero',
@@ -1407,6 +1422,8 @@ const translations: Record<LangCode, Translations> = {
       recoveryGroupAria: 'Wiederherstellungsoptionen',
       tryAgain: 'Erneut versuchen',
       reloadPage: 'Seite neu laden',
+      sovereignLink: 'OMEGA-Oberfläche öffnen (ohne JavaScript)',
+      sovereignHint: 'Tor-freundliche statische Seite mit CET-Angebot und Anker.',
     },
     landmarks: {
       hero: 'Hero',

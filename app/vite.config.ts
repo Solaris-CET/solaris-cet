@@ -32,7 +32,7 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png'],
+      includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png', 'offline.html'],
       manifest: {
         name: 'Solaris CET',
         short_name: 'Solaris',
@@ -75,6 +75,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        /** SPA fallback; do not hijack the zero-JS sovereign subtree. */
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/sovereign\//],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3 MiB to cover phone-mockup.png
         runtimeCaching: [
           {

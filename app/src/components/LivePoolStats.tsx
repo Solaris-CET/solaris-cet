@@ -3,6 +3,7 @@ import { useLivePoolData } from '../hooks/use-live-pool-data';
 import { useLanguage } from '../hooks/useLanguage';
 import { formatUsd, formatPrice } from '../lib/utils';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const DEDUST_POOL_URL =
   'https://dedust.io/pools/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
@@ -93,9 +94,9 @@ const LivePoolStats = () => {
         >
           {loading
             ? Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="p-3 rounded-lg bg-white/5">
-                  <div className="text-solaris-muted text-[11px] mb-1 animate-pulse h-3 bg-white/10 rounded w-3/4" />
-                  <div className="animate-pulse h-4 bg-white/10 rounded w-1/2" />
+                <div key={i} className="p-3 rounded-lg bg-white/5 space-y-2">
+                  <Skeleton className="h-3 w-3/4 bg-white/10" />
+                  <Skeleton className="h-5 w-1/2 bg-solaris-gold/15" />
                 </div>
               ))
             : stats.map((stat) => (
