@@ -255,7 +255,7 @@ function AppContent() {
             className="relative z-10 py-24"
           >
             <ErrorBoundary>
-              {/* Hero runs its own GSAP entrance + pin; ScrollFadeUp here caused double opacity / janky first paint */}
+              {/* Hero: GSAP entrance only (no pin — avoids scroll-jacking); ScrollFadeUp here caused double opacity */}
               <HeroSection />
             </ErrorBoundary>
           </section>

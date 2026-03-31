@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Sun } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+import { SolarisLogoMark } from './SolarisLogoMark';
 
 /**
- * BackToTop — a floating golden sun button that appears after 600px scroll.
- * Features neon-gold pulsing glow, smooth entrance animation, and ARIA.
+ * BackToTop — floating control after 600px scroll; uses Solaris mark on a dark inset for contrast on gold.
  */
 const BackToTop = () => {
   const { t } = useLanguage();
@@ -39,7 +38,12 @@ const BackToTop = () => {
           : 'opacity-0 translate-y-6 pointer-events-none'}
       `}
     >
-      <Sun className="solaris-icon-glow w-5 h-5 animate-spin-slow" strokeWidth={2} />
+      <span
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-slate-950/90 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+        aria-hidden
+      >
+        <SolarisLogoMark className="h-full w-full drop-shadow-[0_0_6px_rgba(242,201,76,0.45)]" />
+      </span>
     </button>
   );
 };

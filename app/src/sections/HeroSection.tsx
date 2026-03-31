@@ -1,6 +1,5 @@
 import React, { useRef, useLayoutEffect, useState, useCallback, memo, lazy, Suspense } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Zap, Activity, Loader2 } from 'lucide-react';
 
 const ParticleCanvas = lazy(() => import('../components/ParticleCanvas'));
@@ -87,10 +86,6 @@ const HeroSection: React.FC = () => {
       typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches;
 
     if (isMobile || prefersReducedMotion) {
-      ScrollTrigger.getAll().forEach((st) => {
-        if (st.trigger === containerRef.current) st.kill();
-      });
-
       const els: (HTMLElement | null)[] = [
         coinWrapperRef.current,
         titleContainerRef.current,
@@ -112,27 +107,19 @@ const HeroSection: React.FC = () => {
     }
 
     const ctx = gsap.context(() => {
-      const mainTl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 1.05 } });
+      /** One-shot entrance only — no pin/scrub (scroll-jacking reads as cheap and hurts UX). */
+      const mainTl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.95 } });
 
       mainTl
-        .fromTo(coinWrapperRef.current, { scale: 0.88, rotateY: -18, opacity: 0 }, { scale: 1, rotateY: 0, opacity: 1, duration: 1.35 })
-        .fromTo([titleContainerRef.current, hudWrapperRef.current], { y: 28, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.12 }, '-=0.85')
-        .fromTo(cetAiWrapperRef.current, { width: '0%', opacity: 0 }, { width: '100%', opacity: 1, duration: 0.85, ease: 'power2.out' }, '-=0.55')
-        .fromTo(tickerContainerRef.current, { y: 48, opacity: 0 }, { y: 0, opacity: 1 }, '-=0.45');
-
-      ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: 'top top',
-        end: '+=150%',
-        pin: true,
-        scrub: 0.65,
-        animation: gsap
-          .timeline({ defaults: { ease: 'power2.inOut' } })
-          .fromTo(coinWrapperRef.current, { opacity: 1 }, { x: '-18vw', rotateY: 72, opacity: 0 })
-          .fromTo(titleContainerRef.current, { opacity: 1 }, { x: '-85%', opacity: 0 }, 0)
-          .fromTo(hudWrapperRef.current, { opacity: 1 }, { x: '85%', opacity: 0 }, 0)
-          .fromTo(cetAiWrapperRef.current, { opacity: 1 }, { y: 28, opacity: 0 }, 0),
-      });
+        .fromTo(coinWrapperRef.current, { scale: 0.94, rotateY: -8, opacity: 0 }, { scale: 1, rotateY: 0, opacity: 1, duration: 1.1 })
+        .fromTo([titleContainerRef.current, hudWrapperRef.current], { y: 20, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.1 }, '-=0.72')
+        .fromTo(
+          cetAiWrapperRef.current,
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.75, ease: 'power2.out' },
+          '-=0.5',
+        )
+        .fromTo(tickerContainerRef.current, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.65 }, '-=0.4');
     }, containerRef);
 
     return () => ctx.revert();
@@ -182,15 +169,15 @@ const HeroSection: React.FC = () => {
           <GlowOrbs variant="gold" className="opacity-[0.68]" />
 
           <div
-            className="absolute inset-0 opacity-[0.22] mix-blend-screen animate-hero-conic-drift"
+            className="absolute inset-0 opacity-[0.12] mix-blend-screen animate-hero-conic-drift"
             style={{
               background:
-                'conic-gradient(from 200deg at 50% 40%, transparent 0deg, rgba(234,179,8,0.07) 60deg, transparent 120deg, rgba(46,231,255,0.04) 200deg, transparent 280deg)',
+                'conic-gradient(from 200deg at 50% 40%, transparent 0deg, rgba(234,179,8,0.05) 60deg, transparent 120deg, rgba(46,231,255,0.03) 200deg, transparent 280deg)',
             }}
           />
 
           <Suspense fallback={null}>
-            <ParticleCanvas count={96} className="hidden sm:block opacity-[0.72]" connectionRadius={118} />
+            <ParticleCanvas count={56} className="hidden sm:block opacity-[0.45]" connectionRadius={110} />
           </Suspense>
 
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_55%_at_50%_0%,rgba(255,200,120,0.1),transparent_60%)]" />
@@ -207,7 +194,7 @@ const HeroSection: React.FC = () => {
               <div className="mb-4 md:mb-5 flex flex-col items-center lg:items-start gap-3 w-full">
                 <div className="flex items-center gap-3 sm:gap-4">
                   <span
-                    className="hidden sm:flex w-10 h-10 md:w-11 md:h-11 shrink-0 items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.03] shadow-[0_0_28px_rgba(242,201,76,0.14)] p-2 animate-logo-breathe motion-reduce:animate-none"
+                    className="hidden sm:flex w-10 h-10 md:w-11 md:h-11 shrink-0 items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.03] shadow-[0_0_20px_rgba(242,201,76,0.1)] p-2"
                     aria-hidden
                   >
                     <SolarisLogoMark className="drop-shadow-[0_0_10px_rgba(242,201,76,0.4)]" />
@@ -223,7 +210,7 @@ const HeroSection: React.FC = () => {
               </div>
 
               <h1 className="w-full font-black tracking-[-0.045em] leading-[0.92] text-balance">
-                <span className="block text-5xl sm:text-6xl md:text-7xl text-transparent bg-clip-text bg-gradient-to-br from-[#FFF8E7] via-[#F2C94C] to-[#B8860B] [text-shadow:0_4px_48px_rgba(0,0,0,0.55)] drop-shadow-[0_0_32px_rgba(242,201,76,0.18)]">
+                <span className="block text-5xl sm:text-6xl md:text-7xl text-transparent bg-clip-text bg-gradient-to-br from-[#FFF8E7] via-[#F2C94C] to-[#A67C00] drop-shadow-[0_2px_24px_rgba(0,0,0,0.55)]">
                   SOLARIS CET
                 </span>
               </h1>
@@ -283,7 +270,7 @@ const HeroSection: React.FC = () => {
                 className="relative w-40 h-40 sm:w-48 sm:h-52 md:w-56 md:h-60 lg:w-64 lg:h-64 xl:w-72 xl:h-72 [perspective:800px]"
               >
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="absolute w-[130%] h-[130%] rounded-full bg-yellow-400/25 blur-[100px] animate-pulse-glow" />
+                  <div className="absolute w-[130%] h-[130%] rounded-full bg-yellow-400/18 blur-[100px]" />
                   <img
                     src={APP_CONFIG.LINKS.HERO_COIN}
                     className="relative z-[1] w-full h-full object-contain drop-shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
@@ -344,8 +331,16 @@ const HeroSection: React.FC = () => {
 
         <div
           ref={tickerContainerRef}
-          className="lg:absolute lg:bottom-0 w-full overflow-hidden py-4 md:py-6 border-t border-white/10 bg-slate-950/75 backdrop-blur-2xl mt-6 lg:mt-0 shadow-[0_-24px_80px_-28px_rgba(255,200,100,0.07)]"
+          className="relative lg:absolute lg:bottom-0 w-full overflow-hidden py-4 md:py-6 border-t border-white/10 bg-slate-950/75 backdrop-blur-2xl mt-6 lg:mt-0 shadow-[0_-24px_80px_-28px_rgba(255,200,100,0.07)]"
         >
+          <div
+            className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-10 sm:w-16 bg-gradient-to-r from-slate-950 via-slate-950/90 to-transparent"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute inset-y-0 right-0 z-[2] w-10 sm:w-16 bg-gradient-to-l from-slate-950 via-slate-950/90 to-transparent"
+            aria-hidden
+          />
           <div className="flex min-w-max animate-ticker whitespace-nowrap">
             {[...TICKER_DATA, ...TICKER_DATA].map((item, i) => (
               <div key={i} className="inline-flex items-center px-6 sm:px-8 md:px-10 gap-3 md:gap-4">
