@@ -6,6 +6,10 @@ WORKDIR /app
 COPY app/package*.json ./
 RUN npm ci --legacy-peer-deps
 
+# Build prerequisites used by app prebuild script.
+COPY scripts/ /scripts/
+COPY static/ /static/
+
 # Build the frontend app.
 COPY app/ ./
 RUN npm run build
