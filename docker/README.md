@@ -6,9 +6,10 @@ Production uses **Coolify** on the project VPS; this folder is a **reference** f
 
 Example **SPA** config for serving a Vite production build (e.g. `app/dist` copied into the image as `/usr/share/nginx/html`):
 
-- `try_files` fallback to `index.html` for client-side routing
+- `try_files` fallback to `index.html` for client-side routing (excluding `/sovereign/*`)
 - **Gzip** for text assets
 - Long cache for hashed static files (`immutable`)
+- Explicit static routing for root favicon/PWA assets and `/fonts/*`
 
 ### Sample usage
 
