@@ -89,7 +89,7 @@ const Navigation = () => {
     if (!nav) return;
 
     const focusable = nav.querySelectorAll<HTMLElement>(
-      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
     );
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
