@@ -4,9 +4,10 @@ Operational notes for the static SPA + Docker/nginx deploy (Coolify → VPS). **
 
 ## Health check
 
-- **URL:** `GET /health.json`
+- **URL:** `GET /health.json` (or `HEAD` for probes)
 - **Expected:** HTTP `200`, `Content-Type: application/json`, body with `"status": "healthy"`.
 - **Bump `version`** in `app/public/health.json` when you ship a meaningful release (keep aligned with `app/package.json` `version` when practical).
+- **Hosting note:** Coolify builds often run **`vite preview`** (see `app/nixpacks.toml` / `npm run start`). Plain Vite preview used to mis-serve `/health.json` as the SPA shell; the repo adds a **`preview-health-json`** plugin in `app/vite.config.ts` so JSON is returned. The **Docker** image uses `docker/nginx.conf` and serves the same file with correct MIME type without that middleware.
 
 ## Critical scenarios
 

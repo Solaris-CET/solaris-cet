@@ -1,8 +1,49 @@
+import fs from "node:fs"
 import path from "path"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
+import type { Plugin } from "vite"
 import { compression } from "vite-plugin-compression2"
 import { VitePWA } from 'vite-plugin-pwa'
+
+/**
+ * Coolify/Nixpacks often run `vite preview` instead of nginx. Vite's preview
+ * SPA `htmlFallback` treats paths containing a dot as client routes, so
+ * `/health.json` incorrectly returns `index.html`. Serve the real file first.
+ */
+function previewHealthJson(): Plugin {
+  return {
+    name: "preview-health-json",
+    configurePreviewServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const pathname = req.url?.split("?")[0]
+        if (pathname !== "/health.json") return next()
+
+        const outDir =
+          server.config.environments?.client?.build?.outDir ??
+          server.config.build?.outDir ??
+          "dist"
+        const file = path.resolve(server.config.root, outDir, "health.json")
+        if (!fs.existsSync(file)) return next()
+
+        if (req.method !== "GET" && req.method !== "HEAD") {
+          res.statusCode = 405
+          res.end()
+          return
+        }
+
+        res.setHeader("Content-Type", "application/json; charset=utf-8")
+        res.setHeader("Cache-Control", "no-store")
+        res.statusCode = 200
+        if (req.method === "HEAD") {
+          res.end()
+          return
+        }
+        fs.createReadStream(file).pipe(res)
+      })
+    },
+  }
+}
 
 /**
  * Coolify / PaaS often set `PORT`. `0` is valid for Vite (pick a free port);
@@ -20,6 +61,7 @@ function resolvePreviewPort(fallback = 4173): number {
 export default defineConfig({
   base: '/',
   plugins: [
+    previewHealthJson(),
     react(),
     // Emit Brotli-compressed (.br) assets alongside regular files.
     // Reduces transfer size by up to 75 % vs gzip — critical for rural
