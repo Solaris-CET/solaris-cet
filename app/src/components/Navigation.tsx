@@ -48,7 +48,7 @@ const Navigation = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const mobileMenuToggleRef = useRef<HTMLButtonElement>(null);
-  const mobileMenuNavRef = useRef<HTMLElement>(null);
+  const mobileMenuContentRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
 
   const navLinks = NAV_HREFS.map(({ key, href }) => ({
@@ -85,10 +85,10 @@ const Navigation = () => {
       return;
     }
 
-    const nav = mobileMenuNavRef.current;
-    if (!nav) return;
+    const content = mobileMenuContentRef.current;
+    if (!content) return;
 
-    const focusable = nav.querySelectorAll<HTMLElement>(
+    const focusable = content.querySelectorAll<HTMLElement>(
       'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
     );
     const first = focusable[0] ?? null;
@@ -226,6 +226,7 @@ const Navigation = () => {
       {/* Off-canvas navigation — blur handled by Sheet overlay + sheet panel */}
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetContent
+          ref={mobileMenuContentRef}
           id="mobile-menu"
           side="right"
           overlayClassName="backdrop-blur-xl bg-slate-950/50"
@@ -248,7 +249,6 @@ const Navigation = () => {
           </SheetHeader>
 
           <nav
-            ref={mobileMenuNavRef}
             className="flex flex-col flex-1 items-center px-6 sm:px-8 md:px-10 py-8 gap-1 min-h-0 w-full max-w-full"
             aria-label={t.nav.primaryNavigation}
           >
