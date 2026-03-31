@@ -158,6 +158,23 @@ jobs:
         working-directory: app
         run: npm run build
 
+      - name: Check main bundle size budget
+        working-directory: app
+        run: |
+          set -e
+          MAIN=$(ls dist/assets/index-*.js 2>/dev/null | head -1)
+          if [ -z "$MAIN" ]; then
+            echo "::error::No dist/assets/index-*.js chunk found"
+            exit 1
+          fi
+          SIZE=$(wc -c < "$MAIN" | tr -d ' ')
+          MAX=250000
+          echo "Main chunk: $MAIN size=${SIZE} bytes (budget max ${MAX})"
+          if [ "$SIZE" -gt "$MAX" ]; then
+            echo "::error::Main bundle exceeds ${MAX} byte budget"
+            exit 1
+          fi
+
       - name: Upload dist artifact
         uses: actions/upload-artifact@v7
         with:

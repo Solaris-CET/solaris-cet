@@ -1,0 +1,9 @@
+{
+  "status": "healthy",
+  "service": "solaris-cet-frontend",
+  "version": "1.0.0",
+  "environment": "production",
+  "checks": {
+    "static": "ok"
+  }
+}
