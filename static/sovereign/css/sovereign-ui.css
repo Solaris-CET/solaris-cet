@@ -1,8 +1,148 @@
 /**
  * Solaris CET — OMEGA sovereign surface (100% CSS, no JS).
  * Innovation Sprint 3: holographic depth, living gold, CRT scan, magnetic buttons.
+ * Phase 5: phi spacing, seal, premium numerals, heavy CTA.
  * All animations respect prefers-reduced-motion.
  */
+
+/* ─── Golden ratio scale (φ) — layout rhythm ─── */
+:root {
+  --phi: 1.618;
+  --space-unit: 1rem;
+  --space-xs: calc(var(--space-unit) / var(--phi));
+  --space-sm: var(--space-unit);
+  --space-md: calc(var(--space-unit) * var(--phi));
+  --space-lg: calc(var(--space-unit) * var(--phi) * var(--phi));
+  --space-xl: calc(var(--space-unit) * var(--phi) * var(--phi) * var(--phi));
+  --space-xxl: calc(var(--space-unit) * 6.854); /* φ⁴ */
+}
+
+main.section-padding {
+  padding-top: var(--space-xxl);
+  padding-bottom: var(--space-xxl);
+}
+
+.solaris-panel.grid-gap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* ─── Micro-typography: .data-mono base lives in index.html (loads after this file) ─── */
+
+/* ─── Sovereign seal (CSS-only, institutional) ─── */
+.sovereign-seal-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-md);
+}
+
+.sovereign-seal {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border: 2px solid rgba(242, 201, 76, 0.3);
+  border-radius: 50%;
+  animation: seal-appear 2s ease-out forwards;
+  opacity: 0;
+  transform: scale(0.8) rotate(-180deg);
+}
+
+.sovereign-seal::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px dashed rgba(242, 201, 76, 0.6);
+  border-radius: 50%;
+  animation: seal-rotate 20s linear infinite;
+}
+
+.sovereign-seal__label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: #f2c94c;
+  z-index: 1;
+}
+
+@keyframes seal-appear {
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    border-color: rgba(242, 201, 76, 0.8);
+  }
+}
+
+@keyframes seal-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Continuity line (honest facts only — no fabricated chain hashes) ─── */
+.sovereign-eternity-line {
+  margin: 0 0 var(--space-sm);
+  font-size: 0.5rem;
+  line-height: 1.5;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.55);
+  max-width: 42rem;
+  overflow-wrap: anywhere;
+}
+
+/* ─── Heavy CTA (3D press, gold mass) ─── */
+.solaris-button--heavy {
+  position: relative;
+  background: linear-gradient(145deg, rgba(242, 201, 76, 0.14), rgba(242, 201, 76, 0.06));
+  border-color: rgba(242, 201, 76, 0.5);
+  box-shadow:
+    0 4px 0 rgba(242, 201, 76, 0.22),
+    0 8px 10px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transform: translateY(0);
+  transition:
+    transform 0.1s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.solaris-button--heavy:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 5px 0 rgba(242, 201, 76, 0.28),
+    0 10px 14px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.solaris-button--heavy:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 0 0 rgba(242, 201, 76, 0),
+    0 2px 4px rgba(0, 0, 0, 0.35),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sovereign-seal {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  .sovereign-seal::before {
+    animation: none !important;
+  }
+
+  .solaris-button--heavy:hover,
+  .solaris-button--heavy:active {
+    transform: none;
+  }
+}
 
 /* ─── Task 9 — Hologram depth (static page) ─── */
 .solaris-hologram {
@@ -225,6 +365,33 @@
 .solaris-button--primary:hover {
   background: #fff6cc;
   box-shadow: 0 0 28px rgba(242, 201, 76, 0.45);
+}
+
+.solaris-button--primary.solaris-button--heavy {
+  background: linear-gradient(145deg, #fff6cc 0%, #f2c94c 48%, #c9a321 100%);
+  border-color: rgba(183, 134, 11, 0.95);
+  box-shadow:
+    0 4px 0 rgba(183, 134, 11, 0.55),
+    0 8px 12px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transform: translateY(0);
+}
+
+.solaris-button--primary.solaris-button--heavy:hover {
+  background: linear-gradient(145deg, #fffdf5 0%, #fff6cc 42%, #f2c94c 100%);
+  transform: translateY(-1px);
+  box-shadow:
+    0 5px 0 rgba(183, 134, 11, 0.6),
+    0 10px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.solaris-button--primary.solaris-button--heavy:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 0 0 rgba(183, 134, 11, 0),
+    0 2px 5px rgba(0, 0, 0, 0.4),
+    inset 0 2px 5px rgba(0, 0, 0, 0.18);
 }
 
 /* Ambient body wash (optional, very subtle) */

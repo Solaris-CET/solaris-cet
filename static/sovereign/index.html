@@ -120,7 +120,8 @@
       main {
         max-width: 42rem;
         margin: 0 auto;
-        padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 2rem);
+        padding-left: clamp(1rem, 4vw, 2rem);
+        padding-right: clamp(1rem, 4vw, 2rem);
       }
 
       .solaris-panel {
@@ -168,8 +169,12 @@
 
       .data-mono {
         font-family: "JetBrains Mono", ui-monospace, "Cascadia Code", monospace;
-        font-variant-numeric: tabular-nums;
+        font-feature-settings: "liga" 1, "calt" 1, "tnum" 1, "zero" 1;
+        font-variant-numeric: tabular-nums slashed-zero;
         color: var(--text-mono);
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
 
       .accent {
@@ -242,8 +247,13 @@
       <p class="micro-label">Solaris CET · TON · RWA</p>
       <h1 class="living-gold-text">Sovereign static node</h1>
     </header>
-    <main id="main" role="main">
-      <article class="solaris-panel solaris-hologram" aria-labelledby="panel-title">
+    <main id="main" class="section-padding" role="main">
+      <div class="sovereign-seal-wrap">
+        <div class="sovereign-seal" role="img" aria-label="Solaris CET seal">
+          <span class="sovereign-seal__label">CET</span>
+        </div>
+      </div>
+      <article class="solaris-panel solaris-hologram grid-gap" aria-labelledby="panel-title">
         <h2 id="panel-title" class="micro-label">Supply invariant</h2>
         <p class="data-mono" style="font-size: 1.5rem; margin: 0.5rem 0">
           <span class="accent breathing-mono">9,000</span> CET
@@ -276,9 +286,15 @@
         </details>
       </article>
       <footer role="contentinfo">
+        <p
+          class="sovereign-eternity-line data-mono"
+          aria-hidden="true"
+        >
+          GENESIS_ANCHOR: 2026-03-31T00:00:00Z · CET_SUPPLY_CAP: 9000 · GEO_ANCHOR: Cetățuia, Romania · NETWORK: TON
+        </p>
         <p class="data-mono">solaris-cet.com/sovereign/</p>
         <p style="margin: 1rem 0 0">
-          <a class="solaris-button solaris-button--primary" href="/">Full Solaris CET experience</a>
+          <a class="solaris-button solaris-button--primary solaris-button--heavy" href="/">Full Solaris CET experience</a>
         </p>
       </footer>
     </main>
