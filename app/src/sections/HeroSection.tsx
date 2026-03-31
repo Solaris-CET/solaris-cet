@@ -13,7 +13,6 @@ import { useLanguage } from '../hooks/useLanguage';
 
 const APP_CONFIG = {
   LINKS: {
-    LOGO: `${import.meta.env.BASE_URL}icon-192.png`,
     TELEGRAM_BOT: 'https://t.me/+tKlfzx7IWopmNWQ0',
     HERO_COIN: `${import.meta.env.BASE_URL}hero-coin.png`,
   },
@@ -62,7 +61,6 @@ const HeroSection: React.FC = () => {
   const coinWrapperRef = useRef<HTMLDivElement>(null);
   const titleContainerRef = useRef<HTMLDivElement>(null);
   const hudWrapperRef = useRef<HTMLDivElement>(null);
-  const ctaGroupRef = useRef<HTMLDivElement>(null);
   const cetAiWrapperRef = useRef<HTMLDivElement>(null);
   const tickerContainerRef = useRef<HTMLDivElement>(null);
 
@@ -90,7 +88,6 @@ const HeroSection: React.FC = () => {
         coinWrapperRef.current,
         titleContainerRef.current,
         hudWrapperRef.current,
-        ctaGroupRef.current,
         tickerContainerRef.current,
       ];
       els.forEach((el) => {
@@ -101,7 +98,7 @@ const HeroSection: React.FC = () => {
       });
       if (cetAiWrapperRef.current) {
         cetAiWrapperRef.current.style.opacity = '1';
-        cetAiWrapperRef.current.style.width = '100%';
+        cetAiWrapperRef.current.style.transform = 'none';
       }
       return;
     }
@@ -225,7 +222,6 @@ const HeroSection: React.FC = () => {
 
               <div className="mt-8 md:mt-10 w-full max-w-xl mx-auto lg:mx-0">
                 <div
-                  ref={ctaGroupRef}
                   className="rounded-2xl md:rounded-3xl border border-white/15 bg-white/[0.04] backdrop-blur-2xl shadow-[0_8px_40px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.08)] p-4 md:p-6 flex flex-col md:flex-row flex-wrap gap-3 md:gap-4 justify-center lg:justify-start ring-1 ring-white/5"
                 >
                   <button
