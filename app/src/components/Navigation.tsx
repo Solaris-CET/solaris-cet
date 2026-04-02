@@ -18,12 +18,12 @@ import { standardSkillBurst, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 const DEDUST_POOL_ADDRESS = 'EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
 const DEDUST_SWAP_URL = `https://dedust.io/swap/TON/${DEDUST_POOL_ADDRESS}`;
 
+/** 7 primary destinations — flat IA, Hick/Miller-friendly (Cursor AI architecture playbook). */
 const NAV_HREFS = [
   { key: 'cetApp',      href: '#nova-app'    },
   { key: 'tokenomics',  href: '#staking'     },
   { key: 'roadmap',     href: '#roadmap'     },
   { key: 'team',        href: '#team'        },
-  { key: 'competition', href: '#competition' },
   { key: 'howToBuy',    href: '#how-to-buy'  },
   { key: 'resources',   href: '#resources'   },
   { key: 'faq',         href: '#faq'         },

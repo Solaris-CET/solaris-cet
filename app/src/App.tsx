@@ -8,12 +8,14 @@ import CursorGlow from './components/CursorGlow';
 import LazyLoadWrapper from './components/LazyLoadWrapper';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import BackToTop from './components/BackToTop';
+import MobileConversionDock from './components/MobileConversionDock';
 import { BuildSeal } from './components/BuildSeal';
 import { ScrollFadeUp } from './components/ScrollFadeUp';
 // Pinned sections — loaded eagerly so the snap/scroll setup can find their ScrollTriggers
 import HeroSection from './sections/HeroSection';
 import HybridEngineSection from './sections/HybridEngineSection';
 import StatsBentoSection from './sections/StatsBentoSection';
+import AuthorityTrustSection from './sections/AuthorityTrustSection';
 import IntelligenceCoreSection from './sections/IntelligenceCoreSection';
 import NovaAppSection from './sections/NovaAppSection';
 import TokenomicsSection from './sections/TokenomicsSection';
@@ -254,7 +256,10 @@ function AppContent() {
         <Navigation />
         
         {/* Main content — conversion flow: Hero → Problem → Solution → Tokenomics → RWA → Roadmap → Footer */}
-        <main id="main-content" className="relative w-full overflow-x-clip">
+        <main
+          id="main-content"
+          className="relative w-full overflow-x-clip pb-[5.75rem] xl:pb-0"
+        >
           {/* 1. Hero — Atenție */}
           <section
             id="hero"
@@ -277,6 +282,13 @@ function AppContent() {
               <LazyLoadWrapper>
                 <ScrollFadeUp>
                   <StatsBentoSection />
+                </ScrollFadeUp>
+              </LazyLoadWrapper>
+            </div>
+            <div className="relative z-[16]">
+              <LazyLoadWrapper>
+                <ScrollFadeUp>
+                  <AuthorityTrustSection />
                 </ScrollFadeUp>
               </LazyLoadWrapper>
             </div>
@@ -479,6 +491,7 @@ function AppContent() {
           </section>
         </main>
       </div>
+      <MobileConversionDock />
       <BackToTop />
       <BuildSeal />
     </LanguageContext.Provider>

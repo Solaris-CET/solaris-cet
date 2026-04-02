@@ -13,6 +13,9 @@ import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useLanguage } from '../hooks/useLanguage';
 import { formatCetSupplyWithSuffix } from '@/lib/numerals';
 
+const DEDUST_POOL_ADDRESS = 'EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
+const DEDUST_SWAP_URL = `https://dedust.io/swap/TON/${DEDUST_POOL_ADDRESS}`;
+
 const APP_CONFIG = {
   LINKS: {
     TELEGRAM_BOT: 'https://t.me/+tKlfzx7IWopmNWQ0',
@@ -240,7 +243,35 @@ const HeroSection: React.FC = () => {
                 {t.hero.description}
               </p>
 
-              <div className="mt-8 md:mt-10 w-full max-w-xl mx-auto lg:mx-0">
+              <div className="mt-6 md:mt-8 w-full max-w-xl mx-auto lg:mx-0">
+                <p className="text-[11px] sm:text-xs font-mono uppercase tracking-[0.2em] text-solaris-muted mb-3 text-center lg:text-left">
+                  {t.hero.nextStepsLabel}
+                </p>
+                <div className="flex flex-wrap gap-2 sm:gap-3 justify-center lg:justify-start mb-6 md:mb-8">
+                  <a
+                    href={DEDUST_SWAP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center min-h-[44px] px-4 py-2 rounded-xl border border-solaris-gold/35 bg-solaris-gold/10 text-solaris-gold text-xs sm:text-sm font-semibold hover:bg-solaris-gold/15 transition-colors"
+                  >
+                    {t.hero.nextStepBuy}
+                  </a>
+                  <a
+                    href="#staking"
+                    className="inline-flex items-center justify-center min-h-[44px] px-4 py-2 rounded-xl border border-solaris-cyan/30 bg-solaris-cyan/5 text-solaris-cyan text-xs sm:text-sm font-semibold hover:bg-solaris-cyan/10 transition-colors"
+                  >
+                    {t.hero.nextStepTokenomics}
+                  </a>
+                  <a
+                    href="#how-to-buy"
+                    className="inline-flex items-center justify-center min-h-[44px] px-4 py-2 rounded-xl border border-white/15 bg-white/[0.04] text-white/90 text-xs sm:text-sm font-semibold hover:bg-white/[0.08] transition-colors"
+                  >
+                    {t.hero.nextStepHowToBuy}
+                  </a>
+                </div>
+              </div>
+
+              <div className="mt-2 md:mt-4 w-full max-w-xl mx-auto lg:mx-0">
                 <div
                   className="rounded-2xl md:rounded-3xl border border-white/15 bg-white/[0.04] backdrop-blur-2xl shadow-[0_8px_40px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.08)] p-4 md:p-6 flex flex-col md:flex-row flex-wrap gap-3 md:gap-4 justify-center lg:justify-start ring-1 ring-white/5"
                 >

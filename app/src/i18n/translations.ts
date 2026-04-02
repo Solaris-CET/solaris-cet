@@ -179,6 +179,8 @@ export interface Translations {
     bftNodeLeader: string;
     bftNodeByzantine: string;
     bftNodeHonest: string;
+    /** Trust pillars — authority & conversion (Vibe Founder playbook). */
+    authorityTrust: string;
   };
   /** shadcn-style UI primitives (may be unused but kept i18n-ready). */
   ui: {
@@ -201,6 +203,33 @@ export interface Translations {
     miningSuccessAria: string;
     /** Landmark for the scrolling metrics strip (WCAG 2.4.1 / 1.3.1). */
     liveTickerAria: string;
+    /** Conversion path row — explicit next steps (PR 378/379). */
+    nextStepsLabel: string;
+    nextStepBuy: string;
+    nextStepTokenomics: string;
+    nextStepHowToBuy: string;
+  };
+  /** Four trust pillars — glass bento (authority, chain, geography, transparency). */
+  authorityTrust: {
+    kicker: string;
+    title: string;
+    subtitle: string;
+    pillar1Title: string;
+    pillar1Body: string;
+    pillar2Title: string;
+    pillar2Body: string;
+    pillar3Title: string;
+    pillar3Body: string;
+    pillar4Title: string;
+    pillar4Body: string;
+  };
+  /** Sticky mobile conversion dock (< xl). */
+  mobileDock: {
+    landmarkLabel: string;
+    buy: string;
+    tokenomics: string;
+    howToBuy: string;
+    community: string;
   };
   tokenomics: {
     title: string;
@@ -382,6 +411,7 @@ const translations: Record<LangCode, Translations> = {
       bftNodeLeader: 'Leader (illustrative)',
       bftNodeByzantine: 'Byzantine / faulty (isolated in model)',
       bftNodeHonest: 'Honest validator (illustrative)',
+      authorityTrust: 'Authority and trust pillars',
     },
     ui: {
       toggleSidebar: 'Toggle Sidebar',
@@ -404,6 +434,35 @@ const translations: Record<LangCode, Translations> = {
       miningSuccessAria: 'Mining initiated successfully',
       liveTickerAria:
         'Scrolling highlights: task agents, CET supply, TON network, DeDust pool, mining, and protocol metrics',
+      nextStepsLabel: 'Your next steps',
+      nextStepBuy: 'Buy on DeDust',
+      nextStepTokenomics: '9,000 CET',
+      nextStepHowToBuy: 'How to buy',
+    },
+    authorityTrust: {
+      kicker: 'TRUST ARCHITECTURE',
+      title: 'Proof you can verify — not hype you can’t',
+      subtitle:
+        'Every surface on Solaris CET is built to reduce cognitive load: technical proof, on-chain scarcity, a legal/geographic anchor, and operational transparency.',
+      pillar1Title: 'Technical proof',
+      pillar1Body:
+        'Cyberscope-audited contract, KYC-verified team, and TON-native execution with verifiable traces — not a black box.',
+      pillar2Title: 'On-chain truth',
+      pillar2Body:
+        'Fixed **9,000 CET** supply on TON. No minting. No inflation. Each token is a permanent slice of a finite cap.',
+      pillar3Title: 'Geographic & legal anchor',
+      pillar3Body:
+        'RWA narrative is anchored in **Cetățuia, Romania** — the real-world bridge between digital scarcity and physical infrastructure.',
+      pillar4Title: 'Operational transparency',
+      pillar4Body:
+        'Open-source posture, build seal on deploy, and CET AI handoff blocks so facts stay copy-pasteable for auditors and partners.',
+    },
+    mobileDock: {
+      landmarkLabel: 'Quick conversion shortcuts',
+      buy: 'Buy',
+      tokenomics: 'Economics',
+      howToBuy: 'How to buy',
+      community: 'Community',
     },
     tokenomics: {
       title: 'Tokenomics',
@@ -607,6 +666,7 @@ const translations: Record<LangCode, Translations> = {
       bftNodeLeader: 'Líder (ilustrativo)',
       bftNodeByzantine: 'Bizantino / fallo (aislado en el modelo)',
       bftNodeHonest: 'Validador honesto (ilustrativo)',
+      authorityTrust: 'Pilares de autoridad y confianza',
     },
     ui: {
       toggleSidebar: 'Alternar barra lateral',
@@ -629,6 +689,35 @@ const translations: Record<LangCode, Translations> = {
       miningSuccessAria: 'Minería iniciada correctamente',
       liveTickerAria:
         'Destacados en carrusel: agentes, suministro CET, red TON, pool DeDust, minería y métricas del protocolo',
+      nextStepsLabel: 'Tus siguientes pasos',
+      nextStepBuy: 'Comprar en DeDust',
+      nextStepTokenomics: '9.000 CET',
+      nextStepHowToBuy: 'Cómo comprar',
+    },
+    authorityTrust: {
+      kicker: 'ARQUITECTURA DE CONFIANZA',
+      title: 'Pruebas verificables — no ruido de marketing',
+      subtitle:
+        'Cada superficie reduce carga cognitiva: prueba técnica, escasez on-chain, ancla legal/geográfica y transparencia operativa.',
+      pillar1Title: 'Prueba técnica',
+      pillar1Body:
+        'Contrato auditado por Cyberscope, equipo con KYC y ejecución en TON con trazas verificables.',
+      pillar2Title: 'Verdad on-chain',
+      pillar2Body:
+        'Suministro fijo de **9.000 CET** en TON. Sin acuñación. Sin inflación.',
+      pillar3Title: 'Ancla geográfica y legal',
+      pillar3Body:
+        'La narrativa RWA se ancla en **Cetățuia, Rumanía** — puente entre escasez digital e infraestructura real.',
+      pillar4Title: 'Transparencia operativa',
+      pillar4Body:
+        'Postura open source, sello de build en despliegue y bloques CET AI listos para auditoría.',
+    },
+    mobileDock: {
+      landmarkLabel: 'Atajos de conversión',
+      buy: 'Comprar',
+      tokenomics: 'Economía',
+      howToBuy: 'Cómo comprar',
+      community: 'Comunidad',
     },
     tokenomics: {
       title: 'Tokenómica',
@@ -831,6 +920,7 @@ const translations: Record<LangCode, Translations> = {
       bftNodeLeader: '领导者（示意）',
       bftNodeByzantine: '拜占庭 / 故障（模型中已隔离）',
       bftNodeHonest: '诚实验证者（示意）',
+      authorityTrust: '信任与权威支柱',
     },
     ui: {
       toggleSidebar: '切换侧边栏',
@@ -852,6 +942,31 @@ const translations: Record<LangCode, Translations> = {
       miningProcessingAria: '正在处理挖矿操作',
       miningSuccessAria: '挖矿已成功启动',
       liveTickerAria: '横向滚动指标：智能体、CET 供应量、TON 网络、DeDust 池、挖矿与协议数据',
+      nextStepsLabel: '下一步',
+      nextStepBuy: '在 DeDust 购买',
+      nextStepTokenomics: '9,000 CET',
+      nextStepHowToBuy: '如何购买',
+    },
+    authorityTrust: {
+      kicker: '信任架构',
+      title: '可验证的证明 — 非空洞宣传',
+      subtitle:
+        '每个界面都降低认知负担：技术证明、链上稀缺、地理/法律锚点与运营透明。',
+      pillar1Title: '技术证明',
+      pillar1Body: 'Cyberscope 审计合约、KYC 团队与 TON 上可验证的执行轨迹。',
+      pillar2Title: '链上真实',
+      pillar2Body: 'TON 上固定 **9,000 CET** 供应。无增发。无通胀。',
+      pillar3Title: '地理与法律锚点',
+      pillar3Body: 'RWA 叙事锚定 **罗马尼亚 Cetățuia** — 连接数字稀缺与实体基础设施。',
+      pillar4Title: '运营透明',
+      pillar4Body: '开源姿态、部署构建印章与 CET AI 交接块，便于审计与合作伙伴复制事实。',
+    },
+    mobileDock: {
+      landmarkLabel: '快捷转化入口',
+      buy: '购买',
+      tokenomics: '经济模型',
+      howToBuy: '如何购买',
+      community: '社区',
     },
     tokenomics: {
       title: '代币经济学',
@@ -1055,6 +1170,7 @@ const translations: Record<LangCode, Translations> = {
       bftNodeLeader: 'Лидер (иллюстрация)',
       bftNodeByzantine: 'Византийский / сбойный (изолирован в модели)',
       bftNodeHonest: 'Честный валидатор (иллюстрация)',
+      authorityTrust: 'Столпы доверия и авторитета',
     },
     ui: {
       toggleSidebar: 'Переключить боковую панель',
@@ -1077,6 +1193,35 @@ const translations: Record<LangCode, Translations> = {
       miningSuccessAria: 'Майнинг успешно запущен',
       liveTickerAria:
         'Бегущая строка: агенты, запас CET, сеть TON, пул DeDust, майнинг и метрики протокола',
+      nextStepsLabel: 'Следующие шаги',
+      nextStepBuy: 'Купить на DeDust',
+      nextStepTokenomics: '9 000 CET',
+      nextStepHowToBuy: 'Как купить',
+    },
+    authorityTrust: {
+      kicker: 'АРХИТЕКТУРА ДОВЕРИЯ',
+      title: 'Доказательства, которые можно проверить',
+      subtitle:
+        'Каждый экран снижает когнитивную нагрузку: техдоказательство, ончейн-дефицит, юридико-географический якорь и прозрачность процессов.',
+      pillar1Title: 'Техническое доказательство',
+      pillar1Body:
+        'Контракт с аудитом Cyberscope, команда с KYC и исполнение в TON с проверяемыми следами.',
+      pillar2Title: 'Правда ончейн',
+      pillar2Body:
+        'Фиксированная эмиссия **9 000 CET** в TON. Без минта. Без инфляции.',
+      pillar3Title: 'Географический и правовой якорь',
+      pillar3Body:
+        'RWA-повествование привязано к **Cetățuia, Румыния** — мост между цифровой редкостью и реальной инфраструктурой.',
+      pillar4Title: 'Операционная прозрачность',
+      pillar4Body:
+        'Открытый код, печать сборки при деплое и блоки CET AI для аудита и партнёров.',
+    },
+    mobileDock: {
+      landmarkLabel: 'Быстрые действия',
+      buy: 'Купить',
+      tokenomics: 'Токеномика',
+      howToBuy: 'Как купить',
+      community: 'Сообщество',
     },
     tokenomics: {
       title: 'Токеномика',
@@ -1280,6 +1425,7 @@ const translations: Record<LangCode, Translations> = {
       bftNodeLeader: 'Lider (ilustrativ)',
       bftNodeByzantine: 'Bizantin / defecțiune (izolat în model)',
       bftNodeHonest: 'Validator cinstit (ilustrativ)',
+      authorityTrust: 'Pilonii de autoritate și încredere',
     },
     ui: {
       toggleSidebar: 'Comută bara laterală',
@@ -1302,6 +1448,35 @@ const translations: Record<LangCode, Translations> = {
       miningSuccessAria: 'Minare inițiată cu succes',
       liveTickerAria:
         'Bandă derulantă: agenți, ofertă CET, rețea TON, pool DeDust, minare și metrici protocol',
+      nextStepsLabel: 'Pașii următori',
+      nextStepBuy: 'Cumpără pe DeDust',
+      nextStepTokenomics: '9.000 CET',
+      nextStepHowToBuy: 'Cum cumperi',
+    },
+    authorityTrust: {
+      kicker: 'ARHITECTURĂ DE ÎNCREDERE',
+      title: 'Dovezi pe care le poți verifica — nu doar marketing',
+      subtitle:
+        'Fiecare zonă reduce încărcarea cognitivă: dovadă tehnică, scaritate on-chain, ancoră geografică/juridică și transparență operațională.',
+      pillar1Title: 'Dovadă tehnică',
+      pillar1Body:
+        'Contract auditat Cyberscope, echipă KYC și execuție TON cu urme verificabile.',
+      pillar2Title: 'Adevăr on-chain',
+      pillar2Body:
+        'Ofertă fixă **9.000 CET** pe TON. Fără mint. Fără inflație.',
+      pillar3Title: 'Ancoră geografică și legală',
+      pillar3Body:
+        'Narațiunea RWA este ancorată în **Cetățuia, România** — legătura între scaritate digitală și infrastructură reală.',
+      pillar4Title: 'Transparență operațională',
+      pillar4Body:
+        'Open source, sigiliu de build la deploy și blocuri CET AI pentru audit și parteneri.',
+    },
+    mobileDock: {
+      landmarkLabel: 'Scurtături conversie',
+      buy: 'Cumpără',
+      tokenomics: 'Tokenomică',
+      howToBuy: 'Cum cumperi',
+      community: 'Comunitate',
     },
     tokenomics: {
       title: 'Tokenomică',
@@ -1505,6 +1680,7 @@ const translations: Record<LangCode, Translations> = {
       bftNodeLeader: 'Líder (ilustrativo)',
       bftNodeByzantine: 'Bizantino / falha (isolado no modelo)',
       bftNodeHonest: 'Validador honesto (ilustrativo)',
+      authorityTrust: 'Pilares de autoridade e confiança',
     },
     ui: {
       toggleSidebar: 'Alternar barra lateral',
@@ -1527,6 +1703,35 @@ const translations: Record<LangCode, Translations> = {
       miningSuccessAria: 'Mineração iniciada com sucesso',
       liveTickerAria:
         'Destaques em rolagem: agentes, oferta CET, rede TON, pool DeDust, mineração e métricas do protocolo',
+      nextStepsLabel: 'Próximos passos',
+      nextStepBuy: 'Comprar no DeDust',
+      nextStepTokenomics: '9.000 CET',
+      nextStepHowToBuy: 'Como comprar',
+    },
+    authorityTrust: {
+      kicker: 'ARQUITETURA DE CONFIANÇA',
+      title: 'Provas que pode verificar — não só marketing',
+      subtitle:
+        'Cada superfície reduz carga cognitiva: prova técnica, escassez on-chain, âncora legal/geográfica e transparência operacional.',
+      pillar1Title: 'Prova técnica',
+      pillar1Body:
+        'Contrato auditado pela Cyberscope, equipa com KYC e execução em TON com rastos verificáveis.',
+      pillar2Title: 'Verdade on-chain',
+      pillar2Body:
+        'Oferta fixa de **9.000 CET** na TON. Sem mint. Sem inflação.',
+      pillar3Title: 'Âncora geográfica e legal',
+      pillar3Body:
+        'A narrativa RWA ancora-se em **Cetățuia, Roménia** — ponte entre escassez digital e infraestrutura real.',
+      pillar4Title: 'Transparência operacional',
+      pillar4Body:
+        'Código aberto, selo de build no deploy e blocos CET AI para auditoria e parceiros.',
+    },
+    mobileDock: {
+      landmarkLabel: 'Atalhos de conversão',
+      buy: 'Comprar',
+      tokenomics: 'Tokenomia',
+      howToBuy: 'Como comprar',
+      community: 'Comunidade',
     },
     tokenomics: {
       title: 'Tokenomia',
@@ -1730,6 +1935,7 @@ const translations: Record<LangCode, Translations> = {
       bftNodeLeader: 'Leader (illustrativ)',
       bftNodeByzantine: 'Byzantinisch / fehlerhaft (im Modell isoliert)',
       bftNodeHonest: 'Ehrlicher Validator (illustrativ)',
+      authorityTrust: 'Vertrauens- und Autoritätssäulen',
     },
     ui: {
       toggleSidebar: 'Seitenleiste umschalten',
@@ -1752,6 +1958,35 @@ const translations: Record<LangCode, Translations> = {
       miningSuccessAria: 'Mining erfolgreich gestartet',
       liveTickerAria:
         'Lauftext: Agenten, CET-Angebot, TON-Netz, DeDust-Pool, Mining und Protokollkennzahlen',
+      nextStepsLabel: 'Nächste Schritte',
+      nextStepBuy: 'Auf DeDust kaufen',
+      nextStepTokenomics: '9.000 CET',
+      nextStepHowToBuy: 'So kaufst du',
+    },
+    authorityTrust: {
+      kicker: 'VERTRAUENSARCHITEKTUR',
+      title: 'Nachweise, die du prüfen kannst — kein leeres Marketing',
+      subtitle:
+        'Jede Fläche reduziert kognitive Last: technischer Nachweis, On-Chain-Knappheit, geo-/rechtlicher Anker und operative Transparenz.',
+      pillar1Title: 'Technischer Nachweis',
+      pillar1Body:
+        'Cyberscope-geprüfter Vertrag, KYC-Team und TON-Ausführung mit verifizierbaren Spuren.',
+      pillar2Title: 'On-Chain-Wahrheit',
+      pillar2Body:
+        'Festes Angebot von **9.000 CET** auf TON. Kein Mint. Keine Inflation.',
+      pillar3Title: 'Geo- und Rechtsanker',
+      pillar3Body:
+        'Die RWA-Erzählung verankert sich in **Cetățuia, Rumänien** — Brücke zwischen digitaler Knappheit und realer Infrastruktur.',
+      pillar4Title: 'Operative Transparenz',
+      pillar4Body:
+        'Open Source, Build-Siegel beim Deploy und CET-AI-Blöcke für Auditoren und Partner.',
+    },
+    mobileDock: {
+      landmarkLabel: 'Schnellaktionen',
+      buy: 'Kaufen',
+      tokenomics: 'Tokenomik',
+      howToBuy: 'So kaufen',
+      community: 'Community',
     },
     tokenomics: {
       title: 'Tokenomik',
