@@ -6,6 +6,10 @@ const publicDir = path.resolve(__dirname, '../../public');
 
 describe('Public discovery — sitemap, security.txt, humans.txt', () => {
   it('static assets ship with expected content', () => {
+    const robots = readFileSync(path.join(publicDir, 'robots.txt'), 'utf8');
+    expect(robots).toContain('Sitemap: https://solaris-cet.com/sitemap.xml');
+    expect(robots).toContain('llms.txt');
+
     const xml = readFileSync(path.join(publicDir, 'sitemap.xml'), 'utf8');
     expect(xml).toContain('https://solaris-cet.com/apocalypse/');
     expect(xml).toContain('https://solaris-cet.com/sovereign/');
