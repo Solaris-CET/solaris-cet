@@ -15,7 +15,10 @@ import { cn } from '@/lib/utils';
 import { standardSkillBurst, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 
-/** Primary in-page destinations — flat IA (Compare links FAQ’s global matrix + `#competition`). */
+/**
+ * Primary in-page destinations — flat IA (Compare links FAQ’s global matrix + `#competition`).
+ * Each `key` must exist on `Translations['nav']` (incl. `competition`); see `translations.test.ts`.
+ */
 const NAV_HREFS = [
   { key: 'cetApp',      href: '#nova-app'    },
   { key: 'tokenomics',  href: '#staking'     },

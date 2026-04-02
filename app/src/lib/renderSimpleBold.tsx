@@ -1,12 +1,6 @@
 import { Fragment, type ReactNode } from 'react';
 
-/**
- * True when every `**` has a matching pair (odd-length split). Empty string is valid.
- * Use in tests / CI for copy that flows through {@link renderSimpleBold}.
- */
-export function hasBalancedSimpleBoldMarkers(text: string): boolean {
-  return text.split(/\*\*/).length % 2 === 1;
-}
+export { hasBalancedSimpleBoldMarkers } from './simpleBoldMarkers';
 
 /**
  * Renders `**bold**` segments from i18n-safe plain text (no HTML injection).

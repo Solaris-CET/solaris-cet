@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import translations, { type LangCode, type Translations } from "../i18n/translations";
 import { SUPPORTED_LANGS } from "../hooks/useLanguage";
-import { hasBalancedSimpleBoldMarkers } from "../lib/renderSimpleBold";
+import { hasBalancedSimpleBoldMarkers } from "../lib/simpleBoldMarkers";
 
 /**
  * Recursively collect all dot-separated leaf key paths from a nested object.
@@ -151,6 +151,14 @@ describe("translations — specific content", () => {
           `${lang}.nav.${key} missing`
         ).toBeTruthy();
       }
+    }
+  });
+
+  it("nav.competition is a non-empty string for every language (Navigation + Footer labels)", () => {
+    for (const lang of SUPPORTED_LANGS) {
+      const label = translations[lang].nav.competition;
+      expect(typeof label, `${lang}.nav.competition type`).toBe("string");
+      expect(label.trim().length, `${lang}.nav.competition empty`).toBeGreaterThan(0);
     }
   });
 

@@ -31,6 +31,7 @@ const FooterSection = () => {
     { id: 'terms', label: t.footerNav.terms, href: WHITEPAPER_URL, icon: undefined },
     { id: 'contact', label: t.footerNav.contact, href: 'https://t.me/SolarisCET', icon: undefined },
     { id: 'authorityTrust', label: t.footerNav.authorityTrust, href: '#authority-trust', icon: undefined },
+    /** Same label as header nav (`t.nav.competition`) — required on `Translations['nav']`, covered by `translations.test.ts`. */
     { id: 'competition', label: t.nav.competition, href: '#competition', icon: undefined },
     { id: 'sovereign', label: t.footerNav.sovereignNoJs, href: '/sovereign/', icon: Shield },
     { id: 'github', label: t.footerNav.github, href: GITHUB_URL, icon: Globe },
