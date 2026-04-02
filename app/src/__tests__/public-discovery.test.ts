@@ -17,5 +17,14 @@ describe('Public discovery — sitemap & security.txt', () => {
     const body = readFileSync(p, 'utf8');
     expect(body).toMatch(/Contact:\s*https:\/\/t\.me\/SolarisCET/);
     expect(body).toContain('Preferred-Languages:');
+    expect(body).toMatch(/^Expires:\s/m);
+  });
+
+  it('humans.txt lists canonical project URLs', () => {
+    const p = path.join(publicDir, 'humans.txt');
+    expect(existsSync(p), 'public/humans.txt must ship').toBe(true);
+    const body = readFileSync(p, 'utf8');
+    expect(body).toContain('https://solaris-cet.com/');
+    expect(body).toContain('github.com/Solaris-CET');
   });
 });

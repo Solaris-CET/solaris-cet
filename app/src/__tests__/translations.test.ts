@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import translations, { type LangCode, type Translations } from "../i18n/translations";
 import { SUPPORTED_LANGS } from "../hooks/useLanguage";
+import { hasBalancedSimpleBoldMarkers } from "../lib/renderSimpleBold";
 
 /**
  * Recursively collect all dot-separated leaf key paths from a nested object.
@@ -221,4 +222,26 @@ describe("translations — specific content", () => {
       }
     }
   });
+});
+
+describe("translations — authorityTrust ** markers for renderSimpleBold", () => {
+  const pillarBodyKeys: Array<keyof Translations["authorityTrust"]> = [
+    "pillar1Body",
+    "pillar2Body",
+    "pillar3Body",
+    "pillar4Body",
+  ];
+
+  for (const lang of SUPPORTED_LANGS) {
+    it(`${lang}: pillar bodies have balanced ** delimiters`, () => {
+      const at = translations[lang].authorityTrust;
+      for (const key of pillarBodyKeys) {
+        const body = at[key];
+        expect(
+          hasBalancedSimpleBoldMarkers(body),
+          `${lang}.authorityTrust.${key}: ${JSON.stringify(body.slice(0, 80))}…`
+        ).toBe(true);
+      }
+    });
+  }
 });

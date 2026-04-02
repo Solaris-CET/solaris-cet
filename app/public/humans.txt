@@ -1,0 +1,8 @@
+/* Solaris CET — humans.txt (project pointers; not a full team directory) */
+
+Site: https://solaris-cet.com/
+Repository: https://github.com/Solaris-CET/solaris-cet
+Community: https://t.me/SolarisCET
+Updates: https://twitter.com/SolarisCET
+
+Standards: TON mainnet · fixed 9,000 CET supply · anchor Cetățuia, Romania

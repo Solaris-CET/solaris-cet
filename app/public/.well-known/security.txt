@@ -5,3 +5,4 @@ Contact: https://t.me/SolarisCET
 Preferred-Languages: en, ro
 Canonical: https://solaris-cet.com/.well-known/security.txt
 Policy: https://github.com/Solaris-CET/solaris-cet/blob/main/LICENSE
+Expires: 2027-06-01T12:00:00.000Z

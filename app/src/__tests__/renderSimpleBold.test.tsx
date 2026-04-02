@@ -1,10 +1,24 @@
 // @vitest-environment jsdom
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
-import { renderSimpleBold } from '@/lib/renderSimpleBold';
+import { hasBalancedSimpleBoldMarkers, renderSimpleBold } from '@/lib/renderSimpleBold';
 
 afterEach(() => {
   cleanup();
+});
+
+describe('hasBalancedSimpleBoldMarkers', () => {
+  it('accepts empty, plain text, and paired ** segments', () => {
+    expect(hasBalancedSimpleBoldMarkers('')).toBe(true);
+    expect(hasBalancedSimpleBoldMarkers('plain')).toBe(true);
+    expect(hasBalancedSimpleBoldMarkers('**x**')).toBe(true);
+    expect(hasBalancedSimpleBoldMarkers('**same** and **same** end')).toBe(true);
+  });
+
+  it('rejects a single stray **', () => {
+    expect(hasBalancedSimpleBoldMarkers('**unclosed')).toBe(false);
+    expect(hasBalancedSimpleBoldMarkers('unclosed**')).toBe(false);
+  });
 });
 
 describe('renderSimpleBold', () => {

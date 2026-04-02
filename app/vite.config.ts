@@ -48,6 +48,31 @@ function previewHealthJson(): Plugin {
 }
 
 /**
+ * Google Search Console: inject real token at build, or drop the meta tag so we never
+ * ship a bogus `YOUR_GOOGLE_SITE_VERIFICATION_CODE` (hurts trust vs. mature competitors).
+ */
+function injectGoogleSiteVerification(): Plugin {
+  return {
+    name: "inject-google-site-verification",
+    transformIndexHtml(html) {
+      const raw = process.env.VITE_GOOGLE_SITE_VERIFICATION?.trim()
+      const esc = (s: string) =>
+        s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;")
+      if (raw) {
+        return html.replace(
+          /<!--\s*google-site-verification:[\s\S]*?-->\s*\n\s*<meta name="google-site-verification"[^>]*\/>/,
+          `<meta name="google-site-verification" content="${esc(raw)}" />`,
+        )
+      }
+      return html.replace(
+        /\s*<!--\s*google-site-verification:[\s\S]*?-->\s*\n\s*<meta name="google-site-verification"[^>]*\/>\s*/i,
+        "\n",
+      )
+    },
+  }
+}
+
+/**
  * Coolify / PaaS often set `PORT`. `0` is valid for Vite (pick a free port);
  * avoid `||` so `0` is not replaced by the fallback.
  */
@@ -83,6 +108,7 @@ export default defineConfig({
   },
   plugins: [
     previewHealthJson(),
+    injectGoogleSiteVerification(),
     react(),
     // Emit Brotli-compressed (.br) assets alongside regular files.
     // Reduces transfer size by up to 75 % vs gzip — critical for rural
