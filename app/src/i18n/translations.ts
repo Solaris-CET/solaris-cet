@@ -121,6 +121,8 @@ export interface Translations {
     privacy: string;
     terms: string;
     contact: string;
+    /** In-page anchor `#authority-trust`. */
+    authorityTrust: string;
     /** `/sovereign/` — OMEGA zero-JS surface. */
     sovereignNoJs: string;
     github: string;
@@ -359,6 +361,7 @@ const translations: Record<LangCode, Translations> = {
       privacy: 'Privacy',
       terms: 'Terms',
       contact: 'Contact',
+      authorityTrust: 'Trust & proof',
       sovereignNoJs: 'Sovereign (no JS)',
       github: 'GitHub',
     },
@@ -614,6 +617,7 @@ const translations: Record<LangCode, Translations> = {
       privacy: 'Privacidad',
       terms: 'Términos',
       contact: 'Contacto',
+      authorityTrust: 'Confianza y pruebas',
       sovereignNoJs: 'Soberano (sin JS)',
       github: 'GitHub',
     },
@@ -869,6 +873,7 @@ const translations: Record<LangCode, Translations> = {
       privacy: '隐私',
       terms: '条款',
       contact: '联系',
+      authorityTrust: '信任与证明',
       sovereignNoJs: '主权（无 JS）',
       github: 'GitHub',
     },
@@ -1118,6 +1123,7 @@ const translations: Record<LangCode, Translations> = {
       privacy: 'Конфиденциальность',
       terms: 'Условия',
       contact: 'Контакт',
+      authorityTrust: 'Доверие и доказательства',
       sovereignNoJs: 'Суверенный (без JS)',
       github: 'GitHub',
     },
@@ -1373,6 +1379,7 @@ const translations: Record<LangCode, Translations> = {
       privacy: 'Confidențialitate',
       terms: 'Termeni',
       contact: 'Contact',
+      authorityTrust: 'Încredere și dovezi',
       sovereignNoJs: 'Suveran (fără JS)',
       github: 'GitHub',
     },
@@ -1628,6 +1635,7 @@ const translations: Record<LangCode, Translations> = {
       privacy: 'Privacidade',
       terms: 'Termos',
       contact: 'Contato',
+      authorityTrust: 'Confiança e provas',
       sovereignNoJs: 'Soberano (sem JS)',
       github: 'GitHub',
     },
@@ -1883,6 +1891,7 @@ const translations: Record<LangCode, Translations> = {
       privacy: 'Datenschutz',
       terms: 'AGB',
       contact: 'Kontakt',
+      authorityTrust: 'Vertrauen & Nachweise',
       sovereignNoJs: 'Souverän (ohne JS)',
       github: 'GitHub',
     },

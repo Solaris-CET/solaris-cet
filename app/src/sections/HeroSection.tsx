@@ -243,7 +243,10 @@ const HeroSection: React.FC = () => {
                 {t.hero.description}
               </p>
 
-              <div className="mt-6 md:mt-8 w-full max-w-xl mx-auto lg:mx-0">
+              <div
+                className="mt-6 md:mt-8 w-full max-w-xl mx-auto lg:mx-0"
+                data-testid="hero-next-steps"
+              >
                 <p className="text-[11px] sm:text-xs font-mono uppercase tracking-[0.2em] text-solaris-muted mb-3 text-center lg:text-left">
                   {t.hero.nextStepsLabel}
                 </p>

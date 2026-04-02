@@ -103,6 +103,7 @@ const SITEMAP_URLS = [
   'https://solaris-cet.com/#network-pulse',
   'https://solaris-cet.com/#how-to-buy',
   'https://solaris-cet.com/#stats',
+  'https://solaris-cet.com/#authority-trust',
   'https://solaris-cet.com/#ecosystem-index',
   'https://solaris-cet.com/#security',
   'https://solaris-cet.com/#whitepaper',
@@ -111,8 +112,8 @@ const SITEMAP_URLS = [
 ];
 
 describe('Sitemap — URL integrity', () => {
-  it('has 14 URLs (9 original + 5 new sections)', () => {
-    expect(SITEMAP_URLS).toHaveLength(14);
+  it('has 15 canonical hash URLs (incl. authority-trust)', () => {
+    expect(SITEMAP_URLS).toHaveLength(15);
   });
 
   it('all URLs are https', () => {
@@ -129,6 +130,10 @@ describe('Sitemap — URL integrity', () => {
 
   it('network-pulse section is in sitemap', () => {
     expect(SITEMAP_URLS).toContain('https://solaris-cet.com/#network-pulse');
+  });
+
+  it('authority-trust section is in sitemap', () => {
+    expect(SITEMAP_URLS).toContain('https://solaris-cet.com/#authority-trust');
   });
 
   it('root URL has no hash', () => {

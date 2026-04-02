@@ -46,6 +46,7 @@ const MobileConversionDock = () => {
   return (
     <div className={cn('fixed inset-x-0 bottom-0 z-[900] xl:hidden pointer-events-none')}>
       <nav
+        data-testid="mobile-conversion-dock"
         className="pointer-events-auto mx-auto max-w-lg px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2"
         aria-label={t.mobileDock.landmarkLabel}
       >
