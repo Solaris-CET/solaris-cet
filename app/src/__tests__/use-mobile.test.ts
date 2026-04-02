@@ -9,7 +9,6 @@ describe('useIsMobile — breakpoint logic', () => {
   const originalInnerWidth = window.innerWidth;
 
   beforeEach(() => {
-    // Reset matchMedia mock before each test
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
       value: (query: string) => ({
@@ -32,38 +31,30 @@ describe('useIsMobile — breakpoint logic', () => {
     });
   });
 
-  it('returns false when window.innerWidth is at desktop width', async () => {
+  it('desktop, mobile, breakpoint edge, boolean type', async () => {
     Object.defineProperty(window, 'innerWidth', { writable: true, value: 1440 });
-    const { resultRef, unmount } = await renderHook(() => useIsMobile());
-    expect(resultRef.current).toBe(false);
-    await unmount();
-  });
+    const { resultRef: d, unmount: u0 } = await renderHook(() => useIsMobile());
+    expect(d.current).toBe(false);
+    await u0();
 
-  it('returns true when window.innerWidth is below mobile breakpoint', async () => {
     Object.defineProperty(window, 'innerWidth', { writable: true, value: 375 });
-    const { resultRef, unmount } = await renderHook(() => useIsMobile());
-    expect(resultRef.current).toBe(true);
-    await unmount();
-  });
-
-  it('returns false at exactly the breakpoint (768px is desktop)', async () => {
-    Object.defineProperty(window, 'innerWidth', { writable: true, value: MOBILE_BREAKPOINT });
-    const { resultRef, unmount: u1 } = await renderHook(() => useIsMobile());
-    expect(resultRef.current).toBe(false);
+    const { resultRef: m, unmount: u1 } = await renderHook(() => useIsMobile());
+    expect(m.current).toBe(true);
     await u1();
-  });
 
-  it('returns true at breakpoint - 1 (767px is mobile)', async () => {
-    Object.defineProperty(window, 'innerWidth', { writable: true, value: MOBILE_BREAKPOINT - 1 });
-    const { resultRef, unmount: u2 } = await renderHook(() => useIsMobile());
-    expect(resultRef.current).toBe(true);
+    Object.defineProperty(window, 'innerWidth', { writable: true, value: MOBILE_BREAKPOINT });
+    const { resultRef: ex, unmount: u2 } = await renderHook(() => useIsMobile());
+    expect(ex.current).toBe(false);
     await u2();
-  });
 
-  it('returns boolean (never undefined after mount)', async () => {
+    Object.defineProperty(window, 'innerWidth', { writable: true, value: MOBILE_BREAKPOINT - 1 });
+    const { resultRef: em, unmount: u3 } = await renderHook(() => useIsMobile());
+    expect(em.current).toBe(true);
+    await u3();
+
     Object.defineProperty(window, 'innerWidth', { writable: true, value: 1024 });
-    const { resultRef, unmount } = await renderHook(() => useIsMobile());
-    expect(typeof resultRef.current).toBe('boolean');
-    await unmount();
+    const { resultRef: b, unmount: u4 } = await renderHook(() => useIsMobile());
+    expect(typeof b.current).toBe('boolean');
+    await u4();
   });
 });
