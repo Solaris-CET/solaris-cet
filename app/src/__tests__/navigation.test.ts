@@ -8,15 +8,14 @@ const NAV_HREFS = [
   { key: 'tokenomics',  href: '#staking'     },
   { key: 'roadmap',     href: '#roadmap'     },
   { key: 'team',        href: '#team'        },
-  { key: 'competition', href: '#competition' },
   { key: 'howToBuy',    href: '#how-to-buy'  },
   { key: 'resources',   href: '#resources'   },
   { key: 'faq',         href: '#faq'         },
 ] as const;
 
 describe('Navigation — NAV_HREFS integrity', () => {
-  it('has exactly 8 nav items', () => {
-    expect(NAV_HREFS).toHaveLength(8);
+  it('has exactly 7 primary nav items (flat IA)', () => {
+    expect(NAV_HREFS).toHaveLength(7);
   });
 
   it('all hrefs start with #', () => {
@@ -33,12 +32,6 @@ describe('Navigation — NAV_HREFS integrity', () => {
   it('all hrefs are unique', () => {
     const hrefs = NAV_HREFS.map(i => i.href);
     expect(new Set(hrefs).size).toBe(hrefs.length);
-  });
-
-  it('competition link exists and points to #competition', () => {
-    const comp = NAV_HREFS.find(i => i.key === 'competition');
-    expect(comp).toBeDefined();
-    expect(comp?.href).toBe('#competition');
   });
 
   it('howToBuy link exists and points to #how-to-buy', () => {
@@ -74,6 +67,7 @@ const SECTION_IDS = [
   'network-pulse',
   'how-to-buy',
   'stats',
+  'authority-trust',
   'ecosystem-index',
   'resources',
   'faq',
@@ -98,5 +92,9 @@ describe('Section IDs — all nav hrefs have matching section IDs', () => {
 
   it('network-pulse section is registered', () => {
     expect(SECTION_IDS).toContain('network-pulse');
+  });
+
+  it('authority-trust section is registered (conversion pillar strip)', () => {
+    expect(SECTION_IDS).toContain('authority-trust');
   });
 });

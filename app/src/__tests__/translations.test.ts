@@ -162,6 +162,14 @@ describe("translations — specific content", () => {
       "description",
       "startMining",
       "docs",
+      "miningStartAria",
+      "miningProcessingAria",
+      "miningSuccessAria",
+      "liveTickerAria",
+      "nextStepsLabel",
+      "nextStepBuy",
+      "nextStepTokenomics",
+      "nextStepHowToBuy",
     ];
     for (const lang of SUPPORTED_LANGS) {
       for (const key of expectedHeroKeys) {

@@ -23,7 +23,7 @@ const BackToTop = () => {
       title={shortSkillWhisper(skillSeedFromLabel('backToTop|scrollAnchor'))}
       aria-hidden={!visible}
       className={`
-        fixed bottom-6 right-6 z-[999]
+        fixed bottom-24 right-6 z-[999] xl:bottom-6
         w-12 h-12 rounded-full
         bg-gradient-to-br from-solaris-gold to-amber-500
         text-solaris-dark
