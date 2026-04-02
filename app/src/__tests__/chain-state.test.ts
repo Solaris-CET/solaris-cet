@@ -7,10 +7,6 @@ import type {
   ChainPoolState,
 } from "../lib/chain-state";
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
 function makeToken(overrides: Partial<ChainTokenState> = {}): ChainTokenState {
   return {
     symbol: "CET",
@@ -42,77 +38,109 @@ function makeChainState(overrides: Partial<ChainState> = {}): ChainState {
   };
 }
 
-// ---------------------------------------------------------------------------
-// Type-shape tests (pure TypeScript / data-structure assertions)
-// ---------------------------------------------------------------------------
+describe("ChainState", () => {
+  it("makers, TS literals, EQ addresses, parseSupply, cetPriceInTon", () => {
+    const t = makeToken();
+    expect(t.symbol).toBe("CET");
+    expect(t.decimals).toBe(9);
+    expect(t.totalSupply).not.toBeNull();
+    expect(makeToken({ totalSupply: null }).totalSupply).toBeNull();
+    expect(typeof t.contract).toBe("string");
+    expect(t.contract.length).toBeGreaterThan(0);
 
-describe("ChainTokenState shape", () => {
-  it("accepts a fully populated token", () => {
-    const token = makeToken();
-    expect(token.symbol).toBe("CET");
-    expect(token.decimals).toBe(9);
-    expect(token.totalSupply).not.toBeNull();
-  });
-
-  it("allows totalSupply to be null (unknown state)", () => {
-    const token = makeToken({ totalSupply: null });
-    expect(token.totalSupply).toBeNull();
-  });
-
-  it("contract address is a non-empty string", () => {
-    const token = makeToken();
-    expect(typeof token.contract).toBe("string");
-    expect(token.contract.length).toBeGreaterThan(0);
-  });
-});
-
-describe("ChainPoolState shape", () => {
-  it("accepts a fully populated pool", () => {
-    const pool = makePool();
-    expect(pool.address).toBeTruthy();
-    expect(pool.reserveTon).not.toBeNull();
-    expect(pool.reserveCet).not.toBeNull();
-    expect(pool.lpSupply).not.toBeNull();
-    expect(pool.priceTonPerCet).not.toBeNull();
-  });
-
-  it("allows all nullable fields to be null (unknown state)", () => {
-    const pool = makePool({
+    const p = makePool();
+    expect(p.address).toBeTruthy();
+    expect(p.reserveTon).not.toBeNull();
+    expect(p.reserveCet).not.toBeNull();
+    expect(p.lpSupply).not.toBeNull();
+    expect(p.priceTonPerCet).not.toBeNull();
+    const n = makePool({
       reserveTon: null,
       reserveCet: null,
       lpSupply: null,
       priceTonPerCet: null,
     });
-    expect(pool.reserveTon).toBeNull();
-    expect(pool.reserveCet).toBeNull();
-    expect(pool.lpSupply).toBeNull();
-    expect(pool.priceTonPerCet).toBeNull();
-  });
+    expect(n.reserveTon).toBeNull();
+    expect(n.reserveCet).toBeNull();
+    expect(n.lpSupply).toBeNull();
+    expect(n.priceTonPerCet).toBeNull();
+    expect(p.address).toBe(DEDUST_POOL_ADDRESS);
 
-  it("pool address matches the known DeDust pool", () => {
-    const pool = makePool();
-    expect(pool.address).toBe(DEDUST_POOL_ADDRESS);
-  });
-});
-
-describe("ChainState shape", () => {
-  it("includes token, pool, and updatedAt", () => {
     const state = makeChainState();
     expect(state.token).toBeDefined();
     expect(state.pool).toBeDefined();
     expect(typeof state.updatedAt).toBe("string");
-  });
+    expect(Number.isNaN(new Date(state.updatedAt).getTime())).toBe(false);
 
-  it("updatedAt is a valid ISO 8601 date string", () => {
-    const state = makeChainState();
-    const parsed = new Date(state.updatedAt);
-    expect(Number.isNaN(parsed.getTime())).toBe(false);
+    const lit: ChainState = {
+      token: {
+        symbol: "CET",
+        name: "Solaris CET",
+        contract: CET_CONTRACT_ADDRESS,
+        totalSupply: "9000.000000000",
+        decimals: 9,
+      },
+      pool: {
+        address: DEDUST_POOL_ADDRESS,
+        reserveTon: "100.5",
+        reserveCet: "4500.0",
+        lpSupply: "2121.0",
+        priceTonPerCet: "0.02233",
+      },
+      updatedAt: "2026-03-22T00:00:00.000Z",
+    };
+    expect(lit.token.symbol).toBe("CET");
+    expect(lit.pool.address).toContain("EQB5");
+
+    const tokenNull: ChainTokenState = {
+      symbol: "CET",
+      name: "Solaris CET",
+      contract: CET_CONTRACT_ADDRESS,
+      totalSupply: null,
+      decimals: 9,
+    };
+    expect(tokenNull.totalSupply).toBeNull();
+
+    const poolNull: ChainPoolState = {
+      address: DEDUST_POOL_ADDRESS,
+      reserveTon: null,
+      reserveCet: null,
+      lpSupply: null,
+      priceTonPerCet: null,
+    };
+    expect(poolNull.reserveTon).toBeNull();
+    expect(poolNull.priceTonPerCet).toBeNull();
+
+    const TON_ADDRESS_RE = /^EQ[A-Za-z0-9_-]{46}$/;
+    expect(CET_CONTRACT_ADDRESS).toMatch(TON_ADDRESS_RE);
+    expect(DEDUST_POOL_ADDRESS).toMatch(TON_ADDRESS_RE);
+    expect(CET_CONTRACT_ADDRESS).not.toBe(DEDUST_POOL_ADDRESS);
+
+    function parseSupply(raw: string | null): number | null {
+      if (raw === null) return null;
+      const num = Number(raw);
+      return Number.isFinite(num) ? num : null;
+    }
+    expect(parseSupply("9000.000000000")).toBe(9000);
+    expect(parseSupply(null)).toBeNull();
+    expect(parseSupply("not-a-number")).toBeNull();
+
+    function cetPriceInTon(
+      reserveTon: string | null,
+      reserveCet: string | null,
+    ): number | null {
+      if (!reserveTon || !reserveCet) return null;
+      const ton = Number(reserveTon);
+      const cet = Number(reserveCet);
+      if (!Number.isFinite(ton) || !Number.isFinite(cet) || cet === 0) return null;
+      return ton / cet;
+    }
+    expect(cetPriceInTon("100", "4500")).toBeCloseTo(0.02222, 4);
+    expect(cetPriceInTon("100", null)).toBeNull();
+    expect(cetPriceInTon(null, "4500")).toBeNull();
+    expect(cetPriceInTon("100", "0")).toBeNull();
   });
 });
-
-// ---------------------------------------------------------------------------
-// fetchChainState — tested by mocking globalThis.fetch
-// ---------------------------------------------------------------------------
 
 describe("fetchChainState (via module re-import with mocked fetch)", () => {
   const originalFetch = globalThis.fetch;
@@ -128,104 +156,66 @@ describe("fetchChainState (via module re-import with mocked fetch)", () => {
     vi.resetModules();
   });
 
-  it("resolves with a valid ChainState on a successful fetch", async () => {
+  it("success, HTTP error retries, network error retries", async () => {
     const mockState = makeChainState();
     globalThis.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
       json: async () => mockState,
     } as unknown as Response);
-
-    const { chainStatePromise } = await import("../lib/chain-state");
-    const result = await chainStatePromise;
-
+    vi.resetModules();
+    const okMod = await import("../lib/chain-state");
+    const result = await okMod.chainStatePromise;
     expect(result.token.symbol).toBe("CET");
     expect(result.pool.address).toBe(DEDUST_POOL_ADDRESS);
-    expect(typeof result.updatedAt).toBe("string");
-  });
 
-  it("rejects when the response status is not ok", async () => {
-    // mockResolvedValue (not Once) so all retry attempts get the same error
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 404,
       json: async () => ({}),
     } as unknown as Response);
-
-    const { chainStatePromise } = await import("../lib/chain-state");
-
-    // Attach rejection handler before advancing timers to avoid unhandled-rejection warnings
-    const assertion = expect(chainStatePromise).rejects.toThrow(
-      "Failed to fetch chain state: 404"
+    vi.resetModules();
+    const errMod = await import("../lib/chain-state");
+    const httpAssert = expect(errMod.chainStatePromise).rejects.toThrow(
+      "Failed to fetch chain state: 404",
     );
-
-    // Advance all fake timers so retry delays complete instantly
     await vi.runAllTimersAsync();
+    await httpAssert;
 
-    await assertion;
-  });
-
-  it("rejects when fetch itself throws a network error", async () => {
-    // mockRejectedValue (not Once) so all retry attempts get the same rejection
     globalThis.fetch = vi
       .fn()
       .mockRejectedValue(new TypeError("Network request failed"));
-
-    const { chainStatePromise } = await import("../lib/chain-state");
-
-    // Attach rejection handler before advancing timers to avoid unhandled-rejection warnings
-    const assertion = expect(chainStatePromise).rejects.toThrow("Network request failed");
-
-    // Advance all fake timers so retry delays complete instantly
+    vi.resetModules();
+    const netMod = await import("../lib/chain-state");
+    const netAssert = expect(netMod.chainStatePromise).rejects.toThrow(
+      "Network request failed",
+    );
     await vi.runAllTimersAsync();
-
-    await assertion;
+    await netAssert;
   });
 });
 
-// ---------------------------------------------------------------------------
-// Pure display / numeric helpers (no module import required)
-// ---------------------------------------------------------------------------
-
 describe("ChainState display helpers", () => {
-  it("handles null pool reserves — returns em-dash placeholder", () => {
-    const priceTonPerCet: string | null = null;
-    const displayPrice = priceTonPerCet
-      ? `${parseFloat(priceTonPerCet).toFixed(4)} TON`
+  it("null price, format price, supply locale, nano scale, TON, TVL", () => {
+    const priceTonPerCetNull: string | null = null;
+    const displayNull = priceTonPerCetNull
+      ? `${parseFloat(priceTonPerCetNull).toFixed(4)} TON`
       : "—";
-    expect(displayPrice).toBe("—");
-  });
+    expect(displayNull).toBe("—");
 
-  it("formats a valid price to 4 decimal places", () => {
-    const priceTonPerCet = "0.012345";
-    const displayPrice = `${parseFloat(priceTonPerCet).toFixed(4)} TON`;
-    expect(displayPrice).toBe("0.0123 TON");
-  });
+    expect(`${parseFloat("0.012345").toFixed(4)} TON`).toBe("0.0123 TON");
 
-  it("formats totalSupply with en-US locale (9000 → '9,000')", () => {
-    const totalSupply = "9000.000000000";
-    const formatted = parseFloat(totalSupply).toLocaleString("en-US", {
+    const formatted = parseFloat("9000.000000000").toLocaleString("en-US", {
       maximumFractionDigits: 2,
     });
     expect(formatted).toBe("9,000");
-  });
 
-  it("CET_DECIMALS = 9 correctly scales nano-units to whole tokens", () => {
     const CET_DECIMALS = 9;
-    const rawReserve = "9000000000000"; // 9000 CET in nanotons
-    const scaled = parseFloat(rawReserve) / 10 ** CET_DECIMALS;
+    const scaled = parseFloat("9000000000000") / 10 ** CET_DECIMALS;
     expect(scaled).toBeCloseTo(9000, 5);
-  });
 
-  it("TON reserve scaling: 1e9 nanotons equals 1 TON", () => {
-    const nanotons = 1_000_000_000;
-    const tons = nanotons / 1e9;
-    expect(tons).toBe(1);
-  });
+    expect(1_000_000_000 / 1e9).toBe(1);
 
-  it("TVL = 2× the TON side for a symmetric pool", () => {
-    const tonReserve = 500; // TON
-    const tonPriceUsd = 3.5;
-    const tvlUsd = tonReserve * tonPriceUsd * 2;
+    const tvlUsd = 500 * 3.5 * 2;
     expect(tvlUsd).toBe(3500);
   });
 });

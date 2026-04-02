@@ -6,7 +6,6 @@ import { useMiningEfficiency } from "../hooks/useMiningEfficiency";
 describe("useMiningEfficiency", () => {
   afterEach(() => {
     vi.restoreAllMocks();
-    // Reset document.hidden to its default (visible)
     Object.defineProperty(document, "hidden", {
       writable: true,
       configurable: true,
@@ -14,38 +13,30 @@ describe("useMiningEfficiency", () => {
     });
   });
 
-  it("starts as not suspended when tab is visible", () => {
+  it("visibility, worker SUSPEND/RESUME, getBatteryInfo", async () => {
     Object.defineProperty(document, "hidden", {
       writable: true,
       configurable: true,
       value: false,
     });
+    const { result: v0 } = renderHook(() => useMiningEfficiency());
+    expect(v0.current.isSuspended).toBe(false);
 
-    const { result } = renderHook(() => useMiningEfficiency());
-    expect(result.current.isSuspended).toBe(false);
-  });
-
-  it("starts as suspended when tab is hidden", () => {
     Object.defineProperty(document, "hidden", {
       writable: true,
       configurable: true,
       value: true,
     });
+    const { result: v1 } = renderHook(() => useMiningEfficiency());
+    expect(v1.current.isSuspended).toBe(true);
 
-    const { result } = renderHook(() => useMiningEfficiency());
-    expect(result.current.isSuspended).toBe(true);
-  });
-
-  it("suspends when visibilitychange fires with hidden=true", () => {
     Object.defineProperty(document, "hidden", {
       writable: true,
       configurable: true,
       value: false,
     });
-
-    const { result } = renderHook(() => useMiningEfficiency());
-    expect(result.current.isSuspended).toBe(false);
-
+    const { result: v2 } = renderHook(() => useMiningEfficiency());
+    expect(v2.current.isSuspended).toBe(false);
     act(() => {
       Object.defineProperty(document, "hidden", {
         writable: true,
@@ -54,20 +45,15 @@ describe("useMiningEfficiency", () => {
       });
       document.dispatchEvent(new Event("visibilitychange"));
     });
+    expect(v2.current.isSuspended).toBe(true);
 
-    expect(result.current.isSuspended).toBe(true);
-  });
-
-  it("resumes when visibilitychange fires with hidden=false", () => {
     Object.defineProperty(document, "hidden", {
       writable: true,
       configurable: true,
       value: true,
     });
-
-    const { result } = renderHook(() => useMiningEfficiency());
-    expect(result.current.isSuspended).toBe(true);
-
+    const { result: v3 } = renderHook(() => useMiningEfficiency());
+    expect(v3.current.isSuspended).toBe(true);
     act(() => {
       Object.defineProperty(document, "hidden", {
         writable: true,
@@ -76,22 +62,16 @@ describe("useMiningEfficiency", () => {
       });
       document.dispatchEvent(new Event("visibilitychange"));
     });
+    expect(v3.current.isSuspended).toBe(false);
 
-    expect(result.current.isSuspended).toBe(false);
-  });
-
-  it("posts SUSPEND message to worker when tab hides", () => {
     Object.defineProperty(document, "hidden", {
       writable: true,
       configurable: true,
       value: false,
     });
-
-    const postMessage = vi.fn();
-    const workerRef = { current: { postMessage } as unknown as Worker };
-
-    renderHook(() => useMiningEfficiency(workerRef));
-
+    const post1 = vi.fn();
+    const workerRef1 = { current: { postMessage: post1 } as unknown as Worker };
+    renderHook(() => useMiningEfficiency(workerRef1));
     act(() => {
       Object.defineProperty(document, "hidden", {
         writable: true,
@@ -100,22 +80,16 @@ describe("useMiningEfficiency", () => {
       });
       document.dispatchEvent(new Event("visibilitychange"));
     });
+    expect(post1).toHaveBeenCalledWith({ type: "SUSPEND" });
 
-    expect(postMessage).toHaveBeenCalledWith({ type: "SUSPEND" });
-  });
-
-  it("posts RESUME message to worker when tab becomes visible", () => {
     Object.defineProperty(document, "hidden", {
       writable: true,
       configurable: true,
       value: true,
     });
-
-    const postMessage = vi.fn();
-    const workerRef = { current: { postMessage } as unknown as Worker };
-
-    renderHook(() => useMiningEfficiency(workerRef));
-
+    const post2 = vi.fn();
+    const workerRef2 = { current: { postMessage: post2 } as unknown as Worker };
+    renderHook(() => useMiningEfficiency(workerRef2));
     act(() => {
       Object.defineProperty(document, "hidden", {
         writable: true,
@@ -124,31 +98,23 @@ describe("useMiningEfficiency", () => {
       });
       document.dispatchEvent(new Event("visibilitychange"));
     });
+    expect(post2).toHaveBeenCalledWith({ type: "RESUME" });
 
-    expect(postMessage).toHaveBeenCalledWith({ type: "RESUME" });
-  });
+    const { result: bat } = renderHook(() => useMiningEfficiency());
+    const fallback = await bat.current.getBatteryInfo();
+    expect(fallback).toMatchObject({ level: 100, charging: true });
 
-  describe("getBatteryInfo", () => {
-    it("returns a fallback when Battery API is unavailable", async () => {
-      const { result } = renderHook(() => useMiningEfficiency());
-      const info = await result.current.getBatteryInfo();
-      expect(info).toMatchObject({ level: 100, charging: true });
+    const mockGetBattery = vi.fn().mockResolvedValue({
+      level: 0.75,
+      charging: false,
     });
-
-    it("returns battery data when Battery API succeeds", async () => {
-      const mockGetBattery = vi.fn().mockResolvedValue({
-        level: 0.75,
-        charging: false,
-      });
-      Object.defineProperty(navigator, "getBattery", {
-        writable: true,
-        configurable: true,
-        value: mockGetBattery,
-      });
-
-      const { result } = renderHook(() => useMiningEfficiency());
-      const info = await result.current.getBatteryInfo();
-      expect(info).toEqual({ level: 75, charging: false });
+    Object.defineProperty(navigator, "getBattery", {
+      writable: true,
+      configurable: true,
+      value: mockGetBattery,
     });
+    const { result: bat2 } = renderHook(() => useMiningEfficiency());
+    const ok = await bat2.current.getBatteryInfo();
+    expect(ok).toEqual({ level: 75, charging: false });
   });
 });

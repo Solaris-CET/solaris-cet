@@ -14,51 +14,27 @@ describe("cn (class name utility)", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// formatUsd
-// ---------------------------------------------------------------------------
 describe("formatUsd", () => {
-  it("returns '—' for null, undefined, NaN, Infinity", () => {
+  it("invalid inputs, M/K tiers, decimals, 1M boundary, zero", () => {
     for (const v of [null, undefined, NaN, Infinity] as const) {
       expect(formatUsd(v)).toBe("—");
     }
-  });
-
-  it("formats millions with M suffix", () => {
     expect(formatUsd(1_234_567)).toBe("$1.23M");
     expect(formatUsd(10_000_000)).toBe("$10.00M");
-  });
-
-  it("formats thousands with K suffix", () => {
     expect(formatUsd(5_678)).toBe("$5.68K");
     expect(formatUsd(1_000)).toBe("$1.00K");
-  });
-
-  it("formats small values with 4 decimal places", () => {
     expect(formatUsd(0.0042)).toBe("$0.0042");
     expect(formatUsd(3.14)).toBe("$3.1400");
-  });
-
-  it("handles exactly 1 000 000", () => {
     expect(formatUsd(1_000_000)).toBe("$1.00M");
-  });
-
-  it("handles zero", () => {
     expect(formatUsd(0)).toBe("$0.0000");
   });
 });
 
-// ---------------------------------------------------------------------------
-// formatPrice
-// ---------------------------------------------------------------------------
 describe("formatPrice", () => {
-  it("returns '—' for null, undefined, NaN", () => {
+  it("invalid, exponential, fixed threshold, normal decimals", () => {
     for (const v of [null, undefined, NaN] as const) {
       expect(formatPrice(v)).toBe("—");
     }
-  });
-
-  it("exponential below 0.001, fixed at 0.001, normal decimals", () => {
     for (const n of [0.00042, 0.0009] as const) {
       const result = formatPrice(n);
       expect(result).toMatch(/^\$/);
@@ -70,9 +46,6 @@ describe("formatPrice", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// clamp
-// ---------------------------------------------------------------------------
 describe("clamp", () => {
   it("in-range, edges, floats, negative ranges", () => {
     expect(clamp(5, 0, 10)).toBe(5);
@@ -87,9 +60,6 @@ describe("clamp", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// debounce
-// ---------------------------------------------------------------------------
 describe("debounce", () => {
   it("coalesces calls, last wins, forwards args", async () => {
     let callCount = 0;

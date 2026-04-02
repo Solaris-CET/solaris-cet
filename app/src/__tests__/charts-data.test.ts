@@ -1,7 +1,5 @@
 import { describe, it, expect } from 'vitest';
 
-// ─── TokenomicsChart — distribution data integrity ────────────────────────
-
 const DISTRIBUTION = [
   { name: 'Mining Rewards (90yr)', pct: 66.66 },
   { name: 'DeDust Liquidity Pool', pct: 20.00 },
@@ -10,49 +8,6 @@ const DISTRIBUTION = [
 ];
 
 const TOTAL_SUPPLY = 9000;
-
-describe('TokenomicsChart — distribution integrity', () => {
-  it('has exactly 4 allocation buckets', () => {
-    expect(DISTRIBUTION).toHaveLength(4);
-  });
-
-  it('percentages sum to 100%', () => {
-    const sum = DISTRIBUTION.reduce((s, d) => s + d.pct, 0);
-    expect(sum).toBeCloseTo(100, 1);
-  });
-
-  it('mining rewards is the largest allocation (>50%)', () => {
-    const largest = [...DISTRIBUTION].sort((a, b) => b.pct - a.pct)[0];
-    expect(largest.name).toBe('Mining Rewards (90yr)');
-    expect(largest.pct).toBeGreaterThan(50);
-  });
-
-  it('all percentages are positive', () => {
-    DISTRIBUTION.forEach(d => expect(d.pct).toBeGreaterThan(0));
-  });
-
-  it('all percentages are less than 100', () => {
-    DISTRIBUTION.forEach(d => expect(d.pct).toBeLessThan(100));
-  });
-
-  it('CET token amount from pct is correct', () => {
-    const miningCET = (66.66 / 100) * TOTAL_SUPPLY;
-    expect(miningCET).toBeCloseTo(5999.4, 0);
-  });
-
-  it('team allocation is exactly 5%', () => {
-    const team = DISTRIBUTION.find(d => d.name === 'Team & Development');
-    expect(team?.pct).toBe(5.00);
-  });
-
-  it('DCBM reserve + team = 13.34%', () => {
-    const dcbm = DISTRIBUTION.find(d => d.name === 'DCBM Reserve')!;
-    const team = DISTRIBUTION.find(d => d.name === 'Team & Development')!;
-    expect(dcbm.pct + team.pct).toBeCloseTo(13.34, 1);
-  });
-});
-
-// ─── AgentDepartmentChart — data integrity ────────────────────────────────
 
 const DEPT_DATA = [
   { name: 'Customer Ops', agents: 48_000 },
@@ -69,36 +24,36 @@ const DEPT_DATA = [
 
 const TOTAL_AGENTS = DEPT_DATA.reduce((s, d) => s + d.agents, 0);
 
-describe('AgentDepartmentChart — data integrity', () => {
-  it('has exactly 10 departments', () => {
+describe('charts data (tokenomics + departments)', () => {
+  it('distribution buckets sum to 100%, mining largest, CET amounts', () => {
+    expect(DISTRIBUTION).toHaveLength(4);
+    const sum = DISTRIBUTION.reduce((s, d) => s + d.pct, 0);
+    expect(sum).toBeCloseTo(100, 1);
+    const largest = [...DISTRIBUTION].sort((a, b) => b.pct - a.pct)[0];
+    expect(largest.name).toBe('Mining Rewards (90yr)');
+    expect(largest.pct).toBeGreaterThan(50);
+    DISTRIBUTION.forEach((d) => {
+      expect(d.pct).toBeGreaterThan(0);
+      expect(d.pct).toBeLessThan(100);
+    });
+    expect((66.66 / 100) * TOTAL_SUPPLY).toBeCloseTo(5999.4, 0);
+    expect(DISTRIBUTION.find((d) => d.name === 'Team & Development')?.pct).toBe(5.0);
+    const dcbm = DISTRIBUTION.find((d) => d.name === 'DCBM Reserve')!;
+    const team = DISTRIBUTION.find((d) => d.name === 'Team & Development')!;
+    expect(dcbm.pct + team.pct).toBeCloseTo(13.34, 1);
+  });
+
+  it('10 departments, 200k agents, ordering, multiples of 1k, top-3 share', () => {
     expect(DEPT_DATA).toHaveLength(10);
-  });
-
-  it('total agents sums to 200,000', () => {
     expect(TOTAL_AGENTS).toBe(200_000);
-  });
-
-  it('Customer Ops is the largest department', () => {
-    const largest = [...DEPT_DATA].sort((a, b) => b.agents - a.agents)[0];
-    expect(largest.name).toBe('Customer Ops');
-  });
-
-  it('Research is the smallest department', () => {
-    const smallest = [...DEPT_DATA].sort((a, b) => a.agents - b.agents)[0];
-    expect(smallest.name).toBe('Research');
-  });
-
-  it('all agent counts are positive', () => {
-    DEPT_DATA.forEach(d => expect(d.agents).toBeGreaterThan(0));
-  });
-
-  it('all agent counts are multiples of 1000', () => {
-    DEPT_DATA.forEach(d => expect(d.agents % 1000).toBe(0));
-  });
-
-  it('top 3 departments account for >50% of agents', () => {
-    const top3 = [...DEPT_DATA].sort((a, b) => b.agents - a.agents).slice(0, 3);
-    const top3Total = top3.reduce((s, d) => s + d.agents, 0);
-    expect(top3Total / TOTAL_AGENTS).toBeGreaterThan(0.5);
+    const byDesc = [...DEPT_DATA].sort((a, b) => b.agents - a.agents);
+    expect(byDesc[0].name).toBe('Customer Ops');
+    expect([...DEPT_DATA].sort((a, b) => a.agents - b.agents)[0].name).toBe('Research');
+    DEPT_DATA.forEach((d) => {
+      expect(d.agents).toBeGreaterThan(0);
+      expect(d.agents % 1000).toBe(0);
+    });
+    const top3 = byDesc.slice(0, 3);
+    expect(top3.reduce((s, d) => s + d.agents, 0) / TOTAL_AGENTS).toBeGreaterThan(0.5);
   });
 });

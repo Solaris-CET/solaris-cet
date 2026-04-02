@@ -31,103 +31,68 @@ function stripFeedTimestamp(line: string): string {
 }
 
 describe('meshSkillFeed', () => {
-  it('expressMeshSkillForFeed is deterministic aside from clock and tags SKILL_MESH', () => {
-    const a = expressMeshSkillForFeed(11);
-    const b = expressMeshSkillForFeed(11);
-    expect(a.dept).toBe(b.dept);
-    expect(stripFeedTimestamp(a.line)).toBe(stripFeedTimestamp(b.line));
-    expect(a.line).toContain('[SKILL_MESH]');
-    expect(a.line).toContain('dept=');
-    expect(a.line).toMatch(/tier=(flash|deep|standard)/);
-  });
+  it('feed lines, locus, salts, board keys, AI team + agentBoard wiring', () => {
+    const ex = expressMeshSkillForFeed(11);
+    const ex2 = expressMeshSkillForFeed(11);
+    expect(ex.dept).toBe(ex2.dept);
+    expect(stripFeedTimestamp(ex.line)).toBe(stripFeedTimestamp(ex2.line));
+    expect(ex.line).toContain('[SKILL_MESH]');
+    expect(ex.line).toContain('dept=');
+    expect(ex.line).toMatch(/tier=(flash|deep|standard)/);
 
-  it('shortSkillWhisper stays within display budget', () => {
-    const s = shortSkillWhisper(3);
-    expect(s.length).toBeLessThanOrEqual(130);
-    expect(s).toContain('—');
-  });
+    const sw = shortSkillWhisper(3);
+    expect(sw.length).toBeLessThanOrEqual(130);
+    expect(sw).toContain('—');
 
-  it('skillCaptionForDept returns empty for unknown id', () => {
     expect(skillCaptionForDept('no-such-dept', 0)).toBe('');
-  });
 
-  it('deepLatticeLineForQuery is deterministic and names a mesh dept', () => {
-    const a = deepLatticeLineForQuery('oracle deep test');
-    const b = deepLatticeLineForQuery('oracle deep test');
-    expect(a).toBe(b);
-    expect(a).toMatch(/ · /);
-    expect(a.length).toBeLessThanOrEqual(102);
-  });
+    const dl = deepLatticeLineForQuery('oracle deep test');
+    expect(dl).toBe(deepLatticeLineForQuery('oracle deep test'));
+    expect(dl).toMatch(/ · /);
+    expect(dl.length).toBeLessThanOrEqual(102);
 
-  it('observeLocusBranchFromTopic maps oracle topics', () => {
     expect(observeLocusBranchFromTopic('price')).toBe('price');
     expect(observeLocusBranchFromTopic('mining')).toBe('mining');
     expect(observeLocusBranchFromTopic('rav')).toBe('ai');
     expect(observeLocusBranchFromTopic('unknown')).toBe('default');
-  });
 
-  it('observeLocusClip is deterministic per branch and bounded', () => {
-    const a = observeLocusClip('test query locus', 'price');
-    const b = observeLocusClip('test query locus', 'price');
-    expect(a).toBe(b);
-    expect(a.length).toBeLessThanOrEqual(84);
-    expect(observeLocusClip('test query locus', 'mining')).not.toBe(a);
-  });
+    const loc = observeLocusClip('test query locus', 'price');
+    expect(loc).toBe(observeLocusClip('test query locus', 'price'));
+    expect(loc.length).toBeLessThanOrEqual(84);
+    expect(observeLocusClip('test query locus', 'mining')).not.toBe(loc);
 
-  it('skillSaltFromQuery is deterministic', () => {
     expect(skillSaltFromQuery('What are AI agents?')).toBe(skillSaltFromQuery('What are AI agents?'));
     expect(skillSaltFromQuery('aaa')).not.toBe(skillSaltFromQuery('aab'));
-  });
 
-  it('skillSeedFromLabel is stable per string', () => {
     expect(skillSeedFromLabel('Parallel agents')).toBe(skillSeedFromLabel('Parallel agents'));
     expect(skillSeedFromLabel('metric-aaa')).not.toBe(skillSeedFromLabel('metric-bbb'));
-  });
 
-  it('skillFlashForBoardDept returns flash line for chart dept names', () => {
-    const s = skillFlashForBoardDept('Engineering', 3);
-    expect(s).toBeTruthy();
-    expect(s!.length).toBeLessThanOrEqual(96);
-    expect(s).toContain(':');
-  });
-
-  it('skillFlashForBoardDept returns null for unknown display name', () => {
+    const flash = skillFlashForBoardDept('Engineering', 3);
+    expect(flash).toBeTruthy();
+    expect(flash!.length).toBeLessThanOrEqual(96);
+    expect(flash).toContain(':');
     expect(skillFlashForBoardDept('Mars Colony', 0)).toBeNull();
-  });
 
-  it('standardSkillBurst is deterministic and includes role prefix', () => {
-    const a = standardSkillBurst(44);
-    const b = standardSkillBurst(44);
-    expect(a).toBe(b);
-    expect(a).toContain(':');
-    expect(a.length).toBeLessThanOrEqual(118);
-  });
+    const burst = standardSkillBurst(44);
+    expect(burst).toBe(standardSkillBurst(44));
+    expect(burst).toContain(':');
+    expect(burst.length).toBeLessThanOrEqual(118);
 
-  it('skillCaptionForDept changes with tick for same dept', () => {
-    const a = skillCaptionForDept('engineering', 0);
-    const b = skillCaptionForDept('engineering', 19);
-    expect(a.length).toBeGreaterThan(5);
-    expect(b.length).toBeGreaterThan(5);
-    expect(a).not.toBe(b);
-  });
+    const cap0 = skillCaptionForDept('engineering', 0);
+    const cap19 = skillCaptionForDept('engineering', 19);
+    expect(cap0.length).toBeGreaterThan(5);
+    expect(cap19.length).toBeGreaterThan(5);
+    expect(cap0).not.toBe(cap19);
 
-  it('meshWhisperFromKey matches shortSkillWhisper ∘ skillSeedFromLabel', () => {
     const k = 'statsBento|agents';
     expect(meshWhisperFromKey(k)).toBe(shortSkillWhisper(skillSeedFromLabel(k)));
-  });
+    const k2 = 'miningCalc|device|node';
+    expect(meshStandardBurstFromKey(k2)).toBe(standardSkillBurst(skillSeedFromLabel(k2)));
 
-  it('meshStandardBurstFromKey matches standardSkillBurst ∘ skillSeedFromLabel', () => {
-    const k = 'miningCalc|device|node';
-    expect(meshStandardBurstFromKey(k)).toBe(standardSkillBurst(skillSeedFromLabel(k)));
-  });
-
-  it('aiTeam scene keys are stable strings', () => {
     expect(aiTeamRoleAgentKey('engineering', 'SRE')).toBe('aiTeam|roleAgent|engineering|SRE');
     expect(aiTeamRoleGeneKey('legal', 'Counsel', 3)).toBe('aiTeam|roleGene|legal|3|Counsel');
     expect(aiTeamSynthKey('sales', 'AE', 'deep', 2)).toBe('aiTeam|synth|sales|deep|2|AE');
-  });
 
-  it('AI team mesh wrappers delegate to keyed whispers / bursts', () => {
     expect(meshWhisperForAiTeamRoleAgent('engineering', 'SRE')).toBe(
       meshWhisperFromKey(aiTeamRoleAgentKey('engineering', 'SRE'))
     );
@@ -140,9 +105,7 @@ describe('meshSkillFeed', () => {
     expect(meshWhisperForAiTeamSynth('marketing', 'Growth', 'flash', 0)).toBe(
       meshWhisperFromKey(aiTeamSynthKey('marketing', 'Growth', 'flash', 0))
     );
-  });
 
-  it('agentBoard live-agent keys encode instance + dept + kind + role', () => {
     expect(agentBoardLiveAgentKey('CX-00042', 'Customer Ops', 'skill', 'Tier-1 Support')).toBe(
       'agentBoard|liveAgent|CX-00042|Customer Ops|skill|Tier-1 Support'
     );

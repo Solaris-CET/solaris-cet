@@ -3,10 +3,6 @@ import translations, { type LangCode, type Translations } from "../i18n/translat
 import { SUPPORTED_LANGS } from "../hooks/useLanguage";
 import { hasBalancedSimpleBoldMarkers } from "../lib/simpleBoldMarkers";
 
-/**
- * Recursively collect all dot-separated leaf key paths from a nested object.
- * E.g. { nav: { home: 'Home' } } → ['nav.home']
- */
 function collectKeys(obj: Record<string, unknown>, prefix = ""): string[] {
   return Object.entries(obj).flatMap(([key, value]) => {
     const fullKey = prefix ? `${prefix}.${key}` : key;
@@ -17,9 +13,6 @@ function collectKeys(obj: Record<string, unknown>, prefix = ""): string[] {
   });
 }
 
-/**
- * Retrieve a nested value using a dot-separated key path.
- */
 function getValueByPath(obj: Record<string, unknown>, path: string): unknown {
   return path
     .split(".")
@@ -32,7 +25,6 @@ function getValueByPath(obj: Record<string, unknown>, path: string): unknown {
     );
 }
 
-/** Keys that may contain `**` and are rendered with `renderSimpleBold` in hero / authority sections. */
 const HERO_BOLD_KEYS: Array<keyof Translations["hero"]> = [
   "tagline",
   "subtitle",
@@ -115,15 +107,11 @@ const referenceKeys = collectKeys(
   translations[referenceLang] as unknown as Record<string, unknown>
 );
 
-describe("translations — language coverage", () => {
-  it("translation map ↔ SUPPORTED_LANGS (same set)", () => {
+describe("translations", () => {
+  it("language set, key parity with EN, value shape per locale", () => {
     const translationKeys = Object.keys(translations) as LangCode[];
     expect(new Set(translationKeys)).toEqual(new Set(SUPPORTED_LANGS));
-  });
-});
 
-describe("translations — key completeness", () => {
-  it("every language matches English (key set + value shape)", () => {
     const enKeysSorted = collectKeys(
       translations.en as unknown as Record<string, unknown>
     ).sort();
@@ -166,19 +154,15 @@ describe("translations — key completeness", () => {
       });
     }
   });
-});
 
-describe("translations — specific content", () => {
-  it("English tagline + all locales (copy, sections, mining disclaimer)", () => {
+  it("Cetățuia tagline, section keys, mining disclaimer, balanced **", () => {
     expect(translations.en.hero.tagline).toContain("Cetățuia");
 
     for (const lang of SUPPORTED_LANGS) {
       const t = translations[lang];
       expect(t.hero.buyNow.trim().length).toBeGreaterThan(0);
       expect(t.nav.competition.trim().length).toBeGreaterThan(0);
-      expect(t.miningCalculator.estimateDisclaimer.trim().length).toBeGreaterThan(
-        0,
-      );
+      expect(t.miningCalculator.estimateDisclaimer.trim().length).toBeGreaterThan(0);
       for (const key of NAV_EXPECTED_KEYS) {
         expect(t.nav[key], `${lang}.nav.${String(key)}`).toBeTruthy();
       }
@@ -191,14 +175,6 @@ describe("translations — specific content", () => {
       for (const key of TOKENOMICS_EXPECTED_KEYS) {
         expect(t.tokenomics[key], `${lang}.tokenomics.${String(key)}`).toBeTruthy();
       }
-    }
-  });
-});
-
-describe("translations — balanced ** (hero + authorityTrust)", () => {
-  it("all languages", () => {
-    for (const lang of SUPPORTED_LANGS) {
-      const t = translations[lang];
       for (const { scope, keys } of BOLD_SCOPES) {
         const block = t[scope] as Record<string, string>;
         for (const key of keys) {

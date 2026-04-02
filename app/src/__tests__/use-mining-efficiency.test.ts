@@ -1,8 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-
-// ─── useMiningEfficiency — pure logic tests ───────────────────────────────
-// The getBatteryInfo function logic extracted for unit testing
+import { describe, it, expect, vi, afterEach } from 'vitest';
 
 async function getBatteryInfo(): Promise<{ level: number; charging: boolean; note?: string }> {
   if ('getBattery' in navigator) {
@@ -18,83 +15,52 @@ async function getBatteryInfo(): Promise<{ level: number; charging: boolean; not
   return { level: 100, charging: true, note: 'Battery API unavailable' };
 }
 
-describe('useMiningEfficiency — getBatteryInfo logic', () => {
-  afterEach(() => { vi.restoreAllMocks(); });
-
-  it('returns 100% charging when Battery API unavailable', async () => {
-    const info = await getBatteryInfo();
-    expect(info.level).toBe(100);
-    expect(info.charging).toBe(true);
-  });
-
-  it('returns a note when Battery API is unavailable', async () => {
-    const info = await getBatteryInfo();
-    expect(info.note).toBe('Battery API unavailable');
-  });
-
-  it('returns level 0–100 range', async () => {
-    const info = await getBatteryInfo();
-    expect(info.level).toBeGreaterThanOrEqual(0);
-    expect(info.level).toBeLessThanOrEqual(100);
-  });
-
-  it('level is always an integer', async () => {
-    const info = await getBatteryInfo();
-    expect(Number.isInteger(info.level)).toBe(true);
-  });
-
-  it('mock getBattery returning 0.75 → level 75', async () => {
-    const mockGetBattery = vi.fn().mockResolvedValue({ level: 0.75, charging: false });
-    vi.stubGlobal('navigator', { ...navigator, getBattery: mockGetBattery });
-    const info = await getBatteryInfo();
-    expect(info.level).toBe(75);
-    expect(info.charging).toBe(false);
-    expect(info.note).toBeUndefined();
-  });
-
-  it('mock getBattery returning 1.0 → level 100', async () => {
-    const mockGetBattery = vi.fn().mockResolvedValue({ level: 1.0, charging: true });
-    vi.stubGlobal('navigator', { ...navigator, getBattery: mockGetBattery });
-    const info = await getBatteryInfo();
-    expect(info.level).toBe(100);
-    expect(info.charging).toBe(true);
-  });
-
-  it('handles getBattery rejection gracefully', async () => {
-    const mockGetBattery = vi.fn().mockRejectedValue(new Error('denied'));
-    vi.stubGlobal('navigator', { ...navigator, getBattery: mockGetBattery });
-    const info = await getBatteryInfo();
-    expect(info.level).toBe(100);
-    expect(info.charging).toBe(true);
-    expect(info.note).toBe('Battery API unavailable');
-  });
-});
-
-// ─── mining suspension state logic ───────────────────────────────────────
-
-describe('useMiningEfficiency — suspension state', () => {
+describe('useMiningEfficiency — getBatteryInfo + suspension helpers', () => {
   const originalHidden = Object.getOwnPropertyDescriptor(document, 'hidden');
 
-  beforeEach(() => {
-    Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
-  });
-
   afterEach(() => {
+    vi.restoreAllMocks();
     if (originalHidden) {
       Object.defineProperty(document, 'hidden', originalHidden);
     }
   });
 
-  it('isSuspended is false when tab is visible', () => {
-    expect(document.hidden).toBe(false);
+  it('getBatteryInfo: fallback, range, mocks, rejection', async () => {
+    const u1 = await getBatteryInfo();
+    expect(u1.level).toBe(100);
+    expect(u1.charging).toBe(true);
+    expect(u1.note).toBe('Battery API unavailable');
+    expect(u1.level).toBeGreaterThanOrEqual(0);
+    expect(u1.level).toBeLessThanOrEqual(100);
+    expect(Number.isInteger(u1.level)).toBe(true);
+
+    const mock75 = vi.fn().mockResolvedValue({ level: 0.75, charging: false });
+    vi.stubGlobal('navigator', { ...navigator, getBattery: mock75 });
+    const u2 = await getBatteryInfo();
+    expect(u2.level).toBe(75);
+    expect(u2.charging).toBe(false);
+    expect(u2.note).toBeUndefined();
+
+    const mock100 = vi.fn().mockResolvedValue({ level: 1.0, charging: true });
+    vi.stubGlobal('navigator', { ...navigator, getBattery: mock100 });
+    const u3 = await getBatteryInfo();
+    expect(u3.level).toBe(100);
+    expect(u3.charging).toBe(true);
+
+    const mockReject = vi.fn().mockRejectedValue(new Error('denied'));
+    vi.stubGlobal('navigator', { ...navigator, getBattery: mockReject });
+    const u4 = await getBatteryInfo();
+    expect(u4.level).toBe(100);
+    expect(u4.charging).toBe(true);
+    expect(u4.note).toBe('Battery API unavailable');
   });
 
-  it('isSuspended is true when tab is hidden', () => {
+  it('document.hidden + localStorage mining-status', () => {
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
+    expect(document.hidden).toBe(false);
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
     expect(document.hidden).toBe(true);
-  });
 
-  it('localStorage mining-status is written correctly', () => {
     localStorage.setItem('mining-status', 'active');
     expect(localStorage.getItem('mining-status')).toBe('active');
     localStorage.setItem('mining-status', 'suspended');

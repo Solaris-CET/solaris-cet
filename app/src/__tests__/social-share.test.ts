@@ -1,7 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 
-// ─── SocialShare — URL construction ──────────────────────────────────────
-
 const SITE_URL = 'https://solaris-cet.com/';
 const SHARE_TEXT =
   '🚀 Just discovered $CET on #TON blockchain! Fixed supply of 9,000 CET — mine, trade & stake. Check it out 👇';
@@ -10,8 +8,10 @@ function buildTwitterShareUrl(text: string, url: string): string {
   return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
 }
 
-describe('SocialShare — URL construction', () => {
-  it('Twitter intent URL, encoded text/url, copy constants', () => {
+describe('SocialShare', () => {
+  afterEach(() => { vi.restoreAllMocks(); });
+
+  it('Twitter intent URL + navigator.share + clipboard fallback', async () => {
     expect(SHARE_TEXT).toContain('$CET');
     expect(SHARE_TEXT).toContain('#TON');
     expect(SITE_URL).toMatch(/^https:\/\//);
@@ -20,15 +20,7 @@ describe('SocialShare — URL construction', () => {
     expect(url).toContain(encodeURIComponent(SHARE_TEXT));
     expect(url).toContain(encodeURIComponent(SITE_URL));
     expect(url).toMatch(/^https:\/\//);
-  });
-});
 
-// ─── SocialShare — native share fallback ─────────────────────────────────
-
-describe('SocialShare — native share logic', () => {
-  afterEach(() => { vi.restoreAllMocks(); });
-
-  it('navigator.share when present; clipboard fallback otherwise', async () => {
     const mockShare = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', { share: mockShare } as unknown as Navigator);
     if (navigator.share) {

@@ -1,7 +1,5 @@
 import { describe, it, expect } from 'vitest';
 
-// ─── RwaSection data integrity ────────────────────────────────────────────
-
 const RWA_STATS = [
   { label: 'Location',       value: 'Cetățuia, Romania'   },
   { label: 'Asset Class',    value: 'Agricultural Land'   },
@@ -21,39 +19,29 @@ const RWA_PILLARS = [
 const IPFS_CID = 'bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a';
 const IPFS_URL = `https://scarlet-past-walrus-15.mypinata.cloud/ipfs/${IPFS_CID}`;
 
-describe('RwaSection — stats integrity', () => {
-  it('count, uniqueness, non-empty fields, Cetățuia / supply / proof', () => {
+describe('RwaSection', () => {
+  it('stats, pillars, IPFS proof', () => {
     expect(RWA_STATS).toHaveLength(6);
-    const labels = RWA_STATS.map(s => s.label);
+    const labels = RWA_STATS.map((s) => s.label);
     expect(new Set(labels).size).toBe(labels.length);
-    RWA_STATS.forEach(s => {
+    RWA_STATS.forEach((s) => {
       expect(s.label.length).toBeGreaterThan(0);
       expect(s.value.length).toBeGreaterThan(0);
     });
-    expect(RWA_STATS.find(s => s.label === 'Location')?.value).toBe('Cetățuia, Romania');
-    expect(RWA_STATS.find(s => s.label === 'Token Layer')?.value).toContain('9,000');
-    const proof = RWA_STATS.find(s => s.label === 'On-Chain Proof');
+    expect(RWA_STATS.find((s) => s.label === 'Location')?.value).toBe('Cetățuia, Romania');
+    expect(RWA_STATS.find((s) => s.label === 'Token Layer')?.value).toContain('9,000');
+    const proof = RWA_STATS.find((s) => s.label === 'On-Chain Proof');
     expect(proof?.value).toContain('IPFS');
     expect(proof?.value).toContain('TON');
-  });
-});
 
-describe('RwaSection — pillars integrity', () => {
-  it('four unique pillars, required titles, border classes', () => {
     expect(RWA_PILLARS).toHaveLength(4);
-    const titles = RWA_PILLARS.map(p => p.title);
+    const titles = RWA_PILLARS.map((p) => p.title);
     expect(new Set(titles).size).toBe(titles.length);
-    expect(RWA_PILLARS.some(p => p.title === 'Tangible Backing')).toBe(true);
-    expect(RWA_PILLARS.some(p => p.title === 'AI-Optimised Yield')).toBe(true);
-    expect(RWA_PILLARS.some(p => p.title === 'Structural Scarcity')).toBe(true);
-    RWA_PILLARS.forEach(p => {
-      expect(p.border).toMatch(/^border-/);
-    });
-  });
-});
+    expect(RWA_PILLARS.some((p) => p.title === 'Tangible Backing')).toBe(true);
+    expect(RWA_PILLARS.some((p) => p.title === 'AI-Optimised Yield')).toBe(true);
+    expect(RWA_PILLARS.some((p) => p.title === 'Structural Scarcity')).toBe(true);
+    RWA_PILLARS.forEach((p) => expect(p.border).toMatch(/^border-/));
 
-describe('RwaSection — IPFS proof', () => {
-  it('CID constant, https URL, v1 bafkrei shape', () => {
     expect(IPFS_CID).toBe('bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a');
     expect(IPFS_URL).toMatch(/^https:\/\//);
     expect(IPFS_URL).toContain(IPFS_CID);
