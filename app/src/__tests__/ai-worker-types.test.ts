@@ -10,7 +10,8 @@ describe('aiWorker — AnalyticsInput / AnalyticsOutput / MemoryStats', () => {
     const labeled: AnalyticsInput = { features: [1, 2, 3], label: 'test-batch-1' };
     expect(labeled.label).toBe('test-batch-1');
 
-    expect((({ features: [] }) as AnalyticsInput).features).toHaveLength(0);
+    const emptyFeatures: AnalyticsInput = { features: [] };
+    expect(emptyFeatures.features).toHaveLength(0);
 
     const cet: AnalyticsInput = {
       features: [0.042, 12_000, 85_000, 0.15, 0.0001],

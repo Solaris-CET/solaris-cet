@@ -3,8 +3,6 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { renderHook } from './renderHook';
 import { useTelegram } from '../hooks/useTelegram';
 
-// ─── Helper: install a mock TelegramWebApp on window ─────────────────────
-
 function installTelegramWebApp(overrides?: Partial<{ initData: string }>) {
   const mock = {
     expand: () => {},
@@ -15,10 +13,7 @@ function installTelegramWebApp(overrides?: Partial<{ initData: string }>) {
     initDataUnsafe: {
       user: { id: 123, first_name: 'Solaris', username: 'solaris_cet' },
     },
-    themeParams: {
-      bg_color: '#05060B',
-      text_color: '#F4F6FF',
-    },
+    themeParams: { bg_color: '#05060B', text_color: '#F4F6FF' },
     HapticFeedback: {
       impactOccurred: () => {},
       notificationOccurred: () => {},
@@ -43,67 +38,34 @@ function removeTelegramWebApp() {
   });
 }
 
-// ─── Tests ────────────────────────────────────────────────────────────────
-
-describe('useTelegram — outside Telegram WebApp', () => {
-  beforeEach(() => removeTelegramWebApp());
-
-  it('isTelegram is false when window.Telegram is not set', async () => {
-    const { resultRef, unmount } = await renderHook(() => useTelegram());
-    expect(resultRef.current.isTelegram).toBe(false);
-    await unmount();
-  });
-
-  it('tg is null outside Telegram WebApp', async () => {
-    const { resultRef, unmount } = await renderHook(() => useTelegram());
-    expect(resultRef.current.tg).toBeNull();
-    await unmount();
-  });
-
-  it('haptic() is a no-op and does not throw', async () => {
-    const { resultRef, unmount } = await renderHook(() => useTelegram());
-    expect(() => resultRef.current.haptic()).not.toThrow();
-    expect(() => resultRef.current.haptic('heavy')).not.toThrow();
-    await unmount();
-  });
-});
-
-describe('useTelegram — inside Telegram WebApp', () => {
-  beforeEach(() => installTelegramWebApp());
+describe('useTelegram', () => {
   afterEach(() => removeTelegramWebApp());
 
-  it('isTelegram is true when initData is present', async () => {
-    const { resultRef, unmount } = await renderHook(() => useTelegram());
-    expect(resultRef.current.isTelegram).toBe(true);
-    await unmount();
-  });
-
-  it('tg is not null inside Telegram WebApp', async () => {
-    const { resultRef, unmount } = await renderHook(() => useTelegram());
-    expect(resultRef.current.tg).not.toBeNull();
-    await unmount();
-  });
-});
-
-describe('useTelegram — empty initData', () => {
-  beforeEach(() => installTelegramWebApp({ initData: '' }));
-
-  it('isTelegram is false when initData is empty string', async () => {
+  it('outside WebApp: false, null tg, haptic no-op, return shape', async () => {
+    removeTelegramWebApp();
     const { resultRef, unmount } = await renderHook(() => useTelegram());
     expect(resultRef.current.isTelegram).toBe(false);
-    await unmount();
-  });
-});
-
-describe('useTelegram — return shape', () => {
-  beforeEach(() => removeTelegramWebApp());
-
-  it('always returns isTelegram, tg, and haptic', async () => {
-    const { resultRef, unmount } = await renderHook(() => useTelegram());
+    expect(resultRef.current.tg).toBeNull();
+    expect(() => resultRef.current.haptic()).not.toThrow();
+    expect(() => resultRef.current.haptic('heavy')).not.toThrow();
     expect(resultRef.current).toHaveProperty('isTelegram');
     expect(resultRef.current).toHaveProperty('tg');
     expect(resultRef.current).toHaveProperty('haptic');
     expect(typeof resultRef.current.haptic).toBe('function');
     await unmount();
+  });
+
+  it('inside WebApp vs empty initData', async () => {
+    installTelegramWebApp();
+    const { resultRef: inTg, unmount: u1 } = await renderHook(() => useTelegram());
+    expect(inTg.current.isTelegram).toBe(true);
+    expect(inTg.current.tg).not.toBeNull();
+    await u1();
+    removeTelegramWebApp();
+
+    installTelegramWebApp({ initData: '' });
+    const { resultRef: empty, unmount: u2 } = await renderHook(() => useTelegram());
+    expect(empty.current.isTelegram).toBe(false);
+    await u2();
   });
 });
