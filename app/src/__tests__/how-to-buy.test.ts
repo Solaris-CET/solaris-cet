@@ -26,46 +26,20 @@ const HOW_TO_BUY_STEPS = [
 ];
 
 describe('HowToBuySection — steps integrity', () => {
-  it('has exactly 3 steps', () => {
+  it('structure, IDs, CTAs, DeDust pool link, wallet first / swap last', () => {
     expect(HOW_TO_BUY_STEPS).toHaveLength(3);
-  });
-
-  it('step numbers are sequential 01/02/03', () => {
-    const numbers = HOW_TO_BUY_STEPS.map(s => s.step);
-    expect(numbers).toEqual(['01', '02', '03']);
-  });
-
-  it('all step IDs are unique', () => {
-    const ids = HOW_TO_BUY_STEPS.map(s => s.id);
+    expect(HOW_TO_BUY_STEPS.map((s) => s.step)).toEqual(['01', '02', '03']);
+    const ids = HOW_TO_BUY_STEPS.map((s) => s.id);
     expect(new Set(ids).size).toBe(ids.length);
-  });
-
-  it('all titles are non-empty', () => {
-    HOW_TO_BUY_STEPS.forEach(s => expect(s.title.length).toBeGreaterThan(5));
-  });
-
-  it('all CTA hrefs are valid https URLs', () => {
-    HOW_TO_BUY_STEPS.forEach(s => {
+    HOW_TO_BUY_STEPS.forEach((s) => {
+      expect(s.title.length).toBeGreaterThan(5);
       expect(s.cta.href).toMatch(/^https:\/\//);
     });
-  });
-
-  it('step 03 CTA links to the correct DeDust pool', () => {
     const swap = HOW_TO_BUY_STEPS[2];
     expect(swap.cta.href).toBe(DEDUST_SWAP_URL);
     expect(swap.cta.href).toContain(DEDUST_POOL_ADDRESS);
-  });
-
-  it('step 01 CTA links to Tonkeeper', () => {
-    const wallet = HOW_TO_BUY_STEPS[0];
-    expect(wallet.cta.href).toContain('tonkeeper.com');
-  });
-
-  it('first step is about getting a wallet', () => {
+    expect(HOW_TO_BUY_STEPS[0].cta.href).toContain('tonkeeper.com');
     expect(HOW_TO_BUY_STEPS[0].id).toBe('wallet');
-  });
-
-  it('last step is about swapping', () => {
     expect(HOW_TO_BUY_STEPS[2].id).toBe('swap');
   });
 });
@@ -73,19 +47,10 @@ describe('HowToBuySection — steps integrity', () => {
 // ─── CET contract address validation ─────────────────────────────────────
 
 describe('HowToBuySection — contract addresses', () => {
-  it('CET contract is a valid TON EQ address', () => {
+  it('EQ shape, length 48, CET ≠ pool', () => {
     expect(CET_CONTRACT).toMatch(/^EQ[A-Za-z0-9_-]{46}$/);
-  });
-
-  it('Pool address is a valid TON EQ address', () => {
     expect(DEDUST_POOL_ADDRESS).toMatch(/^EQ[A-Za-z0-9_-]{46}$/);
-  });
-
-  it('CET contract and pool are distinct addresses', () => {
     expect(CET_CONTRACT).not.toBe(DEDUST_POOL_ADDRESS);
-  });
-
-  it('addresses are 48 chars total (EQ + 46)', () => {
     expect(CET_CONTRACT).toHaveLength(48);
     expect(DEDUST_POOL_ADDRESS).toHaveLength(48);
   });
@@ -112,31 +77,13 @@ const SITEMAP_URLS = [
 ];
 
 describe('Sitemap — URL integrity', () => {
-  it('has 15 canonical hash URLs (incl. authority-trust)', () => {
+  it('15 unique https URLs, key sections, root without hash', () => {
     expect(SITEMAP_URLS).toHaveLength(15);
-  });
-
-  it('all URLs are https', () => {
-    SITEMAP_URLS.forEach(url => expect(url).toMatch(/^https:\/\//));
-  });
-
-  it('all URLs are unique', () => {
     expect(new Set(SITEMAP_URLS).size).toBe(SITEMAP_URLS.length);
-  });
-
-  it('competition section is in sitemap', () => {
+    SITEMAP_URLS.forEach((url) => expect(url).toMatch(/^https:\/\//));
     expect(SITEMAP_URLS).toContain('https://solaris-cet.com/#competition');
-  });
-
-  it('network-pulse section is in sitemap', () => {
     expect(SITEMAP_URLS).toContain('https://solaris-cet.com/#network-pulse');
-  });
-
-  it('authority-trust section is in sitemap', () => {
     expect(SITEMAP_URLS).toContain('https://solaris-cet.com/#authority-trust');
-  });
-
-  it('root URL has no hash', () => {
     expect(SITEMAP_URLS[0]).toBe('https://solaris-cet.com/');
     expect(SITEMAP_URLS[0]).not.toContain('#');
   });

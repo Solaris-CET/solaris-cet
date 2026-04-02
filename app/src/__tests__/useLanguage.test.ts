@@ -40,28 +40,12 @@ describe("SUPPORTED_LANGS", () => {
 // ── detectLanguage ────────────────────────────────────────────────────────────
 
 describe("detectLanguage", () => {
-  it("returns the stored language when it is supported", () => {
+  it("stored vs browser vs defaults", () => {
     expect(detectLanguage("es", "en-US")).toBe("es");
-  });
-
-  it("ignores stored value when it is not a supported language", () => {
-    // Falls back to browser lang
     expect(detectLanguage("fr", "zh-CN")).toBe("zh");
-  });
-
-  it("returns 'en' when stored value is null and browser lang is unsupported", () => {
     expect(detectLanguage(null, "fr-FR")).toBe("en");
-  });
-
-  it("detects browser language from a locale string (e.g. 'zh-CN' → 'zh')", () => {
     expect(detectLanguage(null, "zh-CN")).toBe("zh");
-  });
-
-  it("returns 'en' as the safe default", () => {
     expect(detectLanguage(null, "unknown")).toBe("en");
-  });
-
-  it("returns stored language even when browser lang differs", () => {
     expect(detectLanguage("ru", "es-MX")).toBe("ru");
   });
 });
@@ -69,22 +53,13 @@ describe("detectLanguage", () => {
 // ── translations object ───────────────────────────────────────────────────────
 
 describe("translations", () => {
-  it("every locale has non-empty nav.home and hero.tagline", () => {
+  it("locales, EN copy, nav/hero key parity", () => {
     for (const lang of SUPPORTED_LANGS) {
       expect(translations[lang].nav.home.length).toBeGreaterThan(0);
       expect(translations[lang].hero.tagline.length).toBeGreaterThan(0);
     }
-  });
-
-  it("English tokenomics title is 'Tokenomics'", () => {
     expect(translations.en.tokenomics.title).toBe("Tokenomics");
-  });
-
-  it("English hero buyNow label is 'Buy CET'", () => {
     expect(translations.en.hero.buyNow).toBe("Buy CET");
-  });
-
-  it("all locales define the same nav and hero keys as English", () => {
     const enNavKeys = Object.keys(translations.en.nav).sort();
     const enHeroKeys = Object.keys(translations.en.hero).sort();
     for (const lang of SUPPORTED_LANGS) {
@@ -95,26 +70,11 @@ describe("translations", () => {
 });
 
 // ── localStorage lang persistence (simulated via detectLanguage) ─────────────
-// We pass the stored value directly because the Vitest environment is Node
-// and does not expose `localStorage`.  The real hook calls
-// `localStorage.getItem("solaris_lang")` and passes the result to the same
-// detection logic, so these tests cover that code path faithfully.
 
 describe("localStorage lang persistence", () => {
-  it("uses the stored language code when it is a supported locale", () => {
-    // Simulates: localStorage.getItem("solaris_lang") === "ro"
-    const lang = detectLanguage("ro", "en-US");
-    expect(lang).toBe("ro");
-  });
-
-  it("falls back to the browser language when no lang is stored", () => {
-    // Simulates: localStorage.getItem("solaris_lang") === null
-    const lang = detectLanguage(null, "ru-RU");
-    expect(lang).toBe("ru");
-  });
-
-  it("falls back to English when both stored value and browser lang are unsupported", () => {
-    const lang = detectLanguage("fr", "ja-JP");
-    expect(lang).toBe("en");
+  it("ro stored, ru from browser, en when both unsupported", () => {
+    expect(detectLanguage("ro", "en-US")).toBe("ro");
+    expect(detectLanguage(null, "ru-RU")).toBe("ru");
+    expect(detectLanguage("fr", "ja-JP")).toBe("en");
   });
 });

@@ -14,48 +14,21 @@ const NAV_HREFS = [
 ] as const;
 
 describe('Navigation — NAV_HREFS integrity', () => {
-  it('has 7 primary nav items (workspace target 5–7; #competition via footer + FAQ)', () => {
+  it('seven items, unique keys/hrefs, # slugs, order, no competition in header', () => {
     expect(NAV_HREFS).toHaveLength(7);
-  });
-
-  it('all hrefs start with #', () => {
-    NAV_HREFS.forEach(item => {
+    NAV_HREFS.forEach((item) => {
       expect(item.href).toMatch(/^#/);
-    });
-  });
-
-  it('all keys are unique', () => {
-    const keys = NAV_HREFS.map(i => i.key);
-    expect(new Set(keys).size).toBe(keys.length);
-  });
-
-  it('all hrefs are unique', () => {
-    const hrefs = NAV_HREFS.map(i => i.href);
-    expect(new Set(hrefs).size).toBe(hrefs.length);
-  });
-
-  it('howToBuy link exists and points to #how-to-buy', () => {
-    const item = NAV_HREFS.find(i => i.key === 'howToBuy');
-    expect(item?.href).toBe('#how-to-buy');
-  });
-
-  it('competition is not a primary nav item (reduces header cognitive load)', () => {
-    expect(NAV_HREFS.map(i => String(i.key))).not.toContain('competition');
-  });
-
-  it('faq is last nav item', () => {
-    expect(NAV_HREFS[NAV_HREFS.length - 1].key).toBe('faq');
-  });
-
-  it('cetApp is first nav item', () => {
-    expect(NAV_HREFS[0].key).toBe('cetApp');
-  });
-
-  it('all href slugs are lowercase kebab-case', () => {
-    NAV_HREFS.forEach(item => {
-      const slug = item.href.slice(1); // remove #
+      const slug = item.href.slice(1);
       expect(slug).toMatch(/^[a-z0-9-]+$/);
     });
+    const keys = NAV_HREFS.map((i) => i.key);
+    const hrefs = NAV_HREFS.map((i) => i.href);
+    expect(new Set(keys).size).toBe(keys.length);
+    expect(new Set(hrefs).size).toBe(hrefs.length);
+    expect(NAV_HREFS.find((i) => i.key === 'howToBuy')?.href).toBe('#how-to-buy');
+    expect(NAV_HREFS.map((i) => String(i.key))).not.toContain('competition');
+    expect(NAV_HREFS[NAV_HREFS.length - 1].key).toBe('faq');
+    expect(NAV_HREFS[0].key).toBe('cetApp');
   });
 });
 
@@ -79,26 +52,13 @@ const SECTION_IDS = [
 ];
 
 describe('Section IDs — all nav hrefs have matching section IDs', () => {
-  it('all nav hrefs have a corresponding section ID', () => {
-    NAV_HREFS.forEach(item => {
-      const sectionId = item.href.slice(1);
-      expect(SECTION_IDS).toContain(sectionId);
+  it('nav targets exist, IDs unique, a11y + pulse + authority-trust', () => {
+    NAV_HREFS.forEach((item) => {
+      expect(SECTION_IDS).toContain(item.href.slice(1));
     });
-  });
-
-  it('section IDs list has no duplicates', () => {
     expect(new Set(SECTION_IDS).size).toBe(SECTION_IDS.length);
-  });
-
-  it('main-content anchor exists for accessibility', () => {
     expect(SECTION_IDS).toContain('main-content');
-  });
-
-  it('network-pulse section is registered', () => {
     expect(SECTION_IDS).toContain('network-pulse');
-  });
-
-  it('authority-trust section is registered (conversion pillar strip)', () => {
     expect(SECTION_IDS).toContain('authority-trust');
   });
 });

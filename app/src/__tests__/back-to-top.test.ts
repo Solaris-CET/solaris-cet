@@ -11,23 +11,14 @@ function isButtonVisible(scrollY: number): boolean {
 }
 
 describe('BackToTop — visibility threshold', () => {
-  it('is hidden at scroll position 0', () => {
+  it('600px threshold: hidden at/below, visible above', () => {
+    expect(SCROLL_THRESHOLD).toBe(600);
     expect(isButtonVisible(0)).toBe(false);
-  });
-
-  it('is hidden below the threshold', () => {
     expect(isButtonVisible(100)).toBe(false);
     expect(isButtonVisible(599)).toBe(false);
     expect(isButtonVisible(600)).toBe(false);
-  });
-
-  it('becomes visible just above the threshold', () => {
     expect(isButtonVisible(601)).toBe(true);
     expect(isButtonVisible(1000)).toBe(true);
     expect(isButtonVisible(10_000)).toBe(true);
-  });
-
-  it('threshold is exactly 600px', () => {
-    expect(SCROLL_THRESHOLD).toBe(600);
   });
 });

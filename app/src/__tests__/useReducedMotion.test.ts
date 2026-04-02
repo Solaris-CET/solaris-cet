@@ -3,16 +3,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
 type MatchMediaMockOptions = { matches: boolean };
 
-/**
- * Replaces `window.matchMedia` with a Jest/Vitest-compatible stub that lets
- * us control which queries return `true` or `false`.
- */
 function mockMatchMedia(options: MatchMediaMockOptions) {
   const listeners: ((e: MediaQueryListEvent) => void)[] = [];
 
@@ -32,19 +24,14 @@ function mockMatchMedia(options: MatchMediaMockOptions) {
 
   window.matchMedia = vi.fn().mockReturnValue(mql);
 
-  /** Fire a fake MediaQueryList change event to all registered listeners. */
   const fireChange = (newMatches: boolean) => {
     mql.matches = newMatches;
     const event = { matches: newMatches } as MediaQueryListEvent;
-    listeners.forEach(l => l(event));
+    listeners.forEach((l) => l(event));
   };
 
   return { mql, fireChange };
 }
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 describe('useReducedMotion', () => {
   let originalMatchMedia: typeof window.matchMedia;
@@ -58,51 +45,31 @@ describe('useReducedMotion', () => {
     vi.restoreAllMocks();
   });
 
-  it('returns false when prefers-reduced-motion does NOT match', () => {
+  it('initial match, toggles, unmount removes listener', () => {
     mockMatchMedia({ matches: false });
-    const { result } = renderHook(() => useReducedMotion());
-    expect(result.current).toBe(false);
-  });
+    const { result: r1 } = renderHook(() => useReducedMotion());
+    expect(r1.current).toBe(false);
 
-  it('returns true when prefers-reduced-motion matches', () => {
     mockMatchMedia({ matches: true });
-    const { result } = renderHook(() => useReducedMotion());
-    expect(result.current).toBe(true);
-  });
+    const { result: r2 } = renderHook(() => useReducedMotion());
+    expect(r2.current).toBe(true);
 
-  it('updates when the media query value changes (false → true)', async () => {
-    const { fireChange } = mockMatchMedia({ matches: false });
-    const { result } = renderHook(() => useReducedMotion());
+    const { fireChange: fc1 } = mockMatchMedia({ matches: false });
+    const { result: r3 } = renderHook(() => useReducedMotion());
+    expect(r3.current).toBe(false);
+    act(() => { fc1(true); });
+    expect(r3.current).toBe(true);
 
-    expect(result.current).toBe(false);
+    const { fireChange: fc2 } = mockMatchMedia({ matches: true });
+    const { result: r4 } = renderHook(() => useReducedMotion());
+    expect(r4.current).toBe(true);
+    act(() => { fc2(false); });
+    expect(r4.current).toBe(false);
 
-    act(() => {
-      fireChange(true);
-    });
-
-    expect(result.current).toBe(true);
-  });
-
-  it('updates when the media query value changes (true → false)', async () => {
-    const { fireChange } = mockMatchMedia({ matches: true });
-    const { result } = renderHook(() => useReducedMotion());
-
-    expect(result.current).toBe(true);
-
-    act(() => {
-      fireChange(false);
-    });
-
-    expect(result.current).toBe(false);
-  });
-
-  it('removes the event listener on unmount', () => {
     const { mql } = mockMatchMedia({ matches: false });
     const removeSpy = vi.spyOn(mql, 'removeEventListener');
-
     const { unmount } = renderHook(() => useReducedMotion());
     unmount();
-
     expect(removeSpy).toHaveBeenCalledOnce();
   });
 });

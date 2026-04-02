@@ -9,13 +9,11 @@ import {
 } from '@/lib/cetAiTelemetry';
 
 describe('cetAiTelemetry barrel', () => {
-  it('re-exports TASK_MESH line for SKILL terminal styling', () => {
+  it('TASK_MESH line, observe_parse snapshot, deep lattice + skill locus', () => {
     expect(CET_AI_TASK_MESH_LINE.startsWith('TASK_MESH:')).toBe(true);
     expect(CET_AI_TASK_MESH_LINE).toContain('200k');
     expect(CET_AI_TASK_MESH_LINE).toContain('CET AI');
-  });
 
-  it('observe_parse sequence matches buildCetAiObserveParse (snapshot)', () => {
     const q = 'How do 200k agents route tasks?';
     const detected = 'team';
     const tokenCount = q.split(/\s+/).length;
@@ -24,17 +22,15 @@ describe('cetAiTelemetry barrel', () => {
     expect(seq[1]).toBe(CET_AI_TASK_MESH_LINE);
     expect(seq.some((l) => l.startsWith('INPUT_STREAM:'))).toBe(true);
     expect(seq).toMatchSnapshot();
-  });
 
-  it('deep lattice + act phase lines stay stable', () => {
-    const q = 'cet ai snapshot';
-    const detected = 'default';
-    expect(buildDeepLatticeMeshLogMessageRawQuery('DEEP_LATTICE', q)).toBe(
-      buildDeepLatticeMeshLogMessageRawQuery('DEEP_LATTICE', q)
+    const q2 = 'cet ai snapshot';
+    const detected2 = 'default';
+    expect(buildDeepLatticeMeshLogMessageRawQuery('DEEP_LATTICE', q2)).toBe(
+      buildDeepLatticeMeshLogMessageRawQuery('DEEP_LATTICE', q2)
     );
-    expect(buildDeepLatticeMeshLogMessage('ACT_MESH', q, CET_AI_LATTICE_PHASE.actExecute)).toContain(
+    expect(buildDeepLatticeMeshLogMessage('ACT_MESH', q2, CET_AI_LATTICE_PHASE.actExecute)).toContain(
       'ACT_MESH:'
     );
-    expect(buildSkillLocusLogMessage(q, detected)).toContain('topic=default');
+    expect(buildSkillLocusLogMessage(q2, detected2)).toContain('topic=default');
   });
 });

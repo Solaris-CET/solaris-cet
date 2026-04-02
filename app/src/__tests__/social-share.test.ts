@@ -11,31 +11,14 @@ function buildTwitterShareUrl(text: string, url: string): string {
 }
 
 describe('SocialShare — URL construction', () => {
-  it('buildTwitterShareUrl contains the text encoded', () => {
+  it('Twitter intent URL, encoded text/url, copy constants', () => {
+    expect(SHARE_TEXT).toContain('$CET');
+    expect(SHARE_TEXT).toContain('#TON');
+    expect(SITE_URL).toMatch(/^https:\/\//);
     const url = buildTwitterShareUrl(SHARE_TEXT, SITE_URL);
     expect(url).toContain('twitter.com/intent/tweet');
     expect(url).toContain(encodeURIComponent(SHARE_TEXT));
-  });
-
-  it('buildTwitterShareUrl contains the site URL encoded', () => {
-    const url = buildTwitterShareUrl(SHARE_TEXT, SITE_URL);
     expect(url).toContain(encodeURIComponent(SITE_URL));
-  });
-
-  it('SHARE_TEXT contains $CET ticker', () => {
-    expect(SHARE_TEXT).toContain('$CET');
-  });
-
-  it('SHARE_TEXT contains #TON hashtag', () => {
-    expect(SHARE_TEXT).toContain('#TON');
-  });
-
-  it('SITE_URL is a valid https URL', () => {
-    expect(SITE_URL).toMatch(/^https:\/\//);
-  });
-
-  it('Twitter URL starts with https', () => {
-    const url = buildTwitterShareUrl(SHARE_TEXT, SITE_URL);
     expect(url).toMatch(/^https:\/\//);
   });
 });
@@ -45,10 +28,9 @@ describe('SocialShare — URL construction', () => {
 describe('SocialShare — native share logic', () => {
   afterEach(() => { vi.restoreAllMocks(); });
 
-  it('calls navigator.share when available', async () => {
+  it('navigator.share when present; clipboard fallback otherwise', async () => {
     const mockShare = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', { share: mockShare } as unknown as Navigator);
-
     if (navigator.share) {
       await navigator.share({ title: 'Solaris CET', text: SHARE_TEXT, url: SITE_URL });
       expect(mockShare).toHaveBeenCalledOnce();
@@ -58,15 +40,12 @@ describe('SocialShare — native share logic', () => {
         url: SITE_URL,
       });
     }
-  });
 
-  it('falls back to clipboard when share is unavailable', async () => {
     const mockWriteText = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', {
       share: undefined,
       clipboard: { writeText: mockWriteText },
     } as unknown as Navigator);
-    // Simulate clipboard fallback
     await navigator.clipboard.writeText(`${SHARE_TEXT} ${SITE_URL}`);
     expect(mockWriteText).toHaveBeenCalledWith(`${SHARE_TEXT} ${SITE_URL}`);
   });
