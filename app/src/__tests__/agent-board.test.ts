@@ -1,7 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 
-// ─── Inline replicas of AgentBoard pure logic ─────────────────────────────
-
 interface Dept {
   name: string;
   short: string;
@@ -52,7 +50,7 @@ describe('AgentBoard — inline pure logic', () => {
     vi.restoreAllMocks();
   });
 
-  it('registry: 10 depts, 200k total, unique shorts, counts, min/max', () => {
+  it('registry, randomAgentId, timeSince, AITeam counts', () => {
     expect(DEPARTMENTS).toHaveLength(10);
     expect(TOTAL_AGENTS).toBe(200_000);
     const shorts = DEPARTMENTS.map((d) => d.short);
@@ -63,23 +61,15 @@ describe('AgentBoard — inline pure logic', () => {
     });
     const byAgents = [...DEPARTMENTS].sort((a, b) => b.agents - a.agents);
     expect(byAgents[0].name).toBe('Customer Ops');
-    const byAgentsAsc = [...DEPARTMENTS].sort((a, b) => a.agents - b.agents);
-    expect(byAgentsAsc[0].name).toBe('Research');
-  });
+    expect([...DEPARTMENTS].sort((a, b) => a.agents - b.agents)[0].name).toBe('Research');
 
-  it('randomAgentId format and bounds for every department', () => {
     DEPARTMENTS.forEach((dept) => {
-      const id = randomAgentId(dept, 0.5);
-      expect(id).toMatch(/^[A-Z&]+-\d{5}$/);
-      const id0 = randomAgentId(dept, 0);
-      expect(parseInt(id0.split('-')[1], 10)).toBeGreaterThanOrEqual(1);
-      const idMax = randomAgentId(dept, 0.9999);
-      expect(parseInt(idMax.split('-')[1], 10)).toBeLessThanOrEqual(dept.agents);
+      expect(randomAgentId(dept, 0.5)).toMatch(/^[A-Z&]+-\d{5}$/);
+      expect(parseInt(randomAgentId(dept, 0).split('-')[1], 10)).toBeGreaterThanOrEqual(1);
+      expect(parseInt(randomAgentId(dept, 0.9999).split('-')[1], 10)).toBeLessThanOrEqual(dept.agents);
       expect(randomAgentId(dept, 0.42).startsWith(`${dept.short}-`)).toBe(true);
     });
-  });
 
-  it('timeSince seconds and minutes buckets', () => {
     const now = Date.now();
     expect(timeSince(now - 5_000, now)).toBe('5s ago');
     expect(timeSince(now - 30_000, now)).toBe('30s ago');
