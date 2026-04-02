@@ -19,29 +19,23 @@ beforeEach(() => {
 });
 
 describe('useLanguageState', () => {
-  it('defaults to "en" when no stored preference or browser lang match exists', async () => {
+  it('defaults, localStorage, invalid key, browser zh, setLang, document lang, t, SUPPORTED_LANGS', async () => {
     Object.defineProperty(navigator, 'language', {
-      value: 'ja-JP', // unsupported → falls back to "en"
+      value: 'ja-JP',
       writable: true,
       configurable: true,
     });
-    const { resultRef } = await renderHook(() => useLanguageState());
-    expect(resultRef.current.lang).toBe('en');
-  });
+    const { resultRef: r0 } = await renderHook(() => useLanguageState());
+    expect(r0.current.lang).toBe('en');
 
-  it('picks up a persisted language from localStorage', async () => {
     localStorage.setItem('solaris_lang', 'es');
-    const { resultRef } = await renderHook(() => useLanguageState());
-    expect(resultRef.current.lang).toBe('es');
-  });
+    const { resultRef: r1 } = await renderHook(() => useLanguageState());
+    expect(r1.current.lang).toBe('es');
 
-  it('falls back to "en" for an invalid value in localStorage', async () => {
     localStorage.setItem('solaris_lang', 'xx');
-    const { resultRef } = await renderHook(() => useLanguageState());
-    expect(resultRef.current.lang).toBe('en');
-  });
+    const { resultRef: r2 } = await renderHook(() => useLanguageState());
+    expect(r2.current.lang).toBe('en');
 
-  it('auto-detects a supported browser language', async () => {
     Object.defineProperty(navigator, 'language', {
       value: 'zh-TW',
       writable: true,
@@ -52,41 +46,39 @@ describe('useLanguageState', () => {
       writable: true,
       configurable: true,
     });
-    const { resultRef } = await renderHook(() => useLanguageState());
-    expect(resultRef.current.lang).toBe('zh');
-  });
+    const { resultRef: r3 } = await renderHook(() => useLanguageState());
+    expect(r3.current.lang).toBe('zh');
 
-  it('updates lang and persists to localStorage when setLang is called', async () => {
-    const { resultRef } = await renderHook(() => useLanguageState());
-    await act(() => { resultRef.current.setLang('ru'); });
-    expect(resultRef.current.lang).toBe('ru');
+    const { resultRef: r4 } = await renderHook(() => useLanguageState());
+    await act(() => {
+      r4.current.setLang('ru');
+    });
+    expect(r4.current.lang).toBe('ru');
     expect(localStorage.getItem('solaris_lang')).toBe('ru');
-  });
 
-  it('syncs document.documentElement lang and dir when language changes', async () => {
-    const { resultRef } = await renderHook(() => useLanguageState());
-    await act(() => { resultRef.current.setLang('ro'); });
+    const { resultRef: r5 } = await renderHook(() => useLanguageState());
+    await act(() => {
+      r5.current.setLang('ro');
+    });
     expect(document.documentElement.lang).toBe('ro');
     expect(document.documentElement.dir).toBe('ltr');
-  });
 
-  it('returns a translations object for the selected language', async () => {
-    const { resultRef } = await renderHook(() => useLanguageState());
-    await act(() => { resultRef.current.setLang('es'); });
-    expect(resultRef.current.t.nav.tokenomics).toBeDefined();
-    expect(typeof resultRef.current.t.nav.tokenomics).toBe('string');
-  });
+    const { resultRef: r6 } = await renderHook(() => useLanguageState());
+    await act(() => {
+      r6.current.setLang('es');
+    });
+    expect(r6.current.t.nav.tokenomics).toBeDefined();
+    expect(typeof r6.current.t.nav.tokenomics).toBe('string');
 
-  it('exposes all supported languages', () => {
     expect(SUPPORTED_LANGS).toEqual(expect.arrayContaining(['en', 'es', 'zh', 'ru', 'ro', 'pt', 'de']));
     expect(SUPPORTED_LANGS).toHaveLength(7);
-  });
 
-  it('setLang accepts every supported language without throwing', async () => {
-    const { resultRef } = await renderHook(() => useLanguageState());
+    const { resultRef: r7 } = await renderHook(() => useLanguageState());
     for (const lang of SUPPORTED_LANGS as LangCode[]) {
-      await act(() => { resultRef.current.setLang(lang); });
-      expect(resultRef.current.lang).toBe(lang);
+      await act(() => {
+        r7.current.setLang(lang);
+      });
+      expect(r7.current.lang).toBe(lang);
     }
   });
 });
