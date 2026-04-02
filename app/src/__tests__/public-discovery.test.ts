@@ -11,6 +11,7 @@ describe('Public discovery — sitemap, security.txt, humans.txt', () => {
     expect(xml).toContain('https://solaris-cet.com/sovereign/');
     expect(xml).toContain('https://solaris-cet.com/llms.txt');
     expect(xml).toContain('https://solaris-cet.com/humans.txt');
+    expect(xml).toContain('https://solaris-cet.com/.well-known/security.txt');
 
     const sec = path.join(publicDir, '.well-known/security.txt');
     expect(existsSync(sec), 'public/.well-known/security.txt must ship').toBe(true);
