@@ -1,4 +1,4 @@
-import { ExternalLink, Coins, BookOpen, MessageCircle } from 'lucide-react';
+import { ExternalLink, Coins, BookOpen, MessageCircle, Scale } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '../hooks/useLanguage';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
@@ -34,6 +34,13 @@ const MobileConversionDock = () => {
       className: 'text-white/90',
     },
     {
+      href: '#competition',
+      external: false,
+      label: t.nav.competition,
+      icon: Scale,
+      className: 'text-amber-400/95',
+    },
+    {
       href: TELEGRAM,
       external: true,
       label: t.mobileDock.community,
@@ -58,7 +65,7 @@ const MobileConversionDock = () => {
         >
           {items.map(({ href, external, label, icon: Icon, className }) => (
             <a
-              key={label}
+              key={href}
               href={href}
               {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               className={cn(

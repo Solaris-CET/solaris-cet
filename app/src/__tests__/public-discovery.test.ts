@@ -22,5 +22,13 @@ describe('Public discovery — sitemap, security.txt, humans.txt', () => {
     const humBody = readFileSync(hum, 'utf8');
     expect(humBody).toContain('https://solaris-cet.com/');
     expect(humBody).toContain('github.com/Solaris-CET');
+    expect(humBody).toContain('#competition');
+    expect(humBody).toContain('/llms.txt');
+
+    const llms = readFileSync(path.join(publicDir, 'llms.txt'), 'utf8');
+    expect(llms).toContain('https://solaris-cet.com/');
+    expect(llms).toContain('9,000 CET');
+    expect(llms).toContain('Cetățuia');
+    expect(llms).toContain('dedust.io');
   });
 });

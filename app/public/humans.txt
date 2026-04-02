@@ -6,3 +6,5 @@ Community: https://t.me/SolarisCET
 Updates: https://twitter.com/SolarisCET
 
 Standards: TON mainnet · fixed 9,000 CET supply · anchor Cetățuia, Romania
+Comparison matrix: https://solaris-cet.com/#competition
+LLM / agent brief: https://solaris-cet.com/llms.txt
