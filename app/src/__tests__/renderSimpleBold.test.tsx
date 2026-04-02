@@ -9,16 +9,14 @@ afterEach(() => {
 });
 
 describe('simpleBold markers + renderSimpleBold', () => {
-  it('hasBalanced: valid / invalid ** pairs', () => {
+  it('hasBalanced + render (plain, strong, dup segments, className)', () => {
     expect(hasBalancedSimpleBoldMarkers('')).toBe(true);
     expect(hasBalancedSimpleBoldMarkers('plain')).toBe(true);
     expect(hasBalancedSimpleBoldMarkers('**x**')).toBe(true);
     expect(hasBalancedSimpleBoldMarkers('**same** and **same** end')).toBe(true);
     expect(hasBalancedSimpleBoldMarkers('**unclosed')).toBe(false);
     expect(hasBalancedSimpleBoldMarkers('unclosed**')).toBe(false);
-  });
 
-  it('render: plain, single strong, duplicate segments, className', () => {
     const plain = render(<p>{renderSimpleBold('no bold here')}</p>);
     expect(plain.container.textContent).toBe('no bold here');
     expect(plain.container.querySelector('strong')).toBeNull();

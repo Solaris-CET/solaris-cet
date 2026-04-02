@@ -108,7 +108,7 @@ const referenceKeys = collectKeys(
 );
 
 describe("translations", () => {
-  it("language set, key parity with EN, value shape per locale", () => {
+  it("language set, key parity, value shape, Cetățuia, nav/mining keys, balanced **", () => {
     const translationKeys = Object.keys(translations) as LangCode[];
     expect(new Set(translationKeys)).toEqual(new Set(SUPPORTED_LANGS));
 
@@ -153,9 +153,7 @@ describe("translations", () => {
         badType: [],
       });
     }
-  });
 
-  it("Cetățuia tagline, section keys, mining disclaimer, balanced **", () => {
     expect(translations.en.hero.tagline).toContain("Cetățuia");
 
     for (const lang of SUPPORTED_LANGS) {

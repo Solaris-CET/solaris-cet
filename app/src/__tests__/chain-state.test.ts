@@ -123,52 +123,54 @@ describe("chain-state", () => {
     expect(500 * 3.5 * 2).toBe(3500);
   });
 
-  const originalFetch = globalThis.fetch;
+  describe("fetchChainState (mocked fetch + timers)", () => {
+    const originalFetch = globalThis.fetch;
 
-  beforeEach(() => {
-    vi.useFakeTimers();
-    vi.resetModules();
-  });
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.resetModules();
+    });
 
-  afterEach(() => {
-    globalThis.fetch = originalFetch;
-    vi.useRealTimers();
-    vi.resetModules();
-  });
+    afterEach(() => {
+      globalThis.fetch = originalFetch;
+      vi.useRealTimers();
+      vi.resetModules();
+    });
 
-  it("fetchChainState: success, HTTP error retries, network error retries", async () => {
-    const mockState = makeChainState();
-    globalThis.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockState,
-    } as unknown as Response);
-    vi.resetModules();
-    const okMod = await import("../lib/chain-state");
-    const result = await okMod.chainStatePromise;
-    expect(result.token.symbol).toBe("CET");
+    it("success, HTTP error retries, network error retries", async () => {
+      const mockState = makeChainState();
+      globalThis.fetch = vi.fn().mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockState,
+      } as unknown as Response);
+      vi.resetModules();
+      const okMod = await import("../lib/chain-state");
+      const result = await okMod.chainStatePromise;
+      expect(result.token.symbol).toBe("CET");
 
-    globalThis.fetch = vi.fn().mockResolvedValue({
-      ok: false,
-      status: 404,
-      json: async () => ({}),
-    } as unknown as Response);
-    vi.resetModules();
-    const errMod = await import("../lib/chain-state");
-    const httpAssert = expect(errMod.chainStatePromise).rejects.toThrow(
-      "Failed to fetch chain state: 404",
-    );
-    await vi.runAllTimersAsync();
-    await httpAssert;
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: false,
+        status: 404,
+        json: async () => ({}),
+      } as unknown as Response);
+      vi.resetModules();
+      const errMod = await import("../lib/chain-state");
+      const httpAssert = expect(errMod.chainStatePromise).rejects.toThrow(
+        "Failed to fetch chain state: 404",
+      );
+      await vi.runAllTimersAsync();
+      await httpAssert;
 
-    globalThis.fetch = vi
-      .fn()
-      .mockRejectedValue(new TypeError("Network request failed"));
-    vi.resetModules();
-    const netMod = await import("../lib/chain-state");
-    const netAssert = expect(netMod.chainStatePromise).rejects.toThrow(
-      "Network request failed",
-    );
-    await vi.runAllTimersAsync();
-    await netAssert;
+      globalThis.fetch = vi
+        .fn()
+        .mockRejectedValue(new TypeError("Network request failed"));
+      vi.resetModules();
+      const netMod = await import("../lib/chain-state");
+      const netAssert = expect(netMod.chainStatePromise).rejects.toThrow(
+        "Network request failed",
+      );
+      await vi.runAllTimersAsync();
+      await netAssert;
+    });
   });
 });

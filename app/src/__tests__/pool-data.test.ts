@@ -31,7 +31,7 @@ function deriveVolume24hUsd(volumeRaw: string, tonPriceUsd: number): number {
 }
 
 describe('DeDust pool — formulas & live-pool config', () => {
-  it('price, TVL, volume, null reserve, scaling, integration snapshot', () => {
+  it('formulas, integration, contract addresses, refresh, PoolData shape', () => {
     expect(deriveCetPriceFromReserves(String(1e9), String(1e9), 3)).toBeCloseTo(3, 6);
     expect(deriveCetPriceFromReserves(String(100e9), String(9000e9), 3)).toBeCloseTo((100 / 9000) * 3, 6);
     expect(deriveCetPriceFromReserves(String(100e9), '0', 3)).toBeNull();
@@ -65,9 +65,7 @@ describe('DeDust pool — formulas & live-pool config', () => {
     const cetR = String(200 * 1e9);
     const cetInTon = parseFloat(tonR) / 1e9 / (parseFloat(cetR) / 10 ** CET_DECIMALS);
     expect(cetInTon).toBeCloseTo(5, 6);
-  });
 
-  it('contract addresses, refresh interval, initial PoolData shape', () => {
     expect(DEDUST_POOL_ADDRESS).toMatch(/^EQ[A-Za-z0-9_-]{46}$/);
     expect(CET_CONTRACT_ADDRESS).toMatch(/^EQ[A-Za-z0-9_-]{46}$/);
     expect(CET_DECIMALS).toBe(9);

@@ -25,7 +25,7 @@ const DEPT_DATA = [
 const TOTAL_AGENTS = DEPT_DATA.reduce((s, d) => s + d.agents, 0);
 
 describe('charts data (tokenomics + departments)', () => {
-  it('distribution buckets sum to 100%, mining largest, CET amounts', () => {
+  it('distribution + department registry', () => {
     expect(DISTRIBUTION).toHaveLength(4);
     const sum = DISTRIBUTION.reduce((s, d) => s + d.pct, 0);
     expect(sum).toBeCloseTo(100, 1);
@@ -41,9 +41,7 @@ describe('charts data (tokenomics + departments)', () => {
     const dcbm = DISTRIBUTION.find((d) => d.name === 'DCBM Reserve')!;
     const team = DISTRIBUTION.find((d) => d.name === 'Team & Development')!;
     expect(dcbm.pct + team.pct).toBeCloseTo(13.34, 1);
-  });
 
-  it('10 departments, 200k agents, ordering, multiples of 1k, top-3 share', () => {
     expect(DEPT_DATA).toHaveLength(10);
     expect(TOTAL_AGENTS).toBe(200_000);
     const byDesc = [...DEPT_DATA].sort((a, b) => b.agents - a.agents);
