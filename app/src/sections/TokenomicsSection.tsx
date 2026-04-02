@@ -8,6 +8,7 @@ import TokenomicsChart from '../components/TokenomicsChart';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useLanguage } from '../hooks/useLanguage';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 
 const BENTO_TILE_INTERACTION =
   'transition-all duration-300 hover:!-translate-y-1 hover:!scale-100 hover:!shadow-[0_0_15px_rgba(234,179,8,0.2)]';
@@ -17,9 +18,6 @@ const CET_MINED_SUPPLY = 9000; // 100% mined on launch - hyper-scarce supply
 
 const RING_RADIUS = 54;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
-
-const DEDUST_POOL =
-  'https://dedust.io/swap/TON/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
 
 const TokenomicsSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -286,7 +284,7 @@ const TokenomicsSection = () => {
                   </div>
                 </div>
                 <a
-                  href={DEDUST_POOL}
+                  href={DEDUST_SWAP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   title="View CET token on DeDust exchange"

@@ -5,13 +5,15 @@ import { SolarisLogoMark } from '../components/SolarisLogoMark';
 import SocialShare from '../components/SocialShare';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useLanguage } from '../hooks/useLanguage';
+import {
+  DEDUST_POOL_ADDRESS,
+  DEDUST_POOL_DEPOSIT_URL,
+  DEDUST_SWAP_URL,
+} from '@/lib/dedustUrls';
 
 // Constants defined once to avoid duplication and maintain a single source of truth
 const GITHUB_URL = 'https://github.com/Solaris-CET/solaris-cet';
-const DEDUST_POOL_ADDRESS = 'EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
-const DEDUST_POOL_DEPOSIT_URL = `https://dedust.io/pools/${DEDUST_POOL_ADDRESS}/deposit`;
 const CET_CONTRACT_ADDRESS = 'EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX';
-const DEDUST_SWAP_URL = `https://dedust.io/swap/TON/${DEDUST_POOL_ADDRESS}`;
 const WHITEPAPER_URL = 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a';
 
 const socialLinks = [

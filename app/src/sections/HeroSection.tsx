@@ -12,9 +12,7 @@ import { TooltipProvider } from '../components/ui/tooltip';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useLanguage } from '../hooks/useLanguage';
 import { formatCetSupplyWithSuffix } from '@/lib/numerals';
-
-const DEDUST_POOL_ADDRESS = 'EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
-const DEDUST_SWAP_URL = `https://dedust.io/swap/TON/${DEDUST_POOL_ADDRESS}`;
+import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 
 const APP_CONFIG = {
   LINKS: {

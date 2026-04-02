@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { DEDUST_POOL_ADDRESS, DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 
 // ─── HowToBuy steps data ──────────────────────────────────────────────────
 
@@ -19,7 +20,7 @@ const HOW_TO_BUY_STEPS = [
     step: '03',
     id: 'swap',
     title: 'Swap for CET on DeDust',
-    cta: { label: 'Open DeDust ↗', href: 'https://dedust.io/pools/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB' },
+    cta: { label: 'Open DeDust ↗', href: DEDUST_SWAP_URL },
   },
 ];
 
@@ -50,7 +51,8 @@ describe('HowToBuySection — steps integrity', () => {
 
   it('step 03 CTA links to the correct DeDust pool', () => {
     const swap = HOW_TO_BUY_STEPS[2];
-    expect(swap.cta.href).toContain('EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB');
+    expect(swap.cta.href).toBe(DEDUST_SWAP_URL);
+    expect(swap.cta.href).toContain(DEDUST_POOL_ADDRESS);
   });
 
   it('step 01 CTA links to Tonkeeper', () => {
@@ -70,7 +72,6 @@ describe('HowToBuySection — steps integrity', () => {
 // ─── CET contract address validation ─────────────────────────────────────
 
 const CET_CONTRACT = 'EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX';
-const POOL_ADDRESS = 'EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
 
 describe('HowToBuySection — contract addresses', () => {
   it('CET contract is a valid TON EQ address', () => {
@@ -78,16 +79,16 @@ describe('HowToBuySection — contract addresses', () => {
   });
 
   it('Pool address is a valid TON EQ address', () => {
-    expect(POOL_ADDRESS).toMatch(/^EQ[A-Za-z0-9_-]{46}$/);
+    expect(DEDUST_POOL_ADDRESS).toMatch(/^EQ[A-Za-z0-9_-]{46}$/);
   });
 
   it('CET contract and pool are distinct addresses', () => {
-    expect(CET_CONTRACT).not.toBe(POOL_ADDRESS);
+    expect(CET_CONTRACT).not.toBe(DEDUST_POOL_ADDRESS);
   });
 
   it('addresses are 48 chars total (EQ + 46)', () => {
     expect(CET_CONTRACT).toHaveLength(48);
-    expect(POOL_ADDRESS).toHaveLength(48);
+    expect(DEDUST_POOL_ADDRESS).toHaveLength(48);
   });
 });
 

@@ -1,9 +1,8 @@
 import { ExternalLink, Coins, BookOpen, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '../hooks/useLanguage';
+import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 
-const DEDUST_POOL_ADDRESS = 'EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
-const DEDUST_SWAP_URL = `https://dedust.io/swap/TON/${DEDUST_POOL_ADDRESS}`;
 const TELEGRAM = 'https://t.me/+tKlfzx7IWopmNWQ0';
 
 /**

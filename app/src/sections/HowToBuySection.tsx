@@ -4,10 +4,9 @@ import { Wallet, ArrowRightLeft, Coins, Copy, Check, ExternalLink } from 'lucide
 import LivePoolStats from '../components/LivePoolStats';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useLanguage } from '../hooks/useLanguage';
+import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 
 const CET_CONTRACT_ADDRESS = 'EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX';
-const DEDUST_POOL_ADDRESS = 'EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
-const DEDUST_SWAP_URL = `https://dedust.io/swap/TON/${DEDUST_POOL_ADDRESS}`;
 const TONKEEPER_URL = 'https://tonkeeper.com';
 
 // Static data defined outside component to avoid re-creation on every render

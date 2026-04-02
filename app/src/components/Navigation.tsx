@@ -13,10 +13,7 @@ import {
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { standardSkillBurst, skillSeedFromLabel } from '@/lib/meshSkillFeed';
-
-/** Official CET/TON pool on DeDust — same target as HowToBuySection / Footer. */
-const DEDUST_POOL_ADDRESS = 'EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
-const DEDUST_SWAP_URL = `https://dedust.io/swap/TON/${DEDUST_POOL_ADDRESS}`;
+import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 
 /** 7 primary destinations — flat IA, Hick/Miller-friendly (Cursor AI architecture playbook). */
 const NAV_HREFS = [

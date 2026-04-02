@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { BarChart2, BookOpen, Brain, Globe, ExternalLink } from 'lucide-react';
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
+import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 
 interface Resource {
   name: string;
@@ -257,7 +258,7 @@ const ResourcesSection = () => {
         {/* Quick Links bar */}
         <div className="bento-card p-4 mb-10 grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { label: 'Buy CET', href: 'https://dedust.io/swap/TON/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB', color: 'text-solaris-gold' },
+            { label: 'Buy CET', href: DEDUST_SWAP_URL, color: 'text-solaris-gold' },
             { label: 'Whitepaper', href: 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a', color: 'text-solaris-cyan' },
             { label: 'GitHub', href: 'https://github.com/Solaris-CET/solaris-cet', color: 'text-solaris-text' },
             { label: 'Telegram', href: 'https://t.me/SolarisCET', color: 'text-[#2AABEE]' },

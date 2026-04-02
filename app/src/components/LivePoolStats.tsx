@@ -4,9 +4,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import { formatUsd, formatPrice } from '../lib/utils';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 import { Skeleton } from '@/components/ui/skeleton';
-
-const DEDUST_POOL_URL =
-  'https://dedust.io/pools/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB';
+import { DEDUST_POOL_PAGE_URL } from '@/lib/dedustUrls';
 
 const LivePoolStats = () => {
   const { t } = useLanguage();
@@ -41,7 +39,7 @@ const LivePoolStats = () => {
             <RefreshCw className="w-3.5 h-3.5 text-solaris-muted animate-spin" />
           )}
           <a
-            href={DEDUST_POOL_URL}
+            href={DEDUST_POOL_PAGE_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1 text-xs text-solaris-muted hover:text-solaris-gold transition-colors"
@@ -58,7 +56,7 @@ const LivePoolStats = () => {
           <p className="text-solaris-muted text-xs">
             {t.livePool.errorUnavailable}{' '}
             <a
-              href={DEDUST_POOL_URL}
+              href={DEDUST_POOL_PAGE_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-solaris-gold hover:underline inline-flex items-center gap-1"

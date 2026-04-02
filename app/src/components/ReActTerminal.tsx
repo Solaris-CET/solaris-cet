@@ -1,9 +1,7 @@
 import { useEffect, useCallback, useReducer, useMemo } from 'react';
 import { Brain, Zap, Eye, CheckCircle2, XCircle, ExternalLink } from 'lucide-react';
 import { shortSkillWhisper, skillSaltFromQuery } from '@/lib/meshSkillFeed';
-
-const DEDUST_POOL_URL =
-  'https://dedust.io/pools/EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB/deposit';
+import { DEDUST_POOL_DEPOSIT_URL } from '@/lib/dedustUrls';
 
 /** Delay between each ReAct step reveal (ms). */
 const STEP_REVEAL_DELAY_MS = 700;
@@ -155,7 +153,7 @@ const ReActTerminal = ({ responseText, isLoading }: ReActTerminalProps) => {
 
   const handleAccept = useCallback(() => {
     dispatch({ type: 'HITL_ACCEPTED' });
-    window.open(DEDUST_POOL_URL, '_blank', 'noopener,noreferrer');
+    window.open(DEDUST_POOL_DEPOSIT_URL, '_blank', 'noopener,noreferrer');
   }, []);
 
   const handleReject = useCallback(() => {
