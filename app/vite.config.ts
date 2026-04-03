@@ -121,7 +121,13 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png', 'offline.html'],
+      includeAssets: [
+        'favicon.svg',
+        'icon-192.png',
+        'icon-512.png',
+        'solaris-cet-logo.jpg',
+        'offline.html',
+      ],
       manifest: {
         name: 'Solaris CET',
         short_name: 'Solaris',

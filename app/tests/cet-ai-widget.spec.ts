@@ -68,7 +68,12 @@ test.describe('Solaris CET AI widget — desktop', () => {
   test('hero query shows character count when typing', async ({ page }) => {
     await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
     await page.getByTestId('cet-ai-hero-query').fill('abc');
-    await expect(page.getByTestId('cet-ai-query-char-count')).toHaveText(`3/${CET_AI_MAX_QUERY_CHARS}`);
+    const row = page.getByTestId('cet-ai-query-char-count');
+    await expect(row).toHaveText(`3/${CET_AI_MAX_QUERY_CHARS}`);
+    await expect(row).toHaveAttribute(
+      'aria-label',
+      `Characters: 3 of ${CET_AI_MAX_QUERY_CHARS}.`,
+    );
   });
 
   test('modal follow-up shows character count when typing (offline)', async ({ page }) => {
@@ -85,8 +90,10 @@ test.describe('Solaris CET AI widget — desktop', () => {
     await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
     await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
     await expect(page.getByText(/No live API on this host/i)).toBeVisible({ timeout: 20_000 });
+    const row = page.getByTestId('cet-ai-query-char-count');
     await page.getByTestId('cet-ai-modal-query').fill('x');
-    await expect(page.getByTestId('cet-ai-query-char-count')).toHaveText(`1/${CET_AI_MAX_QUERY_CHARS}`);
+    await expect(row).toHaveText(`1/${CET_AI_MAX_QUERY_CHARS}`);
+    await expect(row).toHaveAttribute('aria-label', `Characters: 1 of ${CET_AI_MAX_QUERY_CHARS}.`);
   });
 
   test('Opening modal from a suggested chip shows dialog', async ({ page }) => {
@@ -194,7 +201,12 @@ test.describe('Solaris CET AI widget — mobile viewport', () => {
   test('hero query shows character count when typing', async ({ page }) => {
     await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
     await page.getByTestId('cet-ai-hero-query').fill('xy');
-    await expect(page.getByTestId('cet-ai-query-char-count')).toHaveText(`2/${CET_AI_MAX_QUERY_CHARS}`);
+    const row = page.getByTestId('cet-ai-query-char-count');
+    await expect(row).toHaveText(`2/${CET_AI_MAX_QUERY_CHARS}`);
+    await expect(row).toHaveAttribute(
+      'aria-label',
+      `Characters: 2 of ${CET_AI_MAX_QUERY_CHARS}.`,
+    );
   });
 
   test('modal follow-up shows character count when typing (offline)', async ({ page }) => {
@@ -207,8 +219,10 @@ test.describe('Solaris CET AI widget — mobile viewport', () => {
     await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
     await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
     await expect(page.getByText(/No live API on this host/i)).toBeVisible({ timeout: 20_000 });
+    const row = page.getByTestId('cet-ai-query-char-count');
     await page.getByTestId('cet-ai-modal-query').fill('m');
-    await expect(page.getByTestId('cet-ai-query-char-count')).toHaveText(`1/${CET_AI_MAX_QUERY_CHARS}`);
+    await expect(row).toHaveText(`1/${CET_AI_MAX_QUERY_CHARS}`);
+    await expect(row).toHaveAttribute('aria-label', `Characters: 1 of ${CET_AI_MAX_QUERY_CHARS}.`);
   });
 
   test('Copy full transcript after follow-up (offline, multi-turn)', async ({ page, context }) => {
@@ -227,6 +241,8 @@ type CetAiLocaleFixture = {
   sendButton: RegExp;
   ravChip: RegExp;
   dialogDescPatterns: readonly [RegExp, RegExp];
+  /** `aria-label` on `#cet-ai-query-char-count` after a single-character query (matches `queryCharCountAria`). */
+  queryCharCountAriaOneChar: RegExp;
 };
 
 const CET_AI_LOCALE_FIXTURES: readonly CetAiLocaleFixture[] = [
@@ -236,6 +252,7 @@ const CET_AI_LOCALE_FIXTURES: readonly CetAiLocaleFixture[] = [
     sendButton: /INIȚIAZĂ PROTOCOLUL/i,
     ravChip: /Ce este protocolul RAV/i,
     dialogDescPatterns: [/Dialog CET AI/i, /Escape/i],
+    queryCharCountAriaOneChar: /^Caractere: 1 din \d+\.$/,
   },
   {
     code: 'de',
@@ -243,6 +260,7 @@ const CET_AI_LOCALE_FIXTURES: readonly CetAiLocaleFixture[] = [
     sendButton: /PROTOKOLL STARTEN/i,
     ravChip: /Was ist das RAV-Protokoll/i,
     dialogDescPatterns: [/CET-AI-Dialog/i, /Escape/i],
+    queryCharCountAriaOneChar: /^Zeichen: 1 von \d+\.$/,
   },
   {
     code: 'es',
@@ -250,6 +268,7 @@ const CET_AI_LOCALE_FIXTURES: readonly CetAiLocaleFixture[] = [
     sendButton: /INICIAR PROTOCOLO/i,
     ravChip: /¿Qué es el protocolo RAV/i,
     dialogDescPatterns: [/Diálogo CET AI/i, /Escape/i],
+    queryCharCountAriaOneChar: /^Caracteres: 1 de \d+\.$/,
   },
   {
     code: 'zh',
@@ -257,6 +276,7 @@ const CET_AI_LOCALE_FIXTURES: readonly CetAiLocaleFixture[] = [
     sendButton: /启动协议/,
     ravChip: /什么是 RAV 协议/,
     dialogDescPatterns: [/CET AI 对话框/, /Escape/],
+    queryCharCountAriaOneChar: /^字符数：1 \/ \d+。$/,
   },
   {
     code: 'pt',
@@ -264,6 +284,7 @@ const CET_AI_LOCALE_FIXTURES: readonly CetAiLocaleFixture[] = [
     sendButton: /INICIAR PROTOCOLO/i,
     ravChip: /O que é o protocolo RAV/i,
     dialogDescPatterns: [/Diálogo CET AI/i, /Escape/i],
+    queryCharCountAriaOneChar: /^Caracteres: 1 de \d+\.$/,
   },
   {
     code: 'ru',
@@ -271,6 +292,7 @@ const CET_AI_LOCALE_FIXTURES: readonly CetAiLocaleFixture[] = [
     sendButton: /ЗАПУСТИТЬ ПРОТОКОЛ/i,
     ravChip: /Что такое протокол RAV/i,
     dialogDescPatterns: [/Диалог CET AI/i, /Escape/i],
+    queryCharCountAriaOneChar: /^Символов: 1 из \d+\.$/,
   },
 ];
 
@@ -312,6 +334,15 @@ for (const L of CET_AI_LOCALE_FIXTURES) {
       await expect(desc).toBeAttached();
       await expect(desc).toContainText(L.dialogDescPatterns[0]);
       await expect(desc).toContainText(L.dialogDescPatterns[1]);
+    });
+
+    test(`?lang=${L.code} query char count aria matches locale`, async ({ page }) => {
+      await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
+      await page.getByTestId('cet-ai-hero-query').fill('z');
+      await expect(page.getByTestId('cet-ai-query-char-count')).toHaveAttribute(
+        'aria-label',
+        L.queryCharCountAriaOneChar,
+      );
     });
   });
 }
