@@ -51,7 +51,6 @@ const projects: CryptoProject[] = [
   { name: 'ASI Alliance', symbol: 'ASI',  href: 'https://superintelligence.io/',          category: 'ai' },
   { name: 'Render',      symbol: 'RNDR',  href: 'https://rendernetwork.com/',             category: 'ai' },
   { name: 'Akash',       symbol: 'AKT',   href: 'https://akash.network/',                 category: 'ai' },
-  { name: 'Bittensor', symbol: 'TAO', href: 'https://bittensor.com', category: 'defi' },
   { name: 'Sky', symbol: 'SKY', href: 'https://sky.money/', category: 'defi' },
   { name: 'Aster', symbol: 'ATR', href: 'https://www.asterdex.com/', category: 'defi' },
   // Meme & Community
