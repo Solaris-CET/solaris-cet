@@ -510,14 +510,16 @@
   position: relative;
   z-index: 1;
   display: block;
-  height: 100%;
-  width: auto;
-  max-height: 100%;
   user-select: none;
   animation: solaris-holo-aurora 6.5s ease-in-out infinite;
 }
 
+/** Full lockup: size from intrinsic aspect + max bounds (parent supplies max-height / max-width). */
 .solaris-holo-img--full {
+  height: auto;
+  width: auto;
+  max-height: 100%;
+  max-width: 100%;
   object-fit: contain;
   object-position: center;
 }
@@ -525,6 +527,7 @@
 .solaris-holo-img--emblem {
   width: 100%;
   height: 100%;
+  max-height: none;
   object-fit: cover;
   object-position: 50% 18%;
   transform: scale(1.12);

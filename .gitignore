@@ -66,6 +66,7 @@ pulls/
 !app/public/logo.png
 !app/public/bitcoin-logo.svg
 !app/public/hero-coin.png
+!app/public/solaris-cet-logo.jpg
 !app/public/hologram-cube.png
 !app/public/phone-mockup.png
 !static/sovereign/favicon.svg
