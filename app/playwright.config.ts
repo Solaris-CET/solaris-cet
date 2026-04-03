@@ -28,7 +28,7 @@ export default defineConfig({
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
     /* Base URL pointing at the Vite preview server */
-    baseURL: 'http://localhost:4173',
+    baseURL: 'http://127.0.0.1:4173',
     /* PWA service worker would otherwise serve stale bundles without new selectors */
     serviceWorkers: 'block',
     /* Capture screenshots/trace on first retry only */
@@ -46,9 +46,11 @@ export default defineConfig({
      so baseURL/webServer.url never silently point at the wrong port. */
   webServer: {
     /* Preview only — run `npm run build` (or `npm run verify`) first so `dist/` exists. A second build
-       here after `verify:full` was redundant and could fail with ENOTEMPTY on `dist/vendor/onnxruntime`. */
-    command: 'npm run preview -- --port 4173 --strictPort',
-    url: 'http://localhost:4173',
+       here after `verify:full` was redundant and could fail with ENOTEMPTY on `dist/vendor/onnxruntime`.
+       `preview:e2e` binds 127.0.0.1 and raises Node heap to reduce mid-suite OOMs that surface as
+       :4173 ERR_CONNECTION_REFUSED. */
+    command: 'npm run preview:e2e',
+    url: 'http://127.0.0.1:4173',
     /* Local: allow reusing `npm run preview` if already running (run `npm run build` after UI changes). */
     reuseExistingServer: !process.env.CI,
     timeout: process.env.CI ? 120_000 : 180_000,
