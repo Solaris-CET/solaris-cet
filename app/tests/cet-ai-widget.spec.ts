@@ -193,3 +193,75 @@ test.describe('Locale query ?lang=de', () => {
     await expect(desc).toContainText(/Escape/i);
   });
 });
+
+test.describe('Locale query ?lang=es', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.removeItem('solaris_lang');
+    });
+    await page.goto('/?lang=es', { waitUntil: 'domcontentloaded' });
+    await page.locator('.loading-overlay').waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+  });
+
+  test('?lang=es applies Spanish CET AI chrome', async ({ page }) => {
+    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
+    await expect(page.getByRole('heading', { name: /CET AI Solaris/i }).first()).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByRole('button', { name: /INICIAR PROTOCOLO/i })).toBeVisible();
+  });
+
+  test('?lang=es modal exposes Spanish screen-reader dialog description', async ({ page }) => {
+    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
+    const chip = page.getByRole('button', { name: /¿Qué es el protocolo RAV/i });
+    await chip.evaluate((el) =>
+      (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
+    );
+    await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
+    await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
+    await expect(page.getByTestId('cet-ai-modal-dialog')).toHaveAttribute(
+      'aria-describedby',
+      'cet-ai-dialog-desc',
+    );
+    const desc = page.locator('#cet-ai-dialog-desc');
+    await expect(desc).toBeAttached();
+    await expect(desc).toContainText(/Diálogo CET AI/i);
+    await expect(desc).toContainText(/Escape/i);
+  });
+});
+
+test.describe('Locale query ?lang=zh', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.removeItem('solaris_lang');
+    });
+    await page.goto('/?lang=zh', { waitUntil: 'domcontentloaded' });
+    await page.locator('.loading-overlay').waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+  });
+
+  test('?lang=zh applies Chinese CET AI chrome', async ({ page }) => {
+    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
+    await expect(page.getByRole('heading', { name: /Solaris CET AI/i }).first()).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByRole('button', { name: /启动协议/ })).toBeVisible();
+  });
+
+  test('?lang=zh modal exposes Chinese screen-reader dialog description', async ({ page }) => {
+    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
+    const chip = page.getByRole('button', { name: /什么是 RAV 协议/ });
+    await chip.evaluate((el) =>
+      (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
+    );
+    await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
+    await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
+    await expect(page.getByTestId('cet-ai-modal-dialog')).toHaveAttribute(
+      'aria-describedby',
+      'cet-ai-dialog-desc',
+    );
+    const desc = page.locator('#cet-ai-dialog-desc');
+    await expect(desc).toBeAttached();
+    await expect(desc).toContainText(/CET AI 对话框/);
+    await expect(desc).toContainText(/Escape/);
+  });
+});
