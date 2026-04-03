@@ -18,7 +18,7 @@ npm run verify       # lint + typecheck + test + build (quick gate before push)
 npm run verify:full  # verify + Playwright E2E (full local check)
 ```
 
-E2E (Chromium): from `app/`, `npm run test:e2e` (install browsers once: `npx playwright install --with-deps chromium`). Config starts **`vite preview` only** — `dist/` must already exist (`npm run build` or run after `npm run verify`). CI supplies `dist/` from the build job.
+E2E (Chromium): from `app/`, `npm run test:e2e` (install browsers once: `npx playwright install --with-deps chromium`). **`pretest:e2e`** fails fast if `app/dist/index.html` is missing (with a hint). Config starts **`vite preview` only** — `dist/` must already exist (`npm run build` or run after `npm run verify`). CI supplies `dist/` from the build job.
 
 ## Layout
 
@@ -29,6 +29,8 @@ E2E (Chromium): from `app/`, `npm run test:e2e` (install browsers once: `npx pla
 | `db/` | Drizzle schema / client (used by `api/auth`) |
 | `public/` | Static assets; `public/api/state.json` for client state |
 | `tests/` | Playwright specs |
+
+**CET AI (`src/lib/`):** `cetAiConstants.ts` (query length caps + near-limit band), `cetAiConversation.ts` (copy-for-AI / multi-turn handoff strings), `cetAiQueryUi.ts` (length indicator tone), plus `cetAiTelemetry.ts` and related mesh/burst helpers — see also `docs/PRODUCTION_LAYOUT.md`.
 
 ## Env (Coolify / production / local)
 

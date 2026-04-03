@@ -5,7 +5,7 @@ This map is the **single orientation** for where code lives before shipping to *
 | Area | Path | Role |
 |------|------|------|
 | **Web app (canonical)** | `app/` | Vite + React + TypeScript; `npm run build` → `app/dist/` |
-| **CET AI (UI + telemetry)** | `app/src/components/CetAiSearch.tsx`, `app/src/lib/cetAi*.ts` | Dual-model chat (Grok × Gemini); headers `X-Cet-Ai-Source` |
+| **CET AI (UI + telemetry)** | `app/src/components/CetAiSearch.tsx`; `cetAiConstants.ts`, `cetAiConversation.ts`, `cetAiQueryUi.ts`, `cetAiTelemetry.ts`, … | Dual-model chat (Grok × Gemini); headers `X-Cet-Ai-Source`; query caps in `cetAiConstants.ts` |
 | **Edge API** | `app/api/chat/route.ts` | POST `/api/chat` — deploy with the app build root |
 | **Root API fallback** | `api/chat/route.ts` | OpenAI-only path if deploy root is repo root (see `api/README.md`) |
 | **Static OMEGA surface** | `static/sovereign/index.html` → `app/public/sovereign/` (`prebuild` / `predev`) | Zero-JS page at **`/sovereign/`** in the same Vite `dist/` as the SPA; listed in `app/public/sitemap.xml` |

@@ -26,4 +26,8 @@ describe('cetAiQueryCharCountToneClass', () => {
       'text-amber-400/90',
     );
   });
+
+  it('when max is smaller than the near-limit band width, the comparison still yields warning tone for typical lengths', () => {
+    expect(cetAiQueryCharCountToneClass(1, 100)).toBe('text-amber-400/90');
+  });
 });
