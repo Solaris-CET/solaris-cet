@@ -66,9 +66,9 @@ test.describe('Solaris CET AI widget — desktop', () => {
     );
     await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
     await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
-    const status = page.getByRole('status');
-    await expect(status).toBeVisible({ timeout: 16_000 });
-    await expect(status).toContainText(/built-in|No live API/i);
+    const offlineHint = page.getByText(/No live API on this host/i);
+    await expect(offlineHint).toBeVisible({ timeout: 16_000 });
+    await expect(offlineHint).toContainText(/built-in|No live API/i);
   });
 });
 

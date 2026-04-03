@@ -353,6 +353,14 @@ export interface Translations {
     sourceBadgeLive: string;
     /** Modal header pill when the reply used built-in knowledge or non-live API. */
     sourceBadgeLocal: string;
+    /** Collapsible technical RAV telemetry (default closed — answer-first UX). */
+    ravTraceToggle: string;
+    /** Stop button while a reply is generating. */
+    stopGenerating: string;
+    /** Keyboard hint under the composer (Enter vs Shift+Enter). */
+    sendHintModEnter: string;
+    /** Shown when the user stops generation mid-flight. */
+    generationStopped: string;
     knowledge: CetAiKnowledge;
   };
   /** FAQ accordion copy (`faqContent.data.ts`). */
@@ -635,6 +643,10 @@ const translations: Record<LangCode, Translations> = {
         'Until /api/chat is live on this host, answers use built-in Solaris facts; deploy the API for Grok × Gemini.',
       sourceBadgeLive: 'Live API',
       sourceBadgeLocal: 'Built-in knowledge',
+      ravTraceToggle: 'RAV protocol trace (technical)',
+      stopGenerating: 'Stop',
+      sendHintModEnter: 'Enter to send · Shift+Enter for new line · ⌘/Ctrl+Enter also sends',
+      generationStopped: 'Generation stopped. Ask again or continue in a new message.',
       knowledge: {
         price: `**CET trades on DeDust (TON)** with a fixed supply of **9,000 tokens** — genuine hyper-scarcity.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- The **DCBM model** correlates scarcity with a 90-year emission schedule\n- Long-term value accumulation driven purely by on-chain demand`,
         mining: '**CET mining runs for 90 years** with a decaying reward curve.\n\n- **66.66%** of total supply enters circulation through proof-of-work\n- Active nodes: **18,420+**\n- Battery drain approaches **0%** thanks to the Zero-Battery constraint\n- Optimal mining window: **Q3 2025** (high-efficiency period)',
@@ -970,6 +982,10 @@ const translations: Record<LangCode, Translations> = {
         'Hasta que /api/chat esté activo aquí, las respuestas usan conocimiento integrado; despliega la API para Grok × Gemini.',
       sourceBadgeLive: 'API en vivo',
       sourceBadgeLocal: 'Conocimiento integrado',
+      ravTraceToggle: 'Traza del protocolo RAV (técnica)',
+      stopGenerating: 'Detener',
+      sendHintModEnter: 'Enter para enviar · Shift+Enter para nueva línea · ⌘/Ctrl+Enter también envía',
+      generationStopped: 'Generación detenida. Pregunta de nuevo o continúa en un mensaje nuevo.',
       knowledge: {
         price: `**CET cotiza en DeDust (TON)** con un suministro fijo de **9,000 tokens** — escasez real.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- El **modelo DCBM** correlaciona la escasez con un cronograma de emisión de 90 años\n- Acumulación de valor a largo plazo impulsada por la demanda on-chain`,
         mining: '**La minería CET dura 90 años** con una curva de recompensa decreciente.\n\n- **66.66%** del suministro total entra en circulación mediante prueba de trabajo\n- Nodos activos: **18,420+**\n- Consumo de batería cercano a **0%** gracias al Zero-Battery constraint\n- Ventana óptima de minería: **Q3 2025**',
@@ -1297,6 +1313,10 @@ const translations: Record<LangCode, Translations> = {
         '在 /api/chat 未部署前，回答来自内置知识；部署后可使用 Grok × Gemini。',
       sourceBadgeLive: '实时 API',
       sourceBadgeLocal: '内置知识',
+      ravTraceToggle: 'RAV 协议追踪（技术）',
+      stopGenerating: '停止',
+      sendHintModEnter: 'Enter 发送 · Shift+Enter 换行 · ⌘/Ctrl+Enter 也可发送',
+      generationStopped: '已停止生成。请重新提问或在新消息中继续。',
       knowledge: {
         price: `**CET 在 DeDust（TON）上交易**，固定供应量 **9,000 枚** — 真正的超稀缺性。\n\n- 池: \`${DEDUST_POOL_ADDRESS}\`\n- **DCBM 模型**将稀缺性与 90 年发行时间表相关联\n- 长期价值积累完全由链上需求驱动`,
         mining: '**CET 挖矿持续 90 年**，奖励曲线递减。\n\n- **66.66%** 的总供应量通过工作量证明流入流通\n- 活跃节点: **18,420+**\n- 得益于零电池约束，电池消耗接近 **0%**\n- 最佳挖矿窗口: **2025 年 Q3**',
@@ -1631,6 +1651,10 @@ const translations: Record<LangCode, Translations> = {
         'Пока /api/chat не развёрнут здесь, ответы из встроенной базы; подключите API для Grok × Gemini.',
       sourceBadgeLive: 'Живой API',
       sourceBadgeLocal: 'Встроенная база',
+      ravTraceToggle: 'Трассировка протокола RAV (техн.)',
+      stopGenerating: 'Стоп',
+      sendHintModEnter: 'Enter — отправить · Shift+Enter — новая строка · ⌘/Ctrl+Enter — отправить',
+      generationStopped: 'Генерация остановлена. Задайте вопрос снова или продолжите новым сообщением.',
       knowledge: {
         price: `**CET торгуется на DeDust (TON)** с фиксированным запасом **9 000 токенов** — настоящая гиперредкость.\n\n- Пул: \`${DEDUST_POOL_ADDRESS}\`\n- **Модель DCBM** коррелирует дефицит с 90-летним графиком эмиссии\n- Долгосрочное накопление стоимости, обусловленное исключительно он-чейн спросом`,
         mining: '**Майнинг CET продолжается 90 лет** с убывающей кривой вознаграждений.\n\n- **66.66%** от общего запаса поступает в обращение через proof-of-work\n- Активных узлов: **18 420+**\n- Расход батареи стремится к **0%** благодаря Zero-Battery ограничению\n- Оптимальное окно майнинга: **Q3 2025**',
@@ -1966,6 +1990,10 @@ const translations: Record<LangCode, Translations> = {
         'Până când /api/chat e activ aici, răspunsurile folosesc cunoștințe integrate; deploy API pentru Grok × Gemini.',
       sourceBadgeLive: 'API live',
       sourceBadgeLocal: 'Cunoștințe integrate',
+      ravTraceToggle: 'Trace protocol RAV (tehnic)',
+      stopGenerating: 'Oprește',
+      sendHintModEnter: 'Enter trimite · Shift+Enter linie nouă · ⌘/Ctrl+Enter trimite',
+      generationStopped: 'Generare oprită. Întreabă din nou sau continuă într-un mesaj nou.',
       knowledge: {
         price: `**CET se tranzacționează pe DeDust (TON)** cu o ofertă fixă de **9.000 de tokeni** — raritate extremă reală.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- **Modelul DCBM** corelează raritatea cu un program de emisie de 90 de ani\n- Acumulare de valoare pe termen lung determinată exclusiv de cererea on-chain`,
         mining: '**Minarea CET durează 90 de ani** cu o curbă de recompensă descrescătoare.\n\n- **66.66%** din oferta totală intră în circulație prin proof-of-work\n- Noduri active: **18.420+**\n- Consum de baterie aproape de **0%** datorită constrângerii Zero-Battery\n- Fereastra optimă de minare: **T3 2025** (perioadă de eficiență ridicată)',
@@ -2301,6 +2329,10 @@ const translations: Record<LangCode, Translations> = {
         'Enquanto /api/chat não estiver ativo aqui, as respostas usam conhecimento integrado; faça deploy da API para Grok × Gemini.',
       sourceBadgeLive: 'API ao vivo',
       sourceBadgeLocal: 'Conhecimento integrado',
+      ravTraceToggle: 'Rastreio do protocolo RAV (técnico)',
+      stopGenerating: 'Parar',
+      sendHintModEnter: 'Enter envia · Shift+Enter nova linha · ⌘/Ctrl+Enter também envia',
+      generationStopped: 'Geração interrompida. Pergunte de novo ou continue numa nova mensagem.',
       knowledge: {
         price: `**CET negocia na DeDust (TON)** com fornecimento fixo de **9.000 tokens** — escassez real.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- O **modelo DCBM** correlaciona escassez com cronograma de emissão de 90 anos\n- Acumulação de valor a longo prazo impulsionada pela demanda on-chain`,
         mining: '**A mineração CET dura 90 anos** com curva de recompensa decrescente.\n\n- **66.66%** do fornecimento total entra em circulação via proof-of-work\n- Nós ativos: **18.420+**\n- Consumo de bateria próximo a **0%** graças à restrição Zero-Battery\n- Janela ótima de mineração: **Q3 2025**',
@@ -2636,6 +2668,10 @@ const translations: Record<LangCode, Translations> = {
         'Solange /api/chat hier nicht aktiv ist, nutzen Antworten eingebautes Wissen; deployen Sie die API für Grok × Gemini.',
       sourceBadgeLive: 'Live-API',
       sourceBadgeLocal: 'Eingebautes Wissen',
+      ravTraceToggle: 'RAV-Protokoll-Trace (technisch)',
+      stopGenerating: 'Stopp',
+      sendHintModEnter: 'Enter senden · Shift+Enter neue Zeile · ⌘/Ctrl+Enter sendet auch',
+      generationStopped: 'Generierung gestoppt. Erneut fragen oder in einer neuen Nachricht fortfahren.',
       knowledge: {
         price: `**CET wird auf DeDust (TON)** mit einem festen Angebot von **9.000 Token** gehandelt — echte Hyperknappheit.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- Das **DCBM-Modell** korreliert Knappheit mit einem 90-Jahres-Emissionsplan\n- Langfristige Wertakkumulation, die ausschließlich durch On-Chain-Nachfrage angetrieben wird`,
         mining: '**CET-Mining läuft 90 Jahre** mit einer abnehmenden Belohnungskurve.\n\n- **66.66%** des Gesamtangebots gelangt durch Proof-of-Work in Umlauf\n- Aktive Nodes: **18.420+**\n- Akkuverbrauch nahezu **0%** dank der Zero-Battery-Einschränkung\n- Optimales Mining-Fenster: **Q3 2025**',

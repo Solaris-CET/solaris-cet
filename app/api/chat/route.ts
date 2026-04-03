@@ -57,6 +57,44 @@ interface OnChainContext {
   volume24hUsd: string;
 }
 
+/** Prior turns for multi-turn follow-ups (Claude-style chat context). Max 24 messages. */
+interface ConversationTurn {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+function normalizeConversation(raw: unknown): ConversationTurn[] {
+  if (!Array.isArray(raw)) return [];
+  const out: ConversationTurn[] = [];
+  for (const item of raw) {
+    if (out.length >= 24) break;
+    if (!item || typeof item !== 'object') continue;
+    const role = (item as { role?: unknown }).role;
+    const content = (item as { content?: unknown }).content;
+    if (role !== 'user' && role !== 'assistant') continue;
+    if (typeof content !== 'string') continue;
+    const c = content.trim();
+    if (!c) continue;
+    out.push({ role, content: c.slice(0, 8000) });
+  }
+  return out;
+}
+
+function buildChatMessages(
+  systemPrompt: string,
+  userQuery: string,
+  conversation: ConversationTurn[],
+): { role: 'system' | 'user' | 'assistant'; content: string }[] {
+  const msgs: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
+    { role: 'system', content: systemPrompt },
+  ];
+  for (const t of conversation) {
+    msgs.push({ role: t.role, content: t.content });
+  }
+  msgs.push({ role: 'user', content: userQuery.trim() });
+  return msgs;
+}
+
 /**
  * Fetch live on-chain data from the DeDust V2 API.
  * Returns null on any error so the handler can degrade gracefully.
@@ -173,8 +211,9 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   // 2. Parse Request
-  const body = (await req.json()) as { query?: unknown };
+  const body = (await req.json()) as { query?: unknown; conversation?: unknown };
   const userQuery = body.query;
+  const conversation = normalizeConversation(body.conversation);
 
   if (!userQuery || typeof userQuery !== 'string' || !userQuery.trim()) {
     return new Response(
@@ -200,8 +239,15 @@ export default async function handler(req: Request): Promise<Response> {
       `- 24h volume: $${onChain.volume24hUsd}`
     : '';
 
+  const multiTurnHint =
+    conversation.length > 0
+      ? `MULTI-TURN: Prior user/assistant messages are included below. Answer the **latest** user message ` +
+        `in full; use earlier turns only for follow-up context, pronouns, and consistency.\n\n`
+      : '';
+
   // ── SHARED SYSTEM CONTEXT ─────────────────────────────────────────────────
   const sharedContext =
+    multiTurnHint +
     `You are Solaris CET AI — flagship inference layer of the Solaris CET ecosystem. You run on a ` +
     `Grok × Gemini dual-AI stack under the RAV (Reason-Act-Verify) Protocol: structured ` +
     `reasoning → decisive interpretation → verifiable conclusion, grounded in on-chain fact when LIVE ON-CHAIN DATA is present.\n\n` +
@@ -267,6 +313,10 @@ export default async function handler(req: Request): Promise<Response> {
     `[DIRECTIVĂ DE ACȚIUNE]\n` +
     `(Observation — 1–2 sentences. Sharp conclusion. If relevant, mention DeDust / TON wallet flow without being salesy.)`;
 
+  const geminiMessages = buildChatMessages(geminiSystemPrompt, userQuery.trim(), conversation);
+  const grokMessages = buildChatMessages(grokSystemPrompt, userQuery.trim(), conversation);
+  const fullFallbackMessages = buildChatMessages(fullFallbackPrompt, userQuery.trim(), conversation);
+
   // ── CALL BOTH AI PROVIDERS IN PARALLEL ───────────────────────────────────
   const [geminiResult, grokResult] = await Promise.allSettled([
     geminiKey
@@ -275,10 +325,7 @@ export default async function handler(req: Request): Promise<Response> {
           baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
         }).chat.completions.create({
           model: GEMINI_MODEL,
-          messages: [
-            { role: 'system', content: geminiSystemPrompt },
-            { role: 'user', content: userQuery },
-          ],
+          messages: geminiMessages,
           temperature: 0.3,
         })
       : Promise.reject(new Error('GEMINI_API_KEY not set')),
@@ -289,10 +336,7 @@ export default async function handler(req: Request): Promise<Response> {
           baseURL: 'https://api.x.ai/v1',
         }).chat.completions.create({
           model: GROK_MODEL,
-          messages: [
-            { role: 'system', content: grokSystemPrompt },
-            { role: 'user', content: userQuery },
-          ],
+          messages: grokMessages,
           temperature: 0.3,
         })
       : Promise.reject(new Error('GROK_API_KEY not set')),
@@ -317,10 +361,7 @@ export default async function handler(req: Request): Promise<Response> {
     });
     const fallback = await fallbackClient.chat.completions.create({
       model: GEMINI_MODEL,
-      messages: [
-        { role: 'system', content: fullFallbackPrompt },
-        { role: 'user', content: userQuery },
-      ],
+      messages: fullFallbackMessages,
       temperature: 0.3,
     });
     reply = fallback.choices[0]?.message?.content ?? 'CET AI is silent.';
@@ -332,10 +373,7 @@ export default async function handler(req: Request): Promise<Response> {
     });
     const fallback = await fallbackClient.chat.completions.create({
       model: GROK_MODEL,
-      messages: [
-        { role: 'system', content: fullFallbackPrompt },
-        { role: 'user', content: userQuery },
-      ],
+      messages: fullFallbackMessages,
       temperature: 0.3,
     });
     reply = fallback.choices[0]?.message?.content ?? 'CET AI is silent.';

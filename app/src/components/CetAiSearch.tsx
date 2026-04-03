@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { track } from '@vercel/analytics/react';
-import { X, Send, Copy, Check, ExternalLink, ChevronRight, Sparkles, Trash2, Bot } from 'lucide-react';
+import { X, Send, Copy, Check, ExternalLink, ChevronRight, Sparkles, Trash2, Bot, StopCircle } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { CetAiKnowledge, Translations } from '../i18n/translations';
@@ -90,10 +90,21 @@ const TOPIC_KEYWORDS: Record<string, string[]> = {
   team:        ['team', 'department', 'echipa', 'equipo', 'команда', '团队', 'mannschaft', 'equipe', '200,000', '200000', '200k', 'task agent', 'tasking', 'task specialists'],
 };
 
+function chatHistoryToConversation(history: ChatEntry[]): { role: 'user' | 'assistant'; content: string }[] {
+  return history
+    .flatMap((e) => [
+      { role: 'user' as const, content: e.question },
+      { role: 'assistant' as const, content: e.answer },
+    ])
+    .slice(-24);
+}
+
 async function fetchCetAiChat(
   query: string,
   signal: AbortSignal,
+  priorHistory: ChatEntry[],
 ): Promise<{ text: string | null; sourceHeader: string | null }> {
+  const conversation = chatHistoryToConversation(priorHistory);
   const maxAttempts = 2;
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     if (attempt > 0) {
@@ -111,7 +122,7 @@ async function fetchCetAiChat(
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ query, conversation }),
         signal,
       });
       const sourceHeader = res.headers.get('X-Cet-Ai-Source');
@@ -201,8 +212,29 @@ function phaseOrderIndex(currentPhase: string): number {
 }
 
 // --- Markdown renderer for CET AI responses ---
-// Supports: **bold**, *italic*, `code`, - bullet lists, numbered lists, \n\n paragraphs
-function MarkdownText({ text }: { text: string }) {
+// Supports: fenced ```code```, **bold**, *italic*, `code`, lists, [label](url), bare https links
+function parseFencedCodeBlocks(text: string): Array<{ type: 'md' | 'code'; lang?: string; content: string }> {
+  const re = /```(\w*)\n?([\s\S]*?)```/g;
+  const out: Array<{ type: 'md' | 'code'; lang?: string; content: string }> = [];
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) {
+      out.push({ type: 'md', content: text.slice(last, m.index) });
+    }
+    out.push({ type: 'code', lang: m[1] || undefined, content: (m[2] ?? '').replace(/\n$/, '') });
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) {
+    out.push({ type: 'md', content: text.slice(last) });
+  }
+  if (out.length === 0) {
+    out.push({ type: 'md', content: text });
+  }
+  return out;
+}
+
+function MarkdownBodyChunk({ text }: { text: string }) {
   const renderLine = (line: string, key: number) => {
     const h3 = line.match(/^###\s+(.+)$/);
     if (h3) {
@@ -243,36 +275,55 @@ function MarkdownText({ text }: { text: string }) {
     return <p key={key} className="leading-relaxed">{renderInline(line)}</p>;
   };
 
-  const renderInline = (text: string): React.ReactNode => {
+  const renderInline = (raw: string): React.ReactNode => {
+    let key = 0;
     const parts: React.ReactNode[] = [];
-    let idx = 0;
-    // Pattern: **bold**, *italic*, `code`
+
+    const pushPlain = (s: string) => {
+      if (!s) return;
+      const linkRe = /(\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)|(https?:\/\/[^\s<]+))/g;
+      let li = 0;
+      let m: RegExpExecArray | null;
+      while ((m = linkRe.exec(s)) !== null) {
+        if (m.index > li) parts.push(<span key={key++}>{s.slice(li, m.index)}</span>);
+        const href = m[2] ? m[3] : m[4];
+        const label = m[2] ? m[2] : (m[4] ?? '');
+        if (href) {
+          parts.push(
+            <a
+              key={key++}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cyan-400 underline underline-offset-2 hover:text-cyan-300 break-all"
+            >
+              {label}
+            </a>,
+          );
+        }
+        li = m.index + m[0].length;
+      }
+      if (li < s.length) parts.push(<span key={key++}>{s.slice(li)}</span>);
+    };
+
     const pattern = /(\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`)/g;
-    let match: RegExpExecArray | null;
     let lastIndex = 0;
-    pattern.lastIndex = 0;
-    while ((match = pattern.exec(text)) !== null) {
-      if (match.index > lastIndex) {
-        parts.push(<span key={idx}>{text.slice(lastIndex, match.index)}</span>);
-        idx += 1;
-      }
+    let match: RegExpExecArray | null;
+    while ((match = pattern.exec(raw)) !== null) {
+      if (match.index > lastIndex) pushPlain(raw.slice(lastIndex, match.index));
       if (match[2]) {
-        parts.push(<strong key={idx} className="text-yellow-300 font-semibold">{match[2]}</strong>);
+        parts.push(<strong key={key++} className="text-yellow-300 font-semibold">{match[2]}</strong>);
       } else if (match[3]) {
-        parts.push(<em key={idx} className="text-gray-300 italic">{match[3]}</em>);
+        parts.push(<em key={key++} className="text-gray-300 italic">{match[3]}</em>);
       } else if (match[4]) {
-        parts.push(<code key={idx} className="bg-gray-800 text-yellow-400 px-1.5 py-0.5 rounded text-xs font-mono break-all">{match[4]}</code>);
+        parts.push(<code key={key++} className="bg-gray-800 text-yellow-400 px-1.5 py-0.5 rounded text-xs font-mono break-all">{match[4]}</code>);
       }
-      idx += 1;
       lastIndex = pattern.lastIndex;
     }
-    if (lastIndex < text.length) {
-      parts.push(<span key={idx}>{text.slice(lastIndex)}</span>);
-    }
-    return parts;
+    if (lastIndex < raw.length) pushPlain(raw.slice(lastIndex));
+    return <>{parts}</>;
   };
 
-  // Split into paragraphs by double newline
   const paragraphs = text.split(/\n\n+/);
   return (
     <div className="space-y-3 text-sm leading-relaxed">
@@ -294,6 +345,26 @@ function MarkdownText({ text }: { text: string }) {
           </React.Fragment>
         );
       })}
+    </div>
+  );
+}
+
+function MarkdownText({ text }: { text: string }) {
+  const segments = parseFencedCodeBlocks(text);
+  return (
+    <div className="space-y-4 text-sm leading-relaxed">
+      {segments.map((seg, i) =>
+        seg.type === 'code' ? (
+          <pre
+            key={i}
+            className="overflow-x-auto rounded-xl border border-white/10 bg-black/60 p-4 text-xs text-slate-200 font-mono leading-relaxed"
+          >
+            <code>{seg.content}</code>
+          </pre>
+        ) : (
+          <MarkdownBodyChunk key={i} text={seg.content} />
+        ),
+      )}
     </div>
   );
 }
@@ -400,10 +471,12 @@ export default function CetAiSearch() {
 
   const terminalRef = useRef<HTMLDivElement>(null);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const modalInputRef = useRef<HTMLInputElement>(null);
+  const modalInputRef = useRef<HTMLTextAreaElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const cetAiAbortRef = useRef<AbortController | null>(null);
   const trackedCompleteKey = useRef<string>('');
+  /** Incremented to invalidate in-flight schedules (stop / new question). */
+  const generationEpochRef = useRef(0);
 
   // Auto-scroll telemetry terminal
   useEffect(() => {
@@ -436,6 +509,7 @@ export default function CetAiSearch() {
 
   // --- CLOSE HANDLER ---
   const handleClose = useCallback(() => {
+    generationEpochRef.current += 1;
     cetAiAbortRef.current?.abort();
     cetAiAbortRef.current = null;
     timersRef.current.forEach(clearTimeout);
@@ -489,8 +563,22 @@ export default function CetAiSearch() {
     timersRef.current.push(id);
   };
 
+  const handleStopGeneration = useCallback(() => {
+    generationEpochRef.current += 1;
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
+    cetAiAbortRef.current?.abort();
+    cetAiAbortRef.current = null;
+    setPhase('complete');
+    setFinalResponse(t.cetAi.generationStopped);
+    setResponseUsedLiveApi(false);
+    setCetAiConfidence(0);
+    setMetrics((m) => ({ ...m, confidence: 0 }));
+  }, [t.cetAi.generationStopped]);
+
   // --- CORE LOGIC: RAV + optional live /api/chat (Coolify/VPS) with local knowledge fallback ---
-  const processQuestion = useCallback((q: string) => {
+  const processQuestion = useCallback((q: string, priorHistory: ChatEntry[] = []) => {
+    const myEpoch = ++generationEpochRef.current;
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
 
@@ -498,7 +586,7 @@ export default function CetAiSearch() {
     const ac = new AbortController();
     cetAiAbortRef.current = ac;
 
-    const cetAiFetchPromise = fetchCetAiChat(q, ac.signal);
+    const cetAiFetchPromise = fetchCetAiChat(q, ac.signal, priorHistory);
 
     const { answer: localAnswer, confidence } = buildContextualResponse(q, t.cetAi.knowledge);
     const lowerQ = q.toLowerCase();
@@ -530,6 +618,7 @@ export default function CetAiSearch() {
     }
 
     schedule(() => {
+      if (generationEpochRef.current !== myEpoch) return;
       setPhase('observe_context');
       addLog('QUANTUM', `INTENT_EXTRACTION: Semantic vector computed. Ambiguity score: 0.${Math.floor(Math.random() * 30 + 10)}`);
       addLog('QUANTUM', buildFlashGlintLogMessage(q));
@@ -539,6 +628,7 @@ export default function CetAiSearch() {
     }, CET_AI_PHASE_MS[0]);
 
     schedule(() => {
+      if (generationEpochRef.current !== myEpoch) return;
       setPhase('think_route');
       addLog('INFO', `GEMINI_REASON: Analytical pathway · parallel hypothesis lattice`);
       addLog('QUANTUM', `HYPOTHESIS_GEN: 6 paths · superposition collapse scheduled`);
@@ -547,6 +637,7 @@ export default function CetAiSearch() {
     }, CET_AI_PHASE_MS[1]);
 
     schedule(() => {
+      if (generationEpochRef.current !== myEpoch) return;
       setPhase('think_validate');
       addLog('QUANTUM', `PATH_COLLAPSE: Highest-confidence path (p=${(confidence / 100).toFixed(4)})`);
       addLog('SEC', `CONSTRAINT_CHECK: Zero-hallucination bounds · fact anchors`);
@@ -561,6 +652,7 @@ export default function CetAiSearch() {
     }, CET_AI_PHASE_MS[2]);
 
     schedule(() => {
+      if (generationEpochRef.current !== myEpoch) return;
       setPhase('act_execute');
       addLog('INFO', `GROK_ACT: Action directive pipeline · live /api/chat merge pending`);
       addLog('QUANTUM', `RESPONSE_COMPILE: dual-model payload · entropy seed`);
@@ -576,6 +668,7 @@ export default function CetAiSearch() {
 
     schedule(() => {
       void (async () => {
+        if (generationEpochRef.current !== myEpoch) return;
         type FetchResult = { text: string | null; sourceHeader: string | null };
         const raced = await Promise.race<FetchResult>([
           cetAiFetchPromise,
@@ -583,6 +676,7 @@ export default function CetAiSearch() {
             setTimeout(() => resolve({ text: null, sourceHeader: null }), 14_000);
           }),
         ]).catch((): FetchResult => ({ text: null, sourceHeader: null }));
+        if (generationEpochRef.current !== myEpoch || ac.signal.aborted) return;
         const remote = raced.text;
         const hasRemoteText = Boolean(remote?.trim());
         /** True only when the edge handler affirms live CET AI (see X-Cet-Ai-Source on /api/chat). */
@@ -614,6 +708,7 @@ export default function CetAiSearch() {
     }, CET_AI_PHASE_MS[4]);
 
     schedule(() => {
+      if (generationEpochRef.current !== myEpoch) return;
       setPhase('verify_cross');
       addLog('SEC', `VERIFY_INIT: Cross-model review · Grok↔Gemini`);
       addLog('QUANTUM', `ZK_PROOF: integrity bundle · Hash: 0x${generateHash()}`);
@@ -621,6 +716,7 @@ export default function CetAiSearch() {
     }, CET_AI_PHASE_MS[5]);
 
     schedule(() => {
+      if (generationEpochRef.current !== myEpoch) return;
       setPhase('verify_anchor');
       addLog('SEC', `IPFS_ANCHOR: trace slot reserved · CID: bafkrei${generateHash().toLowerCase()}`);
       addLog('INFO', `ON_CHAIN: anchor ref · Block: #${Math.floor(Math.random() * 1_000_000 + 48_000_000)}`);
@@ -629,6 +725,7 @@ export default function CetAiSearch() {
     }, CET_AI_PHASE_MS[6]);
 
     schedule(() => {
+      if (generationEpochRef.current !== myEpoch) return;
       setPhase('complete');
       addLog('INFO', buildDeepLatticeMeshLogMessage('SESSION_MESH', q, CET_AI_LATTICE_PHASE.sessionClose));
       addLog('QUANTUM', buildLoopCompleteBurstLogMessage(q));
@@ -642,22 +739,21 @@ export default function CetAiSearch() {
     const q = query.trim();
     setQuery('');
     setIsModalOpen(true);
-    processQuestion(q);
+    processQuestion(q, []);
   };
 
   // Modal follow-up submit → archive current Q&A, start new question
   const handleModalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim() || isProcessing) return;
-    if (finalResponse) {
-      setChatHistory(prev => [
-        ...prev,
-        { question: submittedQuestion, answer: finalResponse, confidence: cetAiConfidence },
-      ]);
-    }
+    const nextHistory: ChatEntry[] =
+      finalResponse && submittedQuestion
+        ? [...chatHistory, { question: submittedQuestion, answer: finalResponse, confidence: cetAiConfidence }]
+        : chatHistory;
+    setChatHistory(nextHistory);
     const q = query.trim();
     setQuery('');
-    processQuestion(q);
+    processQuestion(q, nextHistory);
   };
 
   const isProcessing = phase !== 'idle' && phase !== 'complete';
@@ -723,7 +819,12 @@ export default function CetAiSearch() {
             <button
               key={q}
               type="button"
-              onClick={() => { setQuery(q); setIsModalOpen(true); setTimeout(() => processQuestion(q), 50); setQuery(''); }}
+              onClick={() => {
+                setQuery(q);
+                setIsModalOpen(true);
+                setTimeout(() => processQuestion(q, []), 50);
+                setQuery('');
+              }}
               className="inline-flex items-center gap-1.5 min-h-11 min-w-[44px] px-3 py-2 rounded-full bg-gray-900 border border-gray-700 text-gray-400 text-xs hover:border-yellow-500/50 hover:text-yellow-400 transition-all active:scale-95 touch-manipulation"
             >
               <Sparkles className="w-3 h-3" />
@@ -778,10 +879,21 @@ export default function CetAiSearch() {
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
               <span className="hidden sm:inline text-xs font-mono bg-gray-900 border border-gray-700 px-2 py-0.5 rounded text-blue-400">Gemini REASON</span>
               <span className="hidden sm:inline text-gray-600 text-xs">×</span>
               <span className="hidden sm:inline text-xs font-mono bg-gray-900 border border-gray-700 px-2 py-0.5 rounded text-purple-400">Grok ACT</span>
+              {isProcessing && (
+                <button
+                  type="button"
+                  onClick={handleStopGeneration}
+                  aria-label={t.cetAi.stopGenerating}
+                  className="inline-flex items-center gap-1.5 min-h-11 px-3 py-2 rounded-lg border border-red-500/45 text-red-300 hover:bg-red-500/10 transition-colors touch-manipulation"
+                >
+                  <StopCircle className="w-4 h-4 shrink-0" />
+                  <span className="text-xs font-semibold">{t.cetAi.stopGenerating}</span>
+                </button>
+              )}
               {chatHistory.length > 0 && (
                 <button
                   onClick={() => setChatHistory([])}
@@ -835,14 +947,125 @@ export default function CetAiSearch() {
                   {/* Current user question bubble */}
                   <div className="flex justify-end">
                     <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl rounded-tr-sm px-5 py-3 max-w-2xl">
-                      <p className="text-yellow-200 text-sm">{submittedQuestion}</p>
+                      <p className="text-yellow-200 text-sm whitespace-pre-wrap">{submittedQuestion}</p>
                     </div>
                   </div>
 
-                  {/* ReAct phase visualizer */}
+                  {/* Answer-first (Claude-style): completed reply before technical trace */}
+                  {phase === 'complete' && finalResponse && (
+                    <div className="flex justify-start animate-in fade-in duration-500 slide-in-from-bottom-2">
+                      <div className="bg-gradient-to-br from-green-950/80 to-black border border-green-500/30 rounded-2xl rounded-tl-sm p-5 md:p-6 w-full">
+                        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-yellow-500/20 border border-yellow-500/40 flex items-center justify-center shrink-0">
+                              <svg viewBox="0 0 16 16" className="w-4 h-4 text-yellow-400" fill="currentColor">
+                                <circle cx="8" cy="8" r="3" />
+                                <path d="M8 1 L8.6 4.5 L8 4 L7.4 4.5 Z" />
+                                <path d="M8 15 L8.6 11.5 L8 12 L7.4 11.5 Z" />
+                                <path d="M1 8 L4.5 8.6 L4 8 L4.5 7.4 Z" />
+                                <path d="M15 8 L11.5 8.6 L12 8 L11.5 7.4 Z" />
+                              </svg>
+                            </div>
+                            <p className="text-green-400 text-xs font-mono font-bold uppercase tracking-widest">
+                              {t.cetAi.cetAiResponse} · {t.cetAi.confidence} {cetAiConfidence.toFixed(1)}%
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2 flex-wrap justify-end">
+                            <div className="h-1.5 w-28 bg-gray-800 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-yellow-500 to-green-500 rounded-full transition-all duration-1000"
+                                style={{ width: `${cetAiConfidence}%` }}
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              aria-label={t.cetAi.copyResponseAria}
+                              onClick={() => {
+                                navigator.clipboard.writeText(finalResponse).then(() => {
+                                  setCopiedResponse(true);
+                                  setTimeout(() => setCopiedResponse(false), 2000);
+                                }).catch(() => {});
+                              }}
+                              className="p-1.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:text-yellow-400 hover:border-yellow-500/40 transition-all"
+                            >
+                              {copiedResponse ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+                            </button>
+                            <button
+                              type="button"
+                              title={t.cetAi.copyForAiTooltip}
+                              aria-label={t.cetAi.copyForAiAriaLabel}
+                              onClick={() => {
+                                const payload = buildCopyForAiText(submittedQuestion, finalResponse, t.cetAi);
+                                navigator.clipboard.writeText(payload).then(() => {
+                                  setCopiedForAi(true);
+                                  setTimeout(() => setCopiedForAi(false), 2000);
+                                }).catch(() => {});
+                              }}
+                              className="p-1.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:text-cyan-300 hover:border-cyan-500/40 transition-all"
+                            >
+                              {copiedForAi ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Bot className="w-3.5 h-3.5" />}
+                            </button>
+                            <a
+                              href={TONSCAN_CET_CONTRACT_URL}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={t.cetAi.verifyOnTonscanTitle}
+                              className="p-1.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:text-cyan-400 hover:border-cyan-500/40 transition-all"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+                          </div>
+                        </div>
+                        {!responseUsedLiveApi && (
+                          <p
+                            role="status"
+                            className="text-amber-200/90 text-xs font-mono border border-amber-500/25 bg-amber-500/10 rounded-lg px-3 py-2 mb-4"
+                          >
+                            {t.cetAi.offlineModeHint}
+                          </p>
+                        )}
+                        <div className="text-white">
+                          <MarkdownText text={finalResponse} />
+                        </div>
+                        <div className="mt-5 pt-4 border-t border-green-500/10">
+                          <p className="text-gray-600 text-[10px] font-mono uppercase tracking-widest mb-2">{t.cetAi.askNextLabel}</p>
+                          <div className="flex flex-wrap gap-2">
+                            {(FOLLOW_UP_BY_TOPIC[detectedTopic] ?? FOLLOW_UP_BY_TOPIC.default).map(suggestion => (
+                              <button
+                                key={suggestion}
+                                type="button"
+                                onClick={() => {
+                                  const nextHistory = [
+                                    ...chatHistory,
+                                    { question: submittedQuestion, answer: finalResponse, confidence: cetAiConfidence },
+                                  ];
+                                  setChatHistory(nextHistory);
+                                  processQuestion(suggestion, nextHistory);
+                                }}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-gray-900 border border-gray-700 text-gray-400 text-xs hover:border-yellow-500/50 hover:text-yellow-400 transition-all active:scale-95"
+                              >
+                                <ChevronRight className="w-3 h-3" />
+                                {suggestion}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <details
+                    data-testid="cet-ai-trace"
+                    className="group rounded-2xl border border-gray-800/90 bg-black/30 open:bg-black/40"
+                    open={isProcessing}
+                  >
+                    <summary className="cursor-pointer px-4 py-3 text-xs font-mono text-gray-500 uppercase tracking-wider hover:text-gray-400 list-none flex items-center justify-between gap-2 [&::-webkit-details-marker]:hidden">
+                      <span>{t.cetAi.ravTraceToggle}</span>
+                      <span className="text-[10px] text-gray-600 group-open:rotate-0 transition-transform">▼</span>
+                    </summary>
+                    <div className="border-t border-gray-800/80 px-3 pb-4 pt-2 space-y-4">
                   <ReActPanels phase={phase} />
 
-                  {/* Terminal & Metrics */}
                   <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                     {/* Telemetry terminal */}
                     <div className="lg:col-span-3 bg-gray-950 border border-gray-800 rounded-xl p-3 md:p-4 font-mono text-xs overflow-hidden flex flex-col h-40 md:h-56 shadow-inner">
@@ -946,109 +1169,8 @@ export default function CetAiSearch() {
                       </div>
                     </div>
                   </div>
-
-                  {/* CET AI final response */}
-                  {phase === 'complete' && finalResponse && (
-                    <div className="flex justify-start">
-                      <div className="bg-gradient-to-br from-green-950/80 to-black border border-green-500/30 rounded-2xl rounded-tl-sm p-5 md:p-6 w-full">
-                        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-                          <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-lg bg-yellow-500/20 border border-yellow-500/40 flex items-center justify-center shrink-0">
-                              <svg viewBox="0 0 16 16" className="w-4 h-4 text-yellow-400" fill="currentColor">
-                                <circle cx="8" cy="8" r="3" />
-                                <path d="M8 1 L8.6 4.5 L8 4 L7.4 4.5 Z" />
-                                <path d="M8 15 L8.6 11.5 L8 12 L7.4 11.5 Z" />
-                                <path d="M1 8 L4.5 8.6 L4 8 L4.5 7.4 Z" />
-                                <path d="M15 8 L11.5 8.6 L12 8 L11.5 7.4 Z" />
-                              </svg>
-                            </div>
-                            <p className="text-green-400 text-xs font-mono font-bold uppercase tracking-widest">
-                              {t.cetAi.cetAiResponse} · {t.cetAi.confidence} {cetAiConfidence.toFixed(1)}%
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2 flex-wrap justify-end">
-                            <div className="h-1.5 w-28 bg-gray-800 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-gradient-to-r from-yellow-500 to-green-500 rounded-full transition-all duration-1000"
-                                style={{ width: `${cetAiConfidence}%` }}
-                              />
-                            </div>
-                            {/* Copy response */}
-                            <button
-                              type="button"
-                              aria-label={t.cetAi.copyResponseAria}
-                              onClick={() => {
-                                navigator.clipboard.writeText(finalResponse).then(() => {
-                                  setCopiedResponse(true);
-                                  setTimeout(() => setCopiedResponse(false), 2000);
-                                }).catch(() => {});
-                              }}
-                              className="p-1.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:text-yellow-400 hover:border-yellow-500/40 transition-all"
-                            >
-                              {copiedResponse ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
-                            </button>
-                            <button
-                              type="button"
-                              title={t.cetAi.copyForAiTooltip}
-                              aria-label={t.cetAi.copyForAiAriaLabel}
-                              onClick={() => {
-                                const payload = buildCopyForAiText(submittedQuestion, finalResponse, t.cetAi);
-                                navigator.clipboard.writeText(payload).then(() => {
-                                  setCopiedForAi(true);
-                                  setTimeout(() => setCopiedForAi(false), 2000);
-                                }).catch(() => {});
-                              }}
-                              className="p-1.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:text-cyan-300 hover:border-cyan-500/40 transition-all"
-                            >
-                              {copiedForAi ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Bot className="w-3.5 h-3.5" />}
-                            </button>
-                            {/* On-chain verify */}
-                            <a
-                              href={TONSCAN_CET_CONTRACT_URL}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              title={t.cetAi.verifyOnTonscanTitle}
-                              className="p-1.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:text-cyan-400 hover:border-cyan-500/40 transition-all"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                            </a>
-                          </div>
-                        </div>
-                        {!responseUsedLiveApi && (
-                          <p
-                            role="status"
-                            className="text-amber-200/90 text-xs font-mono border border-amber-500/25 bg-amber-500/10 rounded-lg px-3 py-2 mb-4"
-                          >
-                            {t.cetAi.offlineModeHint}
-                          </p>
-                        )}
-                        <div className="text-white">
-                          <MarkdownText text={finalResponse} />
-                        </div>
-
-                        {/* Follow-up suggestions */}
-                        <div className="mt-5 pt-4 border-t border-green-500/10">
-                          <p className="text-gray-600 text-[10px] font-mono uppercase tracking-widest mb-2">{t.cetAi.askNextLabel}</p>
-                          <div className="flex flex-wrap gap-2">
-                            {(FOLLOW_UP_BY_TOPIC[detectedTopic] ?? FOLLOW_UP_BY_TOPIC.default).map(suggestion => (
-                              <button
-                                key={suggestion}
-                                type="button"
-                                onClick={() => {
-                                  setChatHistory(prev => [...prev, { question: submittedQuestion, answer: finalResponse, confidence: cetAiConfidence }]);
-                                  processQuestion(suggestion);
-                                }}
-                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-gray-900 border border-gray-700 text-gray-400 text-xs hover:border-yellow-500/50 hover:text-yellow-400 transition-all active:scale-95"
-                              >
-                                <ChevronRight className="w-3 h-3" />
-                                {suggestion}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
                     </div>
-                  )}
+                  </details>
                 </div>
               )}
 
@@ -1063,17 +1185,26 @@ export default function CetAiSearch() {
               className="flex gap-3 max-w-5xl mx-auto"
             >
               <div className="flex-grow relative">
-                <input
+                <textarea
                   ref={modalInputRef}
-                  type="text"
                   value={query}
                   onChange={e => setQuery(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key !== 'Enter') return;
+                    if (e.shiftKey) return;
+                    if (e.nativeEvent.isComposing) return;
+                    e.preventDefault();
+                    if (!isProcessing && query.trim()) {
+                      (e.currentTarget.form as HTMLFormElement | null)?.requestSubmit();
+                    }
+                  }}
                   disabled={isProcessing}
+                  rows={2}
                   placeholder={phase === 'complete' ? t.cetAi.followUpPlaceholder : t.cetAi.placeholder}
-                  className="w-full min-h-11 px-5 py-3 bg-gray-950 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-all disabled:opacity-40 text-base"
+                  className="w-full min-h-[3rem] max-h-40 resize-y px-5 py-3 bg-gray-950 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-all disabled:opacity-40 text-base leading-relaxed"
                 />
                 {isProcessing && (
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                  <div className="absolute right-4 top-4">
                     <div className="w-4 h-4 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin" />
                   </div>
                 )}
@@ -1088,7 +1219,10 @@ export default function CetAiSearch() {
                 <span className="hidden sm:inline">{t.cetAi.sendCompact}</span>
               </button>
             </form>
-            <p className="text-center text-gray-700 text-xs mt-2 font-mono">
+            <p className="text-center text-gray-600 text-[11px] mt-2 font-mono max-w-lg mx-auto leading-snug">
+              {t.cetAi.sendHintModEnter}
+            </p>
+            <p className="text-center text-gray-700 text-xs mt-1 font-mono">
               {t.cetAi.escToClose}
             </p>
           </div>
