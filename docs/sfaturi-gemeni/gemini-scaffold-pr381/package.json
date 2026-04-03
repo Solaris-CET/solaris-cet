@@ -1,0 +1,32 @@
+{
+  "name": "solaris-cet-monorepo",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "app",
+    "api",
+    "contracts"
+  ],
+  "scripts": {
+    "dev": "tsx server.ts",
+    "build": "npm run build --workspace=app",
+    "lint": "npm run lint:app && npm run lint:server",
+    "lint:app": "npm run lint --workspace=app",
+    "lint:server": "tsc --project tsconfig.json --noEmit",
+    "typecheck": "npm run typecheck --workspace=app",
+    "start": "NODE_ENV=production node server.ts"
+  },
+  "dependencies": {
+    "@google/genai": "^1.29.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "vite": "^6.4.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.14.0",
+    "tsx": "^4.21.0"
+  }
+}

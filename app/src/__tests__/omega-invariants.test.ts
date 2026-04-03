@@ -27,4 +27,11 @@ describe("OMEGA invariants", () => {
     expect(sovereignHtml).toMatch(/\bTON\b/i);
     expect(sovereignHtml).toMatch(/Cetățuia,\s*Romania/i);
   });
+
+  it("app index: noscript read-only fallback links to /sovereign/; TMA host marker after DOMContentLoaded", () => {
+    expect(appIndexHtml).toContain("solaris-noscript-fallback");
+    expect(appIndexHtml).toContain('href="/sovereign/"');
+    expect(appIndexHtml).toContain("tma-host");
+    expect(appIndexHtml).toContain("DOMContentLoaded");
+  });
 });

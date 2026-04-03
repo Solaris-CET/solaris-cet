@@ -214,6 +214,11 @@ export interface Translations {
     nextStepHowToBuy: string;
     /** Mining rewards continue in the official Telegram bot; hero CTA is on-site flow only. */
     miningTelegramHint: string;
+    /** Compact scan row under hero copy: supply, chain, RWA anchor (B2B clarity). */
+    quickStatsAria: string;
+    quickStatSupplyCaption: string;
+    quickStatChainCaption: string;
+    quickStatAnchorCaption: string;
   };
   /** Mining calculator (`MiningCalculatorSection`) — illustrative UI only. */
   miningCalculator: {
@@ -554,6 +559,10 @@ const translations: Record<LangCode, Translations> = {
       nextStepHowToBuy: 'How to buy',
       miningTelegramHint:
         'Mining runs in the official Solaris CET Telegram bot — this button only starts the on-site flow.',
+      quickStatsAria: 'Key facts: fixed CET supply, TON chain, geographic anchor',
+      quickStatSupplyCaption: 'Fixed supply',
+      quickStatChainCaption: 'Blockchain',
+      quickStatAnchorCaption: 'RWA anchor',
     },
     miningCalculator: {
       estimateDisclaimer:
@@ -909,6 +918,10 @@ const translations: Record<LangCode, Translations> = {
       nextStepHowToBuy: 'Cómo comprar',
       miningTelegramHint:
         'La minería continúa en el bot oficial de Telegram de Solaris CET — este botón solo inicia el flujo en la web.',
+      quickStatsAria: 'Datos clave: suministro CET fijo, cadena TON, ancla geográfica',
+      quickStatSupplyCaption: 'Suministro fijo',
+      quickStatChainCaption: 'Blockchain',
+      quickStatAnchorCaption: 'Ancla RWA',
     },
     miningCalculator: {
       estimateDisclaimer:
@@ -1262,6 +1275,10 @@ const translations: Record<LangCode, Translations> = {
       nextStepHowToBuy: '如何购买',
       miningTelegramHint:
         '日常挖矿在官方 Solaris CET Telegram 机器人中进行；本按钮仅启动站内流程。',
+      quickStatsAria: '关键信息：固定 CET 供应量、TON 链、地理锚点',
+      quickStatSupplyCaption: '固定供应量',
+      quickStatChainCaption: '区块链',
+      quickStatAnchorCaption: 'RWA 锚点',
     },
     miningCalculator: {
       estimateDisclaimer: '演示估算，不构成投资建议。实际收益以协议规则与官方渠道为准。',
@@ -1610,6 +1627,10 @@ const translations: Record<LangCode, Translations> = {
       nextStepHowToBuy: 'Как купить',
       miningTelegramHint:
         'Майнинг ведётся в официальном Telegram-боте Solaris CET — кнопка здесь только запускает сценарий на сайте.',
+      quickStatsAria: 'Ключевые факты: фиксированная эмиссия CET, сеть TON, географический якорь',
+      quickStatSupplyCaption: 'Фиксированная эмиссия',
+      quickStatChainCaption: 'Блокчейн',
+      quickStatAnchorCaption: 'Якорь RWA',
     },
     miningCalculator: {
       estimateDisclaimer:
@@ -1965,6 +1986,10 @@ const translations: Record<LangCode, Translations> = {
       nextStepHowToBuy: 'Cum cumperi',
       miningTelegramHint:
         'Minarea continuă în botul oficial Telegram Solaris CET — acest buton pornește doar fluxul pe site.',
+      quickStatsAria: 'Fapte cheie: ofertă fixă CET, lanț TON, ancoră geografică',
+      quickStatSupplyCaption: 'Ofertă fixă',
+      quickStatChainCaption: 'Blockchain',
+      quickStatAnchorCaption: 'Ancoră RWA',
     },
     miningCalculator: {
       estimateDisclaimer:
@@ -2320,6 +2345,10 @@ const translations: Record<LangCode, Translations> = {
       nextStepHowToBuy: 'Como comprar',
       miningTelegramHint:
         'A mineração continua no bot oficial do Telegram Solaris CET — este botão só inicia o fluxo no site.',
+      quickStatsAria: 'Factos-chave: oferta fixa de CET, cadeia TON, âncora geográfica',
+      quickStatSupplyCaption: 'Oferta fixa',
+      quickStatChainCaption: 'Blockchain',
+      quickStatAnchorCaption: 'Âncora RWA',
     },
     miningCalculator: {
       estimateDisclaimer:
@@ -2675,6 +2704,10 @@ const translations: Record<LangCode, Translations> = {
       nextStepHowToBuy: 'So kaufst du',
       miningTelegramHint:
         'Mining läuft im offiziellen Solaris-CET-Telegram-Bot — hier starten Sie nur den Ablauf auf der Website.',
+      quickStatsAria: 'Kernfakten: festes CET-Angebot, TON-Blockchain, geografischer Anker',
+      quickStatSupplyCaption: 'Festes Angebot',
+      quickStatChainCaption: 'Blockchain',
+      quickStatAnchorCaption: 'RWA-Anker',
     },
     miningCalculator: {
       estimateDisclaimer:

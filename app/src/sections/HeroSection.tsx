@@ -249,6 +249,44 @@ const HeroSection: React.FC = () => {
               </p>
 
               <div
+                role="region"
+                aria-label={t.hero.quickStatsAria}
+                className="mt-6 flex flex-wrap items-start gap-6 sm:gap-8 justify-center lg:justify-start"
+              >
+                <div className="text-center lg:text-left min-w-[5.5rem]">
+                  <p className="text-2xl sm:text-[1.65rem] font-mono font-semibold tabular-nums text-white tracking-tight">
+                    {formatCetSupplyWithSuffix(lang)}
+                  </p>
+                  <p className="mt-1 text-[10px] sm:text-xs text-solaris-muted uppercase tracking-wider">
+                    {t.hero.quickStatSupplyCaption}
+                  </p>
+                </div>
+                <div className="hidden sm:block w-px h-10 bg-white/10 shrink-0 self-center" aria-hidden />
+                <div className="text-center lg:text-left min-w-[3.5rem]">
+                  <p className="text-2xl sm:text-[1.65rem] font-mono font-semibold text-white tracking-tight">
+                    TON
+                  </p>
+                  <p className="mt-1 text-[10px] sm:text-xs text-solaris-muted uppercase tracking-wider">
+                    {t.hero.quickStatChainCaption}
+                  </p>
+                </div>
+                <div className="hidden sm:block w-px h-10 bg-white/10 shrink-0 self-center" aria-hidden />
+                <div className="text-center lg:text-left min-w-[6rem]">
+                  <p className="text-2xl sm:text-[1.65rem] font-semibold text-white tracking-tight">
+                    <a
+                      href="#authority-trust"
+                      className="rounded-sm text-white underline-offset-4 hover:text-solaris-gold hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solaris-gold/80"
+                    >
+                      Cetățuia
+                    </a>
+                  </p>
+                  <p className="mt-1 text-[10px] sm:text-xs text-solaris-muted uppercase tracking-wider">
+                    {t.hero.quickStatAnchorCaption}
+                  </p>
+                </div>
+              </div>
+
+              <div
                 className="mt-6 md:mt-8 w-full max-w-xl mx-auto lg:mx-0"
                 data-testid="hero-next-steps"
               >

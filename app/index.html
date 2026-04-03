@@ -231,7 +231,109 @@
   <body>
     <!-- Skip to main content (accessibility) -->
     <a href="#main-content" class="skip-to-content">Skip to main content</a>
+
+    <!--
+      Progressive enhancement / dual-state (OMEGA-aligned):
+      Without JS, the Vite/React bundle never runs — #root stays empty.
+      This block gives Tor Browser “Safest” and other no-JS clients a read-only
+      path: canonical facts + link to the zero-JS /sovereign/ surface.
+    -->
+    <noscript>
+      <style>
+        .solaris-noscript-fallback {
+          box-sizing: border-box;
+          margin: 0 auto;
+          max-width: 42rem;
+          padding: 1.5rem 1.25rem 2rem;
+          font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, sans-serif;
+          color: #f8fafc;
+          background: #020617;
+          border-bottom: 1px solid rgba(242, 201, 76, 0.25);
+          line-height: 1.5;
+        }
+        .solaris-noscript-fallback h1 {
+          margin: 0 0 0.5rem;
+          font-size: 1.35rem;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+          color: #f2c94c;
+        }
+        .solaris-noscript-fallback p {
+          margin: 0.65rem 0;
+          font-size: 0.95rem;
+          color: #94a3b8;
+        }
+        .solaris-noscript-fallback ul {
+          margin: 0.75rem 0 0;
+          padding-left: 1.2rem;
+          color: #cbd5e1;
+          font-size: 0.9rem;
+        }
+        .solaris-noscript-fallback li {
+          margin: 0.35rem 0;
+        }
+        .solaris-noscript-fallback .solaris-noscript-badge {
+          display: inline-block;
+          margin-top: 0.75rem;
+          padding: 0.35rem 0.65rem;
+          font-size: 0.7rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: #f2c94c;
+          border: 1px solid rgba(242, 201, 76, 0.35);
+          border-radius: 0.35rem;
+          background: rgba(242, 201, 76, 0.08);
+        }
+        .solaris-noscript-fallback a {
+          color: #f2c94c;
+          font-weight: 600;
+          text-decoration: underline;
+          text-underline-offset: 3px;
+        }
+        .solaris-noscript-fallback a:focus-visible {
+          outline: 2px solid #f2c94c;
+          outline-offset: 2px;
+        }
+      </style>
+      <div class="solaris-noscript-fallback" role="region" aria-label="Solaris CET read-only overview">
+        <h1>Solaris CET</h1>
+        <p>
+          This route is the interactive app (wallet, animations, CET AI). With JavaScript disabled you are in
+          <strong style="color: #e2e8f0">read-only mode</strong> — TON Connect and on-chain actions are unavailable.
+        </p>
+        <span class="solaris-noscript-badge">No JavaScript — sovereign read path</span>
+        <ul>
+          <li><strong style="color: #f8fafc">9,000 CET</strong> fixed supply (immutable)</li>
+          <li><strong style="color: #f8fafc">TON</strong> mainnet</li>
+          <li>RWA narrative anchored in <strong style="color: #f8fafc">Cetățuia, Romania</strong></li>
+        </ul>
+        <p>
+          Use the <a href="/sovereign/">OMEGA read-only surface</a> (HTML + CSS, no client JS required) for navigation and core reading in strict environments.
+        </p>
+      </div>
+    </noscript>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!--
+      Context-aware boot: after deferred scripts (e.g. telegram-web-app.js), mark TMA host for CSS/telemetry policy.
+      DOMContentLoaded runs after deferred scripts; do not read Telegram.WebApp synchronously at parse time.
+    -->
+    <script>
+      document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+          try {
+            var wa = window.Telegram && window.Telegram.WebApp;
+            if (!wa) return;
+            document.documentElement.classList.add("tma-host");
+            document.documentElement.setAttribute("data-tma", "1");
+            if (typeof wa.ready === "function") wa.ready();
+          } catch (_) {}
+        },
+        { once: true },
+      );
+    </script>
   </body>
 </html>
