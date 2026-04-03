@@ -62,6 +62,31 @@ describe("index.html — critical image preloads for LCP", () => {
   });
 });
 
+describe("PWA manifest.json — icon paths resolve on disk", () => {
+  it("icons and shortcut icons reference files under app/public", () => {
+    const raw = readFileSync(join(appPublic, "manifest.json"), "utf8");
+    const manifest = JSON.parse(raw) as {
+      icons?: readonly { src?: string }[];
+      shortcuts?: readonly { icons?: readonly { src?: string }[] }[];
+    };
+    const relPaths = new Set<string>();
+    for (const icon of manifest.icons ?? []) {
+      const s = icon.src;
+      if (s?.startsWith("/")) relPaths.add(s.slice(1));
+    }
+    for (const sc of manifest.shortcuts ?? []) {
+      for (const ic of sc.icons ?? []) {
+        const s = ic.src;
+        if (s?.startsWith("/")) relPaths.add(s.slice(1));
+      }
+    }
+    for (const rel of relPaths) {
+      const abs = join(appPublic, rel);
+      expect(existsSync(abs), `manifest.json references missing file: /${rel}`).toBe(true);
+    }
+  });
+});
+
 describe("OMEGA invariants", () => {
   it("sovereign: no scripts, no forbidden CDNs; canonical CET/TON/Cetățuia copy", () => {
     const sovereignHtml = readFileSync(join(repoRoot, "static/sovereign/index.html"), "utf8");
