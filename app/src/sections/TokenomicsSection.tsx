@@ -1,10 +1,12 @@
-import { useRef, useLayoutEffect, useState, useEffect } from 'react';
+import { lazy, Suspense, useRef, useLayoutEffect, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { Coins, Pickaxe, Users, TrendingDown, Lock, Cpu } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
 import LivePoolStats from '../components/LivePoolStats';
 import ChainStateWidget from '../components/ChainStateWidget';
-import TokenomicsChart from '../components/TokenomicsChart';
+import { ChartLazyFallback } from '../components/ChartLazyFallback';
+
+const TokenomicsChart = lazy(() => import('../components/TokenomicsChart'));
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useLanguage } from '../hooks/useLanguage';
 import { useReducedMotion } from '../hooks/useReducedMotion';
@@ -374,7 +376,9 @@ const TokenomicsSection = () => {
           </div>
 
           <div className="p-4 sm:p-5 border-t border-white/10 bg-black/30">
-            <TokenomicsChart />
+            <Suspense fallback={<ChartLazyFallback />}>
+              <TokenomicsChart />
+            </Suspense>
           </div>
 
           <div className="p-3 sm:p-4 border-t border-fuchsia-500/10 bg-black/25">

@@ -54,6 +54,11 @@ export interface Translations {
     primaryNavigation: string;
     /** Appended to external link names in `aria-label`, e.g. "Buy … (opens in new window)". */
     opensInNewWindow: string;
+    /** Compact header strip under TonConnect — landmark for screen readers. */
+    trustStripAria: string;
+    trustLinkCyberscope: string;
+    trustLinkFreshcoins: string;
+    trustLinkKycPaper: string;
   };
   /** Floating controls and language switcher strings. */
   common: {
@@ -419,6 +424,10 @@ const translations: Record<LangCode, Translations> = {
       openMenu: 'Open menu',
       primaryNavigation: 'Primary navigation',
       opensInNewWindow: '(opens in new window)',
+      trustStripAria: 'Third-party audit and verification shortcuts',
+      trustLinkCyberscope: 'Cyberscope',
+      trustLinkFreshcoins: 'Freshcoins',
+      trustLinkKycPaper: 'KYC · Whitepaper',
     },
     common: {
       backToTop: 'Back to top',
@@ -778,6 +787,10 @@ const translations: Record<LangCode, Translations> = {
       openMenu: 'Abrir menú',
       primaryNavigation: 'Navegación principal',
       opensInNewWindow: '(se abre en una ventana nueva)',
+      trustStripAria: 'Enlaces de auditoría y verificación externa',
+      trustLinkCyberscope: 'Cyberscope',
+      trustLinkFreshcoins: 'Freshcoins',
+      trustLinkKycPaper: 'KYC · Whitepaper',
     },
     common: {
       backToTop: 'Volver arriba',
@@ -1137,6 +1150,10 @@ const translations: Record<LangCode, Translations> = {
       openMenu: '打开菜单',
       primaryNavigation: '主导航',
       opensInNewWindow: '（在新窗口打开）',
+      trustStripAria: '第三方审计与验证快捷链接',
+      trustLinkCyberscope: 'Cyberscope',
+      trustLinkFreshcoins: 'Freshcoins',
+      trustLinkKycPaper: 'KYC · 白皮书',
     },
     common: {
       backToTop: '返回顶部',
@@ -1487,6 +1504,10 @@ const translations: Record<LangCode, Translations> = {
       openMenu: 'Открыть меню',
       primaryNavigation: 'Основная навигация',
       opensInNewWindow: '(открывается в новом окне)',
+      trustStripAria: 'Ссылки на аудит и внешнюю верификацию',
+      trustLinkCyberscope: 'Cyberscope',
+      trustLinkFreshcoins: 'Freshcoins',
+      trustLinkKycPaper: 'KYC · Whitepaper',
     },
     common: {
       backToTop: 'Наверх',
@@ -1846,6 +1867,10 @@ const translations: Record<LangCode, Translations> = {
       openMenu: 'Deschide meniul',
       primaryNavigation: 'Navigare principală',
       opensInNewWindow: '(se deschide într-o fereastră nouă)',
+      trustStripAria: 'Scurtături audit și verificare terță parte',
+      trustLinkCyberscope: 'Cyberscope',
+      trustLinkFreshcoins: 'Freshcoins',
+      trustLinkKycPaper: 'KYC · Whitepaper',
     },
     common: {
       backToTop: 'Înapoi sus',
@@ -2205,6 +2230,10 @@ const translations: Record<LangCode, Translations> = {
       openMenu: 'Abrir menu',
       primaryNavigation: 'Navegação principal',
       opensInNewWindow: '(abre numa nova janela)',
+      trustStripAria: 'Atalhos de auditoria e verificação externa',
+      trustLinkCyberscope: 'Cyberscope',
+      trustLinkFreshcoins: 'Freshcoins',
+      trustLinkKycPaper: 'KYC · Whitepaper',
     },
     common: {
       backToTop: 'Voltar ao topo',
@@ -2564,6 +2593,10 @@ const translations: Record<LangCode, Translations> = {
       openMenu: 'Menü öffnen',
       primaryNavigation: 'Hauptnavigation',
       opensInNewWindow: '(öffnet in neuem Fenster)',
+      trustStripAria: 'Kurzlinks zu Audit und externer Verifizierung',
+      trustLinkCyberscope: 'Cyberscope',
+      trustLinkFreshcoins: 'Freshcoins',
+      trustLinkKycPaper: 'KYC · Whitepaper',
     },
     common: {
       backToTop: 'Nach oben',

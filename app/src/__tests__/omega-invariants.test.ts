@@ -34,4 +34,8 @@ describe("OMEGA invariants", () => {
     expect(appIndexHtml).toContain("tma-host");
     expect(appIndexHtml).toContain("DOMContentLoaded");
   });
+
+  it("app index: no third-party analytics hosts in CSP (sovereignty / privacy posture)", () => {
+    expect(appIndexHtml).not.toMatch(/plausible\.io/i);
+  });
 });

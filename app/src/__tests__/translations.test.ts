@@ -79,6 +79,10 @@ const NAV_EXPECTED_KEYS: Array<keyof Translations["nav"]> = [
   "openMenu",
   "primaryNavigation",
   "opensInNewWindow",
+  "trustStripAria",
+  "trustLinkCyberscope",
+  "trustLinkFreshcoins",
+  "trustLinkKycPaper",
 ];
 
 const FOOTER_NAV_EXPECTED_KEYS: Array<keyof Translations["footerNav"]> = [

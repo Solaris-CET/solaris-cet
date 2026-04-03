@@ -1,11 +1,13 @@
-import { useRef, useLayoutEffect } from 'react';
+import { lazy, Suspense, useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { Brain, TrendingUp, ChevronDown } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
 import AnimatedCounter from '../components/AnimatedCounter';
 import AgentBoard from '../components/AgentBoard';
 import LiveAgentStats from '../components/LiveAgentStats';
-import AgentDepartmentChart from '../components/AgentDepartmentChart';
+import { ChartLazyFallback } from '../components/ChartLazyFallback';
+
+const AgentDepartmentChart = lazy(() => import('../components/AgentDepartmentChart'));
 import { solarisDepartments } from '@/data/solarisDepartments';
 import RoleSynthesizedSkills from '@/components/RoleSynthesizedSkills';
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
@@ -264,7 +266,9 @@ const AITeamSection = () => {
 
         {/* Department distribution chart */}
         <div className="mt-6">
-          <AgentDepartmentChart />
+          <Suspense fallback={<ChartLazyFallback />}>
+            <AgentDepartmentChart />
+          </Suspense>
         </div>
 
         {/* Bottom comparison callout */}

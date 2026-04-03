@@ -3,6 +3,7 @@ import { ExternalLink, Menu } from 'lucide-react';
 import { SolarisLogoMark } from './SolarisLogoMark';
 import LanguageSelector from './LanguageSelector';
 import WalletConnect from './WalletConnect';
+import { HeaderTrustStrip } from './HeaderTrustStrip';
 import { useLanguage } from '../hooks/useLanguage';
 import {
   Sheet,
@@ -221,7 +222,10 @@ const Navigation = () => {
 
             <div className="hidden xl:flex items-center gap-3">
               <LanguageSelector />
-              <WalletConnect />
+              <div className="flex flex-col items-end gap-1 shrink-0">
+                <WalletConnect />
+                <HeaderTrustStrip />
+              </div>
               <div
                 className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-400/10 border border-emerald-400/20"
                 title={standardSkillBurst(skillSeedFromLabel('navHeader|liveMesh'))}
@@ -319,7 +323,10 @@ const Navigation = () => {
               </a>
               <div className="w-full flex flex-col items-center gap-4">
                 <LanguageSelector />
-                <WalletConnect />
+                <div className="w-full flex flex-col items-center gap-2">
+                  <WalletConnect />
+                  <HeaderTrustStrip align="center" />
+                </div>
               </div>
               <div
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-400/10 border border-emerald-400/20"

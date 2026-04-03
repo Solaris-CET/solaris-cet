@@ -1,11 +1,13 @@
-import { useRef, useLayoutEffect, useEffect, useState } from 'react';
+import { lazy, Suspense, useRef, useLayoutEffect, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { Cpu, Network } from 'lucide-react';
 import GlowOrbs from '@/components/GlowOrbs';
 import LiveNeuralFeed from '@/components/LiveNeuralFeed';
 import DepartmentIntelligenceScores from '@/components/DepartmentIntelligenceScores';
 import RavInternetMesh from '@/components/RavInternetMesh';
-import AgenticBenchmarkDashboard from '@/components/AgenticBenchmarkDashboard';
+import { ChartLazyFallback } from '@/components/ChartLazyFallback';
+
+const AgenticBenchmarkDashboard = lazy(() => import('@/components/AgenticBenchmarkDashboard'));
 import AgenticNeuralCanvas from '@/components/AgenticNeuralCanvas';
 import AgenticWhispers from '@/components/AgenticWhispers';
 import AgenticSignalUnlock from '@/components/AgenticSignalUnlock';
@@ -123,7 +125,9 @@ const AgenticEngineSection = () => {
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
           <DepartmentIntelligenceScores />
-          <AgenticBenchmarkDashboard />
+          <Suspense fallback={<ChartLazyFallback />}>
+            <AgenticBenchmarkDashboard />
+          </Suspense>
         </div>
       </div>
     </section>

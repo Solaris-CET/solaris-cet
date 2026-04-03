@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { track } from '@vercel/analytics/react';
 import {
   X,
   Send,
@@ -768,7 +767,6 @@ export default function CetAiSearch() {
   const modalInputRef = useRef<HTMLTextAreaElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const cetAiAbortRef = useRef<AbortController | null>(null);
-  const trackedCompleteKey = useRef<string>('');
   /** Incremented to invalidate in-flight schedules (stop / new question). */
   const generationEpochRef = useRef(0);
 
@@ -788,18 +786,6 @@ export default function CetAiSearch() {
   useEffect(() => {
     return () => { timersRef.current.forEach(clearTimeout); };
   }, []);
-
-  useEffect(() => {
-    if (isModalOpen) track('cet_ai_open', {});
-  }, [isModalOpen]);
-
-  useEffect(() => {
-    if (phase !== 'complete' || !finalResponse) return;
-    const key = `${submittedQuestion}::${finalResponse.slice(0, 96)}`;
-    if (trackedCompleteKey.current === key) return;
-    trackedCompleteKey.current = key;
-    track('cet_ai_complete', { source: responseUsedLiveApi ? 'live' : 'fallback' });
-  }, [phase, finalResponse, submittedQuestion, responseUsedLiveApi]);
 
   // --- CLOSE HANDLER ---
   const handleClose = useCallback(() => {
@@ -1096,7 +1082,6 @@ export default function CetAiSearch() {
 
   const handleRegenerate = useCallback(() => {
     if (!submittedQuestion.trim() || isProcessing) return;
-    track('cet_ai_regenerate', {});
     processQuestion(submittedQuestion.trim(), chatHistory);
   }, [submittedQuestion, chatHistory, isProcessing, processQuestion]);
 
@@ -1393,7 +1378,6 @@ export default function CetAiSearch() {
                                   navigator.clipboard
                                     .writeText(payload)
                                     .then(() => {
-                                      track('cet_ai_copy_transcript', { turns: chatHistory.length + 1 });
                                       setCopiedTranscript(true);
                                       setTimeout(() => setCopiedTranscript(false), 2000);
                                     })

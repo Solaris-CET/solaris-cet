@@ -38,14 +38,15 @@ const ResourcesSection = lazy(() => import('./sections/ResourcesSection'));
 const FAQSection = lazy(() => import('./sections/FAQSection'));
 const FooterSection = lazy(() => import('./sections/FooterSection'));
 import { LanguageContext, useLanguageState } from './hooks/useLanguage';
-import { Analytics } from '@vercel/analytics/react';
 import './App.css';
 import { shortSkillWhisper, skillSeedFromLabel } from './lib/meshSkillFeed';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/** Long enough to read the bar; exit uses GSAP so it doesn’t feel like a hard cut. */
-const LOADING_DURATION_MS = 1100;
+/** Brief shell warm-up; shorter than earlier builds to avoid artificial wait (B2B credibility). */
+const LOADING_DURATION_MS = 650;
+/** Skip fixed delay when user requests reduced motion (WCAG 2.3.3). */
+const LOADING_DURATION_REDUCED_MS = 0;
 
 function AppContent() {
   const mainRef = useRef<HTMLDivElement>(null);
@@ -55,28 +56,30 @@ function AppContent() {
   const langState = useLanguageState();
 
   useEffect(() => {
-    // Loading screen exit
     const loadingEl = loadingRef.current;
+    const reducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const delayMs = reducedMotion ? LOADING_DURATION_REDUCED_MS : LOADING_DURATION_MS;
+    const fadeOutSec = reducedMotion ? 0.12 : 0.55;
+
     if (!loadingEl) {
-      const timer = setTimeout(() => setIsLoaded(true), 0);
+      const timer = setTimeout(() => setIsLoaded(true), delayMs);
       return () => clearTimeout(timer);
     }
 
     const timer = setTimeout(() => {
-      // Let clicks reach the page as soon as the exit animation starts: the overlay
-      // stays visually on top while fading but must not intercept pointer events, and
-      // `main` must not stay `inert` until the tween finishes (felt like dead buttons).
       loadingEl.style.pointerEvents = 'none';
       setIsLoaded(true);
       gsap.to(loadingEl, {
         opacity: 0,
-        duration: 0.75,
-        ease: 'power3.out',
+        duration: fadeOutSec,
+        ease: reducedMotion ? 'none' : 'power3.out',
         onComplete: () => {
           loadingEl.style.display = 'none';
         },
       });
-    }, LOADING_DURATION_MS);
+    }, delayMs);
 
     return () => clearTimeout(timer);
   }, []);
@@ -189,7 +192,7 @@ function AppContent() {
         </span>
         <div className="flex flex-col items-center gap-6" aria-hidden>
           <div className="relative w-20 h-20 flex items-center justify-center">
-            <div className="absolute inset-0 rounded-3xl bg-solaris-gold/[0.08] blur-xl animate-gold-pulse" />
+            <div className="absolute inset-0 rounded-3xl bg-solaris-gold/[0.08] blur-xl motion-safe:animate-gold-pulse" />
             <div className="relative w-14 h-14 overflow-hidden rounded-2xl bg-slate-950/80 border border-white/[0.08] shadow-[0_0_40px_rgba(242,201,76,0.12)] flex items-center justify-center p-0">
               <SolarisLogoMark
                 crop="emblem"
@@ -511,7 +514,6 @@ function App() {
   return (
     <TonConnectUIProvider manifestUrl={`${PRODUCTION_SITE_ORIGIN}/tonconnect-manifest.json`}>
       <AppContent />
-      <Analytics />
     </TonConnectUIProvider>
   );
 }

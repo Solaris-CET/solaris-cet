@@ -14,7 +14,11 @@ import {
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 import { ByzantineConsensusVisualization } from '@/components/ByzantineConsensusVisualization';
 import { useLanguage } from '@/hooks/useLanguage';
-
+import {
+  PUBLIC_CYBERSCOPE_URL,
+  PUBLIC_FRESHCOINS_URL,
+  PUBLIC_WHITEPAPER_IPFS_URL,
+} from '@/lib/publicTrustLinks';
 
 // Static data defined outside component to avoid re-creation on every render
 const auditBadges = [
@@ -23,7 +27,7 @@ const auditBadges = [
     label: 'Cyberscope Audited',
     description: 'Smart contract security audit completed',
     color: 'gold',
-    link: 'https://www.cyberscope.io/',
+    link: PUBLIC_CYBERSCOPE_URL,
     linkLabel: 'View Audit Report ↗',
     linkColor: 'text-solaris-gold',
   },
@@ -32,7 +36,7 @@ const auditBadges = [
     label: 'Freshcoins Verified',
     description: 'Project verification and due diligence',
     color: 'cyan',
-    link: 'https://www.freshcoins.io/',
+    link: PUBLIC_FRESHCOINS_URL,
     linkLabel: 'Freshcoins ↗',
     linkColor: 'text-solaris-cyan',
   },
@@ -41,7 +45,7 @@ const auditBadges = [
     label: 'KYC Completed',
     description: 'Team identity verification',
     color: 'emerald',
-    link: 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a',
+    link: PUBLIC_WHITEPAPER_IPFS_URL,
     linkLabel: 'See Whitepaper ↗',
     linkColor: 'text-solaris-cyan',
   },

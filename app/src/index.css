@@ -1059,6 +1059,14 @@
   will-change: width, background-position;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .loading-bar-fill {
+    animation: none;
+    width: 100%;
+    background-position: 0 0;
+  }
+}
+
 /* ─────────────────────────────────────────────
    TAG CHIP
 ───────────────────────────────────────────── */
