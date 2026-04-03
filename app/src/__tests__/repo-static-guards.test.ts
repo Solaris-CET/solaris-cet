@@ -6,7 +6,7 @@ import {
   PRODUCTION_SITE_ORIGIN,
   SOLARIS_CET_LOGO_FILENAME,
   productionBrandLogoUrl,
-} from "@/lib/brandAssetFilenames";
+} from "@/lib/brandAssets";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 const appPublic = join(dirname(fileURLToPath(import.meta.url)), "../../public");
