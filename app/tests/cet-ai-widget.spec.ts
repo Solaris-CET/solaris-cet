@@ -1,4 +1,5 @@
 import { test, expect, type Page, type BrowserContext } from '@playwright/test';
+import { CET_AI_MAX_QUERY_CHARS } from '../src/lib/cetAiConstants';
 import type { LangCode } from '../src/i18n/translations';
 
 /** All `LangCode` values except default English — each must have a row in `CET_AI_LOCALE_FIXTURES`. */
@@ -62,6 +63,12 @@ test.describe('Solaris CET AI widget — desktop', () => {
     await expect(ask).toBeVisible();
     const box = await ask.boundingBox();
     expect(box?.height).toBeGreaterThanOrEqual(40);
+  });
+
+  test('hero query shows character count when typing', async ({ page }) => {
+    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
+    await page.getByTestId('cet-ai-hero-query').fill('abc');
+    await expect(page.getByTestId('cet-ai-query-char-count')).toHaveText(`3/${CET_AI_MAX_QUERY_CHARS}`);
   });
 
   test('Opening modal from a suggested chip shows dialog', async ({ page }) => {

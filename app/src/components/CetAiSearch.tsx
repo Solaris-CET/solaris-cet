@@ -216,6 +216,27 @@ function cetAiQueryCharCountClass(length: number, max: number): string {
   return length >= max - 200 ? 'text-amber-400/90' : 'text-gray-600';
 }
 
+function CetAiQueryCharCountLine({
+  id,
+  length,
+  max,
+}: {
+  id: string;
+  length: number;
+  max: number;
+}): React.ReactNode {
+  if (length === 0) return null;
+  return (
+    <p
+      id={id}
+      data-testid="cet-ai-query-char-count"
+      className={`mt-1 text-right text-[10px] font-mono tabular-nums ${cetAiQueryCharCountClass(length, max)}`}
+    >
+      {length}/{max}
+    </p>
+  );
+}
+
 /** Enter / ⌘+Enter / Ctrl+Enter submit; Shift+Enter stays newline (textarea). */
 function handleComposerEnterKeyDown(
   e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -1137,13 +1158,12 @@ export default function CetAiSearch() {
               }
               className="w-full min-h-11 px-4 md:px-6 py-3 md:py-4 bg-gray-950 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-all text-base md:text-base disabled:opacity-40"
             />
-            {query.length > 0 && !isModalOpen ? (
-              <p
+            {!isModalOpen ? (
+              <CetAiQueryCharCountLine
                 id="cet-ai-hero-char-count"
-                className={`mt-1 text-right text-[10px] font-mono tabular-nums ${cetAiQueryCharCountClass(query.length, CET_AI_MAX_QUERY_CHARS)}`}
-              >
-                {query.length}/{CET_AI_MAX_QUERY_CHARS}
-              </p>
+                length={query.length}
+                max={CET_AI_MAX_QUERY_CHARS}
+              />
             ) : null}
           </div>
           <button
@@ -1613,14 +1633,11 @@ export default function CetAiSearch() {
                   aria-describedby={query.length > 0 ? 'cet-ai-modal-char-count' : undefined}
                   className="w-full min-h-[3rem] max-h-40 resize-y px-5 py-3 bg-gray-950 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-all disabled:opacity-40 text-base leading-relaxed"
                 />
-                {query.length > 0 ? (
-                  <p
-                    id="cet-ai-modal-char-count"
-                    className={`mt-1 text-right text-[10px] font-mono tabular-nums ${cetAiQueryCharCountClass(query.length, CET_AI_MAX_QUERY_CHARS)}`}
-                  >
-                    {query.length}/{CET_AI_MAX_QUERY_CHARS}
-                  </p>
-                ) : null}
+                <CetAiQueryCharCountLine
+                  id="cet-ai-modal-char-count"
+                  length={query.length}
+                  max={CET_AI_MAX_QUERY_CHARS}
+                />
                 {isProcessing && (
                   <div className="absolute right-4 top-4">
                     <div className="w-4 h-4 border-2 border-yellow-500 border-t-transparent rounded-full motion-safe:animate-spin" />

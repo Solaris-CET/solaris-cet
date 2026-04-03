@@ -62,10 +62,7 @@ test.describe('Wallet Connection', () => {
     await expect(modal).toBeVisible({ timeout: 5000 });
   });
 
-  test.skip('wallet modal can be dismissed', async ({ page }) => {
-    // TODO: re-enable once React 19 UI rebuild is complete.
-    // TonConnect modal does not dismiss via Escape in the CI headless environment
-    // due to shadow DOM boundary; close-button selector needs updating.
+  test('wallet modal can be dismissed', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     const walletBtn = page
       .locator('button, [role="button"]')
@@ -74,29 +71,14 @@ test.describe('Wallet Connection', () => {
     await walletBtn.waitFor({ state: 'visible', timeout: 6000 });
     await walletBtn.click();
 
-    const modal = page.locator(
-      'tc-modal, [data-tc-modal], [role="dialog"], .ton-connect-ui-modal, [class*="modal"]'
-    ).first();
-    await modal.waitFor({ state: 'visible', timeout: 5000 });
+    // TonConnect @tonconnect/ui wallets modal — stable hooks from the library bundle
+    const walletsModal = page.locator('[data-tc-wallets-modal-container="true"]');
+    await expect(walletsModal).toBeVisible({ timeout: 8000 });
 
-    // Try ESC key first (standard accessibility pattern)
-    await page.keyboard.press('Escape');
-    const dismissedViaEsc = await modal.isHidden({ timeout: 3000 }).catch(() => false);
-    if (!dismissedViaEsc) {
-      // Fallback: click an overlay/close button
-      const closeBtn = page
-        .locator('button[aria-label*="close" i], button[aria-label*="dismiss" i], [data-tc-close]')
-        .first();
-      if (await closeBtn.isVisible()) {
-        await closeBtn.click();
-        // Re-assert that the modal became hidden after the fallback action
-        await expect(modal).toBeHidden({ timeout: 3000 });
-      } else {
-        throw new Error(
-          'Wallet modal did not dismiss via Escape and no visible close/dismiss button was found.'
-        );
-      }
-    }
+    // Header close control (icon button) — prefer over Escape; CI focus can miss body key handlers
+    const closeBtn = walletsModal.locator('[data-tc-icon-button="true"]').first();
+    await closeBtn.click();
+    await expect(walletsModal).toBeHidden({ timeout: 5000 });
   });
 
   test('connect wallet button is accessible in mobile nav', async ({ page }) => {
