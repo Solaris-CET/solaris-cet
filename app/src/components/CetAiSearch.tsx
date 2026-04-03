@@ -252,6 +252,9 @@ const FOLLOW_UP_BY_TOPIC: Record<string, string[]> = {
 /** RAV telemetry milestones (ms) — tuned for mobile attention span; ~5.3s to completion. */
 const CET_AI_PHASE_MS = [580, 1280, 2080, 2880, 3780, 4380, 4980, 5280] as const;
 
+/** Aligns with `conversation` / user message limits on `/api/chat` (edge handler). */
+const CET_AI_MAX_QUERY_CHARS = 8000;
+
 function buildContextualResponse(q: string, knowledge: CetAiKnowledge): { answer: string; confidence: number } {
   const lower = q.toLowerCase();
   for (const [topic, keywords] of Object.entries(TOPIC_KEYWORDS)) {
@@ -855,6 +858,9 @@ export default function CetAiSearch() {
 
   // --- CORE LOGIC: RAV + optional live /api/chat (Coolify/VPS) with local knowledge fallback ---
   const processQuestion = useCallback((q: string, priorHistory: ChatEntry[] = []) => {
+    const question = q.trim().slice(0, CET_AI_MAX_QUERY_CHARS);
+    if (!question) return;
+
     const myEpoch = ++generationEpochRef.current;
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
@@ -863,10 +869,10 @@ export default function CetAiSearch() {
     const ac = new AbortController();
     cetAiAbortRef.current = ac;
 
-    const cetAiFetchPromise = fetchCetAiChat(q, ac.signal, priorHistory);
+    const cetAiFetchPromise = fetchCetAiChat(question, ac.signal, priorHistory);
 
-    const { answer: localAnswer, confidence } = buildContextualResponse(q, t.cetAi.knowledge);
-    const lowerQ = q.toLowerCase();
+    const { answer: localAnswer, confidence } = buildContextualResponse(question, t.cetAi.knowledge);
+    const lowerQ = question.toLowerCase();
     let detected = 'default';
     for (const [topic, keywords] of Object.entries(TOPIC_KEYWORDS)) {
       if (keywords.some(kw => lowerQ.includes(kw))) {
@@ -876,10 +882,10 @@ export default function CetAiSearch() {
     }
     setDetectedTopic(detected);
     const hash = generateHash();
-    const tokenCount = q.split(/\s+/).length;
+    const tokenCount = question.split(/\s+/).length;
     const startMs = performance.now();
 
-    setSubmittedQuestion(q);
+    setSubmittedQuestion(question);
     setLogs([]);
     setFinalResponse('');
     setCetAiConfidence(0);
@@ -891,7 +897,7 @@ export default function CetAiSearch() {
 
     setPhase('observe_parse');
     addLog('INFO', `RAV_INIT: Grok × Gemini CET AI v3.1 · Session [${hash}]`);
-    const observeParseSeq = buildCetAiObserveParse(q, detected, tokenCount);
+    const observeParseSeq = buildCetAiObserveParse(question, detected, tokenCount);
     addLog('QUANTUM', observeParseSeq[0]!);
     for (const line of observeParseSeq.slice(1)) {
       addLog('INFO', line);
@@ -901,9 +907,9 @@ export default function CetAiSearch() {
       if (generationEpochRef.current !== myEpoch) return;
       setPhase('observe_context');
       addLog('QUANTUM', `INTENT_EXTRACTION: Semantic vector computed. Ambiguity score: 0.${Math.floor(Math.random() * 30 + 10)}`);
-      addLog('QUANTUM', buildFlashGlintLogMessage(q));
+      addLog('QUANTUM', buildFlashGlintLogMessage(question));
       addLog('INFO', `CONTEXT_MAP: Knowledge graph traversal · Nodes visited: 2,847`);
-      addLog('INFO', buildDeepLatticeMeshLogMessage('CONTEXT_MESH', q, CET_AI_LATTICE_PHASE.observeContext));
+      addLog('INFO', buildDeepLatticeMeshLogMessage('CONTEXT_MESH', question, CET_AI_LATTICE_PHASE.observeContext));
       setMetrics(prev => ({ ...prev, latency: Math.round(performance.now() - startMs) }));
     }, CET_AI_PHASE_MS[0]);
 
@@ -912,7 +918,7 @@ export default function CetAiSearch() {
       setPhase('think_route');
       addLog('INFO', `GEMINI_REASON: Analytical pathway · parallel hypothesis lattice`);
       addLog('QUANTUM', `HYPOTHESIS_GEN: 6 paths · superposition collapse scheduled`);
-      addLog('INFO', buildDeepLatticeMeshLogMessage('ROUTE_MESH', q, CET_AI_LATTICE_PHASE.thinkRoute));
+      addLog('INFO', buildDeepLatticeMeshLogMessage('ROUTE_MESH', question, CET_AI_LATTICE_PHASE.thinkRoute));
       setMetrics(prev => ({ ...prev, latency: Math.round(performance.now() - startMs) }));
     }, CET_AI_PHASE_MS[1]);
 
@@ -922,8 +928,8 @@ export default function CetAiSearch() {
       addLog('QUANTUM', `PATH_COLLAPSE: Highest-confidence path (p=${(confidence / 100).toFixed(4)})`);
       addLog('SEC', `CONSTRAINT_CHECK: Zero-hallucination bounds · fact anchors`);
       addLog('INFO', `BRAID_FRAME: Reasoning graph · depth 7 · nodes 1,204`);
-      addLog('INFO', buildDeepLatticeMeshLogMessage('VALIDATE_MESH', q, CET_AI_LATTICE_PHASE.thinkValidate));
-      addLog('QUANTUM', buildExpressomeBurstLogMessage(q));
+      addLog('INFO', buildDeepLatticeMeshLogMessage('VALIDATE_MESH', question, CET_AI_LATTICE_PHASE.thinkValidate));
+      addLog('QUANTUM', buildExpressomeBurstLogMessage(question));
       setMetrics(prev => ({
         ...prev,
         confidence: Math.round(confidence * 0.7),
@@ -936,8 +942,8 @@ export default function CetAiSearch() {
       setPhase('act_execute');
       addLog('INFO', `GROK_ACT: Action directive pipeline · live /api/chat merge pending`);
       addLog('QUANTUM', `RESPONSE_COMPILE: dual-model payload · entropy seed`);
-      addLog('INFO', buildDeepLatticeMeshLogMessage('ACT_MESH', q, CET_AI_LATTICE_PHASE.actExecute));
-      addLog('INFO', buildDeepLatticeMeshLogMessageRawQuery('DEEP_LATTICE', q));
+      addLog('INFO', buildDeepLatticeMeshLogMessage('ACT_MESH', question, CET_AI_LATTICE_PHASE.actExecute));
+      addLog('INFO', buildDeepLatticeMeshLogMessageRawQuery('DEEP_LATTICE', question));
       addLog('SEC', `SIGN: Quantum OS key · Hash: 0x${generateHash()}${generateHash()}`);
       setMetrics(prev => ({
         ...prev,
@@ -997,7 +1003,7 @@ export default function CetAiSearch() {
         );
         addLog('SEC', `TON_CONSENSUS: Payload validated · quorum OK`);
         addLog('QUANTUM', `RAV_COMPLETE: loop closed · Confidence: ${conf.toFixed(1)}%`);
-        addLog('QUANTUM', buildConsensusBurstLogMessage(q));
+        addLog('QUANTUM', buildConsensusBurstLogMessage(question));
         setMetrics(prev => ({
           ...prev,
           confidence: Math.round(conf),
@@ -1014,7 +1020,7 @@ export default function CetAiSearch() {
       setPhase('verify_cross');
       addLog('SEC', `VERIFY_INIT: Cross-model review · Grok↔Gemini`);
       addLog('QUANTUM', `ZK_PROOF: integrity bundle · Hash: 0x${generateHash()}`);
-      addLog('INFO', buildDeepLatticeMeshLogMessage('CROSS_MESH', q, CET_AI_LATTICE_PHASE.verifyCross));
+      addLog('INFO', buildDeepLatticeMeshLogMessage('CROSS_MESH', question, CET_AI_LATTICE_PHASE.verifyCross));
     }, CET_AI_PHASE_MS[5]);
 
     schedule(() => {
@@ -1022,15 +1028,15 @@ export default function CetAiSearch() {
       setPhase('verify_anchor');
       addLog('SEC', `IPFS_ANCHOR: trace slot reserved · CID: bafkrei${generateHash().toLowerCase()}`);
       addLog('INFO', `ON_CHAIN: anchor ref · Block: #${Math.floor(Math.random() * 1_000_000 + 48_000_000)}`);
-      addLog('QUANTUM', buildDeepLatticeMeshLogMessage('MESH_SEAL', q, CET_AI_LATTICE_PHASE.meshSeal));
+      addLog('QUANTUM', buildDeepLatticeMeshLogMessage('MESH_SEAL', question, CET_AI_LATTICE_PHASE.meshSeal));
       addLog('QUANTUM', `RAV_VERIFIED: no hallucination flag on consensus path`);
     }, CET_AI_PHASE_MS[6]);
 
     schedule(() => {
       if (generationEpochRef.current !== myEpoch) return;
       setPhase('complete');
-      addLog('INFO', buildDeepLatticeMeshLogMessage('SESSION_MESH', q, CET_AI_LATTICE_PHASE.sessionClose));
-      addLog('QUANTUM', buildLoopCompleteBurstLogMessage(q));
+      addLog('INFO', buildDeepLatticeMeshLogMessage('SESSION_MESH', question, CET_AI_LATTICE_PHASE.sessionClose));
+      addLog('QUANTUM', buildLoopCompleteBurstLogMessage(question));
     }, CET_AI_PHASE_MS[7]);
   }, [generateHash, addLog, t.cetAi.knowledge]);
 
@@ -1111,7 +1117,8 @@ export default function CetAiSearch() {
               type="text"
               data-testid="cet-ai-hero-query"
               value={query}
-              onChange={e => setQuery(e.target.value)}
+              maxLength={CET_AI_MAX_QUERY_CHARS}
+              onChange={e => setQuery(e.target.value.slice(0, CET_AI_MAX_QUERY_CHARS))}
               onKeyDown={e =>
                 handleComposerEnterKeyDown(e, {
                   isProcessing,
@@ -1163,7 +1170,7 @@ export default function CetAiSearch() {
           <DialogPrimitive.Overlay className="fixed inset-0 z-[9999] bg-[#020202]/98 backdrop-blur-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
           <DialogPrimitive.Content
             data-testid="cet-ai-modal-dialog"
-            aria-describedby={undefined}
+            aria-describedby="cet-ai-dialog-desc"
             aria-busy={isProcessing}
             onOpenAutoFocus={e => {
               e.preventDefault();
@@ -1173,6 +1180,9 @@ export default function CetAiSearch() {
             className="fixed inset-0 z-[9999] flex flex-col font-sans pt-[env(safe-area-inset-top,0px)] outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
           >
           <DialogPrimitive.Title className="sr-only">{t.cetAi.title}</DialogPrimitive.Title>
+          <p id="cet-ai-dialog-desc" className="sr-only">
+            {t.cetAi.modalDescription}
+          </p>
           <div aria-live="polite" aria-atomic="true" className="sr-only">
             {phase === 'complete' && finalResponse ? t.cetAi.announceCetAiReady : ''}
           </div>
@@ -1538,7 +1548,8 @@ export default function CetAiSearch() {
                 <textarea
                   ref={modalInputRef}
                   value={query}
-                  onChange={e => setQuery(e.target.value)}
+                  maxLength={CET_AI_MAX_QUERY_CHARS}
+                  onChange={e => setQuery(e.target.value.slice(0, CET_AI_MAX_QUERY_CHARS))}
                   onKeyDown={e =>
                     handleComposerEnterKeyDown(e, {
                       isProcessing,
