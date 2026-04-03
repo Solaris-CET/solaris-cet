@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { TrendingUp, ExternalLink, BarChart2 } from 'lucide-react';
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
+import { productionSiteUrl } from '@/lib/brandAssets';
 import { useLanguage } from '@/hooks/useLanguage';
 
 interface CryptoProject {
@@ -42,7 +43,7 @@ const projects: CryptoProject[] = [
   { name: 'Hyperliquid', symbol: 'HYPE', href: 'https://hyperliquid.xyz/', category: 'defi' },
   { name: 'Mantle', symbol: 'MNT', href: 'https://group.mantle.xyz/', category: 'defi' },
   // AI Tokens — Solaris CET's direct competitive space
-  { name: 'Solaris CET', symbol: 'CET',   href: 'https://solaris-cet.com/',       category: 'ai' },
+  { name: 'Solaris CET', symbol: 'CET', href: productionSiteUrl(), category: 'ai' },
   { name: 'Fetch.ai',    symbol: 'FET',   href: 'https://fetch.ai/',                      category: 'ai' },
   { name: 'Bittensor',   symbol: 'TAO',   href: 'https://bittensor.com',                  category: 'ai' },
   { name: 'SingularityNET', symbol: 'AGIX', href: 'https://singularitynet.io/',           category: 'ai' },
