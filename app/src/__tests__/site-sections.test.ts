@@ -1,7 +1,10 @@
 import { describe, it, expect } from "vitest";
 import translations from "../i18n/translations";
 import { CET_CONTRACT_ADDRESS as CET_CONTRACT } from "@/lib/cetContract";
+import { PRODUCTION_SITE_ORIGIN } from "@/lib/brandAssetFilenames";
 import { DEDUST_POOL_ADDRESS, DEDUST_SWAP_URL } from "@/lib/dedustUrls";
+
+const SITE_ROOT = `${PRODUCTION_SITE_ORIGIN}/`;
 
 // ─── Navigation + section IDs ─────────────────────────────────────────────
 
@@ -330,21 +333,21 @@ const HOW_TO_BUY_STEPS = [
 ];
 
 const SITEMAP_URLS = [
-  "https://solaris-cet.com/",
-  "https://solaris-cet.com/#nova-app",
-  "https://solaris-cet.com/#staking",
-  "https://solaris-cet.com/#roadmap",
-  "https://solaris-cet.com/#team",
-  "https://solaris-cet.com/#competition",
-  "https://solaris-cet.com/#network-pulse",
-  "https://solaris-cet.com/#how-to-buy",
-  "https://solaris-cet.com/#stats",
-  "https://solaris-cet.com/#authority-trust",
-  "https://solaris-cet.com/#ecosystem-index",
-  "https://solaris-cet.com/#security",
-  "https://solaris-cet.com/#whitepaper",
-  "https://solaris-cet.com/#resources",
-  "https://solaris-cet.com/#faq",
+  SITE_ROOT,
+  `${PRODUCTION_SITE_ORIGIN}/#nova-app`,
+  `${PRODUCTION_SITE_ORIGIN}/#staking`,
+  `${PRODUCTION_SITE_ORIGIN}/#roadmap`,
+  `${PRODUCTION_SITE_ORIGIN}/#team`,
+  `${PRODUCTION_SITE_ORIGIN}/#competition`,
+  `${PRODUCTION_SITE_ORIGIN}/#network-pulse`,
+  `${PRODUCTION_SITE_ORIGIN}/#how-to-buy`,
+  `${PRODUCTION_SITE_ORIGIN}/#stats`,
+  `${PRODUCTION_SITE_ORIGIN}/#authority-trust`,
+  `${PRODUCTION_SITE_ORIGIN}/#ecosystem-index`,
+  `${PRODUCTION_SITE_ORIGIN}/#security`,
+  `${PRODUCTION_SITE_ORIGIN}/#whitepaper`,
+  `${PRODUCTION_SITE_ORIGIN}/#resources`,
+  `${PRODUCTION_SITE_ORIGIN}/#faq`,
 ];
 
 describe("HowToBuy + sitemap", () => {
@@ -373,10 +376,10 @@ describe("HowToBuy + sitemap", () => {
     expect(SITEMAP_URLS).toHaveLength(15);
     expect(new Set(SITEMAP_URLS).size).toBe(SITEMAP_URLS.length);
     SITEMAP_URLS.forEach((url) => expect(url).toMatch(/^https:\/\//));
-    expect(SITEMAP_URLS).toContain("https://solaris-cet.com/#competition");
-    expect(SITEMAP_URLS).toContain("https://solaris-cet.com/#network-pulse");
-    expect(SITEMAP_URLS).toContain("https://solaris-cet.com/#authority-trust");
-    expect(SITEMAP_URLS[0]).toBe("https://solaris-cet.com/");
+    expect(SITEMAP_URLS).toContain(`${PRODUCTION_SITE_ORIGIN}/#competition`);
+    expect(SITEMAP_URLS).toContain(`${PRODUCTION_SITE_ORIGIN}/#network-pulse`);
+    expect(SITEMAP_URLS).toContain(`${PRODUCTION_SITE_ORIGIN}/#authority-trust`);
+    expect(SITEMAP_URLS[0]).toBe(SITE_ROOT);
     expect(SITEMAP_URLS[0]).not.toContain("#");
   });
 });

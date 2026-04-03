@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
+import { productionSiteUrl } from '@/lib/brandAssetFilenames';
 
-const SITE_URL = 'https://solaris-cet.com/';
+const SITE_URL = productionSiteUrl();
 const SHARE_TEXT =
   '🚀 Just discovered $CET on #TON blockchain! Fixed supply of 9,000 CET — mine, trade & stake. Check it out 👇';
 
