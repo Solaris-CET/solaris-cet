@@ -43,9 +43,7 @@ test.describe('Conversion UI', () => {
   });
 
   test('footer includes in-page link to trust pillars', async ({ page }) => {
-    await page.evaluate(() => {
-      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' });
-    });
-    await expect(page.getByTestId('footer-authority-trust-link')).toBeVisible({ timeout: 20000 });
+    await scrollUntilSelectorAttached(page, '[data-testid="footer-authority-trust-link"]');
+    await expect(page.getByTestId('footer-authority-trust-link')).toBeVisible({ timeout: 20_000 });
   });
 });

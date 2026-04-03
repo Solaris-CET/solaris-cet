@@ -77,4 +77,21 @@ test.describe('Domain pillars', () => {
       timeout: 15_000,
     });
   });
+
+  test('roadmap section renders phase cards after lazy mount', async ({ page }) => {
+    await scrollUntilSelectorAttached(page, '#roadmap');
+    const roadmap = page.locator('#roadmap');
+    await roadmap.scrollIntoViewIfNeeded();
+    await expect(roadmap.getByText('ROADMAP')).toBeVisible({ timeout: 15_000 });
+    await expect(roadmap.locator('.roadmap-card')).toHaveCount(7);
+  });
+
+  test('deep link /#roadmap attaches roadmap content after lazy band', async ({ page }) => {
+    await page.goto('/#roadmap');
+    await waitForAppReady(page);
+    await scrollUntilSelectorAttached(page, '#roadmap');
+    await expect(page.locator('#roadmap').locator('.roadmap-card').first()).toBeVisible({
+      timeout: 15_000,
+    });
+  });
 });
