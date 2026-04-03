@@ -215,7 +215,8 @@
 
     <!-- OMEGA policy: no external font/style CDNs in shipped runtime HTML -->
 
-    <!-- Preload above-the-fold hero image to improve Largest Contentful Paint -->
+    <!-- Preload critical raster brand + hero coin (loader/nav mark + hero 3D coin) for LCP -->
+    <link rel="preload" as="image" href="./solaris-cet-logo.jpg" fetchpriority="high" />
     <link rel="preload" as="image" href="./hero-coin.png" fetchpriority="high" />
 
     <!-- Telegram Mini App SDK — enables window.Telegram.WebApp when the app

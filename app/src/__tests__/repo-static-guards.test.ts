@@ -45,6 +45,15 @@ describe("OMEGA sovereign — self-hosted JetBrains Mono", () => {
   });
 });
 
+describe("Brand raster — SolarisLogoMark source of truth", () => {
+  const logoPath = join(appPublic, "solaris-cet-logo.jpg");
+
+  it("solaris-cet-logo.jpg ships in app/public (referenced by SolarisLogoMark)", () => {
+    expect(existsSync(logoPath), `missing ${logoPath}`).toBe(true);
+    expect(statSync(logoPath).size).toBeGreaterThan(5000);
+  });
+});
+
 describe("OMEGA invariants", () => {
   it("sovereign: no scripts, no forbidden CDNs; canonical CET/TON/Cetățuia copy", () => {
     const sovereignHtml = readFileSync(join(repoRoot, "static/sovereign/index.html"), "utf8");
