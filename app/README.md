@@ -34,6 +34,8 @@ E2E (Chromium): from `app/`, **`npm run test:e2e`** (install browsers once: `npx
 
 **Brand raster (`src/lib/`):** `brandAssetFilenames.ts` holds logo + `OG_IMAGE_FILENAME`, `PRODUCTION_SITE_ORIGIN`, and URL helpers (`productionBrandLogoUrl`, `productionOgImageUrl`, `productionSiteUrl`, `productionTonConnectIconUrl` for `tonconnect-manifest.json` `iconUrl`) for Node/`vite.config.ts`; `brandAssets.ts` re-exports those and `solarisCetLogoSrc()` for UI (e.g. `SolarisLogoMark`, social meta).
 
+**API CORS (`api/lib/`):** `cors.ts` (`getAllowedOrigin`) — unit-tested in `src/__tests__/apiCors.test.ts` alongside `PRODUCTION_SITE_ORIGIN`.
+
 ## Env (Coolify / production / local)
 
 - **CET AI:** `GROK_API_KEY` / `GEMINI_API_KEY` (or `*_ENC` + `ENCRYPTION_SECRET`) — see `api/lib/crypto.ts` and `scripts/encrypt-key.mjs` in the repo root.
