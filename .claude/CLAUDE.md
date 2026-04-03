@@ -16,7 +16,7 @@ npm run test        # Vitest
 npm run build
 npm run verify      # lint + typecheck + test + build
 npm run test:e2e    # Playwright (same as CI; browsers — see .devcontainer)
-npm run verify:full # verify + E2E
+npm run verify:full # verify + test:e2e:stable (aligned with CI single-worker E2E)
 ```
 
 ## Layout

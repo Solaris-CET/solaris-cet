@@ -19,7 +19,7 @@ npm run test
 npm run build
 npm run verify        # lint + typecheck + test + build (pre-push gate)
 npm run test:e2e      # Playwright (`pretest:e2e` ensures dist/; preview on 4173 via playwright.config)
-npm run verify:full   # verify + E2E
+npm run verify:full   # verify + E2E via test:e2e:stable (one worker, aligned with CI)
 ```
 
 Preview (`vite preview`) uses port **4173** by default; both **5173** and **4173** are forwarded with labels in `devcontainer.json`.
