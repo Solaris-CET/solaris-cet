@@ -1,4 +1,41 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page, type BrowserContext } from '@playwright/test';
+
+/**
+ * Offline multi-turn flow: chip → follow-up → copy full transcript; asserts clipboard handoff.
+ */
+async function assertCopyTranscriptMultiTurnOffline(page: Page, context: BrowserContext): Promise<void> {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.route('**/api/chat', (route) => route.abort('failed'));
+  await page.addInitScript(() => {
+    localStorage.removeItem('cet-ai-chat-history');
+  });
+  await page.reload();
+  await page.locator('.loading-overlay').waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+
+  await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
+  const chip = page.getByRole('button', { name: /What is the RAV Protocol/i });
+  await chip.evaluate((el) =>
+    (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
+  );
+  await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
+  await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
+  await expect(page.getByText(/No live API on this host/i)).toBeVisible({ timeout: 20_000 });
+
+  await page.getByTestId('cet-ai-modal-query').fill('Second turn CET transcript handoff');
+  await page.getByTestId('cet-ai-modal-dialog').getByRole('button', { name: /Send question/i }).click();
+
+  await expect(page.getByText('Second turn CET transcript handoff', { exact: true })).toBeVisible({
+    timeout: 5000,
+  });
+  await expect(page.getByTestId('cet-ai-copy-transcript')).toBeVisible({ timeout: 25_000 });
+  await page.getByTestId('cet-ai-copy-transcript').click();
+
+  const text = await page.evaluate(async () => navigator.clipboard.readText());
+  expect(text).toContain('---');
+  expect(text).toContain('What is the RAV Protocol');
+  expect(text).toContain('Second turn CET transcript handoff');
+  expect(text).toContain('## Question');
+}
 
 /**
  * Solaris CET AI — desktop + mobile viewport, API failure path, locale query.
@@ -76,37 +113,7 @@ test.describe('Solaris CET AI widget — desktop', () => {
   });
 
   test('Copy full transcript after follow-up (offline, multi-turn)', async ({ page, context }) => {
-    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-    await page.route('**/api/chat', (route) => route.abort('failed'));
-    await page.addInitScript(() => {
-      localStorage.removeItem('cet-ai-chat-history');
-    });
-    await page.reload();
-    await page.locator('.loading-overlay').waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
-
-    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
-    const chip = page.getByRole('button', { name: /What is the RAV Protocol/i });
-    await chip.evaluate((el) =>
-      (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
-    );
-    await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
-    await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
-    await expect(page.getByText(/No live API on this host/i)).toBeVisible({ timeout: 20_000 });
-
-    await page.getByTestId('cet-ai-modal-query').fill('Second turn CET transcript handoff');
-    await page.getByTestId('cet-ai-modal-dialog').getByRole('button', { name: /Send question/i }).click();
-
-    await expect(page.getByText('Second turn CET transcript handoff', { exact: true })).toBeVisible({
-      timeout: 5000,
-    });
-    await expect(page.getByTestId('cet-ai-copy-transcript')).toBeVisible({ timeout: 25_000 });
-    await page.getByTestId('cet-ai-copy-transcript').click();
-
-    const text = await page.evaluate(async () => navigator.clipboard.readText());
-    expect(text).toContain('---');
-    expect(text).toContain('What is the RAV Protocol');
-    expect(text).toContain('Second turn CET transcript handoff');
-    expect(text).toContain('## Question');
+    await assertCopyTranscriptMultiTurnOffline(page, context);
   });
 
   test('static mode shows offline hint when /api/chat fails', async ({ page }) => {
@@ -153,6 +160,10 @@ test.describe('Solaris CET AI widget — mobile viewport', () => {
     await page.getByRole('button', { name: /initiate protocol/i }).click();
     await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
     await expect(page.getByText('What is the CET supply?', { exact: true })).toBeVisible({ timeout: 3000 });
+  });
+
+  test('Copy full transcript after follow-up (offline, multi-turn)', async ({ page, context }) => {
+    await assertCopyTranscriptMultiTurnOffline(page, context);
   });
 });
 
