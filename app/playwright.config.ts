@@ -13,8 +13,16 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI to reduce flakiness */
   retries: process.env.CI ? 2 : 0,
-  /* Parallel workers: 1 on CI to avoid resource contention */
-  workers: process.env.CI ? 1 : undefined,
+  /**
+   * Default 1 worker: all tests share one Vite preview on :4173; higher parallelism often
+   * yields `net::ERR_CONNECTION_REFUSED` locally. Override with `PW_WORKERS=4 npm run test:e2e`.
+   */
+  workers: (() => {
+    const raw = process.env.PW_WORKERS;
+    if (raw === undefined || raw === '') return 1;
+    const n = Number.parseInt(raw, 10);
+    return Number.isFinite(n) && n >= 1 ? n : 1;
+  })(),
   /* Reporter */
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
