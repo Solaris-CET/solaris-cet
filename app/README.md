@@ -32,7 +32,7 @@ E2E (Chromium): from `app/`, **`npm run test:e2e`** (install browsers once: `npx
 
 **CET AI (`src/lib/`):** `cetAiConstants.ts` (query length caps + near-limit band), `cetAiConversation.ts` (copy-for-AI / multi-turn handoff strings), `cetAiQueryUi.ts` (length indicator tone), plus `cetAiTelemetry.ts` and related mesh/burst helpers — see also `docs/PRODUCTION_LAYOUT.md`.
 
-**Brand raster (`src/lib/`):** `brandAssetFilenames.ts` holds logo + `OG_IMAGE_FILENAME`, `PRODUCTION_SITE_ORIGIN`, and URL helpers (`productionBrandLogoUrl`, `productionOgImageUrl`, `productionSiteUrl`) for Node/`vite.config.ts`; `brandAssets.ts` re-exports those and `solarisCetLogoSrc()` for UI (e.g. `SolarisLogoMark`, Ton Connect, social meta).
+**Brand raster (`src/lib/`):** `brandAssetFilenames.ts` holds logo + `OG_IMAGE_FILENAME`, `PRODUCTION_SITE_ORIGIN`, and URL helpers (`productionBrandLogoUrl`, `productionOgImageUrl`, `productionSiteUrl`, `productionTonConnectIconUrl` for `tonconnect-manifest.json` `iconUrl`) for Node/`vite.config.ts`; `brandAssets.ts` re-exports those and `solarisCetLogoSrc()` for UI (e.g. `SolarisLogoMark`, social meta).
 
 ## Env (Coolify / production / local)
 
