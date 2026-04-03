@@ -167,218 +167,98 @@ test.describe('Solaris CET AI widget — mobile viewport', () => {
   });
 });
 
-test.describe('Locale query ?lang=', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.removeItem('solaris_lang');
+/** `/?lang=` CET AI i18n — mirrors `translations.ts` cetAi (title, send, RAV chip, modalDescription). */
+type CetAiLocaleFixture = {
+  code: string;
+  titleHeading: RegExp;
+  sendButton: RegExp;
+  ravChip: RegExp;
+  dialogDescPatterns: readonly [RegExp, RegExp];
+};
+
+const CET_AI_LOCALE_FIXTURES: readonly CetAiLocaleFixture[] = [
+  {
+    code: 'ro',
+    titleHeading: /Solaris CET AI/i,
+    sendButton: /INIȚIAZĂ PROTOCOLUL/i,
+    ravChip: /Ce este protocolul RAV/i,
+    dialogDescPatterns: [/Dialog CET AI/i, /Escape/i],
+  },
+  {
+    code: 'de',
+    titleHeading: /Solaris CET AI/i,
+    sendButton: /PROTOKOLL STARTEN/i,
+    ravChip: /Was ist das RAV-Protokoll/i,
+    dialogDescPatterns: [/CET-AI-Dialog/i, /Escape/i],
+  },
+  {
+    code: 'es',
+    titleHeading: /CET AI Solaris/i,
+    sendButton: /INICIAR PROTOCOLO/i,
+    ravChip: /¿Qué es el protocolo RAV/i,
+    dialogDescPatterns: [/Diálogo CET AI/i, /Escape/i],
+  },
+  {
+    code: 'zh',
+    titleHeading: /Solaris CET AI/i,
+    sendButton: /启动协议/,
+    ravChip: /什么是 RAV 协议/,
+    dialogDescPatterns: [/CET AI 对话框/, /Escape/],
+  },
+  {
+    code: 'pt',
+    titleHeading: /CET AI Solaris/i,
+    sendButton: /INICIAR PROTOCOLO/i,
+    ravChip: /O que é o protocolo RAV/i,
+    dialogDescPatterns: [/Diálogo CET AI/i, /Escape/i],
+  },
+  {
+    code: 'ru',
+    titleHeading: /Solaris CET AI/i,
+    sendButton: /ЗАПУСТИТЬ ПРОТОКОЛ/i,
+    ravChip: /Что такое протокол RAV/i,
+    dialogDescPatterns: [/Диалог CET AI/i, /Escape/i],
+  },
+];
+
+async function openCetAiModalFromRavChip(page: Page, ravChip: RegExp): Promise<void> {
+  await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
+  const chip = page.getByRole('button', { name: ravChip });
+  await chip.evaluate((el) =>
+    (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
+  );
+  await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
+}
+
+for (const L of CET_AI_LOCALE_FIXTURES) {
+  test.describe(`Locale query ?lang=${L.code}`, () => {
+    test.beforeEach(async ({ page }) => {
+      await page.addInitScript(() => {
+        localStorage.removeItem('solaris_lang');
+      });
+      await page.goto(`/?lang=${L.code}`, { waitUntil: 'domcontentloaded' });
+      await page.locator('.loading-overlay').waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
     });
-    await page.goto('/?lang=ro', { waitUntil: 'domcontentloaded' });
-    await page.locator('.loading-overlay').waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
-  });
 
-  test('?lang=ro applies Romanian CET AI chrome', async ({ page }) => {
-    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
-    await expect(page.getByRole('heading', { name: /Solaris CET AI/i }).first()).toBeVisible({
-      timeout: 15_000,
+    test(`?lang=${L.code} applies locale CET AI chrome`, async ({ page }) => {
+      await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
+      await expect(page.getByRole('heading', { name: L.titleHeading }).first()).toBeVisible({
+        timeout: 15_000,
+      });
+      await expect(page.getByRole('button', { name: L.sendButton })).toBeVisible();
     });
-    await expect(page.getByRole('button', { name: /INIȚIAZĂ PROTOCOLUL/i })).toBeVisible();
-  });
 
-  test('?lang=ro modal exposes Romanian screen-reader dialog description', async ({ page }) => {
-    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
-    const chip = page.getByRole('button', { name: /Ce este protocolul RAV/i });
-    await chip.evaluate((el) =>
-      (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
-    );
-    await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
-    await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
-    await expect(page.getByTestId('cet-ai-modal-dialog')).toHaveAttribute(
-      'aria-describedby',
-      'cet-ai-dialog-desc',
-    );
-    const desc = page.locator('#cet-ai-dialog-desc');
-    await expect(desc).toBeAttached();
-    await expect(desc).toContainText(/Dialog CET AI/i);
-    await expect(desc).toContainText(/Escape/i);
-  });
-});
-
-test.describe('Locale query ?lang=de', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.removeItem('solaris_lang');
+    test(`?lang=${L.code} modal exposes screen-reader dialog description`, async ({ page }) => {
+      await openCetAiModalFromRavChip(page, L.ravChip);
+      await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
+      await expect(page.getByTestId('cet-ai-modal-dialog')).toHaveAttribute(
+        'aria-describedby',
+        'cet-ai-dialog-desc',
+      );
+      const desc = page.locator('#cet-ai-dialog-desc');
+      await expect(desc).toBeAttached();
+      await expect(desc).toContainText(L.dialogDescPatterns[0]);
+      await expect(desc).toContainText(L.dialogDescPatterns[1]);
     });
-    await page.goto('/?lang=de', { waitUntil: 'domcontentloaded' });
-    await page.locator('.loading-overlay').waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
   });
-
-  test('?lang=de applies German CET AI chrome', async ({ page }) => {
-    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
-    await expect(page.getByRole('heading', { name: /Solaris CET AI/i }).first()).toBeVisible({
-      timeout: 15_000,
-    });
-    await expect(page.getByRole('button', { name: /PROTOKOLL STARTEN/i })).toBeVisible();
-  });
-
-  test('?lang=de modal exposes German screen-reader dialog description', async ({ page }) => {
-    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
-    const chip = page.getByRole('button', { name: /Was ist das RAV-Protokoll/i });
-    await chip.evaluate((el) =>
-      (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
-    );
-    await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
-    await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
-    await expect(page.getByTestId('cet-ai-modal-dialog')).toHaveAttribute(
-      'aria-describedby',
-      'cet-ai-dialog-desc',
-    );
-    const desc = page.locator('#cet-ai-dialog-desc');
-    await expect(desc).toBeAttached();
-    await expect(desc).toContainText(/CET-AI-Dialog/i);
-    await expect(desc).toContainText(/Escape/i);
-  });
-});
-
-test.describe('Locale query ?lang=es', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.removeItem('solaris_lang');
-    });
-    await page.goto('/?lang=es', { waitUntil: 'domcontentloaded' });
-    await page.locator('.loading-overlay').waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
-  });
-
-  test('?lang=es applies Spanish CET AI chrome', async ({ page }) => {
-    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
-    await expect(page.getByRole('heading', { name: /CET AI Solaris/i }).first()).toBeVisible({
-      timeout: 15_000,
-    });
-    await expect(page.getByRole('button', { name: /INICIAR PROTOCOLO/i })).toBeVisible();
-  });
-
-  test('?lang=es modal exposes Spanish screen-reader dialog description', async ({ page }) => {
-    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
-    const chip = page.getByRole('button', { name: /¿Qué es el protocolo RAV/i });
-    await chip.evaluate((el) =>
-      (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
-    );
-    await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
-    await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
-    await expect(page.getByTestId('cet-ai-modal-dialog')).toHaveAttribute(
-      'aria-describedby',
-      'cet-ai-dialog-desc',
-    );
-    const desc = page.locator('#cet-ai-dialog-desc');
-    await expect(desc).toBeAttached();
-    await expect(desc).toContainText(/Diálogo CET AI/i);
-    await expect(desc).toContainText(/Escape/i);
-  });
-});
-
-test.describe('Locale query ?lang=zh', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.removeItem('solaris_lang');
-    });
-    await page.goto('/?lang=zh', { waitUntil: 'domcontentloaded' });
-    await page.locator('.loading-overlay').waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
-  });
-
-  test('?lang=zh applies Chinese CET AI chrome', async ({ page }) => {
-    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
-    await expect(page.getByRole('heading', { name: /Solaris CET AI/i }).first()).toBeVisible({
-      timeout: 15_000,
-    });
-    await expect(page.getByRole('button', { name: /启动协议/ })).toBeVisible();
-  });
-
-  test('?lang=zh modal exposes Chinese screen-reader dialog description', async ({ page }) => {
-    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
-    const chip = page.getByRole('button', { name: /什么是 RAV 协议/ });
-    await chip.evaluate((el) =>
-      (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
-    );
-    await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
-    await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
-    await expect(page.getByTestId('cet-ai-modal-dialog')).toHaveAttribute(
-      'aria-describedby',
-      'cet-ai-dialog-desc',
-    );
-    const desc = page.locator('#cet-ai-dialog-desc');
-    await expect(desc).toBeAttached();
-    await expect(desc).toContainText(/CET AI 对话框/);
-    await expect(desc).toContainText(/Escape/);
-  });
-});
-
-test.describe('Locale query ?lang=pt', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.removeItem('solaris_lang');
-    });
-    await page.goto('/?lang=pt', { waitUntil: 'domcontentloaded' });
-    await page.locator('.loading-overlay').waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
-  });
-
-  test('?lang=pt applies Portuguese CET AI chrome', async ({ page }) => {
-    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
-    await expect(page.getByRole('heading', { name: /CET AI Solaris/i }).first()).toBeVisible({
-      timeout: 15_000,
-    });
-    await expect(page.getByRole('button', { name: /INICIAR PROTOCOLO/i })).toBeVisible();
-  });
-
-  test('?lang=pt modal exposes Portuguese screen-reader dialog description', async ({ page }) => {
-    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
-    const chip = page.getByRole('button', { name: /O que é o protocolo RAV/i });
-    await chip.evaluate((el) =>
-      (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
-    );
-    await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
-    await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
-    await expect(page.getByTestId('cet-ai-modal-dialog')).toHaveAttribute(
-      'aria-describedby',
-      'cet-ai-dialog-desc',
-    );
-    const desc = page.locator('#cet-ai-dialog-desc');
-    await expect(desc).toBeAttached();
-    await expect(desc).toContainText(/Diálogo CET AI/i);
-    await expect(desc).toContainText(/Escape/i);
-  });
-});
-
-test.describe('Locale query ?lang=ru', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.removeItem('solaris_lang');
-    });
-    await page.goto('/?lang=ru', { waitUntil: 'domcontentloaded' });
-    await page.locator('.loading-overlay').waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
-  });
-
-  test('?lang=ru applies Russian CET AI chrome', async ({ page }) => {
-    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
-    await expect(page.getByRole('heading', { name: /Solaris CET AI/i }).first()).toBeVisible({
-      timeout: 15_000,
-    });
-    await expect(page.getByRole('button', { name: /ЗАПУСТИТЬ ПРОТОКОЛ/i })).toBeVisible();
-  });
-
-  test('?lang=ru modal exposes Russian screen-reader dialog description', async ({ page }) => {
-    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
-    const chip = page.getByRole('button', { name: /Что такое протокол RAV/i });
-    await chip.evaluate((el) =>
-      (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
-    );
-    await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
-    await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
-    await expect(page.getByTestId('cet-ai-modal-dialog')).toHaveAttribute(
-      'aria-describedby',
-      'cet-ai-dialog-desc',
-    );
-    const desc = page.locator('#cet-ai-dialog-desc');
-    await expect(desc).toBeAttached();
-    await expect(desc).toContainText(/Диалог CET AI/i);
-    await expect(desc).toContainText(/Escape/i);
-  });
-});
+}
