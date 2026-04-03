@@ -14,6 +14,8 @@ npm run lint
 npm run test         # Vitest
 npm run test:e2e     # Playwright (same as CI; needs `dist/` + preview, or use `webServer` in config)
 npm run build        # tsc -b + vite build
+npm run verify       # lint + typecheck + test + build (quick gate before push)
+npm run verify:full  # verify + Playwright E2E (full local check)
 ```
 
 E2E (Chromium): from `app/`, `npm run test:e2e` (install browsers once: `npx playwright install --with-deps chromium`). The Playwright config starts a preview server unless one is already running.

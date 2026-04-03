@@ -1,4 +1,8 @@
 import { test, expect, type Page, type BrowserContext } from '@playwright/test';
+import type { LangCode } from '../src/i18n/translations';
+
+/** All `LangCode` values except default English — each must have a row in `CET_AI_LOCALE_FIXTURES`. */
+type NonEnLang = Exclude<LangCode, 'en'>;
 
 /**
  * Offline multi-turn flow: chip → follow-up → copy full transcript; asserts clipboard handoff.
@@ -167,9 +171,13 @@ test.describe('Solaris CET AI widget — mobile viewport', () => {
   });
 });
 
-/** `/?lang=` CET AI i18n — mirrors `translations.ts` cetAi (title, send, RAV chip, modalDescription). */
+/**
+ * `/?lang=` CET AI regression — keep in sync with `translations.ts` `cetAi`:
+ * `title`, `sendButton`, first RAV `suggestedQuestions` chip, `modalDescription` (two substrings).
+ * English (`en`) is covered by desktop tests above (no `?lang=`).
+ */
 type CetAiLocaleFixture = {
-  code: string;
+  code: NonEnLang;
   titleHeading: RegExp;
   sendButton: RegExp;
   ravChip: RegExp;
