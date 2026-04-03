@@ -89,7 +89,7 @@ npm run verify
 npm run test:e2e
 # Dacă apare `ERR_CONNECTION_REFUSED` pe preview-ul local (:4173), limitează worker-ii: `PW_WORKERS=1 npm run test:e2e` (echivalent: `npm run test:e2e:stable`)
 
-# Verificare completă locală: verify + E2E (același tip de suite ca în CI, în ordine)
+# Verificare completă locală: verify + E2E stabil (`test:e2e:stable`, un worker — aliniat cu CI)
 npm run verify:full
 ```
 

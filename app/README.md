@@ -15,7 +15,7 @@ npm run test         # Vitest
 npm run test:e2e     # Playwright — run `npm run build` first (CI downloads `dist/`; local `verify:full` builds then previews)
 npm run build        # tsc -b + vite build
 npm run verify       # lint + typecheck + test + build (quick gate before push)
-npm run verify:full  # verify + Playwright E2E (full local check)
+npm run verify:full  # verify + Playwright E2E stabil (test:e2e:stable, ca în CI)
 ```
 
 E2E (Chromium): from `app/`, **`npm run test:e2e`** (install browsers once: `npx playwright install --with-deps chromium`). **`pretest:e2e`** fails fast if `app/dist/index.html` is missing (with a hint). Calling **`npx playwright test` directly** skips that guard — prefer the npm script. Config starts **`vite preview` only** — `dist/` must already exist (`npm run build` or run after `npm run verify`). CI supplies `dist/` from the build job. On **CI**, Playwright uses **one** worker. **Locally**, default `test:e2e` may use multiple workers; use **`PW_WORKERS=1`** or **`npm run test:e2e:stable`** if the preview on :4173 flakes under load. **`npm run verify:full`** runs E2E via **`test:e2e:stable`** (one worker, aligned with CI).
