@@ -29,11 +29,14 @@ test.describe('OMEGA sovereign static surface', () => {
     // ?lang=en matches useLanguage E2E pattern so `landmarks.footer` aria-label matches the App wrapper.
     await page.goto('/?lang=en');
     await page.locator('.loading-overlay').waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
-    // `footer-landmark-section` is on the outer <section> in App.tsx (FooterSection is a <div> inside it).
-    await page.getByTestId('footer-landmark-section').scrollIntoViewIfNeeded();
+    // Match conversion-ui: scroll to document bottom so LazyLoadWrapper + ScrollFadeUp mount and fade in
+    // (scrollIntoViewIfNeeded on the section alone can leave the lazy footer unmounted in some layouts).
+    await page.evaluate(() => {
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' });
+    });
     // Stable across locales (copy lives in i18n `footerNav.sovereignNoJs`).
     const link = page.getByTestId('footer-sovereign-link');
-    await link.waitFor({ state: 'visible', timeout: 20_000 });
+    await link.waitFor({ state: 'visible', timeout: 25_000 });
     await link.click();
     await expect(page).toHaveURL(/\/sovereign\/?$/);
     await expect(page.getByRole('heading', { name: /Sovereign static node/i })).toBeVisible();

@@ -1,4 +1,4 @@
-import { test, expect, type Page, type BrowserContext } from '@playwright/test';
+import { test, expect, type Page, type BrowserContext, type Locator } from '@playwright/test';
 import { CET_AI_MAX_QUERY_CHARS } from '../src/lib/cetAiConstants';
 import type { LangCode } from '../src/i18n/translations';
 
@@ -19,10 +19,10 @@ async function assertCopyTranscriptMultiTurnOffline(page: Page, context: Browser
 
   await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
   const chip = page.getByRole('button', { name: /What is the RAV Protocol/i });
-  await chip.evaluate((el) =>
-    (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
+  await chip.evaluate((el: HTMLElement) =>
+    el.scrollIntoView({ block: 'center', inline: 'nearest' }),
   );
-  await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
+  await chip.evaluate((btn: HTMLElement) => (btn as HTMLButtonElement).click());
   await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
   await expect(page.getByText(/No live API on this host/i)).toBeVisible({ timeout: 20_000 });
 
@@ -40,6 +40,14 @@ async function assertCopyTranscriptMultiTurnOffline(page: Page, context: Browser
   expect(text).toContain('What is the RAV Protocol');
   expect(text).toContain('Second turn CET transcript handoff');
   expect(text).toContain('## Question');
+}
+
+/** Stable anchor for hero chips (avoids ambiguous `max-w-5xl` + heading filters under load). */
+async function scrollCetAiHeroIntoView(page: Page): Promise<Locator> {
+  const hero = page.getByTestId('cet-ai-hero');
+  await expect(hero).toBeVisible({ timeout: 15_000 });
+  await hero.scrollIntoViewIfNeeded();
+  return hero;
 }
 
 /**
@@ -78,16 +86,12 @@ test.describe('Solaris CET AI widget — desktop', () => {
 
   test('modal follow-up shows character count when typing (offline)', async ({ page }) => {
     await page.route('**/api/chat', (route) => route.abort('failed'));
-    const heroWidget = page
-      .locator('div.max-w-5xl')
-      .filter({ has: page.getByRole('heading', { name: /Solaris CET AI/i }) })
-      .first();
-    await heroWidget.scrollIntoViewIfNeeded();
+    const heroWidget = await scrollCetAiHeroIntoView(page);
     const chip = heroWidget.getByRole('button', { name: /What is the RAV Protocol/i });
-    await chip.evaluate((el) =>
-      (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
+    await chip.evaluate((el: HTMLElement) =>
+      el.scrollIntoView({ block: 'center', inline: 'nearest' }),
     );
-    await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
+    await chip.evaluate((btn: HTMLElement) => (btn as HTMLButtonElement).click());
     await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
     await expect(page.getByText(/No live API on this host/i)).toBeVisible({ timeout: 20_000 });
     const row = page.getByTestId('cet-ai-query-char-count');
@@ -97,32 +101,24 @@ test.describe('Solaris CET AI widget — desktop', () => {
   });
 
   test('Opening modal from a suggested chip shows dialog', async ({ page }) => {
-    const heroWidget = page
-      .locator('div.max-w-5xl')
-      .filter({ has: page.getByRole('heading', { name: /Solaris CET AI/i }) })
-      .first();
-    await heroWidget.scrollIntoViewIfNeeded();
+    const heroWidget = await scrollCetAiHeroIntoView(page);
     const chip = heroWidget.getByRole('button', { name: /What is the RAV Protocol/i });
-    await chip.evaluate((el) =>
-      (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
+    await chip.evaluate((el: HTMLElement) =>
+      el.scrollIntoView({ block: 'center', inline: 'nearest' }),
     );
-    await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
+    await chip.evaluate((btn: HTMLElement) => (btn as HTMLButtonElement).click());
     await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
   });
 
   test('CET AI modal wires aria-describedby to screen-reader instructions (English)', async ({
     page,
   }) => {
-    const heroWidget = page
-      .locator('div.max-w-5xl')
-      .filter({ has: page.getByRole('heading', { name: /Solaris CET AI/i }) })
-      .first();
-    await heroWidget.scrollIntoViewIfNeeded();
+    const heroWidget = await scrollCetAiHeroIntoView(page);
     const chip = heroWidget.getByRole('button', { name: /What is the RAV Protocol/i });
-    await chip.evaluate((el) =>
-      (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
+    await chip.evaluate((el: HTMLElement) =>
+      el.scrollIntoView({ block: 'center', inline: 'nearest' }),
     );
-    await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
+    await chip.evaluate((btn: HTMLElement) => (btn as HTMLButtonElement).click());
     await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
     const dialog = page.getByTestId('cet-ai-modal-dialog');
     await expect(dialog).toHaveAttribute('aria-describedby', 'cet-ai-dialog-desc');
@@ -133,16 +129,12 @@ test.describe('Solaris CET AI widget — desktop', () => {
   });
 
   test('Escape closes CET AI modal', async ({ page }) => {
-    const heroWidget = page
-      .locator('div.max-w-5xl')
-      .filter({ has: page.getByRole('heading', { name: /Solaris CET AI/i }) })
-      .first();
-    await heroWidget.scrollIntoViewIfNeeded();
+    const heroWidget = await scrollCetAiHeroIntoView(page);
     const chip = heroWidget.getByRole('button', { name: /What is the RAV Protocol/i });
-    await chip.evaluate((el) =>
-      (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
+    await chip.evaluate((el: HTMLElement) =>
+      el.scrollIntoView({ block: 'center', inline: 'nearest' }),
     );
-    await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
+    await chip.evaluate((btn: HTMLElement) => (btn as HTMLButtonElement).click());
     await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
     await page.keyboard.press('Escape');
     await expect(page.getByTestId('cet-ai-modal-dialog')).toHaveCount(0);
@@ -161,10 +153,10 @@ test.describe('Solaris CET AI widget — desktop', () => {
       .first();
     await heroWidget.scrollIntoViewIfNeeded();
     const chip = heroWidget.getByRole('button', { name: /What is the RAV Protocol/i });
-    await chip.evaluate((el) =>
-      (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
+    await chip.evaluate((el: HTMLElement) =>
+      el.scrollIntoView({ block: 'center', inline: 'nearest' }),
     );
-    await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
+    await chip.evaluate((btn: HTMLElement) => (btn as HTMLButtonElement).click());
     await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
     const offlineHint = page.getByText(/No live API on this host/i);
     await expect(offlineHint).toBeVisible({ timeout: 16_000 });
@@ -214,10 +206,10 @@ test.describe('Solaris CET AI widget — mobile viewport', () => {
     await page.route('**/api/chat', (route) => route.abort('failed'));
     await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
     const chip = page.getByRole('button', { name: /What is the RAV Protocol/i });
-    await chip.evaluate((el) =>
-      (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
+    await chip.evaluate((el: HTMLElement) =>
+      el.scrollIntoView({ block: 'center', inline: 'nearest' }),
     );
-    await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
+    await chip.evaluate((btn: HTMLElement) => (btn as HTMLButtonElement).click());
     await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
     await expect(page.getByText(/No live API on this host/i)).toBeVisible({ timeout: 20_000 });
     const row = page.getByTestId('cet-ai-query-char-count');
@@ -301,10 +293,10 @@ const CET_AI_LOCALE_FIXTURES: readonly CetAiLocaleFixture[] = [
 async function openCetAiModalFromRavChip(page: Page, ravChip: RegExp): Promise<void> {
   await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
   const chip = page.getByRole('button', { name: ravChip });
-  await chip.evaluate((el) =>
-    (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' }),
+  await chip.evaluate((el: HTMLElement) =>
+    el.scrollIntoView({ block: 'center', inline: 'nearest' }),
   );
-  await chip.evaluate((btn) => (btn as HTMLButtonElement).click());
+  await chip.evaluate((btn: HTMLElement) => (btn as HTMLButtonElement).click());
 }
 
 for (const L of CET_AI_LOCALE_FIXTURES) {
