@@ -13,6 +13,7 @@ import {
   Bot,
   StopCircle,
   RefreshCw,
+  ClipboardList,
 } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 import { useLocalStorage } from '../hooks/useLocalStorage';
@@ -212,6 +213,21 @@ function liveApiHttpHintForStatus(
 
 function buildCopyForAiText(q: string, a: string, o: Translations['cetAi']): string {
   return `${o.copyForAiQuestionLabel}\n${q}\n\n${o.copyForAiAnswerLabel}\n${a}\n\n${o.copyForAiInstructions}`;
+}
+
+/** Multi-turn handoff: prior `chatHistory` blocks + current Q&A, same format as copy-for-AI. */
+function buildFullConversationHandoff(
+  history: ChatEntry[],
+  currentQuestion: string,
+  currentAnswer: string,
+  o: Translations['cetAi'],
+): string {
+  const parts: string[] = [];
+  for (const e of history) {
+    parts.push(buildCopyForAiText(e.question, e.answer, o));
+  }
+  parts.push(buildCopyForAiText(currentQuestion, currentAnswer, o));
+  return parts.join('\n\n---\n\n');
 }
 
 /** Enter / ⌘+Enter / Ctrl+Enter submit; Shift+Enter stays newline (textarea). */
@@ -733,6 +749,7 @@ export default function CetAiSearch() {
   const [chatHistory, setChatHistory] = useLocalStorage<ChatEntry[]>('cet-ai-chat-history', []);
   const [copiedResponse, setCopiedResponse] = useState(false);
   const [copiedForAi, setCopiedForAi] = useState(false);
+  const [copiedTranscript, setCopiedTranscript] = useState(false);
   const [detectedTopic, setDetectedTopic] = useState<string>('default');
   /** False when the last completed answer used local knowledge (no /api/chat). */
   const [responseUsedLiveApi, setResponseUsedLiveApi] = useState(false);
@@ -801,7 +818,9 @@ export default function CetAiSearch() {
     setLiveApiReturnedError(false);
     setLiveApiErrorDetail(null);
     setLiveApiHttpStatus(null);
+    setCopiedResponse(false);
     setCopiedForAi(false);
+    setCopiedTranscript(false);
   }, [
     setIsModalOpen,
     setPhase,
@@ -894,6 +913,9 @@ export default function CetAiSearch() {
     setLiveApiReturnedError(false);
     setLiveApiErrorDetail(null);
     setLiveApiHttpStatus(null);
+    setCopiedResponse(false);
+    setCopiedForAi(false);
+    setCopiedTranscript(false);
 
     setPhase('observe_parse');
     addLog('INFO', `RAV_INIT: Grok × Gemini CET AI v3.1 · Session [${hash}]`);
@@ -1186,6 +1208,9 @@ export default function CetAiSearch() {
           <div aria-live="polite" aria-atomic="true" className="sr-only">
             {phase === 'complete' && finalResponse ? t.cetAi.announceCetAiReady : ''}
           </div>
+          <div aria-live="polite" aria-atomic="true" className="sr-only">
+            {copiedTranscript ? t.cetAi.copyTranscriptAnnounce : ''}
+          </div>
           {/* Modal header */}
           <header className="shrink-0 flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-gray-800 bg-black/60 backdrop-blur-md">
             <div>
@@ -1338,6 +1363,36 @@ export default function CetAiSearch() {
                             >
                               {copiedForAi ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Bot className="w-3.5 h-3.5" />}
                             </button>
+                            {chatHistory.length > 0 ? (
+                              <button
+                                type="button"
+                                title={t.cetAi.copyTranscriptTitle}
+                                aria-label={t.cetAi.copyTranscriptAria}
+                                onClick={() => {
+                                  const payload = buildFullConversationHandoff(
+                                    chatHistory,
+                                    submittedQuestion,
+                                    finalResponse,
+                                    t.cetAi,
+                                  );
+                                  navigator.clipboard
+                                    .writeText(payload)
+                                    .then(() => {
+                                      track('cet_ai_copy_transcript', { turns: chatHistory.length + 1 });
+                                      setCopiedTranscript(true);
+                                      setTimeout(() => setCopiedTranscript(false), 2000);
+                                    })
+                                    .catch(() => {});
+                                }}
+                                className="p-1.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:text-violet-300 hover:border-violet-500/40 transition-all"
+                              >
+                                {copiedTranscript ? (
+                                  <Check className="w-3.5 h-3.5 text-green-400" />
+                                ) : (
+                                  <ClipboardList className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+                            ) : null}
                             <button
                               type="button"
                               title={t.cetAi.regenerateTitle}

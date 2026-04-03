@@ -29,6 +29,9 @@ export const config = { runtime: 'edge' };
 const GEMINI_MODEL = 'gemini-2.0-flash';
 const GROK_MODEL = 'grok-3-mini-beta';
 
+/** Same cap as root `api/chat` and the CET AI client (`CET_AI_MAX_QUERY_CHARS`). */
+const MAX_QUERY_LENGTH = 8000;
+
 interface DeDustAsset {
   type: 'native' | 'jetton';
   address?: string;
@@ -229,6 +232,21 @@ export default async function handler(req: Request): Promise<Response> {
     );
   }
 
+  const trimmedQuery = userQuery.trim();
+  if (trimmedQuery.length > MAX_QUERY_LENGTH) {
+    return new Response(
+      JSON.stringify({ message: `Query must be at most ${MAX_QUERY_LENGTH} characters.` }),
+      {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': allowedOrigin,
+          'Vary': 'Origin',
+        },
+      },
+    );
+  }
+
   // 3. Fetch live on-chain data (OBSERVE step of the outer RAV loop)
   const onChain = await fetchOnChainContext();
   const onChainBlock = onChain
@@ -313,9 +331,9 @@ export default async function handler(req: Request): Promise<Response> {
     `[DIRECTIVĂ DE ACȚIUNE]\n` +
     `(Observation — 1–2 sentences. Sharp conclusion. If relevant, mention DeDust / TON wallet flow without being salesy.)`;
 
-  const geminiMessages = buildChatMessages(geminiSystemPrompt, userQuery.trim(), conversation);
-  const grokMessages = buildChatMessages(grokSystemPrompt, userQuery.trim(), conversation);
-  const fullFallbackMessages = buildChatMessages(fullFallbackPrompt, userQuery.trim(), conversation);
+  const geminiMessages = buildChatMessages(geminiSystemPrompt, trimmedQuery, conversation);
+  const grokMessages = buildChatMessages(grokSystemPrompt, trimmedQuery, conversation);
+  const fullFallbackMessages = buildChatMessages(fullFallbackPrompt, trimmedQuery, conversation);
 
   // ── CALL BOTH AI PROVIDERS IN PARALLEL ───────────────────────────────────
   const [geminiResult, grokResult] = await Promise.allSettled([

@@ -343,6 +343,10 @@ export interface Translations {
     clearChatTitle: string;
     closeCetAiAria: string;
     copyResponseAria: string;
+    /** Copy entire session: prior turns + current answer (multi-turn handoff). */
+    copyTranscriptAria: string;
+    copyTranscriptTitle: string;
+    copyTranscriptAnnounce: string;
     sendQuestionAria: string;
     verifyOnTonscanTitle: string;
     /** Short submit label in CET AI dialog (visible on sm+). */
@@ -655,6 +659,9 @@ const translations: Record<LangCode, Translations> = {
       clearChatTitle: 'Clear history',
       closeCetAiAria: 'Close CET AI',
       copyResponseAria: 'Copy response',
+      copyTranscriptAria: 'Copy full conversation transcript',
+      copyTranscriptTitle: 'Copy all prior Q&A and this answer (multi-turn handoff)',
+      copyTranscriptAnnounce: 'Full transcript copied to clipboard.',
       sendQuestionAria: 'Send question',
       verifyOnTonscanTitle: 'Verify on TonScan',
       sendCompact: 'SEND',
@@ -1006,6 +1013,9 @@ const translations: Record<LangCode, Translations> = {
       clearChatTitle: 'Borrar historial',
       closeCetAiAria: 'Cerrar Oráculo',
       copyResponseAria: 'Copiar respuesta',
+      copyTranscriptAria: 'Copiar transcripto completo de la conversación',
+      copyTranscriptTitle: 'Copiar todos los pares pregunta/respuesta de esta sesión',
+      copyTranscriptAnnounce: 'Transcripto completo copiado al portapapeles.',
       sendQuestionAria: 'Enviar pregunta',
       verifyOnTonscanTitle: 'Verificar en TonScan',
       sendCompact: 'ENVIAR',
@@ -1349,6 +1359,9 @@ const translations: Record<LangCode, Translations> = {
       clearChatTitle: '清除记录',
       closeCetAiAria: '关闭预言机',
       copyResponseAria: '复制回复',
+      copyTranscriptAria: '复制完整对话记录',
+      copyTranscriptTitle: '复制本会话中所有问答（多轮交接）',
+      copyTranscriptAnnounce: '完整对话已复制到剪贴板。',
       sendQuestionAria: '发送问题',
       verifyOnTonscanTitle: '在 TonScan 验证',
       sendCompact: '发送',
@@ -1699,6 +1712,9 @@ const translations: Record<LangCode, Translations> = {
       clearChatTitle: 'Очистить историю',
       closeCetAiAria: 'Закрыть Оракул',
       copyResponseAria: 'Копировать ответ',
+      copyTranscriptAria: 'Копировать полный транскрипт диалога',
+      copyTranscriptTitle: 'Копировать все пары вопрос/ответ этой сессии',
+      copyTranscriptAnnounce: 'Полный транскрипт скопирован в буфер обмена.',
       sendQuestionAria: 'Отправить вопрос',
       verifyOnTonscanTitle: 'Проверить на TonScan',
       sendCompact: 'ОТПРАВИТЬ',
@@ -2050,6 +2066,9 @@ const translations: Record<LangCode, Translations> = {
       clearChatTitle: 'Șterge istoricul',
       closeCetAiAria: 'Închide Oracolul',
       copyResponseAria: 'Copiază răspunsul',
+      copyTranscriptAria: 'Copiază transcriptul complet al conversației',
+      copyTranscriptTitle: 'Copiază toate întrebările și răspunsurile din această sesiune',
+      copyTranscriptAnnounce: 'Transcriptul complet a fost copiat în clipboard.',
       sendQuestionAria: 'Trimite întrebarea',
       verifyOnTonscanTitle: 'Verifică pe TonScan',
       sendCompact: 'TRIMITE',
@@ -2401,6 +2420,9 @@ const translations: Record<LangCode, Translations> = {
       clearChatTitle: 'Limpar histórico',
       closeCetAiAria: 'Fechar Oráculo',
       copyResponseAria: 'Copiar resposta',
+      copyTranscriptAria: 'Copiar transcrição completa da conversa',
+      copyTranscriptTitle: 'Copiar todos os pares pergunta/resposta desta sessão',
+      copyTranscriptAnnounce: 'Transcrição completa copiada para a área de transferência.',
       sendQuestionAria: 'Enviar pergunta',
       verifyOnTonscanTitle: 'Verificar no TonScan',
       sendCompact: 'ENVIAR',
@@ -2752,6 +2774,9 @@ const translations: Record<LangCode, Translations> = {
       clearChatTitle: 'Verlauf löschen',
       closeCetAiAria: 'Orakel schließen',
       copyResponseAria: 'Antwort kopieren',
+      copyTranscriptAria: 'Gesamtes Gespräch kopieren',
+      copyTranscriptTitle: 'Alle Fragen und Antworten dieser Sitzung kopieren',
+      copyTranscriptAnnounce: 'Vollständiges Transkript in die Zwischenablage kopiert.',
       sendQuestionAria: 'Frage senden',
       verifyOnTonscanTitle: 'Auf TonScan prüfen',
       sendCompact: 'SENDEN',
