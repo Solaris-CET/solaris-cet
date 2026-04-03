@@ -1,7 +1,8 @@
 import { memo, useCallback, useId, useState } from 'react';
+import { solarisCetLogoSrc } from '@/lib/brandAssets';
 import { cn } from '@/lib/utils';
 
-const LOGO_SRC = `${import.meta.env.BASE_URL}solaris-cet-logo.jpg`;
+const LOGO_SRC = solarisCetLogoSrc();
 
 export type SolarisLogoMarkProps = {
   className?: string;
@@ -15,7 +16,7 @@ export type SolarisLogoMarkProps = {
   priority?: boolean;
 };
 
-/** Legacy vector mark — shown if `solaris-cet-logo.jpg` fails to load (missing asset, network, CSP). */
+/** Legacy vector mark — shown if brand raster (`solarisCetLogoSrc`) fails to load (missing asset, network, CSP). */
 function SolarisVectorFallback({
   crop,
   decorative,

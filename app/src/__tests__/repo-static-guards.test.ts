@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync, existsSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { SOLARIS_CET_LOGO_FILENAME } from "@/lib/brandAssets";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 const appPublic = join(dirname(fileURLToPath(import.meta.url)), "../../public");
@@ -46,9 +47,9 @@ describe("OMEGA sovereign — self-hosted JetBrains Mono", () => {
 });
 
 describe("Brand raster — SolarisLogoMark source of truth", () => {
-  const logoPath = join(appPublic, "solaris-cet-logo.jpg");
+  const logoPath = join(appPublic, SOLARIS_CET_LOGO_FILENAME);
 
-  it("solaris-cet-logo.jpg ships in app/public (referenced by SolarisLogoMark)", () => {
+  it("brand logo raster ships in app/public (referenced by SolarisLogoMark)", () => {
     expect(existsSync(logoPath), `missing ${logoPath}`).toBe(true);
     expect(statSync(logoPath).size).toBeGreaterThan(5000);
   });
@@ -68,7 +69,8 @@ describe("Social preview — og-image raster", () => {
 describe("index.html — critical image preloads for LCP", () => {
   it("preloads Solaris brand raster and hero coin", () => {
     const appIndexHtml = readFileSync(join(repoRoot, "app/index.html"), "utf8");
-    expect(appIndexHtml).toMatch(/rel="preload"[^>]+solaris-cet-logo\.jpg/s);
+    const escapedLogo = SOLARIS_CET_LOGO_FILENAME.replace(/\./g, "\\.");
+    expect(appIndexHtml).toMatch(new RegExp(`rel="preload"[^>]+${escapedLogo}`, "s"));
     expect(appIndexHtml).toMatch(/rel="preload"[^>]+hero-coin\.png/s);
   });
 });
@@ -114,7 +116,9 @@ describe("TON Connect manifest — brand icon URL", () => {
   it("iconUrl references shipped solaris-cet-logo.jpg", () => {
     const raw = readFileSync(join(appPublic, "tonconnect-manifest.json"), "utf8");
     const j = JSON.parse(raw) as { iconUrl?: string };
-    expect(j.iconUrl).toMatch(/solaris-cet-logo\.jpg$/);
+    expect(j.iconUrl).toMatch(
+      new RegExp(`${SOLARIS_CET_LOGO_FILENAME.replace(/\./g, "\\.")}$`),
+    );
   });
 });
 
