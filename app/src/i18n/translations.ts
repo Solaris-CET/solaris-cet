@@ -378,6 +378,8 @@ export interface Translations {
     liveApiErrorServiceUnavailable: string;
     /** Optional hint when /api/chat fails with other 5xx */
     liveApiErrorServerError: string;
+    /** Screen reader summary for the full-screen CET AI dialog (aria-describedby). */
+    modalDescription: string;
     knowledge: CetAiKnowledge;
   };
   /** FAQ accordion copy (`faqContent.data.ts`). */
@@ -674,6 +676,8 @@ const translations: Record<LangCode, Translations> = {
       liveApiErrorRateLimited: 'HTTP 429 — too many requests. Wait briefly, then use Regenerate.',
       liveApiErrorServiceUnavailable: 'HTTP 502/503/504 — upstream or gateway busy. Retry in a moment.',
       liveApiErrorServerError: 'HTTP 5xx — server error. Retry later or check deployment logs.',
+      modalDescription:
+        'CET AI dialog: type a question, send with the button or Enter; Shift+Enter for a new line. Press Escape to close.',
       knowledge: {
         price: `**CET trades on DeDust (TON)** with a fixed supply of **9,000 tokens** — genuine hyper-scarcity.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- The **DCBM model** correlates scarcity with a 90-year emission schedule\n- Long-term value accumulation driven purely by on-chain demand`,
         mining: '**CET mining runs for 90 years** with a decaying reward curve.\n\n- **66.66%** of total supply enters circulation through proof-of-work\n- Active nodes: **18,420+**\n- Battery drain approaches **0%** thanks to the Zero-Battery constraint\n- Optimal mining window: **Q3 2025** (high-efficiency period)',
@@ -1023,6 +1027,8 @@ const translations: Record<LangCode, Translations> = {
       liveApiErrorRateLimited: 'HTTP 429 — demasiadas solicitudes. Espera un momento y usa Regenerar.',
       liveApiErrorServiceUnavailable: 'HTTP 502/503/504 — servicio ocupado. Reintenta en breve.',
       liveApiErrorServerError: 'HTTP 5xx — error del servidor. Reintenta más tarde o revisa los logs.',
+      modalDescription:
+        'Diálogo CET AI: escribe una pregunta, envía con el botón o Enter; Shift+Enter para nueva línea. Pulsa Escape para cerrar.',
       knowledge: {
         price: `**CET cotiza en DeDust (TON)** con un suministro fijo de **9,000 tokens** — escasez real.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- El **modelo DCBM** correlaciona la escasez con un cronograma de emisión de 90 años\n- Acumulación de valor a largo plazo impulsada por la demanda on-chain`,
         mining: '**La minería CET dura 90 años** con una curva de recompensa decreciente.\n\n- **66.66%** del suministro total entra en circulación mediante prueba de trabajo\n- Nodos activos: **18,420+**\n- Consumo de batería cercano a **0%** gracias al Zero-Battery constraint\n- Ventana óptima de minería: **Q3 2025**',
@@ -1364,6 +1370,8 @@ const translations: Record<LangCode, Translations> = {
       liveApiErrorRateLimited: 'HTTP 429 — 请求过多。稍等片刻后点击重新生成。',
       liveApiErrorServiceUnavailable: 'HTTP 502/503/504 — 上游或网关繁忙。请稍后重试。',
       liveApiErrorServerError: 'HTTP 5xx — 服务器错误。请稍后重试或查看部署日志。',
+      modalDescription:
+        'CET AI 对话框：输入问题，用按钮或 Enter 发送；Shift+Enter 换行。按 Escape 关闭。',
       knowledge: {
         price: `**CET 在 DeDust（TON）上交易**，固定供应量 **9,000 枚** — 真正的超稀缺性。\n\n- 池: \`${DEDUST_POOL_ADDRESS}\`\n- **DCBM 模型**将稀缺性与 90 年发行时间表相关联\n- 长期价值积累完全由链上需求驱动`,
         mining: '**CET 挖矿持续 90 年**，奖励曲线递减。\n\n- **66.66%** 的总供应量通过工作量证明流入流通\n- 活跃节点: **18,420+**\n- 得益于零电池约束，电池消耗接近 **0%**\n- 最佳挖矿窗口: **2025 年 Q3**',
@@ -1712,6 +1720,8 @@ const translations: Record<LangCode, Translations> = {
       liveApiErrorRateLimited: 'HTTP 429 — слишком много запросов. Подождите и нажмите «Перегенерировать».',
       liveApiErrorServiceUnavailable: 'HTTP 502/503/504 — шлюз или upstream заняты. Повторите через минуту.',
       liveApiErrorServerError: 'HTTP 5xx — ошибка сервера. Повторите позже или проверьте логи.',
+      modalDescription:
+        'Диалог CET AI: введите вопрос, отправьте кнопкой или Enter; Shift+Enter — новая строка. Escape — закрыть.',
       knowledge: {
         price: `**CET торгуется на DeDust (TON)** с фиксированным запасом **9 000 токенов** — настоящая гиперредкость.\n\n- Пул: \`${DEDUST_POOL_ADDRESS}\`\n- **Модель DCBM** коррелирует дефицит с 90-летним графиком эмиссии\n- Долгосрочное накопление стоимости, обусловленное исключительно он-чейн спросом`,
         mining: '**Майнинг CET продолжается 90 лет** с убывающей кривой вознаграждений.\n\n- **66.66%** от общего запаса поступает в обращение через proof-of-work\n- Активных узлов: **18 420+**\n- Расход батареи стремится к **0%** благодаря Zero-Battery ограничению\n- Оптимальное окно майнинга: **Q3 2025**',
@@ -2061,6 +2071,8 @@ const translations: Record<LangCode, Translations> = {
       liveApiErrorRateLimited: 'HTTP 429 — prea multe cereri. Așteaptă puțin, apoi folosește Regenerează.',
       liveApiErrorServiceUnavailable: 'HTTP 502/503/504 — serviciu sau gateway ocupat. Reîncearcă în câteva momente.',
       liveApiErrorServerError: 'HTTP 5xx — eroare de server. Reîncearcă mai târziu sau verifică logurile.',
+      modalDescription:
+        'Dialog CET AI: scrie o întrebare, trimite cu butonul sau Enter; Shift+Enter pentru linie nouă. Apasă Escape pentru a închide.',
       knowledge: {
         price: `**CET se tranzacționează pe DeDust (TON)** cu o ofertă fixă de **9.000 de tokeni** — raritate extremă reală.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- **Modelul DCBM** corelează raritatea cu un program de emisie de 90 de ani\n- Acumulare de valoare pe termen lung determinată exclusiv de cererea on-chain`,
         mining: '**Minarea CET durează 90 de ani** cu o curbă de recompensă descrescătoare.\n\n- **66.66%** din oferta totală intră în circulație prin proof-of-work\n- Noduri active: **18.420+**\n- Consum de baterie aproape de **0%** datorită constrângerii Zero-Battery\n- Fereastra optimă de minare: **T3 2025** (perioadă de eficiență ridicată)',
@@ -2410,6 +2422,8 @@ const translations: Record<LangCode, Translations> = {
       liveApiErrorRateLimited: 'HTTP 429 — muitas requisições. Aguarde e use Regenerar.',
       liveApiErrorServiceUnavailable: 'HTTP 502/503/504 — serviço ou gateway ocupado. Tente de novo em instantes.',
       liveApiErrorServerError: 'HTTP 5xx — erro no servidor. Tente mais tarde ou veja os logs.',
+      modalDescription:
+        'Diálogo CET AI: digite uma pergunta, envie com o botão ou Enter; Shift+Enter para nova linha. Escape para fechar.',
       knowledge: {
         price: `**CET negocia na DeDust (TON)** com fornecimento fixo de **9.000 tokens** — escassez real.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- O **modelo DCBM** correlaciona escassez com cronograma de emissão de 90 anos\n- Acumulação de valor a longo prazo impulsionada pela demanda on-chain`,
         mining: '**A mineração CET dura 90 anos** com curva de recompensa decrescente.\n\n- **66.66%** do fornecimento total entra em circulação via proof-of-work\n- Nós ativos: **18.420+**\n- Consumo de bateria próximo a **0%** graças à restrição Zero-Battery\n- Janela ótima de mineração: **Q3 2025**',
@@ -2759,6 +2773,8 @@ const translations: Record<LangCode, Translations> = {
       liveApiErrorRateLimited: 'HTTP 429 — zu viele Anfragen. Kurz warten, dann Neu erzeugen.',
       liveApiErrorServiceUnavailable: 'HTTP 502/503/504 — Dienst oder Gateway ausgelastet. Gleich erneut versuchen.',
       liveApiErrorServerError: 'HTTP 5xx — Serverfehler. Später erneut versuchen oder Logs prüfen.',
+      modalDescription:
+        'CET-AI-Dialog: Frage eingeben, mit Button oder Enter senden; Shift+Enter für neue Zeile. Escape zum Schließen.',
       knowledge: {
         price: `**CET wird auf DeDust (TON)** mit einem festen Angebot von **9.000 Token** gehandelt — echte Hyperknappheit.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- Das **DCBM-Modell** korreliert Knappheit mit einem 90-Jahres-Emissionsplan\n- Langfristige Wertakkumulation, die ausschließlich durch On-Chain-Nachfrage angetrieben wird`,
         mining: '**CET-Mining läuft 90 Jahre** mit einer abnehmenden Belohnungskurve.\n\n- **66.66%** des Gesamtangebots gelangt durch Proof-of-Work in Umlauf\n- Aktive Nodes: **18.420+**\n- Akkuverbrauch nahezu **0%** dank der Zero-Battery-Einschränkung\n- Optimales Mining-Fenster: **Q3 2025**',
