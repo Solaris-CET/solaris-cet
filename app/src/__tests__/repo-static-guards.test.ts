@@ -54,6 +54,17 @@ describe("Brand raster — SolarisLogoMark source of truth", () => {
   });
 });
 
+describe("Social preview — og-image raster", () => {
+  const ogPath = join(appPublic, "og-image.png");
+
+  it("og-image.png ships in app/public (og/twitter meta + JSON-LD)", () => {
+    expect(existsSync(ogPath), `missing ${ogPath}`).toBe(true);
+    expect(statSync(ogPath).size).toBeGreaterThan(1000);
+    const appIndexHtml = readFileSync(join(repoRoot, "app/index.html"), "utf8");
+    expect(appIndexHtml).toContain("og-image.png");
+  });
+});
+
 describe("index.html — critical image preloads for LCP", () => {
   it("preloads Solaris brand raster and hero coin", () => {
     const appIndexHtml = readFileSync(join(repoRoot, "app/index.html"), "utf8");
@@ -84,6 +95,26 @@ describe("PWA manifest.json — icon paths resolve on disk", () => {
       const abs = join(appPublic, rel);
       expect(existsSync(abs), `manifest.json references missing file: /${rel}`).toBe(true);
     }
+  });
+
+  it("main PWA icons use square icon-192/icon-512, not hero-coin", () => {
+    const raw = readFileSync(join(appPublic, "manifest.json"), "utf8");
+    const manifest = JSON.parse(raw) as { icons?: readonly { src?: string }[] };
+    const main = manifest.icons ?? [];
+    expect(main.length).toBeGreaterThanOrEqual(2);
+    for (const icon of main) {
+      expect(icon.src).toBeDefined();
+      expect(icon.src).not.toMatch(/hero-coin/i);
+      expect(icon.src).toMatch(/icon-(192|512)\.png/);
+    }
+  });
+});
+
+describe("TON Connect manifest — brand icon URL", () => {
+  it("iconUrl references shipped solaris-cet-logo.jpg", () => {
+    const raw = readFileSync(join(appPublic, "tonconnect-manifest.json"), "utf8");
+    const j = JSON.parse(raw) as { iconUrl?: string };
+    expect(j.iconUrl).toMatch(/solaris-cet-logo\.jpg$/);
   });
 });
 
