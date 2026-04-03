@@ -15,21 +15,7 @@ import {
 import { cn } from '@/lib/utils';
 import { standardSkillBurst, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
-
-/**
- * Primary in-page destinations — flat IA, **7 items** (workspace target 5–7).
- * Global comparison `#competition` is linked from the footer + FAQ, not duplicated here.
- * Each `key` must exist on `Translations['nav']`; see `translations.test.ts`.
- */
-const NAV_HREFS = [
-  { key: 'cetApp',      href: '#nova-app'    },
-  { key: 'tokenomics',  href: '#staking'     },
-  { key: 'roadmap',     href: '#roadmap'     },
-  { key: 'team',        href: '#team'        },
-  { key: 'howToBuy',    href: '#how-to-buy'  },
-  { key: 'resources',   href: '#resources'   },
-  { key: 'faq',         href: '#faq'         },
-] as const;
+import { NAV_PRIMARY_IN_PAGE } from '@/lib/navPrimaryHrefs';
 
 const MOBILE_MENU_FOCUSABLE_SELECTOR =
   'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -76,9 +62,9 @@ const Navigation = () => {
   const wasMobileMenuOpenRef = useRef(false);
   const { t } = useLanguage();
 
-  const navLinks = NAV_HREFS.map(({ key, href }) => ({
-    navKey: key,
-    label: t.nav[key],
+  const navLinks = NAV_PRIMARY_IN_PAGE.map(({ navKey, href }) => ({
+    navKey,
+    label: t.nav[navKey],
     href,
   }));
 
