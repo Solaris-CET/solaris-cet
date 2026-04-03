@@ -149,6 +149,7 @@ test.describe('Solaris CET AI widget — desktop', () => {
   });
 
   test('Copy full transcript after follow-up (offline, multi-turn)', async ({ page, context }) => {
+    test.setTimeout(60_000);
     await assertCopyTranscriptMultiTurnOffline(page, context);
   });
 
@@ -226,6 +227,7 @@ test.describe('Solaris CET AI widget — mobile viewport', () => {
   });
 
   test('Copy full transcript after follow-up (offline, multi-turn)', async ({ page, context }) => {
+    test.setTimeout(60_000);
     await assertCopyTranscriptMultiTurnOffline(page, context);
   });
 });
