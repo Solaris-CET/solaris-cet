@@ -103,10 +103,10 @@ Branch naming: `feature/`, `fix/`, `docs/`, `refactor/`, `test/`, `chore/`.
 
 ## Pull Requests
 
-Before opening a PR, verify:
+Before opening a PR, verify (from `app/`):
 
-1. `npm run build` passes without errors (run from `app/`)
-2. `npm run lint` passes without errors (run from `app/`)
+1. `npm run verify` passes (lint, typecheck, Vitest, production build) — same surface as local quality gate before CI
+2. For UI, navigation, or CET AI widget changes, also run `npm run test:e2e` or `npm run verify:full` (Playwright + preview)
 3. The PR description follows the `.github/PULL_REQUEST_TEMPLATE.md` checklist
 
 ---

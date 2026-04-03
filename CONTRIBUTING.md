@@ -42,7 +42,7 @@ Contribuțiile sunt binevenite în mai multe forme:
 
 ### Cerințe preliminare
 
-- **Node.js** >= 20.x
+- **Node.js** >= 22.x (vezi `engines` în `app/package.json`)
 - **npm** >= 10.x
 - **Git** >= 2.x
 
@@ -77,6 +77,18 @@ npm run lint
 
 # Verificare TypeScript (același lucru ca în CI)
 npm run typecheck
+
+# Teste unit (Vitest)
+npm run test
+
+# Poartă rapidă înainte de push: lint + typecheck + test + build
+npm run verify
+
+# Playwright E2E (Chromium; prima dată: npx playwright install --with-deps chromium)
+npm run test:e2e
+
+# Verificare completă locală: verify + E2E (același tip de suite ca în CI, în ordine)
+npm run verify:full
 ```
 
 ---
@@ -181,7 +193,7 @@ app/src/
 
 1. **Fork** repository-ul și creează o ramură din `main`
 2. **Implementează** modificările respectând standardele de cod
-3. **Testează** că `npm run build` și `npm run lint` trec fără erori
+3. **Testează** că `npm run verify` trece din `app/` (recomandat înainte de PR); pentru modificări de UI/flux CET AI sau navigație, rulează și `npm run verify:full` sau cel puțin `npm run test:e2e`
 4. **Completează** șablonul de Pull Request cu toate detaliile necesare
 5. **Deschide** PR-ul cu un titlu clar în format Conventional Commits
 6. **Așteaptă** review-ul — un maintainer va răspunde în maxim 5 zile lucrătoare

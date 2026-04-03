@@ -13,8 +13,10 @@ npm run dev         # Vite — port 5173
 npm run lint
 npm run typecheck
 npm run test        # Vitest
-npx playwright test # E2E (requires browsers; see .devcontainer)
 npm run build
+npm run verify      # lint + typecheck + test + build
+npm run test:e2e    # Playwright (same as CI; browsers — see .devcontainer)
+npm run verify:full # verify + E2E
 ```
 
 ## Layout

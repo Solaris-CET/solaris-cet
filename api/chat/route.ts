@@ -35,7 +35,7 @@ function normalizeConversation(raw: unknown): ConversationTurn[] {
     if (typeof content !== 'string') continue;
     const c = content.trim();
     if (!c) continue;
-    out.push({ role, content: c.slice(0, 8000) });
+    out.push({ role, content: c.slice(0, MAX_QUERY_LENGTH) });
   }
   return out;
 }

@@ -24,4 +24,4 @@ The app’s API lives under **`app/api/`**:
 ## Security notes
 
 - CORS is **not** `*`: only known production origins (`solaris-cet.com`, mirrors), `*.vercel.app` previews, and `http://localhost*` are reflected.
-- Long prompts are capped (`MAX_QUERY_LENGTH` in `chat/route.ts`).
+- Long prompts are capped (`MAX_QUERY_LENGTH` in `chat/route.ts`; keep the value aligned with `app/src/lib/cetAiConstants.ts`).
