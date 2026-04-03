@@ -361,6 +361,17 @@ export interface Translations {
     sendHintModEnter: string;
     /** Shown when the user stops generation mid-flight. */
     generationStopped: string;
+    /** When live /api/chat returned an error but built-in knowledge was used. */
+    liveApiErrorFallback: string;
+    /** Accessibility label for copy on fenced code blocks */
+    copyCodeAria: string;
+    /** Regenerate the same answer with a fresh API call */
+    regenerateAria: string;
+    regenerateTitle: string;
+    /** Prefix before optional server error text when /api/chat fails */
+    liveApiErrorDetailLabel: string;
+    /** Announced when a fenced code block is copied (aria-live) */
+    codeCopiedAnnounce: string;
     knowledge: CetAiKnowledge;
   };
   /** FAQ accordion copy (`faqContent.data.ts`). */
@@ -647,6 +658,13 @@ const translations: Record<LangCode, Translations> = {
       stopGenerating: 'Stop',
       sendHintModEnter: 'Enter to send · Shift+Enter for new line · ⌘/Ctrl+Enter also sends',
       generationStopped: 'Generation stopped. Ask again or continue in a new message.',
+      liveApiErrorFallback:
+        'The live API returned an error — this reply uses built-in Solaris knowledge. Retry or check server logs.',
+      copyCodeAria: 'Copy code block',
+      regenerateAria: 'Regenerate answer',
+      regenerateTitle: 'Run the same question again with a fresh inference',
+      liveApiErrorDetailLabel: 'Server:',
+      codeCopiedAnnounce: 'Code copied to clipboard.',
       knowledge: {
         price: `**CET trades on DeDust (TON)** with a fixed supply of **9,000 tokens** — genuine hyper-scarcity.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- The **DCBM model** correlates scarcity with a 90-year emission schedule\n- Long-term value accumulation driven purely by on-chain demand`,
         mining: '**CET mining runs for 90 years** with a decaying reward curve.\n\n- **66.66%** of total supply enters circulation through proof-of-work\n- Active nodes: **18,420+**\n- Battery drain approaches **0%** thanks to the Zero-Battery constraint\n- Optimal mining window: **Q3 2025** (high-efficiency period)',
@@ -986,6 +1004,13 @@ const translations: Record<LangCode, Translations> = {
       stopGenerating: 'Detener',
       sendHintModEnter: 'Enter para enviar · Shift+Enter para nueva línea · ⌘/Ctrl+Enter también envía',
       generationStopped: 'Generación detenida. Pregunta de nuevo o continúa en un mensaje nuevo.',
+      liveApiErrorFallback:
+        'La API en vivo devolvió un error — esta respuesta usa conocimiento integrado de Solaris. Reintenta o revisa los logs del servidor.',
+      copyCodeAria: 'Copiar bloque de código',
+      regenerateAria: 'Regenerar respuesta',
+      regenerateTitle: 'Ejecutar la misma pregunta de nuevo con nueva inferencia',
+      liveApiErrorDetailLabel: 'Servidor:',
+      codeCopiedAnnounce: 'Código copiado al portapapeles.',
       knowledge: {
         price: `**CET cotiza en DeDust (TON)** con un suministro fijo de **9,000 tokens** — escasez real.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- El **modelo DCBM** correlaciona la escasez con un cronograma de emisión de 90 años\n- Acumulación de valor a largo plazo impulsada por la demanda on-chain`,
         mining: '**La minería CET dura 90 años** con una curva de recompensa decreciente.\n\n- **66.66%** del suministro total entra en circulación mediante prueba de trabajo\n- Nodos activos: **18,420+**\n- Consumo de batería cercano a **0%** gracias al Zero-Battery constraint\n- Ventana óptima de minería: **Q3 2025**',
@@ -1317,6 +1342,13 @@ const translations: Record<LangCode, Translations> = {
       stopGenerating: '停止',
       sendHintModEnter: 'Enter 发送 · Shift+Enter 换行 · ⌘/Ctrl+Enter 也可发送',
       generationStopped: '已停止生成。请重新提问或在新消息中继续。',
+      liveApiErrorFallback:
+        '实时 API 返回错误 — 本回复使用内置 Solaris 知识。请重试或检查服务器日志。',
+      copyCodeAria: '复制代码块',
+      regenerateAria: '重新生成回答',
+      regenerateTitle: '使用新的推理再次运行同一问题',
+      liveApiErrorDetailLabel: '服务器：',
+      codeCopiedAnnounce: '代码已复制到剪贴板。',
       knowledge: {
         price: `**CET 在 DeDust（TON）上交易**，固定供应量 **9,000 枚** — 真正的超稀缺性。\n\n- 池: \`${DEDUST_POOL_ADDRESS}\`\n- **DCBM 模型**将稀缺性与 90 年发行时间表相关联\n- 长期价值积累完全由链上需求驱动`,
         mining: '**CET 挖矿持续 90 年**，奖励曲线递减。\n\n- **66.66%** 的总供应量通过工作量证明流入流通\n- 活跃节点: **18,420+**\n- 得益于零电池约束，电池消耗接近 **0%**\n- 最佳挖矿窗口: **2025 年 Q3**',
@@ -1655,6 +1687,13 @@ const translations: Record<LangCode, Translations> = {
       stopGenerating: 'Стоп',
       sendHintModEnter: 'Enter — отправить · Shift+Enter — новая строка · ⌘/Ctrl+Enter — отправить',
       generationStopped: 'Генерация остановлена. Задайте вопрос снова или продолжите новым сообщением.',
+      liveApiErrorFallback:
+        'Живой API вернул ошибку — этот ответ из встроенной базы Solaris. Повторите запрос или проверьте логи сервера.',
+      copyCodeAria: 'Копировать блок кода',
+      regenerateAria: 'Перегенерировать ответ',
+      regenerateTitle: 'Запустить тот же вопрос с новым выводом',
+      liveApiErrorDetailLabel: 'Сервер:',
+      codeCopiedAnnounce: 'Код скопирован в буфер обмена.',
       knowledge: {
         price: `**CET торгуется на DeDust (TON)** с фиксированным запасом **9 000 токенов** — настоящая гиперредкость.\n\n- Пул: \`${DEDUST_POOL_ADDRESS}\`\n- **Модель DCBM** коррелирует дефицит с 90-летним графиком эмиссии\n- Долгосрочное накопление стоимости, обусловленное исключительно он-чейн спросом`,
         mining: '**Майнинг CET продолжается 90 лет** с убывающей кривой вознаграждений.\n\n- **66.66%** от общего запаса поступает в обращение через proof-of-work\n- Активных узлов: **18 420+**\n- Расход батареи стремится к **0%** благодаря Zero-Battery ограничению\n- Оптимальное окно майнинга: **Q3 2025**',
@@ -1994,6 +2033,13 @@ const translations: Record<LangCode, Translations> = {
       stopGenerating: 'Oprește',
       sendHintModEnter: 'Enter trimite · Shift+Enter linie nouă · ⌘/Ctrl+Enter trimite',
       generationStopped: 'Generare oprită. Întreabă din nou sau continuă într-un mesaj nou.',
+      liveApiErrorFallback:
+        'API-ul live a returnat o eroare — acest răspuns folosește cunoaștere integrată Solaris. Reîncearcă sau verifică logurile serverului.',
+      copyCodeAria: 'Copiază blocul de cod',
+      regenerateAria: 'Regenerează răspunsul',
+      regenerateTitle: 'Rulează aceeași întrebare din nou cu inferență nouă',
+      liveApiErrorDetailLabel: 'Server:',
+      codeCopiedAnnounce: 'Cod copiat în clipboard.',
       knowledge: {
         price: `**CET se tranzacționează pe DeDust (TON)** cu o ofertă fixă de **9.000 de tokeni** — raritate extremă reală.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- **Modelul DCBM** corelează raritatea cu un program de emisie de 90 de ani\n- Acumulare de valoare pe termen lung determinată exclusiv de cererea on-chain`,
         mining: '**Minarea CET durează 90 de ani** cu o curbă de recompensă descrescătoare.\n\n- **66.66%** din oferta totală intră în circulație prin proof-of-work\n- Noduri active: **18.420+**\n- Consum de baterie aproape de **0%** datorită constrângerii Zero-Battery\n- Fereastra optimă de minare: **T3 2025** (perioadă de eficiență ridicată)',
@@ -2333,6 +2379,13 @@ const translations: Record<LangCode, Translations> = {
       stopGenerating: 'Parar',
       sendHintModEnter: 'Enter envia · Shift+Enter nova linha · ⌘/Ctrl+Enter também envia',
       generationStopped: 'Geração interrompida. Pergunte de novo ou continue numa nova mensagem.',
+      liveApiErrorFallback:
+        'A API ao vivo retornou erro — esta resposta usa conhecimento integrado Solaris. Tente de novo ou verifique os logs do servidor.',
+      copyCodeAria: 'Copiar bloco de código',
+      regenerateAria: 'Regenerar resposta',
+      regenerateTitle: 'Executar a mesma pergunta novamente com nova inferência',
+      liveApiErrorDetailLabel: 'Servidor:',
+      codeCopiedAnnounce: 'Código copiado para a área de transferência.',
       knowledge: {
         price: `**CET negocia na DeDust (TON)** com fornecimento fixo de **9.000 tokens** — escassez real.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- O **modelo DCBM** correlaciona escassez com cronograma de emissão de 90 anos\n- Acumulação de valor a longo prazo impulsionada pela demanda on-chain`,
         mining: '**A mineração CET dura 90 anos** com curva de recompensa decrescente.\n\n- **66.66%** do fornecimento total entra em circulação via proof-of-work\n- Nós ativos: **18.420+**\n- Consumo de bateria próximo a **0%** graças à restrição Zero-Battery\n- Janela ótima de mineração: **Q3 2025**',
@@ -2672,6 +2725,13 @@ const translations: Record<LangCode, Translations> = {
       stopGenerating: 'Stopp',
       sendHintModEnter: 'Enter senden · Shift+Enter neue Zeile · ⌘/Ctrl+Enter sendet auch',
       generationStopped: 'Generierung gestoppt. Erneut fragen oder in einer neuen Nachricht fortfahren.',
+      liveApiErrorFallback:
+        'Die Live-API hat einen Fehler zurückgegeben — diese Antwort nutzt eingebautes Solaris-Wissen. Erneut versuchen oder Server-Logs prüfen.',
+      copyCodeAria: 'Codeblock kopieren',
+      regenerateAria: 'Antwort neu erzeugen',
+      regenerateTitle: 'Dieselbe Frage erneut mit frischer Inferenz ausführen',
+      liveApiErrorDetailLabel: 'Server:',
+      codeCopiedAnnounce: 'Code in die Zwischenablage kopiert.',
       knowledge: {
         price: `**CET wird auf DeDust (TON)** mit einem festen Angebot von **9.000 Token** gehandelt — echte Hyperknappheit.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- Das **DCBM-Modell** korreliert Knappheit mit einem 90-Jahres-Emissionsplan\n- Langfristige Wertakkumulation, die ausschließlich durch On-Chain-Nachfrage angetrieben wird`,
         mining: '**CET-Mining läuft 90 Jahre** mit einer abnehmenden Belohnungskurve.\n\n- **66.66%** des Gesamtangebots gelangt durch Proof-of-Work in Umlauf\n- Aktive Nodes: **18.420+**\n- Akkuverbrauch nahezu **0%** dank der Zero-Battery-Einschränkung\n- Optimales Mining-Fenster: **Q3 2025**',

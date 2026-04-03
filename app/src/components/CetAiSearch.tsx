@@ -1,7 +1,19 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { track } from '@vercel/analytics/react';
-import { X, Send, Copy, Check, ExternalLink, ChevronRight, Sparkles, Trash2, Bot, StopCircle } from 'lucide-react';
+import {
+  X,
+  Send,
+  Copy,
+  Check,
+  ExternalLink,
+  ChevronRight,
+  Sparkles,
+  Trash2,
+  Bot,
+  StopCircle,
+  RefreshCw,
+} from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { CetAiKnowledge, Translations } from '../i18n/translations';
@@ -99,13 +111,24 @@ function chatHistoryToConversation(history: ChatEntry[]): { role: 'user' | 'assi
     .slice(-24);
 }
 
+interface CetAiFetchResult {
+  text: string | null;
+  sourceHeader: string | null;
+  /** True if /api/chat responded with a non-success or empty body (helps explain fallback). */
+  liveEndpointError: boolean;
+  /** Parsed `message` or `error` from JSON body when the call did not yield a response. */
+  errorDetail: string | null;
+}
+
 async function fetchCetAiChat(
   query: string,
   signal: AbortSignal,
   priorHistory: ChatEntry[],
-): Promise<{ text: string | null; sourceHeader: string | null }> {
+): Promise<CetAiFetchResult> {
   const conversation = chatHistoryToConversation(priorHistory);
   const maxAttempts = 2;
+  let sawHttpOrEmptyError = false;
+  let lastErrorDetail: string | null = null;
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     if (attempt > 0) {
       await new Promise<void>(resolve => {
@@ -116,7 +139,7 @@ async function fetchCetAiChat(
           resolve();
         }, { once: true });
       });
-      if (signal.aborted) return { text: null, sourceHeader: null };
+      if (signal.aborted) return { text: null, sourceHeader: null, liveEndpointError: false, errorDetail: null };
     }
     try {
       const res = await fetch('/api/chat', {
@@ -127,20 +150,40 @@ async function fetchCetAiChat(
       });
       const sourceHeader = res.headers.get('X-Cet-Ai-Source');
       const raw = await res.text();
-      let data: { response?: string } = {};
+      let data: { response?: string; message?: string; error?: string } = {};
       try {
-        data = JSON.parse(raw) as { response?: string };
+        data = JSON.parse(raw) as { response?: string; message?: string; error?: string };
       } catch {
         /* non-JSON error body */
       }
-      if (res.ok && typeof data.response === 'string' && data.response.trim()) {
-        return { text: data.response.trim(), sourceHeader };
+      const responseText = typeof data.response === 'string' ? data.response.trim() : '';
+      const msg = typeof data.message === 'string' ? data.message.trim() : '';
+      const err = typeof data.error === 'string' ? data.error.trim() : '';
+      const pickDetail = (): string | null => {
+        const d = msg || err;
+        if (!d) return null;
+        return d.replace(/\s+/g, ' ').slice(0, 500);
+      };
+      if (res.ok && responseText) {
+        return { text: responseText, sourceHeader, liveEndpointError: false, errorDetail: null };
+      }
+      const detail = pickDetail();
+      if (detail) lastErrorDetail = detail;
+      if (!res.ok) {
+        sawHttpOrEmptyError = true;
+      } else if (res.ok && !responseText) {
+        sawHttpOrEmptyError = true;
       }
     } catch {
-      if (signal.aborted) return { text: null, sourceHeader: null };
+      if (signal.aborted) return { text: null, sourceHeader: null, liveEndpointError: false, errorDetail: null };
     }
   }
-  return { text: null, sourceHeader: null };
+  return {
+    text: null,
+    sourceHeader: null,
+    liveEndpointError: sawHttpOrEmptyError,
+    errorDetail: lastErrorDetail,
+  };
 }
 
 function buildCopyForAiText(q: string, a: string, o: Translations['cetAi']): string {
@@ -363,18 +406,62 @@ function MarkdownBodyChunk({ text }: { text: string }) {
   );
 }
 
-function MarkdownText({ text }: { text: string }) {
+function FencedCodeBlock({
+  content,
+  copyLabel,
+  copiedAnnounce,
+}: {
+  content: string;
+  copyLabel: string;
+  copiedAnnounce: string;
+}) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="relative rounded-xl border border-white/10 bg-black/60">
+      <span className="sr-only" aria-live="polite">
+        {copied ? copiedAnnounce : ''}
+      </span>
+      <button
+        type="button"
+        aria-label={copyLabel}
+        title={copyLabel}
+        onClick={() => {
+          void navigator.clipboard.writeText(content).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+          }).catch(() => {});
+        }}
+        className="absolute top-2 right-2 z-[1] inline-flex items-center justify-center p-1.5 rounded-lg bg-gray-900/95 border border-white/10 text-gray-400 hover:text-yellow-400 hover:border-yellow-500/35 transition-colors"
+      >
+        {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+      </button>
+      <pre className="overflow-x-auto p-4 pt-11 text-xs text-slate-200 font-mono leading-relaxed">
+        <code>{content}</code>
+      </pre>
+    </div>
+  );
+}
+
+function MarkdownText({
+  text,
+  copyCodeLabel,
+  codeCopiedAnnounce,
+}: {
+  text: string;
+  copyCodeLabel: string;
+  codeCopiedAnnounce: string;
+}) {
   const segments = parseFencedCodeBlocks(text);
   return (
     <div className="space-y-4 text-sm leading-relaxed">
       {segments.map((seg, i) =>
         seg.type === 'code' ? (
-          <pre
+          <FencedCodeBlock
             key={i}
-            className="overflow-x-auto rounded-xl border border-white/10 bg-black/60 p-4 text-xs text-slate-200 font-mono leading-relaxed"
-          >
-            <code>{seg.content}</code>
-          </pre>
+            content={seg.content}
+            copyLabel={copyCodeLabel}
+            copiedAnnounce={codeCopiedAnnounce}
+          />
         ) : (
           <MarkdownBodyChunk key={i} text={seg.content} />
         ),
@@ -482,6 +569,10 @@ export default function CetAiSearch() {
   const [detectedTopic, setDetectedTopic] = useState<string>('default');
   /** False when the last completed answer used local knowledge (no /api/chat). */
   const [responseUsedLiveApi, setResponseUsedLiveApi] = useState(false);
+  /** True when /api/chat returned an error/empty body and we fell back to built-in knowledge. */
+  const [liveApiReturnedError, setLiveApiReturnedError] = useState(false);
+  /** Optional server message from JSON (`message` / `error`) when live API failed. */
+  const [liveApiErrorDetail, setLiveApiErrorDetail] = useState<string | null>(null);
 
   const terminalRef = useRef<HTMLDivElement>(null);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -538,6 +629,8 @@ export default function CetAiSearch() {
     setChatHistory([]);
     setSubmittedQuestion('');
     setResponseUsedLiveApi(false);
+    setLiveApiReturnedError(false);
+    setLiveApiErrorDetail(null);
     setCopiedForAi(false);
   }, [
     setIsModalOpen,
@@ -586,6 +679,8 @@ export default function CetAiSearch() {
     setPhase('complete');
     setFinalResponse(t.cetAi.generationStopped);
     setResponseUsedLiveApi(false);
+    setLiveApiReturnedError(false);
+    setLiveApiErrorDetail(null);
     setCetAiConfidence(0);
     setMetrics((m) => ({ ...m, confidence: 0 }));
   }, [t.cetAi.generationStopped]);
@@ -622,6 +717,8 @@ export default function CetAiSearch() {
     setCetAiConfidence(0);
     setMetrics({ confidence: 0, latency: 0, cetCost: 0 });
     setResponseUsedLiveApi(false);
+    setLiveApiReturnedError(false);
+    setLiveApiErrorDetail(null);
 
     setPhase('observe_parse');
     addLog('INFO', `RAV_INIT: Grok × Gemini CET AI v3.1 · Session [${hash}]`);
@@ -683,13 +780,26 @@ export default function CetAiSearch() {
     schedule(() => {
       void (async () => {
         if (generationEpochRef.current !== myEpoch) return;
-        type FetchResult = { text: string | null; sourceHeader: string | null };
-        const raced = await Promise.race<FetchResult>([
+        const raced = await Promise.race<CetAiFetchResult>([
           cetAiFetchPromise,
-          new Promise<FetchResult>(resolve => {
-            setTimeout(() => resolve({ text: null, sourceHeader: null }), 14_000);
+          new Promise<CetAiFetchResult>(resolve => {
+            setTimeout(
+              () =>
+                resolve({
+                  text: null,
+                  sourceHeader: null,
+                  liveEndpointError: false,
+                  errorDetail: null,
+                }),
+              18_000,
+            );
           }),
-        ]).catch((): FetchResult => ({ text: null, sourceHeader: null }));
+        ]).catch((): CetAiFetchResult => ({
+          text: null,
+          sourceHeader: null,
+          liveEndpointError: false,
+          errorDetail: null,
+        }));
         if (generationEpochRef.current !== myEpoch || ac.signal.aborted) return;
         const remote = raced.text;
         const hasRemoteText = Boolean(remote?.trim());
@@ -697,6 +807,10 @@ export default function CetAiSearch() {
         const usedLive = hasRemoteText && raced.sourceHeader === 'live';
         const text = hasRemoteText ? remote!.trim() : localAnswer;
         const conf = hasRemoteText ? Math.min(99.2, confidence + 1.5) : confidence;
+        setLiveApiReturnedError(!hasRemoteText && raced.liveEndpointError);
+        setLiveApiErrorDetail(
+          !hasRemoteText && raced.liveEndpointError ? (raced.errorDetail ?? null) : null,
+        );
 
         setPhase('act_consensus');
         addLog(
@@ -771,6 +885,12 @@ export default function CetAiSearch() {
   };
 
   const isProcessing = phase !== 'idle' && phase !== 'complete';
+
+  const handleRegenerate = useCallback(() => {
+    if (!submittedQuestion.trim() || isProcessing) return;
+    track('cet_ai_regenerate', {});
+    processQuestion(submittedQuestion.trim(), chatHistory);
+  }, [submittedQuestion, chatHistory, isProcessing, processQuestion]);
 
   // ── RENDER ────────────────────────────────────────────────────────────────────
   return (
@@ -956,7 +1076,11 @@ export default function CetAiSearch() {
                         {t.cetAi.cetAiResponse} · {entry.confidence.toFixed(1)}% {t.cetAi.confidence}
                       </p>
                       <div className="text-white">
-                        <MarkdownText text={entry.answer} />
+                        <MarkdownText
+                          text={entry.answer}
+                          copyCodeLabel={t.cetAi.copyCodeAria}
+                          codeCopiedAnnounce={t.cetAi.codeCopiedAnnounce}
+                        />
                       </div>
                     </div>
                   </div>
@@ -1027,6 +1151,16 @@ export default function CetAiSearch() {
                             >
                               {copiedForAi ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Bot className="w-3.5 h-3.5" />}
                             </button>
+                            <button
+                              type="button"
+                              title={t.cetAi.regenerateTitle}
+                              aria-label={t.cetAi.regenerateAria}
+                              onClick={handleRegenerate}
+                              disabled={isProcessing}
+                              className="p-1.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:text-amber-300 hover:border-amber-500/40 transition-all disabled:opacity-40 disabled:pointer-events-none"
+                            >
+                              <RefreshCw className="w-3.5 h-3.5" />
+                            </button>
                             <a
                               href={TONSCAN_CET_CONTRACT_URL}
                               target="_blank"
@@ -1039,15 +1173,27 @@ export default function CetAiSearch() {
                           </div>
                         </div>
                         {!responseUsedLiveApi && (
-                          <p
+                          <div
                             role="status"
-                            className="text-amber-200/90 text-xs font-mono border border-amber-500/25 bg-amber-500/10 rounded-lg px-3 py-2 mb-4"
+                            className="text-amber-200/90 text-xs border border-amber-500/25 bg-amber-500/10 rounded-lg px-3 py-2 mb-4 space-y-2"
                           >
-                            {t.cetAi.offlineModeHint}
-                          </p>
+                            <p className="font-mono leading-relaxed">
+                              {liveApiReturnedError ? t.cetAi.liveApiErrorFallback : t.cetAi.offlineModeHint}
+                            </p>
+                            {liveApiReturnedError && liveApiErrorDetail ? (
+                              <p className="font-mono text-[11px] text-amber-100/80 leading-relaxed break-words">
+                                <span className="text-amber-200/70">{t.cetAi.liveApiErrorDetailLabel}</span>{' '}
+                                {liveApiErrorDetail}
+                              </p>
+                            ) : null}
+                          </div>
                         )}
                         <div className="text-white">
-                          <MarkdownText text={finalResponse} />
+                          <MarkdownText
+                          text={finalResponse}
+                          copyCodeLabel={t.cetAi.copyCodeAria}
+                          codeCopiedAnnounce={t.cetAi.codeCopiedAnnounce}
+                        />
                         </div>
                         <div className="mt-5 pt-4 border-t border-green-500/10">
                           <p className="text-gray-600 text-[10px] font-mono uppercase tracking-widest mb-2">{t.cetAi.askNextLabel}</p>
