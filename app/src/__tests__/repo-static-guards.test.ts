@@ -113,7 +113,7 @@ describe("PWA manifest.json — icon paths resolve on disk", () => {
 });
 
 describe("TON Connect manifest — brand icon URL", () => {
-  it("iconUrl references shipped solaris-cet-logo.jpg", () => {
+  it("iconUrl references shipped brand logo raster (basename)", () => {
     const raw = readFileSync(join(appPublic, "tonconnect-manifest.json"), "utf8");
     const j = JSON.parse(raw) as { iconUrl?: string };
     expect(j.iconUrl).toMatch(
