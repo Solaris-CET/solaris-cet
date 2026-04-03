@@ -1,4 +1,36 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
+
+/**
+ * Wait until Workbox has an active registration, then reload until this client is controlled.
+ * A single reload is not always enough for `navigator.serviceWorker.controller` to be set.
+ */
+async function waitForServiceWorkerControllingClient(page: Page): Promise<void> {
+  await page.waitForLoadState('networkidle');
+
+  await expect
+    .poll(
+      async () =>
+        page.evaluate(async () => {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          return regs.some((r) => r.active != null);
+        }),
+      { timeout: 30_000, intervals: [200, 400, 800, 1600] },
+    )
+    .toBe(true);
+
+  for (let i = 0; i < 6; i++) {
+    const controlled = await page.evaluate(() => navigator.serviceWorker.controller !== null);
+    if (controlled) return;
+    await page.reload({ waitUntil: 'networkidle' });
+  }
+
+  await expect
+    .poll(
+      async () => page.evaluate(() => navigator.serviceWorker.controller !== null),
+      { timeout: 35_000, intervals: [200, 400, 800, 1600, 3200] },
+    )
+    .toBe(true);
+}
 
 /**
  * Offline PWA State E2E tests
