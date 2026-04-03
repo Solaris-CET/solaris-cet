@@ -18,7 +18,7 @@ npm run verify       # lint + typecheck + test + build (quick gate before push)
 npm run verify:full  # verify + Playwright E2E (full local check)
 ```
 
-E2E (Chromium): from `app/`, **`npm run test:e2e`** (install browsers once: `npx playwright install --with-deps chromium`). **`pretest:e2e`** fails fast if `app/dist/index.html` is missing (with a hint). Calling **`npx playwright test` directly** skips that guard — prefer the npm script. Config starts **`vite preview` only** — `dist/` must already exist (`npm run build` or run after `npm run verify`). CI supplies `dist/` from the build job. On **CI**, Playwright uses **one** worker. **Locally**, it uses the default parallelism unless you set **`PW_WORKERS`** (e.g. `PW_WORKERS=1 npm run test:e2e` if the preview on :4173 flakes under load).
+E2E (Chromium): from `app/`, **`npm run test:e2e`** (install browsers once: `npx playwright install --with-deps chromium`). **`pretest:e2e`** fails fast if `app/dist/index.html` is missing (with a hint). Calling **`npx playwright test` directly** skips that guard — prefer the npm script. Config starts **`vite preview` only** — `dist/` must already exist (`npm run build` or run after `npm run verify`). CI supplies `dist/` from the build job. On **CI**, Playwright uses **one** worker. **Locally**, it uses the default parallelism unless you set **`PW_WORKERS`** (e.g. `PW_WORKERS=1 npm run test:e2e` if the preview on :4173 flakes under load). Shortcut: **`npm run test:e2e:stable`** is equivalent to `PW_WORKERS=1 npm run test:e2e`.
 
 ## Layout
 
