@@ -1,4 +1,5 @@
 import { Share2, X } from 'lucide-react';
+import { productionSiteUrl } from '@/lib/brandAssets';
 import { useLanguage } from '../hooks/useLanguage';
 import { useTelegram } from '../hooks/useTelegram';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
@@ -7,7 +8,7 @@ import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 const SITE_URL = (() => {
   const raw = import.meta.env.VITE_PUBLIC_SITE_URL as string | undefined;
   if (raw?.trim()) return raw.trim().replace(/\/?$/, '/');
-  return 'https://solaris-cet.com/';
+  return productionSiteUrl();
 })();
 
 const SocialShare = () => {
