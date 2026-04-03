@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 /**
  * Playwright configuration for Solaris CET E2E tests.
- * Tests hit the Vite preview of the production build (`npm run preview`).
+ * Tests hit the production build via `npm run preview:e2e` (127.0.0.1:4173, raised Node heap).
  * `serviceWorkers: 'block'` avoids the PWA serving a stale precached bundle (selectors/copy drift).
  */
 export default defineConfig({
@@ -38,7 +38,13 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        /* Small /dev/shm (Docker, some CI sandboxes) can crash Chromium mid-suite → preview looks “dead” (:4173 ECONNREFUSED). */
+        launchOptions: {
+          args: ['--disable-dev-shm-usage'],
+        },
+      },
     },
   ],
   /* Start the Vite preview server before running tests.
@@ -51,7 +57,7 @@ export default defineConfig({
        :4173 ERR_CONNECTION_REFUSED. */
     command: 'npm run preview:e2e',
     url: 'http://127.0.0.1:4173',
-    /* Local: allow reusing `npm run preview` if already running (run `npm run build` after UI changes). */
+    /* Local: reuse an existing preview on 127.0.0.1:4173 (e.g. `npm run preview:e2e`) after `npm run build`. */
     reuseExistingServer: !process.env.CI,
     timeout: process.env.CI ? 120_000 : 180_000,
   },
