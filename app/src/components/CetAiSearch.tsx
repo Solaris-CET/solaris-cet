@@ -118,6 +118,8 @@ interface CetAiFetchResult {
   liveEndpointError: boolean;
   /** Parsed `message` or `error` from JSON body when the call did not yield a response. */
   errorDetail: string | null;
+  /** Last HTTP status from /api/chat when the response was not usable (4xx/5xx or empty body). */
+  httpStatus: number | null;
 }
 
 async function fetchCetAiChat(
@@ -129,6 +131,7 @@ async function fetchCetAiChat(
   const maxAttempts = 2;
   let sawHttpOrEmptyError = false;
   let lastErrorDetail: string | null = null;
+  let lastHttpStatus: number | null = null;
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     if (attempt > 0) {
       await new Promise<void>(resolve => {
@@ -139,7 +142,8 @@ async function fetchCetAiChat(
           resolve();
         }, { once: true });
       });
-      if (signal.aborted) return { text: null, sourceHeader: null, liveEndpointError: false, errorDetail: null };
+      if (signal.aborted)
+        return { text: null, sourceHeader: null, liveEndpointError: false, errorDetail: null, httpStatus: null };
     }
     try {
       const res = await fetch('/api/chat', {
@@ -165,17 +169,25 @@ async function fetchCetAiChat(
         return d.replace(/\s+/g, ' ').slice(0, 500);
       };
       if (res.ok && responseText) {
-        return { text: responseText, sourceHeader, liveEndpointError: false, errorDetail: null };
+        return {
+          text: responseText,
+          sourceHeader,
+          liveEndpointError: false,
+          errorDetail: null,
+          httpStatus: null,
+        };
       }
       const detail = pickDetail();
       if (detail) lastErrorDetail = detail;
+      lastHttpStatus = res.status;
       if (!res.ok) {
         sawHttpOrEmptyError = true;
       } else if (res.ok && !responseText) {
         sawHttpOrEmptyError = true;
       }
     } catch {
-      if (signal.aborted) return { text: null, sourceHeader: null, liveEndpointError: false, errorDetail: null };
+      if (signal.aborted)
+        return { text: null, sourceHeader: null, liveEndpointError: false, errorDetail: null, httpStatus: null };
     }
   }
   return {
@@ -183,7 +195,19 @@ async function fetchCetAiChat(
     sourceHeader: null,
     liveEndpointError: sawHttpOrEmptyError,
     errorDetail: lastErrorDetail,
+    httpStatus: lastHttpStatus,
   };
+}
+
+function liveApiHttpHintForStatus(
+  cet: Translations['cetAi'],
+  status: number | null,
+): string | null {
+  if (status == null || status < 400) return null;
+  if (status === 429) return cet.liveApiErrorRateLimited;
+  if (status === 502 || status === 503 || status === 504) return cet.liveApiErrorServiceUnavailable;
+  if (status >= 500) return cet.liveApiErrorServerError;
+  return null;
 }
 
 function buildCopyForAiText(q: string, a: string, o: Translations['cetAi']): string {
@@ -244,7 +268,7 @@ function getReActPhaseStatus(phase: ReActPhase, targetPhases: ReActPhase[]): str
   if (phase === 'complete')
     return 'text-green-500 border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.2)]';
   if (targetPhases.includes(phase))
-    return 'text-yellow-400 border-yellow-400/50 shadow-[0_0_15px_rgba(250,204,21,0.2)] animate-pulse';
+    return 'text-yellow-400 border-yellow-400/50 shadow-[0_0_15px_rgba(250,204,21,0.2)] motion-safe:animate-pulse';
 
   const phaseOrder: ReActPhase[] = [
     'idle', 'observe_parse', 'observe_context',
@@ -293,6 +317,17 @@ function parseFencedCodeBlocks(text: string): Array<{ type: 'md' | 'code'; lang?
 
 function MarkdownBodyChunk({ text }: { text: string }) {
   const renderLine = (line: string, key: number) => {
+    const h2 = line.match(/^##\s+(.+)$/);
+    if (h2) {
+      return (
+        <h3
+          key={key}
+          className="text-yellow-200/95 font-bold text-base md:text-lg tracking-tight mt-4 mb-2 border-b border-yellow-500/25 pb-1"
+        >
+          {renderInline(h2[1])}
+        </h3>
+      );
+    }
     const h3 = line.match(/^###\s+(.+)$/);
     if (h3) {
       return (
@@ -410,17 +445,28 @@ function FencedCodeBlock({
   content,
   copyLabel,
   copiedAnnounce,
+  lang,
 }: {
   content: string;
   copyLabel: string;
   copiedAnnounce: string;
+  lang?: string;
 }) {
   const [copied, setCopied] = useState(false);
+  const langLabel = lang?.trim();
   return (
     <div className="relative rounded-xl border border-white/10 bg-black/60">
       <span className="sr-only" aria-live="polite">
         {copied ? copiedAnnounce : ''}
       </span>
+      {langLabel ? (
+        <span
+          className="absolute top-2 left-3 z-[1] max-w-[min(50%,12rem)] truncate text-[10px] font-mono uppercase tracking-wider text-gray-500"
+          title={langLabel}
+        >
+          {langLabel}
+        </span>
+      ) : null}
       <button
         type="button"
         aria-label={copyLabel}
@@ -461,6 +507,7 @@ function MarkdownText({
             content={seg.content}
             copyLabel={copyCodeLabel}
             copiedAnnounce={codeCopiedAnnounce}
+            lang={seg.lang}
           />
         ) : (
           <MarkdownBodyChunk key={i} text={seg.content} />
@@ -482,11 +529,11 @@ function ReActPanels({ phase }: { phase: ReActPhase }) {
         </div>
         <div className="text-sm space-y-2 opacity-80">
           <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${phase === 'observe_parse' ? 'bg-yellow-400 animate-pulse' : phaseOrderIndex(phase) > 1 ? 'bg-green-500' : 'bg-gray-700'}`} />
+            <div className={`w-2 h-2 rounded-full ${phase === 'observe_parse' ? 'bg-yellow-400 motion-safe:animate-pulse' : phaseOrderIndex(phase) > 1 ? 'bg-green-500' : 'bg-gray-700'}`} />
             <span>Intent Extraction</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${phase === 'observe_context' ? 'bg-yellow-400 animate-pulse' : phaseOrderIndex(phase) > 2 ? 'bg-green-500' : 'bg-gray-700'}`} />
+            <div className={`w-2 h-2 rounded-full ${phase === 'observe_context' ? 'bg-yellow-400 motion-safe:animate-pulse' : phaseOrderIndex(phase) > 2 ? 'bg-green-500' : 'bg-gray-700'}`} />
             <span>Context Mapping</span>
           </div>
         </div>
@@ -500,11 +547,11 @@ function ReActPanels({ phase }: { phase: ReActPhase }) {
         </div>
         <div className="text-sm space-y-2 opacity-80">
           <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${phase === 'think_route' ? 'bg-yellow-400 animate-pulse' : phaseOrderIndex(phase) > 3 ? 'bg-green-500' : 'bg-gray-700'}`} />
+            <div className={`w-2 h-2 rounded-full ${phase === 'think_route' ? 'bg-yellow-400 motion-safe:animate-pulse' : phaseOrderIndex(phase) > 3 ? 'bg-green-500' : 'bg-gray-700'}`} />
             <span>Logic Routing</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${phase === 'think_validate' ? 'bg-yellow-400 animate-pulse' : phaseOrderIndex(phase) > 4 ? 'bg-green-500' : 'bg-gray-700'}`} />
+            <div className={`w-2 h-2 rounded-full ${phase === 'think_validate' ? 'bg-yellow-400 motion-safe:animate-pulse' : phaseOrderIndex(phase) > 4 ? 'bg-green-500' : 'bg-gray-700'}`} />
             <span>Constraint Validation</span>
           </div>
         </div>
@@ -518,11 +565,11 @@ function ReActPanels({ phase }: { phase: ReActPhase }) {
         </div>
         <div className="text-sm space-y-2 opacity-80">
           <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${phase === 'act_execute' ? 'bg-yellow-400 animate-pulse' : phaseOrderIndex(phase) > 5 ? 'bg-green-500' : 'bg-gray-700'}`} />
+            <div className={`w-2 h-2 rounded-full ${phase === 'act_execute' ? 'bg-yellow-400 motion-safe:animate-pulse' : phaseOrderIndex(phase) > 5 ? 'bg-green-500' : 'bg-gray-700'}`} />
             <span>Execution Payload</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${phase === 'act_consensus' ? 'bg-yellow-400 animate-pulse' : phaseOrderIndex(phase) > 6 ? 'bg-green-500' : 'bg-gray-700'}`} />
+            <div className={`w-2 h-2 rounded-full ${phase === 'act_consensus' ? 'bg-yellow-400 motion-safe:animate-pulse' : phaseOrderIndex(phase) > 6 ? 'bg-green-500' : 'bg-gray-700'}`} />
             <span>TON Consensus</span>
           </div>
         </div>
@@ -536,11 +583,11 @@ function ReActPanels({ phase }: { phase: ReActPhase }) {
         </div>
         <div className="text-sm space-y-2 opacity-80">
           <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${phase === 'verify_cross' ? 'bg-yellow-400 animate-pulse' : phaseOrderIndex(phase) > 7 ? 'bg-green-500' : 'bg-gray-700'}`} />
+            <div className={`w-2 h-2 rounded-full ${phase === 'verify_cross' ? 'bg-yellow-400 motion-safe:animate-pulse' : phaseOrderIndex(phase) > 7 ? 'bg-green-500' : 'bg-gray-700'}`} />
             <span>Cross-Model Check</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${phase === 'verify_anchor' ? 'bg-yellow-400 animate-pulse' : phaseOrderIndex(phase) > 8 ? 'bg-green-500' : 'bg-gray-700'}`} />
+            <div className={`w-2 h-2 rounded-full ${phase === 'verify_anchor' ? 'bg-yellow-400 motion-safe:animate-pulse' : phaseOrderIndex(phase) > 8 ? 'bg-green-500' : 'bg-gray-700'}`} />
             <span>IPFS Anchor</span>
           </div>
         </div>
@@ -573,6 +620,8 @@ export default function CetAiSearch() {
   const [liveApiReturnedError, setLiveApiReturnedError] = useState(false);
   /** Optional server message from JSON (`message` / `error`) when live API failed. */
   const [liveApiErrorDetail, setLiveApiErrorDetail] = useState<string | null>(null);
+  /** Last HTTP status from a failed /api/chat response (429, 5xx, etc.). */
+  const [liveApiHttpStatus, setLiveApiHttpStatus] = useState<number | null>(null);
 
   const terminalRef = useRef<HTMLDivElement>(null);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -631,6 +680,7 @@ export default function CetAiSearch() {
     setResponseUsedLiveApi(false);
     setLiveApiReturnedError(false);
     setLiveApiErrorDetail(null);
+    setLiveApiHttpStatus(null);
     setCopiedForAi(false);
   }, [
     setIsModalOpen,
@@ -681,6 +731,7 @@ export default function CetAiSearch() {
     setResponseUsedLiveApi(false);
     setLiveApiReturnedError(false);
     setLiveApiErrorDetail(null);
+    setLiveApiHttpStatus(null);
     setCetAiConfidence(0);
     setMetrics((m) => ({ ...m, confidence: 0 }));
   }, [t.cetAi.generationStopped]);
@@ -719,6 +770,7 @@ export default function CetAiSearch() {
     setResponseUsedLiveApi(false);
     setLiveApiReturnedError(false);
     setLiveApiErrorDetail(null);
+    setLiveApiHttpStatus(null);
 
     setPhase('observe_parse');
     addLog('INFO', `RAV_INIT: Grok × Gemini CET AI v3.1 · Session [${hash}]`);
@@ -790,6 +842,7 @@ export default function CetAiSearch() {
                   sourceHeader: null,
                   liveEndpointError: false,
                   errorDetail: null,
+                  httpStatus: null,
                 }),
               18_000,
             );
@@ -799,6 +852,7 @@ export default function CetAiSearch() {
           sourceHeader: null,
           liveEndpointError: false,
           errorDetail: null,
+          httpStatus: null,
         }));
         if (generationEpochRef.current !== myEpoch || ac.signal.aborted) return;
         const remote = raced.text;
@@ -810,6 +864,9 @@ export default function CetAiSearch() {
         setLiveApiReturnedError(!hasRemoteText && raced.liveEndpointError);
         setLiveApiErrorDetail(
           !hasRemoteText && raced.liveEndpointError ? (raced.errorDetail ?? null) : null,
+        );
+        setLiveApiHttpStatus(
+          !hasRemoteText && raced.liveEndpointError ? (raced.httpStatus ?? null) : null,
         );
 
         setPhase('act_consensus');
@@ -885,6 +942,9 @@ export default function CetAiSearch() {
   };
 
   const isProcessing = phase !== 'idle' && phase !== 'complete';
+  const liveApiHttpHint = liveApiReturnedError
+    ? liveApiHttpHintForStatus(t.cetAi, liveApiHttpStatus)
+    : null;
 
   const handleRegenerate = useCallback(() => {
     if (!submittedQuestion.trim() || isProcessing) return;
@@ -1180,6 +1240,11 @@ export default function CetAiSearch() {
                             <p className="font-mono leading-relaxed">
                               {liveApiReturnedError ? t.cetAi.liveApiErrorFallback : t.cetAi.offlineModeHint}
                             </p>
+                            {liveApiReturnedError && liveApiHttpHint ? (
+                              <p className="font-mono text-[11px] text-amber-100/85 leading-relaxed">
+                                {liveApiHttpHint}
+                              </p>
+                            ) : null}
                             {liveApiReturnedError && liveApiErrorDetail ? (
                               <p className="font-mono text-[11px] text-amber-100/80 leading-relaxed break-words">
                                 <span className="text-amber-200/70">{t.cetAi.liveApiErrorDetailLabel}</span>{' '}
@@ -1239,7 +1304,7 @@ export default function CetAiSearch() {
                     <div className="lg:col-span-3 bg-gray-950 border border-gray-800 rounded-xl p-3 md:p-4 font-mono text-xs overflow-hidden flex flex-col h-40 md:h-56 shadow-inner">
                       <div className="flex items-center justify-between mb-2 pb-2 border-b border-gray-800 text-gray-500">
                         <span>&gt;_ RAV_TERMINAL · Grok × Gemini v3.0</span>
-                        <span className={isProcessing ? 'text-yellow-500 animate-pulse' : 'text-green-500'}>
+                        <span className={isProcessing ? 'text-yellow-500 motion-safe:animate-pulse' : 'text-green-500'}>
                           {isProcessing ? t.cetAi.processing : `● ${t.cetAi.done}`}
                         </span>
                       </div>
