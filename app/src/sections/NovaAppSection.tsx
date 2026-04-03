@@ -3,9 +3,8 @@ import { gsap } from 'gsap';
 import { TrendingUp, Droplets, Clock, Battery } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
+import { SolarisLogoMark } from '../components/SolarisLogoMark';
 import { useReducedMotion } from '../hooks/useReducedMotion';
-
-const SOLARIS_LOGO_URL = `${import.meta.env.BASE_URL}icon-192.png`;
 
 
 // Static data defined outside component to avoid re-creation on every render
@@ -140,13 +139,9 @@ const NovaAppSection = () => {
                 {/* App header */}
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <img
-                      src={SOLARIS_LOGO_URL}
-                      alt="Solaris CET"
-                      width="24"
-                      height="24"
-                      className="solaris-icon-glow w-6 h-6 rounded-md object-contain"
-                    />
+                    <div className="solaris-icon-glow h-6 w-6 shrink-0 overflow-hidden rounded-md">
+                      <SolarisLogoMark className="h-full w-full" />
+                    </div>
                     <span className="font-display font-semibold text-solaris-text text-sm">CET</span>
                   </div>
                   <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -188,14 +183,8 @@ const NovaAppSection = () => {
       >
         <div className="bento-card p-6 lg:p-8">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-10 h-10 rounded-lg overflow-hidden">
-              <img
-                src={SOLARIS_LOGO_URL}
-                alt="Solaris CET"
-                width="40"
-                height="40"
-                className="solaris-icon-glow w-full h-full object-contain"
-              />
+            <div className="solaris-icon-glow h-10 w-10 shrink-0 overflow-hidden rounded-lg">
+              <SolarisLogoMark className="h-full w-full" />
             </div>
             <span className="hud-label text-solaris-gold">Mobile Mining</span>
           </div>

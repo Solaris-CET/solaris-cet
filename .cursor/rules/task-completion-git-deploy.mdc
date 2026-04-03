@@ -15,8 +15,8 @@ Imediat după ce rezumi ce s-a schimbat, printează **exact** acest șablon (cu 
 # 1. Adaugă toate fișierele modificate de agent
 git add .
 
-# 2. Creează commit-ul descriptiv — mesaj nou, nu textul de mai jos (e doar exemplu de formă)
-git commit -m "feat(ui): short English summary of the change"
+# 2. Creează commit-ul — mesajul trebuie să descrie concret diff-ul (Conventional Commits). Nu există text „universal” aici: scrie-l tu după ce vezi `git diff --staged`.
+git commit -m "fix(scope): what you changed"
 
 # 3. Trimite pe server pentru a declanșa build-ul în Coolify
 git push origin main
@@ -24,7 +24,7 @@ git push origin main
 
 ## Reguli
 
-- **Mesajul de commit** trebuie să reflecte fidel diff-ul (prefix `fix:`, `feat:`, `feat/ui:` etc.). **Nu** folosi pe `main` mesaje copiate literal din șablon, meta-instrucțiuni (ex. „nu placeholder”, „rezumat real”) sau exemple fără legătură cu diff-ul.
+- **Mesajul de commit** trebuie să reflecte fidel diff-ul (prefix `fix:`, `feat:`, `feat/ui:` etc.). **Nu** folosi pe `main` mesaje copiate literal din șablon, meta-instrucțiuni, sau propoziții generice (`what you changed`, `short summary`, `feat(ui): short English summary of the change`, etc.).
 - **Blocul bash este obligatoriu în fiecare răspuns** după modificări de cod: pașii 1–3 apar mereu în același șablon. Singura variație permisă de conținut (nu de aplicare a regulii) este prefixarea cu `#` a unei linii care nu trebuie executată, plus opțional `# NOTE: ...` — niciodată omiterea blocului sau înlocuirea lui cu text fără cod.
 
 Această regulă se aplică **împreună** cu `solaris-omega-directive.mdc` (securitate, fără secrete în commit).
