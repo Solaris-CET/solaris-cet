@@ -18,7 +18,7 @@ npm run lint
 npm run test
 npm run build
 npm run verify        # lint + typecheck + test + build (pre-push gate)
-npm run test:e2e      # Playwright (uses preview on 4173 via playwright.config webServer)
+npm run test:e2e      # Playwright (`pretest:e2e` ensures dist/; preview on 4173 via playwright.config)
 npm run verify:full   # verify + E2E
 ```
 
