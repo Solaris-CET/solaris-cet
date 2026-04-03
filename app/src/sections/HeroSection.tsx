@@ -209,10 +209,10 @@ const HeroSection: React.FC = () => {
               <div className="mb-4 md:mb-5 flex flex-col items-center lg:items-start gap-3 w-full">
                 <div className="flex items-center gap-3 sm:gap-4">
                   <span
-                    className="hidden sm:flex w-10 h-10 md:w-11 md:h-11 shrink-0 items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.03] shadow-[0_0_20px_rgba(242,201,76,0.1)] p-2"
+                    className="hidden sm:flex w-11 h-11 md:w-12 md:h-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] shadow-[0_0_20px_rgba(242,201,76,0.1)] p-0"
                     aria-hidden
                   >
-                    <SolarisLogoMark className="drop-shadow-[0_0_10px_rgba(242,201,76,0.4)]" />
+                    <SolarisLogoMark className="h-full w-full drop-shadow-[0_0_10px_rgba(242,201,76,0.4)]" />
                   </span>
                   <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.35em] text-yellow-500/90 text-center lg:text-left leading-snug">
                     {t.hero.tagline}

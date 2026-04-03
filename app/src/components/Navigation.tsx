@@ -167,14 +167,19 @@ const Navigation = () => {
       <div className="w-full section-padding-x xl:px-12">
         <div className="flex items-center justify-between h-16 xl:h-20 gap-2 sm:gap-3">
           {/* Logo */}
-          <a href="#main-content" className="flex items-center gap-2 sm:gap-3 group min-w-0 shrink">
-            <div className="relative w-8 h-8 xl:w-10 xl:h-10 flex items-center justify-center transition-transform duration-500 ease-out group-hover:scale-[1.06]">
-              <SolarisLogoMark className="drop-shadow-[0_0_14px_rgba(242,201,76,0.35)]" />
-              <div className="pointer-events-none absolute inset-[-2px] rounded-full bg-solaris-gold/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <a
+            href="#main-content"
+            className="flex items-center group min-w-0 shrink"
+            aria-label="Solaris CET"
+          >
+            <div className="relative h-10 xl:h-11 shrink-0 flex items-center justify-center transition-transform duration-500 ease-out group-hover:scale-[1.04]">
+              <SolarisLogoMark
+                crop="full"
+                priority
+                className="h-10 xl:h-11 w-auto max-h-full drop-shadow-[0_0_14px_rgba(242,201,76,0.35)]"
+              />
+              <div className="pointer-events-none absolute inset-[-3px] rounded-xl bg-solaris-gold/18 blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
-            <span className="font-display font-semibold text-lg xl:text-xl text-solaris-text tracking-tight">
-              Solaris <span className="text-solaris-gold">CET</span>
-            </span>
           </a>
 
           {/* Desktop Navigation — shown only at xl (≥1280 px) to avoid overflow */}

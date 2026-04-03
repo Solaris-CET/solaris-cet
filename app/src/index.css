@@ -414,6 +414,135 @@
   100% { transform: translateY(100vh); }
 }
 
+/** Solaris CET raster logo — holographic drift (cyan / magenta / gold) + scanline shimmer */
+@keyframes solaris-holo-aurora {
+  0%,
+  100% {
+    filter: brightness(1.04) contrast(1.06) saturate(1.08)
+      drop-shadow(0 0 14px rgba(46, 231, 255, 0.22)) drop-shadow(1px 0 0 rgba(0, 240, 255, 0.35))
+      drop-shadow(-1px 0 0 rgba(255, 60, 200, 0.28));
+  }
+  45% {
+    filter: brightness(1.1) contrast(1.08) saturate(1.18)
+      drop-shadow(0 0 22px rgba(242, 201, 76, 0.35)) drop-shadow(2px 0 0 rgba(255, 80, 220, 0.4))
+      drop-shadow(-2px 0 0 rgba(0, 255, 255, 0.38));
+  }
+  72% {
+    filter: brightness(1.07) contrast(1.07) saturate(1.12)
+      drop-shadow(0 0 18px rgba(167, 139, 250, 0.35)) drop-shadow(-1px 0 0 rgba(46, 231, 255, 0.45))
+      drop-shadow(1px 0 0 rgba(242, 201, 76, 0.32));
+  }
+}
+
+@keyframes solaris-holo-scan-drift {
+  0% {
+    transform: translateY(0);
+    opacity: 0.82;
+  }
+  50% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateY(6px);
+    opacity: 0.82;
+  }
+}
+
+@keyframes solaris-holo-sheen {
+  0%,
+  100% {
+    background-position: 0% 40%;
+  }
+  50% {
+    background-position: 100% 60%;
+  }
+}
+
+.solaris-holo-logo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+}
+
+.solaris-holo-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.solaris-holo-scanlines {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0,
+    transparent 2px,
+    rgba(56, 232, 255, 0.04) 2px,
+    rgba(56, 232, 255, 0.04) 3px
+  );
+  mix-blend-mode: overlay;
+  animation: solaris-holo-scan-drift 9s linear infinite;
+}
+
+.solaris-holo-sheen {
+  position: absolute;
+  inset: -45%;
+  background: linear-gradient(
+    112deg,
+    transparent 0%,
+    transparent 40%,
+    rgba(255, 255, 255, 0.11) 50%,
+    transparent 58%,
+    transparent 100%
+  );
+  background-size: 220% 220%;
+  mix-blend-mode: soft-light;
+  animation: solaris-holo-sheen 7.5s ease-in-out infinite;
+}
+
+.solaris-holo-img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  height: 100%;
+  width: auto;
+  max-height: 100%;
+  user-select: none;
+  animation: solaris-holo-aurora 6.5s ease-in-out infinite;
+}
+
+.solaris-holo-img--full {
+  object-fit: contain;
+  object-position: center;
+}
+
+.solaris-holo-img--emblem {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 18%;
+  transform: scale(1.12);
+  transform-origin: 50% 22%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .solaris-holo-scanlines,
+  .solaris-holo-sheen {
+    animation: none;
+  }
+
+  .solaris-holo-img {
+    animation: none;
+    filter: brightness(1.05) contrast(1.05) drop-shadow(0 0 12px rgba(46, 231, 255, 0.18));
+  }
+}
+
 @keyframes energy-pulse {
   0%, 100% { box-shadow: 0 0 20px rgba(46, 231, 255, 0.2), 0 0 40px rgba(46, 231, 255, 0.1); }
   50% { box-shadow: 0 0 40px rgba(46, 231, 255, 0.4), 0 0 80px rgba(46, 231, 255, 0.2); }

@@ -189,8 +189,12 @@ function AppContent() {
         <div className="flex flex-col items-center gap-6" aria-hidden>
           <div className="relative w-20 h-20 flex items-center justify-center">
             <div className="absolute inset-0 rounded-3xl bg-solaris-gold/[0.08] blur-xl animate-gold-pulse" />
-            <div className="relative w-14 h-14 rounded-2xl bg-slate-950/80 border border-white/[0.08] shadow-[0_0_40px_rgba(242,201,76,0.12)] flex items-center justify-center p-2.5">
-              <SolarisLogoMark className="drop-shadow-[0_0_12px_rgba(242,201,76,0.4)]" />
+            <div className="relative w-14 h-14 overflow-hidden rounded-2xl bg-slate-950/80 border border-white/[0.08] shadow-[0_0_40px_rgba(242,201,76,0.12)] flex items-center justify-center p-0">
+              <SolarisLogoMark
+                crop="emblem"
+                priority
+                className="h-full w-full drop-shadow-[0_0_12px_rgba(242,201,76,0.4)]"
+              />
             </div>
           </div>
           
