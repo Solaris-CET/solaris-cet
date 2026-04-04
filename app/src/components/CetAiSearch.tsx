@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import DOMPurify from 'dompurify';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import {
   X,
@@ -281,6 +282,18 @@ function buildContextualResponse(q: string, knowledge: CetAiKnowledge): { answer
     }
   }
   return { answer: knowledge.default, confidence: CONFIDENCE_SCORES.default };
+}
+
+function sanitizeHtml(html: string): string {
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'a', 'ul', 'ol', 'li'],
+    ALLOWED_ATTR: ['href', 'target', 'rel'],
+  });
+}
+
+function SanitizedHtml({ html }: { html: string }) {
+  const sanitizedHtml = React.useMemo(() => sanitizeHtml(html), [html]);
+  return <div dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
 }
 
 // --- ReAct phase status helper ---
@@ -1435,11 +1448,15 @@ export default function CetAiSearch() {
                           </div>
                         )}
                         <div className="text-white">
-                          <MarkdownText
-                          text={finalResponse}
-                          copyCodeLabel={t.cetAi.copyCodeAria}
-                          codeCopiedAnnounce={t.cetAi.codeCopiedAnnounce}
-                        />
+                          {/<\/?.+?>/.test(finalResponse) ? (
+                            <SanitizedHtml html={finalResponse.replace(/\n/g, '<br/>')} />
+                          ) : (
+                            <MarkdownText
+                              text={finalResponse}
+                              copyCodeLabel={t.cetAi.copyCodeAria}
+                              codeCopiedAnnounce={t.cetAi.codeCopiedAnnounce}
+                            />
+                          )}
                         </div>
                         <div className="mt-5 pt-4 border-t border-green-500/10">
                           <p className="text-gray-600 text-[10px] font-mono uppercase tracking-widest mb-2">{t.cetAi.askNextLabel}</p>

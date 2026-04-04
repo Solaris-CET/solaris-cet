@@ -145,11 +145,15 @@ export function formatTokenAmount(amount: string | null, decimals = 2): string {
  * const save = debounce(() => saveToServer(), 300);
  * save(); save(); save(); // server called once after 300 ms
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function debounce<T extends (...args: any[]) => void>(fn: T, delay: number) {
-  let timer: ReturnType<typeof setTimeout>;
-  return (...args: Parameters<T>) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), delay);
+export function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(fn: T, delay: number) {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  return (...args: Parameters<T>): void => {
+    if (timer !== undefined) {
+      clearTimeout(timer);
+    }
+
+    timer = setTimeout(() => {
+      void fn(...args);
+    }, delay);
   };
 }

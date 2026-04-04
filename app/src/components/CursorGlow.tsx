@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 /**
  * CursorGlow — a fixed-position radial-gradient spotlight that follows the
@@ -10,13 +11,14 @@ import { useEffect, useRef } from 'react';
  *   it is invisible to assistive technologies.
  */
 const CursorGlow = () => {
+  const prefersReducedMotion = useReducedMotion();
   const glowRef = useRef<HTMLDivElement>(null);
   const posRef = useRef({ x: -300, y: -300 });
   const targetRef = useRef({ x: -300, y: -300 });
   const rafRef = useRef<number>(0);
 
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (prefersReducedMotion) return;
     // Skip runtime work when device has no fine pointer (touch-first/coarse).
     if (!window.matchMedia('(pointer: fine)').matches) return;
 
@@ -46,7 +48,9 @@ const CursorGlow = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [prefersReducedMotion]);
+
+  if (prefersReducedMotion) return null;
 
   return (
     <div
