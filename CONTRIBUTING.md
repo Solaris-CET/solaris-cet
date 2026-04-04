@@ -9,6 +9,7 @@ Mulțumim că ești interesat să contribui la **Solaris CET**! Urmează pașii 
 - [Cod de conduită](#cod-de-conduită)
 - [Cum poți contribui](#cum-poți-contribui)
 - [Configurarea mediului de dezvoltare](#configurarea-mediului-de-dezvoltare)
+- [Verificare monorepo](#verificare-monorepo-înainte-de-pr-sau-release)
 - [Flux de lucru Git](#flux-de-lucru-git)
 - [Standarde de cod](#standarde-de-cod)
 - [Trimiterea unui Pull Request](#trimiterea-unui-pull-request)
@@ -92,6 +93,16 @@ npm run test:e2e
 # Verificare completă locală: verify + E2E stabil (`test:e2e:stable`, un worker — aliniat cu CI)
 npm run verify:full
 ```
+
+### Verificare monorepo (înainte de PR sau release)
+
+| Zonă | Comandă |
+|------|---------|
+| **Frontend** (lint + typecheck + test + build, ca porțiunea critică din CI) | Din `app/`: `npm ci && npm run verify` |
+| **E2E Chromium** (toate spec-urile Playwright; ~6 min cu 1 worker; necesită `dist/`) | Din `app/`: `npm ci && npm run build && PW_WORKERS=1 npm run test:e2e` (prima dată: `npx playwright install --with-deps chromium`) |
+| **Contracte TON** (`contracts/`) | Din `contracts/`: `npm ci && npm test` |
+
+**CI GitHub:** job-ul Playwright rulează `npm run test:e2e` cu `PW_WORKERS` din variabila de repository **`E2E_WORKERS`** (opțional; necompletată → 1 worker). Local, `verify:full` folosește în continuare `test:e2e:stable` (un worker, predictibil).
 
 ---
 

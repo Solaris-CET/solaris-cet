@@ -19,6 +19,8 @@ npm run typecheck   # TypeScript, no emit
 npm run index       # Run indexer (needs env / network as per workflow)
 ```
 
+**Verificare completă înainte de push:** vezi tabelul „Verificare monorepo” din [../CONTRIBUTING.md](../CONTRIBUTING.md) (`app/` verify + opțional E2E + `contracts/` test).
+
 Encrypt example (from repo root):
 
 ```bash
