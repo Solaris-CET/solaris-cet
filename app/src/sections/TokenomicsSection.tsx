@@ -11,12 +11,13 @@ import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useLanguage } from '../hooks/useLanguage';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
+import { CET_FIXED_SUPPLY_CAP } from '@/lib/domainPillars';
 
 const BENTO_TILE_INTERACTION =
   'transition-all duration-300 hover:!-translate-y-1 hover:!scale-100 hover:!shadow-[0_0_15px_rgba(234,179,8,0.2)]';
 
-const CET_TOTAL_SUPPLY = 9000;
-const CET_MINED_SUPPLY = 9000; // 100% mined on launch - hyper-scarce supply
+const CET_TOTAL_SUPPLY = CET_FIXED_SUPPLY_CAP;
+const CET_MINED_SUPPLY = CET_FIXED_SUPPLY_CAP; // 100% mined on launch - hyper-scarce supply
 
 const RING_RADIUS = 54;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;

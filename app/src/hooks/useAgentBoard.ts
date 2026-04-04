@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { buildSkillLatticePayload } from '@/lib/agentBoardSkillMix';
+import { AGENT_BOARD_DEPARTMENTS } from '@/lib/agentBoardDepartments';
 
 // ─── Types (shared with AgentBoard component) ─────────────────────────────
 
@@ -26,22 +27,12 @@ export interface UseAgentBoardOptions {
   generateEvent?: () => AgentEvent;
 }
 
-// ─── Department + template data ───────────────────────────────────────────
+// ─── Department + template data (headcount: solarisDepartments via agentBoardDepartments) ─
 
-const DEPARTMENTS = [
-  { name: 'Customer Ops', short: 'CX',  agents: 48_000 },
-  { name: 'Engineering',  short: 'ENG', agents: 34_000 },
-  { name: 'Sales',        short: 'SLS', agents: 27_000 },
-  { name: 'Data & AI',    short: 'AI',  agents: 21_000 },
-  { name: 'Finance',      short: 'FIN', agents: 18_000 },
-  { name: 'Marketing',    short: 'MKT', agents: 17_000 },
-  { name: 'Product',      short: 'PRD', agents: 13_000 },
-  { name: 'Security',     short: 'SEC', agents: 10_000 },
-  { name: 'Legal',        short: 'LGL', agents:  7_000 },
-  { name: 'Research',     short: 'R&D', agents:  5_000 },
-] as const;
+const DEPARTMENTS = AGENT_BOARD_DEPARTMENTS;
 
 type TemplateKind = Exclude<EventKind, 'skill'>;
+type BoardDept = (typeof DEPARTMENTS)[number];
 
 const TEMPLATES: Array<{ kind: TemplateKind; messages: string[]; collab?: true }> = [
   {
@@ -96,7 +87,7 @@ function randomDept() {
   return DEPARTMENTS[Math.floor(Math.random() * DEPARTMENTS.length)];
 }
 
-function randomAgentId(dept: (typeof DEPARTMENTS)[number]): string {
+function randomAgentId(dept: BoardDept): string {
   const id = Math.floor(Math.random() * dept.agents) + 1;
   return `${dept.short}-${String(id).padStart(5, '0')}`;
 }
