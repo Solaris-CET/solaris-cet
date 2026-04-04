@@ -1,6 +1,6 @@
 # Solaris CET — Swarm audit report
 
-**Generated:** 2026-03-31T21:19:41.137Z  
+**Generated:** 2026-04-04T13:49:09.134Z  
 **Mode:** automated static scans of `app/src` and `static/` (pattern-based).  
 **Narrative framing:** 200,000 logical checks across 10 departments — *operational metaphor only*.
 
@@ -16,7 +16,7 @@
 
 ## Automated findings
 
-- **SEC-001** (info) — `app/src/components/ui/chart.tsx` (1×): Uses dangerouslySetInnerHTML — audit each call site for XSS
+- **SEC-001** (info) — `app/src/components/CetAiSearch.tsx` (1×): Uses dangerouslySetInnerHTML — audit each call site for XSS
 
 ## Checklist categories (manual / ongoing)
 

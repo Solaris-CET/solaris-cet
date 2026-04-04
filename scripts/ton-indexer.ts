@@ -127,7 +127,7 @@ async function main(): Promise<void> {
         if (Array.isArray(json.reserves)) {
           reserveTon = BigInt(json.reserves[0]);
           reserveCet = BigInt(json.reserves[1]);
-          if (reserveTon !== null && reserveCet > 0n) {
+          if (reserveCet > 0n) {
             const priceFraction = (reserveTon * NANO) / reserveCet;
             priceTonPerCet = bigintToDecimalString(priceFraction, 9);
           }
