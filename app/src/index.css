@@ -748,8 +748,10 @@
   );
   background-size: 200% auto;
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  isolation: isolate;
   animation: shimmer 4s linear infinite;
 }
 
@@ -818,6 +820,7 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
+  isolation: isolate;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -1446,6 +1449,8 @@
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
+  isolation: isolate;
   animation: text-shimmer 4s linear infinite;
 }
 
@@ -1614,6 +1619,8 @@
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
+  isolation: isolate;
 }
 
 .text-gradient-aurora {
@@ -1621,6 +1628,8 @@
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
+  isolation: isolate;
 }
 
 /* ── Card depth shadow ───────────────────────────────────────────────────── */

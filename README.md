@@ -123,7 +123,7 @@ solaris-cet/
 | **GlowOrbs** | Ambient animated blobs per section (`gold \| cyan \| mixed` variants, `animate-orb-pulse` keyframe). |
 | **AnimatedCounter** | GSAP counter from 0 → target, triggered by IntersectionObserver; supports prefix, suffix, and decimal places. |
 | **Scroll progress bar** | Gold→cyan→gold gradient line in the navigation bar that fills as you scroll. |
-| **Loading screen** | 1.8 s overlay with animated logo + progress bar, fades out with GSAP (`LOADING_DURATION_MS = 1800`). |
+| **Loading screen** | Short overlay (~650 ms, 0 with reduced motion) with logo + progress bar, fades out with GSAP (`LOADING_DURATION_MS` in `App.tsx`). |
 | **Hero parallax** | 3-D mouse-driven parallax on the coin and stat cards (`rotateX`/`rotateY` + lerp). |
 | **HybridEngine nodes** | Click-to-expand PoW/DPoS node cards; animated SVG path (`strokeDashoffset` loop). |
 | **Tokenomics ring** | GSAP-animated radial SVG ring showing mined supply (0 % → current %). |

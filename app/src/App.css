@@ -141,11 +141,6 @@ button, .btn-gold, .btn-filled-gold {
 
 /* Responsive typography adjustments */
 @media (max-width: 640px) {
-  .section-pinned {
-    min-height: 100vh;
-    min-height: 100dvh;
-  }
-  
   .cursor-glow {
     display: none;
   }
