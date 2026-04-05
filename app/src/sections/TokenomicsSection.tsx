@@ -12,6 +12,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 import { CET_FIXED_SUPPLY_CAP } from '@/lib/domainPillars';
+import { TOKEN_DECIMALS } from '../constants/token';
 
 const BENTO_TILE_INTERACTION =
   'transition-all duration-300 hover:!-translate-y-1 hover:!scale-100 hover:!shadow-[0_0_15px_rgba(234,179,8,0.2)]';
@@ -196,7 +197,7 @@ const TokenomicsSection = () => {
                 {t.tokenomics.cetCapLabel}
               </p>
               <p className="font-mono tabular-nums text-4xl sm:text-5xl font-bold text-amber-300 tracking-tight breathing-tabular">
-                {CET_TOTAL_SUPPLY.toLocaleString()}
+                {CET_TOTAL_SUPPLY.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: TOKEN_DECIMALS })}
                 <span className="text-lg sm:text-xl text-amber-400/80 ml-2">CET</span>
               </p>
               <div className="mt-5 pt-4 border-t border-amber-500/20">
@@ -269,7 +270,7 @@ const TokenomicsSection = () => {
               </div>
               <div className="mt-3 text-center">
                 <div className="font-mono tabular-nums text-solaris-gold font-semibold">
-                  {CET_TOTAL_SUPPLY.toLocaleString()} CET
+                  {CET_TOTAL_SUPPLY.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: TOKEN_DECIMALS })} CET
                 </div>
                 <div className="hud-label text-[10px] mt-1">{t.tokenomics.supply.toUpperCase()} · TON</div>
               </div>
@@ -283,7 +284,7 @@ const TokenomicsSection = () => {
                 <div>
                   <div className="hud-label text-[10px] mb-1">CET</div>
                   <div className="font-mono tabular-nums font-bold text-lg text-cyan-300">
-                    {CET_TOTAL_SUPPLY.toLocaleString()}
+                    {CET_TOTAL_SUPPLY.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: TOKEN_DECIMALS })}
                   </div>
                 </div>
                 <a

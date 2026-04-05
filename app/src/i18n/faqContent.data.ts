@@ -1,5 +1,6 @@
 import type { FaqContent } from './faqContent.types';
 import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';
+import { TOKEN_TOTAL_SUPPLY, TOKEN_DECIMALS } from '@/constants/token';
 
 type FaqLang = 'en' | 'es' | 'zh' | 'ru' | 'ro' | 'pt' | 'de';
 
@@ -11,10 +12,10 @@ const faqEn: FaqContent = {
     'Everything you need to know about Solaris CET, from token economics to technical architecture.',
   q1: 'What is Solaris CET?',
   a1:
-    'Solaris CET (CET) is a hyper-scarce Real-World Asset token on the TON blockchain with a fixed supply of 9,000 CET. It bridges AI agents to on-chain execution through the BRAID Framework and the RAV Protocol, anchored in the agricultural and AI infrastructure of Cetățuia, Romania.',
+    `Solaris CET (CET) is a hyper-scarce Real-World Asset token on the TON blockchain with a fixed supply of ${TOKEN_TOTAL_SUPPLY.toLocaleString(undefined, { maximumFractionDigits: TOKEN_DECIMALS })} CET. It bridges AI agents to on-chain execution through the BRAID Framework and the RAV Protocol, anchored in the agricultural and AI infrastructure of Cetățuia, Romania.`,
   q2: 'What is the total supply of CET?',
   a2:
-    'The total supply is fixed at 9,000 CET — permanently. No minting, no admin keys, no inflation. This makes each token represent 0.011% of the entire global supply.',
+    `The total supply is fixed at ${TOKEN_TOTAL_SUPPLY.toLocaleString(undefined, { maximumFractionDigits: TOKEN_DECIMALS })} CET — permanently. No minting, no admin keys, no inflation. This makes each token represent 0.011% of the entire global supply.`,
   q3: 'How do I buy CET?',
   a3:
     `CET trades on DeDust DEX on the TON network. Connect a TON wallet (Tonkeeper recommended), fund it with TON, then swap TON → CET at the official DeDust pool. Always verify the contract address: ${CET_CONTRACT_ADDRESS}`,
@@ -67,10 +68,10 @@ export const faqContentByLang: Record<FaqLang, FaqContent> = {
       'Todo lo que necesitas saber sobre Solaris CET: economía del token y arquitectura técnica.',
     q1: '¿Qué es Solaris CET?',
     a1:
-      'Solaris CET (CET) es un token RWA hiperescaso en la blockchain TON con oferta fija de 9.000 CET. Conecta agentes de IA con la ejecución on-chain mediante el marco BRAID y el protocolo RAV, anclado en la infraestructura agrícola y de IA de Cetățuia, Rumanía.',
+      `Solaris CET (CET) es un token RWA hiperescaso en la blockchain TON con oferta fija de ${TOKEN_TOTAL_SUPPLY.toLocaleString(undefined, { maximumFractionDigits: TOKEN_DECIMALS })} CET. Conecta agentes de IA con la ejecución on-chain mediante el marco BRAID y el protocolo RAV, anclado en la infraestructura agrícola y de IA de Cetățuia, Rumanía.`,
     q2: '¿Cuál es el suministro total de CET?',
     a2:
-      'El suministro total es fijo en 9.000 CET — para siempre. Sin acuñación, sin claves de administrador, sin inflación. Cada token representa el 0,011% del suministro global.',
+      `El suministro total es fijo en ${TOKEN_TOTAL_SUPPLY.toLocaleString(undefined, { maximumFractionDigits: TOKEN_DECIMALS })} CET — para siempre. Sin acuñación, sin claves de administrador, sin inflación. Cada token representa el 0,011% del suministro global.`,
     q3: '¿Cómo compro CET?',
     a3:
       `CET cotiza en el DEX DeDust en TON. Conecta un wallet TON (recomendado Tonkeeper), carga TON e intercambia TON → CET en el pool oficial DeDust. Verifica siempre la dirección del contrato: ${CET_CONTRACT_ADDRESS}`,
@@ -118,10 +119,10 @@ export const faqContentByLang: Record<FaqLang, FaqContent> = {
     subtitle: '关于 Solaris CET 的代币经济与技术架构，您需要了解的核心内容。',
     q1: '什么是 Solaris CET？',
     a1:
-      'Solaris CET（CET）是 TON 上的超稀缺现实世界资产（RWA）代币，固定供应量 9,000 CET。通过 BRAID 框架与 RAV 协议将 AI 智能体与链上执行连接，锚定罗马尼亚 Cetățuia 的农业与 AI 基础设施。',
+      `Solaris CET（CET）是 TON 上的超稀缺现实世界资产（RWA）代币，固定供应量 ${TOKEN_TOTAL_SUPPLY.toLocaleString(undefined, { maximumFractionDigits: TOKEN_DECIMALS })} CET。通过 BRAID 框架与 RAV 协议将 AI 智能体与链上执行连接，锚定罗马尼亚 Cetățuia 的农业与 AI 基础设施。`,
     q2: 'CET 总供应量是多少？',
     a2:
-      '总供应量永久固定为 9,000 CET。无增发、无管理员私钥、无通胀。每个代币占全球总供应的 0.011%。',
+      `总供应量永久固定为 ${TOKEN_TOTAL_SUPPLY.toLocaleString(undefined, { maximumFractionDigits: TOKEN_DECIMALS })} CET。无增发、无管理员私钥、无通胀。每个代币占全球总供应的 0.011%。`,
     q3: '如何购买 CET？',
     a3:
       `CET 在 TON 网络的 DeDust DEX 上交易。连接 TON 钱包（推荐 Tonkeeper），充值 TON，再在官方 DeDust 池将 TON 兑换为 CET。请务必核对合约地址：${CET_CONTRACT_ADDRESS}`,
@@ -170,10 +171,10 @@ export const faqContentByLang: Record<FaqLang, FaqContent> = {
       'Всё важное о Solaris CET: токеномика и техническая архитектура.',
     q1: 'Что такое Solaris CET?',
     a1:
-      'Solaris CET (CET) — сверхдефицитный RWA-токен в сети TON с фиксированной эмиссией 9 000 CET. Связывает ИИ-агентов с ончейн-исполнением через BRAID и RAV, привязан к агро- и ИИ-инфраструктуре Cetățuia, Румыния.',
+      `Solaris CET (CET) — сверхдефицитный RWA-токен в сети TON с фиксированной эмиссией ${TOKEN_TOTAL_SUPPLY.toLocaleString(undefined, { maximumFractionDigits: TOKEN_DECIMALS })} CET. Связывает ИИ-агентов с ончейн-исполнением через BRAID и RAV, привязан к агро- и ИИ-инфраструктуре Cetățuia, Румыния.`,
     q2: 'Какой общий объём предложения CET?',
     a2:
-      'Общий объём зафиксирован навсегда: 9 000 CET. Без минтинга, без админ-ключей, без инфляции. Каждый токен = 0,011% от всего предложения.',
+      `Общий объём зафиксирован навсегда: ${TOKEN_TOTAL_SUPPLY.toLocaleString(undefined, { maximumFractionDigits: TOKEN_DECIMALS })} CET. Без минтинга, без админ-ключей, без инфляции. Каждый токен = 0,011% от всего предложения.`,
     q3: 'Как купить CET?',
     a3:
       `CET торгуется на DEX DeDust в сети TON. Подключите кошелёк TON (рекомендуется Tonkeeper), пополните TON и обменяйте TON → CET в официальном пуле. Проверяйте адрес контракта: ${CET_CONTRACT_ADDRESS}`,
@@ -222,10 +223,10 @@ export const faqContentByLang: Record<FaqLang, FaqContent> = {
       'Tot ce trebuie să știi despre Solaris CET: tokenomics și arhitectură tehnică.',
     q1: 'Ce este Solaris CET?',
     a1:
-      'Solaris CET (CET) este un token RWA hiper-rar pe blockchain-ul TON, cu ofertă fixă de 9.000 CET. Leagă agenții AI de execuția on-chain prin cadrul BRAID și protocolul RAV, ancorat în infrastructura agricolă și AI din Cetățuia, România.',
+      `Solaris CET (CET) este un token RWA hiper-rar pe blockchain-ul TON, cu ofertă fixă de ${TOKEN_TOTAL_SUPPLY.toLocaleString(undefined, { maximumFractionDigits: TOKEN_DECIMALS })} CET. Leagă agenții AI de execuția on-chain prin cadrul BRAID și protocolul RAV, ancorat în infrastructura agricolă și AI din Cetățuia, România.`,
     q2: 'Care este oferta totală de CET?',
     a2:
-      'Oferta totală este fixată permanent la 9.000 CET. Fără emisie nouă, fără chei de admin, fără inflație. Fiecare token reprezintă 0,011% din întreaga ofertă globală.',
+      `Oferta totală este fixată permanent la ${TOKEN_TOTAL_SUPPLY.toLocaleString(undefined, { maximumFractionDigits: TOKEN_DECIMALS })} CET. Fără emisie nouă, fără chei de admin, fără inflație. Fiecare token reprezintă 0,011% din întreaga ofertă globală.`,
     q3: 'Cum cumpăr CET?',
     a3:
       `CET se tranzacționează pe DEX-ul DeDust în rețeaua TON. Conectează un portofel TON (recomandat Tonkeeper), alimentează cu TON, apoi schimbă TON → CET la pool-ul oficial DeDust. Verifică mereu adresa contractului: ${CET_CONTRACT_ADDRESS}`,
@@ -274,10 +275,10 @@ export const faqContentByLang: Record<FaqLang, FaqContent> = {
       'O essencial sobre Solaris CET: tokenomics e arquitetura técnica.',
     q1: 'O que é Solaris CET?',
     a1:
-      'Solaris CET (CET) é um token RWA hiper-escasso na blockchain TON com oferta fixa de 9.000 CET. Liga agentes de IA à execução on-chain via framework BRAID e protocolo RAV, ancorado na infraestrutura agrícola e de IA de Cetățuia, Romênia.',
+      `Solaris CET (CET) é um token RWA hiper-escasso na blockchain TON com oferta fixa de ${TOKEN_TOTAL_SUPPLY.toLocaleString(undefined, { maximumFractionDigits: TOKEN_DECIMALS })} CET. Liga agentes de IA à execução on-chain via framework BRAID e protocolo RAV, ancorado na infraestrutura agrícola e de IA de Cetățuia, Romênia.`,
     q2: 'Qual é o fornecimento total de CET?',
     a2:
-      'O fornecimento total é fixo em 9.000 CET — permanentemente. Sem mint, sem chaves de admin, sem inflação. Cada token = 0,011% do fornecimento global.',
+      `O fornecimento total é fixo em ${TOKEN_TOTAL_SUPPLY.toLocaleString(undefined, { maximumFractionDigits: TOKEN_DECIMALS })} CET — permanentemente. Sem mint, sem chaves de admin, sem inflação. Cada token = 0,011% do fornecimento global.`,
     q3: 'Como compro CET?',
     a3:
       `O CET negocia na DeDust na rede TON. Ligue uma carteira TON (Tonkeeper recomendado), carregue TON e troque TON → CET no pool oficial. Verifique o endereço do contrato: ${CET_CONTRACT_ADDRESS}`,
@@ -326,10 +327,10 @@ export const faqContentByLang: Record<FaqLang, FaqContent> = {
       'Alles Wichtige zu Solaris CET: Tokenökonomie und technische Architektur.',
     q1: 'Was ist Solaris CET?',
     a1:
-      'Solaris CET (CET) ist ein hyper-seltener RWA-Token auf TON mit festem Angebot von 9.000 CET. Es verbindet KI-Agenten mit On-Chain-Ausführung über BRAID und RAV, verankert in der Agrar- und KI-Infrastruktur von Cetățuia, Rumänien.',
+      `Solaris CET (CET) ist ein hyper-seltener RWA-Token auf TON mit festem Angebot von ${TOKEN_TOTAL_SUPPLY.toLocaleString(undefined, { maximumFractionDigits: TOKEN_DECIMALS })} CET. Es verbindet KI-Agenten mit On-Chain-Ausführung über BRAID und RAV, verankert in der Agrar- und KI-Infrastruktur von Cetățuia, Rumänien.`,
     q2: 'Wie hoch ist das Gesamtangebot von CET?',
     a2:
-      'Das Gesamtangebot ist dauerhaft auf 9.000 CET fixiert. Kein Minting, keine Admin-Keys, keine Inflation. Jeder Token entspricht 0,011% des globalen Angebots.',
+      `Das Gesamtangebot ist dauerhaft auf ${TOKEN_TOTAL_SUPPLY.toLocaleString(undefined, { maximumFractionDigits: TOKEN_DECIMALS })} CET fixiert. Kein Minting, keine Admin-Keys, keine Inflation. Jeder Token entspricht 0,011% des globalen Angebots.`,
     q3: 'Wie kaufe ich CET?',
     a3:
       `CET wird auf DeDust im TON-Netz gehandelt. Verbinden Sie eine TON-Wallet (empfohlen: Tonkeeper), laden Sie TON auf und tauschen Sie im offiziellen Pool TON → CET. Vertragsadresse prüfen: ${CET_CONTRACT_ADDRESS}`,

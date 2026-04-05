@@ -13,7 +13,7 @@ export interface ChainTokenState {
   symbol: string;
   name: string;
   contract: string;
-  /** Human-readable decimal string, e.g. "9000.000000000" — or null if unknown */
+  /** Human-readable decimal string, e.g. "9000.000000" — or null if unknown */
   totalSupply: string | null;
   decimals: number;
 }

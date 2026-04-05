@@ -6,76 +6,12 @@ import GlowOrbs from '../components/GlowOrbs';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { meshStandardBurstFromKey, meshWhisperFromKey } from '@/lib/meshSkillFeed';
 import { useLanguage } from '../hooks/useLanguage';
-import { CET_FIXED_SUPPLY_CAP, ENTERPRISE_DEPARTMENT_LANES, TASK_AGENT_MESH_TOTAL } from '@/lib/domainPillars';
+import { CET_FIXED_SUPPLY_CAP, TASK_AGENT_MESH_TOTAL } from '@/lib/domainPillars';
+import { TOKEN_DECIMALS } from '../constants/token';
 
 /** Overrides global `.bento-card:hover` (translate/scale/shadow) with the bento gold glow spec. */
 const BENTO_TILE_INTERACTION =
   'transition-all duration-300 hover:!-translate-y-1 hover:!scale-100 hover:!shadow-[0_0_15px_rgba(234,179,8,0.2)]';
-
-// ─── Stat data ────────────────────────────────────────────────────────────
-
-const STATS = [
-  {
-    id: 'agents',
-    value: TASK_AGENT_MESH_TOTAL,
-    label: 'Task-specialist AI agents',
-    sublabel: `~200k narrow agents for routing, retrieval & validation · ${ENTERPRISE_DEPARTMENT_LANES} departments · orchestrated for CET AI`,
-    suffix: '',
-    icon: Users,
-    color: 'text-solaris-gold',
-    border: 'border-solaris-gold/20',
-    glow: 'rgba(242,201,76,0.12)',
-    size: 'lg',          // large bento cell
-    accentClass: 'text-gradient-gold',
-    badge: 'LIVE',
-    badgeColor: 'bg-emerald-400/10 text-emerald-400 border-emerald-400/30',
-  },
-  {
-    id: 'supply',
-    value: CET_FIXED_SUPPLY_CAP,
-    label: 'Fixed Total Supply',
-    sublabel: 'Forever. No minting. No inflation. Each CET = 0.011% of all value.',
-    suffix: ' CET',
-    icon: Coins,
-    color: 'text-solaris-cyan',
-    border: 'border-solaris-cyan/20',
-    glow: 'rgba(46,231,255,0.10)',
-    size: 'sm',
-    accentClass: 'text-gradient-cyan',
-    badge: 'SCARCE',
-    badgeColor: 'bg-solaris-cyan/10 text-solaris-cyan border-solaris-cyan/30',
-  },
-  {
-    id: 'tps',
-    value: 100_000,
-    label: 'Max TPS on TON',
-    sublabel: '100× faster than Ethereum · 2s finality',
-    suffix: '',
-    icon: Zap,
-    color: 'text-purple-400',
-    border: 'border-purple-400/20',
-    glow: 'rgba(139,92,246,0.10)',
-    size: 'sm',
-    accentClass: 'text-gradient-aurora',
-    badge: 'FASTEST',
-    badgeColor: 'bg-purple-400/10 text-purple-400 border-purple-400/30',
-  },
-  {
-    id: 'years',
-    value: 90,
-    label: 'Year Mining Horizon',
-    sublabel: 'Decaying reward curve · Bitcoin-style emission',
-    suffix: '',
-    icon: Clock,
-    color: 'text-emerald-400',
-    border: 'border-emerald-400/20',
-    glow: 'rgba(16,185,129,0.10)',
-    size: 'sm',
-    accentClass: '',
-    badge: 'LONG TERM',
-    badgeColor: 'bg-emerald-400/10 text-emerald-400 border-emerald-400/30',
-  },
-] as const;
 
 const TRUST_BADGES = [
   { icon: Shield, label: 'Cyberscope Audited' },
@@ -94,6 +30,71 @@ const StatsBento = () => {
   const { t } = useLanguage();
   const sectionRef = useRef<HTMLDivElement>(null);
   const bentoRef   = useRef<HTMLDivElement>(null);
+
+  const stats = [
+    {
+      id: 'agents',
+      value: TASK_AGENT_MESH_TOTAL,
+      label: t.statsBento.labelAgents,
+      sublabel: t.statsBento.sublabelAgents,
+      suffix: '',
+      icon: Users,
+      color: 'text-solaris-gold',
+      border: 'border-solaris-gold/20',
+      glow: 'rgba(242,201,76,0.12)',
+      size: 'lg',          // large bento cell
+      accentClass: 'text-gradient-gold',
+      badge: t.statsBento.badgeLive,
+      badgeColor: 'bg-emerald-400/10 text-emerald-400 border-emerald-400/30',
+    },
+    {
+      id: 'supply',
+      value: CET_FIXED_SUPPLY_CAP,
+      label: t.statsBento.labelSupply,
+      sublabel: t.statsBento.sublabelSupply,
+      suffix: ' CET',
+      icon: Coins,
+      color: 'text-solaris-cyan',
+      border: 'border-solaris-cyan/20',
+      glow: 'rgba(46,231,255,0.10)',
+      size: 'sm',
+      accentClass: 'text-gradient-cyan',
+      badge: t.statsBento.badgeScarce,
+      badgeColor: 'bg-solaris-cyan/10 text-solaris-cyan border-solaris-cyan/30',
+    },
+    {
+      id: 'tps',
+      value: 100_000,
+      label: t.statsBento.labelTps,
+      sublabel: t.statsBento.sublabelTps,
+      suffix: '',
+      icon: Zap,
+      color: 'text-purple-400',
+      border: 'border-purple-400/20',
+      glow: 'rgba(139,92,246,0.10)',
+      size: 'sm',
+      accentClass: 'text-gradient-aurora',
+      badge: t.statsBento.badgeFastest,
+      badgeColor: 'bg-purple-400/10 text-purple-400 border-purple-400/30',
+    },
+    {
+      id: 'years',
+      value: 90,
+      label: t.statsBento.labelYears,
+      sublabel: t.statsBento.sublabelYears,
+      suffix: '',
+      icon: Clock,
+      color: 'text-emerald-400',
+      border: 'border-emerald-400/20',
+      glow: 'rgba(16,185,129,0.10)',
+      size: 'sm',
+      accentClass: '',
+      badge: t.statsBento.badgeLongTerm,
+      badgeColor: 'bg-emerald-400/10 text-emerald-400 border-emerald-400/30',
+    },
+  ] as const;
+
+  const [agentStat, ...smallStats] = stats;
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -121,8 +122,6 @@ const StatsBento = () => {
     return () => ctx.revert();
   }, []);
 
-  const [agentStat, ...smallStats] = STATS;
-
   return (
     <section
       id="stats"
@@ -143,7 +142,7 @@ const StatsBento = () => {
         {/* Section tag */}
         <div className="flex items-center gap-3 mb-10 justify-center md:justify-start">
           <span className="live-dot" />
-          <span className="hud-label text-solaris-gold">NETWORK AT A GLANCE</span>
+          <span className="hud-label text-solaris-gold">{t.statsBento.networkAtAGlance}</span>
         </div>
 
         {/* Bento grid — asymmetric 12-col layout */}
@@ -190,7 +189,7 @@ const StatsBento = () => {
               href="#team"
               className="mt-6 inline-flex items-center gap-2 text-solaris-gold text-sm font-semibold hover:gap-3 transition-all duration-200"
             >
-              Meet the agents <ArrowRight className="w-4 h-4 text-solaris-gold" />
+              {t.statsBento.meetAgents} <ArrowRight className="w-4 h-4 text-solaris-gold" />
             </a>
           </div>
 
@@ -226,6 +225,7 @@ const StatsBento = () => {
                         end={stat.value}
                         duration={2}
                         suffix={stat.suffix}
+                        decimals={stat.id === 'supply' ? TOKEN_DECIMALS : 0}
                         className={stat.accentClass || stat.color}
                         meshTitleKey={`statsBento|${stat.id}`}
                       />
@@ -242,7 +242,7 @@ const StatsBento = () => {
             <div
               className={`bento-stat bento-card p-5 border border-white/5 shadow-depth flex flex-col md:flex-row items-center gap-5 ${BENTO_TILE_INTERACTION}`}
             >
-              <p className="text-solaris-muted text-xs font-mono uppercase tracking-widest shrink-0">Verified by</p>
+              <p className="text-solaris-muted text-xs font-mono uppercase tracking-widest shrink-0">{t.statsBento.verifiedBy}</p>
               <div className="flex flex-wrap items-center gap-4 flex-1">
                 {TRUST_BADGES.map(({ icon: Icon, label }) => (
                   <span key={label} className="inline-flex items-center gap-2 text-xs font-semibold text-solaris-text">

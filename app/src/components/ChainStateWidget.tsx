@@ -14,6 +14,7 @@ import { Database, ExternalLink } from 'lucide-react';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 import { chainStatePromise } from '../lib/chain-state';
 import type { ChainState } from '../lib/chain-state';
+import { TOKEN_DECIMALS } from '../constants/token';
 
 // ── Inner component (suspends until chainStatePromise resolves) ──────────────
 
@@ -35,7 +36,7 @@ function ChainStateContent() {
   const rows: { label: string; value: string; color: string }[] = [
     {
       label: 'Total Supply',
-      value: token.totalSupply ? `${parseFloat(token.totalSupply).toLocaleString()} ${token.symbol}` : '—',
+      value: token.totalSupply ? `${parseFloat(token.totalSupply).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: TOKEN_DECIMALS })} ${token.symbol}` : '—',
       color: 'text-solaris-gold',
     },
     {

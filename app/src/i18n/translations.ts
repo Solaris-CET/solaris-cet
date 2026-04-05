@@ -292,6 +292,42 @@ export interface Translations {
     btcSReference: string;
     cetCapLabel: string;
   };
+  /** Stats bento labels. */
+  statsBento: {
+    networkAtAGlance: string;
+    meetAgents: string;
+    verifiedBy: string;
+    labelAgents: string;
+    sublabelAgents: string;
+    labelSupply: string;
+    sublabelSupply: string;
+    labelTps: string;
+    sublabelTps: string;
+    labelYears: string;
+    sublabelYears: string;
+    badgeLive: string;
+    badgeScarce: string;
+    badgeFastest: string;
+    badgeLongTerm: string;
+  };
+  /** AI Team section labels. */
+  aiTeam: {
+    corporateStructure: string;
+    title: string;
+    titleAccent: string;
+    description: string;
+    totalWorkforce: string;
+    workforceSublabel: string;
+    departments: string;
+    departmentsSublabel: string;
+    uptime: string;
+    uptimeSublabel: string;
+    agentsLabel: string;
+    curatedGenes: string;
+    parityTitle: string;
+    parityDescription: string;
+    liveActivityBadge: string;
+  };
   /** Global competition matrix + charts (`CompetitionSection`). */
   competitionSection: {
     badge: string;
@@ -643,6 +679,43 @@ const translations: Record<LangCode, Translations> = {
       ravStack: 'Reason · Act · Verify — Grok × Gemini · IPFS audit trail',
       btcSReference: 'BTC-S reference supply',
       cetCapLabel: 'CET hard cap (TON)',
+    },
+    statsBento: {
+      networkAtAGlance: 'NETWORK AT A GLANCE',
+      meetAgents: 'Meet the agents',
+      verifiedBy: 'Verified by',
+      labelAgents: 'Task-specialist AI agents',
+      sublabelAgents:
+        '~200k narrow agents for routing, retrieval & validation · 10 departments · orchestrated for CET AI',
+      labelSupply: 'Fixed Total Supply',
+      sublabelSupply: 'Forever. No minting. No inflation. Each CET = 0.011% of all value.',
+      labelTps: 'Max TPS on TON',
+      sublabelTps: '100× faster than Ethereum · 2s finality',
+      labelYears: 'Year Mining Horizon',
+      sublabelYears: 'Decaying reward curve · Bitcoin-style emission',
+      badgeLive: 'LIVE',
+      badgeScarce: 'SCARCE',
+      badgeFastest: 'FASTEST',
+      badgeLongTerm: 'LONG TERM',
+    },
+    aiTeam: {
+      corporateStructure: 'AI CORPORATE STRUCTURE',
+      title: '200,000 Agents.',
+      titleAccent: 'Zero Marginal Cost.',
+      description:
+        'Large enterprises deploy hundreds of thousands of employees — now augmented by AI. Solaris CET matches that scale entirely through autonomous agents: 200,000 specialists operating 24/7, across 10 departments, at the speed of thought.',
+      totalWorkforce: 'TOTAL WORKFORCE',
+      workforceSublabel: 'Autonomous Agents Deployed',
+      departments: 'DEPARTMENTS',
+      departmentsSublabel: 'Enterprise Divisions',
+      uptime: 'UPTIME',
+      uptimeSublabel: 'Always On — No Sleep, No Breaks',
+      agentsLabel: 'AGENTS',
+      curatedGenes: 'Curated genes',
+      parityTitle: 'COMPETITIVE PARITY',
+      parityDescription:
+        'Fortune 500 companies deploy 100,000–300,000 employees — increasingly augmented by AI. Solaris CET matches that scale with 200,000 autonomous agents: zero HR overhead, zero downtime, infinite parallelism.',
+      liveActivityBadge: 'AGENTS TALKING · LEARNING · SOLVING — RIGHT NOW',
     },
     cetAi: {
       title: 'Solaris CET AI',
@@ -1007,6 +1080,43 @@ const translations: Record<LangCode, Translations> = {
       btcSReference: 'Suministro de referencia BTC-S',
       cetCapLabel: 'Tope CET (TON)',
     },
+    statsBento: {
+      networkAtAGlance: 'RED DE UN VISTAZO',
+      meetAgents: 'Conoce a los agentes',
+      verifiedBy: 'Verificado por',
+      labelAgents: 'Agentes IA especialistas',
+      sublabelAgents:
+        '~200k agentes para enrutamiento, recuperación y validación · 10 departamentos · orquestados para CET AI',
+      labelSupply: 'Suministro Total Fijo',
+      sublabelSupply: 'Para siempre. Sin acuñación. Sin inflación. Cada CET = 0.011% del valor.',
+      labelTps: 'TPS Máximo en TON',
+      sublabelTps: '100× más rápido que Ethereum · 2s finalización',
+      labelYears: 'Horizonte de Minería 90 Años',
+      sublabelYears: 'Curva de recompensa decreciente · emisión estilo Bitcoin',
+      badgeLive: 'EN VIVO',
+      badgeScarce: 'ESCASO',
+      badgeFastest: 'RÁPIDO',
+      badgeLongTerm: 'LARGO PLAZO',
+    },
+    aiTeam: {
+      corporateStructure: 'ESTRUCTURA CORPORATIVA IA',
+      title: '200.000 Agentes.',
+      titleAccent: 'Costo Marginal Cero.',
+      description:
+        'Las grandes empresas despliegan cientos de miles de empleados — ahora aumentados por IA. Solaris CET iguala esa escala íntegramente con agentes autónomos: 200.000 especialistas operando 24/7, en 10 departamentos.',
+      totalWorkforce: 'FUERZA LABORAL TOTAL',
+      workforceSublabel: 'Agentes Autónomos Desplegados',
+      departments: 'DEPARTAMENTOS',
+      departmentsSublabel: 'Divisiones Enterprise',
+      uptime: 'TIEMPO DE ACTIVIDAD',
+      uptimeSublabel: 'Siempre Activo — Sin Sueño ni Descansos',
+      agentsLabel: 'AGENTES',
+      curatedGenes: 'Genes curados',
+      parityTitle: 'PARIDAD COMPETITIVA',
+      parityDescription:
+        'Las empresas Fortune 500 despliegan 100.000–300.000 empleados. Solaris CET alcanza esa escala con 200.000 agentes autónomos: cero costos de RR.HH., cero inactividad.',
+      liveActivityBadge: 'AGENTES HABLANDO · APRENDIENDO · RESOLVIENDO — AHORA MISMO',
+    },
     cetAi: {
       title: 'CET AI Solaris',
       subtitle: 'Grok × Gemini · RAV · API en vivo si está desplegado · malla de agentes de tarea',
@@ -1361,6 +1471,40 @@ const translations: Record<LangCode, Translations> = {
       ravStack: '推理 · 执行 · 验证 — Grok × Gemini · IPFS 可审计',
       btcSReference: 'BTC-S 参考供应量',
       cetCapLabel: 'CET 硬顶（TON）',
+    },
+    statsBento: {
+      networkAtAGlance: '网络概览',
+      meetAgents: '会见智能体',
+      verifiedBy: '验证方',
+      labelAgents: '任务型 AI 智能体',
+      sublabelAgents: '~200k 细分智能体，负责路由、检索与验证 · 10 个部门',
+      labelSupply: '固定总供应量',
+      sublabelSupply: '永久固定。无铸造。无通胀。每个 CET = 总价值的 0.011%。',
+      labelTps: 'TON 最大 TPS',
+      sublabelTps: '比以太坊快 100 倍 · 2s 确认',
+      labelYears: '90 年挖矿周期',
+      sublabelYears: '衰减奖励曲线 · 类比特币减半机制',
+      badgeLive: '实时',
+      badgeScarce: '稀缺',
+      badgeFastest: '极速',
+      badgeLongTerm: '长期',
+    },
+    aiTeam: {
+      corporateStructure: 'AI 企业架构',
+      title: '200,000 智能体。',
+      titleAccent: '零边际成本。',
+      description: '大型企业部署数十万员工。Solaris CET 通过自主智能体实现同等规模：200,000 名专家 24/7 全天候运作。',
+      totalWorkforce: '总劳动力',
+      workforceSublabel: '已部署自主智能体',
+      departments: '部门',
+      departmentsSublabel: '企业分部',
+      uptime: '运行时间',
+      uptimeSublabel: '始终在线 — 无需睡眠或休息',
+      agentsLabel: '智能体',
+      curatedGenes: '精选基因',
+      parityTitle: '竞争均势',
+      parityDescription: '财富 500 强企业部署 10-30 万名员工。Solaris CET 以 20 万名自主智能体达到此规模。',
+      liveActivityBadge: '智能体交流 · 学习 · 解决 — 就在此刻',
     },
     cetAi: {
       title: 'Solaris CET AI',
@@ -1723,6 +1867,40 @@ const translations: Record<LangCode, Translations> = {
       ravStack: 'Reason · Act · Verify — Grok × Gemini · аудит IPFS',
       btcSReference: 'Эталонное предложение BTC-S',
       cetCapLabel: 'Потолок CET (TON)',
+    },
+    statsBento: {
+      networkAtAGlance: 'ОБЗОР СЕТИ',
+      meetAgents: 'Встречайте агентов',
+      verifiedBy: 'Проверено',
+      labelAgents: 'Специализированные ИИ-агенты',
+      sublabelAgents: '~200k агентов для маршрутизации, поиска и проверки · 10 отделов',
+      labelSupply: 'Фиксированная эмиссия',
+      sublabelSupply: 'Навсегда. Без минта. Без инфляции. Каждый CET = 0.011% от стоимости.',
+      labelTps: 'Макс. TPS на TON',
+      sublabelTps: 'в 100 раз быстрее Ethereum · финализация 2с',
+      labelYears: '90-летний горизонт майнинга',
+      sublabelYears: 'Затухающая кривая наград · эмиссия в стиле Bitcoin',
+      badgeLive: 'LIVE',
+      badgeScarce: 'РЕДКИЙ',
+      badgeFastest: 'БЫСТРЫЙ',
+      badgeLongTerm: 'ДОЛГОСРОК',
+    },
+    aiTeam: {
+      corporateStructure: 'КОРПОРАТИВНАЯ СТРУКТУРА ИИ',
+      title: '200 000 агентов.',
+      titleAccent: 'Нулевые предельные издержки.',
+      description: 'Крупные предприятия нанимают сотни тысяч сотрудников. Solaris CET достигает того же масштаба с автономными агентами: 200 000 специалистов 24/7.',
+      totalWorkforce: 'ОБЩИЙ ШТАТ',
+      workforceSublabel: 'Развернуто автономных агентов',
+      departments: 'ОТДЕЛЫ',
+      departmentsSublabel: 'Корпоративные подразделения',
+      uptime: 'АПТАЙМ',
+      uptimeSublabel: 'Всегда в сети — без сна и перерывов',
+      agentsLabel: 'АГЕНТЫ',
+      curatedGenes: 'Отобранные гены',
+      parityTitle: 'КОНКУРЕНТНЫЙ ПАРИТЕТ',
+      parityDescription: 'Компании Fortune 500 нанимают 100-300 тыс. человек. Solaris CET достигает этого масштаба с 200 тыс. агентов.',
+      liveActivityBadge: 'АГЕНТЫ ОБЩАЮТСЯ · УЧАТСЯ · РЕШАЮТ — ПРЯМО СЕЙЧАС',
     },
     cetAi: {
       title: 'Solaris CET AI',
@@ -2087,6 +2265,43 @@ const translations: Record<LangCode, Translations> = {
       btcSReference: 'Ofertă de referință BTC-S',
       cetCapLabel: 'Plafon CET (TON)',
     },
+    statsBento: {
+      networkAtAGlance: 'REȚEAUA PE SCURT',
+      meetAgents: 'Întâlnește agenții',
+      verifiedBy: 'Verificat de',
+      labelAgents: 'Agenți AI specializați',
+      sublabelAgents:
+        '~200k agenți pentru rutare, recuperare și validare · 10 departamente · orchestrați pentru CET AI',
+      labelSupply: 'Ofertă Totală Fixă',
+      sublabelSupply: 'Pentru totdeauna. Fără mint. Fără inflație. Fiecare CET = 0.011% din valoare.',
+      labelTps: 'TPS Maxim pe TON',
+      sublabelTps: 'de 100× mai rapid decât Ethereum · finalitate 2s',
+      labelYears: 'Orizont Minare 90 Ani',
+      sublabelYears: 'Curbă de recompensă descrescătoare · emisie tip Bitcoin',
+      badgeLive: 'LIVE',
+      badgeScarce: 'RAR',
+      badgeFastest: 'RAPID',
+      badgeLongTerm: 'TERMEN LUNG',
+    },
+    aiTeam: {
+      corporateStructure: 'STRUCTURĂ CORPORATIVĂ AI',
+      title: '200.000 de Agenți.',
+      titleAccent: 'Cost Marginal Zero.',
+      description:
+        'Marile întreprinderi folosesc sute de mii de angajați — acum augmentați de AI. Solaris CET egalează acea scară integral prin agenți autonomi: 200.000 de specialiști care operează 24/7, în 10 departamente, la viteza gândului.',
+      totalWorkforce: 'FORȚĂ DE MUNCĂ TOTALĂ',
+      workforceSublabel: 'Agenți Autonomi Deployați',
+      departments: 'DEPARTAMENTE',
+      departmentsSublabel: 'Divizii Enterprise',
+      uptime: 'TIMP DE FUNCȚIONARE',
+      uptimeSublabel: 'Mereu Activ — Fără Somn, Fără Pauze',
+      agentsLabel: 'AGENȚI',
+      curatedGenes: 'Gene curatate',
+      parityTitle: 'PARITATE COMPETITIVĂ',
+      parityDescription:
+        'Companiile Fortune 500 deployează 100.000–300.000 de angajați. Solaris CET atinge acea scară cu 200.000 de agenți autonomi: zero costuri HR, zero downtime, paralelism infinit.',
+      liveActivityBadge: 'AGENȚI VORBIND · ÎNVĂȚÂND · REZOLVÂND — CHIAR ACUM',
+    },
     cetAi: {
       title: 'Solaris CET AI',
       subtitle: 'Grok × Gemini · RAV · API live la deploy · rețea agenți de tasking',
@@ -2450,6 +2665,43 @@ const translations: Record<LangCode, Translations> = {
       btcSReference: 'Oferta de referência BTC-S',
       cetCapLabel: 'Teto CET (TON)',
     },
+    statsBento: {
+      networkAtAGlance: 'VISÃO GERAL DA REDE',
+      meetAgents: 'Conheça os agentes',
+      verifiedBy: 'Verificado por',
+      labelAgents: 'Agentes IA especialistas',
+      sublabelAgents:
+        '~200k agentes especializados para roteamento, recuperação e validação · 10 departamentos',
+      labelSupply: 'Oferta Total Fixa',
+      sublabelSupply: 'Para sempre. Sem cunhagem. Sem inflação. Cada CET = 0,011% do valor.',
+      labelTps: 'TPS Máximo em TON',
+      sublabelTps: '100× mais rápido que Ethereum · finalização em 2s',
+      labelYears: 'Horizonte de Mineração de 90 Anos',
+      sublabelYears: 'Curva de recompensa decrescente · emissão estilo Bitcoin',
+      badgeLive: 'AO VIVO',
+      badgeScarce: 'ESCASSO',
+      badgeFastest: 'MAIS RÁPIDO',
+      badgeLongTerm: 'LONGO PRAZO',
+    },
+    aiTeam: {
+      corporateStructure: 'ESTRUTURA CORPORATIVA IA',
+      title: '200.000 Agentes.',
+      titleAccent: 'Custo Marginal Zero.',
+      description:
+        'Grandes empresas implantam centenas de milhares de funcionários. A Solaris CET iguala essa escala com agentes autônomos: 200.000 especialistas operando 24/7.',
+      totalWorkforce: 'FORÇA DE TRABALHO TOTAL',
+      workforceSublabel: 'Agentes Autônomos Implantados',
+      departments: 'DEPARTAMENTOS',
+      departmentsSublabel: 'Divisões Empresariais',
+      uptime: 'TEMPO DE ATIVIDADE',
+      uptimeSublabel: 'Sempre Ativo — Sem Sono nem Pausas',
+      agentsLabel: 'AGENTES',
+      curatedGenes: 'Genes curados',
+      parityTitle: 'PARIDADE COMPETITIVA',
+      parityDescription:
+        'Empresas Fortune 500 implantam 100.000–300.000 funcionários. A Solaris CET atinge essa escala com 200.000 agentes autônomos.',
+      liveActivityBadge: 'AGENTES FALANDO · APRENDENDO · RESOLVENDO — AGORA MESMO',
+    },
     cetAi: {
       title: 'CET AI Solaris',
       subtitle: 'Grok × Gemini · RAV · API ao vivo quando implantado · malha de agentes de tarefa',
@@ -2812,6 +3064,43 @@ const translations: Record<LangCode, Translations> = {
       ravStack: 'Reason · Act · Verify — Grok × Gemini · IPFS-Audit-Trail',
       btcSReference: 'BTC-S Referenzangebot',
       cetCapLabel: 'CET-Obergrenze (TON)',
+    },
+    statsBento: {
+      networkAtAGlance: 'NETZWERK IM ÜBERBLICK',
+      meetAgents: 'Treffen Sie die Agenten',
+      verifiedBy: 'Verifiziert durch',
+      labelAgents: 'KI-Spezialisten-Agenten',
+      sublabelAgents:
+        '~200k spezialisierte Agenten für Routing, Retrieval & Validierung · 10 Abteilungen',
+      labelSupply: 'Festes Gesamtangebot',
+      sublabelSupply: 'Für immer. Kein Minting. Keine Inflation. Jedes CET = 0,011% des Wertes.',
+      labelTps: 'Max. TPS auf TON',
+      sublabelTps: '100× schneller als Ethereum · 2s Finalität',
+      labelYears: '90 Jahre Mining-Horizont',
+      sublabelYears: 'Abnehmende Belohnungskurve · Bitcoin-ähnliche Emission',
+      badgeLive: 'LIVE',
+      badgeScarce: 'KNAPP',
+      badgeFastest: 'SCHNELLSTE',
+      badgeLongTerm: 'LANGFRISTIG',
+    },
+    aiTeam: {
+      corporateStructure: 'KI-UNTERNEHMENSSTRUKTUR',
+      title: '200.000 Agenten.',
+      titleAccent: 'Null Grenzkosten.',
+      description:
+        'Große Unternehmen setzen Hunderttausende Mitarbeiter ein. Solaris CET erreicht diesen Umfang mit autonomen Agenten: 200.000 Spezialisten im 24/7-Betrieb.',
+      totalWorkforce: 'GESAMTBELEGSCHAFT',
+      workforceSublabel: 'Autonome Agenten im Einsatz',
+      departments: 'ABTEILUNGEN',
+      departmentsSublabel: 'Unternehmensbereiche',
+      uptime: 'BETRIEBSZEIT',
+      uptimeSublabel: 'Immer aktiv — kein Schlaf, keine Pausen',
+      agentsLabel: 'AGENTEN',
+      curatedGenes: 'Kuratierte Gene',
+      parityTitle: 'WETTBEWERBSPARITÄT',
+      parityDescription:
+        'Fortune-500-Unternehmen setzen 100.000–300.000 Mitarbeiter ein. Solaris CET erreicht diesen Umfang mit 200.000 autonomen Agenten.',
+      liveActivityBadge: 'AGENTEN SPRECHEN · LERNEN · LÖSEN — JETZT GERADE',
     },
     cetAi: {
       title: 'Solaris CET AI',

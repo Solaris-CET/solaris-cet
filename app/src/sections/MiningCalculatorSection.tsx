@@ -6,6 +6,7 @@ import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { meshStandardBurstFromKey, meshWhisperFromKey } from '@/lib/meshSkillFeed';
 import { useLanguage } from '../hooks/useLanguage';
 
+const BTC_S_SYMBOL = 'BTC-S';
 
 type DeviceType = 'smartphone' | 'laptop' | 'desktop' | 'node';
 
@@ -30,7 +31,7 @@ const LIVE_STATS_ROWS = [
   { id: 'networkHashrate' as const, value: '2.4 EH/s', change: '+12%' },
   { id: 'activeMiners' as const, value: '18,420', change: '+5%' },
   { id: 'avgBlockTime' as const, value: '2.0s', change: 'Stable' },
-  { id: 'rewardPerBlock' as const, value: '6.25 BTC-S', change: '-2%' },
+  { id: 'rewardPerBlock' as const, value: `6.25 ${BTC_S_SYMBOL}`, change: '-2%' },
 ];
 
 const MiningCalculatorSection = () => {
@@ -315,11 +316,11 @@ const MiningCalculatorSection = () => {
               <div className="p-5 rounded-xl bg-white/5">
                 <div className="hud-label mb-2">{t.miningCalculator.dailyYieldLabel}</div>
                 <div className="flex items-baseline gap-2">
-                  <span className="font-display font-bold text-3xl lg:text-4xl text-solaris-gold">
-                    {results.daily.toFixed(4)}
-                  </span>
-                  <span className="text-solaris-muted">{t.miningCalculator.unitBtcS}</span>
-                </div>
+                    <span className="font-display font-bold text-3xl lg:text-4xl text-solaris-gold">
+                      {results.daily.toFixed(4)}
+                    </span>
+                    <span className="text-solaris-muted">{BTC_S_SYMBOL}</span>
+                  </div>
                 <p
                   className="mt-3 text-[9px] font-mono text-fuchsia-200/60 leading-snug line-clamp-2 border-t border-fuchsia-500/10 pt-2"
                   title={meshWhisperFromKey('miningCalc|yield|daily')}
@@ -331,11 +332,11 @@ const MiningCalculatorSection = () => {
               <div className="p-5 rounded-xl bg-white/5">
                 <div className="hud-label mb-2">{t.miningCalculator.monthlyProjectionLabel}</div>
                 <div className="flex items-baseline gap-2">
-                  <span className="font-display font-bold text-3xl lg:text-4xl text-solaris-cyan">
-                    {results.monthly.toFixed(2)}
-                  </span>
-                  <span className="text-solaris-muted">{t.miningCalculator.unitBtcS}</span>
-                </div>
+                    <span className="font-display font-bold text-3xl lg:text-4xl text-solaris-cyan">
+                      {results.monthly.toFixed(2)}
+                    </span>
+                    <span className="text-solaris-muted">{BTC_S_SYMBOL}</span>
+                  </div>
                 <p
                   className="mt-3 text-[9px] font-mono text-fuchsia-200/60 leading-snug line-clamp-2 border-t border-fuchsia-500/10 pt-2"
                   title={meshWhisperFromKey('miningCalc|yield|monthly')}

@@ -2,6 +2,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { Coins } from 'lucide-react';
 import { CET_FIXED_SUPPLY_CAP } from '@/lib/domainPillars';
 import { skillSeedFromLabel, standardSkillBurst } from '@/lib/meshSkillFeed';
+import { TOKEN_DECIMALS } from '../constants/token';
 
 const BENTO_TILE_INTERACTION =
   'transition-all duration-300 hover:!-translate-y-1 hover:!scale-100 hover:!shadow-[0_0_15px_rgba(234,179,8,0.2)]';
@@ -31,7 +32,7 @@ const CustomTooltip = ({ active, payload }: TooltipProps) => {
       <div className="font-bold mb-1" style={{ color: d.color }}>{d.name}</div>
       <div className="text-solaris-text text-base font-bold">{d.pct.toFixed(2)}%</div>
       <div className="text-solaris-muted mt-1 text-[10px] leading-relaxed">{d.description}</div>
-      <div className="text-solaris-muted mt-1">{((d.pct / 100) * CET_FIXED_SUPPLY_CAP).toFixed(0)} CET</div>
+      <div className="text-solaris-muted mt-1">{((d.pct / 100) * CET_FIXED_SUPPLY_CAP).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: TOKEN_DECIMALS })} CET</div>
       <p
         className="mt-2 pt-2 border-t border-fuchsia-500/20 text-[9px] text-fuchsia-200/85 leading-snug line-clamp-3"
         title={skill}
@@ -82,7 +83,9 @@ const TokenomicsChart = () => {
           </ResponsiveContainer>
           {/* Center label */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none drop-shadow-[0_0_12px_rgba(242,201,76,0.35)]">
-            <div className="font-mono tabular-nums font-black text-2xl text-gradient-gold">9,000</div>
+            <div className="font-mono tabular-nums font-black text-2xl text-gradient-gold">
+              {CET_FIXED_SUPPLY_CAP.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: TOKEN_DECIMALS })}
+            </div>
             <div className="text-solaris-gold/60 text-[10px] font-mono tracking-widest font-bold">TOTAL CET</div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { chainStatePromise } from '@/lib/chain-state';
+import { fromNanoCET } from '../constants/token';
 
 import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';
 const REFRESH_INTERVAL_MS = 60_000;
@@ -70,8 +71,8 @@ export function useLivePoolData(): PoolData {
 
       // Use reserves from state.json (cached/indexed)
       const { pool } = state;
-      const reserveTon = pool.reserveTon ? parseFloat(pool.reserveTon) : null;
-      const reserveCet = pool.reserveCet ? parseFloat(pool.reserveCet) : null;
+      const reserveTon = pool.reserveTon ? parseFloat(pool.reserveTon) / 1e9 : null;
+      const reserveCet = pool.reserveCet ? parseFloat(pool.reserveCet) : null; // Raw nanoCET
 
       // Look up CET price directly from prices endpoint
       const cetAddressLower = CET_CONTRACT_ADDRESS.toLowerCase();
@@ -84,9 +85,10 @@ export function useLivePoolData(): PoolData {
       let volume24hUsd: number | null = null;
 
       if (reserveTon !== null && reserveCet !== null && tonPriceUsd) {
+        const reserveCetReadable = fromNanoCET(reserveCet);
         // Calculate CET price from reserves if not available in prices endpoint
-        if (priceUsd === null && reserveCet > 0) {
-          priceUsd = (reserveTon / reserveCet) * tonPriceUsd;
+        if (priceUsd === null && reserveCetReadable > 0) {
+          priceUsd = (reserveTon / reserveCetReadable) * tonPriceUsd;
         }
 
         // TVL = 2× the TON side (symmetric pool)

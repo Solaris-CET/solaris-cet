@@ -20,13 +20,15 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { CET_CONTRACT_ADDRESS } from '../app/src/lib/cetContract';
 import { DEDUST_POOL_ADDRESS } from '../app/src/lib/dedustUrls';
+import { TOKEN_NAME, TOKEN_SYMBOL, TOKEN_DECIMALS } from '../app/src/constants/token';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const TON_ENDPOINT = process.env['TON_RPC_ENDPOINT'] ?? 'https://toncenter.com/api/v2/jsonRPC';
 
-// Number of nano-units per whole token (both TON and CET use 9 decimals)
-const NANO = 1_000_000_000n;
+// Number of nano-units per whole token (TON uses 9 decimals)
+const NANO_TON = 1_000_000_000n;
+const NANO_CET = BigInt(10 ** TOKEN_DECIMALS);
 
 // ── TON client setup ─────────────────────────────────────────────────────────
 
@@ -75,9 +77,9 @@ async function main(): Promise<void> {
 
   // ── 1. Query CET jetton master for total supply ───────────────────────────
   let totalSupply: bigint | null = null;
-  const symbol  = 'CET';
-  const name    = 'SOLARIS CET';
-  const decimals = 9;
+  const symbol  = TOKEN_SYMBOL;
+  const name    = TOKEN_NAME;
+  const decimals = TOKEN_DECIMALS;
 
   try {
     const jettonRoot = client.open(JettonRoot.createFromAddress(cetAddress));
@@ -109,7 +111,9 @@ async function main(): Promise<void> {
     reserveCet = r1;
 
     if (reserveTon !== null && reserveCet !== null && reserveCet > 0n) {
-      const priceFraction = (reserveTon * NANO) / reserveCet;
+      // Price in TON per CET: (TON / 10^9) / (CET / 10^TOKEN_DECIMALS)
+      // = (TON * 10^TOKEN_DECIMALS) / (CET * 10^9)
+      const priceFraction = (reserveTon * NANO_CET) / reserveCet;
       priceTonPerCet = bigintToDecimalString(priceFraction, 9);
     }
 
@@ -128,7 +132,7 @@ async function main(): Promise<void> {
           reserveTon = BigInt(json.reserves[0]);
           reserveCet = BigInt(json.reserves[1]);
           if (reserveCet > 0n) {
-            const priceFraction = (reserveTon * NANO) / reserveCet;
+            const priceFraction = (reserveTon * NANO_CET) / reserveCet;
             priceTonPerCet = bigintToDecimalString(priceFraction, 9);
           }
         }
@@ -159,7 +163,7 @@ async function main(): Promise<void> {
         ? bigintToDecimalString(reserveCet, decimals)
         : null,
       lpSupply: null,
-      priceTonPerCet: priceTonPerCet,
+      priceTonPerCet,
     },
     updatedAt: new Date().toISOString(),
   };
