@@ -27,7 +27,7 @@ const LanguageSelector = () => {
             key={code}
             onClick={() => setLang(code)}
             aria-label={`${t.common.switchLanguagePrefix} ${LANG_LABELS[code]}`}
-            className={`px-2 py-1.5 rounded text-[11px] font-mono transition-all duration-150 min-h-[36px] min-w-[36px] flex items-center justify-center ${
+            className={`px-2 py-1.5 rounded text-[11px] font-mono transition-all duration-150 min-h-[44px] min-w-[44px] flex items-center justify-center ${
               lang === code
                 ? 'text-solaris-gold bg-solaris-gold/10'
                 : 'text-solaris-muted hover:text-solaris-text'

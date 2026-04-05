@@ -205,20 +205,20 @@ const AITeamSection = () => {
                     <li key={role.title}>
                       <details className="group rounded-lg border border-white/[0.06] bg-black/20 open:border-white/12 open:bg-white/[0.03] transition-colors">
                         <summary
-                          className="flex cursor-pointer list-none items-center justify-between gap-2 py-1.5 px-2 select-none [&::-webkit-details-marker]:hidden"
+                          className="flex cursor-pointer list-none items-center justify-between gap-2 py-2.5 px-3 select-none [&::-webkit-details-marker]:hidden min-h-[44px]"
                           title={meshStandardBurstForAiTeamRoleAgent(dept.id, role.title)}
                         >
                           <span className="flex min-w-0 items-center gap-1.5">
-                            <span className={`h-1 w-1 shrink-0 rounded-full bg-current ${dept.iconColor}`} />
-                            <span className="text-xs font-medium leading-tight text-solaris-text truncate">
+                            <span className={`h-1.5 w-1.5 shrink-0 rounded-full bg-current ${dept.iconColor}`} />
+                            <span className="text-xs font-semibold leading-tight text-solaris-text truncate">
                               {role.title}
                             </span>
                           </span>
-                          <span className="flex shrink-0 items-center gap-1 text-[9px] font-mono text-solaris-muted">
+                          <span className="flex shrink-0 items-center gap-1.5 text-[10px] font-mono text-solaris-muted">
                             <span>
                               {role.skills.length}+
                             </span>
-                            <ChevronDown className="h-3 w-3 transition-transform group-open:rotate-180 opacity-70" aria-hidden />
+                            <ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180 opacity-70" aria-hidden />
                           </span>
                         </summary>
                         <div className="border-t border-white/[0.06] px-2 pb-2 pt-2 space-y-2">

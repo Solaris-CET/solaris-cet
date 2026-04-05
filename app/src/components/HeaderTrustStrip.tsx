@@ -20,7 +20,7 @@ export function HeaderTrustStrip({ className, align = 'end' }: Props) {
   const { t } = useLanguage();
   const suffix = ` ${t.nav.opensInNewWindow}`;
   const linkClass =
-    'text-[10px] font-mono uppercase tracking-wider text-solaris-muted hover:text-solaris-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solaris-gold/70 rounded-sm transition-colors whitespace-nowrap';
+    'text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-solaris-muted hover:text-solaris-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solaris-gold/70 rounded-sm transition-colors whitespace-nowrap py-1.5 px-2';
 
   return (
     <nav

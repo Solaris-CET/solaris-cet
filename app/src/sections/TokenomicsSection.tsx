@@ -125,7 +125,7 @@ const TokenomicsSection = () => {
 
       <GlowOrbs variant="cyan" />
 
-      <div ref={pillsRef} className="absolute inset-0 z-20 pointer-events-none">
+      <div ref={pillsRef} className="absolute inset-0 z-20 pointer-events-none hidden xl:block">
         <div
           className={`metric-pill pointer-events-auto absolute left-[6vw] top-[20vh] bento-card px-5 py-3 flex items-center gap-3 animate-float shadow-depth ${BENTO_TILE_INTERACTION}`}
           role="group"
