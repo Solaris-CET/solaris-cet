@@ -1,113 +1,48 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { meshWhisperFromKey } from '@/lib/meshSkillFeed';
 
-/**
- * Props accepted by {@link AnimatedCounter}.
- */
-interface AnimatedCounterProps {
-  /** The final numeric value the counter animates toward. */
-  end: number;
-  /** Animation duration in seconds (default: `2`). */
-  duration?: number;
-  /** Text appended after the formatted number, e.g. `'%'` or `' CET'`. */
-  suffix?: string;
-  /** Text prepended before the formatted number, e.g. `'$'`. */
+const AnimatedCounter: React.FC<{
+  value: number;
+  label: string;
   prefix?: string;
-  /** Number of decimal places shown during and after the animation (default: `0`). */
-  decimals?: number;
-  /** Additional Tailwind/CSS class names applied to the `<span>`. */
-  className?: string;
-  /**
-   * When `true`, the animation starts immediately on mount instead of waiting
-   * for the element to enter the viewport (default: `false`).
-   */
-  triggerOnMount?: boolean;
-  /** When set, adds a deterministic mesh skill line as the native `title` tooltip. */
-  meshTitleKey?: string;
-}
-
-/**
- * AnimatedCounter — a GSAP-powered numeric counter that animates from 0 to
- * {@link AnimatedCounterProps.end} using `power2.out` easing.
- *
- * By default the animation is deferred until the element is at least 30 %
- * visible in the viewport (via `IntersectionObserver`). Set
- * `triggerOnMount={true}` to start immediately.
- *
- * The value is formatted with `Number.toLocaleString('en-US')` and supports
- * an optional prefix/suffix and configurable decimal places.
- *
- * @param props - {@link AnimatedCounterProps}
- * @returns A `<span>` whose text content is updated on every GSAP tick.
- *
- * @example
- * ```tsx
- * <AnimatedCounter end={9000} suffix=" CET" />
- * <AnimatedCounter end={74} suffix="x" decimals={0} />
- * ```
- */
-const AnimatedCounter = ({
-  end,
-  duration = 2,
-  suffix = '',
-  prefix = '',
-  decimals = 0,
-  className = '',
-  triggerOnMount = false,
-  meshTitleKey,
-}: AnimatedCounterProps) => {
-  const ref = useRef<HTMLSpanElement>(null);
-  const proxy = useRef({ val: 0 });
-  const [isVisible, setIsVisible] = useState(triggerOnMount);
+  suffix?: string;
+  duration?: number;
+}> = ({ value, label, prefix = '', suffix = '', duration = 2.5 }) => {
+  const nodeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (triggerOnMount) return;
+    const node = nodeRef.current;
+    if (!node) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [triggerOnMount]);
-
-  useEffect(() => {
-    if (!isVisible) return;
-
-    const tween = gsap.to(proxy.current, {
-      val: end,
-      duration,
-      ease: 'power2.out',
+    const target = { val: 0 };
+    gsap.to(target, {
+      val: value,
+      duration: duration,
+      ease: "power3.out",
       onUpdate: () => {
-        if (ref.current) {
-          const val = proxy.current.val;
-          ref.current.textContent = `${prefix}${val.toLocaleString('en-US', {
-            minimumFractionDigits: decimals,
-            maximumFractionDigits: decimals,
-          })}${suffix}`;
+        if (node) {
+          node.innerText = `${prefix}${Math.floor(target.val).toLocaleString()}${suffix}`;
         }
       },
+      scrollTrigger: {
+        trigger: node,
+        start: "top 95%",
+      }
     });
-
-    return () => { tween.kill(); };
-  }, [isVisible, end, duration, suffix, prefix, decimals]);
+  }, [value, prefix, suffix, duration]);
 
   return (
-    <span
-      ref={ref}
-      className={className}
-      title={meshTitleKey ? meshWhisperFromKey(meshTitleKey) : undefined}
-    >
-      {prefix}0{suffix}
-    </span>
+    <div className="flex flex-col items-center group relative p-3 rounded-2xl transition-colors hover:bg-white/[0.02]">
+      <div 
+        ref={nodeRef} 
+        className="text-3xl md:text-5xl font-black font-syne text-white tracking-tighter"
+      >
+        {prefix}0{suffix}
+      </div>
+      <div className="text-[10px] md:text-xs text-teal-400/80 tracking-[0.2em] uppercase mt-2 font-medium">
+        {label}
+      </div>
+    </div>
   );
 };
-
 export default AnimatedCounter;

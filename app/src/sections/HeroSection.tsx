@@ -1,41 +1,20 @@
-import React, { useRef, useLayoutEffect, useState, useCallback, useMemo, memo, lazy, Suspense } from 'react';
+import React, { useRef, useLayoutEffect, useMemo, memo, lazy, Suspense } from 'react';
 import { gsap } from 'gsap';
-import { Zap, Activity, Loader2 } from 'lucide-react';
-
-const ParticleCanvas = lazy(() => import('../components/ParticleCanvas'));
-import GlowOrbs from '../components/GlowOrbs';
-import HeroAmbientFields from '../components/HeroAmbientFields';
-import CetAiSearch from '../components/CetAiSearch';
-import MeshSkillRibbon from '../components/MeshSkillRibbon';
-import { SolarisLogoMark } from '../components/SolarisLogoMark';
-import { TooltipProvider } from '../components/ui/tooltip';
+import { Zap, ShieldCheck, TrendingUp, CheckCircle, ChevronDown, Rocket } from 'lucide-react';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useLanguage } from '../hooks/useLanguage';
 import { formatCetSupplyWithSuffix, formatTaskAgentMeshHeadline } from '@/lib/numerals';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
-import { renderSimpleBold } from '@/lib/renderSimpleBold';
+import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '../components/ui/tooltip';
 
-const APP_CONFIG = {
-  LINKS: {
-    TELEGRAM_BOT: 'https://t.me/+tKlfzx7IWopmNWQ0',
-    HERO_COIN: `${import.meta.env.BASE_URL}hero-coin.png`,
-  },
-  TIMING: {
-    PROCESSING: 2000,
-    SUCCESS_DISPLAY: 3000,
-  },
-} as const;
-
-const WAVE_BAR_HEIGHTS = [
-  0.4, 0.7, 0.5, 0.9, 0.6,
-  1.0, 0.8, 0.7, 0.5, 0.9,
-  0.6, 1.0, 0.8, 0.4, 0.7,
-  0.5, 0.9, 0.6, 1.0, 0.8,
-] as const;
+const NetworkNodesCanvas = lazy(() => import('../components/NetworkNodesCanvas'));
+import CetAiSearch from '../components/CetAiSearch';
+import { TypewriterTitle } from '../components/TypewriterTitle';
+import AnimatedCounter from '../components/AnimatedCounter';
 
 const TICKER_DATA = [
-  { label: 'AI AGENTS', value: '' }, // filled in useMemo from domain headcount
-  { label: 'SUPPLY', value: '' }, // filled in useMemo from formatCetSupplyWithSuffix
+  { label: 'AI AGENTS', value: '' },
+  { label: 'SUPPLY', value: '' },
   { label: 'NETWORK', value: 'TON' },
   { label: 'MAX TPS', value: '100,000' },
   { label: 'FINALITY', value: '2.0s' },
@@ -50,25 +29,12 @@ const TICKER_DATA = [
   { label: 'RWA BACKING', value: 'CETĂȚUIA, RO' },
 ];
 
-const StatRow = memo(
-  ({ label, value, colorClass = 'text-solaris-gold' }: { label: string; value: string; colorClass?: string }) => (
-    <div className="flex justify-between items-center gap-4 group/stat">
-      <span className="text-solaris-muted text-xs sm:text-sm group-hover/stat:text-white transition-colors">{label}</span>
-      <span className={`font-mono ${colorClass} text-sm sm:text-base font-semibold tracking-tighter shrink-0`}>{value}</span>
-    </div>
-  ),
-);
-StatRow.displayName = 'StatRow';
-
 const HeroSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const coinWrapperRef = useRef<HTMLDivElement>(null);
   const titleContainerRef = useRef<HTMLDivElement>(null);
-  const hudWrapperRef = useRef<HTMLDivElement>(null);
   const cetAiWrapperRef = useRef<HTMLDivElement>(null);
   const tickerContainerRef = useRef<HTMLDivElement>(null);
 
-  const [miningState, setMiningState] = useState<'IDLE' | 'PROCESSING' | 'SUCCESS'>('IDLE');
   const prefersReducedMotion = useReducedMotion();
   const { t, lang } = useLanguage();
 
@@ -82,55 +48,33 @@ const HeroSection: React.FC = () => {
     });
   }, [lang]);
 
-  const handleMiningOperation = useCallback(async () => {
-    if (miningState !== 'IDLE') return;
-    setMiningState('PROCESSING');
-
-    await new Promise((resolve) => setTimeout(resolve, APP_CONFIG.TIMING.PROCESSING));
-    setMiningState('SUCCESS');
-    window.open(APP_CONFIG.LINKS.TELEGRAM_BOT, '_blank', 'noopener,noreferrer');
-
-    setTimeout(() => setMiningState('IDLE'), APP_CONFIG.TIMING.SUCCESS_DISPLAY);
-  }, [miningState]);
-
   useLayoutEffect(() => {
     const isMobile =
       typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches;
 
     if (isMobile || prefersReducedMotion) {
-      const els: (HTMLElement | null)[] = [
-        coinWrapperRef.current,
-        titleContainerRef.current,
-        hudWrapperRef.current,
-        tickerContainerRef.current,
-      ];
-      els.forEach((el) => {
-        if (el) {
-          el.style.opacity = '1';
-          el.style.transform = 'none';
-        }
-      });
+      if (titleContainerRef.current) {
+        titleContainerRef.current.style.opacity = '1';
+        titleContainerRef.current.style.transform = 'none';
+      }
       if (cetAiWrapperRef.current) {
         cetAiWrapperRef.current.style.opacity = '1';
         cetAiWrapperRef.current.style.transform = 'none';
+      }
+      if (tickerContainerRef.current) {
+        tickerContainerRef.current.style.opacity = '1';
+        tickerContainerRef.current.style.transform = 'none';
       }
       return;
     }
 
     const ctx = gsap.context(() => {
-      /** One-shot entrance only — no pin/scrub (scroll-jacking reads as cheap and hurts UX). */
-      const mainTl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.95 } });
+      const mainTl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 1.1 } });
 
       mainTl
-        .fromTo(coinWrapperRef.current, { scale: 0.94, rotateY: -8, opacity: 0 }, { scale: 1, rotateY: 0, opacity: 1, duration: 1.1 })
-        .fromTo([titleContainerRef.current, hudWrapperRef.current], { y: 20, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.1 }, '-=0.72')
-        .fromTo(
-          cetAiWrapperRef.current,
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.75, ease: 'power2.out' },
-          '-=0.5',
-        )
-        .fromTo(tickerContainerRef.current, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.65 }, '-=0.4');
+        .fromTo(titleContainerRef.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1 }, 0.2)
+        .fromTo(cetAiWrapperRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1 }, '-=0.5')
+        .fromTo(tickerContainerRef.current, { y: 24, opacity: 0 }, { y: 0, opacity: 1 }, '-=0.6');
     }, containerRef);
 
     return () => ctx.revert();
@@ -140,325 +84,143 @@ const HeroSection: React.FC = () => {
     <TooltipProvider>
       <section
         ref={containerRef}
-        className="relative min-h-dvh bg-slate-950 overflow-x-hidden lg:overflow-hidden flex flex-col justify-center items-center"
+        style={{ fontFamily: '"Syne", sans-serif' }}
+        className="relative min-h-dvh bg-slate-950 overflow-x-hidden lg:overflow-hidden flex flex-col justify-center items-center pt-20 pb-16 lg:pb-24 lg:pt-16"
       >
-        {/* Ambient background: gradient mesh + orbs + particles */}
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden>
-          <div
-            className="absolute inset-0 sm:hidden"
-            style={{
-              background:
-                'radial-gradient(ellipse 100% 55% at 50% -5%, rgba(255,215,140,0.18), transparent 52%), radial-gradient(circle at 18% 22%, rgba(46,231,255,0.08), transparent 46%), linear-gradient(180deg, #0a0a0b 0%, #09090b 50%, #030305 100%)',
-            }}
-          />
-          <div
-            className="hidden sm:block absolute inset-0 opacity-90"
-            style={{
-              background:
-                'radial-gradient(ellipse 120% 80% at 50% -20%, rgba(234,179,8,0.14), transparent 55%), radial-gradient(ellipse 90% 60% at 100% 50%, rgba(46,231,255,0.06), transparent 50%), linear-gradient(180deg, #050506 0%, #09090b 45%, #030305 100%)',
-            }}
-          />
+        {/* Deep Space Background & TON Nodes */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden>
+          {/* Base gradient */}
+          <div className="absolute inset-0 bg-[#020510]" />
+          
+          {/* Subtle deep space glows */}
+          <div className="absolute w-[100vw] h-[100vw] rounded-full blur-[160px] opacity-20 bg-[radial-gradient(circle,#2ee7ff_0%,transparent_60%)] -top-1/4 -left-1/4" />
+          <div className="absolute w-[100vw] h-[100vw] rounded-full blur-[160px] opacity-10 bg-[radial-gradient(circle,#f2c94c_0%,transparent_70%)] -bottom-1/4 -right-1/4" />
 
-          {/* Slow-moving gold “light” blobs */}
-          <div
-            className="absolute w-[min(120vw,1400px)] h-[min(120vw,1400px)] rounded-full blur-[100px] opacity-[0.35] animate-hero-aurora"
-            style={{
-              left: '15%',
-              top: '5%',
-              background: 'radial-gradient(circle, rgba(250,204,21,0.45) 0%, rgba(234,179,8,0.12) 38%, transparent 68%)',
-            }}
-          />
-          <div
-            className="absolute w-[min(90vw,900px)] h-[min(90vw,900px)] rounded-full blur-[90px] opacity-[0.25] animate-hero-aurora [animation-delay:-14s]"
-            style={{
-              right: '-5%',
-              bottom: '10%',
-              background: 'radial-gradient(circle, rgba(253,224,71,0.25) 0%, rgba(202,138,4,0.08) 42%, transparent 70%)',
-            }}
-          />
-
-          <GlowOrbs variant="gold" className="opacity-[0.68]" />
-
-          <HeroAmbientFields />
-
-          <div
-            className="absolute inset-0 opacity-[0.12] mix-blend-screen animate-hero-conic-drift"
-            style={{
-              background:
-                'conic-gradient(from 200deg at 50% 40%, transparent 0deg, rgba(234,179,8,0.05) 60deg, transparent 120deg, rgba(46,231,255,0.03) 200deg, transparent 280deg)',
-            }}
-          />
-
+          {/* Canvas Nodes Animation */}
           <Suspense fallback={null}>
-            <ParticleCanvas count={56} className="hidden sm:block opacity-[0.45]" connectionRadius={110} />
+            <NetworkNodesCanvas />
           </Suspense>
 
-          <div
-            className="absolute inset-0 z-[2] mix-blend-overlay opacity-[0.22] motion-reduce:opacity-[0.12] hero-film-grain pointer-events-none"
-            aria-hidden
-          />
-
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_55%_at_50%_0%,rgba(255,200,120,0.1),transparent_60%)]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-950/90" />
+          <div className="absolute inset-0 opacity-10 hero-film-grain mix-blend-overlay" />
         </div>
 
-        <div className="relative z-10 mx-auto w-full max-w-7xl section-padding-x xl:px-12 flex flex-col gap-8 lg:gap-10 pb-16 lg:pb-24 pt-24 lg:pt-16">
-          <div className="grid grid-cols-1 lg:grid-cols-12 lg:gap-10 xl:gap-12 items-center gap-10">
-            {/* Center column: headline + CTAs */}
-            <div
-              ref={titleContainerRef}
-              className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left order-2 lg:order-1"
-            >
-              <div className="mb-4 md:mb-5 flex flex-col items-center lg:items-start gap-3 w-full">
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <span
-                    className="hidden sm:flex h-14 sm:h-16 md:h-[4.25rem] w-auto max-w-[min(7.25rem,30vw)] shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] shadow-[0_0_20px_rgba(242,201,76,0.1)] p-0"
-                    aria-hidden
-                  >
-                    <SolarisLogoMark
-                      crop="full"
-                      className="h-full max-h-full w-auto max-w-full drop-shadow-[0_0_10px_rgba(242,201,76,0.4)]"
-                    />
-                  </span>
-                  <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.35em] text-yellow-500/90 text-center lg:text-left leading-snug">
-                    {t.hero.tagline}
-                  </p>
-                </div>
-                <div
-                  className="h-px w-full max-w-md mx-auto lg:mx-0 bg-gradient-to-r from-transparent via-solaris-gold/40 to-transparent opacity-90"
-                  aria-hidden
-                />
-              </div>
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 flex flex-col gap-12 lg:gap-16 pt-12 md:pt-16">
+          
+          <div ref={titleContainerRef} className="flex flex-col items-center text-center w-full max-w-4xl mx-auto">
+            
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-teal-500/30 bg-teal-500/10 text-teal-400 text-[10px] sm:text-xs font-semibold tracking-widest uppercase mb-8 shadow-[0_0_15px_rgba(46,231,255,0.15)]">
+               <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
+               Rețeaua TON Inovatoare
+            </div>
 
-              <h1 className="w-full font-black tracking-[-0.045em] leading-[0.92] text-balance">
-                <span className="relative block text-5xl sm:text-6xl md:text-7xl living-gold-text drop-shadow-[0_2px_24px_rgba(0,0,0,0.55)]">
-                  <span
-                    className="absolute -inset-x-8 -inset-y-3 -z-10 rounded-[2rem] bg-gradient-to-r from-transparent via-amber-400/[0.07] to-transparent blur-2xl motion-safe:animate-hero-mesh-shift"
-                    aria-hidden
-                  />
-                  SOLARIS CET
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-tight tracking-tighter mb-6 drop-shadow-2xl h-[120px] sm:h-[140px] md:h-[180px] lg:h-[200px] flex items-center justify-center">
+              <TypewriterTitle phrases={['SOLARIS CET', 'THE AI RWA TOKEN', 'INNOVATION ON TON']} />
+            </h1>
+            
+            <p className="text-base sm:text-lg md:text-xl text-slate-300 max-w-2xl font-medium leading-relaxed mb-10 text-balance px-4">
+              Primul proiect RWA condus de {formatTaskAgentMeshHeadline(lang)} agenți AI complet autonomi. 
+              Inovație hibridă. Execuție descentralizată. Construit pentru performanță extremă.
+            </p>
+
+            {/* Custom CTA Buttons with precise requests */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-12 sm:mb-16 w-full sm:w-auto px-4">
+              <a
+                href={DEDUST_SWAP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative flex items-center justify-center w-full sm:w-auto h-14 px-8 rounded-xl bg-teal-500 text-slate-950 font-bold text-base md:text-lg tracking-wide transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_35px_-5px_rgba(46,231,255,0.5)] overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                <span className="relative flex items-center gap-2">
+                  <Zap size={20} className="stroke-[2.5]" /> Cumpără CET
                 </span>
-              </h1>
+              </a>
 
-              <p className="mt-5 md:mt-6 max-w-xl text-base sm:text-lg md:text-xl text-white/90 font-medium leading-snug">
-                {t.hero.subtitle}
-              </p>
-
-              <p className="mt-4 max-w-[52ch] text-sm sm:text-base text-solaris-muted leading-relaxed">
-                {renderSimpleBold(
-                  t.hero.description,
-                  'text-solaris-gold/90 font-semibold',
-                )}
-              </p>
-
-              <div
-                role="region"
-                aria-label={t.hero.quickStatsAria}
-                data-testid="hero-quick-stats"
-                className="mt-6 flex flex-wrap items-start gap-6 sm:gap-8 justify-center lg:justify-start"
+              <a
+                href="#whitepaper"
+                className="group flex items-center justify-center w-full sm:w-auto h-14 px-8 rounded-xl border-2 border-teal-500/50 bg-transparent text-white font-bold text-base md:text-lg tracking-wide transition-all duration-300 hover:bg-teal-500/10 hover:border-teal-400 hover:-translate-y-1 hover:shadow-[0_10px_35px_-5px_rgba(46,231,255,0.15)]"
               >
-                <div className="text-center lg:text-left min-w-[5.5rem]">
-                  <p className="text-2xl sm:text-[1.65rem] font-mono font-semibold tabular-nums text-white tracking-tight">
-                    {formatCetSupplyWithSuffix(lang)}
-                  </p>
-                  <p className="mt-1 text-[10px] sm:text-xs text-solaris-muted uppercase tracking-wider">
-                    {t.hero.quickStatSupplyCaption}
-                  </p>
-                </div>
-                <div className="hidden sm:block w-px h-10 bg-white/10 shrink-0 self-center" aria-hidden />
-                <div className="text-center lg:text-left min-w-[3.5rem]">
-                  <p className="text-2xl sm:text-[1.65rem] font-mono font-semibold text-white tracking-tight">
-                    TON
-                  </p>
-                  <p className="mt-1 text-[10px] sm:text-xs text-solaris-muted uppercase tracking-wider">
-                    {t.hero.quickStatChainCaption}
-                  </p>
-                </div>
-                <div className="hidden sm:block w-px h-10 bg-white/10 shrink-0 self-center" aria-hidden />
-                <div className="text-center lg:text-left min-w-[6rem]">
-                  <p className="text-2xl sm:text-[1.65rem] font-semibold text-white tracking-tight">
-                    <a
-                      href="#authority-trust"
-                      className="rounded-sm text-white underline-offset-4 hover:text-solaris-gold hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solaris-gold/80"
-                    >
-                      Cetățuia
-                    </a>
-                  </p>
-                  <p className="mt-1 text-[10px] sm:text-xs text-solaris-muted uppercase tracking-wider">
-                    {t.hero.quickStatAnchorCaption}
-                  </p>
-                </div>
-              </div>
-
-              <div
-                className="mt-6 md:mt-8 w-full max-w-xl mx-auto lg:mx-0"
-                data-testid="hero-next-steps"
-              >
-                <p className="text-[11px] sm:text-xs font-mono uppercase tracking-[0.2em] text-solaris-muted mb-3 text-center lg:text-left">
-                  {t.hero.nextStepsLabel}
-                </p>
-                <div className="flex flex-wrap gap-2 sm:gap-3 justify-center lg:justify-start mb-6 md:mb-8">
-                  <a
-                    href={DEDUST_SWAP_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center min-h-[44px] px-4 py-2 rounded-xl border border-solaris-gold/35 bg-solaris-gold/10 text-solaris-gold text-xs sm:text-sm font-semibold hover:bg-solaris-gold/15 transition-colors"
-                  >
-                    {t.hero.nextStepBuy}
-                  </a>
-                  <a
-                    href="#staking"
-                    className="inline-flex items-center justify-center min-h-[44px] px-4 py-2 rounded-xl border border-solaris-cyan/30 bg-solaris-cyan/5 text-solaris-cyan text-xs sm:text-sm font-semibold hover:bg-solaris-cyan/10 transition-colors"
-                  >
-                    {t.hero.nextStepTokenomics}
-                  </a>
-                  <a
-                    href="#how-to-buy"
-                    className="inline-flex items-center justify-center min-h-[44px] px-4 py-2 rounded-xl border border-white/15 bg-white/[0.04] text-white/90 text-xs sm:text-sm font-semibold hover:bg-white/[0.08] transition-colors"
-                  >
-                    {t.hero.nextStepHowToBuy}
-                  </a>
-                </div>
-              </div>
-
-              <div className="mt-2 md:mt-4 w-full max-w-xl mx-auto lg:mx-0">
-                <div
-                  className="rounded-2xl md:rounded-3xl border border-white/15 bg-white/[0.04] backdrop-blur-2xl shadow-[0_8px_40px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.08)] p-4 md:p-6 flex flex-col md:flex-row flex-wrap gap-3 md:gap-4 justify-center lg:justify-start ring-1 ring-white/5"
-                >
-                  <button
-                    type="button"
-                    onClick={handleMiningOperation}
-                    aria-live="polite"
-                    aria-busy={miningState === 'PROCESSING'}
-                    aria-label={
-                      miningState === 'IDLE'
-                        ? t.hero.miningStartAria
-                        : miningState === 'PROCESSING'
-                          ? t.hero.miningProcessingAria
-                          : t.hero.miningSuccessAria
-                    }
-                    className="btn-magnetic glow-pulse-hover group relative w-full md:w-auto min-h-[52px] px-8 py-4 rounded-2xl bg-gradient-to-br from-[#F2C94C] to-[#D4AF37] text-slate-950 font-bold text-sm md:text-base tracking-wide shadow-[0_0_28px_rgba(234,179,8,0.35)] transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-[0_0_50px_rgba(250,204,21,0.55),0_0_100px_rgba(234,179,8,0.28)] hover:-translate-y-0.5 active:scale-[0.99] flex items-center justify-center gap-2.5 overflow-hidden"
-                  >
-                    <span className="absolute inset-0 rounded-2xl bg-gradient-to-t from-yellow-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                    {miningState === 'IDLE' ? (
-                      <>
-                        <Zap size={20} className="shrink-0" strokeWidth={2.25} />
-                        {t.hero.startMining}
-                      </>
-                    ) : (
-                      <Loader2 className="animate-spin" size={22} />
-                    )}
-                  </button>
-
-                  <a
-                    href="#whitepaper"
-                    className="w-full md:w-auto min-h-[52px] px-8 py-4 rounded-2xl border border-white/20 bg-white/[0.06] text-white font-semibold text-sm md:text-base text-center backdrop-blur-md transition-all duration-300 hover:bg-white/[0.1] hover:border-yellow-500/40 hover:text-white"
-                  >
-                    {t.hero.docs}
-                  </a>
-                  <p className="w-full mt-1 text-[11px] sm:text-xs text-solaris-muted/95 text-center lg:text-left leading-snug max-w-[52ch]">
-                    {t.hero.miningTelegramHint}
-                  </p>
-                </div>
-              </div>
+                <Rocket size={20} className="mr-2" />
+                Citește Whitepaper
+              </a>
             </div>
 
-            {/* Coin + glow */}
-            <div className="lg:col-span-2 flex justify-center order-1 lg:order-2">
-              <div
-                ref={coinWrapperRef}
-                className="relative w-40 h-40 sm:w-48 sm:h-52 md:w-56 md:h-60 lg:w-64 lg:h-64 xl:w-72 xl:h-72 [perspective:800px]"
-              >
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="absolute w-[130%] h-[130%] rounded-full bg-yellow-400/18 blur-[100px]" />
-                  <img
-                    src={APP_CONFIG.LINKS.HERO_COIN}
-                    className="relative z-[1] w-full h-full object-contain drop-shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
-                    alt="CET Token"
-                  />
-                </div>
-              </div>
+            {/* Animated Counters Subtitle Area */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 lg:gap-16 w-full max-w-4xl border-y border-white/5 py-8 bg-white/[0.01] backdrop-blur-md rounded-3xl mb-12 shadow-2xl">
+              <AnimatedCounter value={9000} label="Total Supply" />
+              <AnimatedCounter value={214500} label="Market Cap" prefix="$" />
+              <AnimatedCounter value={200000} label="AI Agents" />
             </div>
 
-            {/* Telemetry */}
-            <div ref={hudWrapperRef} className="lg:col-span-3 order-3 w-full max-w-md mx-auto lg:max-w-none lg:mx-0">
-              <div className="glass-card-gold p-6 sm:p-7 rounded-3xl border border-yellow-500/20 shadow-[0_0_80px_-24px_rgba(234,179,8,0.25)]">
-                <div className="flex items-center gap-2 mb-6 text-yellow-500 font-mono text-[11px] sm:text-xs tracking-[0.2em]">
-                  <Activity size={14} strokeWidth={2.5} />
-                  NETWORK TELEMETRY
-                </div>
+            {/* Trust Badges under CTA */}
+            <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-10 opacity-80 mb-8">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-2 text-slate-400 hover:text-teal-400 transition-colors cursor-help">
+                    <ShieldCheck size={20} />
+                    <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Auditat Cyberscope</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>Audit securitate complet, 0 vulnerabilități.</TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-2 text-slate-400 hover:text-teal-400 transition-colors cursor-help">
+                    <TrendingUp size={20} />
+                    <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Listed DeDust</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>Inclus pe exchange-ul descentralizat DeDust.</TooltipContent>
+              </Tooltip>
 
-                <div className="space-y-4 sm:space-y-5">
-                  <StatRow
-                    label="TASK AGENTS (ROUTING)"
-                    value={formatTaskAgentMeshHeadline(lang)}
-                    colorClass="text-yellow-500"
-                  />
-                  <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent w-full" />
-                  <StatRow label="THROUGHPUT" value="~100,000 TPS" />
-                  <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent w-full" />
-                  <StatRow label="LATENCY" value="2.0s" colorClass="text-cyan-400" />
-                  <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent w-full" />
-                  <StatRow label="NODES" value="ACTIVE [300+]" colorClass="text-white" />
-                </div>
-
-                <MeshSkillRibbon
-                  variant="compact"
-                  saltOffset={340}
-                  className="mt-5 border-fuchsia-500/12 bg-fuchsia-500/[0.04]"
-                />
-
-                <div className="mt-6 flex items-center justify-between text-[10px] font-mono text-solaris-muted">
-                  <span>HASHRATE MONITOR</span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-                    LIVE
-                  </span>
-                </div>
-                <div className="mt-2 h-14 sm:h-16 w-full bg-black/50 rounded-2xl border border-white/[0.06] overflow-hidden flex items-end gap-px px-2 pb-1.5">
-                  {WAVE_BAR_HEIGHTS.map((h, i) => (
-                    <div
-                      key={i}
-                      className="wave-bar flex-1 text-solaris-gold"
-                      style={{ height: `${h * 100}%`, animationDelay: `${i * 0.08}s` }}
-                    />
-                  ))}
-                </div>
-              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-2 text-slate-400 hover:text-teal-400 transition-colors cursor-help">
+                    <CheckCircle size={20} />
+                    <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Built on TON</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>Construit pe ecosistemul The Open Network.</TooltipContent>
+              </Tooltip>
             </div>
+            
           </div>
 
           <div id="cet-ai" ref={cetAiWrapperRef} className="w-full transform-gpu overflow-hidden scroll-mt-24">
             <CetAiSearch />
           </div>
+
         </div>
 
+        {/* Scroll Indicator Animat */}
+        <div className="hidden lg:flex absolute bottom-[100px] left-1/2 -translate-x-1/2 flex-col items-center gap-2 pointer-events-none opacity-60 animate-[pulse_3s_ease-in-out_infinite]">
+           <span className="text-[10px] uppercase font-mono tracking-[0.2em] text-teal-400">Scroll to Explore</span>
+           <ChevronDown size={20} className="animate-bounce text-teal-400" />
+        </div>
+
+        {/* Live Ticker Area */}
         <div
           ref={tickerContainerRef}
           role="region"
           aria-label={t.hero.liveTickerAria}
-          className="relative lg:absolute lg:bottom-0 w-full overflow-hidden py-4 md:py-6 border-t border-white/10 bg-slate-950/75 backdrop-blur-2xl mt-6 lg:mt-0 shadow-[0_-24px_80px_-28px_rgba(255,200,100,0.07)]"
+          className="relative lg:absolute lg:bottom-0 w-full overflow-hidden py-4 md:py-6 border-t border-white/10 bg-slate-950/80 backdrop-blur-2xl mt-6 lg:mt-0 shadow-[0_-24px_80px_-28px_rgba(46,231,255,0.07)]"
         >
-          <div
-            className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-10 sm:w-16 bg-gradient-to-r from-slate-950 via-slate-950/90 to-transparent"
-            aria-hidden
-          />
-          <div
-            className="pointer-events-none absolute inset-y-0 right-0 z-[2] w-10 sm:w-16 bg-gradient-to-l from-slate-950 via-slate-950/90 to-transparent"
-            aria-hidden
-          />
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-10 sm:w-16 bg-gradient-to-r from-[#020510] to-transparent" aria-hidden />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-[2] w-10 sm:w-16 bg-gradient-to-l from-[#020510] to-transparent" aria-hidden />
           <div className="flex min-w-max animate-ticker whitespace-nowrap group/ticker">
             {[...tickerRows, ...tickerRows].map((item, i) => (
               <div
                 key={`${lang}-ticker-${item.label}-${i}`}
                 className="inline-flex items-center px-6 sm:px-8 md:px-10 gap-3 md:gap-4 group/item transition-opacity duration-300 hover:!opacity-100 group-hover/ticker:opacity-50"
               >
-                <span className="text-[10px] text-zinc-500 font-mono transition-colors group-hover/item:text-solaris-gold/70">{item.label}</span>
-                <span className="text-yellow-500 font-bold text-sm transition-transform duration-300 group-hover/item:scale-105">{item.value}</span>
+                <span className="text-[10px] text-zinc-500 font-mono transition-colors group-hover/item:text-teal-400/70">{item.label}</span>
+                <span className="text-teal-400 font-bold text-sm transition-transform duration-300 group-hover/item:scale-105">{item.value}</span>
               </div>
             ))}
           </div>
         </div>
+
       </section>
     </TooltipProvider>
   );
