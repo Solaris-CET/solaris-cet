@@ -18,9 +18,9 @@ export const TONCONNECT_ICON_FILENAME = "icon-192.png" as const;
 /** Social preview card (1200×630 typical); matches `og:image` / `twitter:image` in `index.html`. */
 export const OG_IMAGE_FILENAME = "og-image.png" as const;
 
-/** Canonical site URL with trailing slash (TON `url`, canonical link). */
+/** Canonical site URL (TON `url`, canonical link). */
 export function productionSiteUrl(): string {
-  return `${PRODUCTION_SITE_ORIGIN}/`;
+  return PRODUCTION_SITE_ORIGIN;
 }
 
 /** Absolute production URL for the raster lockup (matches Organization `logo` in `index.html`). */
