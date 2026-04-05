@@ -44,7 +44,7 @@ import { shortSkillWhisper, skillSeedFromLabel } from './lib/meshSkillFeed';
 gsap.registerPlugin(ScrollTrigger);
 
 /** Brief shell warm-up; shorter than earlier builds to avoid artificial wait (B2B credibility). */
-const LOADING_DURATION_MS = 650;
+const LOADING_DURATION_MS = 450;
 /** Skip fixed delay when user requests reduced motion (WCAG 2.3.3). */
 const LOADING_DURATION_REDUCED_MS = 0;
 
@@ -114,8 +114,8 @@ function AppContent() {
   useEffect(() => {
     if (!isLoaded) return;
 
-    // Re-enable scroll snap for pinned sections on wide desktop only.
-    const isBelowDesktop = typeof window !== 'undefined' && window.matchMedia('(max-width: 1279px)').matches;
+    // Below 1024 px (tablets/small laptops), free scrolling is more natural
+    const isBelowDesktop = typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches;
     if (isBelowDesktop) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
@@ -511,8 +511,12 @@ function AppContent() {
 }
 
 function App() {
+  const manifestUrl = import.meta.env.DEV 
+    ? `${window.location.origin}/tonconnect-manifest.json`
+    : `${PRODUCTION_SITE_ORIGIN}/tonconnect-manifest.json`;
+
   return (
-    <TonConnectUIProvider manifestUrl={`${PRODUCTION_SITE_ORIGIN}/tonconnect-manifest.json`}>
+    <TonConnectUIProvider manifestUrl={manifestUrl}>
       <AppContent />
     </TonConnectUIProvider>
   );

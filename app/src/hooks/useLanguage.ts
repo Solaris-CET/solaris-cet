@@ -41,7 +41,9 @@ async function detectCountryLanguage(): Promise<LangCode | null> {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 3000);
-    const res = await fetch('https://api.country.is/', { signal: controller.signal });
+    const isDev = import.meta.env.DEV;
+    const url = isDev ? '/api-country/' : 'https://api.country.is/';
+    const res = await fetch(url, { signal: controller.signal });
     clearTimeout(timer);
     if (!res.ok) return null;
     const data = await res.json() as { country: string };

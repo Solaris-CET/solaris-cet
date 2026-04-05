@@ -447,14 +447,14 @@ const HeroSection: React.FC = () => {
             className="pointer-events-none absolute inset-y-0 right-0 z-[2] w-10 sm:w-16 bg-gradient-to-l from-slate-950 via-slate-950/90 to-transparent"
             aria-hidden
           />
-          <div className="flex min-w-max animate-ticker whitespace-nowrap">
+          <div className="flex min-w-max animate-ticker whitespace-nowrap group/ticker">
             {[...tickerRows, ...tickerRows].map((item, i) => (
               <div
                 key={`${lang}-ticker-${item.label}-${i}`}
-                className="inline-flex items-center px-6 sm:px-8 md:px-10 gap-3 md:gap-4"
+                className="inline-flex items-center px-6 sm:px-8 md:px-10 gap-3 md:gap-4 group/item transition-opacity duration-300 hover:!opacity-100 group-hover/ticker:opacity-50"
               >
-                <span className="text-[10px] text-zinc-500 font-mono">{item.label}</span>
-                <span className="text-yellow-500 font-bold text-sm">{item.value}</span>
+                <span className="text-[10px] text-zinc-500 font-mono transition-colors group-hover/item:text-solaris-gold/70">{item.label}</span>
+                <span className="text-yellow-500 font-bold text-sm transition-transform duration-300 group-hover/item:scale-105">{item.value}</span>
               </div>
             ))}
           </div>

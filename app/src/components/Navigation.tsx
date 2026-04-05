@@ -142,13 +142,13 @@ const Navigation = () => {
       {/* Scroll progress bar — animated shimmer */}
       <div
         ref={progressBarRef}
-        className="absolute bottom-0 left-0 h-[2px] transition-none"
+        className="absolute bottom-0 left-0 h-[1px] transition-none"
         style={{
           width: `${scrollProgress}%`,
           background: 'linear-gradient(90deg, #F2C94C, #2EE7FF, #a78bfa, #F2C94C)',
           backgroundSize: '200% 100%',
           animation: 'text-shimmer 3s linear infinite',
-          boxShadow: '0 0 8px rgba(242,201,76,0.6)',
+          boxShadow: '0 0 6px rgba(242,201,76,0.4)',
         }}
       />
 

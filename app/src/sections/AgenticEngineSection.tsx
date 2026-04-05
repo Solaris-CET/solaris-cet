@@ -87,7 +87,7 @@ const AgenticEngineSection = () => {
           </div>
           <h2 className="font-display font-bold text-[clamp(26px,3.2vw,44px)] text-solaris-text mb-4">
             Data plane,{' '}
-            <span className="relative inline-block text-solaris-gold after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:bg-gradient-to-r after:from-transparent after:via-solaris-gold/70 after:to-transparent after:opacity-80">
+            <span className="relative inline-block text-solaris-gold drop-shadow-[0_0_12px_rgba(242,201,76,0.25)] after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:bg-gradient-to-r after:from-transparent after:via-solaris-gold/70 after:to-transparent after:opacity-80">
               reasoning plane,
             </span>{' '}
             verification plane

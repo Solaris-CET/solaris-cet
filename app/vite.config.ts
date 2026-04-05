@@ -295,4 +295,18 @@ export default defineConfig({
       "@lib": path.resolve(__dirname, "./src/lib"),
     },
   },
+  server: {
+    proxy: {
+      '/api-dedust': {
+        target: 'https://api.dedust.io',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api-dedust/, ''),
+      },
+      '/api-country': {
+        target: 'https://api.country.is',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api-country/, ''),
+      },
+    },
+  },
 });

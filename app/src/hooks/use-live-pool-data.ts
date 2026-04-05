@@ -67,9 +67,13 @@ export function useLivePoolData(): PoolData {
   const fetchData = useCallback(async () => {
     try {
       const signal = createTimeoutSignal(8000);
+      const isDev = import.meta.env.DEV;
+      const poolsUrl = isDev ? '/api-dedust/v2/pools' : 'https://api.dedust.io/v2/pools';
+      const pricesUrl = isDev ? '/api-dedust/v2/prices' : 'https://api.dedust.io/v2/prices';
+
       const [poolsRes, pricesRes] = await Promise.all([
-        fetch('https://api.dedust.io/v2/pools', { signal }),
-        fetch('https://api.dedust.io/v2/prices', { signal }),
+        fetch(poolsUrl, { signal }),
+        fetch(pricesUrl, { signal }),
       ]);
 
       if (!poolsRes.ok || !pricesRes.ok) {
