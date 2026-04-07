@@ -1,10 +1,13 @@
 import { useRef, useLayoutEffect, useState } from 'react';
 import { gsap } from 'gsap';
-import { Download, FileText, ArrowRight, Globe, X, Send, Copy, CheckCircle, Zap, Shield } from 'lucide-react';
+import { Download, FileText, ArrowRight, Globe, X, Send, Copy, CheckCircle, Zap, Shield, Users, CalendarClock } from 'lucide-react';
 import { SolarisLogoMark } from '../components/SolarisLogoMark';
 import SocialShare from '../components/SocialShare';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useLanguage } from '../hooks/useLanguage';
+import AnimatedCounter from '../components/AnimatedCounter';
+import TeamFlipCard from '../components/TeamFlipCard';
+import { useCommunityProof } from '../hooks/use-community-proof';
 import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';
 import {
   DEDUST_POOL_ADDRESS,
@@ -25,6 +28,7 @@ const socialLinks = [
 
 const FooterSection = () => {
   const { t } = useLanguage();
+  const proof = useCommunityProof();
   /** Stable `key`s for React (not translated labels). Privacy + Terms share `href` so we cannot key by URL alone. */
   const footerLinks = [
     { id: 'privacy', label: t.footerNav.privacy, href: WHITEPAPER_URL, icon: undefined },
@@ -140,32 +144,14 @@ const FooterSection = () => {
         </div>
 
         {/* Founder Card */}
-        <div className="bento-card p-6 mb-6 flex flex-col md:flex-row items-center gap-5">
-          <div className="shrink-0 w-16 h-16 rounded-2xl overflow-hidden border-2 border-solaris-gold/30 bg-solaris-gold/10 flex items-center justify-center">
-            {/* Founder avatar — LinkedIn profile */}
-            <span className="font-display font-bold text-2xl text-solaris-gold">CB</span>
-          </div>
-          <div className="flex-1 text-center md:text-left">
-            <div className="hud-label text-solaris-gold text-[10px] mb-1">FOUNDER &amp; CREATOR</div>
-            <h3 className="font-display font-semibold text-solaris-text text-lg leading-tight mb-0.5">
-              Claudiu Ciprian Balaban
-            </h3>
-            <p className="text-solaris-muted text-sm">
-              Visionary behind Solaris CET · AI &amp; Blockchain Strategist · Bridge between High Intelligence and decentralized finance on TON.
-            </p>
-          </div>
-          <a
-            href="https://www.linkedin.com/in/claudiu-ciprian-balaban-76ab8a394/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 px-4 py-2 rounded-xl bg-[#0A66C2]/20 border border-[#0A66C2]/40 text-[#4FC3F7] text-sm font-medium hover:bg-[#0A66C2]/30 transition-colors flex items-center gap-2"
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-            </svg>
-            LinkedIn Profile
-          </a>
-        </div>
+        <TeamFlipCard
+          className="mb-6"
+          initials="CB"
+          role="FOUNDER & CREATOR"
+          name="Claudiu Ciprian Balaban"
+          bio="Visionary behind Solaris CET · AI & Blockchain Strategist · Bridge between High Intelligence and decentralized finance on TON."
+          linkedinUrl="https://www.linkedin.com/in/claudiu-ciprian-balaban-76ab8a394/"
+        />
 
         {/* Contract address */}
         <div className="bento-card p-4 mb-3 flex items-center justify-between gap-4">
@@ -222,6 +208,49 @@ const FooterSection = () => {
               </div>
               <p className="text-solaris-text">Get live updates, talk to the team, and follow the 200,000-agent build in real time.</p>
               <p className="text-solaris-muted text-xs mt-1">Telegram · Free · No spam · Instant access</p>
+              <div className="mt-5 grid grid-cols-2 gap-3 max-w-sm">
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2 text-[11px] font-mono text-solaris-muted">
+                      <Send className="w-3.5 h-3.5 text-[#2AABEE]" />
+                      <span>{t.communityProof.telegramMembers}</span>
+                    </div>
+                    <Users className="w-4 h-4 text-solaris-gold/80" aria-hidden />
+                  </div>
+                  <AnimatedCounter
+                    value={proof.telegramMembers}
+                    prefix=""
+                    suffix=""
+                    duration={1.7}
+                    className="text-2xl md:text-3xl"
+                    wrapperClassName="items-start p-0 hover:bg-transparent"
+                  />
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2 text-[11px] font-mono text-solaris-muted">
+                      <X className="w-3.5 h-3.5 text-solaris-text" />
+                      <span>{t.communityProof.xFollowers}</span>
+                    </div>
+                    <Users className="w-4 h-4 text-solaris-cyan/80" aria-hidden />
+                  </div>
+                  <AnimatedCounter
+                    value={proof.xFollowers}
+                    prefix=""
+                    suffix=""
+                    duration={1.7}
+                    className="text-2xl md:text-3xl"
+                    wrapperClassName="items-start p-0 hover:bg-transparent"
+                  />
+                </div>
+              </div>
+              <div className="mt-3 flex items-center gap-2 text-[10px] font-mono text-solaris-muted">
+                <CalendarClock className="w-3.5 h-3.5" aria-hidden />
+                <span>
+                  {t.communityProof.updatedPrefix} {proof.updatedAt}
+                </span>
+                {proof.stale ? <span className="text-amber-300/80">· {t.communityProof.staleHint}</span> : null}
+              </div>
             </div>
             <div className="flex flex-col md:flex-row gap-3 shrink-0">
               <a

@@ -6,28 +6,29 @@ export const TypewriterTitle: React.FC<{ phrases: string[] }> = ({ phrases }) =>
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-    const currentPhrase = phrases[index % phrases.length];
-    
-    if (isDeleting) {
-      if (text === '') {
-        setIsDeleting(false);
-        setIndex(i => i + 1);
-        timer = setTimeout(() => {}, 500); 
-      } else {
-        timer = setTimeout(() => {
-          setText(text.slice(0, -1));
-        }, 40);
+    const currentPhrase = phrases[index % phrases.length] ?? '';
+
+    const timer = setTimeout(() => {
+      if (isDeleting) {
+        if (text === '') {
+          setIsDeleting(false);
+          setIndex((i) => i + 1);
+          return;
+        }
+        setText(text.slice(0, -1));
+        return;
       }
-    } else {
+
       if (text === currentPhrase) {
-        timer = setTimeout(() => setIsDeleting(true), 2500); 
-      } else {
-        timer = setTimeout(() => {
-          setText(currentPhrase.slice(0, text.length + 1));
-        }, 80);
+        setIsDeleting(true);
+        return;
       }
-    }
+
+      setText(currentPhrase.slice(0, text.length + 1));
+    }, (() => {
+      if (isDeleting) return text === '' ? 500 : 40;
+      return text === currentPhrase ? 2500 : 80;
+    })());
 
     return () => clearTimeout(timer);
   }, [text, isDeleting, index, phrases]);

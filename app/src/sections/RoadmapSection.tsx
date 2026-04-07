@@ -1,6 +1,7 @@
 import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
-import { CheckCircle, Loader, Circle } from 'lucide-react';
+import { CheckCircle, Loader, Circle, ChevronDown } from 'lucide-react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 
 type PhaseStatus = 'done' | 'active' | 'upcoming';
@@ -141,10 +142,13 @@ const statusConfig: Record<PhaseStatus, PhaseStatusConfig> = {
   },
 };
 
+gsap.registerPlugin(ScrollTrigger);
+
 const RoadmapSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
+  const lineRef = useRef<SVGPathElement>(null);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -168,7 +172,7 @@ const RoadmapSection = () => {
       );
 
       const cards = cardsRef.current?.querySelectorAll('.roadmap-card');
-      if (cards) {
+      if (cards?.length) {
         gsap.fromTo(
           cards,
           { y: 40, opacity: 0 },
@@ -186,6 +190,24 @@ const RoadmapSection = () => {
           }
         );
       }
+
+      if (lineRef.current) {
+        const path = lineRef.current;
+        const length = path.getTotalLength();
+        path.style.strokeDasharray = `${length}`;
+        path.style.strokeDashoffset = `${length}`;
+
+        gsap.to(path, {
+          strokeDashoffset: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: cardsRef.current,
+            start: 'top 85%',
+            end: 'bottom 20%',
+            scrub: true,
+          },
+        });
+      }
     }, section);
 
     return () => ctx.revert();
@@ -193,6 +215,7 @@ const RoadmapSection = () => {
 
   return (
     <div
+      id="roadmap"
       ref={sectionRef}
       className="relative section-glass py-24 lg:py-32 overflow-hidden mesh-bg"
     >
@@ -250,46 +273,101 @@ const RoadmapSection = () => {
           </div>
         </div>
 
-        {/* Phase cards */}
         <div
           ref={cardsRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="relative"
         >
-          {phases.map((phase) => {
-            const cfg = statusConfig[phase.status];
-            const StatusIcon = cfg.icon;
+          <div className="pointer-events-none absolute inset-y-0 left-4 lg:left-1/2 w-px bg-white/10" aria-hidden />
+          <svg
+            className="pointer-events-none absolute inset-y-0 left-4 lg:left-1/2 w-[2px]"
+            width="2"
+            height="100%"
+            viewBox="0 0 2 100"
+            preserveAspectRatio="none"
+            aria-hidden
+          >
+            <path
+              ref={lineRef}
+              d="M1 0 V100"
+              stroke="rgba(242,201,76,0.55)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              fill="none"
+            />
+          </svg>
 
-            return (
-              <div
-                key={phase.id}
-                className={`roadmap-card bento-card p-6 border ${cfg.borderClass} flex flex-col gap-4 group hover:border-opacity-60 transition-all duration-300`}
-              >
-                {/* Quarter + status badge */}
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-solaris-muted text-xs">{phase.quarter}</span>
-                  <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border ${cfg.badgeClass}`}>
-                    <StatusIcon className={`w-3 h-3 ${cfg.iconClass} ${cfg.iconAnimClass}`} />
-                    {cfg.label}
-                  </span>
+          <div className="space-y-8 lg:space-y-10">
+            {phases.map((phase, idx) => {
+              const cfg = statusConfig[phase.status];
+              const StatusIcon = cfg.icon;
+              const isLeft = idx % 2 === 0;
+
+              return (
+                <div
+                  key={phase.id}
+                  className="roadmap-card relative pl-10 lg:pl-0 lg:grid lg:grid-cols-12 lg:gap-6"
+                >
+                  <div className="absolute left-4 top-6 -translate-x-1/2 lg:static lg:translate-x-0 lg:col-span-2 lg:col-start-6 flex justify-center">
+                    <div
+                      className={`relative grid place-items-center w-10 h-10 rounded-full border ${cfg.borderClass} bg-black/40 backdrop-blur`}
+                    >
+                      <div
+                        className={`absolute inset-0 rounded-full ${phase.status === 'active' ? 'animate-pulse' : ''}`}
+                        style={{
+                          boxShadow:
+                            phase.status === 'active'
+                              ? '0 0 18px rgba(242,201,76,0.35)'
+                              : phase.status === 'done'
+                              ? '0 0 16px rgba(16,185,129,0.25)'
+                              : 'none',
+                        }}
+                        aria-hidden
+                      />
+                      <StatusIcon className={`w-4 h-4 ${cfg.iconClass} ${cfg.iconAnimClass}`} />
+                    </div>
+                  </div>
+
+                  <div
+                    className={[
+                      'lg:col-span-5',
+                      isLeft ? 'lg:col-start-1' : 'lg:col-start-8',
+                    ].join(' ')}
+                  >
+                    <details
+                      className={`bento-card p-6 border ${cfg.borderClass} group transition-all duration-300 hover:border-opacity-60`}
+                    >
+                      <summary className="flex cursor-pointer list-none items-start justify-between gap-4 [&::-webkit-details-marker]:hidden">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-3">
+                            <span className="font-mono text-solaris-muted text-xs">{phase.quarter}</span>
+                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border ${cfg.badgeClass}`}>
+                              <StatusIcon className={`w-3 h-3 ${cfg.iconClass} ${cfg.iconAnimClass}`} />
+                              {cfg.label}
+                            </span>
+                          </div>
+                          <h3 className="mt-3 font-display font-bold text-solaris-text text-xl group-hover:text-solaris-gold transition-colors">
+                            {phase.title}
+                          </h3>
+                        </div>
+                        <ChevronDown className="h-5 w-5 shrink-0 text-solaris-muted transition-transform group-open:rotate-180" aria-hidden />
+                      </summary>
+
+                      <div className="mt-4 border-t border-white/10 pt-4">
+                        <ul className="space-y-2">
+                          {phase.milestones.map((m) => (
+                            <li key={m.text} className="flex items-start gap-2">
+                              <StatusIcon className={`w-3.5 h-3.5 mt-0.5 shrink-0 ${cfg.iconClass} ${cfg.iconAnimClass}`} />
+                              <span className="text-solaris-muted text-xs leading-relaxed">{m.text}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </details>
+                  </div>
                 </div>
-
-                {/* Phase title */}
-                <h3 className="font-display font-bold text-solaris-text text-xl group-hover:text-solaris-gold transition-colors">
-                  {phase.title}
-                </h3>
-
-                {/* Milestones */}
-                <ul className="space-y-2 flex-1">
-                  {phase.milestones.map((m) => (
-                    <li key={m.text} className="flex items-start gap-2">
-                      <StatusIcon className={`w-3.5 h-3.5 mt-0.5 shrink-0 ${cfg.iconClass} ${cfg.iconAnimClass}`} />
-                      <span className="text-solaris-muted text-xs leading-relaxed">{m.text}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
         <div className="mt-12 max-w-3xl">

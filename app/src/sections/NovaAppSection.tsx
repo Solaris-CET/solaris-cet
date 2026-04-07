@@ -131,6 +131,9 @@ const NovaAppSection = () => {
                 alt="Solaris CET App"
                 width="360"
                 height="720"
+                loading="lazy"
+                decoding="async"
+                fetchPriority="low"
                 className="w-full h-full object-contain"
               />
 

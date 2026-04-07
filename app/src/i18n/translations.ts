@@ -99,6 +99,13 @@ export interface Translations {
     followSuffix: string;
     updatedPrefix: string;
   };
+  communityProof: {
+    title: string;
+    telegramMembers: string;
+    xFollowers: string;
+    updatedPrefix: string;
+    staleHint: string;
+  };
   /** Default fallback UI for `ErrorBoundary` (class component reads via `getActiveLangSync()` + map). */
   errorBoundary: {
     title: string;
@@ -146,6 +153,7 @@ export interface Translations {
     statsBento: string;
     aiTeamStructure: string;
     miningDeviceTypes: string;
+    stakingCalculator: string;
     whitepaperSection: string;
     faq: string;
     rwa: string;
@@ -259,6 +267,30 @@ export interface Translations {
       rewardPerBlock: string;
     };
   };
+  stakingCalculator: {
+    estimateDisclaimer: string;
+    kicker: string;
+    title: string;
+    subtitle: string;
+    inputsTitle: string;
+    outputsTitle: string;
+    amountLabel: string;
+    durationLabel: string;
+    compoundingTitle: string;
+    compoundingEvery: string;
+    compoundingOn: string;
+    compoundingOff: string;
+    priceUnavailable: string;
+    pricePrefix: string;
+    apyLabel: string;
+    rewardCetLabel: string;
+    rewardUsdLabel: string;
+    projectedBalanceLabel: string;
+    modeCompound: string;
+    modeSimple: string;
+    ctaTokenomics: string;
+    ctaMiningBot: string;
+  };
   /** Four trust pillars — glass bento (authority, chain, geography, transparency). */
   authorityTrust: {
     kicker: string;
@@ -277,6 +309,7 @@ export interface Translations {
   mobileDock: {
     landmarkLabel: string;
     buy: string;
+    install: string;
     tokenomics: string;
     howToBuy: string;
     community: string;
@@ -498,6 +531,13 @@ const translations: Record<LangCode, Translations> = {
       followSuffix: 'for real-time updates.',
       updatedPrefix: 'Updated',
     },
+    communityProof: {
+      title: 'Social proof',
+      telegramMembers: 'Telegram members',
+      xFollowers: 'X followers',
+      updatedPrefix: 'Updated',
+      staleHint: 'Numbers may be outdated.',
+    },
     errorBoundary: {
       title: 'Something went wrong',
       unexpectedMessage: 'An unexpected error occurred.',
@@ -537,6 +577,7 @@ const translations: Record<LangCode, Translations> = {
       statsBento: 'Solaris CET core statistics',
       aiTeamStructure: 'AI Corporate Team Structure',
       miningDeviceTypes: 'Device type selection',
+      stakingCalculator: 'Staking calculator',
       whitepaperSection: 'Whitepaper',
       faq: 'Frequently Asked Questions',
       rwa: 'Real World Assets — Cetățuia Agricultural Land',
@@ -644,6 +685,30 @@ const translations: Record<LangCode, Translations> = {
         rewardPerBlock: 'Reward per block',
       },
     },
+    stakingCalculator: {
+      estimateDisclaimer: 'Estimates only — not financial advice.',
+      kicker: 'Estimate staking rewards',
+      title: 'Staking calculator',
+      subtitle: 'Configure CET amount and duration. Uses live price when available.',
+      inputsTitle: 'Inputs',
+      outputsTitle: 'Output',
+      amountLabel: 'Amount (CET)',
+      durationLabel: 'Duration',
+      compoundingTitle: 'Compounding',
+      compoundingEvery: 'Daily',
+      compoundingOn: 'On',
+      compoundingOff: 'Off',
+      priceUnavailable: 'Price: cached / unavailable',
+      pricePrefix: 'Price:',
+      apyLabel: 'APY',
+      rewardCetLabel: 'Reward (CET)',
+      rewardUsdLabel: 'Reward (USD)',
+      projectedBalanceLabel: 'Projected balance',
+      modeCompound: 'Compound',
+      modeSimple: 'Simple',
+      ctaTokenomics: 'Continue to Tokenomics',
+      ctaMiningBot: 'Start Mining Bot',
+    },
     authorityTrust: {
       kicker: 'TRUST ARCHITECTURE',
       title: 'Proof you can verify — not hype you can’t',
@@ -665,6 +730,7 @@ const translations: Record<LangCode, Translations> = {
     mobileDock: {
       landmarkLabel: 'Quick conversion shortcuts',
       buy: 'Buy',
+      install: 'Install',
       tokenomics: 'Economics',
       howToBuy: 'How to buy',
       community: 'Community',
@@ -898,6 +964,13 @@ const translations: Record<LangCode, Translations> = {
       followSuffix: 'para actualizaciones en tiempo real.',
       updatedPrefix: 'Actualizado',
     },
+    communityProof: {
+      title: 'Prueba social',
+      telegramMembers: 'Miembros de Telegram',
+      xFollowers: 'Seguidores en X',
+      updatedPrefix: 'Actualizado',
+      staleHint: 'Los números pueden estar desactualizados.',
+    },
     errorBoundary: {
       title: 'Algo salió mal',
       unexpectedMessage: 'Ocurrió un error inesperado.',
@@ -937,6 +1010,7 @@ const translations: Record<LangCode, Translations> = {
       statsBento: 'Estadísticas centrales de Solaris CET',
       aiTeamStructure: 'Estructura corporativa del equipo IA',
       miningDeviceTypes: 'Selección de tipo de dispositivo',
+      stakingCalculator: 'Calculadora de staking',
       whitepaperSection: 'Libro blanco',
       faq: 'Preguntas frecuentes',
       rwa: 'Activos del mundo real — tierras agrícolas Cetățuia',
@@ -1044,6 +1118,30 @@ const translations: Record<LangCode, Translations> = {
         rewardPerBlock: 'Recompensa por bloque',
       },
     },
+    stakingCalculator: {
+      estimateDisclaimer: 'Solo estimaciones — no es asesoramiento financiero.',
+      kicker: 'Estima recompensas de staking',
+      title: 'Calculadora de staking',
+      subtitle: 'Configura cantidad de CET y duración. Usa precio en vivo cuando está disponible.',
+      inputsTitle: 'Entradas',
+      outputsTitle: 'Salida',
+      amountLabel: 'Cantidad (CET)',
+      durationLabel: 'Duración',
+      compoundingTitle: 'Capitalización',
+      compoundingEvery: 'Diaria',
+      compoundingOn: 'Activada',
+      compoundingOff: 'Desactivada',
+      priceUnavailable: 'Precio: caché / no disponible',
+      pricePrefix: 'Precio:',
+      apyLabel: 'APY',
+      rewardCetLabel: 'Recompensa (CET)',
+      rewardUsdLabel: 'Recompensa (USD)',
+      projectedBalanceLabel: 'Saldo proyectado',
+      modeCompound: 'Compuesto',
+      modeSimple: 'Simple',
+      ctaTokenomics: 'Continuar a Tokenomics',
+      ctaMiningBot: 'Iniciar bot de minería',
+    },
     authorityTrust: {
       kicker: 'ARQUITECTURA DE CONFIANZA',
       title: 'Pruebas verificables — no ruido de marketing',
@@ -1065,6 +1163,7 @@ const translations: Record<LangCode, Translations> = {
     mobileDock: {
       landmarkLabel: 'Atajos de conversión',
       buy: 'Comprar',
+      install: 'Instalar',
       tokenomics: 'Economía',
       howToBuy: 'Cómo comprar',
       community: 'Comunidad',
@@ -1298,6 +1397,13 @@ const translations: Record<LangCode, Translations> = {
       followSuffix: '关注我们获取实时更新。',
       updatedPrefix: '更新于',
     },
+    communityProof: {
+      title: '社交证明',
+      telegramMembers: 'Telegram 成员',
+      xFollowers: 'X 关注者',
+      updatedPrefix: '更新于',
+      staleHint: '数据可能已过期。',
+    },
     errorBoundary: {
       title: '出了点问题',
       unexpectedMessage: '发生意外错误。',
@@ -1337,6 +1443,7 @@ const translations: Record<LangCode, Translations> = {
       statsBento: 'Solaris CET 核心统计',
       aiTeamStructure: 'AI 企业团队结构',
       miningDeviceTypes: '设备类型选择',
+      stakingCalculator: '质押计算器',
       whitepaperSection: '白皮书',
       faq: '常见问题',
       rwa: '现实世界资产 — Cetățuia 农业用地',
@@ -1440,6 +1547,30 @@ const translations: Record<LangCode, Translations> = {
         rewardPerBlock: '每块奖励',
       },
     },
+    stakingCalculator: {
+      estimateDisclaimer: '仅为估算 — 不构成财务建议。',
+      kicker: '估算质押收益',
+      title: '质押计算器',
+      subtitle: '设置 CET 数量与周期。可用时使用实时价格。',
+      inputsTitle: '输入',
+      outputsTitle: '输出',
+      amountLabel: '数量（CET）',
+      durationLabel: '周期',
+      compoundingTitle: '复利',
+      compoundingEvery: '每日',
+      compoundingOn: '开启',
+      compoundingOff: '关闭',
+      priceUnavailable: '价格：缓存/不可用',
+      pricePrefix: '价格：',
+      apyLabel: 'APY',
+      rewardCetLabel: '收益（CET）',
+      rewardUsdLabel: '收益（USD）',
+      projectedBalanceLabel: '预计余额',
+      modeCompound: '复利',
+      modeSimple: '单利',
+      ctaTokenomics: '继续查看 Tokenomics',
+      ctaMiningBot: '启动挖矿机器人',
+    },
     authorityTrust: {
       kicker: '信任架构',
       title: '可验证的证明 — 非空洞宣传',
@@ -1457,6 +1588,7 @@ const translations: Record<LangCode, Translations> = {
     mobileDock: {
       landmarkLabel: '快捷转化入口',
       buy: '购买',
+      install: '安装',
       tokenomics: '经济模型',
       howToBuy: '如何购买',
       community: '社区',
@@ -1686,6 +1818,13 @@ const translations: Record<LangCode, Translations> = {
       followSuffix: 'для актуальных обновлений.',
       updatedPrefix: 'Обновлено',
     },
+    communityProof: {
+      title: 'Социальное доказательство',
+      telegramMembers: 'Участники Telegram',
+      xFollowers: 'Подписчики X',
+      updatedPrefix: 'Обновлено',
+      staleHint: 'Числа могут быть устаревшими.',
+    },
     errorBoundary: {
       title: 'Что-то пошло не так',
       unexpectedMessage: 'Произошла непредвиденная ошибка.',
@@ -1725,6 +1864,7 @@ const translations: Record<LangCode, Translations> = {
       statsBento: 'Ключевая статистика Solaris CET',
       aiTeamStructure: 'Корпоративная структура AI-команды',
       miningDeviceTypes: 'Выбор типа устройства',
+      stakingCalculator: 'Калькулятор стейкинга',
       whitepaperSection: 'Whitepaper',
       faq: 'Часто задаваемые вопросы',
       rwa: 'Реальные активы — сельхозземли Cetățuia',
@@ -1832,6 +1972,30 @@ const translations: Record<LangCode, Translations> = {
         rewardPerBlock: 'Награда за блок',
       },
     },
+    stakingCalculator: {
+      estimateDisclaimer: 'Только оценки — не финансовый совет.',
+      kicker: 'Оцените доход от стейкинга',
+      title: 'Калькулятор стейкинга',
+      subtitle: 'Настройте количество CET и срок. Использует live-цену при наличии.',
+      inputsTitle: 'Ввод',
+      outputsTitle: 'Результат',
+      amountLabel: 'Сумма (CET)',
+      durationLabel: 'Срок',
+      compoundingTitle: 'Капитализация',
+      compoundingEvery: 'Ежедневно',
+      compoundingOn: 'Вкл',
+      compoundingOff: 'Выкл',
+      priceUnavailable: 'Цена: кэш/недоступно',
+      pricePrefix: 'Цена:',
+      apyLabel: 'APY',
+      rewardCetLabel: 'Награда (CET)',
+      rewardUsdLabel: 'Награда (USD)',
+      projectedBalanceLabel: 'Прогноз баланса',
+      modeCompound: 'Сложный',
+      modeSimple: 'Простой',
+      ctaTokenomics: 'К токеномике',
+      ctaMiningBot: 'Запустить майнинг-бота',
+    },
     authorityTrust: {
       kicker: 'АРХИТЕКТУРА ДОВЕРИЯ',
       title: 'Доказательства, которые можно проверить',
@@ -1853,6 +2017,7 @@ const translations: Record<LangCode, Translations> = {
     mobileDock: {
       landmarkLabel: 'Быстрые действия',
       buy: 'Купить',
+      install: 'Установить',
       tokenomics: 'Токеномика',
       howToBuy: 'Как купить',
       community: 'Сообщество',
@@ -2083,6 +2248,13 @@ const translations: Record<LangCode, Translations> = {
       followSuffix: 'pentru actualizări în timp real.',
       updatedPrefix: 'Actualizat',
     },
+    communityProof: {
+      title: 'Dovadă socială',
+      telegramMembers: 'Membri Telegram',
+      xFollowers: 'Urmăritori X',
+      updatedPrefix: 'Actualizat',
+      staleHint: 'Numerele pot fi învechite.',
+    },
     errorBoundary: {
       title: 'Ceva nu a funcționat',
       unexpectedMessage: 'A apărut o eroare neașteptată.',
@@ -2122,6 +2294,7 @@ const translations: Record<LangCode, Translations> = {
       statsBento: 'Statistici centrale Solaris CET',
       aiTeamStructure: 'Structură corporativă echipă AI',
       miningDeviceTypes: 'Selecție tip dispozitiv',
+      stakingCalculator: 'Calculator de staking',
       whitepaperSection: 'Whitepaper',
       faq: 'Întrebări frecvente',
       rwa: 'Active din lumea reală — teren agricol Cetățuia',
@@ -2229,6 +2402,30 @@ const translations: Record<LangCode, Translations> = {
         rewardPerBlock: 'Recompensă per bloc',
       },
     },
+    stakingCalculator: {
+      estimateDisclaimer: 'Doar estimări — nu reprezintă sfat financiar.',
+      kicker: 'Estimează recompensele de staking',
+      title: 'Calculator de staking',
+      subtitle: 'Configurează cantitatea de CET și durata. Folosește preț live când e disponibil.',
+      inputsTitle: 'Intrări',
+      outputsTitle: 'Rezultat',
+      amountLabel: 'Cantitate (CET)',
+      durationLabel: 'Durată',
+      compoundingTitle: 'Capitalizare',
+      compoundingEvery: 'Zilnic',
+      compoundingOn: 'Pornit',
+      compoundingOff: 'Oprit',
+      priceUnavailable: 'Preț: cache / indisponibil',
+      pricePrefix: 'Preț:',
+      apyLabel: 'APY',
+      rewardCetLabel: 'Recompensă (CET)',
+      rewardUsdLabel: 'Recompensă (USD)',
+      projectedBalanceLabel: 'Sold estimat',
+      modeCompound: 'Compus',
+      modeSimple: 'Simplu',
+      ctaTokenomics: 'Continuă la Tokenomics',
+      ctaMiningBot: 'Pornește botul de mining',
+    },
     authorityTrust: {
       kicker: 'ARHITECTURĂ DE ÎNCREDERE',
       title: 'Dovezi pe care le poți verifica — nu doar marketing',
@@ -2250,6 +2447,7 @@ const translations: Record<LangCode, Translations> = {
     mobileDock: {
       landmarkLabel: 'Scurtături conversie',
       buy: 'Cumpără',
+      install: 'Instalează',
       tokenomics: 'Tokenomică',
       howToBuy: 'Cum cumperi',
       community: 'Comunitate',
@@ -2483,6 +2681,13 @@ const translations: Record<LangCode, Translations> = {
       followSuffix: 'para atualizações em tempo real.',
       updatedPrefix: 'Atualizado',
     },
+    communityProof: {
+      title: 'Prova social',
+      telegramMembers: 'Membros do Telegram',
+      xFollowers: 'Seguidores no X',
+      updatedPrefix: 'Atualizado',
+      staleHint: 'Os números podem estar desatualizados.',
+    },
     errorBoundary: {
       title: 'Algo correu mal',
       unexpectedMessage: 'Ocorreu um erro inesperado.',
@@ -2522,6 +2727,7 @@ const translations: Record<LangCode, Translations> = {
       statsBento: 'Estatísticas centrais Solaris CET',
       aiTeamStructure: 'Estrutura corporativa da equipa IA',
       miningDeviceTypes: 'Seleção do tipo de dispositivo',
+      stakingCalculator: 'Calculadora de staking',
       whitepaperSection: 'Whitepaper',
       faq: 'Perguntas frequentes',
       rwa: 'Ativos do mundo real — terras agrícolas Cetățuia',
@@ -2629,6 +2835,30 @@ const translations: Record<LangCode, Translations> = {
         rewardPerBlock: 'Recompensa por bloco',
       },
     },
+    stakingCalculator: {
+      estimateDisclaimer: 'Apenas estimativas — não é aconselhamento financeiro.',
+      kicker: 'Estime recompensas de staking',
+      title: 'Calculadora de staking',
+      subtitle: 'Configure a quantidade de CET e a duração. Usa preço ao vivo quando disponível.',
+      inputsTitle: 'Entradas',
+      outputsTitle: 'Saída',
+      amountLabel: 'Quantidade (CET)',
+      durationLabel: 'Duração',
+      compoundingTitle: 'Capitalização',
+      compoundingEvery: 'Diária',
+      compoundingOn: 'Ligado',
+      compoundingOff: 'Desligado',
+      priceUnavailable: 'Preço: cache / indisponível',
+      pricePrefix: 'Preço:',
+      apyLabel: 'APY',
+      rewardCetLabel: 'Recompensa (CET)',
+      rewardUsdLabel: 'Recompensa (USD)',
+      projectedBalanceLabel: 'Saldo projetado',
+      modeCompound: 'Composto',
+      modeSimple: 'Simples',
+      ctaTokenomics: 'Continuar para Tokenomics',
+      ctaMiningBot: 'Iniciar bot de mineração',
+    },
     authorityTrust: {
       kicker: 'ARQUITETURA DE CONFIANÇA',
       title: 'Provas que pode verificar — não só marketing',
@@ -2650,6 +2880,7 @@ const translations: Record<LangCode, Translations> = {
     mobileDock: {
       landmarkLabel: 'Atalhos de conversão',
       buy: 'Comprar',
+      install: 'Instalar',
       tokenomics: 'Tokenomia',
       howToBuy: 'Como comprar',
       community: 'Comunidade',
@@ -2883,6 +3114,13 @@ const translations: Record<LangCode, Translations> = {
       followSuffix: 'für Echtzeit-Updates.',
       updatedPrefix: 'Aktualisiert',
     },
+    communityProof: {
+      title: 'Social Proof',
+      telegramMembers: 'Telegram Mitglieder',
+      xFollowers: 'X Follower',
+      updatedPrefix: 'Aktualisiert',
+      staleHint: 'Zahlen können veraltet sein.',
+    },
     errorBoundary: {
       title: 'Etwas ist schiefgelaufen',
       unexpectedMessage: 'Ein unerwarteter Fehler ist aufgetreten.',
@@ -2922,6 +3160,7 @@ const translations: Record<LangCode, Translations> = {
       statsBento: 'Kernstatistiken Solaris CET',
       aiTeamStructure: 'Unternehmensstruktur des KI-Teams',
       miningDeviceTypes: 'Gerätetyp-Auswahl',
+      stakingCalculator: 'Staking-Rechner',
       whitepaperSection: 'Whitepaper',
       faq: 'Häufig gestellte Fragen',
       rwa: 'Real World Assets — landwirtschaftliche Flächen Cetățuia',
@@ -3029,6 +3268,30 @@ const translations: Record<LangCode, Translations> = {
         rewardPerBlock: 'Belohnung pro Block',
       },
     },
+    stakingCalculator: {
+      estimateDisclaimer: 'Nur Schätzungen — keine Finanzberatung.',
+      kicker: 'Staking-Erträge schätzen',
+      title: 'Staking-Rechner',
+      subtitle: 'CET-Betrag und Laufzeit konfigurieren. Nutzt Live-Preis wenn verfügbar.',
+      inputsTitle: 'Eingaben',
+      outputsTitle: 'Ausgabe',
+      amountLabel: 'Betrag (CET)',
+      durationLabel: 'Laufzeit',
+      compoundingTitle: 'Zinseszins',
+      compoundingEvery: 'Täglich',
+      compoundingOn: 'An',
+      compoundingOff: 'Aus',
+      priceUnavailable: 'Preis: Cache / nicht verfügbar',
+      pricePrefix: 'Preis:',
+      apyLabel: 'APY',
+      rewardCetLabel: 'Ertrag (CET)',
+      rewardUsdLabel: 'Ertrag (USD)',
+      projectedBalanceLabel: 'Prognose Saldo',
+      modeCompound: 'Zinseszins',
+      modeSimple: 'Einfach',
+      ctaTokenomics: 'Weiter zu Tokenomics',
+      ctaMiningBot: 'Mining-Bot starten',
+    },
     authorityTrust: {
       kicker: 'VERTRAUENSARCHITEKTUR',
       title: 'Nachweise, die du prüfen kannst — kein leeres Marketing',
@@ -3050,6 +3313,7 @@ const translations: Record<LangCode, Translations> = {
     mobileDock: {
       landmarkLabel: 'Schnellaktionen',
       buy: 'Kaufen',
+      install: 'Installieren',
       tokenomics: 'Tokenomik',
       howToBuy: 'So kaufen',
       community: 'Community',

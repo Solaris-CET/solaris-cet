@@ -10,6 +10,7 @@ import LazyLoadWrapper from './components/LazyLoadWrapper';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import BackToTop from './components/BackToTop';
 import MobileConversionDock from './components/MobileConversionDock';
+import PwaInstallPrompt from './components/PwaInstallPrompt';
 import { BuildSeal } from './components/BuildSeal';
 import { ScrollFadeUp } from './components/ScrollFadeUp';
 // Pinned sections — loaded eagerly so the snap/scroll setup can find their ScrollTriggers
@@ -29,6 +30,7 @@ const CompetitionSection = lazy(() => import('./sections/CompetitionSection'));
 const NetworkPulseSection = lazy(() => import('./sections/NetworkPulseSection'));
 const HowToBuySection = lazy(() => import('./sections/HowToBuySection'));
 const MiningCalculatorSection = lazy(() => import('./sections/MiningCalculatorSection'));
+const StakingCalculatorSection = lazy(() => import('./sections/StakingCalculatorSection'));
 const SecuritySection = lazy(() => import('./sections/SecuritySection'));
 const WhitepaperSection = lazy(() => import('./sections/WhitepaperSection'));
 const HighIntelligenceSection = lazy(() => import('./sections/HighIntelligenceSection'));
@@ -41,6 +43,7 @@ import { LanguageContext, useLanguageState } from './hooks/useLanguage';
 import { useSmoothAnchors } from './hooks/useSmoothAnchors';
 import './App.css';
 import { shortSkillWhisper, skillSeedFromLabel } from './lib/meshSkillFeed';
+import CookieConsentBanner from './components/CookieConsentBanner';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -63,15 +66,26 @@ function AppContent() {
     const reducedMotion =
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const delayMs = reducedMotion ? LOADING_DURATION_REDUCED_MS : LOADING_DURATION_MS;
+    const isSeen =
+      typeof window !== 'undefined' &&
+      typeof sessionStorage !== 'undefined' &&
+      sessionStorage.getItem('solaris_intro_seen') === '1';
+    const delayMs = reducedMotion || isSeen ? LOADING_DURATION_REDUCED_MS : LOADING_DURATION_MS;
     const fadeOutSec = reducedMotion ? 0.12 : 0.55;
+    let finished = false;
 
-    if (!loadingEl) {
-      const timer = setTimeout(() => setIsLoaded(true), delayMs);
-      return () => clearTimeout(timer);
-    }
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem('solaris_intro_seen', '1');
+      }
 
-    const timer = setTimeout(() => {
+      if (!loadingEl) {
+        setIsLoaded(true);
+        return;
+      }
+
       loadingEl.style.pointerEvents = 'none';
       setIsLoaded(true);
       gsap.to(loadingEl, {
@@ -82,9 +96,15 @@ function AppContent() {
           loadingEl.style.display = 'none';
         },
       });
-    }, delayMs);
+    };
 
-    return () => clearTimeout(timer);
+    const timer = window.setTimeout(finish, delayMs);
+    const safety = window.setTimeout(finish, 3000);
+
+    return () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(safety);
+    };
   }, []);
 
   useEffect(() => {
@@ -372,7 +392,6 @@ function AppContent() {
 
           {/* 6. Roadmap (id matches nav #roadmap) */}
           <section
-            id="roadmap"
             aria-label={langState.t.landmarks.roadmap}
             className="relative z-[70] scroll-mt-24 py-24"
           >
@@ -434,6 +453,15 @@ function AppContent() {
             <LazyLoadWrapper>
               <ScrollFadeUp>
                 <ErrorBoundary><MiningCalculatorSection /></ErrorBoundary>
+              </ScrollFadeUp>
+            </LazyLoadWrapper>
+          </div>
+
+          {/* Section 11.5: Staking Calculator - pin: false */}
+          <div className="relative z-[95]">
+            <LazyLoadWrapper>
+              <ScrollFadeUp>
+                <ErrorBoundary><StakingCalculatorSection /></ErrorBoundary>
               </ScrollFadeUp>
             </LazyLoadWrapper>
           </div>
@@ -506,9 +534,11 @@ function AppContent() {
           </section>
         </main>
       </div>
+      <PwaInstallPrompt />
       <MobileConversionDock />
       <BackToTop />
       <BuildSeal />
+      <CookieConsentBanner />
     </LanguageContext.Provider>
   );
 }

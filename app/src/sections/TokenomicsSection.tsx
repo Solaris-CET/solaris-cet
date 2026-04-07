@@ -29,12 +29,21 @@ const TokenomicsSection = () => {
   const pillsRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<SVGCircleElement>(null);
   const [ringVisible, setRingVisible] = useState(false);
+  const [showPinnedPills, setShowPinnedPills] = useState(false);
   const { t } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     const timer = setTimeout(() => setRingVisible(true), 300);
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1280px)');
+    const apply = () => setShowPinnedPills(mq.matches);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
   }, []);
 
   useEffect(() => {
@@ -126,7 +135,8 @@ const TokenomicsSection = () => {
 
       <GlowOrbs variant="cyan" />
 
-      <div ref={pillsRef} className="absolute inset-0 z-20 pointer-events-none hidden xl:block">
+      {showPinnedPills ? (
+      <div ref={pillsRef} className="absolute inset-0 z-20 pointer-events-none">
         <div
           className={`metric-pill pointer-events-auto absolute left-[6vw] top-[20vh] bento-card px-5 py-3 flex items-center gap-3 animate-float shadow-depth ${BENTO_TILE_INTERACTION}`}
           role="group"
@@ -159,6 +169,7 @@ const TokenomicsSection = () => {
           </div>
         </div>
       </div>
+      ) : null}
 
       <div ref={cardRef} className="relative z-10 w-full max-w-[1100px]">
         {/* Bank dashboard shell */}

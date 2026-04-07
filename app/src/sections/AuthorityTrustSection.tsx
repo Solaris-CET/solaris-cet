@@ -5,6 +5,7 @@ import { ShieldCheck, Link2, MapPin, Eye } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 import GlowOrbs from '../components/GlowOrbs';
 import { renderSimpleBold } from '@/lib/renderSimpleBold';
+import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,6 +17,18 @@ const AuthorityTrustSection = () => {
   const { t } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+
+  const listedOn = [
+    { label: 'Freshcoins', href: 'https://freshcoins.io' },
+    { label: 'Tonviewer', href: 'https://tonviewer.com' },
+    { label: 'TON', href: 'https://ton.org' },
+  ] as const;
+
+  const partners = [
+    { label: 'DeDust', href: DEDUST_SWAP_URL },
+    { label: 'IPFS', href: 'https://ipfs.tech' },
+    { label: 'Cyberscope', href: 'https://cyberscope.io' },
+  ] as const;
 
   const pillars = [
     {
@@ -131,6 +144,76 @@ const AuthorityTrustSection = () => {
               </article>
             );
           })}
+        </div>
+
+        <div className="mt-10 lg:mt-12 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-5">
+          <div className="bento-card p-5 border border-white/8 shadow-depth">
+            <div className="hud-label mb-3">LISTED ON</div>
+            <div className="hidden sm:flex flex-wrap gap-2">
+              {listedOn.map((x) => (
+                <a
+                  key={x.label}
+                  href={x.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-solaris-text text-xs font-semibold transition-all duration-300 grayscale opacity-70 hover:opacity-100 hover:grayscale-0 hover:border-solaris-gold/30"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-solaris-gold/80" />
+                  {x.label}
+                </a>
+              ))}
+            </div>
+            <div className="sm:hidden overflow-hidden solaris-marquee">
+              <div className="flex gap-2 solaris-marquee-track">
+                {[...listedOn, ...listedOn].map((x, i) => (
+                  <a
+                    key={`${x.label}-${i}`}
+                    href={x.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-solaris-text text-xs font-semibold grayscale opacity-70"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-solaris-gold/80" />
+                    {x.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="bento-card p-5 border border-white/8 shadow-depth">
+            <div className="hud-label mb-3">PARTNERS</div>
+            <div className="hidden sm:flex flex-wrap gap-2">
+              {partners.map((x) => (
+                <a
+                  key={x.label}
+                  href={x.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-solaris-text text-xs font-semibold transition-all duration-300 grayscale opacity-70 hover:opacity-100 hover:grayscale-0 hover:border-solaris-gold/30"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-solaris-cyan/80" />
+                  {x.label}
+                </a>
+              ))}
+            </div>
+            <div className="sm:hidden overflow-hidden solaris-marquee">
+              <div className="flex gap-2 solaris-marquee-track">
+                {[...partners, ...partners].map((x, i) => (
+                  <a
+                    key={`${x.label}-${i}`}
+                    href={x.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-solaris-text text-xs font-semibold grayscale opacity-70"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-solaris-cyan/80" />
+                    {x.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

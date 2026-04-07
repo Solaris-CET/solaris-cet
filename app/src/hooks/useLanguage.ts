@@ -59,32 +59,76 @@ const detectLanguage = (): LangCode => {
     if (stored && (SUPPORTED_LANGS as string[]).includes(stored)) {
       return stored as LangCode;
     }
-    // Check navigator.languages (ordered preference list) before falling back
-    // to navigator.language so a secondary preferred language is honoured.
-    const candidates = [
-      ...(navigator.languages ?? []),
-      navigator.language,
-    ];
-    for (const lang of candidates) {
-      const code = lang.slice(0, 2);
-      if ((SUPPORTED_LANGS as string[]).includes(code)) {
-        return code as LangCode;
-      }
-    }
+    const nav = detectNavigatorLanguage();
+    if (nav) return nav;
     return 'en';
   } catch {
     return 'en';
   }
 };
 
+function detectNavigatorLanguage(): LangCode | null {
+  try {
+    const candidates = [...(navigator.languages ?? []), navigator.language].filter(Boolean);
+    for (const lang of candidates) {
+      const code = lang.slice(0, 2);
+      if ((SUPPORTED_LANGS as string[]).includes(code)) return code as LangCode;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 /** `?lang=xx` wins over stored/browser for shareable links and E2E (initializer avoids effect setState lint). */
+function readLangQueryParam(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const rawCandidates = [window.location.href, document.baseURI].filter(
+      (v, i, a) => typeof v === 'string' && v && a.indexOf(v) === i,
+    ) as string[];
+
+    for (const raw of rawCandidates) {
+      const m = /[?&]lang=([^&#]+)/.exec(raw);
+      if (m?.[1]) {
+        try {
+          return decodeURIComponent(m[1]);
+        } catch {
+          return m[1];
+        }
+      }
+
+      const hashIndex = raw.indexOf('#');
+      if (hashIndex !== -1) {
+        const hash = raw.slice(hashIndex + 1);
+        const qm = /[?&]lang=([^&#]+)/.exec(hash);
+        if (qm?.[1]) {
+          try {
+            return decodeURIComponent(qm[1]);
+          } catch {
+            return qm[1];
+          }
+        }
+      }
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 function resolveInitialLang(): LangCode {
   if (typeof window !== 'undefined') {
     try {
-      const code = new URLSearchParams(window.location.search).get('lang');
+      const code = readLangQueryParam();
       if (code && (SUPPORTED_LANGS as readonly string[]).includes(code)) {
         const next = code as LangCode;
-        localStorage.setItem('solaris_lang', next);
+        try {
+          localStorage.setItem('solaris_lang', next);
+        } catch {
+          void 0;
+        }
         return next;
       }
     } catch {
@@ -123,6 +167,18 @@ export const useLanguageState = (): LanguageContextValue => {
     }
   }, []);
 
+  useEffect(() => {
+    try {
+      const code = readLangQueryParam();
+      if (!code || !(SUPPORTED_LANGS as readonly string[]).includes(code)) return;
+      if (code === lang) return;
+      const next = code as LangCode;
+      queueMicrotask(() => setLangState(next));
+    } catch {
+      void 0;
+    }
+  }, [lang]);
+
   // Geo-IP fallback: fires once on mount when the user has no stored preference.
   // If the visitor's country maps to a supported language, update accordingly.
   useEffect(() => {
@@ -131,6 +187,7 @@ export const useLanguageState = (): LanguageContextValue => {
     } catch {
       return;
     }
+    if (detectNavigatorLanguage()) return;
     detectCountryLanguage().then((countryLang) => {
       if (countryLang) {
         setLangState(countryLang);

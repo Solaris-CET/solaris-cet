@@ -1,4 +1,4 @@
-import { useRef, useLayoutEffect, useState } from 'react';
+import { useRef, useLayoutEffect, useState, useEffect, useMemo } from 'react';
 import { gsap } from 'gsap';
 import {
   Brain,
@@ -310,6 +310,17 @@ const WhitepaperSection = () => {
   const headingRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const [progress, setProgress] = useState(0);
+
+  const readMinutes = useMemo(() => {
+    const words = wpSections
+      .flatMap((s) => s.content)
+      .join(' ')
+      .split(/\s+/)
+      .filter(Boolean).length;
+    return Math.max(1, Math.round(words / 220));
+  }, []);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -368,6 +379,38 @@ const WhitepaperSection = () => {
     return () => ctx.revert();
   }, []);
 
+  useEffect(() => {
+    const section = sectionRef.current;
+    const content = contentRef.current;
+    const cta = ctaRef.current;
+    if (!section || !content || !cta) return;
+
+    const update = () => {
+      rafRef.current = null;
+      const start = content.getBoundingClientRect().top + window.scrollY;
+      const end = cta.getBoundingClientRect().bottom + window.scrollY;
+      const span = Math.max(1, end - start);
+      const y = window.scrollY + 120;
+      const raw = (y - start) / span;
+      const next = Math.max(0, Math.min(1, raw));
+      setProgress(next);
+    };
+
+    const onScroll = () => {
+      if (rafRef.current !== null) return;
+      rafRef.current = window.requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (rafRef.current !== null) window.cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
   return (
     <section
       ref={sectionRef}
@@ -375,6 +418,13 @@ const WhitepaperSection = () => {
       aria-label={t.sectionAria.whitepaperSection}
       className="relative section-glass py-24 lg:py-32 overflow-hidden mesh-bg"
     >
+      <div className="sticky top-0 z-30 h-1 w-full bg-transparent">
+        <div
+          className="h-full bg-gradient-to-r from-solaris-gold/0 via-solaris-gold to-solaris-cyan/0"
+          style={{ width: `${Math.round(progress * 100)}%` }}
+          aria-hidden
+        />
+      </div>
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute bottom-0 left-0 right-0 h-[40vh] grid-floor opacity-15" />
@@ -401,6 +451,14 @@ const WhitepaperSection = () => {
           <p className="text-solaris-muted text-base lg:text-lg leading-relaxed mb-4">
             A complete, human-readable specification of the Solaris CET protocol. Click any section to expand it. No PDF reader, no metadata, no download required — this whitepaper lives entirely on-chain and on this page.
           </p>
+
+          <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono text-solaris-muted mb-5">
+            <span>~{readMinutes} min read</span>
+            <span className="opacity-50">·</span>
+            <span>{Math.round(progress * 100)}%</span>
+            <span className="opacity-50">·</span>
+            <span>v1.0</span>
+          </div>
 
           <div className="flex flex-wrap gap-3">
             {['TON Blockchain', 'RAV Protocol', 'BRAID Framework', 'Grok × Gemini', '9,000 CET Supply'].map(tag => (

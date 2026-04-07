@@ -84,7 +84,6 @@ const HeroSection: React.FC = () => {
     <TooltipProvider>
       <section
         ref={containerRef}
-        style={{ fontFamily: '"Syne", sans-serif' }}
         className="relative min-h-dvh bg-slate-950 overflow-x-hidden lg:overflow-hidden flex flex-col justify-center items-center pt-20 pb-16 lg:pb-24 lg:pt-16"
       >
         {/* Deep Space Background & TON Nodes */}
@@ -146,11 +145,53 @@ const HeroSection: React.FC = () => {
             </div>
 
             {/* Animated Counters Subtitle Area */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 lg:gap-16 w-full max-w-4xl border-y border-white/5 py-8 bg-white/[0.01] backdrop-blur-md rounded-3xl mb-12 shadow-2xl">
-              <AnimatedCounter value={9000} label="Total Supply" />
+            <div
+              data-testid="hero-quick-stats"
+              className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 lg:gap-16 w-full max-w-4xl border-y border-white/5 py-8 bg-white/[0.01] backdrop-blur-md rounded-3xl mb-6 shadow-2xl"
+            >
+              <AnimatedCounter value={9000} label="Total Supply" suffix=" CET" />
               <AnimatedCounter value={214500} label="Market Cap" prefix="$" />
               <AnimatedCounter value={200000} label="AI Agents" />
+              <div className="sm:col-span-3 flex flex-wrap justify-center items-center gap-3 sm:gap-4 opacity-90 mt-2">
+                <div className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono text-solaris-muted">
+                  TON
+                </div>
+                <a
+                  href="#authority-trust"
+                  className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono text-solaris-muted hover:text-solaris-text hover:bg-white/10 transition-colors"
+                >
+                  Cetățuia
+                </a>
+              </div>
             </div>
+
+            <div
+              data-testid="hero-next-steps"
+              className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-10 w-full max-w-4xl px-4"
+            >
+              <a
+                href={DEDUST_SWAP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-solaris-text text-sm font-semibold hover:bg-white/10 transition-colors"
+              >
+                DeDust
+              </a>
+              <a
+                href="#staking"
+                className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-solaris-text text-sm font-semibold hover:bg-white/10 transition-colors"
+              >
+                Tokenomics
+              </a>
+              <a
+                href="#how-to-buy"
+                className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-solaris-text text-sm font-semibold hover:bg-white/10 transition-colors"
+              >
+                How to Buy
+              </a>
+            </div>
+
+            
 
             {/* Trust Badges under CTA */}
             <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-10 opacity-80 mb-8">
