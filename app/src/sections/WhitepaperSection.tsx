@@ -78,16 +78,16 @@ const wpSections: WPSection[] = [
     title: 'Architecture',
     subtitle: 'Hybrid Dual-Layer Blockchain on TON',
     content: [
-      'Solaris CET is built on the TON (The Open Network) blockchain, inheriting its sharded architecture, Proof-of-Stake consensus, and native smart contract capabilities. TON was selected for its unmatched throughput (100,000+ TPS), sub-2-second finality, and Telegram ecosystem integration reaching 900M+ users.',
+      'Solaris CET is built on the TON (The Open Network) blockchain, inheriting its sharded architecture, Proof-of-Stake consensus, and native smart contract capabilities. TON was selected for its high throughput design, short finality, and deep Telegram ecosystem integration.',
       'The dual-layer architecture separates concerns: Layer 1 handles consensus, token settlement, and immutable state storage. Layer 2 processes the AI reasoning workloads — high-frequency agent interactions, model inference requests, and IPFS content addressing — before anchoring verified results back to Layer 1.',
       'This design means users never wait for AI reasoning to block on-chain transactions. The two layers operate in parallel, converging on finality every 2 seconds. The cryptographic bridge between them uses Merkle proofs to guarantee that no Layer 2 result can be submitted to Layer 1 without a complete, verifiable reasoning trace.',
     ],
     chips: ['TON L1', 'AI L2', 'Merkle Bridge', 'IPFS Storage', 'PoS Consensus'],
     stats: [
-      { label: 'TPS', value: '100,000' },
-      { label: 'Finality', value: '~2.0s' },
-      { label: 'Active Nodes', value: '18,420' },
-      { label: 'Shards', value: 'Dynamic' },
+      { label: 'L1', value: 'TON (sharded)' },
+      { label: 'Finality', value: '~2s (typical)' },
+      { label: 'Bridge', value: 'Merkle proofs' },
+      { label: 'Storage', value: 'IPFS' },
     ],
   },
   {
@@ -98,11 +98,11 @@ const wpSections: WPSection[] = [
     title: 'RAV Protocol',
     subtitle: 'Reason → Act → Verify Loop',
     content: [
-      'The RAV (Reason-Act-Verify) Protocol is the proprietary dual-AI operational framework powering every Solaris CET agent. The REASON phase is handled by Google Gemini — decomposing goals into sub-objectives using BRAID graphs and indexing all available on-chain and off-chain signals. Before any on-chain action is executed, the agent must produce a verifiable reasoning trace stored immutably on IPFS and anchored to its Layer 1 transaction.',
-      'The ACT phase is executed by xAI Grok — delivering the optimal action sequence across market automation or crop diagnostics pipelines with decisive, low-latency responses. All parameters are recorded on-chain. The VERIFY phase cross-validates both model outputs: the outcome is confirmed against the prediction, the agent\'s self-model is updated, and a verifiable performance delta is published.',
-      'In empirical testing across 50,000 agent runs, the RAV dual-AI architecture achieved a 34% higher task success rate than single-model agents, reduced hallucination incidents by 89%, and enabled full post-hoc audit of every decision. Gemini supplies the analytical depth; Grok supplies the execution speed.',
+      'The RAV (Reason-Act-Verify) Protocol is an operational loop used to make agent actions auditable. The REASON phase decomposes goals into sub-objectives using structured reasoning graphs and indexes available on-chain and off-chain signals. Before any on-chain action is executed, the agent must produce a verifiable reasoning trace stored on IPFS and anchored to its Layer 1 transaction.',
+      'The ACT phase executes the selected action sequence across market automation or crop diagnostics pipelines. Parameters are recorded and can be reviewed post-hoc. The VERIFY phase cross-checks outcomes against expectations and chain facts, then publishes a trace so the decision can be audited later.',
+      'Quantitative benchmarking is treated as a publishable artifact: if/when performance metrics are claimed, they should be linked to reproducible methodology and datasets.',
     ],
-    chips: ['Reason', 'Act', 'Verify', 'Grok × Gemini', 'On-Chain Audit'],
+    chips: ['Reason', 'Act', 'Verify', 'Multi-model', 'On-Chain Audit'],
   },
   {
     id: 'braid',
@@ -113,11 +113,11 @@ const wpSections: WPSection[] = [
     subtitle: 'Structural Reasoning with Logic Graphs',
     content: [
       'BRAID (Bidirectional Reasoning with AI-Directed graphs) replaces the linear token prediction of standard LLMs with a directed acyclic graph (DAG) of reasoning nodes. Each node represents a discrete cognitive operation: fact retrieval, hypothesis generation, logical inference, or outcome evaluation.',
-      'The graph structure allows agents to perform parallel reasoning across independent branches, prune dead-end paths early, and reuse verified sub-conclusions without recomputation. In benchmarks, BRAID-structured agents achieve 74× the computational efficiency of equivalent flat-context LLMs on multi-step reasoning tasks.',
+      'The graph structure allows agents to perform parallel reasoning across independent branches, prune dead-end paths early, and reuse verified sub-conclusions without recomputation. This improves debuggability for multi-step reasoning tasks.',
       'BRAID graphs are serialised in Mermaid notation, stored on IPFS, and referenced in every CET transaction. This means developers and auditors can reconstruct the exact reasoning path that led to any agent action — months or years after the fact — without access to the original model.',
     ],
     stats: [
-      { label: 'Efficiency Gain', value: '74×' },
+      { label: 'Reasoning', value: 'Graph-based' },
       { label: 'Graph Format', value: 'Mermaid DAG' },
       { label: 'Storage', value: 'IPFS' },
       { label: 'Audit Lag', value: '0' },

@@ -3,6 +3,7 @@ import { ExternalLink, Menu } from 'lucide-react';
 import { SolarisLogoMark } from './SolarisLogoMark';
 import LanguageSelector from './LanguageSelector';
 import WalletConnect from './WalletConnect';
+import WalletBalance from './WalletBalance';
 import { HeaderTrustStrip } from './HeaderTrustStrip';
 import HeaderPriceTicker from './HeaderPriceTicker';
 import ThemeToggle from './ThemeToggle';
@@ -214,6 +215,7 @@ const Navigation = () => {
               <ThemeToggle />
               <div className="flex flex-col items-end gap-1 shrink-0">
                 <WalletConnect />
+                <WalletBalance />
                 <HeaderTrustStrip />
               </div>
               <HeaderPriceTicker />
@@ -317,6 +319,7 @@ const Navigation = () => {
                 <ThemeToggle />
                 <div className="w-full flex flex-col items-center gap-2">
                   <WalletConnect />
+                  <WalletBalance className="justify-center" />
                   <HeaderTrustStrip align="center" />
                 </div>
               </div>

@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { Shield, Zap, Cpu, ArrowLeftRight } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
+import AppImage from '../components/AppImage';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -106,7 +107,7 @@ const HybridEngineSection = () => {
   const badges = [
     { icon: Shield, label: 'PoW Security', color: 'text-solaris-gold', bg: 'bg-solaris-gold/10', border: 'border-solaris-gold/30', key: 'pow' as const },
     { icon: Zap, label: 'DPoS Speed', color: 'text-solaris-cyan', bg: 'bg-solaris-cyan/10', border: 'border-solaris-cyan/30', key: 'dpos' as const },
-    { icon: Cpu, label: '100K TPS', color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/30', key: null },
+    { icon: Cpu, label: 'Sharded L1', color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/30', key: null },
   ];
 
   return (
@@ -124,7 +125,7 @@ const HybridEngineSection = () => {
       <GlowOrbs variant="gold" />
 
       {/* Background coin */}
-      <img
+      <AppImage
         ref={coinRef}
         src={`${import.meta.env.BASE_URL}hero-coin.png`}
         alt="Solaris CET token coin"
@@ -224,10 +225,10 @@ const HybridEngineSection = () => {
               >
                 <Zap className="w-6 h-6 text-solaris-cyan mx-auto mb-2" />
                 <div className="font-mono text-sm text-solaris-cyan font-semibold">DPoS Layer</div>
-                <div className="text-solaris-muted text-xs mt-1">100,000 TPS execution</div>
+                <div className="text-solaris-muted text-xs mt-1">High-throughput execution (sharded)</div>
                 {activeNode === 'dpos' && (
                   <div className="mt-3 pt-3 border-t border-solaris-cyan/20 text-xs text-solaris-muted text-left">
-                    Delegated proof-of-stake enables near-instant finality and massive throughput for agentic workloads.
+                    Delegated proof-of-stake enables fast finality and high throughput for parallel workloads.
                   </div>
                 )}
               </button>
@@ -237,8 +238,7 @@ const HybridEngineSection = () => {
           {/* Content */}
           <div className="space-y-3 mb-8">
             <p className="text-solaris-muted text-base lg:text-lg leading-relaxed">
-              Dynamic block sizes on the Solaris Layer push throughput to{' '}
-              <span className="text-solaris-gold font-semibold">100,000 TPS</span>—without sacrificing decentralization.
+              The execution layer is designed for high throughput via sharding and batching, while settlement remains verifiable on-chain.
             </p>
           </div>
 
@@ -260,19 +260,19 @@ const HybridEngineSection = () => {
             <div className="stat-card p-3 rounded-lg bg-white/3">
               <div className="hud-label mb-1">Throughput</div>
               <div className="font-display font-bold text-2xl lg:text-3xl text-solaris-gold">
-                100K <span className="text-lg text-solaris-muted">TPS</span>
+                High <span className="text-lg text-solaris-muted">sharded</span>
               </div>
             </div>
             <div className="stat-card p-3 rounded-lg bg-white/3">
               <div className="hud-label mb-1">Finality</div>
               <div className="font-display font-bold text-2xl lg:text-3xl text-solaris-cyan">
-                2.0 <span className="text-lg text-solaris-muted">sec</span>
+                ~2 <span className="text-lg text-solaris-muted">sec</span>
               </div>
             </div>
             <div className="stat-card p-3 rounded-lg bg-white/3">
-              <div className="hud-label mb-1">Energy Saved</div>
+              <div className="hud-label mb-1">Energy Profile</div>
               <div className="font-display font-bold text-2xl lg:text-3xl text-emerald-400">
-                99.95<span className="text-lg">%</span>
+                PoS<span className="text-lg text-solaris-muted">-based</span>
               </div>
             </div>
           </div>

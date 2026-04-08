@@ -7,7 +7,7 @@ import {
 describe('competitionChartData', () => {
   it('keeps CET as first bar in both series with canonical figures', () => {
     expect(COMPETITION_TPS_CHART_ROWS[0]).toEqual(
-      expect.objectContaining({ name: 'CET', value: 100_000, isCET: true }),
+      expect.objectContaining({ name: 'CET', value: 100, isCET: true }),
     );
     expect(COMPETITION_SCARCITY_CHART_ROWS[0]).toEqual(
       expect.objectContaining({ name: 'CET', value: 9_000, isCET: true }),

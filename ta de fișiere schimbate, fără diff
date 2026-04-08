@@ -1,0 +1,1188 @@
+[1mdiff --git a/.env.example b/.env.example[m
+[1mindex 17a4e98..a54f2b9 100644[m
+[1m--- a/.env.example[m
+[1m+++ b/.env.example[m
+[36m@@ -33,3 +33,18 @@[m [mGEMINI_API_KEY_ENC=[m
+ #[m
+ # FALLBACK (plaintext — local dev only):[m
+ GEMINI_API_KEY=[m
+[32m+[m
+[32m+[m[32m# ── Auth / DB / infra (optional) ─────────────────────────────────────────────[m
+[32m+[m[32m# JWT secret used by /api/auth and protected routes (GDPR delete, audit attribution).[m
+[32m+[m[32mJWT_SECRET=[m
+[32m+[m[32m#[m
+[32m+[m[32m# Postgres connection string for Drizzle (wallet sync + audit logs).[m
+[32m+[m[32mDATABASE_URL=[m
+[32m+[m[32m#[m
+[32m+[m[32m# TON balance lookup (optional). If not set, /api/wallet/balance degrades gracefully.[m
+[32m+[m[32mTONCENTER_RPC_URL=https://toncenter.com/api/v2/jsonRPC[m
+[32m+[m[32mTONCENTER_API_KEY=[m
+[32m+[m[32m#[m
+[32m+[m[32m# Upstash Redis REST (optional): rate limiting + cache.[m
+[32m+[m[32mUPSTASH_REDIS_REST_URL=[m
+[32m+[m[32mUPSTASH_REDIS_REST_TOKEN=[m
+[1mdiff --git a/app/.env.example b/app/.env.example[m
+[1mindex 12a2891..4406919 100644[m
+[1m--- a/app/.env.example[m
+[1m+++ b/app/.env.example[m
+[36m@@ -23,3 +23,18 @@[m [mGROK_API_KEY=[m
+ # Gemini provider (set encrypted or plaintext key)[m
+ GEMINI_API_KEY_ENC=[m
+ GEMINI_API_KEY=[m
+[32m+[m
+[32m+[m[32m# Optional: secure auth token issued by /api/auth (HS256)[m
+[32m+[m[32mJWT_SECRET=[m
+[32m+[m
+[32m+[m[32m# Optional: Postgres for /api/auth, /api/audit (DB mode), /api/gdpr[m
+[32m+[m[32mDATABASE_URL=[m
+[32m+[m
+[32m+[m[32m# Optional: TON Center RPC for /api/wallet/balance[m
+[32m+[m[32m# TONCENTER_RPC_URL=https://toncenter.com/api/v2/jsonRPC[m
+[32m+[m[32mTONCENTER_RPC_URL=[m
+[32m+[m[32mTONCENTER_API_KEY=[m
+[32m+[m
+[32m+[m[32m# Optional: Upstash Redis REST (rate limit /api/chat, cache /api/cache)[m
+[32m+[m[32mUPSTASH_REDIS_REST_URL=[m
+[32m+[m[32mUPSTASH_REDIS_REST_TOKEN=[m
+[1mdiff --git a/app/README.md b/app/README.md[m
+[1mindex 52d6550..a88e969 100644[m
+[1m--- a/app/README.md[m
+[1m+++ b/app/README.md[m
+[36m@@ -42,6 +42,9 @@[m [mE2E (Chromium): from `app/`, **`npm run test:e2e`** (install browsers once: `npx[m
+ [m
+ - **CET AI:** `GROK_API_KEY` / `GEMINI_API_KEY` (or `*_ENC` + `ENCRYPTION_SECRET`) — see `api/lib/crypto.ts` and `scripts/encrypt-key.mjs` in the repo root.[m
+ - **Auth API:** database URL expected by `db/client` (see Drizzle config).[m
+[32m+[m[32m- **JWT (optional):** `JWT_SECRET` enables `/api/auth` token issuance and protects `/api/gdpr` and audit attribution.[m
+[32m+[m[32m- **Rate limiting / cache (optional):** `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` enable `/api/chat` rate limiting and `/api/cache`.[m
+[32m+[m[32m- **TON RPC (optional):** `TONCENTER_RPC_URL`, `TONCENTER_API_KEY` enable `/api/wallet/balance`.[m
+ [m
+ ## Deploy notes[m
+ [m
+[1mdiff --git a/app/api/auth/route.ts b/app/api/auth/route.ts[m
+[1mindex 68f08eb..1271f5e 100644[m
+[1m--- a/app/api/auth/route.ts[m
+[1m+++ b/app/api/auth/route.ts[m
+[36m@@ -6,6 +6,7 @@[m [mimport { eq } from 'drizzle-orm';[m
+ import { nanoid } from 'nanoid';[m
+ import { getAllowedOrigin } from '../lib/cors';[m
+ import { getDb, schema } from '../../db/client';[m
+[32m+[m[32mimport { signJwt, verifyJwt } from '../lib/jwt';[m
+ [m
+ export const config = { runtime: 'nodejs' };[m
+ [m
+[36m@@ -18,6 +19,8 @@[m [mfunction isUniqueViolation(err: unknown): boolean {[m
+   );[m
+ }[m
+ [m
+[32m+[m[32mconst JWT_TTL_SECONDS = 60 * 60;[m
+[32m+[m
+ export default async function handler(req: Request): Promise<Response> {[m
+   const origin = req.headers.get('origin');[m
+   const allowedOrigin = getAllowedOrigin(origin);[m
+[36m@@ -34,14 +37,31 @@[m [mexport default async function handler(req: Request): Promise<Response> {[m
+     });[m
+   }[m
+ [m
+[31m-  if (req.method !== 'POST') {[m
+[32m+[m[32m  if (req.method === 'GET') {[m
+[32m+[m[32m    const auth = req.headers.get('Authorization') ?? '';[m
+[32m+[m[32m    const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';[m
+[32m+[m[32m    const secret = process.env.JWT_SECRET?.trim();[m
+[32m+[m[32m    if (!token || !secret) {[m
+[32m+[m[32m      return new Response(JSON.stringify({ error: 'Unauthorized' }), {[m
+[32m+[m[32m        status: 401,[m
+[32m+[m[32m        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },[m
+[32m+[m[32m      });[m
+[32m+[m[32m    }[m
+[32m+[m[32m    const decoded = verifyJwt(token, secret);[m
+[32m+[m[32m    if (!decoded || typeof decoded.wallet !== 'string') {[m
+[32m+[m[32m      return new Response(JSON.stringify({ error: 'Invalid token' }), {[m
+[32m+[m[32m        status: 401,[m
+[32m+[m[32m        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },[m
+[32m+[m[32m      });[m
+[32m+[m[32m    }[m
+[32m+[m[32m    return new Response(JSON.stringify({ user: { wallet: decoded.wallet } }), {[m
+[32m+[m[32m      status: 200,[m
+[32m+[m[32m      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },[m
+[32m+[m[32m    });[m
+[32m+[m[32m  } else if (req.method !== 'POST') {[m
+     return new Response(JSON.stringify({ error: 'Method not allowed' }), {[m
+       status: 405,[m
+[31m-      headers: {[m
+[31m-        'Content-Type': 'application/json',[m
+[31m-        'Access-Control-Allow-Origin': allowedOrigin,[m
+[31m-        Vary: 'Origin',[m
+[31m-      },[m
+[32m+[m[32m      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },[m
+     });[m
+   }[m
+ [m
+[36m@@ -87,7 +107,9 @@[m [mexport default async function handler(req: Request): Promise<Response> {[m
+       .where(eq(schema.users.walletAddress, walletAddress));[m
+ [m
+     if (existing) {[m
+[31m-      return new Response(JSON.stringify(existing), {[m
+[32m+[m[32m      const secret = process.env.JWT_SECRET?.trim();[m
+[32m+[m[32m      const token = secret ? await signJwt({ wallet: walletAddress }, secret, JWT_TTL_SECONDS) : undefined;[m
+[32m+[m[32m      return new Response(JSON.stringify({ ...existing, token }), {[m
+         status: 200,[m
+         headers: {[m
+           'Content-Type': 'application/json',[m
+[36m@@ -110,7 +132,9 @@[m [mexport default async function handler(req: Request): Promise<Response> {[m
+           })[m
+           .returning();[m
+ [m
+[31m-        return new Response(JSON.stringify(newUser), {[m
+[32m+[m[32m        const secret = process.env.JWT_SECRET?.trim();[m
+[32m+[m[32m        const token = secret ? await signJwt({ wallet: walletAddress }, secret, JWT_TTL_SECONDS) : undefined;[m
+[32m+[m[32m        return new Response(JSON.stringify({ ...newUser, token }), {[m
+           status: 201,[m
+           headers: {[m
+             'Content-Type': 'application/json',[m
+[1mdiff --git a/app/api/chat/route.ts b/app/api/chat/route.ts[m
+[1mindex ff99bf1..cbb51d7 100644[m
+[1m--- a/app/api/chat/route.ts[m
+[1m+++ b/app/api/chat/route.ts[m
+[36m@@ -59,6 +59,37 @@[m [minterface OnChainContext {[m
+   volume24hUsd: string;[m
+ }[m
+ [m
+[32m+[m[32masync function withRateLimit(req: Request, allowedOrigin: string): Promise<Response | null> {[m
+[32m+[m[32m  const url = (process.env.UPSTASH_REDIS_REST_URL ?? '').trim();[m
+[32m+[m[32m  const token = (process.env.UPSTASH_REDIS_REST_TOKEN ?? '').trim();[m
+[32m+[m[32m  if (!url || !token) return null;[m
+[32m+[m[32m  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';[m
+[32m+[m[32m  const key = `cet-ai-chat:${ip}`;[m
+[32m+[m[32m  try {[m
+[32m+[m[32m    const incr = await fetch(`${url}/incr/${encodeURIComponent(key)}`, {[m
+[32m+[m[32m      headers: { Authorization: `Bearer ${token}` },[m
+[32m+[m[32m      cache: 'no-store',[m
+[32m+[m[32m    });[m
+[32m+[m[32m    const payload = (await incr.json()) as { result?: unknown };[m
+[32m+[m[32m    const count = typeof payload.result === 'number' ? payload.result : Number.NaN;[m
+[32m+[m[32m    if (Number.isFinite(count) && count === 1) {[m
+[32m+[m[32m      await fetch(`${url}/expire/${encodeURIComponent(key)}/10`, {[m
+[32m+[m[32m        headers: { Authorization: `Bearer ${token}` },[m
+[32m+[m[32m        cache: 'no-store',[m
+[32m+[m[32m      });[m
+[32m+[m[32m    }[m
+[32m+[m[32m    if (Number.isFinite(count) && count > 10) {[m
+[32m+[m[32m      return new Response(JSON.stringify({ error: 'Rate limited' }), {[m
+[32m+[m[32m        status: 429,[m
+[32m+[m[32m        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },[m
+[32m+[m[32m      });[m
+[32m+[m[32m    }[m
+[32m+[m[32m  } catch {[m
+[32m+[m[32m    // ignore[m
+[32m+[m[32m  }[m
+[32m+[m[32m  return null;[m
+[32m+[m[32m}[m
+[32m+[m
+ /** Prior turns for multi-turn follow-ups (Claude-style chat context). Max 24 messages. */[m
+ interface ConversationTurn {[m
+   role: 'user' | 'assistant';[m
+[36m@@ -190,6 +221,9 @@[m [mexport default async function handler(req: Request): Promise<Response> {[m
+     });[m
+   }[m
+ [m
+[32m+[m[32m  const limited = await withRateLimit(req, allowedOrigin);[m
+[32m+[m[32m  if (limited) return limited;[m
+[32m+[m
+   try {[m
+   // 1. Resolve API keys — prefer AES-256-GCM encrypted variants (*_ENC) when[m
+   //    ENCRYPTION_SECRET is set; fall back to plaintext variants for local dev.[m
+[1mdiff --git a/app/db/schema.ts b/app/db/schema.ts[m
+[1mindex 5809e1a..5985912 100644[m
+[1m--- a/app/db/schema.ts[m
+[1m+++ b/app/db/schema.ts[m
+[36m@@ -58,9 +58,23 @@[m [mexport const transactions = pgTable([m
+   (t) => [index('transactions_user_id_idx').on(t.userId)],[m
+ );[m
+ [m
+[32m+[m[32mexport const auditLogs = pgTable([m
+[32m+[m[32m  'audit_logs',[m
+[32m+[m[32m  {[m
+[32m+[m[32m    id: uuid('id').primaryKey().defaultRandom(),[m
+[32m+[m[32m    walletAddress: text('wallet_address'),[m
+[32m+[m[32m    action: text('action').notNull(),[m
+[32m+[m[32m    details: text('details'),[m
+[32m+[m[32m    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),[m
+[32m+[m[32m  },[m
+[32m+[m[32m  (t) => [index('audit_logs_wallet_address_idx').on(t.walletAddress)],[m
+[32m+[m[32m);[m
+[32m+[m
+ export type User = typeof users.$inferSelect;[m
+ export type NewUser = typeof users.$inferInsert;[m
+ export type MiningSession = typeof miningSessions.$inferSelect;[m
+ export type NewMiningSession = typeof miningSessions.$inferInsert;[m
+ export type Transaction = typeof transactions.$inferSelect;[m
+ export type NewTransaction = typeof transactions.$inferInsert;[m
+[32m+[m[32mexport type AuditLog = typeof auditLogs.$inferSelect;[m
+[32m+[m[32mexport type NewAuditLog = typeof auditLogs.$inferInsert;[m
+[1mdiff --git a/app/index.html b/app/index.html[m
+[1mindex ba21a0f..2faa35e 100644[m
+[1m--- a/app/index.html[m
+[1m+++ b/app/index.html[m
+[36m@@ -158,7 +158,7 @@[m
+           "name": "What is Solaris CET?",[m
+           "acceptedAnswer": {[m
+             "@type": "Answer",[m
+[31m-            "text": "Solaris CET (CET) is a hyper-scarce Real-World Asset token on the TON blockchain with a fixed supply of 9,000 CET. It operates 200,000 autonomous AI agents across 10 enterprise departments, powered by the Grok × Gemini dual-AI RAV Protocol."[m
+[32m+[m[32m            "text": "Solaris CET (CET) is a hyper-scarce Real-World Asset token on the TON blockchain with a fixed supply of 9,000 CET. The site includes a simulated task-agent mesh and an optional multi-model RAV-style workflow when deployed with live AI APIs."[m
+           }[m
+         },[m
+         {[m
+[36m@@ -190,7 +190,7 @@[m
+           "name": "What blockchain does CET run on?",[m
+           "acceptedAnswer": {[m
+             "@type": "Answer",[m
+[31m-            "text": "CET is deployed on the TON (The Open Network) mainnet — one of the fastest L1 blockchains, with approximately 100,000 TPS throughput and 2-second transaction finality."[m
+[32m+[m[32m            "text": "CET is deployed on the TON (The Open Network) mainnet — a sharded L1 designed for high throughput and short finality in typical conditions (varies by network load and workload)."[m
+           }[m
+         },[m
+         {[m
+[36m@@ -198,7 +198,7 @@[m
+           "name": "How does CET compare to Fetch.ai, Bittensor, and SingularityNET?",[m
+           "acceptedAnswer": {[m
+             "@type": "Answer",[m
+[31m-            "text": "Solaris CET has a fixed supply of 9,000 (vs billions for competitors), runs on TON at 100,000 TPS (vs under 1,000 TPS for FET/TAO/AGIX), operates 200,000 deployed autonomous agents (not just a marketplace), uses dual-AI Grok × Gemini RAV Protocol (unique), and is backed by real-world agricultural assets."[m
+[32m+[m[32m            "text": "Solaris CET has a fixed supply of 9,000 (vs millions/billions for many competitors), runs on TON (sharded L1), includes a simulated agent-mesh UX for structured answers, and anchors its narrative in real-world agricultural assets."[m
+           }[m
+         },[m
+         {[m
+[1mdiff --git a/app/src/App.tsx b/app/src/App.tsx[m
+[1mindex 506d277..3c794e1 100644[m
+[1m--- a/app/src/App.tsx[m
+[1m+++ b/app/src/App.tsx[m
+[36m@@ -4,6 +4,8 @@[m [mimport { ScrollTrigger } from 'gsap/ScrollTrigger';[m
+ import { PRODUCTION_SITE_ORIGIN } from '@/lib/brandAssets';[m
+ import { TonConnectUIProvider } from '@tonconnect/ui-react';[m
+ import Navigation from './components/Navigation';[m
+[32m+[m[32mimport StatusBar from './components/StatusBar';[m
+[32m+[m[32mimport { Toaster } from '@/components/ui/sonner';[m
+ import { SolarisLogoMark } from './components/SolarisLogoMark';[m
+ import CursorGlow from './components/CursorGlow';[m
+ import LazyLoadWrapper from './components/LazyLoadWrapper';[m
+[36m@@ -289,6 +291,8 @@[m [mfunction AppContent() {[m
+         </a>[m
+         {/* Navigation */}[m
+         <Navigation />[m
+[32m+[m[32m        <Toaster />[m
+[32m+[m[32m        <StatusBar />[m
+         [m
+         {/* Main content — conversion flow: Hero → Problem → Solution → Tokenomics → RWA → Roadmap → Footer */}[m
+         <main[m
+[1mdiff --git a/app/src/__tests__/competitionChartData.test.ts b/app/src/__tests__/competitionChartData.test.ts[m
+[1mindex 21df9a2..77b2b23 100644[m
+[1m--- a/app/src/__tests__/competitionChartData.test.ts[m
+[1m+++ b/app/src/__tests__/competitionChartData.test.ts[m
+[36m@@ -7,7 +7,7 @@[m [mimport {[m
+ describe('competitionChartData', () => {[m
+   it('keeps CET as first bar in both series with canonical figures', () => {[m
+     expect(COMPETITION_TPS_CHART_ROWS[0]).toEqual([m
+[31m-      expect.objectContaining({ name: 'CET', value: 100_000, isCET: true }),[m
+[32m+[m[32m      expect.objectContaining({ name: 'CET', value: 100, isCET: true }),[m
+     );[m
+     expect(COMPETITION_SCARCITY_CHART_ROWS[0]).toEqual([m
+       expect.objectContaining({ name: 'CET', value: 9_000, isCET: true }),[m
+[1mdiff --git a/app/src/components/Navigation.tsx b/app/src/components/Navigation.tsx[m
+[1mindex 95d1d39..979f0e1 100644[m
+[1m--- a/app/src/components/Navigation.tsx[m
+[1m+++ b/app/src/components/Navigation.tsx[m
+[36m@@ -3,6 +3,7 @@[m [mimport { ExternalLink, Menu } from 'lucide-react';[m
+ import { SolarisLogoMark } from './SolarisLogoMark';[m
+ import LanguageSelector from './LanguageSelector';[m
+ import WalletConnect from './WalletConnect';[m
+[32m+[m[32mimport WalletBalance from './WalletBalance';[m
+ import { HeaderTrustStrip } from './HeaderTrustStrip';[m
+ import HeaderPriceTicker from './HeaderPriceTicker';[m
+ import ThemeToggle from './ThemeToggle';[m
+[36m@@ -214,6 +215,7 @@[m [mconst Navigation = () => {[m
+               <ThemeToggle />[m
+               <div className="flex flex-col items-end gap-1 shrink-0">[m
+                 <WalletConnect />[m
+[32m+[m[32m                <WalletBalance />[m
+                 <HeaderTrustStrip />[m
+               </div>[m
+               <HeaderPriceTicker />[m
+[36m@@ -317,6 +319,7 @@[m [mconst Navigation = () => {[m
+                 <ThemeToggle />[m
+                 <div className="w-full flex flex-col items-center gap-2">[m
+                   <WalletConnect />[m
+[32m+[m[32m                  <WalletBalance className="justify-center" />[m
+                   <HeaderTrustStrip align="center" />[m
+                 </div>[m
+               </div>[m
+[1mdiff --git a/app/src/components/SocialShare.tsx b/app/src/components/SocialShare.tsx[m
+[1mindex f23f6ec..17d671a 100644[m
+[1m--- a/app/src/components/SocialShare.tsx[m
+[1m+++ b/app/src/components/SocialShare.tsx[m
+[36m@@ -3,6 +3,7 @@[m [mimport { productionSiteUrl } from '@/lib/brandAssets';[m
+ import { useLanguage } from '../hooks/useLanguage';[m
+ import { useTelegram } from '../hooks/useTelegram';[m
+ import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';[m
+[32m+[m[32mimport { toast } from 'sonner';[m
+ [m
+ /** Canonical link in shares — matches `index.html`; override in Coolify / `.env` via `VITE_PUBLIC_SITE_URL`. */[m
+ const SITE_URL = (() => {[m
+[36m@@ -38,7 +39,7 @@[m [mconst SocialShare = () => {[m
+     } else {[m
+       try {[m
+         await navigator.clipboard.writeText(`${t.social.shareBody} ${SITE_URL}`);[m
+[31m-        alert(t.social.linkCopied);[m
+[32m+[m[32m        toast.success(t.social.linkCopied);[m
+       } catch {[m
+         // clipboard unavailable[m
+       }[m
+[1mdiff --git a/app/src/components/ThemeToggle.tsx b/app/src/components/ThemeToggle.tsx[m
+[1mindex 08539e1..cc46c85 100644[m
+[1m--- a/app/src/components/ThemeToggle.tsx[m
+[1m+++ b/app/src/components/ThemeToggle.tsx[m
+[36m@@ -4,7 +4,7 @@[m [mimport { useTheme } from 'next-themes';[m
+ import { cn } from '@/lib/utils';[m
+ [m
+ export default function ThemeToggle({ className }: { className?: string }) {[m
+[31m-  const { theme, setTheme } = useTheme();[m
+[32m+[m[32m  const { resolvedTheme, setTheme } = useTheme();[m
+   const [mounted, setMounted] = useState(false);[m
+ [m
+   useEffect(() => {[m
+[36m@@ -12,7 +12,8 @@[m [mexport default function ThemeToggle({ className }: { className?: string }) {[m
+     return () => window.clearTimeout(id);[m
+   }, []);[m
+ [m
+[31m-  const next = theme === 'light' ? 'dark' : 'light';[m
+[32m+[m[32m  const active = resolvedTheme === 'light' ? 'light' : 'dark';[m
+[32m+[m[32m  const next = active === 'light' ? 'dark' : 'light';[m
+ [m
+   return ([m
+     <button[m
+[36m@@ -25,7 +26,7 @@[m [mexport default function ThemeToggle({ className }: { className?: string }) {[m
+       onClick={() => setTheme(next)}[m
+       aria-label="Toggle theme"[m
+     >[m
+[31m-      {mounted && theme === 'light' ? ([m
+[32m+[m[32m      {mounted && active === 'light' ? ([m
+         <Moon className="w-4 h-4" />[m
+       ) : ([m
+         <Sun className="w-4 h-4" />[m
+[1mdiff --git a/app/src/i18n/faqContent.data.ts b/app/src/i18n/faqContent.data.ts[m
+[1mindex cedab86..12afba9 100644[m
+[1m--- a/app/src/i18n/faqContent.data.ts[m
+[1m+++ b/app/src/i18n/faqContent.data.ts[m
+[36m@@ -24,16 +24,16 @@[m [mconst faqEn: FaqContent = {[m
+     'Yes. The CET smart contract was fully audited by Cyberscope with zero critical findings. The core team has also completed KYC verification and the project is listed on Freshcoins. The full audit report is linked in the whitepaper.',[m
+   q5: 'How does CET mining work?',[m
+   a5:[m
+[31m-    "66.66% of the BTC-S supply (the broader ecosystem token) enters circulation via Proof-of-Work mining over a 90-year schedule with a decaying reward curve — similar to Bitcoin's halving model. The Zero-Battery constraint ensures mining approaches 0% battery drain on participating devices.",[m
+[32m+[m[32m    "Mining is designed to run over a long horizon with a decaying reward curve, similar in spirit to emission schedules like Bitcoin's. Exact reward distribution and device impact depend on implementation details and should be verified against the deployed protocol rules.",[m
+   q6: 'What is the DCBM mechanism?',[m
+   a6:[m
+[31m-    'DCBM (Dynamic-Control Buyback Mechanism) uses PID controllers to autonomously manage buy-back operations when price deviates from the target band. It reduces token price volatility by up to 66%, providing scientific price stability without manual intervention.',[m
+[32m+[m[32m    'DCBM (Dynamic-Control Buyback Mechanism) is a proposed buyback and stabilization concept using feedback-control ideas (e.g. PID-like controllers). Any quantitative claims should be backed by a reproducible backtest and on-chain audit trail when implemented.',[m
+   q7: 'What blockchain does CET run on?',[m
+   a7:[m
+[31m-    "CET is deployed on the TON (The Open Network) mainnet — one of the fastest L1 blockchains, with ~100,000 TPS throughput and 2-second transaction finality. TON's sharded architecture provides virtually unlimited scalability.",[m
+[32m+[m[32m    "CET is deployed on the TON (The Open Network) mainnet — a sharded L1 designed for high throughput and short finality in typical conditions. Exact performance varies by network load and workload.",[m
+   q8: 'What is the ReAct Protocol?',[m
+   a8:[m
+[31m-    "ReAct (Reasoning + Acting) is Solaris CET's on-chain AI reasoning standard. Every AI agent action goes through a 5-phase loop: Observe → Think → Plan → Act → Verify. All reasoning traces are anchored on-chain, making every AI decision transparent, auditable, and hallucination-resistant.",[m
+[32m+[m[32m    "ReAct (Reasoning + Acting) is a pattern that interleaves reasoning and actions. Solaris CET uses a 5-phase loop (Observe → Think → Plan → Act → Verify) to keep actions reviewable; traces can be anchored via IPFS/on-chain references when deployed.",[m
+   q9: 'Where can I find the whitepaper?',[m
+   a9: 'The whitepaper is permanently published on IPFS — immutable and censorship-resistant.',[m
+   q10: 'How do I join the Solaris CET community?',[m
+[36m@@ -41,13 +41,13 @@[m [mconst faqEn: FaqContent = {[m
+     'Join the official Telegram community for news, updates, and direct communication with the team. The source code is also open on GitHub.',[m
+   q11: 'How does Solaris CET compare to Fetch.ai, Bittensor and SingularityNET?',[m
+   a11:[m
+[31m-    'CET has 9,000 total supply vs billions for competitors. TON delivers 100,000 TPS vs under 1,000 for Fetch.ai and Bittensor. CET operates 200,000 deployed autonomous agents — not just a marketplace. Only CET uses Grok × Gemini dual-AI simultaneously. And only CET is backed by real-world agricultural assets in Romania.',[m
+[32m+[m[32m    'CET has a fixed supply of 9,000 (many competitors are in the millions/billions). CET runs on TON (sharded L1). The site includes a simulated agent-mesh UX for structured answers, and multi-model routing can be enabled when deployed. CET is anchored to a real-world agricultural narrative in Romania (Cetățuia).',[m
+   q12: 'What is the BRAID Framework?',[m
+   a12:[m
+     'BRAID (Blockchain-Recursive AI Decision) serialises agent reasoning paths as Mermaid notation graphs, stores them on IPFS, and anchors them in every CET transaction. This means any decision made by any agent can be reconstructed and audited months or years later — with complete traceability and zero trust assumptions.',[m
+   q13: 'What are the RAV Protocol phases?',[m
+   a13:[m
+[31m-    'RAV = Reason · Act · Verify. Phase 1 (REASON): Google Gemini decomposes the goal into sub-objectives using a BRAID graph. Phase 2 (ACT): xAI Grok executes the optimised action plan and generates TON transactions. Phase 3 (VERIFY): An independent model reviews the action and its on-chain trace before finalisation. Every phase is timestamped and stored immutably on IPFS.',[m
+[32m+[m[32m    'RAV = Reason · Act · Verify. Phase 1 (REASON): decompose the goal into sub-objectives using a structured reasoning graph. Phase 2 (ACT): execute the action plan (on-chain/off-chain). Phase 3 (VERIFY): cross-check outcomes against chain facts and expected results. Traces can be stored on IPFS and referenced for audits.',[m
+   q14: 'What is the Zero-Battery Constraint?',[m
+   a14:[m
+     "CET mining is engineered to approach zero battery drain on mobile devices. Unlike Bitcoin mining, CET's Zero-Battery Constraint limits CPU utilisation to background-idle levels, meaning mining can run passively without heating your device or reducing battery life measurably.",[m
+[36m@@ -235,16 +235,16 @@[m [mexport const faqContentByLang: Record<FaqLang, FaqContent> = {[m
+       'Da. Contractul CET a fost auditat complet de Cyberscope, fără constatări critice. Echipa a finalizat KYC, iar proiectul este listat pe Freshcoins. Raportul complet este legat în whitepaper.',[m
+     q5: 'Cum funcționează minarea CET?',[m
+     a5:[m
+[31m-      '66,66% din oferta BTC-S intră în circulație prin Proof-of-Work pe 90 de ani, cu curbă descrescătoare — similar modelului de halving Bitcoin. Constrângerea Zero-Battery menține consumul de baterie aproape de 0% pe dispozitive.',[m
+[32m+[m[32m      'Minarea este gândită să ruleze pe un orizont lung, cu o curbă de recompense descrescătoare, similar ca idee cu programe de emisie precum Bitcoin. Distribuția exactă a recompenselor și impactul pe dispozitive depind de implementarea finală și trebuie verificate în regulile protocolului deployat.',[m
+     q6: 'Ce este mecanismul DCBM?',[m
+     a6:[m
+[31m-      'DCBM (mecanism dinamic de răscumpărare) folosește controlere PID pentru operațiuni autonome când prețul deviază de la banda țintă. Poate reduce volatilitatea prețului cu până la 66%, fără intervenție manuală.',[m
+[32m+[m[32m      'DCBM (mecanism dinamic de răscumpărare) este un concept propus de stabilizare care folosește idei de control (feedback de tip PID). Orice afirmație cantitativă trebuie susținută de un backtest reproductibil și de un audit trail on-chain când este implementat.',[m
+     q7: 'Pe ce blockchain rulează CET?',[m
+     a7:[m
+[31m-      'CET este deployat pe mainnet-ul TON (The Open Network) — unul dintre cele mai rapide L1, cu ~100.000 TPS și finalitate în ~2 secunde. Arhitectura sharded a TON oferă scalabilitate foarte mare.',[m
+[32m+[m[32m      'CET este deployat pe mainnet-ul TON (The Open Network) — un L1 fragmentat proiectat pentru debit ridicat și finalitate scurtă în condiții tipice. Performanța exactă variază în funcție de load și workload.',[m
+     q8: 'Ce este protocolul ReAct?',[m
+     a8:[m
+[31m-      'ReAct (Raționament + Acțiune) este standardul on-chain de raționament AI al Solaris CET. Fiecare acțiune a agentului trece prin: Observă → Gândește → Planifică → Acționează → Verifică. Urmele de raționament sunt ancorate on-chain.',[m
+[32m+[m[32m      'ReAct (Raționament + Acțiune) este un pattern care îmbină raționarea cu acțiuni. Solaris CET folosește o buclă în 5 pași (Observă → Gândește → Planifică → Acționează → Verifică) pentru a păstra acțiunile ușor de revizuit; urmele pot fi ancorate prin referințe IPFS/on-chain când e deployat.',[m
+     q9: 'Unde găsesc whitepaper-ul?',[m
+     a9: 'Whitepaper-ul este publicat permanent pe IPFS — imuabil și rezistent la cenzură.',[m
+     q10: 'Cum mă alătur comunității Solaris CET?',[m
+[36m@@ -252,13 +252,13 @@[m [mexport const faqContentByLang: Record<FaqLang, FaqContent> = {[m
+       'Intră în comunitatea oficială Telegram pentru noutăți și dialog cu echipa. Codul sursă este deschis pe GitHub.',[m
+     q11: 'Cum se compară Solaris CET cu Fetch.ai, Bittensor și SingularityNET?',[m
+     a11:[m
+[31m-      'CET are 9.000 tokeni total față de miliarde la concurenți. TON oferă 100.000 TPS față de sub 1.000 la mulți rivali. CET operează ~200.000 agenți autonomi. Doar CET folosește simultan Grok × Gemini. Doar CET este ancorat în active agricole reale în România.',[m
+[32m+[m[32m      'CET are o ofertă fixă de 9.000 (multe proiecte concurente sunt la milioane/miliarde). CET rulează pe TON (L1 fragmentat). Site-ul include o experiență de tip agent-mesh (simulat) pentru răspunsuri structurate, iar rutarea multi-model poate fi activată când e deployat. CET este ancorat într-o narațiune RWA în România (Cetățuia).',[m
+     q12: 'Ce este cadrul BRAID?',[m
+     a12:[m
+       'BRAID serializează căile de raționament ca grafuri Mermaid pe IPFS și le ancorează în fiecare tranzacție CET, pentru audit ulterior.',[m
+     q13: 'Care sunt fazele protocolului RAV?',[m
+     a13:[m
+[31m-      'RAV = Reason · Act · Verify. REASON: Gemini descompune obiectivele. ACT: Grok execută planul și generează tranzacții TON. VERIFY: un model independent verifică acțiunea și urma on-chain. Totul este stocat imuabil pe IPFS.',[m
+[32m+[m[32m      'RAV = Reason · Act · Verify. REASON: descompune obiectivul în sub-obiective folosind un graf de raționament. ACT: execută planul (on-chain/off-chain). VERIFY: verifică rezultatul vs. fapte on-chain și așteptări. Urmele pot fi stocate pe IPFS și referențiate pentru audit.',[m
+     q14: 'Ce este constrângerea Zero-Battery?',[m
+     a14:[m
+       'Minarea CET este proiectată pentru consum aproape nul de baterie pe mobil. Spre deosebire de minarea tip Bitcoin, Zero-Battery limitează CPU la nivel de fundal, fără încălzire vizibilă sau uzură de baterie.',[m
+[1mdiff --git a/app/src/i18n/translations.ts b/app/src/i18n/translations.ts[m
+[1mindex 36432da..0fff0a2 100644[m
+[1m--- a/app/src/i18n/translations.ts[m
+[1m+++ b/app/src/i18n/translations.ts[m
+[36m@@ -752,11 +752,11 @@[m [mconst translations: Record<LangCode, Translations> = {[m
+       verifiedBy: 'Verified by',[m
+       labelAgents: 'Task-specialist AI agents',[m
+       sublabelAgents:[m
+[31m-        '~200k narrow agents for routing, retrieval & validation · 10 departments · orchestrated for CET AI',[m
+[32m+[m[32m        '~200k simulated narrow agents for routing, retrieval & validation · 10 departments · orchestrated for CET AI',[m
+       labelSupply: 'Fixed Total Supply',[m
+       sublabelSupply: 'Forever. No minting. No inflation. Each CET = 0.011% of all value.',[m
+[31m-      labelTps: 'Max TPS on TON',[m
+[31m-      sublabelTps: '100× faster than Ethereum · 2s finality',[m
+[32m+[m[32m      labelTps: 'Finality (typ.)',[m
+[32m+[m[32m      sublabelTps: 'Typical finality on TON (varies)',[m
+       labelYears: 'Year Mining Horizon',[m
+       sublabelYears: 'Decaying reward curve · Bitcoin-style emission',[m
+       badgeLive: 'LIVE',[m
+[36m@@ -766,12 +766,12 @@[m [mconst translations: Record<LangCode, Translations> = {[m
+     },[m
+     aiTeam: {[m
+       corporateStructure: 'AI CORPORATE STRUCTURE',[m
+[31m-      title: '200,000 Agents.',[m
+[32m+[m[32m      title: '200,000 Agents (simulated).',[m
+       titleAccent: 'Zero Marginal Cost.',[m
+       description:[m
+[31m-        'Large enterprises deploy hundreds of thousands of employees — now augmented by AI. Solaris CET matches that scale entirely through autonomous agents: 200,000 specialists operating 24/7, across 10 departments, at the speed of thought.',[m
+[32m+[m[32m        'Large enterprises deploy hundreds of thousands of employees — now augmented by AI. Solaris CET models that scale through an agent mesh: up to 200,000 task specialists operating across 10 departments, 24/7.',[m
+       totalWorkforce: 'TOTAL WORKFORCE',[m
+[31m-      workforceSublabel: 'Autonomous Agents Deployed',[m
+[32m+[m[32m      workforceSublabel: 'Autonomous agents (simulated)',[m
+       departments: 'DEPARTMENTS',[m
+       departmentsSublabel: 'Enterprise Divisions',[m
+       uptime: 'UPTIME',[m
+[36m@@ -780,8 +780,8 @@[m [mconst translations: Record<LangCode, Translations> = {[m
+       curatedGenes: 'Curated genes',[m
+       parityTitle: 'COMPETITIVE PARITY',[m
+       parityDescription:[m
+[31m-        'Fortune 500 companies deploy 100,000–300,000 employees — increasingly augmented by AI. Solaris CET matches that scale with 200,000 autonomous agents: zero HR overhead, zero downtime, infinite parallelism.',[m
+[31m-      liveActivityBadge: 'AGENTS TALKING · LEARNING · SOLVING — RIGHT NOW',[m
+[32m+[m[32m        'Fortune 500 companies deploy 100,000–300,000 employees — increasingly augmented by AI. Solaris CET models that scale with a simulated mesh of autonomous agents: zero HR overhead, zero downtime, high parallelism.',[m
+[32m+[m[32m      liveActivityBadge: 'AGENTS TALKING · LEARNING · SOLVING — SIMULATION',[m
+     },[m
+     cetAi: {[m
+       title: 'Solaris CET AI',[m
+[36m@@ -847,17 +847,17 @@[m [mconst translations: Record<LangCode, Translations> = {[m
+         'CET AI dialog: type a question, send with the button or Enter; Shift+Enter for a new line. Press Escape to close.',[m
+       knowledge: {[m
+         price: `**CET trades on DeDust (TON)** with a fixed supply of **9,000 tokens** — genuine hyper-scarcity.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- The **DCBM model** correlates scarcity with a 90-year emission schedule\n- Long-term value accumulation driven purely by on-chain demand`,[m
+[31m-        mining: '**CET mining runs for 90 years** with a decaying reward curve.\n\n- **66.66%** of total supply enters circulation through proof-of-work\n- Active nodes: **18,420+**\n- Battery drain approaches **0%** thanks to the Zero-Battery constraint\n- Optimal mining window: **Q3 2025** (high-efficiency period)',[m
+[32m+[m[32m        mining: '**CET mining runs for 90 years** with a decaying reward curve.\n\n- Circulation increases over time through proof-of-work\n- Reward schedule is fixed by protocol rules\n- Mining is designed to be accessible on consumer hardware',[m
+         ai: '**Solaris CET embeds the BRAID framework** (Blockchain-Recursive AI Decision).\n\n- **~200,000 task-specialist agents** (narrow routing, retrieval, validation) map to C-Suite, Engineering, Sales, Data, Finance, Marketing, Product, Security, Legal, and Research lanes — they feed **Solaris CET AI** so answers stay structured and token-efficient\n- Every high-stakes action is validated through a **ReAct-style loop**: Observe → Think → Plan → Act → Verify\n- Reasoning traces can be **anchored on-chain / IPFS** for auditability\n- Designed so external AI tools (e.g. coding assistants) get **dense, copy-paste-ready** facts and spend fewer follow-up turns\n\n**Handoff:** Paste this block into another assistant as context to save follow-up turns.',[m
+[31m-        ton: '**CET lives on TON mainnet** — the fastest L1 blockchain.\n\n- **~100,000 TPS** throughput\n- **2-second** finality\n- Sharded architecture for infinite scalability\n- Smart contract **audited by Cyberscope** and KYC-verified',[m
+[32m+[m[32m        ton: '**CET lives on TON mainnet**.\n\n- Sharded architecture designed for high throughput\n- Short finality in typical conditions (varies)\n- Smart contract audit/KYC references are linked in the Trust section',[m
+         buy: `**Buy CET on DeDust DEX** in 3 simple steps:\n\n1. Connect your **TON wallet** (Tonkeeper recommended)\n2. Navigate to pool \`${DEDUST_POOL_ADDRESS}\`\n3. Swap **TON for CET** — recommended slippage: 0.5–1%\n\nOnly **9,000 CET** exist globally — each token = **0.011%** of total supply.`,[m
+         quantum: '**Quantum OS** is Solaris CET\'s entropy layer.\n\n- **8 simulated qubits** in superposition\n- Collapse via QRNG-seeded wavefunction generates unpredictable cryptographic seeds\n- Powers **fair mining randomness**, agent scheduling, and zero-knowledge proof generation\n- Every on-chain event is **provably random**',[m
+         security: '**CET contract passed Cyberscope\'s audit** with zero critical findings.\n\n- ✅ Full **KYC** completed by the team\n- ✅ On-chain reasoning traces **prevent hallucinated AI decisions**\n- ✅ **Quantum OS entropy** + ReAct verification loops\n- ✅ TON\'s BFT consensus (66.7% honest nodes required)',[m
+         roadmap: '**Solaris CET roadmap — updated March 2026:**\n\n- ✅ **Q1–Q4 2025** (COMPLETE): Contract deployed, Cyberscope audit passed, DeDust pool live, IPFS whitepaper, AI farming pilot, Developer SDK beta, ReAct on-chain traces, Next-gen processing units, Self-Actualization Protocol mainnet\n- ✅ **Q1 2026** (COMPLETE): Multi-chain liquidity integrated, Community governance portal launched, AI oracle public API v1 released, Mobile wallet deep-link deployed\n- 🔄 **Q2 2026** (ACTIVE): DAO formation, Cross-chain bridge mainnet, Ecosystem grants expansion, RWA tokenisation pilot\n- 🔮 **Q3 2026+** (PLANNED): AI-to-AI autonomous contract execution, Solaris Prime neural mesh, Zero-knowledge proof layer, Global agriculture data oracle network',[m
+[31m-        competition: '**Solaris CET vs. AI token competitors:**\n\n- **Supply**: CET=9,000 · FET=1.15B · TAO=21M · AGIX=2B · OCEAN=1.41B — CET is orders of magnitude scarcer\n- **TPS**: TON=100,000 · FET~1,000 · TAO~1,000 · AGIX~15 — CET rides the fastest L1 here\n- **Agents**: CET describes **~200,000 task-specialist agents** plus a **dual-model CET AI** — most peers only offer marketplaces or single-model chat\n- **Dual-AI**: CET uses **Grok × Gemini** under RAV for split Reason / Act lanes\n- **RWA**: CET is tied to real-world agricultural infrastructure (Cetățuia)\n- **Bottom line**: scarcity + speed + RWA + structured CET AI output\n\n**Handoff:** Paste this comparison into another assistant as context to save follow-up turns.',[m
+[32m+[m[32m        competition: '**Solaris CET vs. AI token competitors:**\n\n- **Supply**: CET=9,000 · most peers are in the millions/billions\n- **Chain**: CET is on TON (sharded L1)\n- **Agents**: CET models a large task-agent mesh (simulated) for routing/retrieval/validation\n- **AI mode**: multi-model routing is supported when deployed\n- **RWA**: CET is tied to a real-world narrative anchor (Cetățuia)\n\n**Note:** Treat non-supply performance numbers as illustrative unless linked to a reproducible benchmark.',[m
+         rwa: '**Real-World Asset (RWA) backing** is Solaris CET\'s core differentiator.\n\n- Every CET token is anchored to **agricultural and AI infrastructure in Cetățuia, Romania**\n- Unlike purely digital tokens, CET represents a claim on physical productivity\n- The **BRAID Framework** connects AI agent actions directly to real-world outcomes\n- RWA tokenisation pilot launches **Q2 2026** — expanding on-chain ↔ real-world integration\n- This makes CET one of the only crypto assets where **digital scarcity meets physical value**',[m
+[31m-        dcbm: '**DCBM — Dynamic-Control Buyback Mechanism** is Solaris CET\'s price stability engine.\n\n- Uses **PID controllers** (Proportional-Integral-Derivative) to manage autonomous buybacks\n- When CET price deviates from the target band, the DCBM automatically triggers buy-back operations\n- Reduces price volatility by up to **66%** compared to uncontrolled market dynamics\n- No manual intervention, no governance votes — **pure mathematical control theory**\n- Every DCBM action is recorded on-chain and verifiable in real time',[m
+[31m-        rav: '**RAV Protocol — Reason · Act · Verify** is the operational core of every Solaris CET agent.\n\n- **REASON** (Google Gemini): decomposes goals into sub-objectives using BRAID graphs, indexes all on-chain and off-chain signals\n- **ACT** (xAI Grok): executes the optimised action plan, generates TON transactions, updates agent state\n- **VERIFY**: a second independent model reviews the action and its on-chain trace before finalisation\n- All reasoning traces are **stored immutably on IPFS** and anchored to each transaction\n- Result: **zero hallucinated actions** — every agent decision is auditable months later',[m
+[32m+[m[32m        dcbm: '**DCBM — Dynamic-Control Buyback Mechanism** is a proposed stability mechanism.\n\n- Uses control-theory ideas (e.g. PID-like feedback)\n- Any quantitative volatility claims should be linked to a reproducible backtest\n- On-chain logging can make actions auditable when implemented',[m
+[32m+[m[32m        rav: '**RAV Protocol — Reason · Act · Verify** is an operational loop.\n\n- REASON: decompose the goal and gather facts\n- ACT: execute actions (on-chain/off-chain)\n- VERIFY: cross-check outcomes against chain facts and expected results\n- Traces can be stored on IPFS and referenced for later audits',[m
+         braid: '**BRAID Framework — Blockchain-Recursive AI Decision** is the architectural backbone.\n\n- Serialises reasoning paths as **Mermaid notation graphs** stored on IPFS\n- Every CET transaction references its BRAID graph — developers can reconstruct any decision post-facto\n- Enables **recursive AI reasoning**: each agent can spawn sub-agents for complex tasks\n- Compatible with TON\'s sharded architecture for **infinite horizontal scaling**\n- Open standard — third-party developers can build BRAID-compatible agents',[m
+         wallet: `**Connect your TON wallet** to interact with Solaris CET.\n\n1. Install **Tonkeeper** (iOS / Android / Browser extension) — the recommended wallet\n2. Create or import your wallet — back up your seed phrase securely\n3. Fund with **TON** from any major exchange (Bybit, OKX, Huobi)\n4. Click **Connect Wallet** on this page to link via TonConnect\n5. Navigate to DeDust pool to swap TON → CET\n\nContract: \`${CET_CONTRACT_ADDRESS}\``,[m
+         staking: '**CET holding benefits** increase with time and scarcity.\n\n- **9,000 CET maximum supply** — every holder owns a permanent fraction of a finite resource\n- DCBM buyback pressure creates **natural price support** for long-term holders\n- **Mining staking bonus**: staking CET multiplies your BTC-S mining rewards (up to 2× at max stake)\n- DAO governance rights scale with holding — **more CET = more voting power**\n- As AI adoption grows, demand for CET (the payment token for agent actions) increases structurally',[m
+[36m@@ -875,7 +875,7 @@[m [mconst translations: Record<LangCode, Translations> = {[m
+         '. Below is why Solaris CET is structurally different — and superior — on every dimension that drives long-term value.',[m
+       tableFeature: 'Feature',[m
+       rowTotalSupply: 'Total Supply',[m
+[31m-      rowTps: 'TPS (claimed)',[m
+[32m+[m[32m      rowTps: 'Throughput',[m
+       rowAgents: 'Active Agents',[m
+       rowMarginalCost: 'Marginal Cost',[m
+       rowRwa: 'RWA Backing',[m
+[36m@@ -883,24 +883,24 @@[m [mconst translations: Record<LangCode, Translations> = {[m
+       rowPowMining: 'PoW Mining',[m
+       rowAuditKyc: 'Audit + KYC',[m
+       dataDisclaimer:[m
+[31m-        'Figures are illustrative and sourced from public whitepapers and official project documentation. Supply and throughput are approximate public claims — verify against each project’s own specifications.',[m
+[32m+[m[32m        'Figures are illustrative and sourced from public whitepapers and official project documentation. Token supply is the most comparable value; throughput is shown as a relative index, not absolute TPS.',[m
+       advScarcityTitle: 'Extreme Scarcity',[m
+       advScarcityBody:[m
+         '9,000 CET total — forever. FET has 1.15B tokens. AGIX has 2B. Scarcity is Solaris CET\'s permanent structural advantage.',[m
+[31m-      advTonTitle: 'Fastest Chain: TON',[m
+[32m+[m[32m      advTonTitle: 'High-throughput chain: TON',[m
+       advTonBody:[m
+[31m-        '100,000 TPS and 2-second finality. Fetch.ai, TAO, AGIX, and OCEAN run on chains with far lower headline throughput. Speed is not even close.',[m
+[32m+[m[32m        'TON is a sharded L1 designed for high throughput with short finality in typical conditions. Exact performance depends on network conditions and workload.',[m
+       advDualAiTitle: 'Only Dual-AI Protocol',[m
+       advDualAiBody:[m
+[31m-        'Grok (xAI) × Gemini (Google) — every agent action Reasons + Acts + Verifies with two independent frontier models. No competitor does this.',[m
+[32m+[m[32m        'Multi-model routing can be enabled when deployed — actions can be paired with traces so results stay reviewable.',[m
+       advRwaTitle: 'Real-World Asset Backing',[m
+       advRwaBody:[m
+         'Each CET is anchored to actual agricultural and AI infrastructure in Cetățuia, Romania. Peers without RWA are purely digital exposure.',[m
+[31m-      chartTpsLabel: 'TRANSACTIONS PER SECOND (TPS)',[m
+[31m-      chartTpsCaption: 'TON headline throughput vs. typical public claims for legacy AI-token chains',[m
+[32m+[m[32m      chartTpsLabel: 'THROUGHPUT INDEX (RELATIVE)',[m
+[32m+[m[32m      chartTpsCaption: 'Relative scale for quick comparison — not an absolute TPS claim',[m
+       chartScarcityLabel: 'TOKEN SCARCITY (log scale — lower = rarer)',[m
+       chartScarcityCaption: '9,000 CET vs multi-billion supplies — scarcity is a structural store-of-value signal',[m
+[31m-      tooltipTpsUnit: 'TPS',[m
+[32m+[m[32m      tooltipTpsUnit: 'index',[m
+       tooltipSupplyUnit: 'tokens (circulating / target supply)',[m
+     },[m
+     faqContent: faqContentByLang.en,[m
+[36m@@ -1188,8 +1188,8 @@[m [mconst translations: Record<LangCode, Translations> = {[m
+         '~200k agentes para enrutamiento, recuperación y validación · 10 departamentos · orquestados para CET AI',[m
+       labelSupply: 'Suministro Total Fijo',[m
+       sublabelSupply: 'Para siempre. Sin acuñación. Sin inflación. Cada CET = 0.011% del valor.',[m
+[31m-      labelTps: 'TPS Máximo en TON',[m
+[31m-      sublabelTps: '100× más rápido que Ethereum · 2s finalización',[m
+[32m+[m[32m      labelTps: 'Finalidad (típ.)',[m
+[32m+[m[32m      sublabelTps: 'Finalidad típica en TON (varía)',[m
+       labelYears: 'Horizonte de Minería 90 Años',[m
+       sublabelYears: 'Curva de recompensa decreciente · emisión estilo Bitcoin',[m
+       badgeLive: 'EN VIVO',[m
+[36m@@ -1612,8 +1612,8 @@[m [mconst translations: Record<LangCode, Translations> = {[m
+       sublabelAgents: '~200k 细分智能体，负责路由、检索与验证 · 10 个部门',[m
+       labelSupply: '固定总供应量',[m
+       sublabelSupply: '永久固定。无铸造。无通胀。每个 CET = 总价值的 0.011%。',[m
+[31m-      labelTps: 'TON 最大 TPS',[m
+[31m-      sublabelTps: '比以太坊快 100 倍 · 2s 确认',[m
+[32m+[m[32m      labelTps: '最终性（典型）',[m
+[32m+[m[32m      sublabelTps: 'TON 的典型最终性（会变化）',[m
+       labelYears: '90 年挖矿周期',[m
+       sublabelYears: '衰减奖励曲线 · 类比特币减半机制',[m
+       badgeLive: '实时',[m
+[36m@@ -2041,8 +2041,8 @@[m [mconst translations: Record<LangCode, Translations> = {[m
+       sublabelAgents: '~200k агентов для маршрутизации, поиска и проверки · 10 отделов',[m
+       labelSupply: 'Фиксированная эмиссия',[m
+       sublabelSupply: 'Навсегда. Без минта. Без инфляции. Каждый CET = 0.011% от стоимости.',[m
+[31m-      labelTps: 'Макс. TPS на TON',[m
+[31m-      sublabelTps: 'в 100 раз быстрее Ethereum · финализация 2с',[m
+[32m+[m[32m      labelTps: 'Финализация (тип.)',[m
+[32m+[m[32m      sublabelTps: 'Типичная финализация в TON (может меняться)',[m
+       labelYears: '90-летний горизонт майнинга',[m
+       sublabelYears: 'Затухающая кривая наград · эмиссия в стиле Bitcoin',[m
+       badgeLive: 'LIVE',[m
+[36m@@ -2472,8 +2472,8 @@[m [mconst translations: Record<LangCode, Translations> = {[m
+         '~200k agenți pentru rutare, recuperare și validare · 10 departamente · orchestrați pentru CET AI',[m
+       labelSupply: 'Ofertă Totală Fixă',[m
+       sublabelSupply: 'Pentru totdeauna. Fără mint. Fără inflație. Fiecare CET = 0.011% din valoare.',[m
+[31m-      labelTps: 'TPS Maxim pe TON',[m
+[31m-      sublabelTps: 'de 100× mai rapid decât Ethereum · finalitate 2s',[m
+[32m+[m[32m      labelTps: 'Finalitate (típ.)',[m
+[32m+[m[32m      sublabelTps: 'Finalitate tipică pe TON (variază)',[m
+       labelYears: 'Orizont Minare 90 Ani',[m
+       sublabelYears: 'Curbă de recompensă descrescătoare · emisie tip Bitcoin',[m
+       badgeLive: 'LIVE',[m
+[36m@@ -2566,15 +2566,15 @@[m [mconst translations: Record<LangCode, Translations> = {[m
+         price: `**CET se tranzacționează pe DeDust (TON)** cu o ofertă fixă de **9.000 de tokeni** — raritate extremă reală.\n\n- Pool: \`${DEDUST_POOL_ADDRESS}\`\n- **Modelul DCBM** corelează raritatea cu un program de emisie de 90 de ani\n- Acumulare de valoare pe termen lung determinată exclusiv de cererea on-chain`,[m
+         mining: '**Minarea CET durează 90 de ani** cu o curbă de recompensă descrescătoare.\n\n- **66.66%** din oferta totală intră în circulație prin proof-of-work\n- Noduri active: **18.420+**\n- Consum de baterie aproape de **0%** datorită constrângerii Zero-Battery\n- Fereastra optimă de minare: **T3 2025** (perioadă de eficiență ridicată)',[m
+         ai: '**Solaris CET integrează cadrul BRAID** (Blockchain-Recursive AI Decision).\n\n- **~200.000 agenți specializați pe taskuri** (rutare îngustă, recuperare, validare) pe zece linii (conducere, inginerie, vânzări, date, finanțe, marketing, produs, securitate, juridic, cercetare) **alimentează Oracolul Solaris** — răspunsuri structurate și eficiente ca tokeni\n- Fiecare acțiune cu mize mari trece printr-o **buclă în stil ReAct**: Observă → Gândește → Planifică → Acționează → Verifică\n- Urmele de raționament pot fi **ancorate on-chain / IPFS** pentru audit\n- Gândit ca instrumentele AI externe să primească **fapte dense, gata de copiat**, cu mai puține tururi de clarificare\n\n**Handoff:** Lipește acest bloc în alt asistent ca context pentru mai puține tururi de clarificare.',[m
+[31m-        ton: '**CET există pe mainnet-ul TON** — cel mai rapid blockchain L1.\n\n- **~100.000 TPS** debit\n- Finalitate de **2 secunde**\n- Arhitectură fragmentată pentru scalabilitate infinită\n- Contract inteligent **auditat de Cyberscope** și verificat KYC',[m
+[32m+[m[32m        ton: '**CET există pe mainnet-ul TON**.\n\n- Arhitectură fragmentată pentru debit ridicat\n- Finalitate scurtă în condiții tipice (variază)\n- Referințele de audit/KYC sunt în secțiunea Trust',[m
+         buy: `**Cumpără CET pe DEX-ul DeDust** în 3 pași simpli:\n\n1. Conectează-ți **portofelul TON** (recomandat Tonkeeper)\n2. Navighează la pool-ul \`${DEDUST_POOL_ADDRESS}\`\n3. Schimbă **TON cu CET** — slippage recomandat: 0.5–1%\n\nExistă doar **9.000 CET** la nivel global — fiecare token = **0.011%** din oferta totală.`,[m
+         quantum: '**Quantum OS** este stratul de entropie al Solaris CET.\n\n- **8 qubits simulați** în superpoziție\n- Colapsul prin funcția de undă QRNG generează semințe criptografice imprevizibile\n- Alimentează **aleatorizarea echitabilă a minării**, programarea agenților și generarea dovezilor zero-knowledge',[m
+         security: '**Contractul CET a trecut auditul Cyberscope** fără constatări critice.\n\n- ✅ **KYC** complet finalizat de echipă\n- ✅ Urmele de raționament on-chain **previn deciziile halucinatoare ale AI**\n- ✅ **Entropia Quantum OS** + bucle de verificare ReAct\n- ✅ Consensul BFT al TON (necesare 66.7% noduri oneste)',[m
+         roadmap: '**Foaia de parcurs Solaris CET:**\n\n- ✅ **T1–T2 2025** (FINALIZAT): Contract implementat, audit trecut, pool DeDust activ, whitepaper IPFS\n- 🔄 **T3 2025** (ACTIV): Pilot agricultură de precizie AI în Puiești, SDK pentru dezvoltatori beta\n- 🔮 **T4 2025+**: Unități de procesare de nouă generație, Self-Actualization Protocol mainnet',[m
+[31m-        competition: '**Solaris CET vs tokeni AI concurenți:**\n\n- **Ofertă**: CET=9.000 · FET=1,15 mld · TAO=21 mil · AGIX=2 mld · OCEAN=1,41 mld — CET e cu ordine de mărime mai rar\n- **TPS**: TON=100.000 · FET~1.000 · TAO~1.000 · AGIX~15 — CET pe cel mai rapid L1\n- **Agenți**: CET descrie **~200.000 agenți de tasking** plus un **Oracol dual-model** — mulți rivali doar marketplace sau chat monomodel\n- **Dual-AI**: **Grok × Gemini** sub RAV (Reason / Act)\n- **RWA**: CET legat de infrastructură agricolă reală (Cetățuia)\n- **Concluzie**: raritate + viteză + RWA + ieșire structurată din Oracol\n\n**Handoff:** Lipește această comparație în alt asistent ca context pentru mai puține tururi de clarificare.',[m
+[32m+[m[32m        competition: '**Solaris CET vs tokeni AI concurenți:**\n\n- **Ofertă**: CET=9.000 · majoritatea rivalilor sunt la milioane/miliarde\n- **Lanț**: CET este pe TON (L1 fragmentat)\n- **Agenți**: CET modelează o plasă mare de agenți (simulat) pentru rutare/recuperare/validare\n- **Mod AI**: rutare multi-model când e deployat\n- **RWA**: CET are o ancoră narativă în lumea reală (Cetățuia)\n\n**Notă:** tratează numerele de performanță ca ilustrative dacă nu sunt legate de un benchmark reproductibil.',[m
+         rwa: '**RWA — Active din Lumea Reală**: fiecare CET este ancorat la infrastructura agricolă și AI din Cetățuia, România. Pilot de tokenizare RWA în **Q2 2026**.',[m
+[31m-        dcbm: '**DCBM** folosește controllere PID pentru răscumpărări autonome. Reduce volatilitatea cu până la **66%** fără intervenție manuală.',[m
+[31m-        rav: '**Protocolul RAV**: Raționament (Gemini) → Acțiune (Grok) → Verificare. Fiecare decizie a agentului este stocată pe IPFS — auditabilitate permanentă.',[m
+[32m+[m[32m        dcbm: '**DCBM** este un mecanism propus de stabilizare.\n\n- Folosește idei de control (feedback de tip PID)\n- Orice afirmație cantitativă despre volatilitate trebuie susținută de backtest reproductibil\n- Logarea on-chain poate face acțiunile auditabile când e implementat',[m
+[32m+[m[32m        rav: '**Protocolul RAV**: Reason · Act · Verify.\n\n- REASON: descompune obiectivul și adună fapte\n- ACT: execută acțiuni (on-chain/off-chain)\n- VERIFY: verifică rezultatul vs. fapte on-chain și așteptări\n- Urmele pot fi stocate pe IPFS și referențiate pentru audit',[m
+         braid: '**BRAID Framework**: serializează căile de raționament pe IPFS. Fiecare tranzacție CET face referire la graful său BRAID.',[m
+         wallet: '**Conectează-ți portofelul TON**: instalează Tonkeeper → alimentează cu TON → conectează prin TonConnect → schimbă TON→CET pe DeDust.',[m
+         staking: '**Beneficii deținere CET**: ofertă fixă 9.000 · presiune de cumpărare DCBM · bonus mining 2× la stake maxim · drepturi de vot DAO.',[m
+[36m@@ -2592,7 +2592,7 @@[m [mconst translations: Record<LangCode, Translations> = {[m
+         '. Mai jos: de ce Solaris CET este structural diferit — și superior — pe dimensiunile care susțin valoarea pe termen lung.',[m
+       tableFeature: 'Criteriu',[m
+       rowTotalSupply: 'Ofertă totală',[m
+[31m-      rowTps: 'TPS (declarat)',[m
+[32m+[m[32m      rowTps: 'Throughput',[m
+       rowAgents: 'Agenți activi',[m
+       rowMarginalCost: 'Cost marginal',[m
+       rowRwa: 'Sprijin RWA',[m
+[36m@@ -2600,24 +2600,24 @@[m [mconst translations: Record<LangCode, Translations> = {[m
+       rowPowMining: 'Minerit PoW',[m
+       rowAuditKyc: 'Audit + KYC',[m
+       dataDisclaimer:[m
+[31m-        'Date ilustrative din whitepaper-uri publice și documentație oficială. Oferta și throughput-ul sunt revendicări aproximative — verifică specificațiile fiecărui proiect.',[m
+[32m+[m[32m        'Date ilustrative din whitepaper-uri publice și documentație oficială. Oferta este cel mai comparabil indicator; throughput-ul este un index relativ, nu TPS absolut.',[m
+       advScarcityTitle: 'Scăzămie extremă',[m
+       advScarcityBody:[m
+         '9.000 CET în total — pentru totdeauna. FET are 1,15 mld tokeni. AGIX are 2 mld. Scăzămia este avantajul structural permanent al Solaris CET.',[m
+[31m-      advTonTitle: 'Cel mai rapid lanț: TON',[m
+[32m+[m[32m      advTonTitle: 'Lanț cu debit ridicat: TON',[m
+       advTonBody:[m
+[31m-        '100.000 TPS și finalitate ~2 s. Fetch.ai, TAO, AGIX și OCEAN rulează pe lanțuri cu mult mai puțin throughput declarat.',[m
+[32m+[m[32m        'TON este un L1 fragmentat proiectat pentru debit ridicat, cu finalitate scurtă în condiții tipice. Performanța exactă depinde de condiții și workload.',[m
+       advDualAiTitle: 'Singurul protocol Dual-AI',[m
+       advDualAiBody:[m
+[31m-        'Grok (xAI) × Gemini (Google): fiecare acțiune de agent Raționează + Acționează + Verifică cu două modele de frontieră. Niciun rival nu face asta.',[m
+[32m+[m[32m        'Rutarea multi-model poate fi activată când e deployat — acțiunile pot fi însoțite de urme pentru audit.',[m
+       advRwaTitle: 'Ancorare în active reale',[m
+       advRwaBody:[m
+         'Fiecare CET este ancorat în infrastructură agricolă și AI reală la Cetățuia, România. Fără RWA rămâi doar la expunere digitală.',[m
+[31m-      chartTpsLabel: 'TRANZACȚII PE SECUNDĂ (TPS)',[m
+[31m-      chartTpsCaption: 'Throughput nominal TON vs. revendicări tipice pentru lanțuri «AI-token» mai vechi',[m
+[32m+[m[32m      chartTpsLabel: 'INDEX THROUGHPUT (RELATIV)',[m
+[32m+[m[32m      chartTpsCaption: 'Scală relativă pentru comparație — nu TPS absolut',[m
+       chartScarcityLabel: 'SCĂZĂMIE TOKEN (scală log — mai jos = mai rar)',[m
+       chartScarcityCaption: '9.000 CET față de miliarde de supply — scăzămia ca semnal de stocare a valorii',[m
+[31m-      tooltipTpsUnit: 'TPS',[m
+[32m+[m[32m      tooltipTpsUnit: 'index',[m
+       tooltipSupplyUnit: 'tokeni (circulant / țintă emisie)',[m
+     },[m
+     faqContent: faqContentByLang.ro,[m
+[36m@@ -2905,8 +2905,8 @@[m [mconst translations: Record<LangCode, Translations> = {[m
+         '~200k agentes especializados para roteamento, recuperação e validação · 10 departamentos',[m
+       labelSupply: 'Oferta Total Fixa',[m
+       sublabelSupply: 'Para sempre. Sem cunhagem. Sem inflação. Cada CET = 0,011% do valor.',[m
+[31m-      labelTps: 'TPS Máximo em TON',[m
+[31m-      sublabelTps: '100× mais rápido que Ethereum · finalização em 2s',[m
+[32m+[m[32m      labelTps: 'Finalidade (típ.)',[m
+[32m+[m[32m      sublabelTps: 'Finalidade típica na TON (varia)',[m
+       labelYears: 'Horizonte de Mineração de 90 Anos',[m
+       sublabelYears: 'Curva de recompensa decrescente · emissão estilo Bitcoin',[m
+       badgeLive: 'AO VIVO',[m
+[36m@@ -3338,8 +3338,8 @@[m [mconst translations: Record<LangCode, Translations> = {[m
+         '~200k spezialisierte Agenten für Routing, Retrieval & Validierung · 10 Abteilungen',[m
+       labelSupply: 'Festes Gesamtangebot',[m
+       sublabelSupply: 'Für immer. Kein Minting. Keine Inflation. Jedes CET = 0,011% des Wertes.',[m
+[31m-      labelTps: 'Max. TPS auf TON',[m
+[31m-      sublabelTps: '100× schneller als Ethereum · 2s Finalität',[m
+[32m+[m[32m      labelTps: 'Finalität (typ.)',[m
+[32m+[m[32m      sublabelTps: 'Typische Finalität auf TON (variiert)',[m
+       labelYears: '90 Jahre Mining-Horizont',[m
+       sublabelYears: 'Abnehmende Belohnungskurve · Bitcoin-ähnliche Emission',[m
+       badgeLive: 'LIVE',[m
+[1mdiff --git a/app/src/lib/competitionChartData.ts b/app/src/lib/competitionChartData.ts[m
+[1mindex 17e5670..ec89503 100644[m
+[1m--- a/app/src/lib/competitionChartData.ts[m
+[1m+++ b/app/src/lib/competitionChartData.ts[m
+[36m@@ -2,15 +2,15 @@[m [mimport { CET_FIXED_SUPPLY_CAP } from '@/lib/domainPillars';[m
+ [m
+ /**[m
+  * Chart series for `CompetitionCharts` — kept separate for tests and copy parity with the comparison matrix.[m
+[31m- * CET row must stay aligned with immutable supply / throughput messaging.[m
+[32m+[m[32m * CET row must stay aligned with immutable supply messaging.[m
+  */[m
+ export const COMPETITION_TPS_CHART_ROWS = [[m
+[31m-  { name: 'CET', value: 100_000, isCET: true },[m
+[31m-  { name: 'FET', value: 1_000, isCET: false },[m
+[31m-  { name: 'TAO', value: 1_000, isCET: false },[m
+[31m-  { name: 'ASI', value: 1_000, isCET: false },[m
+[31m-  { name: 'AGIX', value: 15, isCET: false },[m
+[31m-  { name: 'OCEAN', value: 15, isCET: false },[m
+[32m+[m[32m  { name: 'CET', value: 100, isCET: true },[m
+[32m+[m[32m  { name: 'FET', value: 40, isCET: false },[m
+[32m+[m[32m  { name: 'TAO', value: 40, isCET: false },[m
+[32m+[m[32m  { name: 'ASI', value: 35, isCET: false },[m
+[32m+[m[32m  { name: 'AGIX', value: 25, isCET: false },[m
+[32m+[m[32m  { name: 'OCEAN', value: 25, isCET: false },[m
+ ] as const;[m
+ [m
+ export const COMPETITION_SCARCITY_CHART_ROWS = [[m
+[1mdiff --git a/app/src/main.tsx b/app/src/main.tsx[m
+[1mindex 46bf29e..01f8a61 100644[m
+[1m--- a/app/src/main.tsx[m
+[1m+++ b/app/src/main.tsx[m
+[36m@@ -19,7 +19,7 @@[m [mwindow.addEventListener('vite:preloadError', () => {[m
+ [m
+ createRoot(document.getElementById('root')!).render([m
+   <StrictMode>[m
+[31m-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>[m
+[32m+[m[32m    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem storageKey="theme">[m
+       <ErrorBoundary>[m
+         <App />[m
+       </ErrorBoundary>[m
+[1mdiff --git a/app/src/sections/CompetitionSection.tsx b/app/src/sections/CompetitionSection.tsx[m
+[1mindex a0be163..ba85b04 100644[m
+[1m--- a/app/src/sections/CompetitionSection.tsx[m
+[1m+++ b/app/src/sections/CompetitionSection.tsx[m
+[36m@@ -41,8 +41,8 @@[m [mconst competitors: Competitor[] = [[m
+     symbol: 'CET',[m
+     chain: 'TON',[m
+     supply: fmtIntEn(CET_FIXED_SUPPLY_CAP),[m
+[31m-    tps: '100,000',[m
+[31m-    agents: fmtIntEn(TASK_AGENT_MESH_TOTAL),[m
+[32m+[m[32m    tps: 'High (sharded)',[m
+[32m+[m[32m    agents: `${fmtIntEn(TASK_AGENT_MESH_TOTAL)} (simulated)`,[m
+     rwa: true,[m
+     dualAi: true,[m
+     mining: true,[m
+[36m@@ -55,7 +55,7 @@[m [mconst competitors: Competitor[] = [[m
+     symbol: 'FET',[m
+     chain: 'Cosmos',[m
+     supply: '1.15B',[m
+[31m-    tps: '~1,000',[m
+[32m+[m[32m    tps: 'Varies',[m
+     agents: 'Marketplace',[m
+     rwa: false,[m
+     dualAi: false,[m
+[36m@@ -68,7 +68,7 @@[m [mconst competitors: Competitor[] = [[m
+     symbol: 'TAO',[m
+     chain: 'Custom',[m
+     supply: '21M',[m
+[31m-    tps: '~1,000',[m
+[32m+[m[32m    tps: 'Varies',[m
+     agents: 'Subnet miners',[m
+     rwa: false,[m
+     dualAi: false,[m
+[36m@@ -81,7 +81,7 @@[m [mconst competitors: Competitor[] = [[m
+     symbol: 'AGIX',[m
+     chain: 'ETH/BNB',[m
+     supply: '2B',[m
+[31m-    tps: '~15',[m
+[32m+[m[32m    tps: 'L1/L2 dependent',[m
+     agents: 'Marketplace',[m
+     rwa: false,[m
+     dualAi: false,[m
+[36m@@ -94,7 +94,7 @@[m [mconst competitors: Competitor[] = [[m
+     symbol: 'OCEAN',[m
+     chain: 'ETH/Polygon',[m
+     supply: '1.41B',[m
+[31m-    tps: '~15',[m
+[32m+[m[32m    tps: 'L1/L2 dependent',[m
+     agents: 'Data agents',[m
+     rwa: 'partial',[m
+     dualAi: false,[m
+[36m@@ -107,7 +107,7 @@[m [mconst competitors: Competitor[] = [[m
+     symbol: 'ASI',[m
+     chain: 'Multi',[m
+     supply: '~4.6B',[m
+[31m-    tps: '~1,000',[m
+[32m+[m[32m    tps: 'Varies',[m
+     agents: 'Marketplace',[m
+     rwa: false,[m
+     dualAi: false,[m
+[1mdiff --git a/app/src/sections/FooterSection.tsx b/app/src/sections/FooterSection.tsx[m
+[1mindex 7b8c38a..234cebf 100644[m
+[1m--- a/app/src/sections/FooterSection.tsx[m
+[1m+++ b/app/src/sections/FooterSection.tsx[m
+[36m@@ -9,6 +9,7 @@[m [mimport AnimatedCounter from '../components/AnimatedCounter';[m
+ import TeamFlipCard from '../components/TeamFlipCard';[m
+ import { useCommunityProof } from '../hooks/use-community-proof';[m
+ import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';[m
+[32m+[m[32mimport { toast } from 'sonner';[m
+ import {[m
+   DEDUST_POOL_ADDRESS,[m
+   DEDUST_POOL_DEPOSIT_URL,[m
+[36m@@ -51,6 +52,7 @@[m [mconst FooterSection = () => {[m
+   const handleCopyPool = () => {[m
+     navigator.clipboard.writeText(DEDUST_POOL_ADDRESS).then(() => {[m
+       setCopiedPool(true);[m
+[32m+[m[32m      toast.success(t.social.linkCopied);[m
+       setTimeout(() => setCopiedPool(false), 2000);[m
+     }).catch(() => {/* clipboard access denied – fail silently */});[m
+   };[m
+[36m@@ -58,6 +60,7 @@[m [mconst FooterSection = () => {[m
+   const handleCopyContract = () => {[m
+     navigator.clipboard.writeText(CET_CONTRACT_ADDRESS).then(() => {[m
+       setCopiedContract(true);[m
+[32m+[m[32m      toast.success(t.social.linkCopied);[m
+       setTimeout(() => setCopiedContract(false), 2000);[m
+     }).catch(() => {/* clipboard access denied – fail silently */});[m
+   };[m
+[1mdiff --git a/app/src/sections/HeroSection.tsx b/app/src/sections/HeroSection.tsx[m
+[1mindex 0a12676..e334562 100644[m
+[1m--- a/app/src/sections/HeroSection.tsx[m
+[1m+++ b/app/src/sections/HeroSection.tsx[m
+[36m@@ -16,16 +16,16 @@[m [mconst TICKER_DATA = [[m
+   { label: 'AI AGENTS', value: '' },[m
+   { label: 'SUPPLY', value: '' },[m
+   { label: 'NETWORK', value: 'TON' },[m
+[31m-  { label: 'MAX TPS', value: '100,000' },[m
+[31m-  { label: 'FINALITY', value: '2.0s' },[m
+[32m+[m[32m  { label: 'THROUGHPUT', value: 'SHARDED' },[m
+[32m+[m[32m  { label: 'FINALITY', value: '≈2s' },[m
+   { label: 'POOL', value: 'DeDust' },[m
+   { label: 'MINING', value: '90 YEARS' },[m
+   { label: 'DEPARTMENTS', value: '10' },[m
+   { label: 'UPTIME', value: '24/7' },[m
+   { label: 'AUDIT', value: 'CYBERSCOPE' },[m
+   { label: 'CHAIN', value: 'MAINNET' },[m
+[31m-  { label: 'PROTOCOL', value: 'RAV v3.0' },[m
+[31m-  { label: 'DUAL-AI', value: 'GROK × GEMINI' },[m
+[32m+[m[32m  { label: 'PROTOCOL', value: 'RAV' },[m
+[32m+[m[32m  { label: 'AI MODE', value: 'DUAL (OPT.)' },[m
+   { label: 'RWA BACKING', value: 'CETĂȚUIA, RO' },[m
+ ];[m
+ [m
+[1mdiff --git a/app/src/sections/HighIntelligenceSection.tsx b/app/src/sections/HighIntelligenceSection.tsx[m
+[1mindex 8504155..5b7732b 100644[m
+[1m--- a/app/src/sections/HighIntelligenceSection.tsx[m
+[1m+++ b/app/src/sections/HighIntelligenceSection.tsx[m
+[36m@@ -35,7 +35,7 @@[m [mfunction buildReasoningSteps(query: string): ReasoningStep[] {[m
+   const observe = isPrice[m
+     ? 'Scanning DeDust CET/USDT pool · 24h volume detected · Liquidity depth measured'[m
+     : isMining[m
+[31m-    ? 'Reading on-chain hashrate metrics · Active nodes: 18,420 · Reward schedule verified'[m
+[32m+[m[32m    ? 'Reading on-chain mining metrics · Reward schedule verified · Consistency checks running'[m
+     : isAI[m
+     ? 'Loading ReAct protocol trace · BRAID reasoning graph initialized · Agent context active'[m
+     : isTon[m
+[36m@@ -59,7 +59,7 @@[m [mfunction buildReasoningSteps(query: string): ReasoningStep[] {[m
+     : isMining[m
+     ? 'Analysing 90-year emission schedule → optimal mining window identified'[m
+     : isAI[m
+[31m-    ? 'Mapping query to BRAID reasoning nodes → 74x efficiency path selected'[m
+[32m+[m[32m    ? 'Mapping query to structured reasoning nodes → trace plan prepared'[m
+     : isTon[m
+     ? 'Cross-referencing TON sharding topology with CET contract state'[m
+     : 'Decomposing intent → sub-goals identified → priority ordering applied';[m
+[36m@@ -71,7 +71,7 @@[m [mfunction buildReasoningSteps(query: string): ReasoningStep[] {[m
+     : isAI[m
+     ? 'Step 1: load agent memory · Step 2: reason over context · Step 3: generate verifiable action'[m
+     : isTon[m
+[31m-    ? 'Step 1: sign transaction · Step 2: broadcast to TON · Step 3: await 2-second finality'[m
+[32m+[m[32m    ? 'Step 1: sign transaction · Step 2: broadcast to TON · Step 3: await finality'[m
+     : 'Step 1: retrieve relevant facts · Step 2: synthesize response · Step 3: validate output';[m
+ [m
+   const act = isPrice[m
+[36m@@ -82,18 +82,18 @@[m [mfunction buildReasoningSteps(query: string): ReasoningStep[] {[m
+     ? 'Agent action dispatched · On-chain reasoning trace anchored to TON block #' +[m
+       (Math.floor(Math.random() * TON_MAINNET_BLOCK_RANGE) + TON_MAINNET_BLOCK_MIN)[m
+     : isTon[m
+[31m-    ? 'Transaction broadcast · TON mempool accepted · Finality countdown: 2.0s'[m
+[32m+[m[32m    ? 'Transaction broadcast · Network accepted · Awaiting finality'[m
+     : 'High-Intelligence response generated · Confidence: ' +[m
+       (88 + Math.floor(Math.random() * 11)) + '%';[m
+ [m
+   const verify = isPrice[m
+     ? 'Swap confirmed · CET balance updated · Price impact within tolerance ✓'[m
+     : isMining[m
+[31m-    ? 'Proof-of-Work hash validated by 18,420 nodes · Reward queued ✓'[m
+[32m+[m[32m    ? 'Proof validated · Reward queued ✓'[m
+     : isAI[m
+[31m-    ? 'Reasoning trace verified on-chain · No hallucinations detected · Audit trail saved ✓'[m
+[32m+[m[32m    ? 'Reasoning trace attached · Audit trail saved ✓'[m
+     : isTon[m
+[31m-    ? 'Block finalized in 1.97s · 2-of-3 validators confirmed · State root updated ✓'[m
+[32m+[m[32m    ? 'Finality reached · State root updated ✓'[m
+     : 'Output cross-validated against on-chain facts · Integrity score: 99.2% ✓';[m
+ [m
+   return [[m
+[1mdiff --git a/app/src/sections/HowToBuySection.tsx b/app/src/sections/HowToBuySection.tsx[m
+[1mindex 458c672..54c8114 100644[m
+[1m--- a/app/src/sections/HowToBuySection.tsx[m
+[1m+++ b/app/src/sections/HowToBuySection.tsx[m
+[36m@@ -6,6 +6,7 @@[m [mimport MeshSkillRibbon from '../components/MeshSkillRibbon';[m
+ import { useLanguage } from '../hooks/useLanguage';[m
+ import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';[m
+ import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';[m
+[32m+[m[32mimport { toast } from 'sonner';[m
+ [m
+ const TONKEEPER_URL = 'https://tonkeeper.com';[m
+ [m
+[36m@@ -64,16 +65,19 @@[m [mconst HowToBuySection = () => {[m
+   const [copied, setCopied] = useState(false);[m
+   const [copyFailed, setCopyFailed] = useState(false);[m
+ [m
+[32m+[m[32m  const linkCopied = t.social.linkCopied;[m
+[32m+[m
+   const handleCopy = useCallback(() => {[m
+     navigator.clipboard.writeText(CET_CONTRACT_ADDRESS).then(() => {[m
+       setCopied(true);[m
+       setCopyFailed(false);[m
+[32m+[m[32m      toast.success(linkCopied);[m
+       setTimeout(() => setCopied(false), 2000);[m
+     }).catch(() => {[m
+       setCopyFailed(true);[m
+       setTimeout(() => setCopyFailed(false), 2000);[m
+     });[m
+[31m-  }, []);[m
+[32m+[m[32m  }, [linkCopied]);[m
+ [m
+   useLayoutEffect(() => {[m
+     const section = sectionRef.current;[m
+[1mdiff --git a/app/src/sections/HybridEngineSection.tsx b/app/src/sections/HybridEngineSection.tsx[m
+[1mindex 80ec048..3f51483 100644[m
+[1m--- a/app/src/sections/HybridEngineSection.tsx[m
+[1m+++ b/app/src/sections/HybridEngineSection.tsx[m
+[36m@@ -106,7 +106,7 @@[m [mconst HybridEngineSection = () => {[m
+   const badges = [[m
+     { icon: Shield, label: 'PoW Security', color: 'text-solaris-gold', bg: 'bg-solaris-gold/10', border: 'border-solaris-gold/30', key: 'pow' as const },[m
+     { icon: Zap, label: 'DPoS Speed', color: 'text-solaris-cyan', bg: 'bg-solaris-cyan/10', border: 'border-solaris-cyan/30', key: 'dpos' as const },[m
+[31m-    { icon: Cpu, label: '100K TPS', color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/30', key: null },[m
+[32m+[m[32m    { icon: Cpu, label: 'Sharded L1', color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/30', key: null },[m
+   ];[m
+ [m
+   return ([m
+[36m@@ -224,10 +224,10 @@[m [mconst HybridEngineSection = () => {[m
+               >[m
+                 <Zap className="w-6 h-6 text-solaris-cyan mx-auto mb-2" />[m
+                 <div className="font-mono text-sm text-solaris-cyan font-semibold">DPoS Layer</div>[m
+[31m-                <div className="text-solaris-muted text-xs mt-1">100,000 TPS execution</div>[m
+[32m+[m[32m                <div className="text-solaris-muted text-xs mt-1">High-throughput execution (sharded)</div>[m
+                 {activeNode === 'dpos' && ([m
+                   <div className="mt-3 pt-3 border-t border-solaris-cyan/20 text-xs text-solaris-muted text-left">[m
+[31m-                    Delegated proof-of-stake enables near-instant finality and massive throughput for agentic workloads.[m
+[32m+[m[32m                    Delegated proof-of-stake enables fast finality and high throughput for parallel workloads.[m
+                   </div>[m
+                 )}[m
+               </button>[m
+[36m@@ -237,8 +237,7 @@[m [mconst HybridEngineSection = () => {[m
+           {/* Content */}[m
+           <div className="space-y-3 mb-8">[m
+             <p className="text-solaris-muted text-base lg:text-lg leading-relaxed">[m
+[31m-              Dynamic block sizes on the Solaris Layer push throughput to{' '}[m
+[31m-              <span className="text-solaris-gold font-semibold">100,000 TPS</span>—without sacrificing decentralization.[m
+[32m+[m[32m              The execution layer is designed for high throughput via sharding and batching, while settlement remains verifiable on-chain.[m
+             </p>[m
+           </div>[m
+ [m
+[36m@@ -260,19 +259,19 @@[m [mconst HybridEngineSection = () => {[m
+             <div className="stat-card p-3 rounded-lg bg-white/3">[m
+               <div className="hud-label mb-1">Throughput</div>[m
+               <div className="font-display font-bold text-2xl lg:text-3xl text-solaris-gold">[m
+[31m-                100K <span className="text-lg text-solaris-muted">TPS</span>[m
+[32m+[m[32m                High <span className="text-lg text-solaris-muted">sharded</span>[m
+               </div>[m
+             </div>[m
+             <div className="stat-card p-3 rounded-lg bg-white/3">[m
+               <div className="hud-label mb-1">Finality</div>[m
+               <div className="font-display font-bold text-2xl lg:text-3xl text-solaris-cyan">[m
+[31m-                2.0 <span className="text-lg text-solaris-muted">sec</span>[m
+[32m+[m[32m                ~2 <span className="text-lg text-solaris-muted">sec</span>[m
+               </div>[m
+             </div>[m
+             <div className="stat-card p-3 rounded-lg bg-white/3">[m
+[31m-              <div className="hud-label mb-1">Energy Saved</div>[m
+[32m+[m[32m              <div className="hud-label mb-1">Energy Profile</div>[m
+               <div className="font-display font-bold text-2xl lg:text-3xl text-emerald-400">[m
+[31m-                99.95<span className="text-lg">%</span>[m
+[32m+[m[32m                PoS<span className="text-lg text-solaris-muted">-based</span>[m
+               </div>[m
+             </div>[m
+           </div>[m
+[1mdiff --git a/app/src/sections/IntelligenceCoreSection.tsx b/app/src/sections/IntelligenceCoreSection.tsx[m
+[1mindex e5abcdb..db15d17 100644[m
+[1m--- a/app/src/sections/IntelligenceCoreSection.tsx[m
+[1m+++ b/app/src/sections/IntelligenceCoreSection.tsx[m
+[36m@@ -154,23 +154,23 @@[m [mconst IntelligenceCoreSection = () => {[m
+               <span className="text-solaris-cyan font-semibold">ReAct Protocol</span> interleaves reasoning traces with actions—so agents explain before they execute.[m
+             </p>[m
+             <p className="text-solaris-muted text-sm lg:text-base leading-relaxed">[m
+[31m-              Result: <span className="text-solaris-text font-medium">34% higher task success</span>, fewer hallucinations, and auditable on-chain logic.[m
+[32m+[m[32m              Result: clearer reasoning traces, fewer ungrounded outputs, and auditable execution paths.[m
+             </p>[m
+           </div>[m
+ [m
+           {/* Metrics row */}[m
+           <div className="mt-5 grid grid-cols-3 gap-3">[m
+             <div className="p-3 rounded-lg bg-white/5 text-center">[m
+[31m-              <div className="font-display font-bold text-lg text-solaris-cyan">34%</div>[m
+[31m-              <div className="hud-label text-[9px]">SUCCESS ↑</div>[m
+[32m+[m[32m              <div className="font-display font-bold text-lg text-solaris-cyan">TRACE</div>[m
+[32m+[m[32m              <div className="hud-label text-[9px]">BEFORE ACTION</div>[m
+             </div>[m
+             <div className="p-3 rounded-lg bg-white/5 text-center">[m
+[31m-              <div className="font-display font-bold text-lg text-solaris-gold">74x</div>[m
+[31m-              <div className="hud-label text-[9px]">EFFICIENCY</div>[m
+[32m+[m[32m              <div className="font-display font-bold text-lg text-solaris-gold">VERIFY</div>[m
+[32m+[m[32m              <div className="hud-label text-[9px]">AGAINST FACTS</div>[m
+             </div>[m
+             <div className="p-3 rounded-lg bg-white/5 text-center">[m
+               <div className="font-display font-bold text-lg text-emerald-400">∞</div>[m
+[31m-              <div className="hud-label text-[9px]">SCALE</div>[m
+[32m+[m[32m              <div className="hud-label text-[9px]">ITERATION</div>[m
+             </div>[m
+           </div>[m
+ [m
+[36m@@ -182,7 +182,7 @@[m [mconst IntelligenceCoreSection = () => {[m
+             </div>[m
+             <p className="text-solaris-muted text-sm">[m
+               Structural reasoning with Mermaid-based logic graphs for{' '}[m
+[31m-              <span className="text-solaris-text font-semibold">74x efficiency gains</span>.[m
+[32m+[m[32m              <span className="text-solaris-text font-semibold">more predictable multi-step reasoning</span>.[m
+             </p>[m
+           </div>[m
+         </div>[m
+[1mdiff --git a/app/src/sections/StatsBentoSection.tsx b/app/src/sections/StatsBentoSection.tsx[m
+[1mindex 0010e07..75554d1 100644[m
+[1m--- a/app/src/sections/StatsBentoSection.tsx[m
+[1m+++ b/app/src/sections/StatsBentoSection.tsx[m
+[36m@@ -64,10 +64,10 @@[m [mconst StatsBento = () => {[m
+     },[m
+     {[m
+       id: 'tps',[m
+[31m-      value: 100_000,[m
+[32m+[m[32m      value: 2,[m
+       label: t.statsBento.labelTps,[m
+       sublabel: t.statsBento.sublabelTps,[m
+[31m-      suffix: '',[m
+[32m+[m[32m      suffix: 's',[m
+       icon: Zap,[m
+       color: 'text-purple-400',[m
+       border: 'border-purple-400/20',[m
+[1mdiff --git a/app/src/sections/WhitepaperSection.tsx b/app/src/sections/WhitepaperSection.tsx[m
+[1mindex 5263ebb..b86e7f1 100644[m
+[1m--- a/app/src/sections/WhitepaperSection.tsx[m
+[1m+++ b/app/src/sections/WhitepaperSection.tsx[m
+[36m@@ -78,16 +78,16 @@[m [mconst wpSections: WPSection[] = [[m
+     title: 'Architecture',[m
+     subtitle: 'Hybrid Dual-Layer Blockchain on TON',[m
+     content: [[m
+[31m-      'Solaris CET is built on the TON (The Open Network) blockchain, inheriting its sharded architecture, Proof-of-Stake consensus, and native smart contract capabilities. TON was selected for its unmatched throughput (100,000+ TPS), sub-2-second finality, and Telegram ecosystem integration reaching 900M+ users.',[m
+[32m+[m[32m      'Solaris CET is built on the TON (The Open Network) blockchain, inheriting its sharded architecture, Proof-of-Stake consensus, and native smart contract capabilities. TON was selected for its high throughput design, short finality, and deep Telegram ecosystem integration.',[m
+       'The dual-layer architecture separates concerns: Layer 1 handles consensus, token settlement, and immutable state storage. Layer 2 processes the AI reasoning workloads — high-frequency agent interactions, model inference requests, and IPFS content addressing — before anchoring verified results back to Layer 1.',[m
+       'This design means users never wait for AI reasoning to block on-chain transactions. The two layers operate in parallel, converging on finality every 2 seconds. The cryptographic bridge between them uses Merkle proofs to guarantee that no Layer 2 result can be submitted to Layer 1 without a complete, verifiable reasoning trace.',[m
+     ],[m
+     chips: ['TON L1', 'AI L2', 'Merkle Bridge', 'IPFS Storage', 'PoS Consensus'],[m
+     stats: [[m
+[31m-      { label: 'TPS', value: '100,000' },[m
+[31m-      { label: 'Finality', value: '~2.0s' },[m
+[31m-      { label: 'Active Nodes', value: '18,420' },[m
+[31m-      { label: 'Shards', value: 'Dynamic' },[m
+[32m+[m[32m      { label: 'L1', value: 'TON (sharded)' },[m
+[32m+[m[32m      { label: 'Finality', value: '~2s (typical)' },[m
+[32m+[m[32m      { label: 'Bridge', value: 'Merkle proofs' },[m
+[32m+[m[32m      { label: 'Storage', value: 'IPFS' },[m
+     ],[m
+   },[m
+   {[m
+[36m@@ -98,11 +98,11 @@[m [mconst wpSections: WPSection[] = [[m
+     title: 'RAV Protocol',[m
+     subtitle: 'Reason → Act → Verify Loop',[m
+     content: [[m
+[31m-      'The RAV (Reason-Act-Verify) Protocol is the proprietary dual-AI operational framework powering every Solaris CET agent. The REASON phase is handled by Google Gemini — decomposing goals into sub-objectives using BRAID graphs and indexing all available on-chain and off-chain signals. Before any on-chain action is executed, the agent must produce a verifiable reasoning trace stored immutably on IPFS and anchored to its Layer 1 transaction.',[m
+[31m-      'The ACT phase is executed by xAI Grok — delivering the optimal action sequence across market automation or crop diagnostics pipelines with decisive, low-latency responses. All parameters are recorded on-chain. The VERIFY phase cross-validates both model outputs: the outcome is confirmed against the prediction, the agent\'s self-model is updated, and a verifiable performance delta is published.',[m
+[31m-      'In empirical testing across 50,000 agent runs, the RAV dual-AI architecture achieved a 34% higher task success rate than single-model agents, reduced hallucination incidents by 89%, and enabled full post-hoc audit of every decision. Gemini supplies the analytical depth; Grok supplies the execution speed.',[m
+[32m+[m[32m      'The RAV (Reason-Act-Verify) Protocol is an operational loop used to make agent actions auditable. The REASON phase decomposes goals into sub-objectives using structured reasoning graphs and indexes available on-chain and off-chain signals. Before any on-chain action is executed, the agent must produce a verifiable reasoning trace stored on IPFS and anchored to its Layer 1 transaction.',[m
+[32m+[m[32m      'The ACT phase executes the selected action sequence across market automation or crop diagnostics pipelines. Parameters are recorded and can be reviewed post-hoc. The VERIFY phase cross-checks outcomes against expectations and chain facts, then publishes a trace so the decision can be audited later.',[m
+[32m+[m[32m      'Quantitative benchmarking is treated as a publishable artifact: if/when performance metrics are claimed, they should be linked to reproducible methodology and datasets.',[m
+     ],[m
+[31m-    chips: ['Reason', 'Act', 'Verify', 'Grok × Gemini', 'On-Chain Audit'],[m
+[32m+[m[32m    chips: ['Reason', 'Act', 'Verify', 'Multi-model', 'On-Chain Audit'],[m
+   },[m
+   {[m
+     id: 'braid',[m
+[36m@@ -113,11 +113,11 @@[m [mconst wpSections: WPSection[] = [[m
+     subtitle: 'Structural Reasoning with Logic Graphs',[m
+     content: [[m
+       'BRAID (Bidirectional Reasoning with AI-Directed graphs) replaces the linear token prediction of standard LLMs with a directed acyclic graph (DAG) of reasoning nodes. Each node represents a discrete cognitive operation: fact retrieval, hypothesis generation, logical inference, or outcome evaluation.',[m
+[31m-      'The graph structure allows agents to perform parallel reasoning across independent branches, prune dead-end paths early, and reuse verified sub-conclusions without recomputation. In benchmarks, BRAID-structured agents achieve 74× the computational efficiency of equivalent flat-context LLMs on multi-step reasoning tasks.',[m
+[32m+[m[32m      'The graph structure allows agents to perform parallel reasoning across independent branches, prune dead-end paths early, and reuse verified sub-conclusions without recomputation. This improves debuggability for multi-step reasoning tasks.',[m
+       'BRAID graphs are serialised in Mermaid notation, stored on IPFS, and referenced in every CET transaction. This means developers and auditors can reconstruct the exact reasoning path that led to any agent action — months or years after the fact — without access to the original model.',[m
+     ],[m
+     stats: [[m
+[31m-      { label: 'Efficiency Gain', value: '74×' },[m
+[32m+[m[32m      { label: 'Reasoning', value: 'Graph-based' },[m
+       { label: 'Graph Format', value: 'Mermaid DAG' },[m
+       { label: 'Storage', value: 'IPFS' },[m
+       { label: 'Audit Lag', value: '0' },[m
+[1mdiff --git a/app/tests/ai-model.spec.ts b/app/tests/ai-model.spec.ts[m
+[1mindex fa016b9..478981c 100644[m
+[1m--- a/app/tests/ai-model.spec.ts[m
+[1m+++ b/app/tests/ai-model.spec.ts[m
+[36m@@ -76,18 +76,18 @@[m [mtest.describe('AI Model Execution — Intelligence Core', () => {[m
+     expect(['THOUGHT', 'ACTION', 'OBSERVE']).toContain(second);[m
+   });[m
+ [m
+[31m-  test('AI metrics — 34%, 74x, and infinity symbol are displayed', async ({ page }) => {[m
+[32m+[m[32m  test('AI metrics — TRACE, VERIFY, and infinity symbol are displayed', async ({ page }) => {[m
+     await page.evaluate(() => window.scrollBy(0, window.innerHeight * 2));[m
+ [m
+[31m-    await expect(page.locator('text=34%').first()).toBeAttached({ timeout: 8000 });[m
+[31m-    await expect(page.locator('text=74x').first()).toBeAttached({ timeout: 8000 });[m
+[32m+[m[32m    await expect(page.locator('text=TRACE').first()).toBeAttached({ timeout: 8000 });[m
+[32m+[m[32m    await expect(page.locator('text=VERIFY').first()).toBeAttached({ timeout: 8000 });[m
+     await expect(page.locator('text=∞').first()).toBeAttached({ timeout: 8000 });[m
+   });[m
+ [m
+   test('BRAID Framework card is visible after scroll', async ({ page }) => {[m
+     await page.evaluate(() => window.scrollBy(0, window.innerHeight * 2));[m
+     await expect(page.locator('text=BRAID Framework').first()).toBeAttached({ timeout: 8000 });[m
+[31m-    await expect(page.locator('text=74x efficiency gains').first()).toBeAttached({ timeout: 8000 });[m
+[32m+[m[32m    await expect(page.locator('text=more predictable multi-step reasoning').first()).toBeAttached({ timeout: 8000 });[m
+   });[m
+ [m
+   test('AgentBridge visualisation is present in the DOM', async ({ page }) => {[m
+[1mdiff --git a/app/tests/competition-section.spec.ts b/app/tests/competition-section.spec.ts[m
+[1mindex 979cea1..1a55458 100644[m
+[1m--- a/app/tests/competition-section.spec.ts[m
+[1m+++ b/app/tests/competition-section.spec.ts[m
+[36m@@ -16,7 +16,7 @@[m [mtest.describe('Competition section', () => {[m
+ [m
+     await expect(section).toBeVisible({ timeout: 15000 });[m
+     await expect(section.locator('thead th div', { hasText: /^CET$/ })).toBeVisible();[m
+[31m-    await expect(section.getByText('Fetch.ai', { exact: false })).toBeVisible();[m
+[32m+[m[32m    await expect(section.locator('thead th div', { hasText: /^FET$/ })).toBeVisible();[m
+ [m
+     // Viewport gate + lazy chunk: Recharts surfaces use .recharts-wrapper[m
+     await expect(section.locator('.recharts-wrapper').first()).toBeVisible({ timeout: 25_000 });[m
+[1mdiff --git a/app/vercel.json b/app/vercel.json[m
+[1mindex a419ada..75ff08e 100644[m
+[1m--- a/app/vercel.json[m
+[1m+++ b/app/vercel.json[m
+[36m@@ -1,6 +1,18 @@[m
+ {[m
+   "rewrites": [[m
+     { "source": "/api/chat", "destination": "/api/chat/route" },[m
+[31m-    { "source": "/api/auth", "destination": "/api/auth/route" }[m
+[32m+[m[32m    { "source": "/api/auth", "destination": "/api/auth/route" },[m
+[32m+[m[32m    { "source": "/api/react", "destination": "/api/react/route" },[m
+[32m+[m[32m    { "source": "/api/recovery", "destination": "/api/recovery/route" },[m
+[32m+[m[32m    { "source": "/api/route", "destination": "/api/route/route" },[m
+[32m+[m[32m    { "source": "/api/lyapunov", "destination": "/api/lyapunov/route" },[m
+[32m+[m[32m    { "source": "/api/mermaid/agent", "destination": "/api/mermaid/agent/route" },[m
+[32m+[m[32m    { "source": "/api/status", "destination": "/api/status/route" },[m
+[32m+[m[32m    { "source": "/api/health", "destination": "/api/health/route" },[m
+[32m+[m[32m    { "source": "/api/wallet/balance", "destination": "/api/wallet/balance/route" },[m
+[32m+[m[32m    { "source": "/api/audit", "destination": "/api/audit/route" },[m
+[32m+[m[32m    { "source": "/api/gdpr", "destination": "/api/gdpr/route" },[m
+[32m+[m[32m    { "source": "/api/cache", "destination": "/api/cache/route" },[m
+[32m+[m[32m    { "source": "/api/metrics", "destination": "/api/metrics/route" }[m
+   ][m
+ }[m
+[1mdiff --git a/contracts/package.json b/contracts/package.json[m
+[1mindex 2869aa9..2a66ee4 100644[m
+[1m--- a/contracts/package.json[m
+[1m+++ b/contracts/package.json[m
+[36m@@ -8,11 +8,11 @@[m
+   },[m
+   "scripts": {[m
+     "build": "blueprint build",[m
+[31m-    "pretest": "npx blueprint build MultiSigWrapper",[m
+[32m+[m[32m    "pretest": "npx blueprint build --all",[m
+     "test": "jest",[m
+     "test:ci": "jest --ci --forceExit",[m
+     "deploy": "blueprint run deployMultiSigWrapper",[m
+[31m-    "typecheck": "npx blueprint build MultiSigWrapper && npx tsc --noEmit"[m
+[32m+[m[32m    "typecheck": "npx blueprint build --all && npx tsc --noEmit"[m
+   },[m
+   "overrides": {[m
+     "brace-expansion": "^2.0.3",[m
+[1mdiff --git a/contracts/tsconfig.json b/contracts/tsconfig.json[m
+[1mindex 5e2d4b2..6e2ce33 100644[m
+[1m--- a/contracts/tsconfig.json[m
+[1m+++ b/contracts/tsconfig.json[m
+[36m@@ -1 +1 @@[m
+[31m-{"compilerOptions":{"target":"ES2020","module":"node16","moduleResolution":"node16","esModuleInterop":true,"strict":true,"isolatedModules":true,"types":["node","jest"],"skipLibCheck":true},"include":["tests/**/*.ts","wrappers/**/*.ts","scripts/**/*.ts","**/*.ts"]}[m
+[32m+[m[32m{"compilerOptions":{"target":"ES2020","module":"node16","moduleResolution":"node16","esModuleInterop":true,"strict":true,"isolatedModules":true,"types":["node","jest"],"skipLibCheck":true},"include":["build/**/*.ts","tests/**/*.ts","wrappers/**/*.ts","scripts/**/*.ts"]}[m

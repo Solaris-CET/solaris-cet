@@ -14,6 +14,9 @@ npm run lint
 npm run test         # Vitest
 npm run test:e2e     # Playwright — run `npm run build` first (CI downloads `dist/`; local `verify:full` builds then previews)
 npm run build        # tsc -b + vite build
+npm run api:build    # compile `api/**` routes to `.api-dist/` for the Node server
+npm run start:node   # serve `dist/` + proxy `/api/*` to compiled routes (production-like local)
+npm run start:full   # build + api:build + start:node (single command for Coolify/VPS)
 npm run verify       # lint + typecheck + test + build (quick gate before push)
 npm run verify:full  # verify + Playwright E2E cu 1 worker local (test:e2e:stable)
 ```
@@ -27,7 +30,7 @@ E2E (Chromium): from `app/`, **`npm run test:e2e`** (install browsers once: `npx
 | Path | Purpose |
 |------|---------|
 | `src/` | UI, hooks, workers, i18n |
-| `api/` | CET AI `chat` (Edge) + `auth` (Node + Postgres) — run beside the static build on Coolify/VPS or any Node host |
+| `api/` | CET AI `chat` (Edge) + `auth` (Node + Postgres) — compiled by `api:build` and served by `server/index.cjs` |
 | `db/` | Drizzle schema / client (used by `api/auth`) |
 | `public/` | Static assets; `public/api/state.json` for client state |
 | `tests/` | Playwright specs |
@@ -42,9 +45,12 @@ E2E (Chromium): from `app/`, **`npm run test:e2e`** (install browsers once: `npx
 
 - **CET AI:** `GROK_API_KEY` / `GEMINI_API_KEY` (or `*_ENC` + `ENCRYPTION_SECRET`) — see `api/lib/crypto.ts` and `scripts/encrypt-key.mjs` in the repo root.
 - **Auth API:** database URL expected by `db/client` (see Drizzle config).
+- **JWT (optional):** `JWT_SECRET` enables `/api/auth` token issuance and protects `/api/gdpr` and audit attribution.
+- **Rate limiting / cache (optional):** `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` enable `/api/chat` rate limiting and `/api/cache`.
+- **TON RPC (optional):** `TONCENTER_RPC_URL`, `TONCENTER_API_KEY` enable `/api/wallet/balance`.
 
 ## Deploy notes
 
-- **Coolify (production):** build `app/` (output `dist/`), serve the SPA; wire `/api/*` to the same app’s API routes or a companion Node service. Set the same env vars as below.
+- **Coolify (production):** run `npm run start:full` (serves `dist/` + `/api/*` from the same container via `server/index.cjs`). Set the same env vars as below.
 - **GitHub Pages:** static `dist/` only; `/api/chat` and `/api/auth` need a separate backend unless you disable those features.
 - `vercel.json` exists for teams that still deploy on Vercel; it maps `/api/chat` and `/api/auth` when the project root is **`app`**.

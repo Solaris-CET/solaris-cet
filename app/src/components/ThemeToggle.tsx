@@ -4,7 +4,7 @@ import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 
 export default function ThemeToggle({ className }: { className?: string }) {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -12,7 +12,8 @@ export default function ThemeToggle({ className }: { className?: string }) {
     return () => window.clearTimeout(id);
   }, []);
 
-  const next = theme === 'light' ? 'dark' : 'light';
+  const active = resolvedTheme === 'light' ? 'light' : 'dark';
+  const next = active === 'light' ? 'dark' : 'light';
 
   return (
     <button
@@ -25,7 +26,7 @@ export default function ThemeToggle({ className }: { className?: string }) {
       onClick={() => setTheme(next)}
       aria-label="Toggle theme"
     >
-      {mounted && theme === 'light' ? (
+      {mounted && active === 'light' ? (
         <Moon className="w-4 h-4" />
       ) : (
         <Sun className="w-4 h-4" />

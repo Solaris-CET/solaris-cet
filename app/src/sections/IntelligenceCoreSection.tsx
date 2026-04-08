@@ -4,6 +4,7 @@ import { Brain, Lightbulb, Play, Eye, Zap } from 'lucide-react';
 import AgentBridge from '../components/AgentBridge';
 import DualAiFusionGraphic from '../components/DualAiFusionGraphic';
 import GlowOrbs from '../components/GlowOrbs';
+import HierarchyGraph from '../components/HierarchyGraph';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useLanguage } from '../hooks/useLanguage';
@@ -154,23 +155,23 @@ const IntelligenceCoreSection = () => {
               <span className="text-solaris-cyan font-semibold">ReAct Protocol</span> interleaves reasoning traces with actions—so agents explain before they execute.
             </p>
             <p className="text-solaris-muted text-sm lg:text-base leading-relaxed">
-              Result: <span className="text-solaris-text font-medium">34% higher task success</span>, fewer hallucinations, and auditable on-chain logic.
+              Result: clearer reasoning traces, fewer ungrounded outputs, and auditable execution paths.
             </p>
           </div>
 
           {/* Metrics row */}
           <div className="mt-5 grid grid-cols-3 gap-3">
             <div className="p-3 rounded-lg bg-white/5 text-center">
-              <div className="font-display font-bold text-lg text-solaris-cyan">34%</div>
-              <div className="hud-label text-[9px]">SUCCESS ↑</div>
+              <div className="font-display font-bold text-lg text-solaris-cyan">TRACE</div>
+              <div className="hud-label text-[9px]">BEFORE ACTION</div>
             </div>
             <div className="p-3 rounded-lg bg-white/5 text-center">
-              <div className="font-display font-bold text-lg text-solaris-gold">74x</div>
-              <div className="hud-label text-[9px]">EFFICIENCY</div>
+              <div className="font-display font-bold text-lg text-solaris-gold">VERIFY</div>
+              <div className="hud-label text-[9px]">AGAINST FACTS</div>
             </div>
             <div className="p-3 rounded-lg bg-white/5 text-center">
               <div className="font-display font-bold text-lg text-emerald-400">∞</div>
-              <div className="hud-label text-[9px]">SCALE</div>
+              <div className="hud-label text-[9px]">ITERATION</div>
             </div>
           </div>
 
@@ -182,8 +183,11 @@ const IntelligenceCoreSection = () => {
             </div>
             <p className="text-solaris-muted text-sm">
               Structural reasoning with Mermaid-based logic graphs for{' '}
-              <span className="text-solaris-text font-semibold">74x efficiency gains</span>.
+              <span className="text-solaris-text font-semibold">more predictable multi-step reasoning</span>.
             </p>
+            <div className="mt-4">
+              <HierarchyGraph />
+            </div>
           </div>
         </div>
       </div>

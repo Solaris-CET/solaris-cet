@@ -16,7 +16,7 @@ test.describe('Competition section', () => {
 
     await expect(section).toBeVisible({ timeout: 15000 });
     await expect(section.locator('thead th div', { hasText: /^CET$/ })).toBeVisible();
-    await expect(section.getByText('Fetch.ai', { exact: false })).toBeVisible();
+    await expect(section.locator('thead th div', { hasText: /^FET$/ })).toBeVisible();
 
     // Viewport gate + lazy chunk: Recharts surfaces use .recharts-wrapper
     await expect(section.locator('.recharts-wrapper').first()).toBeVisible({ timeout: 25_000 });

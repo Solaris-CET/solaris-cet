@@ -58,9 +58,23 @@ export const transactions = pgTable(
   (t) => [index('transactions_user_id_idx').on(t.userId)],
 );
 
+export const auditLogs = pgTable(
+  'audit_logs',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    walletAddress: text('wallet_address'),
+    action: text('action').notNull(),
+    details: text('details'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('audit_logs_wallet_address_idx').on(t.walletAddress)],
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type MiningSession = typeof miningSessions.$inferSelect;
 export type NewMiningSession = typeof miningSessions.$inferInsert;
 export type Transaction = typeof transactions.$inferSelect;
 export type NewTransaction = typeof transactions.$inferInsert;
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type NewAuditLog = typeof auditLogs.$inferInsert;

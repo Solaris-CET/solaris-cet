@@ -6,6 +6,7 @@ import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useLanguage } from '../hooks/useLanguage';
 import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
+import { toast } from 'sonner';
 
 const TONKEEPER_URL = 'https://tonkeeper.com';
 
@@ -64,16 +65,19 @@ const HowToBuySection = () => {
   const [copied, setCopied] = useState(false);
   const [copyFailed, setCopyFailed] = useState(false);
 
+  const linkCopied = t.social.linkCopied;
+
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(CET_CONTRACT_ADDRESS).then(() => {
       setCopied(true);
       setCopyFailed(false);
+      toast.success(linkCopied);
       setTimeout(() => setCopied(false), 2000);
     }).catch(() => {
       setCopyFailed(true);
       setTimeout(() => setCopyFailed(false), 2000);
     });
-  }, []);
+  }, [linkCopied]);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;

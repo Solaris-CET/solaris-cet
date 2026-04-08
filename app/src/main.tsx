@@ -19,7 +19,7 @@ window.addEventListener('vite:preloadError', () => {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem storageKey="theme">
       <ErrorBoundary>
         <App />
       </ErrorBoundary>

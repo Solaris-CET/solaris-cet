@@ -35,7 +35,7 @@ function buildReasoningSteps(query: string): ReasoningStep[] {
   const observe = isPrice
     ? 'Scanning DeDust CET/USDT pool · 24h volume detected · Liquidity depth measured'
     : isMining
-    ? 'Reading on-chain hashrate metrics · Active nodes: 18,420 · Reward schedule verified'
+    ? 'Reading on-chain mining metrics · Reward schedule verified · Consistency checks running'
     : isAI
     ? 'Loading ReAct protocol trace · BRAID reasoning graph initialized · Agent context active'
     : isTon
@@ -59,7 +59,7 @@ function buildReasoningSteps(query: string): ReasoningStep[] {
     : isMining
     ? 'Analysing 90-year emission schedule → optimal mining window identified'
     : isAI
-    ? 'Mapping query to BRAID reasoning nodes → 74x efficiency path selected'
+    ? 'Mapping query to structured reasoning nodes → trace plan prepared'
     : isTon
     ? 'Cross-referencing TON sharding topology with CET contract state'
     : 'Decomposing intent → sub-goals identified → priority ordering applied';
@@ -71,7 +71,7 @@ function buildReasoningSteps(query: string): ReasoningStep[] {
     : isAI
     ? 'Step 1: load agent memory · Step 2: reason over context · Step 3: generate verifiable action'
     : isTon
-    ? 'Step 1: sign transaction · Step 2: broadcast to TON · Step 3: await 2-second finality'
+    ? 'Step 1: sign transaction · Step 2: broadcast to TON · Step 3: await finality'
     : 'Step 1: retrieve relevant facts · Step 2: synthesize response · Step 3: validate output';
 
   const act = isPrice
@@ -82,18 +82,18 @@ function buildReasoningSteps(query: string): ReasoningStep[] {
     ? 'Agent action dispatched · On-chain reasoning trace anchored to TON block #' +
       (Math.floor(Math.random() * TON_MAINNET_BLOCK_RANGE) + TON_MAINNET_BLOCK_MIN)
     : isTon
-    ? 'Transaction broadcast · TON mempool accepted · Finality countdown: 2.0s'
+    ? 'Transaction broadcast · Network accepted · Awaiting finality'
     : 'High-Intelligence response generated · Confidence: ' +
       (88 + Math.floor(Math.random() * 11)) + '%';
 
   const verify = isPrice
     ? 'Swap confirmed · CET balance updated · Price impact within tolerance ✓'
     : isMining
-    ? 'Proof-of-Work hash validated by 18,420 nodes · Reward queued ✓'
+    ? 'Proof validated · Reward queued ✓'
     : isAI
-    ? 'Reasoning trace verified on-chain · No hallucinations detected · Audit trail saved ✓'
+    ? 'Reasoning trace attached · Audit trail saved ✓'
     : isTon
-    ? 'Block finalized in 1.97s · 2-of-3 validators confirmed · State root updated ✓'
+    ? 'Finality reached · State root updated ✓'
     : 'Output cross-validated against on-chain facts · Integrity score: 99.2% ✓';
 
   return [

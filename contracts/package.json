@@ -8,11 +8,11 @@
   },
   "scripts": {
     "build": "blueprint build",
-    "pretest": "npx blueprint build MultiSigWrapper",
+    "pretest": "npx blueprint build --all",
     "test": "jest",
     "test:ci": "jest --ci --forceExit",
     "deploy": "blueprint run deployMultiSigWrapper",
-    "typecheck": "npx blueprint build MultiSigWrapper && npx tsc --noEmit"
+    "typecheck": "npx blueprint build --all && npx tsc --noEmit"
   },
   "overrides": {
     "brace-expansion": "^2.0.3",

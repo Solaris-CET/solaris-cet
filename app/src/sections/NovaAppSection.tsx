@@ -4,6 +4,7 @@ import { TrendingUp, Droplets, Clock, Battery } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { SolarisLogoMark } from '../components/SolarisLogoMark';
+import AppImage from '../components/AppImage';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 
@@ -126,7 +127,7 @@ const NovaAppSection = () => {
           {/* Phone mockup */}
           <div className="h-full flex flex-col">
             <div className="flex-1 relative">
-              <img
+              <AppImage
                 src={`${import.meta.env.BASE_URL}phone-mockup.png`}
                 alt="Solaris CET App"
                 width="360"

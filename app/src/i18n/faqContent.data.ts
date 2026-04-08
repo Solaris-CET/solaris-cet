@@ -24,16 +24,16 @@ const faqEn: FaqContent = {
     'Yes. The CET smart contract was fully audited by Cyberscope with zero critical findings. The core team has also completed KYC verification and the project is listed on Freshcoins. The full audit report is linked in the whitepaper.',
   q5: 'How does CET mining work?',
   a5:
-    "66.66% of the BTC-S supply (the broader ecosystem token) enters circulation via Proof-of-Work mining over a 90-year schedule with a decaying reward curve — similar to Bitcoin's halving model. The Zero-Battery constraint ensures mining approaches 0% battery drain on participating devices.",
+    "Mining is designed to run over a long horizon with a decaying reward curve, similar in spirit to emission schedules like Bitcoin's. Exact reward distribution and device impact depend on implementation details and should be verified against the deployed protocol rules.",
   q6: 'What is the DCBM mechanism?',
   a6:
-    'DCBM (Dynamic-Control Buyback Mechanism) uses PID controllers to autonomously manage buy-back operations when price deviates from the target band. It reduces token price volatility by up to 66%, providing scientific price stability without manual intervention.',
+    'DCBM (Dynamic-Control Buyback Mechanism) is a proposed buyback and stabilization concept using feedback-control ideas (e.g. PID-like controllers). Any quantitative claims should be backed by a reproducible backtest and on-chain audit trail when implemented.',
   q7: 'What blockchain does CET run on?',
   a7:
-    "CET is deployed on the TON (The Open Network) mainnet — one of the fastest L1 blockchains, with ~100,000 TPS throughput and 2-second transaction finality. TON's sharded architecture provides virtually unlimited scalability.",
+    "CET is deployed on the TON (The Open Network) mainnet — a sharded L1 designed for high throughput and short finality in typical conditions. Exact performance varies by network load and workload.",
   q8: 'What is the ReAct Protocol?',
   a8:
-    "ReAct (Reasoning + Acting) is Solaris CET's on-chain AI reasoning standard. Every AI agent action goes through a 5-phase loop: Observe → Think → Plan → Act → Verify. All reasoning traces are anchored on-chain, making every AI decision transparent, auditable, and hallucination-resistant.",
+    "ReAct (Reasoning + Acting) is a pattern that interleaves reasoning and actions. Solaris CET uses a 5-phase loop (Observe → Think → Plan → Act → Verify) to keep actions reviewable; traces can be anchored via IPFS/on-chain references when deployed.",
   q9: 'Where can I find the whitepaper?',
   a9: 'The whitepaper is permanently published on IPFS — immutable and censorship-resistant.',
   q10: 'How do I join the Solaris CET community?',
@@ -41,13 +41,13 @@ const faqEn: FaqContent = {
     'Join the official Telegram community for news, updates, and direct communication with the team. The source code is also open on GitHub.',
   q11: 'How does Solaris CET compare to Fetch.ai, Bittensor and SingularityNET?',
   a11:
-    'CET has 9,000 total supply vs billions for competitors. TON delivers 100,000 TPS vs under 1,000 for Fetch.ai and Bittensor. CET operates 200,000 deployed autonomous agents — not just a marketplace. Only CET uses Grok × Gemini dual-AI simultaneously. And only CET is backed by real-world agricultural assets in Romania.',
+    'CET has a fixed supply of 9,000 (many competitors are in the millions/billions). CET runs on TON (sharded L1). The site includes a simulated agent-mesh UX for structured answers, and multi-model routing can be enabled when deployed. CET is anchored to a real-world agricultural narrative in Romania (Cetățuia).',
   q12: 'What is the BRAID Framework?',
   a12:
     'BRAID (Blockchain-Recursive AI Decision) serialises agent reasoning paths as Mermaid notation graphs, stores them on IPFS, and anchors them in every CET transaction. This means any decision made by any agent can be reconstructed and audited months or years later — with complete traceability and zero trust assumptions.',
   q13: 'What are the RAV Protocol phases?',
   a13:
-    'RAV = Reason · Act · Verify. Phase 1 (REASON): Google Gemini decomposes the goal into sub-objectives using a BRAID graph. Phase 2 (ACT): xAI Grok executes the optimised action plan and generates TON transactions. Phase 3 (VERIFY): An independent model reviews the action and its on-chain trace before finalisation. Every phase is timestamped and stored immutably on IPFS.',
+    'RAV = Reason · Act · Verify. Phase 1 (REASON): decompose the goal into sub-objectives using a structured reasoning graph. Phase 2 (ACT): execute the action plan (on-chain/off-chain). Phase 3 (VERIFY): cross-check outcomes against chain facts and expected results. Traces can be stored on IPFS and referenced for audits.',
   q14: 'What is the Zero-Battery Constraint?',
   a14:
     "CET mining is engineered to approach zero battery drain on mobile devices. Unlike Bitcoin mining, CET's Zero-Battery Constraint limits CPU utilisation to background-idle levels, meaning mining can run passively without heating your device or reducing battery life measurably.",
@@ -235,16 +235,16 @@ export const faqContentByLang: Record<FaqLang, FaqContent> = {
       'Da. Contractul CET a fost auditat complet de Cyberscope, fără constatări critice. Echipa a finalizat KYC, iar proiectul este listat pe Freshcoins. Raportul complet este legat în whitepaper.',
     q5: 'Cum funcționează minarea CET?',
     a5:
-      '66,66% din oferta BTC-S intră în circulație prin Proof-of-Work pe 90 de ani, cu curbă descrescătoare — similar modelului de halving Bitcoin. Constrângerea Zero-Battery menține consumul de baterie aproape de 0% pe dispozitive.',
+      'Minarea este gândită să ruleze pe un orizont lung, cu o curbă de recompense descrescătoare, similar ca idee cu programe de emisie precum Bitcoin. Distribuția exactă a recompenselor și impactul pe dispozitive depind de implementarea finală și trebuie verificate în regulile protocolului deployat.',
     q6: 'Ce este mecanismul DCBM?',
     a6:
-      'DCBM (mecanism dinamic de răscumpărare) folosește controlere PID pentru operațiuni autonome când prețul deviază de la banda țintă. Poate reduce volatilitatea prețului cu până la 66%, fără intervenție manuală.',
+      'DCBM (mecanism dinamic de răscumpărare) este un concept propus de stabilizare care folosește idei de control (feedback de tip PID). Orice afirmație cantitativă trebuie susținută de un backtest reproductibil și de un audit trail on-chain când este implementat.',
     q7: 'Pe ce blockchain rulează CET?',
     a7:
-      'CET este deployat pe mainnet-ul TON (The Open Network) — unul dintre cele mai rapide L1, cu ~100.000 TPS și finalitate în ~2 secunde. Arhitectura sharded a TON oferă scalabilitate foarte mare.',
+      'CET este deployat pe mainnet-ul TON (The Open Network) — un L1 fragmentat proiectat pentru debit ridicat și finalitate scurtă în condiții tipice. Performanța exactă variază în funcție de load și workload.',
     q8: 'Ce este protocolul ReAct?',
     a8:
-      'ReAct (Raționament + Acțiune) este standardul on-chain de raționament AI al Solaris CET. Fiecare acțiune a agentului trece prin: Observă → Gândește → Planifică → Acționează → Verifică. Urmele de raționament sunt ancorate on-chain.',
+      'ReAct (Raționament + Acțiune) este un pattern care îmbină raționarea cu acțiuni. Solaris CET folosește o buclă în 5 pași (Observă → Gândește → Planifică → Acționează → Verifică) pentru a păstra acțiunile ușor de revizuit; urmele pot fi ancorate prin referințe IPFS/on-chain când e deployat.',
     q9: 'Unde găsesc whitepaper-ul?',
     a9: 'Whitepaper-ul este publicat permanent pe IPFS — imuabil și rezistent la cenzură.',
     q10: 'Cum mă alătur comunității Solaris CET?',
@@ -252,13 +252,13 @@ export const faqContentByLang: Record<FaqLang, FaqContent> = {
       'Intră în comunitatea oficială Telegram pentru noutăți și dialog cu echipa. Codul sursă este deschis pe GitHub.',
     q11: 'Cum se compară Solaris CET cu Fetch.ai, Bittensor și SingularityNET?',
     a11:
-      'CET are 9.000 tokeni total față de miliarde la concurenți. TON oferă 100.000 TPS față de sub 1.000 la mulți rivali. CET operează ~200.000 agenți autonomi. Doar CET folosește simultan Grok × Gemini. Doar CET este ancorat în active agricole reale în România.',
+      'CET are o ofertă fixă de 9.000 (multe proiecte concurente sunt la milioane/miliarde). CET rulează pe TON (L1 fragmentat). Site-ul include o experiență de tip agent-mesh (simulat) pentru răspunsuri structurate, iar rutarea multi-model poate fi activată când e deployat. CET este ancorat într-o narațiune RWA în România (Cetățuia).',
     q12: 'Ce este cadrul BRAID?',
     a12:
       'BRAID serializează căile de raționament ca grafuri Mermaid pe IPFS și le ancorează în fiecare tranzacție CET, pentru audit ulterior.',
     q13: 'Care sunt fazele protocolului RAV?',
     a13:
-      'RAV = Reason · Act · Verify. REASON: Gemini descompune obiectivele. ACT: Grok execută planul și generează tranzacții TON. VERIFY: un model independent verifică acțiunea și urma on-chain. Totul este stocat imuabil pe IPFS.',
+      'RAV = Reason · Act · Verify. REASON: descompune obiectivul în sub-obiective folosind un graf de raționament. ACT: execută planul (on-chain/off-chain). VERIFY: verifică rezultatul vs. fapte on-chain și așteptări. Urmele pot fi stocate pe IPFS și referențiate pentru audit.',
     q14: 'Ce este constrângerea Zero-Battery?',
     a14:
       'Minarea CET este proiectată pentru consum aproape nul de baterie pe mobil. Spre deosebire de minarea tip Bitcoin, Zero-Battery limitează CPU la nivel de fundal, fără încălzire vizibilă sau uzură de baterie.',

@@ -6,6 +6,7 @@ import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { getAllowedOrigin } from '../lib/cors';
 import { getDb, schema } from '../../db/client';
+import { signJwt, verifyJwt } from '../lib/jwt';
 
 export const config = { runtime: 'nodejs' };
 
@@ -17,6 +18,8 @@ function isUniqueViolation(err: unknown): boolean {
     (err as { code?: string }).code === '23505'
   );
 }
+
+const JWT_TTL_SECONDS = 60 * 60;
 
 export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
@@ -34,14 +37,31 @@ export default async function handler(req: Request): Promise<Response> {
     });
   }
 
-  if (req.method !== 'POST') {
+  if (req.method === 'GET') {
+    const auth = req.headers.get('Authorization') ?? '';
+    const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+    const secret = process.env.JWT_SECRET?.trim();
+    if (!token || !secret) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
+      });
+    }
+    const decoded = verifyJwt(token, secret);
+    if (!decoded || typeof decoded.wallet !== 'string') {
+      return new Response(JSON.stringify({ error: 'Invalid token' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
+      });
+    }
+    return new Response(JSON.stringify({ user: { wallet: decoded.wallet } }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
+    });
+  } else if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
       status: 405,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': allowedOrigin,
-        Vary: 'Origin',
-      },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
     });
   }
 
@@ -87,7 +107,9 @@ export default async function handler(req: Request): Promise<Response> {
       .where(eq(schema.users.walletAddress, walletAddress));
 
     if (existing) {
-      return new Response(JSON.stringify(existing), {
+      const secret = process.env.JWT_SECRET?.trim();
+      const token = secret ? await signJwt({ wallet: walletAddress }, secret, JWT_TTL_SECONDS) : undefined;
+      return new Response(JSON.stringify({ ...existing, token }), {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +132,9 @@ export default async function handler(req: Request): Promise<Response> {
           })
           .returning();
 
-        return new Response(JSON.stringify(newUser), {
+        const secret = process.env.JWT_SECRET?.trim();
+        const token = secret ? await signJwt({ wallet: walletAddress }, secret, JWT_TTL_SECONDS) : undefined;
+        return new Response(JSON.stringify({ ...newUser, token }), {
           status: 201,
           headers: {
             'Content-Type': 'application/json',

@@ -4,6 +4,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { PRODUCTION_SITE_ORIGIN } from '@/lib/brandAssets';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import Navigation from './components/Navigation';
+import StatusBar from './components/StatusBar';
+import { Toaster } from '@/components/ui/sonner';
 import { SolarisLogoMark } from './components/SolarisLogoMark';
 import CursorGlow from './components/CursorGlow';
 import LazyLoadWrapper from './components/LazyLoadWrapper';
@@ -289,6 +291,8 @@ function AppContent() {
         </a>
         {/* Navigation */}
         <Navigation />
+        <Toaster />
+        <StatusBar />
         
         {/* Main content — conversion flow: Hero → Problem → Solution → Tokenomics → RWA → Roadmap → Footer */}
         <main

@@ -1,6 +1,30 @@
 {
   "rewrites": [
     { "source": "/api/chat", "destination": "/api/chat/route" },
-    { "source": "/api/auth", "destination": "/api/auth/route" }
+    { "source": "/api/auth", "destination": "/api/auth/route" },
+    { "source": "/api/react", "destination": "/api/react/route" },
+    { "source": "/api/recovery", "destination": "/api/recovery/route" },
+    { "source": "/api/route", "destination": "/api/route/route" },
+    { "source": "/api/lyapunov", "destination": "/api/lyapunov/route" },
+    { "source": "/api/mermaid/agent", "destination": "/api/mermaid/agent/route" },
+    { "source": "/api/status", "destination": "/api/status/route" },
+    { "source": "/api/health", "destination": "/api/health/route" },
+    { "source": "/api/wallet/balance", "destination": "/api/wallet/balance/route" },
+    { "source": "/api/audit", "destination": "/api/audit/route" },
+    { "source": "/api/gdpr", "destination": "/api/gdpr/route" },
+    { "source": "/api/cache", "destination": "/api/cache/route" },
+    { "source": "/api/metrics", "destination": "/api/metrics/route" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+        { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains; preload" }
+      ]
+    }
   ]
 }

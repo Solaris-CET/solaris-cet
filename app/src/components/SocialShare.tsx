@@ -3,6 +3,7 @@ import { productionSiteUrl } from '@/lib/brandAssets';
 import { useLanguage } from '../hooks/useLanguage';
 import { useTelegram } from '../hooks/useTelegram';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+import { toast } from 'sonner';
 
 /** Canonical link in shares — matches `index.html`; override in Coolify / `.env` via `VITE_PUBLIC_SITE_URL`. */
 const SITE_URL = (() => {
@@ -38,7 +39,7 @@ const SocialShare = () => {
     } else {
       try {
         await navigator.clipboard.writeText(`${t.social.shareBody} ${SITE_URL}`);
-        alert(t.social.linkCopied);
+        toast.success(t.social.linkCopied);
       } catch {
         // clipboard unavailable
       }

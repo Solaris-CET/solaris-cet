@@ -64,10 +64,10 @@ const StatsBento = () => {
     },
     {
       id: 'tps',
-      value: 100_000,
+      value: 2,
       label: t.statsBento.labelTps,
       sublabel: t.statsBento.sublabelTps,
-      suffix: '',
+      suffix: 's',
       icon: Zap,
       color: 'text-purple-400',
       border: 'border-purple-400/20',

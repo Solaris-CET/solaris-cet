@@ -1,24 +1,61 @@
 import React, { useEffect, useState } from 'react';
 import { X, Cookie } from 'lucide-react';
 
+type CookieConsentState = {
+  essential: true;
+  analytics: boolean;
+  marketing: boolean;
+};
+
+function readStoredConsent(): CookieConsentState | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem('solaris_cookie_consent');
+    if (!raw) return null;
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return null;
+    const obj = parsed as Record<string, unknown>;
+    return {
+      essential: true,
+      analytics: Boolean(obj.analytics),
+      marketing: Boolean(obj.marketing),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function injectAnalyticsScript(src: string) {
+  if (!src) return;
+  const id = 'solaris-ux-analytics';
+  if (document.getElementById(id)) return;
+  const s = document.createElement('script');
+  s.id = id;
+  s.async = true;
+  s.src = src;
+  document.head.appendChild(s);
+}
+
 const CookieConsentBanner: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
-  const [preferences, setPreferences] = useState({
-    essential: true, // Always true
-    analytics: false,
-    marketing: false,
+  const [preferences, setPreferences] = useState<CookieConsentState>(() => {
+    return readStoredConsent() ?? { essential: true, analytics: false, marketing: false };
   });
 
+  const analyticsSrc = (import.meta.env.VITE_UX_TEST_SRC ?? '').trim();
+
   useEffect(() => {
-    const consent = localStorage.getItem('solaris_cookie_consent');
+    const consent = readStoredConsent();
     let timer: NodeJS.Timeout;
     if (!consent) {
       // Animate in after page load to not block LCP
       timer = setTimeout(() => setIsVisible(true), 2500);
+    } else {
+      if (analyticsSrc && consent.analytics) injectAnalyticsScript(analyticsSrc);
     }
     return () => clearTimeout(timer);
-  }, []);
+  }, [analyticsSrc]);
 
   if (!isVisible) return null;
 
@@ -27,6 +64,7 @@ const CookieConsentBanner: React.FC = () => {
       'solaris_cookie_consent',
       JSON.stringify({ essential: true, analytics: true, marketing: true })
     );
+    if (analyticsSrc) injectAnalyticsScript(analyticsSrc);
     setIsVisible(false);
   };
 
@@ -35,6 +73,7 @@ const CookieConsentBanner: React.FC = () => {
       'solaris_cookie_consent',
       JSON.stringify(preferences)
     );
+    if (preferences.analytics && analyticsSrc) injectAnalyticsScript(analyticsSrc);
     setIsVisible(false);
   };
 

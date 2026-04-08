@@ -9,6 +9,7 @@ import AnimatedCounter from '../components/AnimatedCounter';
 import TeamFlipCard from '../components/TeamFlipCard';
 import { useCommunityProof } from '../hooks/use-community-proof';
 import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';
+import { toast } from 'sonner';
 import {
   DEDUST_POOL_ADDRESS,
   DEDUST_POOL_DEPOSIT_URL,
@@ -51,6 +52,7 @@ const FooterSection = () => {
   const handleCopyPool = () => {
     navigator.clipboard.writeText(DEDUST_POOL_ADDRESS).then(() => {
       setCopiedPool(true);
+      toast.success(t.social.linkCopied);
       setTimeout(() => setCopiedPool(false), 2000);
     }).catch(() => {/* clipboard access denied – fail silently */});
   };
@@ -58,6 +60,7 @@ const FooterSection = () => {
   const handleCopyContract = () => {
     navigator.clipboard.writeText(CET_CONTRACT_ADDRESS).then(() => {
       setCopiedContract(true);
+      toast.success(t.social.linkCopied);
       setTimeout(() => setCopiedContract(false), 2000);
     }).catch(() => {/* clipboard access denied – fail silently */});
   };

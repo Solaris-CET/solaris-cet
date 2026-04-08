@@ -76,18 +76,18 @@ test.describe('AI Model Execution — Intelligence Core', () => {
     expect(['THOUGHT', 'ACTION', 'OBSERVE']).toContain(second);
   });
 
-  test('AI metrics — 34%, 74x, and infinity symbol are displayed', async ({ page }) => {
+  test('AI metrics — TRACE, VERIFY, and infinity symbol are displayed', async ({ page }) => {
     await page.evaluate(() => window.scrollBy(0, window.innerHeight * 2));
 
-    await expect(page.locator('text=34%').first()).toBeAttached({ timeout: 8000 });
-    await expect(page.locator('text=74x').first()).toBeAttached({ timeout: 8000 });
+    await expect(page.locator('text=TRACE').first()).toBeAttached({ timeout: 8000 });
+    await expect(page.locator('text=VERIFY').first()).toBeAttached({ timeout: 8000 });
     await expect(page.locator('text=∞').first()).toBeAttached({ timeout: 8000 });
   });
 
   test('BRAID Framework card is visible after scroll', async ({ page }) => {
     await page.evaluate(() => window.scrollBy(0, window.innerHeight * 2));
     await expect(page.locator('text=BRAID Framework').first()).toBeAttached({ timeout: 8000 });
-    await expect(page.locator('text=74x efficiency gains').first()).toBeAttached({ timeout: 8000 });
+    await expect(page.locator('text=more predictable multi-step reasoning').first()).toBeAttached({ timeout: 8000 });
   });
 
   test('AgentBridge visualisation is present in the DOM', async ({ page }) => {

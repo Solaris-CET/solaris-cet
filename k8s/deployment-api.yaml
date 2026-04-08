@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: solaris-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: solaris-api
+  template:
+    metadata:
+      labels:
+        app: solaris-api
+    spec:
+      containers:
+        - name: solaris-api
+          image: yourregistry/solaris-cet-api:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: GROK_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cet-secrets
+                  key: GROK_API_KEY
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cet-secrets
+                  key: GEMINI_API_KEY
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cet-secrets
+                  key: DATABASE_URL
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: solaris-api-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: solaris-api
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
+

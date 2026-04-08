@@ -1,0 +1,29 @@
+services:
+  frontend:
+    image: node:22
+    working_dir: /app
+    volumes:
+      - ../app:/app
+    environment:
+      - VITE_PUBLIC_SITE_URL=${VITE_PUBLIC_SITE_URL}
+      - VITE_GOOGLE_SITE_VERIFICATION=${VITE_GOOGLE_SITE_VERIFICATION}
+      - GROK_API_KEY=${GROK_API_KEY}
+      - GROK_API_KEY_ENC=${GROK_API_KEY_ENC}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_API_KEY_ENC=${GEMINI_API_KEY_ENC}
+      - ENCRYPTION_SECRET=${ENCRYPTION_SECRET}
+      - JWT_SECRET=${JWT_SECRET}
+      - DATABASE_URL=${DATABASE_URL}
+      - TONCENTER_RPC_URL=${TONCENTER_RPC_URL}
+      - TONCENTER_API_KEY=${TONCENTER_API_KEY}
+      - UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL}
+      - UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN}
+      - VITE_UX_TEST_SRC=${VITE_UX_TEST_SRC}
+    command: sh -lc "npm ci && npm run build && npm run api:build && PORT=3000 npm run start:node"
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health.json"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
