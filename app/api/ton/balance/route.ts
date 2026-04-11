@@ -45,12 +45,12 @@ export default async function handler(req: Request): Promise<Response> {
     return jsonResponse({ ok: false, error: 'Invalid address' }, allowedOrigin, 400);
   }
 
-  const client = getTonClient();
-  if (!client) {
-    return jsonResponse({ ok: false, error: 'TON not configured' }, allowedOrigin, 503);
-  }
-
   try {
+    const client = getTonClient();
+    if (!client) {
+      return jsonResponse({ ok: false, error: 'TON not configured' }, allowedOrigin, 503);
+    }
+
     const run = async (c: TonClient) => {
       const tonBalanceNano = (await c.getBalance(address)).toString();
       let cetBalanceNano: string | null = null;
