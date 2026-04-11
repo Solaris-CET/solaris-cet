@@ -1,16 +1,15 @@
-import React, { useRef, useLayoutEffect, useMemo, memo, lazy, Suspense, useEffect, useState } from 'react';
+import React, { useRef, useLayoutEffect, useMemo, memo, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
-import { Zap, ShieldCheck, TrendingUp, CheckCircle, ChevronDown, Rocket } from 'lucide-react';
+import { ShieldCheck, TrendingUp, CheckCircle, ChevronDown, FileText } from 'lucide-react';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useLanguage } from '../hooks/useLanguage';
 import { formatCetSupplyWithSuffix, formatTaskAgentMeshHeadline } from '@/lib/numerals';
-import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '../components/ui/tooltip';
-
-const NetworkNodesCanvas = lazy(() => import('../components/NetworkNodesCanvas'));
-import CetAiSearch from '../components/CetAiSearch';
-import { TypewriterTitle } from '../components/TypewriterTitle';
+import { TonConnectButton } from '@tonconnect/ui-react';
+import SolarRaysCoinsCanvas from '../components/SolarRaysCoinsCanvas';
 import AnimatedCounter from '../components/AnimatedCounter';
+import { useLivePoolData } from '@/hooks/use-live-pool-data';
+import { useCommunityProof } from '@/hooks/use-community-proof';
 
 const TICKER_DATA = [
   { label: 'AI AGENTS', value: '' },
@@ -54,11 +53,12 @@ function parseTotalSupply(input: unknown): number | null {
 const HeroSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleContainerRef = useRef<HTMLDivElement>(null);
-  const cetAiWrapperRef = useRef<HTMLDivElement>(null);
   const tickerContainerRef = useRef<HTMLDivElement>(null);
 
   const prefersReducedMotion = useReducedMotion();
   const { t, lang } = useLanguage();
+  const pool = useLivePoolData();
+  const community = useCommunityProof();
   const [stats, setStats] = useState<HeroStatState>({
     totalSupply: 9000,
     marketCap: 214500,
@@ -84,10 +84,6 @@ const HeroSection: React.FC = () => {
         titleContainerRef.current.style.opacity = '1';
         titleContainerRef.current.style.transform = 'none';
       }
-      if (cetAiWrapperRef.current) {
-        cetAiWrapperRef.current.style.opacity = '1';
-        cetAiWrapperRef.current.style.transform = 'none';
-      }
       if (tickerContainerRef.current) {
         tickerContainerRef.current.style.opacity = '1';
         tickerContainerRef.current.style.transform = 'none';
@@ -100,7 +96,6 @@ const HeroSection: React.FC = () => {
 
       mainTl
         .fromTo(titleContainerRef.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1 }, 0.2)
-        .fromTo(cetAiWrapperRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1 }, '-=0.5')
         .fromTo(tickerContainerRef.current, { y: 24, opacity: 0 }, { y: 0, opacity: 1 }, '-=0.6');
     }, containerRef);
 
@@ -135,22 +130,24 @@ const HeroSection: React.FC = () => {
     <TooltipProvider>
       <section
         ref={containerRef}
-        className="relative min-h-dvh bg-slate-950 overflow-x-hidden lg:overflow-hidden flex flex-col justify-center items-center pt-20 pb-16 lg:pb-24 lg:pt-16"
+        className="relative min-h-dvh bg-[#020510] overflow-x-hidden lg:overflow-hidden flex flex-col justify-center items-center pt-20 pb-16 lg:pb-24 lg:pt-16"
       >
-        {/* Deep Space Background & TON Nodes */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden>
-          {/* Base gradient */}
           <div className="absolute inset-0 bg-[#020510]" />
-          
-          {/* Subtle deep space glows */}
-          <div className="absolute w-[100vw] h-[100vw] rounded-full blur-[160px] opacity-20 bg-[radial-gradient(circle,#2ee7ff_0%,transparent_60%)] -top-1/4 -left-1/4" />
-          <div className="absolute w-[100vw] h-[100vw] rounded-full blur-[160px] opacity-10 bg-[radial-gradient(circle,#f2c94c_0%,transparent_70%)] -bottom-1/4 -right-1/4" />
-
-          {/* Canvas Nodes Animation */}
-          <Suspense fallback={null}>
-            <NetworkNodesCanvas />
-          </Suspense>
-
+          <div className="absolute inset-0 hidden sm:block">
+            <SolarRaysCoinsCanvas />
+          </div>
+          <div className="absolute inset-0 sm:hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_22%,rgba(242,201,76,0.16)_0%,transparent_55%)]" />
+            <img
+              src="/hero-coin.png"
+              alt=""
+              className="absolute right-[-20%] bottom-[-10%] w-[520px] max-w-none opacity-35 blur-[0.2px]"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#020510]/35 via-[#020510]/70 to-[#020510]" />
           <div className="absolute inset-0 opacity-10 hero-film-grain mix-blend-overlay" />
         </div>
 
@@ -158,76 +155,85 @@ const HeroSection: React.FC = () => {
           
           <div ref={titleContainerRef} className="flex flex-col items-center text-center w-full max-w-4xl mx-auto">
             
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-teal-500/30 bg-teal-500/10 text-teal-400 text-[10px] sm:text-xs font-semibold tracking-widest uppercase mb-8 shadow-[0_0_15px_rgba(46,231,255,0.15)]">
-               <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
-               Rețeaua TON Inovatoare
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-solaris-gold/25 bg-solaris-gold/10 text-solaris-gold text-[10px] sm:text-xs font-semibold tracking-widest uppercase mb-8 shadow-[0_0_18px_rgba(242,201,76,0.15)]">
+               <span className="w-1.5 h-1.5 rounded-full bg-solaris-gold animate-pulse" />
+               RWA · CETĂȚUIA ROMÂNIEI · TON
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-tight tracking-tighter mb-6 drop-shadow-2xl h-[120px] sm:h-[140px] md:h-[180px] lg:h-[200px] flex items-center justify-center">
-              <TypewriterTitle phrases={['SOLARIS CET', 'THE AI RWA TOKEN', 'INNOVATION ON TON']} />
+            <h1 className="font-display text-white leading-[1.02] tracking-[-0.04em] mb-5 drop-shadow-2xl text-[clamp(42px,5.4vw,86px)]">
+              Primul Token RWA Ancorat în{' '}
+              <span className="text-gradient-gold">Cetățuia României</span>
+              <span className="text-solaris-gold"> — 9,000 CET.</span>
+              <span className="block text-white">Imuabil.</span>
             </h1>
             
-            <p className="text-base sm:text-lg md:text-xl text-slate-300 max-w-2xl font-medium leading-relaxed mb-10 text-balance px-4">
-              Primul proiect RWA condus de {formatTaskAgentMeshHeadline(lang)} agenți AI complet autonomi. 
-              Inovație hibridă. Execuție descentralizată. Construit pentru performanță extremă.
+            <p className="text-base sm:text-lg md:text-xl text-slate-200/90 max-w-2xl font-medium leading-relaxed mb-10 text-balance px-4">
+              Activ real. Supply fix. Lichiditate on-chain. Un token care nu se confundă cu mii de copieri.
             </p>
 
-            {/* Custom CTA Buttons with precise requests */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-12 sm:mb-16 w-full sm:w-auto px-4">
-              <a
-                href={DEDUST_SWAP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative flex items-center justify-center w-full sm:w-auto h-14 px-8 rounded-xl bg-teal-500 text-slate-950 font-bold text-base md:text-lg tracking-wide transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_35px_-5px_rgba(46,231,255,0.5)] overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                <span className="relative flex items-center gap-2">
-                  <Zap size={20} className="stroke-[2.5]" /> Cumpără CET
-                </span>
-              </a>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-10 sm:mb-12 w-full sm:w-auto px-4">
+              <div className="w-full sm:w-auto animate-gold-pulse">
+                <TonConnectButton className="ton-connect-btn" />
+              </div>
 
               <a
                 href="#whitepaper"
-                className="group flex items-center justify-center w-full sm:w-auto h-14 px-8 rounded-xl border-2 border-teal-500/50 bg-transparent text-white font-bold text-base md:text-lg tracking-wide transition-all duration-300 hover:bg-teal-500/10 hover:border-teal-400 hover:-translate-y-1 hover:shadow-[0_10px_35px_-5px_rgba(46,231,255,0.15)]"
+                className="hidden sm:inline-flex btn-gold glow-pulse-hover"
               >
-                <Rocket size={20} className="mr-2" />
+                <FileText size={18} className="shrink-0" aria-hidden />
                 Citește Whitepaper
               </a>
             </div>
 
-            {/* Animated Counters Subtitle Area */}
+            <a
+              href="#whitepaper"
+              className="sm:hidden inline-flex items-center gap-2 text-solaris-gold font-semibold text-sm underline underline-offset-4"
+            >
+              <FileText size={16} className="shrink-0" aria-hidden />
+              Citește Whitepaper
+            </a>
+
             <div
               data-testid="hero-quick-stats"
-              className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 lg:gap-16 w-full max-w-4xl border-y border-white/5 py-8 bg-white/[0.01] backdrop-blur-md rounded-3xl mb-6 shadow-2xl"
+              className="hidden sm:grid grid-cols-3 gap-4 md:gap-8 w-full max-w-4xl border border-white/10 py-6 px-5 bg-white/[0.03] backdrop-blur-xl rounded-3xl mb-6 shadow-2xl"
             >
-              <AnimatedCounter value={stats.totalSupply} label="Total Supply" suffix=" CET" />
-              <AnimatedCounter value={stats.marketCap} label="Market Cap" prefix="$" />
-              <AnimatedCounter value={stats.aiAgents} label="AI Agents" />
-              <div className="sm:col-span-3 flex flex-wrap justify-center items-center gap-3 sm:gap-4 opacity-90 mt-2">
-                <div className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono text-solaris-muted">
-                  TON
+              <AnimatedCounter
+                value={stats.totalSupply}
+                label="Supply total"
+                suffix=" CET"
+                labelClassName="text-[10px] md:text-xs text-solaris-gold/80 tracking-[0.2em] uppercase mt-2 font-medium"
+              />
+
+              {typeof pool.priceUsd === 'number' ? (
+                <AnimatedCounter
+                  value={pool.priceUsd}
+                  label="Preț curent"
+                  prefix="$"
+                  decimals={6}
+                  labelClassName="text-[10px] md:text-xs text-solaris-gold/80 tracking-[0.2em] uppercase mt-2 font-medium"
+                />
+              ) : (
+                <div className="flex flex-col items-center group relative p-3 rounded-2xl transition-colors hover:bg-white/[0.02]">
+                  <div className="text-3xl md:text-5xl font-black text-white tracking-tighter">—</div>
+                  <div className="text-[10px] md:text-xs text-solaris-gold/80 tracking-[0.2em] uppercase mt-2 font-medium">
+                    Preț curent
+                  </div>
                 </div>
-                <a
-                  href="#authority-trust"
-                  className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono text-solaris-muted hover:text-solaris-text hover:bg-white/10 transition-colors"
-                >
-                  Cetățuia
-                </a>
-              </div>
+              )}
+
+              <AnimatedCounter
+                value={community.telegramMembers}
+                label="Holderi activi"
+                labelClassName="text-[10px] md:text-xs text-solaris-gold/80 tracking-[0.2em] uppercase mt-2 font-medium"
+                wrapperClassName="[&>div[title]]:cursor-help"
+                meshTitleKey="Proxy: comunitate Telegram"
+              />
             </div>
 
             <div
               data-testid="hero-next-steps"
               className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-10 w-full max-w-4xl px-4"
             >
-              <a
-                href={DEDUST_SWAP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-solaris-text text-sm font-semibold hover:bg-white/10 transition-colors"
-              >
-                DeDust
-              </a>
               <a
                 href="#staking"
                 className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-solaris-text text-sm font-semibold hover:bg-white/10 transition-colors"
@@ -278,11 +284,6 @@ const HeroSection: React.FC = () => {
             </div>
             
           </div>
-
-          <div id="cet-ai" ref={cetAiWrapperRef} className="w-full transform-gpu overflow-hidden scroll-mt-24">
-            <CetAiSearch />
-          </div>
-
         </div>
 
         {/* Scroll Indicator Animat */}

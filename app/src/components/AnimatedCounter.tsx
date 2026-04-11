@@ -5,6 +5,7 @@ type AnimatedCounterProps = {
   value?: number;
   end?: number;
   label?: string;
+  labelClassName?: string;
   prefix?: string;
   suffix?: string;
   duration?: number;
@@ -18,6 +19,7 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
   value,
   end,
   label,
+  labelClassName,
   prefix = '',
   suffix = '',
   duration = 2.5,
@@ -32,7 +34,20 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
     const node = nodeRef.current;
     if (!node) return;
 
+    const reducedMotion =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     const targetValue = typeof value === 'number' ? value : (end ?? 0);
+    if (reducedMotion) {
+      const formatted = targetValue.toLocaleString(undefined, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      });
+      node.innerText = `${prefix}${formatted}${suffix}`;
+      return;
+    }
     const target = { val: 0 };
     gsap.to(target, {
       val: targetValue,
@@ -64,7 +79,12 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
         {prefix}0{suffix}
       </div>
       {label ? (
-        <div className="text-[10px] md:text-xs text-teal-400/80 tracking-[0.2em] uppercase mt-2 font-medium">
+        <div
+          className={
+            labelClassName ??
+            'text-[10px] md:text-xs text-teal-400/80 tracking-[0.2em] uppercase mt-2 font-medium'
+          }
+        >
           {label}
         </div>
       ) : null}
