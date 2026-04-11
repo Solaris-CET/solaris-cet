@@ -28,6 +28,8 @@ export function InteractionEffectsManager() {
   useEffect(() => {
     if (prefersReducedMotion) return;
 
+    const options: AddEventListenerOptions = { capture: true };
+
     const onPointerDown = (event: PointerEvent) => {
       if (event.button !== 0) return;
       const rawTarget = event.target as HTMLElement | null;
@@ -38,10 +40,9 @@ export function InteractionEffectsManager() {
       createRipple(target, event.clientX, event.clientY);
     };
 
-    document.addEventListener('pointerdown', onPointerDown, { capture: true });
-    return () => document.removeEventListener('pointerdown', onPointerDown, { capture: true } as AddEventListenerOptions);
+    document.addEventListener('pointerdown', onPointerDown, options);
+    return () => document.removeEventListener('pointerdown', onPointerDown, options);
   }, [prefersReducedMotion]);
 
   return null;
 }
-

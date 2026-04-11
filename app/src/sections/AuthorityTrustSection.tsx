@@ -87,7 +87,7 @@ const AuthorityTrustSection = () => {
             return (
               <article
                 key={p.title}
-                className="authority-pillar group relative rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl p-6 sm:p-7 shadow-[0_8px_40px_rgba(0,0,0,0.25)] hover:border-solaris-gold/25 hover:bg-white/[0.05] transition-all duration-300"
+                className="authority-pillar group relative rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl p-6 sm:p-7 shadow-[0_8px_40px_rgba(0,0,0,0.25)] hover:border-solaris-gold/25 hover:bg-white/[0.05] hover:-translate-y-1.5 transition-all duration-[250ms]"
               >
                 <div
                   className={`pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br ${p.accent} opacity-80 group-hover:opacity-100 transition-opacity`}

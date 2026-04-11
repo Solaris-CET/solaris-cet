@@ -1,6 +1,7 @@
-import { useRef, useLayoutEffect, useState, useCallback } from 'react';
-import { gsap } from 'gsap';
+import { useState, useCallback } from 'react';
 import { Wallet, ArrowRightLeft, Coins, Copy, Check, ExternalLink } from 'lucide-react';
+import { ScrollFadeUp } from '@/components/ScrollFadeUp';
+import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
 import LivePoolStats from '../components/LivePoolStats';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useLanguage } from '../hooks/useLanguage';
@@ -58,10 +59,6 @@ const colorMap: Record<string, { bg: string; text: string; border: string }> = {
 
 const HowToBuySection = () => {
   const { t } = useLanguage();
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const headingRef = useRef<HTMLDivElement>(null);
-  const stepsRef = useRef<HTMLDivElement>(null);
-  const ctaRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
   const [copyFailed, setCopyFailed] = useState(false);
 
@@ -79,71 +76,9 @@ const HowToBuySection = () => {
     });
   }, [linkCopied]);
 
-  useLayoutEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headingRef.current,
-        { y: 32, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: headingRef.current,
-            start: 'top 82%',
-            end: 'top 55%',
-            scrub: true,
-          },
-        }
-      );
-
-      const stepCards = stepsRef.current?.querySelectorAll('.step-card');
-      if (stepCards) {
-        gsap.fromTo(
-          stepCards,
-          { y: 40, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            stagger: 0.15,
-            duration: 0.7,
-            scrollTrigger: {
-              trigger: stepsRef.current,
-              start: 'top 80%',
-              end: 'top 35%',
-              scrub: true,
-            },
-          }
-        );
-      }
-
-      gsap.fromTo(
-        ctaRef.current,
-        { y: 24, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.7,
-          scrollTrigger: {
-            trigger: ctaRef.current,
-            start: 'top 88%',
-            end: 'top 65%',
-            scrub: true,
-          },
-        }
-      );
-    }, section);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
     <section
       id="how-to-buy"
-      ref={sectionRef}
       className="relative section-glass py-24 lg:py-32 overflow-hidden mesh-bg"
     >
       {/* Background decorations */}
@@ -155,7 +90,7 @@ const HowToBuySection = () => {
 
       <div className="relative z-10 section-padding-x max-w-7xl mx-auto w-full">
         {/* Section heading */}
-        <div ref={headingRef} className="max-w-2xl mb-16">
+        <ScrollFadeUp className="max-w-2xl mb-16">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-solaris-gold/10 flex items-center justify-center">
               <ArrowRightLeft className="w-5 h-5 text-solaris-gold" />
@@ -173,13 +108,10 @@ const HowToBuySection = () => {
             below and always verify the contract address to stay safe from
             phishing tokens.
           </p>
-        </div>
+        </ScrollFadeUp>
 
         {/* Step cards */}
-        <div
-          ref={stepsRef}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
-        >
+        <ScrollStaggerFadeUp className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {steps.map((step) => {
             const Icon = step.icon;
             const c = colorMap[step.color];
@@ -223,7 +155,7 @@ const HowToBuySection = () => {
               </div>
             );
           })}
-        </div>
+        </ScrollStaggerFadeUp>
 
         {/* Verified Safe trust bar */}
         <div className="mb-6 flex flex-wrap items-center gap-3">
@@ -244,54 +176,46 @@ const HowToBuySection = () => {
         </div>
 
         {/* Contract address CTA */}
-        <div
-          ref={ctaRef}
-          className="bento-card p-6 lg:p-8 border border-solaris-gold/20"
-        >
-          <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8">
-            {/* Warning label */}
-            <div className="shrink-0">
-              <span className="hud-label text-solaris-gold">OFFICIAL CONTRACT ADDRESS</span>
-              <p className="text-solaris-muted text-xs mt-1">
-                Always verify before swapping — there is only one authentic CET token.
-              </p>
-            </div>
+        <ScrollFadeUp>
+          <div className="bento-card p-6 lg:p-8 border border-solaris-gold/20">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8">
+              <div className="shrink-0">
+                <span className="hud-label text-solaris-gold">OFFICIAL CONTRACT ADDRESS</span>
+                <p className="text-solaris-muted text-xs mt-1">
+                  Always verify before swapping — there is only one authentic CET token.
+                </p>
+              </div>
 
-            {/* Address + copy */}
-            <div className="flex-1 flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10 overflow-hidden">
-              <span className="font-mono text-solaris-text text-xs sm:text-sm truncate flex-1">
-                {CET_CONTRACT_ADDRESS}
-              </span>
-              <button
-                onClick={handleCopy}
-                aria-label={t.sectionAria.copyCetAddress}
-                className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold active:scale-95 transition-all duration-150 ${
-                  copyFailed
-                    ? 'bg-red-400/10 border-red-400/30 text-red-400 hover:bg-red-400/20'
-                    : 'bg-solaris-gold/10 border-solaris-gold/30 text-solaris-gold hover:bg-solaris-gold/20'
-                }`}
+              <div className="flex-1 flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10 overflow-hidden">
+                <span className="font-mono text-solaris-text text-xs sm:text-sm truncate flex-1">
+                  {CET_CONTRACT_ADDRESS}
+                </span>
+                <button
+                  onClick={handleCopy}
+                  aria-label={t.sectionAria.copyCetAddress}
+                  className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold active:scale-95 transition-all duration-150 ${
+                    copyFailed
+                      ? 'bg-red-400/10 border-red-400/30 text-red-400 hover:bg-red-400/20'
+                      : 'bg-solaris-gold/10 border-solaris-gold/30 text-solaris-gold hover:bg-solaris-gold/20'
+                  }`}
+                >
+                  {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copied ? 'Copied!' : copyFailed ? 'Failed' : 'Copy'}
+                </button>
+              </div>
+
+              <a
+                href={DEDUST_SWAP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 btn-filled-gold text-sm"
               >
-                {copied ? (
-                  <Check className="w-3.5 h-3.5" />
-                ) : (
-                  <Copy className="w-3.5 h-3.5" />
-                )}
-                {copied ? 'Copied!' : copyFailed ? 'Failed' : 'Copy'}
-              </button>
+                <ArrowRightLeft className="w-4 h-4" />
+                Swap on DeDust
+              </a>
             </div>
-
-            {/* DeDust swap button */}
-            <a
-              href={DEDUST_SWAP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 btn-filled-gold text-sm"
-            >
-              <ArrowRightLeft className="w-4 h-4" />
-              Swap on DeDust
-            </a>
           </div>
-        </div>
+        </ScrollFadeUp>
 
         {/* Live DeDust pool stats */}
         <div className="mt-6">

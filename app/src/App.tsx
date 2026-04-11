@@ -8,6 +8,7 @@ import StatusBar from './components/StatusBar';
 import { Toaster } from '@/components/ui/sonner';
 import { SolarisLogoMark } from './components/SolarisLogoMark';
 import CursorGlow from './components/CursorGlow';
+import { InteractionEffectsManager } from '@/components/InteractionEffectsManager';
 import LazyLoadWrapper from './components/LazyLoadWrapper';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import BackToTop from './components/BackToTop';
@@ -249,6 +250,7 @@ function AppContent() {
 
       {/* Cursor glow effect */}
       <CursorGlow />
+      <InteractionEffectsManager />
 
       <div
         ref={mainRef}

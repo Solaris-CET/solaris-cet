@@ -54,6 +54,7 @@ function parseTotalSupply(input: unknown): number | null {
 
 const HeroSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const backgroundRef = useRef<HTMLDivElement>(null);
   const titleContainerRef = useRef<HTMLDivElement>(null);
   const tickerContainerRef = useRef<HTMLDivElement>(null);
 
@@ -131,13 +132,41 @@ const HeroSection: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    const bg = backgroundRef.current;
+    if (!bg) return;
+    const isBelowDesktop = typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches;
+    if (isBelowDesktop) return;
+
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const y = Math.max(-160, -window.scrollY * 0.3);
+      bg.style.transform = `translate3d(0, ${y}px, 0)`;
+    };
+
+    const onScroll = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) window.cancelAnimationFrame(raf);
+      bg.style.transform = '';
+    };
+  }, [prefersReducedMotion]);
+
   return (
     <TooltipProvider>
       <section
         ref={containerRef}
         className="relative min-h-dvh bg-[#020510] overflow-x-hidden lg:overflow-hidden flex flex-col justify-center items-center pt-20 pb-16 lg:pb-24 lg:pt-16"
       >
-        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden>
+        <div ref={backgroundRef} className="absolute inset-0 z-0 overflow-hidden pointer-events-none will-change-transform" aria-hidden>
           <div className="absolute inset-0 bg-[#020510]" />
           <div className="absolute inset-0 hidden sm:block">
             <SolarRaysCoinsCanvas />
