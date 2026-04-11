@@ -1,9 +1,6 @@
 export const config = { runtime: 'nodejs' };
 
 import { getAllowedOrigin } from '../../lib/cors';
-import { CET_JETTON_MASTER_ADDRESS } from '../../../src/constants/token';
-import { getTonClient, parseTonAddress } from '../../lib/ton';
-import { JettonMaster, JettonWallet, TonClient } from '@ton/ton';
 
 function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -15,6 +12,12 @@ function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Respo
       'Cache-Control': 'no-store',
     },
   });
+}
+
+function isLikelyTonAddress(v: string) {
+  const s = v.trim();
+  if (s.length < 20 || s.length > 80) return false;
+  return /^[A-Za-z0-9_\-+=]+$/.test(s);
 }
 
 export default async function handler(req: Request): Promise<Response> {
@@ -38,64 +41,66 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const url = new URL(req.url);
-  const addressParam = url.searchParams.get('address') ?? '';
-  const includeJetton = ['1', 'true', 'yes'].includes((url.searchParams.get('jetton') ?? '').toLowerCase());
-  const address = parseTonAddress(addressParam);
-  if (!address) {
+  const address = (url.searchParams.get('address') ?? '').trim();
+  if (!address || !isLikelyTonAddress(address)) {
     return jsonResponse({ ok: false, error: 'Invalid address' }, allowedOrigin, 400);
   }
 
   try {
-    const client = getTonClient();
-    if (!client) {
-      return jsonResponse({ ok: false, error: 'TON not configured' }, allowedOrigin, 503);
-    }
+    const rpc = process.env.TONCENTER_RPC_URL?.trim() || 'https://toncenter.com/api/v2/jsonRPC';
+    const apiKey = process.env.TONCENTER_API_KEY?.trim();
+    const rpcUrl = new URL(rpc);
+    if (apiKey) rpcUrl.searchParams.set('api_key', apiKey);
 
-    const run = async (c: TonClient) => {
-      const tonBalanceNano = (await c.getBalance(address)).toString();
-      let cetBalanceNano: string | null = null;
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 4500);
+    try {
+      const fetchBalance = async (urlString: string) => {
+        const res = await fetch(urlString, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: '1',
+            jsonrpc: '2.0',
+            method: 'getAddressBalance',
+            params: { address },
+          }),
+          signal: controller.signal,
+        });
 
-      if (includeJetton) {
-        try {
-          const master = parseTonAddress(CET_JETTON_MASTER_ADDRESS);
-          if (master) {
-            const openedMaster = c.open(JettonMaster.create(master));
-            const jettonWalletAddress = await openedMaster.getWalletAddress(address);
-            const openedWallet = c.open(JettonWallet.create(jettonWalletAddress));
-            cetBalanceNano = (await openedWallet.getBalance()).toString();
-          }
-        } catch {
-          cetBalanceNano = null;
-        }
+        const json = (await res.json()) as { ok?: boolean; result?: string; error?: unknown };
+        if (!res.ok || json?.result == null) return null;
+        return String(json.result);
+      };
+
+      let tonBalanceNano: string | null = await fetchBalance(rpcUrl.toString());
+      if (tonBalanceNano == null && apiKey) {
+        const u = new URL(rpcUrl.toString());
+        u.searchParams.delete('api_key');
+        tonBalanceNano = await fetchBalance(u.toString());
       }
 
-      return { tonBalanceNano, cetBalanceNano };
-    };
+      if (tonBalanceNano == null) {
+        return jsonResponse({ ok: false, address, error: 'unavailable', cetBalanceNano: null }, allowedOrigin, 200);
+      }
 
-    let result: { tonBalanceNano: string; cetBalanceNano: string | null };
-    try {
-      result = await run(client);
+      return jsonResponse(
+        {
+          ok: true,
+          address,
+          tonBalanceNano,
+          cetBalanceNano: null,
+          source: 'toncenter',
+        },
+        allowedOrigin,
+        200,
+      );
     } catch {
-      const endpointRaw = process.env.TONCENTER_RPC_URL?.trim();
-      if (!endpointRaw) throw new Error('missing_endpoint');
-      const u = new URL(endpointRaw);
-      u.searchParams.delete('api_key');
-      const fallback = new TonClient({ endpoint: u.toString() });
-      result = await run(fallback);
+      return jsonResponse({ ok: false, address, error: 'unavailable', cetBalanceNano: null }, allowedOrigin, 200);
+    } finally {
+      clearTimeout(id);
     }
-
-    return jsonResponse(
-      {
-        ok: true,
-        address: address.toString(),
-        tonBalanceNano: result.tonBalanceNano,
-        cetBalanceNano: result.cetBalanceNano,
-        source: 'ton-sdk',
-      },
-      allowedOrigin,
-      200,
-    );
   } catch {
-    return jsonResponse({ ok: false, error: 'TON request failed' }, allowedOrigin, 502);
+    return jsonResponse({ ok: false, address, error: 'unavailable', cetBalanceNano: null }, allowedOrigin, 200);
   }
 }
