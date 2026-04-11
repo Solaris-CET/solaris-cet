@@ -1,5 +1,5 @@
 import { expect, type Page } from '@playwright/test';
-import { NAV_PRIMARY_IN_PAGE } from '@/lib/navPrimaryHrefs';
+import { NAV_PRIMARY_IN_PAGE } from '../src/lib/navPrimaryHrefs';
 import { scrollUntilSelectorAttached } from './e2e-helpers';
 
 /** Match `sovereign-static.spec.ts`: fixed language for stable nav + section copy. */
@@ -17,27 +17,25 @@ export async function clickHeaderNavHash(page: Page, href: NavPrimaryInPageHref)
 const desktopAssertByHref: {
   [K in NavPrimaryInPageHref]: (page: Page) => Promise<void>;
 } = {
-  '#nova-app': async (page) => {
-    const nova = page.locator('#nova-app');
-    await expect(nova).toBeAttached({ timeout: 15_000 });
-    await nova.scrollIntoViewIfNeeded();
-    await expect(nova.getByText('Mobile Mining')).toBeVisible({ timeout: 10_000 });
-  },
   '#staking': async (page) => {
     const staking = page.locator('#staking');
     await expect(staking).toBeAttached({ timeout: 15_000 });
     await staking.scrollIntoViewIfNeeded();
     await expect(staking.getByText('9,000').first()).toBeVisible({ timeout: 10_000 });
   },
-  '#roadmap': async (page) => {
-    await scrollUntilSelectorAttached(page, '#roadmap');
-    await expect(page.locator('#roadmap').locator('.roadmap-card').first()).toBeVisible({
+  '#rwa': async (page) => {
+    await scrollUntilSelectorAttached(page, '#rwa');
+    await expect(page.locator('#rwa').getByText('REAL WORLD ASSETS · RWA')).toBeVisible({
       timeout: 15_000,
     });
   },
-  '#team': async (page) => {
-    await scrollUntilSelectorAttached(page, '#team');
-    await expect(page.locator('#team').getByText('AI CORPORATE STRUCTURE')).toBeVisible({
+  '#cet-ai': async (page) => {
+    await scrollUntilSelectorAttached(page, '#cet-ai');
+    await expect(page.getByTestId('cet-ai-hero')).toBeVisible({ timeout: 15_000 });
+  },
+  '#whitepaper': async (page) => {
+    await scrollUntilSelectorAttached(page, '#whitepaper');
+    await expect(page.locator('#whitepaper').getByText('WHITEPAPER · INLINE EDITION')).toBeVisible({
       timeout: 15_000,
     });
   },

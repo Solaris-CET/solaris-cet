@@ -4,10 +4,10 @@
  * Each `navKey` must exist on `Translations['nav']` (see `translations.test.ts`).
  */
 export const NAV_PRIMARY_IN_PAGE = [
-  { navKey: 'cetApp', href: '#nova-app' },
   { navKey: 'tokenomics', href: '#staking' },
-  { navKey: 'roadmap', href: '#roadmap' },
-  { navKey: 'team', href: '#team' },
+  { navKey: 'rwa', href: '#rwa' },
+  { navKey: 'cetAi', href: '#cet-ai' },
+  { navKey: 'whitepaper', href: '#whitepaper' },
   { navKey: 'howToBuy', href: '#how-to-buy' },
   { navKey: 'resources', href: '#resources' },
   { navKey: 'faq', href: '#faq' },

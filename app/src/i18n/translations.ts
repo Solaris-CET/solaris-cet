@@ -37,6 +37,8 @@ export interface Translations {
     home: string;
     cetApp: string;
     tokenomics: string;
+    rwa: string;
+    cetAi: string;
     roadmap: string;
     team: string;
     howToBuy: string;
@@ -481,6 +483,8 @@ const translations: Record<LangCode, Translations> = {
       home: 'Home',
       cetApp: 'CET App',
       tokenomics: 'Tokenomics',
+      rwa: 'RWA',
+      cetAi: 'CET AI',
       roadmap: 'Roadmap',
       team: 'AI Team',
       howToBuy: 'How to Buy',
@@ -914,6 +918,8 @@ const translations: Record<LangCode, Translations> = {
       home: 'Inicio',
       cetApp: 'App CET',
       tokenomics: 'Tokenómica',
+      rwa: 'RWA',
+      cetAi: 'CET AI',
       roadmap: 'Hoja de Ruta',
       team: 'Equipo IA',
       howToBuy: 'Cómo Comprar',
@@ -1347,6 +1353,8 @@ const translations: Record<LangCode, Translations> = {
       home: '首页',
       cetApp: 'CET 应用',
       tokenomics: '代币经济学',
+      rwa: 'RWA',
+      cetAi: 'CET AI',
       roadmap: '路线图',
       team: 'AI团队',
       howToBuy: '如何购买',
@@ -1768,6 +1776,8 @@ const translations: Record<LangCode, Translations> = {
       home: 'Главная',
       cetApp: 'Приложение CET',
       tokenomics: 'Токеномика',
+      rwa: 'RWA',
+      cetAi: 'CET AI',
       roadmap: 'Дорожная карта',
       team: 'AI Команда',
       howToBuy: 'Как купить',
@@ -2198,6 +2208,8 @@ const translations: Record<LangCode, Translations> = {
       home: 'Acasă',
       cetApp: 'Aplicație CET',
       tokenomics: 'Tokenomică',
+      rwa: 'RWA',
+      cetAi: 'CET AI',
       roadmap: 'Foaie de Parcurs',
       team: 'Echipa AI',
       howToBuy: 'Cum să Cumperi',
@@ -2631,6 +2643,8 @@ const translations: Record<LangCode, Translations> = {
       home: 'Início',
       cetApp: 'App CET',
       tokenomics: 'Tokenomia',
+      rwa: 'RWA',
+      cetAi: 'CET AI',
       roadmap: 'Roteiro',
       team: 'Equipa IA',
       howToBuy: 'Como Comprar',
@@ -3064,6 +3078,8 @@ const translations: Record<LangCode, Translations> = {
       home: 'Startseite',
       cetApp: 'CET App',
       tokenomics: 'Tokenomik',
+      rwa: 'RWA',
+      cetAi: 'CET AI',
       roadmap: 'Fahrplan',
       team: 'KI-Team',
       howToBuy: 'Wie Kaufen',

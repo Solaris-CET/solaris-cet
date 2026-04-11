@@ -274,7 +274,7 @@ const HeroSection: React.FC = () => {
               </a>
             </div>
 
-            <div className="w-full mt-6 px-4">
+            <div id="cet-ai" className="w-full mt-6 px-4">
               <CetAiSearch />
             </div>
 

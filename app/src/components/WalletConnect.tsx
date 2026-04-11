@@ -1,8 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { ExternalLink } from 'lucide-react';
 import { TonConnectButton, useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
-import { useLanguage } from '@/hooks/useLanguage';
-import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 import { standardSkillBurst, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 
 /**
@@ -13,10 +10,9 @@ import { standardSkillBurst, skillSeedFromLabel } from '@/lib/meshSkillFeed';
  * wallet state (shows address + disconnect option when connected).
  *
  * In development, when a wallet is connected, also renders a "Send Test TON"
- * button for a small test transaction. In production, shows a DeDust trade link instead.
+ * button for a small test transaction.
  */
 const WalletConnect = () => {
-  const { t } = useLanguage();
   const [tonConnectUI] = useTonConnectUI();
   const wallet = useTonWallet();
   const lastSyncedAddress = useRef<string | null>(null);
@@ -71,23 +67,11 @@ const WalletConnect = () => {
       <div className="touch-manipulation">
         <TonConnectButton className="ton-connect-btn" />
       </div>
-      {wallet && (
-        import.meta.env.PROD ? (
-          <a
-            href={DEDUST_SWAP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-gold text-sm inline-flex items-center gap-1.5"
-          >
-            {t.nav.buyOnDedust}
-            <ExternalLink className="w-3.5 h-3.5 shrink-0" aria-hidden />
-          </a>
-        ) : (
-          <button type="button" className="btn-gold text-sm" onClick={handleTestTransaction}>
-            Send Test TON
-          </button>
-        )
-      )}
+      {wallet && import.meta.env.DEV ? (
+        <button type="button" className="btn-gold text-sm" onClick={handleTestTransaction}>
+          Send Test TON
+        </button>
+      ) : null}
     </div>
   );
 };

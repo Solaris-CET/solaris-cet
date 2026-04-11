@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState, useRef } from 'react';
-import { ExternalLink, Menu } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import { ExternalLink } from 'lucide-react';
 import { SolarisLogoMark } from './SolarisLogoMark';
 import LanguageSelector from './LanguageSelector';
 import WalletConnect from './WalletConnect';
@@ -65,17 +65,27 @@ const Navigation = () => {
   const wasMobileMenuOpenRef = useRef(false);
   const { t } = useLanguage();
 
-  const navLinks = NAV_PRIMARY_IN_PAGE.map(({ navKey, href }) => ({
-    navKey,
-    label: t.nav[navKey],
-    href,
-  }));
+  const navLinks = useMemo(
+    () =>
+      NAV_PRIMARY_IN_PAGE.map(({ navKey, href }) => ({
+        navKey,
+        label: t.nav[navKey],
+        href,
+      })),
+    [t],
+  );
+
+  const primaryDesktopHrefs = useMemo(() => new Set(navLinks.slice(0, 4).map((l) => l.href)), [navLinks]);
+  const [activeHref, setActiveHref] = useState<string>(() => {
+    const hash = typeof window !== 'undefined' ? window.location.hash : '';
+    return navLinks.some((l) => l.href === hash) ? hash : (navLinks[0]?.href ?? '#');
+  });
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      setIsScrolled(scrollTop > 100);
+      setIsScrolled(scrollTop > 80);
       setScrollProgress(docHeight > 0 ? (scrollTop / docHeight) * 100 : 0);
     };
 
@@ -83,6 +93,46 @@ const Navigation = () => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const sections = navLinks.flatMap((link) => {
+      const id = link.href.startsWith('#') ? link.href.slice(1) : '';
+      const el = id ? document.getElementById(id) : null;
+      return el ? [{ el, href: link.href }] : [];
+    });
+
+    if (sections.length === 0) return;
+
+    const ratios = new Map<string, number>();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const href = `#${(entry.target as HTMLElement).id}`;
+          if (!navLinks.some((l) => l.href === href)) continue;
+          ratios.set(href, entry.isIntersecting ? entry.intersectionRatio : 0);
+        }
+
+        let bestHref = activeHref;
+        let bestRatio = ratios.get(bestHref) ?? 0;
+        for (const link of navLinks) {
+          const r = ratios.get(link.href) ?? 0;
+          if (r > bestRatio + 0.02) {
+            bestRatio = r;
+            bestHref = link.href;
+          }
+        }
+        if (bestHref !== activeHref) setActiveHref(bestHref);
+      },
+      {
+        threshold: [0.15, 0.25, 0.4, 0.6],
+        rootMargin: '-25% 0px -60% 0px',
+      },
+    );
+
+    for (const s of sections) observer.observe(s.el);
+    return () => observer.disconnect();
+  }, [navLinks, activeHref]);
 
   // Stable handler reference: same function instance for add + removeEventListener (no duplicate document listeners).
   const handleMobileMenuKeyDown = useCallback((event: KeyboardEvent) => {
@@ -136,10 +186,10 @@ const Navigation = () => {
     <header
       className={cn(
         /* transform-gpu: Chromium composites fixed + backdrop-filter more reliably */
-        'fixed top-0 left-0 right-0 z-[1000] border-b transition-all duration-500 transform-gpu backface-hidden',
+        'fixed top-0 left-0 right-0 z-[1000] border-b transition-all duration-300 transform-gpu backface-hidden',
         isScrolled
-          ? 'bg-slate-950/88 backdrop-blur-2xl border-white/6 shadow-[0_1px_0_rgba(242,201,76,0.06),0_8px_32px_rgba(0,0,0,0.4)]'
-          : 'bg-slate-950/50 backdrop-blur-xl border-white/[0.05]',
+          ? 'bg-[rgba(10,10,30,0.85)] backdrop-blur-[20px] border-white/10 shadow-[0_1px_0_rgba(242,201,76,0.08),0_12px_36px_rgba(0,0,0,0.45)]'
+          : 'bg-[rgba(10,10,30,0.55)] backdrop-blur-[20px] border-white/6',
       )}
     >
       {/* Scroll progress bar — animated shimmer */}
@@ -186,10 +236,22 @@ const Navigation = () => {
               <a
                 key={link.navKey}
                 href={link.href}
-                className="shrink-0 text-sm text-solaris-muted transition-colors duration-300 hover:text-solaris-text relative group"
+                className={cn(
+                  'shrink-0 text-sm transition-colors duration-300 relative group px-2 py-1.5',
+                  activeHref === link.href
+                    ? 'text-solaris-text'
+                    : primaryDesktopHrefs.has(link.href)
+                      ? 'text-solaris-muted hover:text-solaris-text'
+                      : 'text-solaris-muted/70 hover:text-solaris-muted',
+                )}
               >
                 {link.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-px bg-gradient-to-r from-solaris-gold to-solaris-cyan transition-all duration-300 group-hover:w-full" />
+                <span
+                  className={cn(
+                    'absolute -bottom-1 left-2 right-2 h-px origin-left scale-x-0 bg-gradient-to-r from-solaris-gold via-solaris-cyan to-solaris-gold transition-transform duration-300',
+                    activeHref === link.href ? 'scale-x-100' : 'group-hover:scale-x-100',
+                  )}
+                />
               </a>
             ))}
           </nav>
@@ -211,8 +273,10 @@ const Navigation = () => {
             </a>
 
             <div className="hidden lg:flex items-center gap-3">
-              <LanguageSelector />
-              <ThemeToggle />
+              <div className="flex items-center gap-3">
+                <LanguageSelector />
+                <ThemeToggle />
+              </div>
               <div className="flex flex-col items-end gap-1 shrink-0">
                 <WalletConnect />
                 <WalletBalance />
@@ -226,23 +290,6 @@ const Navigation = () => {
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="font-mono text-[11px] text-emerald-400">LIVE</span>
               </div>
-              <a
-                href={DEDUST_SWAP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-filled-gold text-sm inline-flex items-center gap-1.5 px-5 py-2.5"
-                aria-label={`${t.nav.buyOnDedust} ${t.nav.opensInNewWindow}`}
-              >
-                {t.nav.buyOnDedust}
-                <ExternalLink className="w-3.5 h-3.5 opacity-90" aria-hidden />
-              </a>
-              <button
-                className="btn-gold text-sm"
-                onClick={() => window.open('https://t.me/+tKlfzx7IWopmNWQ0', '_blank', 'noopener,noreferrer')}
-                aria-label={`${t.hero.startMining} ${t.nav.opensInNewWindow}`}
-              >
-                {t.hero.startMining}
-              </button>
             </div>
 
             {/* Mobile / Tablet Menu Button — shown below lg (1024 px) */}
@@ -256,7 +303,26 @@ const Navigation = () => {
               aria-expanded={isMobileMenuOpen}
               aria-controls="mobile-menu"
             >
-              <Menu className="w-6 h-6" />
+              <span className="relative block h-7 w-7" aria-hidden>
+                <span
+                  className={cn(
+                    'absolute left-0 top-[7px] h-0.5 w-7 rounded-full bg-current transition-transform duration-300',
+                    isMobileMenuOpen && 'translate-y-[7px] rotate-45',
+                  )}
+                />
+                <span
+                  className={cn(
+                    'absolute left-0 top-1/2 -translate-y-1/2 h-0.5 w-7 rounded-full bg-current transition-opacity duration-200',
+                    isMobileMenuOpen && 'opacity-0',
+                  )}
+                />
+                <span
+                  className={cn(
+                    'absolute left-0 bottom-[7px] h-0.5 w-7 rounded-full bg-current transition-transform duration-300',
+                    isMobileMenuOpen && '-translate-y-[7px] -rotate-45',
+                  )}
+                />
+              </span>
             </button>
           </div>
         </div>
@@ -268,10 +334,11 @@ const Navigation = () => {
           ref={mobileMenuContentRef}
           id="mobile-menu"
           side="right"
-          overlayClassName="backdrop-blur-xl bg-slate-950/50"
+          overlayClassName="backdrop-blur-[20px] bg-[rgba(10,10,30,0.55)]"
           className={cn(
             'border-l border-white/10 bg-slate-950/92 backdrop-blur-2xl p-0 gap-0 shadow-[0_0_80px_rgba(0,0,0,0.65)]',
             'flex flex-col overflow-y-auto overscroll-contain',
+            'w-screen max-w-none h-dvh sm:max-w-none',
             '[&>button]:top-5 [&>button]:right-5 [&>button]:size-10 [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center',
           )}
         >
@@ -288,14 +355,14 @@ const Navigation = () => {
           </SheetHeader>
 
           <nav
-            className="flex flex-col flex-1 items-center px-6 sm:px-8 md:px-10 py-8 gap-1 min-h-0 w-full max-w-full"
+            className="flex flex-col flex-1 items-center px-6 sm:px-10 py-10 gap-2 min-h-0 w-full max-w-full"
             aria-label={t.nav.primaryNavigation}
           >
             {navLinks.map((link) => (
               <a
                 key={link.navKey}
                 href={link.href}
-                className="w-full max-w-[16rem] text-center py-3.5 text-base text-solaris-muted hover:text-solaris-text transition-colors rounded-xl hover:bg-white/[0.04]"
+                className="w-full max-w-[20rem] text-center py-4 text-[32px] leading-tight font-semibold text-solaris-muted hover:text-solaris-text transition-colors rounded-2xl hover:bg-white/[0.04]"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.label}
