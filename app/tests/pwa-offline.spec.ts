@@ -5,7 +5,7 @@ import { test, expect, type Page } from '@playwright/test';
  * A single reload is not always enough for `navigator.serviceWorker.controller` to be set.
  */
 async function waitForServiceWorkerControllingClient(page: Page): Promise<void> {
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   await expect
     .poll(
@@ -21,7 +21,7 @@ async function waitForServiceWorkerControllingClient(page: Page): Promise<void> 
   for (let i = 0; i < 6; i++) {
     const controlled = await page.evaluate(() => navigator.serviceWorker.controller !== null);
     if (controlled) return;
-    await page.reload({ waitUntil: 'networkidle' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
   }
 
   await expect
