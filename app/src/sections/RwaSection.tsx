@@ -1,16 +1,20 @@
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
-import { MapPin, Leaf, Shield, TrendingUp, Layers, Sun, Landmark } from 'lucide-react';
+import { MapPin, Leaf, Shield, TrendingUp, Layers, Sun, Landmark, ExternalLink, Fingerprint, Wallet } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 import { useLanguage } from '../hooks/useLanguage';
 import { PredictiveTerrainHeatmap } from '@/components/PredictiveTerrainHeatmap';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { RwaPortfolioMap } from '@/components/rwa/RwaPortfolioMap';
 import { RwaTimelinePanel } from '@/components/rwa/RwaTimelinePanel';
 import { RwaDocumentsPanel } from '@/components/rwa/RwaDocumentsPanel';
 import { RWA_DOCUMENTS, RWA_PROJECTS, RWA_TIMELINE, statusChipClass } from '@/lib/rwaPortfolio';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { TONSCAN_CET_CONTRACT_URL } from '@/lib/cetContract';
+import { DEDUST_POOL_PAGE_URL } from '@/lib/dedustUrls';
+import { PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
 
 /** Inline SVG placeholder — replace with on-site photography of Cetățuia land when available */
 const PHYSICAL_ASSET_PLACEHOLDER_BG =
@@ -34,6 +38,15 @@ const PHYSICAL_ASSET_PLACEHOLDER_BG =
       <text x="960" y="420" text-anchor="middle" fill="rgba(148,163,184,0.45)" font-family="ui-monospace,monospace" font-size="14">Cetățuia, Romania · agricultural land</text>
     </svg>`
   );
+
+function ipfsCidFromUrl(url: string): string | null {
+  const m = url.match(/\/ipfs\/([^/?#]+)/i);
+  return m?.[1] ?? null;
+}
+
+function clamp(n: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, n));
+}
 
 // ─── RWA stats ────────────────────────────────────────────────────────────
 
@@ -89,6 +102,8 @@ const RWA_PILLARS = [
  */
 const RwaSection = () => {
   const { t } = useLanguage();
+  const prefersReducedMotion = useReducedMotion();
+  const physicalBgRef = useRef<HTMLDivElement | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(RWA_PROJECTS[0]?.id ?? null);
 
   const selectedProject = useMemo(() => {
@@ -106,6 +121,40 @@ const RwaSection = () => {
     const ids = new Set(selectedProject.timelineIds);
     return RWA_TIMELINE.filter((e) => ids.has(e.id));
   }, [selectedProject]);
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    const bg = physicalBgRef.current;
+    if (!bg) return;
+    const isBelowDesktop = typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches;
+    if (isBelowDesktop) return;
+
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const rect = bg.getBoundingClientRect();
+      const offset = clamp(rect.top, -900, 900);
+      const y = clamp(offset * -0.08, -48, 48);
+      bg.style.transform = `translate3d(0, ${y}px, 0) scale(1.05)`;
+    };
+
+    const onScroll = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) window.cancelAnimationFrame(raf);
+      bg.style.transform = '';
+    };
+  }, [prefersReducedMotion]);
+
+  const ipfsCid = useMemo(() => ipfsCidFromUrl(PUBLIC_WHITEPAPER_IPFS_URL), []);
 
   return (
     <section
@@ -146,6 +195,7 @@ const RwaSection = () => {
           >
           <div
             className="absolute inset-0 bg-cover bg-center scale-105 motion-safe:transition-transform duration-700"
+            ref={physicalBgRef}
             style={{
               backgroundImage: `linear-gradient(105deg, rgba(2,12,8,0.92) 0%, rgba(2,12,8,0.72) 38%, rgba(2,12,8,0.55) 65%, rgba(2,12,8,0.78) 100%), url(${PHYSICAL_ASSET_PLACEHOLDER_BG})`,
             }}
@@ -177,6 +227,40 @@ const RwaSection = () => {
               This is structural backing: the project is not &ldquo;digital air&rdquo; — it is explicitly anchored in a named
               location and a tangible asset class you can verify independently.
             </p>
+            <div className="mt-6 flex flex-wrap items-center gap-2">
+              <a
+                href={TONSCAN_CET_CONTRACT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1.5 text-[11px] font-mono text-emerald-200 hover:bg-emerald-400/15 transition-colors"
+              >
+                <Wallet className="h-3.5 w-3.5" aria-hidden="true" />
+                TON contract
+                <ExternalLink className="h-3.5 w-3.5 opacity-80" aria-hidden="true" />
+              </a>
+              <a
+                href={DEDUST_POOL_PAGE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-solaris-gold/25 bg-solaris-gold/10 px-3 py-1.5 text-[11px] font-mono text-solaris-gold hover:bg-solaris-gold/15 transition-colors"
+              >
+                <Shield className="h-3.5 w-3.5" aria-hidden="true" />
+                DeDust pool
+                <ExternalLink className="h-3.5 w-3.5 opacity-80" aria-hidden="true" />
+              </a>
+              <a
+                href={PUBLIC_WHITEPAPER_IPFS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-mono text-solaris-text hover:bg-white/10 transition-colors"
+                title={ipfsCid ? `CID: ${ipfsCid}` : undefined}
+              >
+                <Fingerprint className="h-3.5 w-3.5" aria-hidden="true" />
+                IPFS proof
+                <span className="text-solaris-muted">{ipfsCid ? ipfsCid.slice(0, 10) + '…' : ''}</span>
+                <ExternalLink className="h-3.5 w-3.5 opacity-80" aria-hidden="true" />
+              </a>
+            </div>
           </div>
           </div>
         </ScrollFadeUp>

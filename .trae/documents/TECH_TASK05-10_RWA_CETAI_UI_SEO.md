@@ -2,9 +2,7 @@
 ```mermaid
 graph TD
   A["User Browser"] --> B["React + Vite Frontend (SPA)"]
-  B --> C["Supabase SDK (public read/insert)"]
-  C --> D["Supabase (PostgreSQL + Storage)"]
-  B --> E["Map rendering (Leaflet + OSM tiles)"]
+  B --> E["RWA portfolio UI (map + timeline + documents)"]
   B --> F["AI Endpoint securizat: POST /api/chat (Serverless/Edge)"]
   F --> G["Rate limit (Upstash Redis) - opțional"]
   F --> H["DeDust V2 API (pools + prices)"]
@@ -14,10 +12,6 @@ graph TD
   subgraph "Frontend Layer"
     B
     E
-  end
-
-  subgraph "Service Layer (Provided by Supabase)"
-    D
   end
 
   subgraph "Backend Layer (Serverless)"
@@ -35,7 +29,7 @@ graph TD
 ## 2.Technology Description
 - Frontend: React@18+ (sau 19) + TypeScript + vite
 - Styling/UI: tailwindcss@3 + Radix UI (Dialog/Popover/Accordion) pentru componente accesibile
-- Map: leaflet + OpenStreetMap tiles (încărcat doar pe `/rwa`)
+- RWA: dataset local (static) în `app/src/lib/rwaPortfolio.ts` + componente UI (map/timeline/docs)
 - Backend (doar pentru AI): route handler serverless/edge `POST /api/chat` (OpenAI SDK), cu:
   - chei API doar pe server (env), fără expunere în client
   - validare input + normalizare context multi-turn (max 24 mesaje)
@@ -43,7 +37,7 @@ graph TD
   - timeout + abort, fallback single-provider dacă unul pică
   - fetch context on-chain (DeDust) cu timeout și degradare graceful
   - rate limit IP-based (ex. 10 req / 10s) dacă este configurat Upstash
-- Database/Storage: Supabase (PostgreSQL + Storage) folosit doar din frontend pentru conținut public RWA + lead capture
+- PWA: `vite-plugin-pwa` cu `generateSW`; precache limitat + runtime caching pentru chunks (assets) și endpoint-uri publice
 
 ## 3.Route definitions
 | Route | Purpose |
@@ -115,6 +109,7 @@ graph TD
 
 ## 6.Data model(if applicable)
 ### 6.1 Data model definition
+Modelul de mai jos este opțional (pentru când RWA este migrat din dataset local către o bază de date). În implementarea actuală, portofoliul RWA este servit din fișiere TS statice.
 ```mermaid
 erDiagram
   RWA_PROJECT ||--o{ RWA_DOCUMENT : has

@@ -10,6 +10,7 @@ import { useCommunityProof } from '../hooks/use-community-proof';
 import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';
 import { toast } from 'sonner';
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
+import { HeaderTrustStrip } from '@/components/HeaderTrustStrip';
 import {
   DEDUST_POOL_ADDRESS,
   DEDUST_POOL_DEPOSIT_URL,
@@ -254,9 +255,12 @@ const FooterSection = () => {
               >
                 <SolarisLogoMark className="h-full w-full drop-shadow-[0_0_8px_rgba(242,201,76,0.35)]" />
               </div>
-              <span className="font-display font-semibold text-lg text-solaris-text">
-                Solaris <span className="text-solaris-gold">CET</span>
-              </span>
+              <div className="flex flex-col">
+                <span className="font-display font-semibold text-lg text-solaris-text">
+                  Solaris <span className="text-solaris-gold">CET</span>
+                </span>
+                <HeaderTrustStrip align="center" className="mt-1 max-w-none justify-start" />
+              </div>
             </div>
             <nav className="flex flex-wrap items-center gap-6">
             {footerLinks.map((link) => (
