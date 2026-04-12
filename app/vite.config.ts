@@ -182,6 +182,13 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globIgnores: [
+          '**/vendor/onnxruntime/**',
+          '**/assets/mermaid-*.js*',
+          '**/assets/@mermaid-js/**',
+          '**/assets/cytoscape-*.js*',
+          '**/assets/cytoscape-*/*.js*',
+        ],
         /**
          * SPA shell for client routes (must stay index.html — not offline.html, or SPA breaks).
          * Offline navigations use NetworkFirst below + handlerDidError → offline.html.
@@ -190,6 +197,19 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/sovereign\//, /^\/apocalypse\//],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3 MiB to cover phone-mockup.png
         runtimeCaching: [
+          {
+            urlPattern: ({ url }: { url: URL }) =>
+              url.pathname.startsWith('/assets/') &&
+              (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')),
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'asset-chunks',
+              expiration: {
+                maxEntries: 80,
+                maxAgeSeconds: 60 * 60 * 24 * 14, // 14 days
+              },
+            },
+          },
           {
             urlPattern: ({ request, url }: { request: Request; url: URL }) =>
               request.mode === 'navigate' &&
