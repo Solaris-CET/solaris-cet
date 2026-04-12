@@ -7,7 +7,7 @@
   left: 8px;
   z-index: 9999;
   padding: 8px 16px;
-  background: #F2C94C;
+  background: var(--solaris-gold);
   color: #05060B;
   font-weight: 600;
   border-radius: 4px;
@@ -24,7 +24,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #020617;
+  background: var(--solaris-dark);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -33,12 +33,12 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #F2C94C;
+  background: var(--solaris-gold);
 }
 
 /* Selection */
 ::selection {
-  background: #ffd700;
+  background: var(--solaris-gold);
   color: #000;
 }
 
@@ -59,7 +59,7 @@ input[type="range"]::-webkit-slider-track {
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  background: #F2C94C;
+  background: var(--solaris-gold);
   height: 20px;
   width: 20px;
   border-radius: 50%;
@@ -80,7 +80,7 @@ input[type="range"]::-moz-range-track {
 }
 
 input[type="range"]::-moz-range-thumb {
-  background: #F2C94C;
+  background: var(--solaris-gold);
   height: 20px;
   width: 20px;
   border-radius: 50%;
@@ -102,7 +102,7 @@ a, input {
 button:focus-visible,
 a:focus-visible,
 input:focus-visible {
-  outline: 2px solid #F2C94C;
+  outline: 2px solid var(--solaris-gold);
   outline-offset: 2px;
 }
 
@@ -281,4 +281,3 @@ html[data-lang="de"] .font-display {
 html[data-lang="zh"] .font-mono {
   letter-spacing: 0.03em;
 }
-

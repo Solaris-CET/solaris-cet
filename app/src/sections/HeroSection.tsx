@@ -164,10 +164,10 @@ const HeroSection: React.FC = () => {
     <TooltipProvider>
       <section
         ref={containerRef}
-        className="relative min-h-dvh bg-[#020510] overflow-x-hidden lg:overflow-hidden flex flex-col justify-center items-center pt-20 pb-16 lg:pb-24 lg:pt-16"
+        className="relative min-h-dvh bg-[color:var(--solaris-void)] overflow-x-hidden lg:overflow-hidden flex flex-col justify-center items-center pt-20 pb-16 lg:pb-24 lg:pt-16"
       >
         <div ref={backgroundRef} className="absolute inset-0 z-0 overflow-hidden pointer-events-none will-change-transform" aria-hidden>
-          <div className="absolute inset-0 bg-[#020510]" />
+          <div className="absolute inset-0 bg-[color:var(--solaris-void)]" />
           <div className="absolute inset-0 hidden sm:block">
             <SolarRaysCoinsCanvas />
           </div>
@@ -181,7 +181,7 @@ const HeroSection: React.FC = () => {
               decoding="async"
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-[#020510]/35 via-[#020510]/70 to-[#020510]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/70 to-black" />
           <div className="absolute inset-0 opacity-10 hero-film-grain mix-blend-overlay" />
         </div>
 
@@ -194,14 +194,14 @@ const HeroSection: React.FC = () => {
                RWA · CETĂȚUIA ROMÂNIEI · TON
             </div>
 
-            <h1 className="font-display text-white leading-[1.02] tracking-[-0.04em] mb-5 drop-shadow-2xl text-[44px] sm:text-[52px] md:text-[62px] lg:text-[74px] xl:text-[86px]">
+            <h1 className="font-display text-white leading-[1.02] tracking-[-0.04em] mb-5 drop-shadow-2xl type-h1">
               Primul Token RWA Ancorat în{' '}
               <span className="text-gradient-gold">Cetățuia României</span>
               <span className="text-solaris-gold"> — 9,000 CET.</span>
               <span className="block text-white">Imuabil.</span>
             </h1>
             
-            <p className="text-base sm:text-lg md:text-xl text-slate-200/90 max-w-2xl font-medium leading-relaxed mb-10 text-balance px-4">
+            <p className="type-body text-slate-200/90 max-w-2xl font-medium mb-10 text-balance px-4">
               Activ real. Supply fix. Lichiditate on-chain. Un token care nu se confundă cu mii de copieri.
             </p>
 

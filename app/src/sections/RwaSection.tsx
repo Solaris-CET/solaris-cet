@@ -39,6 +39,8 @@ const PHYSICAL_ASSET_PLACEHOLDER_BG =
     </svg>`
   );
 
+const DEFAULT_PHYSICAL_ASSET_PHOTO_URL = '/rwa/cetatuia.webp';
+
 function ipfsCidFromUrl(url: string): string | null {
   const m = url.match(/\/ipfs\/([^/?#]+)/i);
   return m?.[1] ?? null;
@@ -105,6 +107,7 @@ const RwaSection = () => {
   const prefersReducedMotion = useReducedMotion();
   const physicalBgRef = useRef<HTMLDivElement | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(RWA_PROJECTS[0]?.id ?? null);
+  const [physicalAssetPhotoUrl, setPhysicalAssetPhotoUrl] = useState<string | null>(null);
 
   const selectedProject = useMemo(() => {
     return RWA_PROJECTS.find((p) => p.id === selectedProjectId) ?? RWA_PROJECTS[0] ?? null;
@@ -121,6 +124,16 @@ const RwaSection = () => {
     const ids = new Set(selectedProject.timelineIds);
     return RWA_TIMELINE.filter((e) => ids.has(e.id));
   }, [selectedProject]);
+
+  useEffect(() => {
+    const configured = import.meta.env.VITE_RWA_PHOTO_URL;
+    const candidate = configured?.trim() ? configured.trim() : DEFAULT_PHYSICAL_ASSET_PHOTO_URL;
+    const img = new Image();
+    img.decoding = 'async';
+    img.onload = () => setPhysicalAssetPhotoUrl(candidate);
+    img.onerror = () => setPhysicalAssetPhotoUrl(null);
+    img.src = candidate;
+  }, []);
 
   useEffect(() => {
     if (prefersReducedMotion) return;
@@ -155,6 +168,9 @@ const RwaSection = () => {
   }, [prefersReducedMotion]);
 
   const ipfsCid = useMemo(() => ipfsCidFromUrl(PUBLIC_WHITEPAPER_IPFS_URL), []);
+  const mapsQuery = useMemo(() => encodeURIComponent(selectedProject?.region ?? 'Cetățuia, Romania'), [selectedProject]);
+  const mapsEmbedUrl = useMemo(() => `https://www.google.com/maps?q=${mapsQuery}&output=embed`, [mapsQuery]);
+  const mapsOpenUrl = useMemo(() => `https://www.google.com/maps?q=${mapsQuery}`, [mapsQuery]);
 
   return (
     <section
@@ -197,7 +213,7 @@ const RwaSection = () => {
             className="absolute inset-0 bg-cover bg-center scale-105 motion-safe:transition-transform duration-700"
             ref={physicalBgRef}
             style={{
-              backgroundImage: `linear-gradient(105deg, rgba(2,12,8,0.92) 0%, rgba(2,12,8,0.72) 38%, rgba(2,12,8,0.55) 65%, rgba(2,12,8,0.78) 100%), url(${PHYSICAL_ASSET_PLACEHOLDER_BG})`,
+              backgroundImage: `linear-gradient(105deg, rgba(2,12,8,0.92) 0%, rgba(2,12,8,0.72) 38%, rgba(2,12,8,0.55) 65%, rgba(2,12,8,0.78) 100%), url(${physicalAssetPhotoUrl ?? PHYSICAL_ASSET_PLACEHOLDER_BG})`,
             }}
             aria-hidden="true"
           />
@@ -347,6 +363,30 @@ const RwaSection = () => {
                     <p className="text-[11px] font-mono text-solaris-muted leading-relaxed">
                       Proof bundle: IPFS + TON references. Always verify claims against linked artifacts.
                     </p>
+                  </div>
+
+                  <div className="mt-6 overflow-hidden rounded-xl border border-white/10 bg-black/30">
+                    <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-white/10">
+                      <div className="text-[10px] font-mono uppercase tracking-widest text-solaris-muted">
+                        Map · {selectedProject?.region ?? 'Cetățuia, Romania'}
+                      </div>
+                      <a
+                        href={mapsOpenUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[10px] font-mono text-solaris-cyan hover:text-solaris-text transition-colors"
+                      >
+                        Open
+                        <ExternalLink className="h-3 w-3 opacity-80" aria-hidden="true" />
+                      </a>
+                    </div>
+                    <iframe
+                      title={`Map: ${selectedProject?.region ?? 'Cetățuia, Romania'}`}
+                      src={mapsEmbedUrl}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      className="w-full h-[220px]"
+                    />
                   </div>
                 </>
               ) : (

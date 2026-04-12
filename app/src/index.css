@@ -53,9 +53,16 @@
     --solaris-gold: #f2c94c;
     --solaris-cyan: #2ee7ff;
     --solaris-dark: #020617;
+    --solaris-void: #020510;
+    --solaris-panel: #0d0e17;
     --solaris-card: rgba(255, 255, 255, 0.05);
     --solaris-text: rgba(255, 255, 255, 0.9);
     --solaris-muted: #a6a9b6;
+
+    --type-h1: clamp(40px, 5vw, 86px);
+    --type-h2: clamp(28px, 3.5vw, 48px);
+    --type-h3: clamp(20px, 2.25vw, 32px);
+    --type-body: clamp(15px, 1.2vw, 18px);
 
     /* MobileConversionDock: must match `main` padding-bottom (< xl) and BackToTop offset. */
     --mobile-conversion-dock-reserve: 5.75rem;
@@ -87,6 +94,9 @@
     --solaris-card: rgba(2, 6, 23, 0.04);
     --solaris-text: rgba(2, 6, 23, 0.92);
     --solaris-muted: #475569;
+
+    --solaris-void: #f8fafc;
+    --solaris-panel: rgba(255, 255, 255, 0.92);
   }
 }
 
@@ -262,6 +272,23 @@
     text-transform: uppercase;
     color: var(--solaris-muted);
   }
+
+  .type-h1 {
+    font-size: var(--type-h1);
+  }
+
+  .type-h2 {
+    font-size: var(--type-h2);
+  }
+
+  .type-h3 {
+    font-size: var(--type-h3);
+  }
+
+  .type-body {
+    font-size: var(--type-body);
+    line-height: 1.6;
+  }
   
   .gold-glow {
     box-shadow: 0 0 40px rgba(242, 201, 76, 0.18);
@@ -327,8 +354,13 @@
 
   @media (max-width: 767px) {
     .noise-overlay {
-      display: none;
+      opacity: 0.014;
     }
+  }
+
+  html.light .noise-overlay {
+    opacity: 0.016;
+    mix-blend-mode: multiply;
   }
   
   .section-pinned {
@@ -1691,10 +1723,10 @@
 
 .bento-card:hover {
   transform: translateY(-6px);
-  border-color: rgba(242, 201, 76, 0.35);
+  border-color: rgba(242, 201, 76, 0.28);
   box-shadow:
     0 28px 72px rgba(0,0,0,0.55),
-    0 0 56px rgba(255, 200, 100, 0.1),
+    0 0 56px rgba(255, 200, 100, 0.07),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
@@ -1704,21 +1736,33 @@
 
 /* AI department matrix — thin gold frame, hover scale (informational cards, not controls) */
 .team-card.bento-card {
-  border: 1px solid rgba(242, 201, 76, 0.38);
+  border: 1px solid rgba(242, 201, 76, 0.28);
 }
 .team-card.bento-card:hover {
   transform: translateY(-6px) scale(1.04);
-  border-color: rgba(242, 201, 76, 0.62);
+  border-color: rgba(242, 201, 76, 0.45);
 }
 
 /* ── Mesh grid background ────────────────────────────────────────────────── */
 .mesh-bg {
   background-image:
-    radial-gradient(circle at 20% 15%, rgba(255, 200, 120, 0.07) 0%, transparent 52%),
-    radial-gradient(circle at 78% 72%, rgba(46, 231, 255, 0.04) 0%, transparent 50%),
+    radial-gradient(circle at 20% 15%, rgba(255, 200, 120, 0.08) 0%, transparent 54%),
+    radial-gradient(circle at 52% 8%, rgba(242, 201, 76, 0.06) 0%, transparent 58%),
+    radial-gradient(circle at 78% 72%, rgba(46, 231, 255, 0.05) 0%, transparent 55%),
+    radial-gradient(circle at 8% 78%, rgba(192, 132, 252, 0.035) 0%, transparent 55%),
     linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
-  background-size: auto, auto, 48px 48px, 48px 48px;
+  background-size: auto, auto, auto, auto, 48px 48px, 48px 48px;
+}
+
+html.light .mesh-bg {
+  background-image:
+    radial-gradient(circle at 20% 12%, rgba(242, 201, 76, 0.12) 0%, transparent 56%),
+    radial-gradient(circle at 82% 68%, rgba(46, 231, 255, 0.08) 0%, transparent 58%),
+    radial-gradient(circle at 10% 86%, rgba(99, 102, 241, 0.06) 0%, transparent 60%),
+    linear-gradient(rgba(2, 6, 23, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(2, 6, 23, 0.035) 1px, transparent 1px);
+  background-size: auto, auto, auto, 48px 48px, 48px 48px;
 }
 
 /* ── Gradient border (no pseudo-element trick) ───────────────────────────── */

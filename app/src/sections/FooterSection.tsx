@@ -44,6 +44,8 @@ const FooterSection = () => {
   ];
   const [copiedPool, setCopiedPool] = useState(false);
   const [copiedContract, setCopiedContract] = useState(false);
+  const [waitlistEmail, setWaitlistEmail] = useState('');
+  const [waitlistBusy, setWaitlistBusy] = useState(false);
 
   const handleCopyPool = () => {
     navigator.clipboard.writeText(DEDUST_POOL_ADDRESS).then(() => {
@@ -59,6 +61,38 @@ const FooterSection = () => {
       toast.success(t.social.linkCopied);
       setTimeout(() => setCopiedContract(false), 2000);
     }).catch(() => {/* clipboard access denied – fail silently */});
+  };
+
+  const submitWaitlist = async () => {
+    const email = waitlistEmail.trim();
+    if (!email) return;
+    setWaitlistBusy(true);
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}api/waitlist`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+        cache: 'no-store',
+      });
+      if (res.ok) {
+        toast.success('Added to waitlist');
+        setWaitlistEmail('');
+        return;
+      }
+      const payload = (await res.json().catch(() => null)) as { error?: unknown } | null;
+      const error = typeof payload?.error === 'string' ? payload.error : 'Waitlist unavailable';
+      if (res.status === 503) {
+        window.location.href = `mailto:?subject=${encodeURIComponent('Solaris CET Waitlist')}&body=${encodeURIComponent(
+          `Please add this email to the Solaris CET waitlist: ${email}`,
+        )}`;
+        return;
+      }
+      toast.error(error);
+    } catch {
+      toast.error('Waitlist unavailable');
+    } finally {
+      setWaitlistBusy(false);
+    }
   };
 
   return (
@@ -242,6 +276,48 @@ const FooterSection = () => {
             </div>
           </div>
         </div>
+        </ScrollFadeUp>
+
+        <ScrollFadeUp>
+          <div className="bento-card p-6 lg:p-8 mb-10 border border-solaris-gold/20">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <ArrowRight className="w-4 h-4 text-solaris-gold" aria-hidden />
+                  <span className="hud-label text-solaris-gold">Email Waitlist</span>
+                </div>
+                <p className="text-solaris-text">Get product drops and important announcements by email.</p>
+                <p className="text-solaris-muted text-xs mt-1">If the endpoint is not configured, we open your mail client as fallback.</p>
+              </div>
+              <form
+                className="flex flex-col sm:flex-row gap-3 shrink-0 w-full lg:w-auto"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void submitWaitlist();
+                }}
+              >
+                <input
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  required
+                  value={waitlistEmail}
+                  onChange={(e) => setWaitlistEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="min-h-11 w-full sm:w-[320px] rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-solaris-text placeholder:text-solaris-muted focus:outline-none focus:ring-2 focus:ring-solaris-gold/30"
+                  aria-label="Email address"
+                />
+                <button
+                  type="submit"
+                  className="min-h-11 inline-flex items-center justify-center gap-2 rounded-xl bg-solaris-gold/10 border border-solaris-gold/30 text-solaris-gold px-5 text-sm font-semibold hover:bg-solaris-gold/20 transition-colors disabled:opacity-50"
+                  disabled={waitlistBusy}
+                >
+                  {waitlistBusy ? 'Sending…' : 'Notify me'}
+                  <Send className="w-4 h-4" aria-hidden />
+                </button>
+              </form>
+            </div>
+          </div>
         </ScrollFadeUp>
 
         {/* Footer */}

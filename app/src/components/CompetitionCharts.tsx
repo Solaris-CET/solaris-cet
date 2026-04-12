@@ -34,7 +34,7 @@ function CompetitionBarTooltip({
   const formatted =
     typeof v === 'number' ? v.toLocaleString(numberLocale, { maximumFractionDigits: 0 }) : String(v);
   return (
-    <div className="rounded-lg border border-white/12 bg-[#0D0E17] px-3 py-2 shadow-[0_8px_30px_rgba(0,0,0,0.4)] max-w-[min(90vw,280px)]">
+    <div className="rounded-lg border border-white/12 bg-[color:var(--solaris-panel)] px-3 py-2 shadow-[0_8px_30px_rgba(0,0,0,0.4)] max-w-[min(90vw,280px)]">
       <p className="font-mono text-sm font-bold text-solaris-text">{name}</p>
       <p className="text-xs text-solaris-muted mt-1 tabular-nums">
         {formatted} {valueLabel}
@@ -76,16 +76,16 @@ export default function CompetitionCharts() {
           <Zap className="w-4 h-4 text-solaris-cyan" />
           <span className="hud-label text-solaris-cyan">{cs.chartTpsLabel}</span>
         </div>
-        <ResponsiveContainer width="100%" height={220}>
+        <ResponsiveContainer width="100%" height={220} minWidth={280} minHeight={200}>
           <BarChart data={[...COMPETITION_TPS_CHART_ROWS]} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
             <XAxis
               dataKey="name"
-              tick={{ fill: '#A6A9B6', fontSize: 11, fontFamily: 'monospace' }}
+              tick={{ fill: 'var(--solaris-muted)', fontSize: 11, fontFamily: 'monospace' }}
               axisLine={false}
               tickLine={false}
             />
             <YAxis
-              tick={{ fill: '#A6A9B6', fontSize: 10, fontFamily: 'monospace' }}
+              tick={{ fill: 'var(--solaris-muted)', fontSize: 10, fontFamily: 'monospace' }}
               axisLine={false}
               tickLine={false}
               tickFormatter={formatTpsAxis}
@@ -103,7 +103,7 @@ export default function CompetitionCharts() {
             />
             <Bar dataKey="value" radius={[4, 4, 0, 0]}>
               {COMPETITION_TPS_CHART_ROWS.map((entry) => (
-                <Cell key={entry.name} fill={entry.isCET ? '#F2C94C' : 'rgba(255,255,255,0.15)'} />
+                <Cell key={entry.name} fill={entry.isCET ? 'var(--solaris-gold)' : 'rgba(255,255,255,0.15)'} />
               ))}
             </Bar>
           </BarChart>
@@ -116,18 +116,18 @@ export default function CompetitionCharts() {
           <Coins className="w-4 h-4 text-solaris-gold" />
           <span className="hud-label text-solaris-gold">{cs.chartScarcityLabel}</span>
         </div>
-        <ResponsiveContainer width="100%" height={220}>
+        <ResponsiveContainer width="100%" height={220} minWidth={280} minHeight={200}>
           <BarChart data={[...COMPETITION_SCARCITY_CHART_ROWS]} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
             <XAxis
               dataKey="name"
-              tick={{ fill: '#A6A9B6', fontSize: 11, fontFamily: 'monospace' }}
+              tick={{ fill: 'var(--solaris-muted)', fontSize: 11, fontFamily: 'monospace' }}
               axisLine={false}
               tickLine={false}
             />
             <YAxis
               scale="log"
               domain={['auto', 'auto']}
-              tick={{ fill: '#A6A9B6', fontSize: 10, fontFamily: 'monospace' }}
+              tick={{ fill: 'var(--solaris-muted)', fontSize: 10, fontFamily: 'monospace' }}
               axisLine={false}
               tickLine={false}
               tickFormatter={formatSupplyAxis}
@@ -145,7 +145,7 @@ export default function CompetitionCharts() {
             />
             <Bar dataKey="value" radius={[4, 4, 0, 0]}>
               {COMPETITION_SCARCITY_CHART_ROWS.map((entry) => (
-                <Cell key={entry.name} fill={entry.isCET ? '#F2C94C' : 'rgba(255,255,255,0.15)'} />
+                <Cell key={entry.name} fill={entry.isCET ? 'var(--solaris-gold)' : 'rgba(255,255,255,0.15)'} />
               ))}
             </Bar>
           </BarChart>
