@@ -9,6 +9,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { SolarisLogoMark } from './components/SolarisLogoMark';
 import CursorGlow from './components/CursorGlow';
 import { InteractionEffectsManager } from '@/components/InteractionEffectsManager';
+import { CinematicBackground } from '@/components/CinematicBackground';
 import LazyLoadWrapper from './components/LazyLoadWrapper';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import BackToTop from './components/BackToTop';
@@ -258,7 +259,7 @@ function AppContent() {
         aria-hidden={!isLoaded}
         inert={!isLoaded ? true : undefined}
       >
-        <div className="cosmic-backdrop" aria-hidden />
+        <CinematicBackground />
 
         {/* Ambient solar glow — fixed, behind sections */}
         <div

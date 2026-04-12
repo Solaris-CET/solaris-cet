@@ -201,6 +201,9 @@ const HeroSection: React.FC = () => {
 
           {/* Layer 6 — ambient quantum glow (CSS, fără JS) */}
           <div className="quantum-ambient-glow" aria-hidden />
+
+          <div className="absolute inset-0 hidden sm:block hero-holo-grid" aria-hidden />
+          <div className="absolute inset-0 hidden sm:block hero-holo-scanline" aria-hidden />
         </div>
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 flex flex-col gap-12 lg:gap-16 pt-12 md:pt-16">
