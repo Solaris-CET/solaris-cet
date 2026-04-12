@@ -27,7 +27,7 @@
   "devDependencies": {
     "@tact-lang/compiler": "^1.6.13",
     "@ton-community/func-js": "^0.11.0",
-    "@ton/blueprint": "0.44.0",
+    "@ton/blueprint": "0.44.1",
     "@ton/sandbox": "^0.41.0",
     "@ton/test-utils": "^0.12.0",
     "@ton/tolk-js": "^1.3.0",
