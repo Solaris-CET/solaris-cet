@@ -183,7 +183,7 @@ const TokenomicsChart = () => {
         <div className="lg:col-span-6 flex justify-center">
           <div className="relative w-64 h-64 sm:w-72 sm:h-72">
             {isVisible ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={240} minHeight={240}>
                 <PieChart>
                   <Pie
                     data={distributionVisible}

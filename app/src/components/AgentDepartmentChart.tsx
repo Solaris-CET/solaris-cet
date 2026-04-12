@@ -88,7 +88,7 @@ const AgentDepartmentChart = () => {
       <div className="flex flex-col lg:flex-row gap-6 items-center">
         {/* Radial chart */}
         <div className="w-full lg:w-64 h-64 shrink-0">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={240} minHeight={240}>
             <RadialBarChart
               innerRadius="20%"
               outerRadius="90%"

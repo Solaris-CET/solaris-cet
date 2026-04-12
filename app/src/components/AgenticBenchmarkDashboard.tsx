@@ -76,7 +76,7 @@ const AgenticBenchmarkDashboard = () => (
     </p>
 
     <div className="w-full h-[min(380px,55vh)] min-h-[280px]">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={320} minHeight={280}>
         <BarChart
           data={rows}
           layout="vertical"
