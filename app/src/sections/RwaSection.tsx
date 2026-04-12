@@ -39,7 +39,7 @@ const PHYSICAL_ASSET_PLACEHOLDER_BG =
     </svg>`
   );
 
-const DEFAULT_PHYSICAL_ASSET_PHOTO_URL = '/rwa/cetatuia.webp';
+const DEFAULT_PHYSICAL_ASSET_PHOTO_URL = '/rwa/cetatuia.jpg';
 
 function ipfsCidFromUrl(url: string): string | null {
   const m = url.match(/\/ipfs\/([^/?#]+)/i);
