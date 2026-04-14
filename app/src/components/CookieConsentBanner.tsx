@@ -86,10 +86,10 @@ const CookieConsentBanner: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md bg-slate-950/95 backdrop-blur-2xl border border-white/10 p-5 rounded-2xl shadow-[0_0_80px_rgba(0,0,0,0.8)] z-[9999] animate-in slide-in-from-bottom-10 fade-in duration-500 will-change-transform">
+    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-[380px] max-h-[70vh] overflow-auto bg-slate-950/95 backdrop-blur-2xl border border-white/10 p-4 sm:p-5 rounded-2xl shadow-[0_0_80px_rgba(0,0,0,0.8)] z-[9999] animate-in slide-in-from-bottom-10 fade-in duration-500 will-change-transform">
       {!showPreferences ? (
         <>
-          <div className="flex items-start gap-4 mb-5">
+          <div className="flex items-start gap-4 mb-4">
             <div className="w-12 h-12 rounded-xl bg-solaris-gold/10 border border-solaris-gold/20 flex items-center justify-center shrink-0">
               <Cookie className="w-6 h-6 text-solaris-gold" />
             </div>
@@ -101,11 +101,20 @@ const CookieConsentBanner: React.FC = () => {
                 Utilizăm module cookie pentru funcționarea platformei, analizarea traficului și îmbunătățirea experienței. Alegerea îți aparține.
               </p>
             </div>
+            <button
+              onClick={() => setIsVisible(false)}
+              className="ml-auto p-1.5 text-solaris-muted hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+              aria-label="Închide"
+              type="button"
+            >
+              <X className="w-4 h-4" aria-hidden />
+            </button>
           </div>
           <div className="flex flex-col gap-2.5">
             <button
               onClick={handleAcceptAll}
               className="w-full btn-filled-gold text-sm font-semibold py-3 rounded-xl transition-transform hover:-translate-y-0.5 shadow-[0_0_15px_rgba(242,201,76,0.15)]"
+              type="button"
             >
               Acceptă Toate Cookies
             </button>
@@ -113,12 +122,14 @@ const CookieConsentBanner: React.FC = () => {
               <button
                 onClick={() => setShowPreferences(true)}
                 className="flex-1 text-xs font-semibold py-2.5 px-4 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 rounded-xl transition-all"
+                type="button"
               >
                 Setări Personalizate
               </button>
               <button
                 onClick={handleDecline}
                 className="flex-1 text-xs font-semibold py-2.5 px-4 bg-transparent hover:bg-white/5 text-solaris-muted hover:text-white rounded-xl transition-colors"
+                type="button"
               >
                 Doar Esențiale
               </button>
@@ -134,6 +145,7 @@ const CookieConsentBanner: React.FC = () => {
             <button 
               onClick={() => setShowPreferences(false)} 
               className="p-1 text-solaris-muted hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+              type="button"
             >
               <X className="w-4 h-4" />
             </button>
@@ -178,6 +190,7 @@ const CookieConsentBanner: React.FC = () => {
           <button
             onClick={handleSavePreferences}
             className="w-full btn-filled-gold text-sm font-semibold py-3 rounded-xl transition-transform hover:-translate-y-0.5"
+            type="button"
           >
             Salvează și Închide
           </button>

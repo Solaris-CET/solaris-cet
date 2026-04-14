@@ -1,8 +1,9 @@
-import { useRef, useLayoutEffect } from 'react';
+import { useRef, useLayoutEffect, useMemo } from 'react';
 import { gsap } from 'gsap';
 import { CheckCircle, Loader, Circle, ChevronDown } from 'lucide-react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
+import { useLanguage } from '@/hooks/useLanguage';
 
 type PhaseStatus = 'done' | 'active' | 'upcoming';
 
@@ -19,7 +20,7 @@ interface Phase {
 }
 
 // Static data defined outside component to avoid re-creation on every render
-const phases: Phase[] = [
+const phasesEn: Phase[] = [
   {
     id: 'q1',
     quarter: 'Q1 2025',
@@ -106,6 +107,93 @@ const phases: Phase[] = [
   },
 ];
 
+const phasesRo: Phase[] = [
+  {
+    id: 'q1',
+    quarter: 'Q1 2025',
+    title: 'Fundație',
+    status: 'done',
+    milestones: [
+      { text: 'Contractul tokenului deployat pe TON mainnet' },
+      { text: 'Audit Cyberscope finalizat pentru smart contract' },
+      { text: 'Verificare proiect Freshcoins' },
+      { text: 'Proces KYC finalizat pentru echipa core' },
+    ],
+  },
+  {
+    id: 'q2',
+    quarter: 'Q2 2025',
+    title: 'Lansare',
+    status: 'done',
+    milestones: [
+      { text: 'Pool de lichiditate DeDust live' },
+      { text: 'Publicare whitepaper pe IPFS' },
+      { text: 'Landing page + canale comunitate live' },
+      { text: 'Distribuție inițială token finalizată' },
+    ],
+  },
+  {
+    id: 'q3',
+    quarter: 'Q3 2025',
+    title: 'Creștere',
+    status: 'done',
+    milestones: [
+      { text: 'Pilot agricultură de precizie (AI) în Puiești' },
+      { text: 'SDK + API beta pentru dezvoltatori' },
+      { text: 'Urme de raționament ReAct ancorate on-chain' },
+      { text: 'Modul guvernanță (vot)' },
+    ],
+  },
+  {
+    id: 'q4',
+    quarter: 'Q4 2025',
+    title: 'Scalare',
+    status: 'done',
+    milestones: [
+      { text: 'Deploy unități de procesare next-gen' },
+      { text: 'Protocol de auto-actualizare pe mainnet' },
+      { text: 'Explorare pod cross-chain' },
+      { text: 'Program de granturi pentru ecosistem' },
+    ],
+  },
+  {
+    id: 'q1-2026',
+    quarter: 'Q1 2026',
+    title: 'Extindere',
+    status: 'done',
+    milestones: [
+      { text: 'Integrare lichiditate multi-chain finalizată' },
+      { text: 'Portal guvernanță comunitate lansat' },
+      { text: 'Oracle AI · API public v1 lansat' },
+      { text: 'Suport deep-link pentru portofel mobil' },
+    ],
+  },
+  {
+    id: 'q2-2026',
+    quarter: 'Q2 2026+',
+    title: 'Evoluție',
+    status: 'active',
+    milestones: [
+      { text: 'Organizație autonomă descentralizată (DAO)' },
+      { text: 'Pod cross-chain pe mainnet' },
+      { text: 'Extindere program de granturi pentru ecosistem' },
+      { text: 'Pilot tokenizare activ din lumea reală (RWA)' },
+    ],
+  },
+  {
+    id: 'q3-2026',
+    quarter: 'Q3 2026+',
+    title: 'Transcendență',
+    status: 'upcoming',
+    milestones: [
+      { text: 'Execuție autonomă contracte AI-to-AI' },
+      { text: 'Solaris Prime mainnet neural mesh' },
+      { text: 'Integrare strat zero-knowledge proofs' },
+      { text: 'Rețea globală de oracole pentru date agricole' },
+    ],
+  },
+];
+
 interface PhaseStatusConfig {
   icon: typeof CheckCircle;
   iconClass: string;
@@ -145,10 +233,17 @@ const statusConfig: Record<PhaseStatus, PhaseStatusConfig> = {
 gsap.registerPlugin(ScrollTrigger);
 
 const RoadmapSection = () => {
+  const { t, lang } = useLanguage();
+  const tx = t.roadmapUi;
+  const phases: Phase[] = useMemo(
+    () => (({ ro: phasesRo } as Partial<Record<string, typeof phasesEn>>)[lang] ?? phasesEn),
+    [lang],
+  );
   const sectionRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<SVGPathElement>(null);
+  const statusLabel: Record<PhaseStatus, string> = tx.status;
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -233,23 +328,23 @@ const RoadmapSection = () => {
             <div className="w-10 h-10 rounded-xl bg-emerald-400/10 flex items-center justify-center">
               <CheckCircle className="w-5 h-5 text-emerald-400" />
             </div>
-            <span className="hud-label text-emerald-400">ROADMAP</span>
+            <span className="hud-label text-emerald-400">{tx.kicker}</span>
           </div>
 
           <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text mb-4">
-            The Path to{' '}
-            <span className="text-gradient-gold">Sustainable Growth</span>
+            {tx.titleLead} <span className="text-gradient-gold">{tx.titleHighlight}</span> {tx.titleTail}
           </h2>
 
           <p className="text-solaris-muted text-base lg:text-lg leading-relaxed">
-            From the initial token launch to a full-scale AI-powered agricultural
-            ecosystem — every milestone is publicly trackable and immutably recorded.
+            {tx.subtitle}
           </p>
 
           {/* Overall progress bar: 5 done + 1 active (0.5) of 7 = ~79% */}
           <div className="mt-6 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-solaris-muted text-[11px] uppercase tracking-wider">Overall Progress</span>
+              <span className="font-mono text-solaris-muted text-[11px] uppercase tracking-wider">
+                {tx.overallProgressLabel}
+              </span>
               <span className="font-mono text-solaris-gold text-xs font-bold">79%</span>
             </div>
             <div className="h-2 rounded-full bg-white/5 overflow-hidden">
@@ -259,8 +354,8 @@ const RoadmapSection = () => {
               />
             </div>
             <div className="flex items-center justify-between text-[10px] font-mono text-solaris-muted">
-              <span>5 phases complete</span>
-              <span>1 active · 1 upcoming</span>
+              <span>{tx.phasesCompleteLabel}</span>
+              <span>{tx.activeUpcomingLabel}</span>
             </div>
           </div>
 
@@ -268,7 +363,7 @@ const RoadmapSection = () => {
           <div className="mt-4 inline-flex items-center gap-3 px-4 py-2 rounded-full bg-solaris-gold/10 border border-solaris-gold/30">
             <span className="w-2 h-2 rounded-full bg-solaris-gold animate-pulse inline-block" />
             <span className="font-mono text-solaris-gold text-xs font-semibold">
-              NOW: Q2 2026 — DAO &amp; Cross-Chain Bridge in Progress
+              {tx.nowLine}
             </span>
           </div>
         </div>
@@ -342,7 +437,7 @@ const RoadmapSection = () => {
                             <span className="font-mono text-solaris-muted text-xs">{phase.quarter}</span>
                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border ${cfg.badgeClass}`}>
                               <StatusIcon className={`w-3 h-3 ${cfg.iconClass} ${cfg.iconAnimClass}`} />
-                              {cfg.label}
+                              {statusLabel[phase.status]}
                             </span>
                           </div>
                           <h3 className="mt-3 font-display font-bold text-solaris-text text-xl group-hover:text-solaris-gold transition-colors">

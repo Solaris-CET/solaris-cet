@@ -5,6 +5,7 @@ import GlowOrbs from '../components/GlowOrbs';
 import AppImage from '../components/AppImage';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { useLanguage } from '../hooks/useLanguage';
 
 
 const HybridEngineSection = () => {
@@ -15,11 +16,14 @@ const HybridEngineSection = () => {
   const svgPathRef = useRef<SVGPathElement>(null);
   const [activeNode, setActiveNode] = useState<'pow' | 'dpos' | null>(null);
   const prefersReducedMotion = useReducedMotion();
+  const { t } = useLanguage();
+  const tx = t.hybridEngineUi;
 
   // SVG path animation
   useEffect(() => {
     const path = svgPathRef.current;
     if (!path) return;
+    if (prefersReducedMotion) return;
 
     const len = path.getTotalLength();
     gsap.set(path, { strokeDasharray: len, strokeDashoffset: len });
@@ -33,7 +37,7 @@ const HybridEngineSection = () => {
     });
 
     return () => { tween.kill(); };
-  }, []);
+  }, [prefersReducedMotion]);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -52,7 +56,7 @@ const HybridEngineSection = () => {
         scrollTrigger: {
           trigger: section,
           start: 'top top',
-          end: '+=130%',
+          end: '+=70%',
           pin: true,
           scrub: 0.5,
         },
@@ -85,29 +89,37 @@ const HybridEngineSection = () => {
 
       // SETTLE (30% - 70%): Hold
 
-      // EXIT (70% - 100%)
-      scrollTl.fromTo(
-        cardRef.current,
-        { y: 0, rotateX: 0, scale: 1, opacity: 1 },
-        { y: '-40vh', rotateX: -12, scale: 0.92, opacity: 0, ease: 'power2.in' },
-        0.7
-      );
-
-      scrollTl.fromTo(
-        coinRef.current,
-        { x: 0, opacity: 0.35 },
-        { x: '-20vw', opacity: 0.1, ease: 'power2.in' },
-        0.7
-      );
+      scrollTl.to(cardRef.current, { scale: 0.985, ease: 'none' }, 0.72);
     }, section);
 
     return () => ctx.revert();
   }, [prefersReducedMotion]);
 
   const badges = [
-    { icon: Shield, label: 'PoW Security', color: 'text-solaris-gold', bg: 'bg-solaris-gold/10', border: 'border-solaris-gold/30', key: 'pow' as const },
-    { icon: Zap, label: 'DPoS Speed', color: 'text-solaris-cyan', bg: 'bg-solaris-cyan/10', border: 'border-solaris-cyan/30', key: 'dpos' as const },
-    { icon: Cpu, label: 'Sharded L1', color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/30', key: null },
+    {
+      icon: Shield,
+      label: tx.badgePow,
+      color: 'text-solaris-gold',
+      bg: 'bg-solaris-gold/10',
+      border: 'border-solaris-gold/30',
+      key: 'pow' as const,
+    },
+    {
+      icon: Zap,
+      label: tx.badgeDpos,
+      color: 'text-solaris-cyan',
+      bg: 'bg-solaris-cyan/10',
+      border: 'border-solaris-cyan/30',
+      key: 'dpos' as const,
+    },
+    {
+      icon: Cpu,
+      label: tx.badgeSharded,
+      color: 'text-emerald-400',
+      bg: 'bg-emerald-400/10',
+      border: 'border-emerald-400/30',
+      key: null,
+    },
   ];
 
   return (
@@ -163,9 +175,9 @@ const HybridEngineSection = () => {
               ref={titleRef}
               className="font-display font-bold text-[clamp(24px,3vw,40px)] text-solaris-text"
             >
-              <span className="word inline-block">The</span>{' '}
-              <span className="word inline-block text-gradient-gold">Hybrid</span>{' '}
-              <span className="word inline-block">Engine</span>
+              <span className="word inline-block">{tx.titleLead}</span>{' '}
+              <span className="word inline-block text-gradient-gold">{tx.titleAccent}</span>{' '}
+              {tx.titleTail ? <span className="word inline-block">{tx.titleTail}</span> : null}
             </h2>
           </div>
 
@@ -180,13 +192,18 @@ const HybridEngineSection = () => {
                     : 'bg-white/5 border-white/10 hover:border-solaris-gold/40'
                 }`}
                 onClick={() => setActiveNode(activeNode === 'pow' ? null : 'pow')}
+                type="button"
               >
                 <Shield className="w-6 h-6 text-solaris-gold mx-auto mb-2" />
-                <div className="font-mono text-sm text-solaris-gold font-semibold">PoW Layer</div>
-                <div className="text-solaris-muted text-xs mt-1">Bitcoin-grade security</div>
+                <div className="font-mono text-sm text-solaris-gold font-semibold">
+                  {tx.powLayerTitle}
+                </div>
+                <div className="text-solaris-muted text-xs mt-1">
+                  {tx.powLayerSubtitle}
+                </div>
                 {activeNode === 'pow' && (
                   <div className="mt-3 pt-3 border-t border-solaris-gold/20 text-xs text-solaris-muted text-left">
-                    SHA-256 proof-of-work provides immutable finality and censorship resistance on the base layer.
+                    {tx.powLayerDetail}
                   </div>
                 )}
               </button>
@@ -222,13 +239,18 @@ const HybridEngineSection = () => {
                     : 'bg-white/5 border-white/10 hover:border-solaris-cyan/40'
                 }`}
                 onClick={() => setActiveNode(activeNode === 'dpos' ? null : 'dpos')}
+                type="button"
               >
                 <Zap className="w-6 h-6 text-solaris-cyan mx-auto mb-2" />
-                <div className="font-mono text-sm text-solaris-cyan font-semibold">DPoS Layer</div>
-                <div className="text-solaris-muted text-xs mt-1">High-throughput execution (sharded)</div>
+                <div className="font-mono text-sm text-solaris-cyan font-semibold">
+                  {tx.dposLayerTitle}
+                </div>
+                <div className="text-solaris-muted text-xs mt-1">
+                  {tx.dposLayerSubtitle}
+                </div>
                 {activeNode === 'dpos' && (
                   <div className="mt-3 pt-3 border-t border-solaris-cyan/20 text-xs text-solaris-muted text-left">
-                    Delegated proof-of-stake enables fast finality and high throughput for parallel workloads.
+                    {tx.dposLayerDetail}
                   </div>
                 )}
               </button>

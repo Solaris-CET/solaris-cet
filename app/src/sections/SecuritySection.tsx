@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 import { ByzantineConsensusVisualization } from '@/components/ByzantineConsensusVisualization';
+import { useMemo } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import {
   PUBLIC_CYBERSCOPE_URL,
@@ -20,61 +21,63 @@ import {
   PUBLIC_WHITEPAPER_IPFS_URL,
 } from '@/lib/publicTrustLinks';
 
-// Static data defined outside component to avoid re-creation on every render
-const auditBadges = [
-  {
-    icon: FileSearch,
-    label: 'Cyberscope Audited',
-    description: 'Smart contract security audit completed',
-    color: 'gold',
-    link: PUBLIC_CYBERSCOPE_URL,
-    linkLabel: 'View Audit Report ↗',
-    linkColor: 'text-solaris-gold',
-  },
-  {
-    icon: CheckCircle,
-    label: 'Freshcoins Verified',
-    description: 'Project verification and due diligence',
-    color: 'cyan',
-    link: PUBLIC_FRESHCOINS_URL,
-    linkLabel: 'Freshcoins ↗',
-    linkColor: 'text-solaris-cyan',
-  },
-  {
-    icon: UserCheck,
-    label: 'KYC Completed',
-    description: 'Team identity verification',
-    color: 'emerald',
-    link: PUBLIC_WHITEPAPER_IPFS_URL,
-    linkLabel: 'See Whitepaper ↗',
-    linkColor: 'text-solaris-cyan',
-  },
-  {
-    icon: Code,
-    label: 'Open Source',
-    description: 'Fully transparent codebase',
-    color: 'purple',
-    link: 'https://github.com/Solaris-CET/solaris-cet',
-    linkLabel: 'GitHub repository ↗',
-    linkColor: 'text-purple-400',
-  },
-];
-
-const securityFeatures = [
-  { icon: Lock, text: 'No admin minting' },
-  { icon: Shield, text: 'No hidden proxies' },
-  { icon: Code, text: 'Code is law—published and reproducible' },
-];
-
-/** Compact trust signals for audit & security — converts assurance into scannable proof points */
-const trustSignalBadges = [
-  { icon: Sparkles, label: 'AI Audited', ring: 'ring-solaris-gold/25', iconClass: 'text-solaris-gold' },
-  { icon: BadgeCheck, label: 'TON Verified', ring: 'ring-solaris-cyan/25', iconClass: 'text-solaris-cyan' },
-  { icon: Anchor, label: 'RWA Anchored', ring: 'ring-emerald-400/25', iconClass: 'text-emerald-400' },
+const AUDIT_BADGE_BASE = [
+  { icon: FileSearch, color: 'gold', link: PUBLIC_CYBERSCOPE_URL, linkColor: 'text-solaris-gold' },
+  { icon: CheckCircle, color: 'cyan', link: PUBLIC_FRESHCOINS_URL, linkColor: 'text-solaris-cyan' },
+  { icon: UserCheck, color: 'emerald', link: PUBLIC_WHITEPAPER_IPFS_URL, linkColor: 'text-solaris-cyan' },
+  { icon: Code, color: 'purple', link: 'https://github.com/Solaris-CET/solaris-cet', linkColor: 'text-purple-400' },
 ] as const;
 
 const SecuritySection = () => {
   const { t } = useLanguage();
+  const tx = t.securityUi;
+
+  const auditBadges = useMemo(() => {
+    return [
+      {
+        ...AUDIT_BADGE_BASE[0],
+        label: tx.auditBadges.cyberscopeLabel,
+        description: tx.auditBadges.cyberscopeDesc,
+        linkLabel: tx.auditBadges.cyberscopeLinkLabel,
+      },
+      {
+        ...AUDIT_BADGE_BASE[1],
+        label: tx.auditBadges.freshcoinsLabel,
+        description: tx.auditBadges.freshcoinsDesc,
+        linkLabel: tx.auditBadges.freshcoinsLinkLabel,
+      },
+      {
+        ...AUDIT_BADGE_BASE[2],
+        label: tx.auditBadges.kycLabel,
+        description: tx.auditBadges.kycDesc,
+        linkLabel: tx.auditBadges.kycLinkLabel,
+      },
+      {
+        ...AUDIT_BADGE_BASE[3],
+        label: tx.auditBadges.openSourceLabel,
+        description: tx.auditBadges.openSourceDesc,
+        linkLabel: tx.auditBadges.openSourceLinkLabel,
+      },
+    ];
+  }, [tx.auditBadges]);
+
+  const securityFeatures = useMemo(() => {
+    return [
+      { icon: Lock, text: tx.securityFeatures.noAdminMinting },
+      { icon: Shield, text: tx.securityFeatures.noHiddenProxies },
+      { icon: Code, text: tx.securityFeatures.reproducibleCode },
+    ];
+  }, [tx.securityFeatures]);
+
+  const trustSignals = useMemo(
+    () =>
+      [
+        { icon: Sparkles, label: tx.trustBadges.aiAudited, ring: 'ring-solaris-gold/25', iconClass: 'text-solaris-gold' },
+        { icon: BadgeCheck, label: tx.trustBadges.tonVerified, ring: 'ring-solaris-cyan/25', iconClass: 'text-solaris-cyan' },
+        { icon: Anchor, label: tx.trustBadges.rwaAnchored, ring: 'ring-emerald-400/25', iconClass: 'text-emerald-400' },
+      ] as const,
+    [tx.trustBadges]
+  );
   return (
     <section
       id="security"
@@ -99,17 +102,17 @@ const SecuritySection = () => {
             </div>
 
             <h2 className="font-display font-bold text-[clamp(28px,3.5vw,44px)] text-solaris-text mb-4">
-              Security <span className="text-gradient-aurora">First</span>
+              {tx.titleLead} <span className="text-gradient-aurora">{tx.titleHighlight}</span>
             </h2>
 
             <p className="text-solaris-muted text-base lg:text-lg leading-relaxed mb-6">
-              <span className="text-solaris-gold font-semibold">Cyberscope audited</span>.{' '}
-              <span className="text-solaris-cyan font-semibold">Freshcoins verified</span>.{' '}
-              <span className="text-emerald-400 font-semibold">KYC completed</span>.
+              <span className="text-solaris-gold font-semibold">{tx.proofCyberscope}</span>.{' '}
+              <span className="text-solaris-cyan font-semibold">{tx.proofFreshcoins}</span>.{' '}
+              <span className="text-emerald-400 font-semibold">{tx.proofKyc}</span>.
             </p>
 
             <p className="text-solaris-muted text-base leading-relaxed mb-8">
-              Our commitment to transparency means no admin minting, no hidden proxies, and complete code reproducibility.
+              {tx.transparencyBody}
             </p>
 
             {/* Security features list */}
@@ -135,10 +138,10 @@ const SecuritySection = () => {
               aria-label={t.sectionAria.trustSignals}
             >
               <span className="text-solaris-muted text-[10px] font-mono uppercase tracking-[0.2em] shrink-0">
-                Trust signals
+                {tx.trustSignalsLabel}
               </span>
               <ScrollStaggerFadeUp className="flex flex-wrap items-center gap-2 sm:gap-3 sm:justify-end">
-                {trustSignalBadges.map(({ icon: Icon, label, ring, iconClass }) => (
+                {trustSignals.map(({ icon: Icon, label, ring, iconClass }) => (
                   <div
                     key={label}
                     className={`inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-solaris-text shadow-depth ring-1 ${ring} transition-colors hover:border-white/20`}
@@ -156,14 +159,14 @@ const SecuritySection = () => {
             <div className="bento-card p-6 mb-10 flex flex-col md:flex-row items-center gap-6 border border-solaris-gold/30">
               <div className="shrink-0 text-center">
                 <div className="font-display font-black text-6xl text-solaris-gold leading-none">A+</div>
-                <div className="hud-label text-[10px] mt-1">SECURITY RATING</div>
+                <div className="hud-label text-[10px] mt-1">{tx.ratingLabel}</div>
               </div>
               <div className="flex-1 space-y-3">
                 {[
-                  { label: 'Smart Contract', score: 100 },
-                  { label: 'KYC Verification', score: 100 },
-                  { label: 'Audit Coverage', score: 100 },
-                  { label: 'Open Source', score: 100 },
+                  { label: tx.scoreLabels.smartContract, score: 100 },
+                  { label: tx.scoreLabels.kycVerification, score: 100 },
+                  { label: tx.scoreLabels.auditCoverage, score: 100 },
+                  { label: tx.scoreLabels.openSource, score: 100 },
                 ].map(({ label, score }) => (
                   <div key={label}>
                     <div className="flex justify-between text-xs mb-1">
@@ -218,7 +221,7 @@ const SecuritySection = () => {
                     href={badge.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`text-xs hover:opacity-80 transition-opacity mt-1 ${badge.linkColor}`}
+                    className={`text-xs hover:opacity-90 transition-opacity mt-1 ${badge.linkColor} btn-quantum`}
                   >
                     {badge.linkLabel}
                   </a>

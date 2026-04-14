@@ -6,20 +6,10 @@ import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { SolarisLogoMark } from '../components/SolarisLogoMark';
 import AppImage from '../components/AppImage';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { useLanguage } from '../hooks/useLanguage';
 
 
-// Static data defined outside component to avoid re-creation on every render
-const tickerItems = [
-  { label: 'Hashrate', value: '14.2 TH/s', icon: TrendingUp },
-  { label: 'Earnings', value: '0.0041 CET / hr', icon: Droplets },
-  { label: 'Uptime', value: '99.97%', icon: Battery },
-  { label: 'Next Payout', value: '00:14:22', icon: Clock },
-  { label: 'Task agents', value: '200,000+', icon: Battery },
-  { label: 'Miners Active', value: '18,420', icon: TrendingUp },
-];
-
-// Pre-build the doubled ticker array once to avoid array spread on every render
-const doubledTickerItems = [...tickerItems, ...tickerItems];
+type TickerItem = { label: string; value: string; icon: typeof TrendingUp };
 
 const NovaAppSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -27,6 +17,19 @@ const NovaAppSection = () => {
   const textPanelRef = useRef<HTMLDivElement>(null);
   const tickerRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
+  const { t } = useLanguage();
+  const tx = t.novaAppUi;
+
+  const tickerItems: TickerItem[] = [
+    { label: tx.ticker.hashrate, value: '14.2 TH/s', icon: TrendingUp },
+    { label: tx.ticker.earnings, value: '0.0041 CET / hr', icon: Droplets },
+    { label: tx.ticker.uptime, value: '99.97%', icon: Battery },
+    { label: tx.ticker.nextPayout, value: '00:14:22', icon: Clock },
+    { label: tx.ticker.taskAgents, value: '200,000+', icon: Battery },
+    { label: tx.ticker.minersActive, value: '18,420', icon: TrendingUp },
+  ];
+
+  const doubledTickerItems = [...tickerItems, ...tickerItems];
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -45,7 +48,7 @@ const NovaAppSection = () => {
         scrollTrigger: {
           trigger: section,
           start: 'top top',
-          end: '+=130%',
+          end: '+=70%',
           pin: true,
           scrub: 0.5,
         },
@@ -75,27 +78,7 @@ const NovaAppSection = () => {
 
       // SETTLE (30% - 70%): Hold
 
-      // EXIT (70% - 100%)
-      scrollTl.fromTo(
-        phoneRef.current,
-        { y: 0, opacity: 1 },
-        { y: '-30vh', opacity: 0, ease: 'power2.in' },
-        0.7
-      );
-
-      scrollTl.fromTo(
-        textPanelRef.current,
-        { x: 0, opacity: 1 },
-        { x: '18vw', opacity: 0, ease: 'power2.in' },
-        0.7
-      );
-
-      scrollTl.fromTo(
-        tickerRef.current,
-        { opacity: 1 },
-        { opacity: 0, ease: 'power2.in' },
-        0.75
-      );
+      scrollTl.to([phoneRef.current, textPanelRef.current], { scale: 0.99, ease: 'none' }, 0.72);
     }, section);
 
     return () => ctx.revert();
@@ -158,19 +141,21 @@ const NovaAppSection = () => {
                     <TrendingUp className="w-8 h-8 text-solaris-gold" />
                   </div>
                   <div className="text-center">
-                    <div className="hud-label mb-1">Mining</div>
-                    <div className="font-display font-bold text-2xl text-solaris-gold">Active</div>
+                    <div className="hud-label mb-1">{tx.miningLabel}</div>
+                    <div className="font-display font-bold text-2xl text-solaris-gold">
+                      {tx.miningActive}
+                    </div>
                   </div>
                 </div>
 
                 {/* Stats */}
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3 rounded-lg bg-white/5">
-                    <span className="text-solaris-muted text-sm">Hashrate</span>
+                    <span className="text-solaris-muted text-sm">{tx.ticker.hashrate}</span>
                     <span className="font-mono text-solaris-gold">14.2 TH/s</span>
                   </div>
                   <div className="flex justify-between items-center p-3 rounded-lg bg-white/5">
-                    <span className="text-solaris-muted text-sm">Earned Today</span>
+                    <span className="text-solaris-muted text-sm">{tx.earnedToday}</span>
                     <span className="font-mono text-solaris-text">0.098 CET</span>
                   </div>
                 </div>
@@ -190,34 +175,28 @@ const NovaAppSection = () => {
             <div className="solaris-icon-glow h-10 w-10 shrink-0 overflow-hidden rounded-lg">
               <SolarisLogoMark className="h-full w-full" />
             </div>
-            <span className="hud-label text-solaris-gold">Mobile Mining</span>
+            <span className="hud-label text-solaris-gold">{tx.kicker}</span>
           </div>
 
           <h2 className="font-display font-bold text-[clamp(22px,2.5vw,36px)] text-solaris-text mb-4">
-            Solaris <span className="text-gradient-gold">CET</span> App
+            {tx.titleLead} <span className="text-gradient-gold">{tx.titleToken}</span> {tx.titleTail}
           </h2>
 
           <div className="space-y-4 mb-6">
-            <p className="text-solaris-muted text-sm lg:text-base leading-relaxed">
-              Mine <span className="text-solaris-gold font-semibold">CET</span> from your smartphone{' '}
-              <span className="text-solaris-text font-medium">with minimal battery impact</span>.
-              Mining suspends automatically when the app is in the background.
-            </p>
-            <p className="text-solaris-muted text-sm lg:text-base leading-relaxed">
-              <span className="text-solaris-cyan font-semibold">Liquid staking</span> converts rewards into sCET—so you stay liquid while earning. Powered by the TON blockchain and High-Intelligence AI protocols.
-            </p>
+            <p className="text-solaris-muted text-sm lg:text-base leading-relaxed">{tx.body1}</p>
+            <p className="text-solaris-muted text-sm lg:text-base leading-relaxed">{tx.body2}</p>
           </div>
 
           {/* Feature badges */}
           <div className="flex flex-wrap gap-2">
             <div className="px-3 py-1.5 rounded-lg bg-solaris-gold/10 border border-solaris-gold/20">
-              <span className="text-xs text-solaris-gold font-medium">Universal Mining</span>
+              <span className="text-xs text-solaris-gold font-medium">{tx.badgeUniversalMining}</span>
             </div>
             <div className="px-3 py-1.5 rounded-lg bg-solaris-cyan/10 border border-solaris-cyan/20">
-              <span className="text-xs text-solaris-cyan font-medium">Liquid Staking</span>
+              <span className="text-xs text-solaris-cyan font-medium">{tx.badgeLiquidStaking}</span>
             </div>
             <div className="px-3 py-1.5 rounded-lg bg-emerald-400/10 border border-emerald-400/20">
-              <span className="text-xs text-emerald-400 font-medium">90% Battery Savings</span>
+              <span className="text-xs text-emerald-400 font-medium">{tx.badgeBatterySavings}</span>
             </div>
           </div>
         </div>

@@ -84,7 +84,8 @@ function useCountUpValue(target: number, start: boolean, durationMs: number, pre
  * Total supply: 9,000 CET — shown in the donut center.
  */
 const TokenomicsChart = () => {
-  const { lang } = useLanguage();
+  const { t, lang } = useLanguage();
+  const tx = t.tokenomicsUi;
   const prefersReducedMotion = useReducedMotion();
   const { elementRef, isVisible } = useIntersectionObserver({ threshold: 0.25, freezeOnceVisible: true });
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -129,7 +130,7 @@ const TokenomicsChart = () => {
   return (
     <section
       ref={elementRef as unknown as React.RefObject<HTMLElement>}
-      aria-label={lang === 'ro' ? 'Tokenomics: distribuție' : 'Tokenomics: distribution'}
+      aria-label={tx.chartAria}
       className={`bento-card p-6 border border-solaris-gold/20 shadow-depth ${BENTO_TILE_INTERACTION} motion-safe:transition-all motion-safe:duration-700 ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       }`}
@@ -140,33 +141,33 @@ const TokenomicsChart = () => {
             <Coins className="w-3.5 h-3.5 text-solaris-gold" aria-hidden />
           </div>
           <span className="hud-label text-solaris-gold text-[10px]">
-            {lang === 'ro' ? 'DISTRIBUȚIE TOKEN · 9,000 CET' : 'TOKEN DISTRIBUTION · 9,000 CET'}
+            {tx.chartKicker}
           </span>
         </div>
         <div className="hidden sm:flex items-center gap-2 text-[10px] font-mono text-solaris-muted">
           <span className="inline-flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden />
-            {lang === 'ro' ? 'reveal la scroll' : 'scroll reveal'}
+            {tx.chartScrollReveal}
           </span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
         <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
-          <div className="text-[10px] font-mono text-solaris-muted">{lang === 'ro' ? 'TOTAL SUPPLY' : 'TOTAL SUPPLY'}</div>
+          <div className="text-[10px] font-mono text-solaris-muted">{tx.chartStatTotalSupply}</div>
           <div className="mt-1 font-mono tabular-nums text-lg font-bold text-solaris-gold">
             {supply.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: TOKEN_DECIMALS })}
             <span className="ml-1 text-xs text-solaris-gold/70">CET</span>
           </div>
         </div>
         <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
-          <div className="text-[10px] font-mono text-solaris-muted">{lang === 'ro' ? 'BURNED' : 'BURNED'}</div>
+          <div className="text-[10px] font-mono text-solaris-muted">{tx.chartStatBurned}</div>
           <div className="mt-1 font-mono tabular-nums text-lg font-bold text-rose-300">
             {burned.toLocaleString(undefined, { maximumFractionDigits: 2 })}%
           </div>
         </div>
         <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
-          <div className="text-[10px] font-mono text-solaris-muted">{lang === 'ro' ? 'HOLDERI' : 'HOLDERS'}</div>
+          <div className="text-[10px] font-mono text-solaris-muted">{tx.chartStatHolders}</div>
           <div className="mt-1 font-mono tabular-nums text-lg font-bold text-cyan-200">
             {holders.toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </div>
@@ -174,9 +175,7 @@ const TokenomicsChart = () => {
       </div>
 
       <div className="mb-6 text-[10px] text-solaris-muted font-mono">
-        {lang === 'ro'
-          ? 'Notă: Burned și Holderi sunt valori configurabile (actualizează-le din datele tokenomics).'
-          : 'Note: Burned and Holders are configurable values (update them in tokenomics data).'}
+        {tx.chartConfigNote}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -230,7 +229,7 @@ const TokenomicsChart = () => {
                 {TOKENOMICS_TOTAL_SUPPLY_CET.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: TOKEN_DECIMALS })}
               </div>
               <div className="text-solaris-gold/60 text-[10px] font-mono tracking-widest font-bold">
-                {lang === 'ro' ? 'TOTAL SUPPLY' : 'TOTAL SUPPLY'}
+                {tx.chartCenterLabel}
               </div>
             </div>
           </div>
@@ -269,15 +268,7 @@ const TokenomicsChart = () => {
                             type="button"
                             className="h-7 w-7 rounded-lg border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] transition-colors inline-flex items-center justify-center"
                             onClick={() => toggleHidden(entry.id)}
-                            aria-label={
-                              isHidden
-                                ? lang === 'ro'
-                                  ? 'Afișează categorie'
-                                  : 'Show category'
-                                : lang === 'ro'
-                                  ? 'Ascunde categorie'
-                                  : 'Hide category'
-                            }
+                            aria-label={isHidden ? tx.chartShowCategory : tx.chartHideCategory}
                           >
                             {isHidden ? (
                               <Eye className="w-3.5 h-3.5 text-solaris-muted" aria-hidden />
@@ -315,7 +306,7 @@ const TokenomicsChart = () => {
           {selected ? (
             <div className="mt-4 rounded-xl border border-fuchsia-500/15 bg-fuchsia-500/[0.03] px-4 py-3">
               <div className="text-[10px] font-mono text-fuchsia-200/80">
-                {lang === 'ro' ? 'SELECTAT' : 'SELECTED'}
+                {tx.chartSelected}
               </div>
               <div className="mt-1 flex items-center justify-between gap-3">
                 <div className="text-sm font-semibold text-solaris-text">{selected.name}</div>

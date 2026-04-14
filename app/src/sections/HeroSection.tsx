@@ -216,14 +216,14 @@ const HeroSection: React.FC = () => {
             </div>
 
             <h1 className="font-display text-white leading-[1.02] tracking-[-0.04em] mb-5 drop-shadow-2xl type-h1">
-              Primul Token RWA Ancorat în{' '}
-              <span className="text-gradient-gold">Cetățuia României</span>
+              Primul token RWA ancorat în{' '}
+              <span className="text-gradient-aurora">Cetățuia României</span>
               <span className="text-solaris-gold"> — 9,000 CET.</span>
-              <span className="block text-white">Imuabil.</span>
+              <span className="block text-white">Imutabil.</span>
             </h1>
             
-            <p className="type-body text-slate-200/90 max-w-2xl font-medium mb-10 text-balance px-4">
-              Activ real. Supply fix. Lichiditate on-chain. Un token care nu se confundă cu mii de copieri.
+            <p className="type-body text-slate-100/90 max-w-2xl font-medium mb-10 text-balance px-4">
+              Activ real. Supply fix. Lichiditate on-chain. Un token care nu se confundă cu mii de imitații.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-10 sm:mb-12 w-full sm:w-auto px-4">
@@ -305,7 +305,7 @@ const HeroSection: React.FC = () => {
               <a
                 href={DEDUST_SWAP_URL}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-solaris-text text-sm font-semibold hover:bg-white/10 transition-colors btn-quantum"
               >
                 DeDust

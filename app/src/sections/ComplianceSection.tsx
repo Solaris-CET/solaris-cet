@@ -9,6 +9,7 @@ import { useLanguage } from '../hooks/useLanguage';
 
 const ComplianceSection = () => {
   const { t } = useLanguage();
+  const tx = t.complianceUi;
   const sectionRef = useRef<HTMLDivElement>(null);
   const leftCardRef = useRef<HTMLDivElement>(null);
   const rightCardRef = useRef<HTMLDivElement>(null);
@@ -32,7 +33,7 @@ const ComplianceSection = () => {
         scrollTrigger: {
           trigger: section,
           start: 'top top',
-          end: '+=130%',
+          end: '+=70%',
           pin: true,
           scrub: 0.5,
         },
@@ -65,29 +66,7 @@ const ComplianceSection = () => {
 
       // SETTLE (30% - 70%): Hold
 
-      // EXIT (70% - 100%)
-      scrollTl.fromTo(
-        leftCardRef.current,
-        { x: 0, opacity: 1 },
-        { x: '-18vw', opacity: 0, ease: 'power2.in' },
-        0.7
-      );
-
-      scrollTl.fromTo(
-        rightCardRef.current,
-        { x: 0, opacity: 1 },
-        { x: '18vw', opacity: 0, ease: 'power2.in' },
-        0.7
-      );
-
-      if (badges) {
-        scrollTl.fromTo(
-          badges,
-          { opacity: 1 },
-          { opacity: 0, ease: 'power2.in' },
-          0.75
-        );
-      }
+      scrollTl.to([leftCardRef.current, rightCardRef.current], { scale: 0.99, ease: 'none' }, 0.72);
     }, section);
 
     return () => ctx.revert();
@@ -122,29 +101,27 @@ const ComplianceSection = () => {
           </div>
 
           <h2 className="font-display font-bold text-[clamp(22px,2.5vw,36px)] text-solaris-text mb-4">
-            Compliance <span className="text-emerald-400">& Enterprise</span>
+            {tx.titleLead} <span className="text-emerald-400">{tx.titleAccent}</span>
           </h2>
 
           <div className="space-y-5">
             <div className="p-4 rounded-xl bg-emerald-400/5 border border-emerald-400/20">
               <div className="flex items-center gap-2 mb-2">
                 <FileCheck className="w-4 h-4 text-emerald-400" />
-                <span className="font-semibold text-solaris-text text-sm">EU AI Act Ready</span>
+                <span className="font-semibold text-solaris-text text-sm">{tx.cardAuditTitle}</span>
               </div>
               <p className="text-solaris-muted text-sm leading-relaxed">
-                Native audit trails through on-chain{' '}
-                <span className="text-emerald-400 font-medium">Reasoning Traces</span>—every AI decision is verifiable and auditable.
+                {tx.cardAuditBody}
               </p>
             </div>
 
             <div className="p-4 rounded-xl bg-solaris-cyan/5 border border-solaris-cyan/20">
               <div className="flex items-center gap-2 mb-2">
                 <Globe className="w-4 h-4 text-solaris-cyan" />
-                <span className="font-semibold text-solaris-text text-sm">Managed Data Planes</span>
+                <span className="font-semibold text-solaris-text text-sm">{tx.cardDataTitle}</span>
               </div>
               <p className="text-solaris-muted text-sm leading-relaxed">
-                <span className="text-solaris-cyan font-medium">Sovereign AI infrastructure</span>{' '}
-                that keeps data local while control is global.
+                {tx.cardDataBody}
               </p>
             </div>
           </div>

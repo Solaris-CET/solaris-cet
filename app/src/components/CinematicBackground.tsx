@@ -2,16 +2,50 @@ import { useEffect, useMemo, useState } from 'react';
 import AppImage from '@/components/AppImage';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
-const CINEMATIC_VIDEO_URL = 'https://cdn.coverr.co/videos/coverr-earth-from-space-5178/1080p.mp4';
+const VIDEO_CANDIDATES = ['/cinematic/cosmic-loop.webm', '/cinematic/cosmic-loop.mp4'];
 
-const CINEMATIC_POSTER_URL =
-  'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=ultra%20realistic%20cinematic%20space%20catastrophe%2C%20two%20planets%20colliding%2C%20glowing%20shockwave%20ring%2C%20debris%20field%2C%20volumetric%20nebula%2C%20cyan%20teal%20and%20violet%20highlights%2C%20deep%20black%20space%2C%20anamorphic%20lens%20flare%2C%20subtle%20film%20grain%2C%20high%20detail%2C%2016%3A9%2C%20no%20text%2C%20no%20watermark&image_size=landscape_16_9';
+const POSTER_CANDIDATES = ['/cinematic/cosmic-poster.jpg', '/cinematic/cosmic-poster.webp', '/og-image.png'];
 
 const GLYPH_LINES = [
   '∑ ψ(x) e^{iθ} · 量子 · क्वांटम · квант · 量子纠缠 · ⟂ ⊗ ⟂ · ∫ dt · ϕ(t) → ∞',
   'ΛCDM · Ω_m · Ω_Λ · v/c · ΣΔ · 統計 · गणित · αβγ · δt · ⟨0|H|1⟩ · ΔEΔt ≥ ħ/2',
   'FRAME SHIFT · 視点変更 · تغيير زاوية · zmiana perspektywy · 測地線 · Δψ · ρ(x,t)',
 ];
+
+function useFirstAvailableAsset(candidates: string[]) {
+  const [url, setUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    let alive = true;
+    const controller = new AbortController();
+
+    const pick = async () => {
+      for (const candidate of candidates) {
+        try {
+          const res = await fetch(candidate, { method: 'HEAD', cache: 'no-store', signal: controller.signal });
+          if (!alive) return;
+          if (res.ok) {
+            setUrl(candidate);
+            return;
+          }
+        } catch {
+          void 0;
+        }
+      }
+      if (alive) setUrl(null);
+    };
+
+    void pick();
+    return () => {
+      alive = false;
+      controller.abort();
+    };
+  }, [candidates]);
+
+  return url;
+}
 
 function useCinematicEligibility(reduceMotion: boolean) {
   const [eligible, setEligible] = useState(false);
@@ -46,6 +80,8 @@ export function CinematicBackground() {
   const reduceMotion = useReducedMotion();
   const canUseVideo = useCinematicEligibility(reduceMotion);
   const [videoReady, setVideoReady] = useState(false);
+  const posterUrl = useFirstAvailableAsset(POSTER_CANDIDATES);
+  const videoUrl = useFirstAvailableAsset(VIDEO_CANDIDATES);
 
   const glyphText = useMemo(() => {
     const all = GLYPH_LINES.join('   ·   ');
@@ -55,14 +91,14 @@ export function CinematicBackground() {
   return (
     <div className="cinematic-bg" aria-hidden>
       <AppImage
-        src={CINEMATIC_POSTER_URL}
+        src={posterUrl ?? '/og-image.png'}
         alt=""
         className="cinematic-poster"
         loading="eager"
         decoding="async"
       />
 
-      {canUseVideo ? (
+      {canUseVideo && videoUrl ? (
         <video
           className={videoReady ? 'cinematic-video is-ready' : 'cinematic-video'}
           autoPlay
@@ -70,10 +106,10 @@ export function CinematicBackground() {
           loop
           playsInline
           preload="metadata"
-          poster={CINEMATIC_POSTER_URL}
+          poster={posterUrl ?? '/og-image.png'}
           onCanPlay={() => setVideoReady(true)}
         >
-          <source src={CINEMATIC_VIDEO_URL} type="video/mp4" />
+          <source src={videoUrl} type={videoUrl.endsWith('.webm') ? 'video/webm' : 'video/mp4'} />
         </video>
       ) : null}
 

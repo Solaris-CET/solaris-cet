@@ -201,6 +201,548 @@ export interface Translations {
     /** Trust pillars — authority & conversion (Vibe Founder playbook). */
     authorityTrust: string;
   };
+  rwaUi: {
+    map: {
+      ariaLabel: string;
+      controlsAria: string;
+      zoomInAria: string;
+      zoomOutAria: string;
+      resetAria: string;
+      resetLabel: string;
+      selectionAria: string;
+      selectProjectAria: string;
+      infoNote: string;
+      helpLine: string;
+    };
+    timeline: {
+      ariaLabel: string;
+      title: string;
+      subtitle: string;
+      legendComplete: string;
+      legendActive: string;
+      legendPlanned: string;
+    };
+    documents: {
+      ariaLabel: string;
+      title: string;
+      subtitle: string;
+      searchSr: string;
+      searchPlaceholder: string;
+      filterSr: string;
+      filterAll: string;
+      filterWhitepaper: string;
+      filterAudit: string;
+      filterIpfs: string;
+      filterRegistry: string;
+      filterTimeline: string;
+      typeWhitepaper: string;
+      typeAudit: string;
+      typeIpfs: string;
+      typeRegistry: string;
+      typeTimeline: string;
+      preview: string;
+      download: string;
+      empty: string;
+    };
+  };
+  rwaSectionUi: {
+    kicker: string;
+    titleLead: string;
+    titleAccent: string;
+    subtitle: string;
+    physicalKicker: string;
+    physicalHeadingLead: string;
+    physicalHeadingAccent: string;
+    physicalHeadingTail: string;
+    physicalBodyPrefix: string;
+    physicalLocationName: string;
+    physicalBodySuffix: string;
+    physicalQuote: string;
+    chipTonContract: string;
+    chipDedustPool: string;
+    chipIpfsProof: string;
+    asideAria: string;
+    asideRegion: string;
+    asideType: string;
+    asideJumpDocs: string;
+    asideJumpTimeline: string;
+    asideProofBundle: string;
+    asideMapOpen: string;
+    asideMapTitlePrefix: string;
+    asideNoSelection: string;
+    verifiedKicker: string;
+    verifiedBody: string;
+    verifiedCta: string;
+  };
+  ecosystemIndexUi: {
+    kicker: string;
+    titleLead: string;
+    titleAccent: string;
+    titleTail: string;
+    subtitle: string;
+    uniqueKicker: string;
+    uniqueBodyPrefix: string;
+    uniqueTokenName: string;
+    uniqueBodySuffix: string;
+    featuredKicker: string;
+    featuredBody: string;
+    projectsUnit: string;
+    categories: {
+      l1: string;
+      stablecoin: string;
+      ai: string;
+      defi: string;
+      meme: string;
+      other: string;
+    };
+  };
+  howToBuyUi: {
+    kicker: string;
+    titleLead: string;
+    titleToken: string;
+    titleTail: string;
+    subtitle: string;
+    trustBadges: {
+      audit: string;
+      kyc: string;
+      freshcoins: string;
+      openSource: string;
+    };
+    contractTitle: string;
+    contractSubtitle: string;
+    copyIdle: string;
+    copyCopied: string;
+    copyFailed: string;
+    swapCta: string;
+    steps: {
+      walletTitle: string;
+      walletDescription: string;
+      walletCta: string;
+      fundTitle: string;
+      fundDescription: string;
+      swapTitle: string;
+      swapDescription: string;
+      swapCta: string;
+    };
+  };
+  tokenomicsUi: {
+    pillMining: string;
+    pillTeam: string;
+    aiReason: string;
+    aiAct: string;
+    aiVerify: string;
+    minedLabel: string;
+    dedustTitle: string;
+    dcbmTitle: string;
+    dcbmBody: string;
+    scientificStability: string;
+    gridLaunchType: string;
+    gridMiningPeriod: string;
+    gridVolatility: string;
+    gridTargetVal: string;
+    gridMiningPeriodValue: string;
+    chartAria: string;
+    chartKicker: string;
+    chartScrollReveal: string;
+    chartStatTotalSupply: string;
+    chartStatBurned: string;
+    chartStatHolders: string;
+    chartNote: string;
+    chartConfigNote: string;
+    chartCenterLabel: string;
+    chartShowCategory: string;
+    chartHideCategory: string;
+    chartSelected: string;
+  };
+  footerUi: {
+    waitlistAdded: string;
+    waitlistUnavailable: string;
+    mailtoSubject: string;
+    mailtoBody: string;
+    kicker: string;
+    headlineLead: string;
+    headlineAccent: string;
+    headlineTail: string;
+    subtitle: string;
+    ctaTelegramMining: string;
+    ctaWhitepaper: string;
+    founderRole: string;
+    founderBio: string;
+    contractLabel: string;
+    communityKicker: string;
+    communityBody: string;
+    communityMeta: string;
+    ctaTelegramChannel: string;
+    ctaMiningBot: string;
+    emailWaitlistKicker: string;
+    emailWaitlistBody: string;
+    emailWaitlistFallback: string;
+    emailPlaceholder: string;
+    emailAria: string;
+    emailSending: string;
+    emailNotify: string;
+    copyrightBridge: string;
+    copyrightRights: string;
+    liveOnTon: string;
+    architectedBy: string;
+  };
+  novaAppUi: {
+    ticker: {
+      hashrate: string;
+      earnings: string;
+      uptime: string;
+      nextPayout: string;
+      taskAgents: string;
+      minersActive: string;
+    };
+    miningLabel: string;
+    miningActive: string;
+    earnedToday: string;
+    kicker: string;
+    titleLead: string;
+    titleToken: string;
+    titleTail: string;
+    body1: string;
+    body2: string;
+    badgeUniversalMining: string;
+    badgeLiquidStaking: string;
+    badgeBatterySavings: string;
+  };
+  competitionUi: {
+    numberLocale: string;
+    tpsHigh: string;
+    tpsVaries: string;
+    tpsL1L2Dependent: string;
+    marginalVariable: string;
+    agentsMarketplace: string;
+    agentsSubnetMiners: string;
+    agentsDataAgents: string;
+    chainCustom: string;
+    chainMulti: string;
+    simulatedSuffix: string;
+  };
+  highIntelligenceUi: {
+    kicker: string;
+    titleLead: string;
+    titleAccent: string;
+    titleTail: string;
+    subtitle: string;
+    cards: {
+      reactDesc: string;
+      quantumDesc: string;
+      braidDesc: string;
+    };
+    neural: {
+      title: string;
+      statusProcessing: string;
+      statusReady: string;
+      prompt: string;
+      placeholder: string;
+      run: string;
+      activateHint: string;
+      completeLine: string;
+      defaultQuestion: string;
+    };
+    quantum: {
+      statusCollapsed: string;
+      statusCollapsing: string;
+      statusSuperposition: string;
+      desc: string;
+      bitsLabel: string;
+      entropyKeyLabel: string;
+      keyBody: string;
+      collapseIdle: string;
+      collapseInProgress: string;
+      collapseDone: string;
+    };
+    reasoning: {
+      observePrice: string;
+      observeMining: string;
+      observeAi: string;
+      observeTon: string;
+      observeDefault: string;
+      thinkPrice: string;
+      thinkMining: string;
+      thinkAi: string;
+      thinkTon: string;
+      thinkDefault: string;
+      planPrice: string;
+      planMining: string;
+      planAi: string;
+      planTon: string;
+      planDefault: string;
+      actPrice: string;
+      actMining: string;
+      actAi: string;
+      actTon: string;
+      actDefault: string;
+      verifyPrice: string;
+      verifyMining: string;
+      verifyAi: string;
+      verifyTon: string;
+      verifyDefault: string;
+    };
+  };
+  hybridEngineUi: {
+    titleLead: string;
+    titleAccent: string;
+    titleTail: string;
+    badgePow: string;
+    badgeDpos: string;
+    badgeSharded: string;
+    powLayerTitle: string;
+    powLayerSubtitle: string;
+    powLayerDetail: string;
+    dposLayerTitle: string;
+    dposLayerSubtitle: string;
+    dposLayerDetail: string;
+  };
+  intelligenceCoreUi: {
+    aiIntegrationLabel: string;
+    titleLead: string;
+    titleAccent: string;
+    titleTail: string;
+    reactSentence: string;
+    resultSentence: string;
+    metricTraceLabel: string;
+    metricTraceSub: string;
+    metricVerifyLabel: string;
+    metricVerifySub: string;
+    metricIterationSub: string;
+    braidLabel: string;
+    braidDesc: string;
+    terminalTitle: string;
+    terminalActive: string;
+    reasoningTraceLabel: string;
+    decisionLoopsLabel: string;
+    chipThought: string;
+    chipAction: string;
+    chipObservation: string;
+    reactSteps: string[];
+  };
+  complianceUi: {
+    titleLead: string;
+    titleAccent: string;
+    cardAuditTitle: string;
+    cardAuditBody: string;
+    cardDataTitle: string;
+    cardDataBody: string;
+  };
+  agenticEngineUi: {
+    kicker: string;
+    headlineBefore: string;
+    headlineHighlight: string;
+    headlineAfter: string;
+    paragraph: string;
+    trainingKicker: string;
+    trainingBody: string;
+  };
+  hierarchyGraphUi: {
+    title: string;
+    render: string;
+    rendered: string;
+    clipboardUnavailable: string;
+    graphCopied: string;
+    copyFailed: string;
+    ariaCopyGraph: string;
+    ariaOpenMermaid: string;
+    graphUnavailable: string;
+    renderOptional: string;
+    source: string;
+    expand: string;
+    collapse: string;
+    localUserAsks: string;
+    localIsWalletConnected: string;
+    localShowBalance: string;
+    localShowConnect: string;
+    localNextActions: string;
+    localLinks: string;
+  };
+  resourcesUi: {
+    kicker: string;
+    titleLead: string;
+    titleHighlight: string;
+    titleTail: string;
+    subtitle: string;
+    quickLinks: {
+      buyCet: string;
+      whitepaper: string;
+      github: string;
+      telegram: string;
+      cetContract: string;
+    };
+    categories: {
+      market: {
+        label: string;
+        title: string;
+        resources: {
+          coinGeckoDescription: string;
+          coinMarketCapDescription: string;
+          dedustDescription: string;
+          dexScreenerDescription: string;
+        };
+      };
+      ecosystem: {
+        label: string;
+        title: string;
+        resources: {
+          tonFoundationDescription: string;
+          tonkeeperDescription: string;
+          tonscanDescription: string;
+          tonviewerDescription: string;
+        };
+      };
+      research: {
+        label: string;
+        title: string;
+        resources: {
+          messariDescription: string;
+          coindeskDescription: string;
+          whitepaperName: string;
+          whitepaperDescription: string;
+        };
+      };
+      ai: {
+        label: string;
+        title: string;
+        resources: {
+          agentsBeginnersName: string;
+          agentsBeginnersDescription: string;
+          hfAgentsName: string;
+          hfAgentsDescription: string;
+          promptGuideName: string;
+          promptGuideDescription: string;
+          githubName: string;
+          githubDescription: string;
+        };
+      };
+    };
+  };
+  networkPulseUi: {
+    kicker: string;
+    titleLead: string;
+    titleHighlight: string;
+    titleTail: string;
+    subtitle: string;
+    mainnetBlockLabel: string;
+    stats: {
+      blocksProcessed: { label: string; description: string };
+      transactions: { label: string; description: string };
+      validatorsActive: { label: string; description: string };
+      agentActions: { label: string; description: string };
+      countriesReached: { label: string; description: string };
+      uptime: { label: string; description: string };
+    };
+    footnote: string;
+  };
+  whitepaperUi: {
+    kicker: string;
+    headlineHighlight: string;
+    intro: string;
+    metaReadMinutes: string;
+    tags: string[];
+    archiveKicker: string;
+    archiveTitle: string;
+    archiveBody: string;
+    downloadLabel: string;
+  };
+  aiTeamUi: {
+    kicker: string;
+    headlineLead: string;
+    headlineHighlight: string;
+    intro: string;
+    totalWorkforceLabel: string;
+    totalWorkforceSub: string;
+    departmentsLabel: string;
+    departmentsSub: string;
+    uptimeLabel: string;
+    uptimeSub: string;
+    agentsLabel: string;
+    curatedGenesLabel: string;
+    liveActivityKicker: string;
+    competitiveParityKicker: string;
+    competitiveParityLead: string;
+    competitiveParityHighlight: string;
+    competitiveParityTail: string;
+  };
+  roadmapUi: {
+    kicker: string;
+    titleLead: string;
+    titleHighlight: string;
+    titleTail: string;
+    subtitle: string;
+    overallProgressLabel: string;
+    phasesCompleteLabel: string;
+    activeUpcomingLabel: string;
+    nowLine: string;
+    status: { done: string; active: string; upcoming: string };
+  };
+  securityUi: {
+    titleLead: string;
+    titleHighlight: string;
+    proofCyberscope: string;
+    proofFreshcoins: string;
+    proofKyc: string;
+    transparencyBody: string;
+    trustSignalsLabel: string;
+    ratingLabel: string;
+    scoreLabels: {
+      smartContract: string;
+      kycVerification: string;
+      auditCoverage: string;
+      openSource: string;
+    };
+    auditBadges: {
+      cyberscopeLabel: string;
+      cyberscopeDesc: string;
+      cyberscopeLinkLabel: string;
+      freshcoinsLabel: string;
+      freshcoinsDesc: string;
+      freshcoinsLinkLabel: string;
+      kycLabel: string;
+      kycDesc: string;
+      kycLinkLabel: string;
+      openSourceLabel: string;
+      openSourceDesc: string;
+      openSourceLinkLabel: string;
+    };
+    securityFeatures: {
+      noAdminMinting: string;
+      noHiddenProxies: string;
+      reproducibleCode: string;
+    };
+    trustBadges: {
+      aiAudited: string;
+      tonVerified: string;
+      rwaAnchored: string;
+    };
+  };
+  rwaContentUi: {
+    stats: {
+      locationLabel: string;
+      locationValue: string;
+      assetClassLabel: string;
+      assetClassValue: string;
+      aiIntegrationLabel: string;
+      aiIntegrationValue: string;
+      onChainProofLabel: string;
+      onChainProofValue: string;
+      yieldTypeLabel: string;
+      yieldTypeValue: string;
+      tokenLayerLabel: string;
+      tokenLayerValue: string;
+    };
+    pillars: {
+      tangibleTitle: string;
+      tangibleDescription: string;
+      transparencyTitle: string;
+      transparencyDescription: string;
+      aiYieldTitle: string;
+      aiYieldDescription: string;
+      scarcityTitle: string;
+      scarcityDescription: string;
+    };
+  };
   /** shadcn-style UI primitives (may be unused but kept i18n-ready). */
   ui: {
     toggleSidebar: string;
@@ -298,6 +840,8 @@ export interface Translations {
     kicker: string;
     title: string;
     subtitle: string;
+    listedOnLabel: string;
+    partnersLabel: string;
     pillar1Title: string;
     pillar1Body: string;
     pillar2Title: string;
@@ -332,6 +876,7 @@ export interface Translations {
     networkAtAGlance: string;
     meetAgents: string;
     verifiedBy: string;
+    allSystemsLive: string;
     labelAgents: string;
     sublabelAgents: string;
     labelSupply: string;
@@ -344,6 +889,9 @@ export interface Translations {
     badgeScarce: string;
     badgeFastest: string;
     badgeLongTerm: string;
+    trustBadgeAudited: string;
+    trustBadgeKyc: string;
+    trustBadgeOpenSource: string;
   };
   /** AI Team section labels. */
   aiTeam: {
@@ -476,6 +1024,1032 @@ export interface Translations {
   /** FAQ accordion copy (`faqContent.data.ts`). */
   faqContent: FaqContent;
 }
+
+const howToBuyUiEn: Translations['howToBuyUi'] = {
+  kicker: 'HOW TO BUY',
+  titleLead: 'Get',
+  titleToken: 'Solaris CET',
+  titleTail: 'in 3 Steps',
+  subtitle:
+    'CET trades on the TON blockchain via DeDust DEX. Follow the steps below and always verify the contract address to stay safe from phishing tokens.',
+  trustBadges: {
+    audit: 'Cyberscope Audited',
+    kyc: 'KYC Verified',
+    freshcoins: 'Freshcoins Listed',
+    openSource: 'Open Source',
+  },
+  contractTitle: 'OFFICIAL CONTRACT ADDRESS',
+  contractSubtitle: 'Always verify before swapping — there is only one authentic CET token.',
+  copyIdle: 'Copy',
+  copyCopied: 'Copied!',
+  copyFailed: 'Failed',
+  swapCta: 'Swap on DeDust',
+  steps: {
+    walletTitle: 'Get a TON Wallet',
+    walletDescription:
+      'Download Tonkeeper (mobile or browser extension) and create a new wallet. Store your seed phrase securely — it is the only key to your funds.',
+    walletCta: 'Get Tonkeeper',
+    fundTitle: 'Fund with TON',
+    fundDescription:
+      'Purchase TON on any major exchange (Bybit, OKX, Huobi) and withdraw to your Tonkeeper address. You need TON to cover both the swap and the small network gas fee.',
+    swapTitle: 'Swap for CET on DeDust',
+    swapDescription:
+      'Go to DeDust and swap TON → CET. Always use the official contract address below to verify you are trading the authentic Solaris CET token.',
+    swapCta: 'Open DeDust ↗',
+  },
+};
+
+const howToBuyUiRo: Translations['howToBuyUi'] = {
+  kicker: 'CUM CUMPERI',
+  titleLead: 'Cumpără',
+  titleToken: 'Solaris CET',
+  titleTail: 'în 3 pași',
+  subtitle:
+    'CET se tranzacționează pe TON prin DEX-ul DeDust. Urmează pașii de mai jos și verifică întotdeauna adresa contractului ca să eviți tokenuri phishing.',
+  trustBadges: {
+    audit: 'Cyberscope Audit',
+    kyc: 'KYC Verificat',
+    freshcoins: 'Freshcoins Listat',
+    openSource: 'Open Source',
+  },
+  contractTitle: 'ADRESĂ OFICIALĂ DE CONTRACT',
+  contractSubtitle: 'Verifică înainte de swap — există un singur token CET autentic.',
+  copyIdle: 'Copiază',
+  copyCopied: 'Copiat!',
+  copyFailed: 'Eroare',
+  swapCta: 'Swap pe DeDust',
+  steps: {
+    walletTitle: 'Creează un portofel TON',
+    walletDescription:
+      'Descarcă Tonkeeper (mobil sau extensie de browser) și creează un portofel nou. Păstrează seed phrase în siguranță — este singura cheie către fondurile tale.',
+    walletCta: 'Deschide Tonkeeper',
+    fundTitle: 'Alimentează cu TON',
+    fundDescription:
+      'Cumpără TON de pe orice exchange major și retrage către adresa ta Tonkeeper. Ai nevoie de TON atât pentru swap, cât și pentru taxa mică de gas din rețea.',
+    swapTitle: 'Schimbă în CET pe DeDust',
+    swapDescription:
+      'Intră pe DeDust și fă swap TON → CET. Folosește mereu adresa oficială de contract de mai jos ca să verifici că tranzacționezi tokenul autentic Solaris CET.',
+    swapCta: 'Deschide DeDust ↗',
+  },
+};
+
+const tokenomicsUiEn: Translations['tokenomicsUi'] = {
+  pillMining: 'Mining',
+  pillTeam: 'Team',
+  aiReason: 'REASON',
+  aiAct: 'ACT',
+  aiVerify: 'VERIFY',
+  minedLabel: 'MINED',
+  dedustTitle: 'View CET token on DeDust exchange',
+  dcbmTitle: 'DCBM Stability',
+  dcbmBody: 'Dynamic-Control Buyback Mechanism uses PID controllers to reduce volatility by {pct}.',
+  scientificStability: 'Scientific price stability',
+  gridLaunchType: 'Launch Type',
+  gridMiningPeriod: 'Mining Period',
+  gridVolatility: 'Volatility ↓',
+  gridTargetVal: 'Target Val.',
+  gridMiningPeriodValue: '90 Years',
+  chartAria: 'Tokenomics: distribution',
+  chartKicker: 'TOKEN DISTRIBUTION · 9,000 CET',
+  chartScrollReveal: 'Scroll reveal',
+  chartStatTotalSupply: 'TOTAL SUPPLY',
+  chartStatBurned: 'BURNED',
+  chartStatHolders: 'HOLDERS',
+  chartNote: '* Allocations are based on the published tokenomics plan.',
+  chartConfigNote: 'Note: Burned and Holders are configurable values (update them in tokenomics data).',
+  chartCenterLabel: 'TOTAL SUPPLY',
+  chartShowCategory: 'Show category',
+  chartHideCategory: 'Hide category',
+  chartSelected: 'SELECTED',
+};
+
+const tokenomicsUiRo: Translations['tokenomicsUi'] = {
+  pillMining: 'Minerit',
+  pillTeam: 'Echipă',
+  aiReason: 'RAȚIUNE',
+  aiAct: 'ACȚIUNE',
+  aiVerify: 'VERIFICĂ',
+  minedLabel: 'MINAT',
+  dedustTitle: 'Vezi tokenul CET pe DeDust',
+  dcbmTitle: 'Stabilitate DCBM',
+  dcbmBody: 'Dynamic-Control Buyback Mechanism folosește control PID pentru a reduce volatilitatea cu {pct}.',
+  scientificStability: 'Stabilitate de preț (model științific)',
+  gridLaunchType: 'Tip lansare',
+  gridMiningPeriod: 'Perioadă minare',
+  gridVolatility: 'Volatilitate ↓',
+  gridTargetVal: 'Țintă val.',
+  gridMiningPeriodValue: '90 ani',
+  chartAria: 'Tokenomics: distribuție',
+  chartKicker: 'DISTRIBUȚIE TOKEN · 9.000 CET',
+  chartScrollReveal: 'Dezvăluire la scroll',
+  chartStatTotalSupply: 'SUPPLY TOTAL',
+  chartStatBurned: 'ARS',
+  chartStatHolders: 'DEȚINĂTORI',
+  chartNote: '* Alocările sunt bazate pe planul tokenomics publicat.',
+  chartConfigNote: 'Notă: Ars și Deținători sunt valori configurabile (actualizează-le din datele tokenomics).',
+  chartCenterLabel: 'SUPPLY TOTAL',
+  chartShowCategory: 'Afișează categoria',
+  chartHideCategory: 'Ascunde categoria',
+  chartSelected: 'SELECTAT',
+};
+
+const footerUiEn: Translations['footerUi'] = {
+  waitlistAdded: 'Added to waitlist',
+  waitlistUnavailable: 'Waitlist unavailable',
+  mailtoSubject: 'Solaris CET Waitlist',
+  mailtoBody: 'Please add this email to the Solaris CET waitlist: {email}',
+  kicker: 'AI BRIDGE TO HIGH INTELLIGENCE',
+  headlineLead: 'Start mining in ',
+  headlineAccent: 'minutes',
+  headlineTail: '.',
+  subtitle:
+    'Download the Solaris CET App. Connect a wallet. Begin earning on the bridge between current AI and High Intelligence.',
+  ctaTelegramMining: 'Start Mining on Telegram',
+  ctaWhitepaper: 'Read the Whitepaper',
+  founderRole: 'FOUNDER & CREATOR',
+  founderBio:
+    'Visionary behind Solaris CET · AI & Blockchain Strategist · Bridge between High Intelligence and decentralized finance on TON.',
+  contractLabel: 'CET Contract Address (TON)',
+  communityKicker: 'Join the Community',
+  communityBody: 'Get live updates, talk to the team, and follow the 200,000-agent build in real time.',
+  communityMeta: 'Telegram · Free · No spam · Instant access',
+  ctaTelegramChannel: 'Join Telegram Channel',
+  ctaMiningBot: 'Start Mining Bot',
+  emailWaitlistKicker: 'Email Waitlist',
+  emailWaitlistBody: 'Get product drops and important announcements by email.',
+  emailWaitlistFallback: 'If the endpoint is not configured, we open your mail client as fallback.',
+  emailPlaceholder: 'you@example.com',
+  emailAria: 'Email address',
+  emailSending: 'Sending…',
+  emailNotify: 'Notify me',
+  copyrightBridge: 'AI Bridge to High Intelligence.',
+  copyrightRights: 'All rights reserved.',
+  liveOnTon: 'LIVE ON TON MAINNET',
+  architectedBy: 'Architected by Claudiu',
+};
+
+const footerUiRo: Translations['footerUi'] = {
+  waitlistAdded: 'Adăugat în lista de așteptare',
+  waitlistUnavailable: 'Lista de așteptare indisponibilă',
+  mailtoSubject: 'Solaris CET — Lista de așteptare',
+  mailtoBody: 'Te rog adaugă acest email în lista de așteptare Solaris CET: {email}',
+  kicker: 'PUNTE AI CĂTRE HIGH INTELLIGENCE',
+  headlineLead: 'Începe minarea în ',
+  headlineAccent: 'minute',
+  headlineTail: '.',
+  subtitle:
+    'Descarcă aplicația Solaris CET. Conectează un wallet. Începe să câștigi pe puntea dintre AI-ul actual și High Intelligence.',
+  ctaTelegramMining: 'Pornește minarea pe Telegram',
+  ctaWhitepaper: 'Citește whitepaper-ul',
+  founderRole: 'FONDATOR & CREATOR',
+  founderBio:
+    'Viziune Solaris CET · Strateg AI & Blockchain · Punte între High Intelligence și finanțe descentralizate pe TON.',
+  contractLabel: 'Adresă contract CET (TON)',
+  communityKicker: 'Alătură-te comunității',
+  communityBody: 'Primește update-uri live, vorbește cu echipa și urmărește build-ul de 200.000 agenți în timp real.',
+  communityMeta: 'Telegram · Gratuit · Fără spam · Acces instant',
+  ctaTelegramChannel: 'Intră pe canalul Telegram',
+  ctaMiningBot: 'Pornește botul de minare',
+  emailWaitlistKicker: 'Lista de așteptare (email)',
+  emailWaitlistBody: 'Primește lansări și anunțuri importante pe email.',
+  emailWaitlistFallback: 'Dacă endpoint-ul nu e configurat, deschidem clientul tău de mail (fallback).',
+  emailPlaceholder: 'tu@exemplu.com',
+  emailAria: 'Adresă email',
+  emailSending: 'Trimit…',
+  emailNotify: 'Anunță-mă',
+  copyrightBridge: 'Punte AI către High Intelligence.',
+  copyrightRights: 'Toate drepturile rezervate.',
+  liveOnTon: 'LIVE PE TON MAINNET',
+  architectedBy: 'Arhitectură: Claudiu',
+};
+
+const novaAppUiEn: Translations['novaAppUi'] = {
+  ticker: {
+    hashrate: 'Hashrate',
+    earnings: 'Earnings',
+    uptime: 'Uptime',
+    nextPayout: 'Next Payout',
+    taskAgents: 'Task agents',
+    minersActive: 'Miners Active',
+  },
+  miningLabel: 'Mining',
+  miningActive: 'Active',
+  earnedToday: 'Earned Today',
+  kicker: 'Mobile Mining',
+  titleLead: 'Solaris',
+  titleToken: 'CET',
+  titleTail: 'App',
+  body1:
+    'Mine CET from your smartphone with minimal battery impact. Mining suspends automatically when the app is in the background.',
+  body2:
+    'Liquid staking converts rewards into sCET—so you stay liquid while earning. Powered by the TON blockchain and High-Intelligence AI protocols.',
+  badgeUniversalMining: 'Universal Mining',
+  badgeLiquidStaking: 'Liquid Staking',
+  badgeBatterySavings: '90% Battery Savings',
+};
+
+const novaAppUiRo: Translations['novaAppUi'] = {
+  ticker: {
+    hashrate: 'Hashrate',
+    earnings: 'Câștig',
+    uptime: 'Uptime',
+    nextPayout: 'Urm. plată',
+    taskAgents: 'Agenți task',
+    minersActive: 'Miners activi',
+  },
+  miningLabel: 'Minerit',
+  miningActive: 'Activ',
+  earnedToday: 'Câștig azi',
+  kicker: 'Minerit mobil',
+  titleLead: 'Solaris',
+  titleToken: 'CET',
+  titleTail: 'App',
+  body1:
+    'Minează CET de pe telefon, cu impact minim asupra bateriei. Mineritul se suspendă automat când aplicația rulează în fundal.',
+  body2:
+    'Liquid staking transformă recompensele în sCET—rămâi lichid în timp ce câștigi. Powered by TON + protocoale AI High-Intelligence.',
+  badgeUniversalMining: 'Minerit universal',
+  badgeLiquidStaking: 'Liquid Staking',
+  badgeBatterySavings: '−90% consum baterie',
+};
+
+const competitionUiEn: Translations['competitionUi'] = {
+  numberLocale: 'en-US',
+  tpsHigh: 'High (sharded)',
+  tpsVaries: 'Varies',
+  tpsL1L2Dependent: 'L1/L2 dependent',
+  marginalVariable: 'Variable',
+  agentsMarketplace: 'Marketplace',
+  agentsSubnetMiners: 'Subnet miners',
+  agentsDataAgents: 'Data agents',
+  chainCustom: 'Custom',
+  chainMulti: 'Multi',
+  simulatedSuffix: '(simulated)',
+};
+
+const competitionUiRo: Translations['competitionUi'] = {
+  numberLocale: 'ro-RO',
+  tpsHigh: 'Ridicat (sharded)',
+  tpsVaries: 'Variabil',
+  tpsL1L2Dependent: 'Depinde de L1/L2',
+  marginalVariable: 'Variabil',
+  agentsMarketplace: 'Marketplace',
+  agentsSubnetMiners: 'Miners subnet',
+  agentsDataAgents: 'Agenți de date',
+  chainCustom: 'Custom',
+  chainMulti: 'Multi',
+  simulatedSuffix: '(simulat)',
+};
+
+const highIntelligenceUiEn: Translations['highIntelligenceUi'] = {
+  kicker: 'HIGH INTELLIGENCE · LIVE DEMOS',
+  titleLead: 'Experience',
+  titleAccent: 'High Intelligence',
+  titleTail: '& Quantum OS',
+  subtitle:
+    'These are not simulations — they are live demonstrations of the two core technologies powering Solaris CET: Neural Reasoning via ReAct Protocol and Quantum OS Entropy. Interact with them to understand what High Intelligence means.',
+  cards: {
+    reactDesc:
+      'Observe → Think → Plan → Act → Verify. Every AI decision is transparent, auditable, and anchored on-chain.',
+    quantumDesc:
+      'True quantum randomness from wavefunction collapse — classical computers cannot predict or reproduce it.',
+    braidDesc: 'Structural reasoning with Mermaid-based logic graphs for multi-step reasoning you can audit.',
+  },
+  neural: {
+    title: 'Neural Reasoning Engine',
+    statusProcessing: 'PROCESSING',
+    statusReady: 'READY',
+    prompt: 'Ask anything about Solaris CET, mining, AI agents, or TON. Watch the High-Intelligence ReAct loop process your query step by step.',
+    placeholder: 'e.g. How does CET mining work?',
+    run: 'Run',
+    activateHint: 'Enter a query above and press Run to activate the reasoning engine',
+    completeLine: 'REASONING COMPLETE · CHAIN VERIFIED',
+    defaultQuestion: 'How does Solaris CET work?',
+  },
+  quantum: {
+    statusCollapsed: 'COLLAPSED',
+    statusCollapsing: 'COLLAPSING',
+    statusSuperposition: 'SUPERPOSITION',
+    desc:
+      "Watch 8 qubits in quantum superposition. Collapse the wavefunction to generate true quantum entropy — the seed for CET's cryptographic randomness.",
+    bitsLabel: 'QUANTUM BITS',
+    entropyKeyLabel: 'ENTROPY KEY (HEX)',
+    keyBody:
+      'This quantum-derived key cannot be predicted by any classical algorithm — it is the foundation of Quantum OS security in Solaris CET.',
+    collapseIdle: 'Collapse Wavefunction',
+    collapseInProgress: 'Collapsing…',
+    collapseDone: 'Wavefunction Collapsed',
+  },
+  reasoning: {
+    observePrice: 'Scanning DeDust CET/USDT pool · 24h volume detected · Liquidity depth measured',
+    observeMining: 'Reading on-chain mining metrics · Reward schedule verified · Consistency checks running',
+    observeAi: 'Loading ReAct protocol trace · BRAID reasoning graph initialized · Agent context active',
+    observeTon: 'TON mainnet state sync · Block height confirmed · Smart contract ABI loaded',
+    observeDefault: 'Indexing query tokens · Context window populated · Knowledge graph traversal started',
+    thinkPrice: 'Correlating pool liquidity with 9,000 CET fixed supply → scarcity premium calculated',
+    thinkMining: 'Analysing 90-year emission schedule → optimal mining window identified',
+    thinkAi: 'Mapping query to structured reasoning nodes → trace plan prepared',
+    thinkTon: 'Cross-referencing TON sharding topology with CET contract state',
+    thinkDefault: 'Decomposing intent → sub-goals identified → priority ordering applied',
+    planPrice: 'Step 1: fetch pool TVL · Step 2: compute CET/USDT rate · Step 3: apply slippage model',
+    planMining: 'Step 1: confirm node eligibility · Step 2: allocate compute quota · Step 3: submit PoW',
+    planAi: 'Step 1: load agent memory · Step 2: reason over context · Step 3: generate verifiable action',
+    planTon: 'Step 1: sign transaction · Step 2: broadcast to TON · Step 3: await finality',
+    planDefault: 'Step 1: retrieve relevant facts · Step 2: synthesize response · Step 3: validate output',
+    actPrice: 'Executing optimal swap via DeDust · Route: TON → CET · Slippage: 0.08%',
+    actMining: 'Mining session initiated · Hashrate: 14.2 TH/s · Battery impact: ~0%',
+    actAi: 'Agent action dispatched · On-chain reasoning trace anchored to TON block #{block}',
+    actTon: 'Transaction broadcast · Network accepted · Awaiting finality',
+    actDefault: 'High-Intelligence response generated · Confidence: {confidence}%',
+    verifyPrice: 'Swap confirmed · CET balance updated · Price impact within tolerance ✓',
+    verifyMining: 'Proof validated · Reward queued ✓',
+    verifyAi: 'Reasoning trace attached · Audit trail saved ✓',
+    verifyTon: 'Finality reached · State root updated ✓',
+    verifyDefault: 'Output cross-validated against on-chain facts · Integrity score: 99.2% ✓',
+  },
+};
+
+const highIntelligenceUiRo: Translations['highIntelligenceUi'] = {
+  kicker: 'HIGH INTELLIGENCE · DEMO LIVE',
+  titleLead: 'Experimentează',
+  titleAccent: 'High Intelligence',
+  titleTail: '& Quantum OS',
+  subtitle:
+    'Nu sunt animații “de decor” — sunt demonstrații live ale celor două tehnologii cheie din Solaris CET: raționament neural (ReAct) și entropie Quantum OS. Interacționează ca să vezi ce înseamnă High Intelligence.',
+  cards: {
+    reactDesc:
+      'Observă → Gândește → Planifică → Acționează → Verifică. Deciziile AI sunt transparente, auditabile și ancorate on-chain.',
+    quantumDesc:
+      'Aleatorizare cuantică din colapsul funcției de undă — calculatoarele clasice nu o pot prezice sau reproduce.',
+    braidDesc: 'Raționament structural cu grafuri logice (Mermaid) pentru pași multi-step predictibili și auditabili.',
+  },
+  neural: {
+    title: 'Motor de Raționament Neural',
+    statusProcessing: 'PROCESEZ',
+    statusReady: 'GATA',
+    prompt:
+      'Întreabă orice despre Solaris CET, minare, agenți AI sau TON. Urmărește bucla ReAct cum procesează pas cu pas.',
+    placeholder: 'ex: Cum funcționează minarea CET?',
+    run: 'Rulează',
+    activateHint: 'Introdu o întrebare și apasă Rulează ca să activezi motorul',
+    completeLine: 'RAȚIONAMENT FINALIZAT · CHAIN VERIFICAT',
+    defaultQuestion: 'Cum funcționează Solaris CET?',
+  },
+  quantum: {
+    statusCollapsed: 'COLAPS',
+    statusCollapsing: 'COLAPSEZ',
+    statusSuperposition: 'SUPERPOZIȚIE',
+    desc:
+      'Urmărește 8 qubits în superpoziție. Colapsează funcția de undă pentru entropie cuantică — seed pentru aleatorizarea criptografică CET.',
+    bitsLabel: 'BIȚI CUANTICI',
+    entropyKeyLabel: 'CHEIE ENTROPIE (HEX)',
+    keyBody:
+      'Cheia derivată nu poate fi prezisă de algoritmi clasici — baza securității Quantum OS în Solaris CET.',
+    collapseIdle: 'Colapsează funcția de undă',
+    collapseInProgress: 'Colapsez…',
+    collapseDone: 'Funcția de undă e colapsată',
+  },
+  reasoning: {
+    observePrice: 'Scanez pool-ul DeDust CET/USDT · volum 24h detectat · adâncime lichiditate măsurată',
+    observeMining: 'Citesc metrici on-chain de minare · programul de recompense verificat · verificări de consistență',
+    observeAi: 'Încarc trace ReAct · graful BRAID inițializat · context agent activ',
+    observeTon: 'Sincronizare stare TON mainnet · înălțime bloc confirmată · ABI contract încărcat',
+    observeDefault: 'Indexez query-ul · fereastră de context populată · parcurgere knowledge graph pornită',
+    thinkPrice: 'Corelez lichiditatea pool-ului cu supply-ul fix de 9.000 CET → calculez premium de raritate',
+    thinkMining: 'Analizez programul de emisie pe 90 de ani → identific fereastra optimă de minare',
+    thinkAi: 'Mapez query-ul pe noduri de raționament structurat → plan de trace pregătit',
+    thinkTon: 'Corelez topologia de sharding TON cu starea contractului CET',
+    thinkDefault: 'Descompun intenția → identific sub-obiective → ordonez priorități',
+    planPrice: 'Pas 1: preiau TVL · Pas 2: calculez rata CET/USDT · Pas 3: aplic model de slippage',
+    planMining: 'Pas 1: confirm eligibilitatea nodului · Pas 2: aloc quota de compute · Pas 3: submit PoW',
+    planAi: 'Pas 1: încarc memoria agentului · Pas 2: raționez peste context · Pas 3: generez acțiune verificabilă',
+    planTon: 'Pas 1: semnez tranzacția · Pas 2: broadcast pe TON · Pas 3: aștept finalitatea',
+    planDefault: 'Pas 1: recuperez fapte relevante · Pas 2: sintetizez răspuns · Pas 3: validez ieșirea',
+    actPrice: 'Execut swap optim via DeDust · Rută: TON → CET · Slippage: 0.08%',
+    actMining: 'Sesiune de minare pornită · Hashrate: 14.2 TH/s · Impact baterie: ~0%',
+    actAi: 'Acțiune agent trimisă · trace de raționament ancorat în bloc TON #{block}',
+    actTon: 'Tranzacție broadcast · rețeaua a acceptat · aștept finalitatea',
+    actDefault: 'Răspuns High-Intelligence generat · Încredere: {confidence}%',
+    verifyPrice: 'Swap confirmat · balanță CET actualizată · impact în toleranță ✓',
+    verifyMining: 'Dovadă validată · recompensă pusă la coadă ✓',
+    verifyAi: 'Trace atașat · audit trail salvat ✓',
+    verifyTon: 'Finalitate atinsă · state root actualizat ✓',
+    verifyDefault: 'Ieșire cross-validată cu fapte on-chain · scor integritate: 99.2% ✓',
+  },
+};
+
+const hybridEngineUiEn: Translations['hybridEngineUi'] = {
+  titleLead: 'The',
+  titleAccent: 'Hybrid',
+  titleTail: 'Engine',
+  badgePow: 'PoW Security',
+  badgeDpos: 'DPoS Speed',
+  badgeSharded: 'Sharded L1',
+  powLayerTitle: 'PoW Layer',
+  powLayerSubtitle: 'Bitcoin-grade security',
+  powLayerDetail: 'SHA-256 proof-of-work provides immutable finality and censorship resistance on the base layer.',
+  dposLayerTitle: 'DPoS Layer',
+  dposLayerSubtitle: 'Fast finality',
+  dposLayerDetail: 'Delegated proof-of-stake enables high throughput while inheriting PoW security guarantees.',
+};
+
+const hybridEngineUiRo: Translations['hybridEngineUi'] = {
+  titleLead: 'Motorul',
+  titleAccent: 'Hibrid',
+  titleTail: '\u200B',
+  badgePow: 'Securitate PoW',
+  badgeDpos: 'Viteză DPoS',
+  badgeSharded: 'L1 Sharded',
+  powLayerTitle: 'Strat PoW',
+  powLayerSubtitle: 'Securitate de nivel Bitcoin',
+  powLayerDetail: 'Proof-of-work (SHA-256) oferă finalitate imutabilă și rezistență la cenzură pe stratul de bază.',
+  dposLayerTitle: 'Strat DPoS',
+  dposLayerSubtitle: 'Finalitate rapidă',
+  dposLayerDetail: 'Delegated proof-of-stake oferă throughput ridicat, păstrând garanțiile de securitate ale stratului PoW.',
+};
+
+const intelligenceCoreUiEn: Translations['intelligenceCoreUi'] = {
+  aiIntegrationLabel: 'AI Integration',
+  titleLead: 'The Intelligence',
+  titleAccent: 'Core',
+  titleTail: '\u200B',
+  reactSentence: 'interleaves reasoning traces with actions—so agents explain before they execute.',
+  resultSentence: 'Result: clearer reasoning traces, fewer ungrounded outputs, and auditable execution paths.',
+  metricTraceLabel: 'TRACE',
+  metricTraceSub: 'BEFORE ACTION',
+  metricVerifyLabel: 'VERIFY',
+  metricVerifySub: 'AGAINST FACTS',
+  metricIterationSub: 'ITERATION',
+  braidLabel: 'BRAID Framework',
+  braidDesc: 'Structural reasoning with Mermaid-based logic graphs for more predictable multi-step reasoning.',
+  terminalTitle: 'ReAct Protocol · Live',
+  terminalActive: 'ACTIVE',
+  reasoningTraceLabel: 'REASONING TRACE',
+  decisionLoopsLabel: 'Verifiable AI Decision Loops',
+  chipThought: 'Thought',
+  chipAction: 'Action',
+  chipObservation: 'Observation',
+  reactSteps: [
+    'THOUGHT|🧠|Analyzing blockchain data patterns...|var(--solaris-gold)',
+    'ACTION|⚡|Query DeDust pool liquidity metrics|var(--solaris-cyan)',
+    'OBSERVE|👁|Pool TVL: $2.4M | 24h Vol: $180K|rgba(52, 211, 153, 1)',
+    'THOUGHT|🧠|High liquidity confirms token utility|var(--solaris-gold)',
+    'ACTION|⚡|Execute optimal swap route...|var(--solaris-cyan)',
+    'OBSERVE|👁|Swap completed. Slippage: 0.12%|rgba(52, 211, 153, 1)',
+  ],
+};
+
+const intelligenceCoreUiRo: Translations['intelligenceCoreUi'] = {
+  aiIntegrationLabel: 'Integrare AI',
+  titleLead: 'Nucleul de',
+  titleAccent: 'Inteligență',
+  titleTail: '\u200B',
+  reactSentence: 'intercalează urmele de raționament cu acțiuni — agenții explică înainte să execute.',
+  resultSentence: 'Rezultat: urme mai clare, mai puține ieșiri nefundamentate și pași de execuție auditabili.',
+  metricTraceLabel: 'TRACE',
+  metricTraceSub: 'ÎNAINTE DE ACȚIUNE',
+  metricVerifyLabel: 'VERIFY',
+  metricVerifySub: 'CONTRA FAPTELOR',
+  metricIterationSub: 'ITERARE',
+  braidLabel: 'BRAID Framework',
+  braidDesc: 'Raționament structural cu grafuri logice (Mermaid) pentru pași multipli mai predictibili.',
+  terminalTitle: 'ReAct Protocol · Live',
+  terminalActive: 'ACTIV',
+  reasoningTraceLabel: 'URMĂ DE RAȚIONAMENT',
+  decisionLoopsLabel: 'Bucle decizie AI verificabile',
+  chipThought: 'Gând',
+  chipAction: 'Acțiune',
+  chipObservation: 'Observație',
+  reactSteps: [
+    'GÂND|🧠|Analizez tipare din datele blockchain...|var(--solaris-gold)',
+    'ACȚIUNE|⚡|Interoghez lichiditatea pool-ului DeDust|var(--solaris-cyan)',
+    'OBSERV|👁|TVL: $2.4M | Vol 24h: $180K|rgba(52, 211, 153, 1)',
+    'GÂND|🧠|Lichiditatea confirmă utilitatea tokenului|var(--solaris-gold)',
+    'ACȚIUNE|⚡|Execut ruta optimă de swap...|var(--solaris-cyan)',
+    'OBSERV|👁|Swap finalizat. Slippage: 0.12%|rgba(52, 211, 153, 1)',
+  ],
+};
+
+const complianceUiEn: Translations['complianceUi'] = {
+  titleLead: 'Compliance',
+  titleAccent: '& Enterprise',
+  cardAuditTitle: 'EU AI Act Ready',
+  cardAuditBody: 'Native audit trails through on-chain Reasoning Traces—every AI decision is verifiable and auditable.',
+  cardDataTitle: 'Managed Data Planes',
+  cardDataBody: 'Sovereign AI infrastructure that keeps data local while control is global.',
+};
+
+const complianceUiRo: Translations['complianceUi'] = {
+  titleLead: 'Conformitate',
+  titleAccent: '& Enterprise',
+  cardAuditTitle: 'EU AI Act Ready',
+  cardAuditBody:
+    'Audit trails native prin Reasoning Traces on-chain — fiecare decizie AI este verificabilă și auditabilă.',
+  cardDataTitle: 'Managed Data Planes',
+  cardDataBody: 'Infrastructură Sovereign AI: datele rămân locale, controlul rămâne global.',
+};
+
+const agenticEngineUiEn: Translations['agenticEngineUi'] = {
+  kicker: 'AGENTIC ENGINE · 200,000 AGENTS',
+  headlineBefore: 'Data plane,',
+  headlineHighlight: 'reasoning plane,',
+  headlineAfter: 'verification plane',
+  paragraph:
+    'The mesh does not pretend to be one brain — it is two hundred thousand narrow experts orchestrated through RAV, fed by Grok and Gemini in fusion, and grounded on the same open signals that power modern software: the web, public repositories, registries, and APIs.',
+  trainingKicker: 'TRAINING HORIZON (SIMULATION)',
+  trainingBody:
+    'A four-hour wall-clock run at “full mesh” would mean billions of micro-gradient and retrieval steps across shards — impossible to replay in a browser. The live feed above models that aggregate behaviour: throughput, verification, and queue health, so stakeholders can reason about scale without a datacenter in the tab.',
+};
+
+const agenticEngineUiRo: Translations['agenticEngineUi'] = {
+  kicker: 'MOTOR AGENTIC · 200.000 AGENȚI',
+  headlineBefore: 'Plan de date,',
+  headlineHighlight: 'plan de raționament,',
+  headlineAfter: 'plan de verificare',
+  paragraph:
+    'Mesh-ul nu pretinde că este „un singur creier”. Sunt două sute de mii de experți înguști, orchestrați prin RAV, alimentați de Grok și Gemini în fuziune și ancorați în aceleași semnale deschise care alimentează software-ul modern: web, repo-uri publice, registries și API-uri.',
+  trainingKicker: 'ORIZONT DE ANTRENARE (SIMULARE)',
+  trainingBody:
+    'O execuție de patru ore “full mesh” ar însemna miliarde de pași micro-gradient și retrieval pe shards — imposibil de reluat într-un browser. Feed-ul live de mai sus modelează acest comportament agregat: throughput, verificare și sănătatea cozii, astfel încât stakeholderii să poată evalua scala fără un datacenter în tab.',
+};
+
+const hierarchyGraphUiEn: Translations['hierarchyGraphUi'] = {
+  title: 'DECISION MAP (MERMAID)',
+  render: 'Render',
+  rendered: 'Rendered',
+  clipboardUnavailable: 'Clipboard unavailable',
+  graphCopied: 'Mermaid graph copied',
+  copyFailed: 'Copy failed',
+  ariaCopyGraph: 'Copy Mermaid graph',
+  ariaOpenMermaid: 'Open Mermaid Live Editor',
+  graphUnavailable: 'Mermaid graph unavailable right now.',
+  renderOptional: 'Render is optional to keep performance tight. Use the Render button if you want the SVG.',
+  source: 'Source',
+  expand: 'expand',
+  collapse: 'collapse',
+  localUserAsks: 'User asks',
+  localIsWalletConnected: 'Wallet connected?',
+  localShowBalance: 'Show CET balance / staking options',
+  localShowConnect: 'Show connect wallet',
+  localNextActions: 'Show next actions: Buy / Stake / Learn',
+  localLinks: 'Show links + calculators',
+};
+
+const hierarchyGraphUiRo: Translations['hierarchyGraphUi'] = {
+  title: 'HARTĂ DECIZIE (MERMAID)',
+  render: 'Randează',
+  rendered: 'Randat',
+  clipboardUnavailable: 'Clipboard indisponibil',
+  graphCopied: 'Graful Mermaid a fost copiat',
+  copyFailed: 'Copiere eșuată',
+  ariaCopyGraph: 'Copiază graful Mermaid',
+  ariaOpenMermaid: 'Deschide Mermaid Live Editor',
+  graphUnavailable: 'Graful Mermaid este indisponibil momentan.',
+  renderOptional: 'Randarea este opțională pentru performanță. Folosește butonul Randează dacă vrei SVG-ul.',
+  source: 'Sursă',
+  expand: 'extinde',
+  collapse: 'restrânge',
+  localUserAsks: 'Utilizatorul întreabă',
+  localIsWalletConnected: 'Portofel conectat?',
+  localShowBalance: 'Arată soldul CET / opțiuni de staking',
+  localShowConnect: 'Arată conectarea portofelului',
+  localNextActions: 'Arată acțiunile următoare: Cumpără / Staking / Învață',
+  localLinks: 'Arată linkuri + calculatoare',
+};
+
+const resourcesUiEn: Translations['resourcesUi'] = {
+  kicker: 'ECOSYSTEM RESOURCES',
+  titleLead: 'Everything You Need to',
+  titleHighlight: 'Navigate',
+  titleTail: 'the Ecosystem',
+  subtitle:
+    'From tracking CET on-chain to exploring the TON network, staying informed on the latest research, and learning to build AI agents — these are the trusted platforms used by the Solaris community.',
+  quickLinks: {
+    buyCet: 'Buy CET',
+    whitepaper: 'Whitepaper',
+    github: 'GitHub',
+    telegram: 'Telegram',
+    cetContract: 'CET contract',
+  },
+  categories: {
+    market: {
+      label: 'MARKET DATA',
+      title: 'Track & Trade',
+      resources: {
+        coinGeckoDescription:
+          'Search “Solaris CET” on CoinGecko for listings, charts, and volume — the same flow serious traders use for any new TON jetton.',
+        coinMarketCapDescription:
+          'CMC search for Solaris CET — rankings, supply context, and cross-exchange visibility when the asset is tracked.',
+        dedustDescription:
+          'The native TON decentralised exchange where CET trades. Swap TON → CET directly in your Tonkeeper wallet.',
+        dexScreenerDescription:
+          'Search by CET contract address to surface TON pool charts and liquidity depth alongside other DEX aggregators.',
+      },
+    },
+    ecosystem: {
+      label: 'TON ECOSYSTEM',
+      title: 'Explore TON',
+      resources: {
+        tonFoundationDescription:
+          'Official documentation, developer guides, and the full specification of the TON blockchain — the home of CET.',
+        tonkeeperDescription:
+          'The most-used non-custodial TON wallet. Available as a mobile app and browser extension — required to hold CET.',
+        tonscanDescription:
+          'Real-time TON block explorer. Verify CET transactions, inspect contract state, and audit the DeDust pool on-chain.',
+        tonviewerDescription:
+          'Wallet-style TON explorer for the CET jetton — messages, holders, and transfers in a layout many mobile wallets deep-link to.',
+      },
+    },
+    research: {
+      label: 'RESEARCH & NEWS',
+      title: 'Stay Informed',
+      resources: {
+        messariDescription:
+          'Institutional-grade research, protocol reports, and on-chain data analytics — the standard for informed crypto investment.',
+        coindeskDescription:
+          'Award-winning crypto journalism: market news, regulatory developments, and deep-dive investigative reports.',
+        whitepaperName: 'Solaris Whitepaper',
+        whitepaperDescription:
+          'Read the full Solaris CET whitepaper on IPFS — tokenomics, architecture, roadmap, and the High Intelligence thesis.',
+      },
+    },
+    ai: {
+      label: 'AI & AGENTS',
+      title: 'Build Intelligence',
+      resources: {
+        agentsBeginnersName: 'AI Agents for Beginners',
+        agentsBeginnersDescription:
+          'Free 12-lesson course by Microsoft for building AI agents from the ground up — fundamentals, code examples, and hands-on exercises.',
+        hfAgentsName: 'HuggingFace Agents Course',
+        hfAgentsDescription:
+          'Free intermediate-to-expert course on AI agents from HuggingFace — core concepts, code snippets, and practical build-and-deploy examples.',
+        promptGuideName: 'Prompt Engineering Guide',
+        promptGuideDescription:
+          'Comprehensive free guide by DAIR.AI covering prompt engineering techniques essential for optimizing AI agents, with tutorials and research papers.',
+        githubName: 'Solaris CET on GitHub',
+        githubDescription:
+          'Official open-source repository for the Solaris CET landing page — explore the code, open issues, or contribute to the project.',
+      },
+    },
+  },
+};
+
+const resourcesUiRo: Translations['resourcesUi'] = {
+  kicker: 'RESURSE ECOSISTEM',
+  titleLead: 'Tot ce ai nevoie ca să',
+  titleHighlight: 'navighezi',
+  titleTail: 'ecosistemul',
+  subtitle:
+    'De la tracking on-chain pentru CET și explorarea rețelei TON, până la research și învățare despre agenți AI — acestea sunt platformele de încredere folosite de comunitatea Solaris.',
+  quickLinks: {
+    buyCet: 'Cumpără CET',
+    whitepaper: 'Whitepaper',
+    github: 'GitHub',
+    telegram: 'Telegram',
+    cetContract: 'Contract CET',
+  },
+  categories: {
+    market: {
+      label: 'DATE DE PIAȚĂ',
+      title: 'Urmărește & Tranzacționează',
+      resources: {
+        coinGeckoDescription:
+          'Caută „Solaris CET” pe CoinGecko pentru listări, chart-uri și volum — fluxul pe care îl folosesc traderii serioși.',
+        coinMarketCapDescription:
+          'Căutare CMC pentru Solaris CET — ranking, context de supply și vizibilitate cross-exchange când asset-ul este urmărit.',
+        dedustDescription:
+          'DEX-ul nativ pe TON unde se tranzacționează CET. Swap TON → CET direct din Tonkeeper.',
+        dexScreenerDescription:
+          'Caută după adresa contractului CET ca să vezi chart-uri și lichiditate pentru pool-urile TON.',
+      },
+    },
+    ecosystem: {
+      label: 'ECOSISTEM TON',
+      title: 'Explorează TON',
+      resources: {
+        tonFoundationDescription:
+          'Documentație oficială, ghiduri pentru dezvoltatori și specificația completă a blockchain-ului TON — “casa” CET.',
+        tonkeeperDescription:
+          'Cel mai folosit wallet non-custodial pe TON (mobil + extensie browser) — necesar pentru a deține CET.',
+        tonscanDescription:
+          'Explorer TON în timp real. Verifică tranzacții CET, inspectează starea contractului și auditează pool-ul DeDust on-chain.',
+        tonviewerDescription:
+          'Explorer TON cu layout de tip wallet pentru jetton-ul CET — mesaje, holders și transferuri.',
+      },
+    },
+    research: {
+      label: 'RESEARCH & ȘTIRI',
+      title: 'Rămâi informat',
+      resources: {
+        messariDescription:
+          'Research de nivel instituțional, rapoarte și analitică on-chain — standardul pentru informare în crypto.',
+        coindeskDescription: 'Jurnalism crypto: știri de piață, reglementări și articole de profunzime.',
+        whitepaperName: 'Whitepaper Solaris',
+        whitepaperDescription:
+          'Citește whitepaper-ul Solaris CET pe IPFS — tokenomics, arhitectură, roadmap și teza High Intelligence.',
+      },
+    },
+    ai: {
+      label: 'AI & AGENȚI',
+      title: 'Construiește inteligență',
+      resources: {
+        agentsBeginnersName: 'AI Agents pentru începători',
+        agentsBeginnersDescription:
+          'Curs gratuit (12 lecții) de la Microsoft pentru AI agents — concepte, exemple de cod și exerciții.',
+        hfAgentsName: 'HuggingFace Agents Course',
+        hfAgentsDescription:
+          'Curs gratuit (intermediar → avansat) despre agenți AI — concepte, snippet-uri și exemple practice.',
+        promptGuideName: 'Ghid Prompt Engineering',
+        promptGuideDescription:
+          'Ghid complet DAIR.AI despre prompt engineering — tehnici esențiale pentru agenți, tutoriale și research.',
+        githubName: 'Solaris CET pe GitHub',
+        githubDescription: 'Repo-ul open-source oficial pentru landing page — vezi codul, issues sau contribuie.',
+      },
+    },
+  },
+};
+
+const networkPulseUiEn: Translations['networkPulseUi'] = {
+  kicker: 'NETWORK LIVE · REAL-TIME DATA',
+  titleLead: 'TON Network',
+  titleHighlight: 'Pulse',
+  titleTail: '\u200B',
+  subtitle: "Solaris CET rides the world's fastest L1. Every number below reflects a network that never sleeps.",
+  mainnetBlockLabel: 'MAINNET · BLOCK #{block}',
+  stats: {
+    blocksProcessed: { label: 'Blocks Processed', description: 'TON mainnet blocks since genesis' },
+    transactions: { label: 'Transactions', description: 'Total TON network transactions' },
+    validatorsActive: { label: 'Validators Active', description: 'Current TON validator set' },
+    agentActions: { label: 'Agent Actions', description: 'Cumulative on-chain CET agent actions' },
+    countriesReached: { label: 'Countries Reached', description: 'Nations with active CET holders' },
+    uptime: { label: 'Uptime', description: 'CET protocol uptime since launch' },
+  },
+  footnote:
+    '* Block and transaction counts are extrapolated from public TON network data (avg ~5 blocks/s, ~120 txns/s since genesis). Agent action counts start from the verified Q1 2026 milestone baseline. Validator count and uptime are observed mainnet values.',
+};
+
+const networkPulseUiRo: Translations['networkPulseUi'] = {
+  kicker: 'REȚEA LIVE · DATE ÎN TIMP REAL',
+  titleLead: 'Puls',
+  titleHighlight: 'TON',
+  titleTail: '\u200B',
+  subtitle: 'Solaris CET rulează pe unul dintre cele mai rapide L1. Fiecare număr de mai jos reflectă o rețea care nu doarme.',
+  mainnetBlockLabel: 'MAINNET · BLOC #{block}',
+  stats: {
+    blocksProcessed: { label: 'Blocuri procesate', description: 'Blocuri TON mainnet de la genesis' },
+    transactions: { label: 'Tranzacții', description: 'Total tranzacții în rețeaua TON' },
+    validatorsActive: { label: 'Validatori activi', description: 'Setul curent de validatori TON' },
+    agentActions: { label: 'Acțiuni agenți', description: 'Acțiuni CET on-chain (cumulat)' },
+    countriesReached: { label: 'Țări atinse', description: 'Țări cu deținători CET activi' },
+    uptime: { label: 'Uptime', description: 'Uptime protocol CET de la lansare' },
+  },
+  footnote:
+    '* Numărul de blocuri și tranzacții este extrapolat din date publice TON (medie ~5 blocuri/s, ~120 tx/s de la genesis). Acțiunile agenților pornesc de la un baseline verificat (Q1 2026). Numărul de validatori și uptime sunt valori observate în mainnet.',
+};
+
+const whitepaperUiEn: Translations['whitepaperUi'] = {
+  kicker: 'WHITEPAPER · INLINE EDITION',
+  headlineHighlight: 'Technical Overview',
+  intro:
+    'A complete, human-readable specification of the Solaris CET protocol. Click any section to expand it. No PDF reader, no metadata, no download required — this whitepaper lives entirely on-chain and on this page.',
+  metaReadMinutes: '~{minutes} min read',
+  tags: ['TON Blockchain', 'RAV Protocol', 'BRAID Framework', 'Grok × Gemini', '9,000 CET Supply'],
+  archiveKicker: 'PERMANENT ARCHIVE',
+  archiveTitle: 'Immutably stored on IPFS',
+  archiveBody:
+    'The canonical PDF version of this whitepaper is permanently archived on IPFS — decentralised, censorship-resistant, and always available.',
+  downloadLabel: 'Download PDF (IPFS)',
+};
+
+const whitepaperUiRo: Translations['whitepaperUi'] = {
+  kicker: 'WHITEPAPER · EDIȚIE INLINE',
+  headlineHighlight: 'Prezentare tehnică',
+  intro:
+    'O specificație completă, ușor de citit, a protocolului Solaris CET. Apasă pe orice secțiune ca să o extinzi. Fără PDF reader, fără metadata, fără download obligatoriu.',
+  metaReadMinutes: '~{minutes} min citire',
+  tags: ['Blockchain TON', 'Protocol RAV', 'Framework BRAID', 'Grok × Gemini', 'Supply 9.000 CET'],
+  archiveKicker: 'ARHIVĂ PERMANENTĂ',
+  archiveTitle: 'Stocat imutabil pe IPFS',
+  archiveBody:
+    'Versiunea PDF canonică este arhivată permanent pe IPFS — descentralizat, rezistent la cenzură și disponibil oricând.',
+  downloadLabel: 'Descarcă PDF (IPFS)',
+};
+
+const aiTeamUiEn: Translations['aiTeamUi'] = {
+  kicker: 'AI CORPORATE STRUCTURE',
+  headlineLead: '200,000 Agents.',
+  headlineHighlight: 'Zero Marginal Cost.',
+  intro:
+    'Large enterprises deploy hundreds of thousands of employees — now augmented by AI. Solaris CET matches that scale entirely through autonomous agents: 200,000 specialists operating 24/7, across 10 departments, at the speed of thought.',
+  totalWorkforceLabel: 'TOTAL WORKFORCE',
+  totalWorkforceSub: 'Autonomous Agents Deployed',
+  departmentsLabel: 'DEPARTMENTS',
+  departmentsSub: 'Enterprise Divisions',
+  uptimeLabel: 'UPTIME',
+  uptimeSub: 'Always On — No Sleep, No Breaks',
+  agentsLabel: 'AGENTS',
+  curatedGenesLabel: 'Curated genes',
+  liveActivityKicker: 'AGENTS TALKING · LEARNING · SOLVING — RIGHT NOW',
+  competitiveParityKicker: 'COMPETITIVE PARITY',
+  competitiveParityLead:
+    'Fortune 500 companies deploy 100,000–300,000 employees — increasingly augmented by AI. Solaris CET matches that scale with ',
+  competitiveParityHighlight: '200,000 autonomous agents',
+  competitiveParityTail: ': zero HR overhead, zero downtime, infinite parallelism.',
+};
+
+const aiTeamUiRo: Translations['aiTeamUi'] = {
+  kicker: 'STRUCTURĂ CORPORATE AI',
+  headlineLead: '200.000 agenți.',
+  headlineHighlight: 'Cost marginal zero.',
+  intro:
+    'Enterprise-urile mari operează cu sute de mii de angajați — acum augmentați de AI. Solaris CET atinge aceeași scală prin agenți autonomi: 200.000 specialiști, 24/7, în 10 departamente.',
+  totalWorkforceLabel: 'FORȚĂ TOTALĂ',
+  totalWorkforceSub: 'Agenți autonomi deployați',
+  departmentsLabel: 'DEPARTAMENTE',
+  departmentsSub: 'Divizii enterprise',
+  uptimeLabel: 'UPTIME',
+  uptimeSub: 'Non-stop — fără pauze',
+  agentsLabel: 'AGENȚI',
+  curatedGenesLabel: 'Gene curatoriate',
+  liveActivityKicker: 'AGENȚI CARE VORBESC · ÎNVAȚĂ · REZOLVĂ — ACUM',
+  competitiveParityKicker: 'PARITATE COMPETITIVĂ',
+  competitiveParityLead:
+    'Companiile Fortune 500 au 100.000–300.000 angajați — tot mai des augmentați de AI. Solaris CET atinge aceeași scală cu ',
+  competitiveParityHighlight: '200.000 agenți autonomi',
+  competitiveParityTail: ': overhead HR zero, downtime zero, paralelism practic nelimitat.',
+};
+
+const roadmapUiEn: Translations['roadmapUi'] = {
+  kicker: 'ROADMAP',
+  titleLead: 'The Path to',
+  titleHighlight: 'Sustainable Growth',
+  titleTail: '\u200B',
+  subtitle:
+    'From the initial token launch to a full-scale AI-powered agricultural ecosystem — every milestone is publicly trackable and immutably recorded.',
+  overallProgressLabel: 'Overall Progress',
+  phasesCompleteLabel: '5 phases complete',
+  activeUpcomingLabel: '1 active · 1 upcoming',
+  nowLine: 'NOW: Q2 2026 — DAO & Cross-Chain Bridge in Progress',
+  status: { done: 'Completed', active: 'In Progress', upcoming: 'Planned' },
+};
+
+const roadmapUiRo: Translations['roadmapUi'] = {
+  kicker: 'FOAIE DE PARCURS',
+  titleLead: 'Drumul către',
+  titleHighlight: 'creștere sustenabilă',
+  titleTail: '\u200B',
+  subtitle:
+    'De la lansarea tokenului până la un ecosistem agricol scalat și asistat de AI — fiecare reper este urmărit public și înregistrat imutabil.',
+  overallProgressLabel: 'Progres general',
+  phasesCompleteLabel: '5 faze finalizate',
+  activeUpcomingLabel: '1 în lucru · 1 planificată',
+  nowLine: 'ACUM: Q2 2026 — DAO & pod cross-chain în lucru',
+  status: { done: 'Finalizat', active: 'În lucru', upcoming: 'Planificat' },
+};
+
+const securityUiEn: Translations['securityUi'] = {
+  titleLead: 'Security',
+  titleHighlight: 'First',
+  proofCyberscope: 'Cyberscope audited',
+  proofFreshcoins: 'Freshcoins verified',
+  proofKyc: 'KYC completed',
+  transparencyBody: 'Our commitment to transparency means no admin minting, no hidden proxies, and complete code reproducibility.',
+  trustSignalsLabel: 'Trust signals',
+  ratingLabel: 'SECURITY RATING',
+  scoreLabels: {
+    smartContract: 'Smart Contract',
+    kycVerification: 'KYC Verification',
+    auditCoverage: 'Audit Coverage',
+    openSource: 'Open Source',
+  },
+  auditBadges: {
+    cyberscopeLabel: 'Cyberscope Audit',
+    cyberscopeDesc: 'Security audit report for the smart contract',
+    cyberscopeLinkLabel: 'View report ↗',
+    freshcoinsLabel: 'Freshcoins verified',
+    freshcoinsDesc: 'Project verification + due diligence',
+    freshcoinsLinkLabel: 'Freshcoins ↗',
+    kycLabel: 'KYC completed',
+    kycDesc: 'Team identity verification',
+    kycLinkLabel: 'View whitepaper ↗',
+    openSourceLabel: 'Open source',
+    openSourceDesc: 'Transparent code, publicly available',
+    openSourceLinkLabel: 'GitHub repo ↗',
+  },
+  securityFeatures: {
+    noAdminMinting: 'No admin minting',
+    noHiddenProxies: 'No hidden proxies',
+    reproducibleCode: 'Code is law—published and reproducible',
+  },
+  trustBadges: {
+    aiAudited: 'AI Audited',
+    tonVerified: 'TON Verified',
+    rwaAnchored: 'RWA Anchored',
+  },
+};
+
+const securityUiRo: Translations['securityUi'] = {
+  titleLead: 'Securitate',
+  titleHighlight: 'prima',
+  proofCyberscope: 'Audit Cyberscope',
+  proofFreshcoins: 'Freshcoins verificat',
+  proofKyc: 'KYC finalizat',
+  transparencyBody: 'Transparență totală: fără minting admin, fără proxy-uri ascunse și cod complet reproductibil.',
+  trustSignalsLabel: 'Semnale de încredere',
+  ratingLabel: 'RATING SECURITATE',
+  scoreLabels: {
+    smartContract: 'Smart Contract',
+    kycVerification: 'Verificare KYC',
+    auditCoverage: 'Acoperire audit',
+    openSource: 'Open source',
+  },
+  auditBadges: {
+    cyberscopeLabel: 'Audit Cyberscope',
+    cyberscopeDesc: 'Audit de securitate pentru smart contract',
+    cyberscopeLinkLabel: 'Vezi raportul ↗',
+    freshcoinsLabel: 'Freshcoins verificat',
+    freshcoinsDesc: 'Verificare proiect + due diligence',
+    freshcoinsLinkLabel: 'Freshcoins ↗',
+    kycLabel: 'KYC finalizat',
+    kycDesc: 'Verificare identitate echipă',
+    kycLinkLabel: 'Vezi whitepaper ↗',
+    openSourceLabel: 'Open source',
+    openSourceDesc: 'Cod transparent, public',
+    openSourceLinkLabel: 'Repo GitHub ↗',
+  },
+  securityFeatures: {
+    noAdminMinting: 'Fără minting admin',
+    noHiddenProxies: 'Fără proxy-uri ascunse',
+    reproducibleCode: 'Cod public, reproductibil',
+  },
+  trustBadges: {
+    aiAudited: 'Audit AI',
+    tonVerified: 'TON verificat',
+    rwaAnchored: 'Ancorat RWA',
+  },
+};
+
+const rwaContentUiEn: Translations['rwaContentUi'] = {
+  stats: {
+    locationLabel: 'Location',
+    locationValue: 'Cetățuia, Romania',
+    assetClassLabel: 'Asset Class',
+    assetClassValue: 'Agricultural Land',
+    aiIntegrationLabel: 'AI Integration',
+    aiIntegrationValue: 'Precision Farming',
+    onChainProofLabel: 'On-Chain Proof',
+    onChainProofValue: 'IPFS + TON L1',
+    yieldTypeLabel: 'Yield Type',
+    yieldTypeValue: 'Agricultural + Token',
+    tokenLayerLabel: 'Token Layer',
+    tokenLayerValue: 'CET · 9,000 supply',
+  },
+  pillars: {
+    tangibleTitle: 'Tangible Backing',
+    tangibleDescription:
+      'Every CET token is backed by productive agricultural land in Cetățuia, Romania — not speculative promises. The land generates real-world agricultural yield independent of crypto market cycles.',
+    transparencyTitle: 'On-Chain Transparency',
+    transparencyDescription:
+      'All land ownership documents, agricultural records, and AI farming reports are stored on IPFS and anchored to TON L1. Any holder can verify the backing assets without trusting a third party.',
+    aiYieldTitle: 'AI-Optimised Yield',
+    aiYieldDescription:
+      "Solaris CET's ~200,000 task-specialist AI agents coordinate agricultural operations — soil analysis, crop rotation planning, weather prediction, and irrigation scheduling — with CET AI–orchestrated validation, maximising yield sustainably.",
+    scarcityTitle: 'Structural Scarcity',
+    scarcityDescription:
+      'With only 9,000 CET ever minted, each token represents a proportional share of a unique real-world asset. No competitor combines AI agent infrastructure with hard-capped supply and physical asset backing.',
+  },
+};
+
+const rwaContentUiRo: Translations['rwaContentUi'] = {
+  stats: {
+    locationLabel: 'Locație',
+    locationValue: 'Cetățuia, România',
+    assetClassLabel: 'Clasă activ',
+    assetClassValue: 'Teren agricol',
+    aiIntegrationLabel: 'Integrare AI',
+    aiIntegrationValue: 'Agricultură de precizie',
+    onChainProofLabel: 'Dovadă on-chain',
+    onChainProofValue: 'IPFS + TON L1',
+    yieldTypeLabel: 'Tip randament',
+    yieldTypeValue: 'Agricol + token',
+    tokenLayerLabel: 'Strat token',
+    tokenLayerValue: 'CET · supply 9.000',
+  },
+  pillars: {
+    tangibleTitle: 'Backing tangibil',
+    tangibleDescription:
+      'Fiecare token CET este susținut de teren agricol productiv în Cetățuia, România — nu de promisiuni speculative. Terenul generează randament real, independent de ciclurile pieței crypto.',
+    transparencyTitle: 'Transparență on-chain',
+    transparencyDescription:
+      'Documentele de proprietate, evidențe agricole și rapoarte AI sunt stocate pe IPFS și ancorate în TON L1. Orice deținător poate verifica backing-ul fără a avea nevoie de “încredere” într-un terț.',
+    aiYieldTitle: 'Randament optimizat de AI',
+    aiYieldDescription:
+      'Agenții AI (~200.000) coordonează operațiunile agricole: analiză sol, rotație culturi, predicție meteo, irigații — cu validare orchestratǎ, pentru maximizarea randamentului în mod sustenabil.',
+    scarcityTitle: 'Raritate structurală',
+    scarcityDescription:
+      'Cu doar 9.000 CET vreodată emise, fiecare token reprezintă o parte proporțională dintr-un activ real. Niciun competitor nu combină infrastructură de agenți AI, supply hard-capped și backing fizic.',
+  },
+};
 
 const translations: Record<LangCode, Translations> = {
   en: {
@@ -626,6 +2200,126 @@ const translations: Record<LangCode, Translations> = {
       bftNodeHonest: 'Honest validator (illustrative)',
       authorityTrust: 'Authority and trust pillars',
     },
+    rwaUi: {
+      map: {
+        ariaLabel: 'RWA portfolio map',
+        controlsAria: 'Map controls',
+        zoomInAria: 'Zoom in',
+        zoomOutAria: 'Zoom out',
+        resetAria: 'Reset map',
+        resetLabel: 'Reset',
+        selectionAria: 'Selection',
+        selectProjectAria: 'Select project {title}',
+        infoNote: 'Interactive map is a lightweight portfolio view; it is not a live oracle.',
+        helpLine: 'Drag to pan · Use controls to zoom · Click markers to view details',
+      },
+      timeline: {
+        ariaLabel: 'RWA timeline',
+        title: 'Timeline',
+        subtitle: 'Milestones are linked for deep navigation and can be expanded for details.',
+        legendComplete: 'COMPLETE',
+        legendActive: 'ACTIVE',
+        legendPlanned: 'PLANNED',
+      },
+      documents: {
+        ariaLabel: 'RWA documents',
+        title: 'Documents',
+        subtitle: 'Preview when possible; download links open in a new tab.',
+        searchSr: 'Search documents',
+        searchPlaceholder: 'Search…',
+        filterSr: 'Filter by type',
+        filterAll: 'All types',
+        filterWhitepaper: 'Whitepaper',
+        filterAudit: 'Audit',
+        filterIpfs: 'IPFS proof',
+        filterRegistry: 'Land registry',
+        filterTimeline: 'Timeline',
+        typeWhitepaper: 'Whitepaper',
+        typeAudit: 'Audit',
+        typeIpfs: 'IPFS proof',
+        typeRegistry: 'Land registry',
+        typeTimeline: 'Timeline',
+        preview: 'Preview',
+        download: 'Download',
+        empty: 'No documents match your filters.',
+      },
+    },
+    rwaSectionUi: {
+      kicker: 'REAL WORLD ASSETS · RWA',
+      titleLead: 'Grounded in',
+      titleAccent: 'Real Land',
+      subtitle:
+        'Solaris CET is the only AI token backed by physical real-world assets. Productive agricultural land in Cetățuia, Romania — managed by 200,000 AI agents — provides structural backing that no competitor can replicate.',
+      physicalKicker: 'PHYSICAL ASSET · LAND ANCHOR',
+      physicalHeadingLead: 'The token is tied to',
+      physicalHeadingAccent: 'real soil',
+      physicalHeadingTail: 'not screens',
+      physicalBodyPrefix: 'CET is designed as a claim on productive agricultural land in',
+      physicalLocationName: 'Cetățuia, Romania',
+      physicalBodySuffix:
+        '— the same jurisdiction and asset class referenced in RWA documentation. Each unit in the 9,000 CET supply maps to a fractional economic interest in that land-backed stack: crop yield, verified operations, and on-chain attestations (IPFS + TON) are the bridge between the token and the field.',
+      physicalQuote:
+        'This is structural backing: the project is not “digital air” — it is explicitly anchored in a named location and a tangible asset class you can verify independently.',
+      chipTonContract: 'TON contract',
+      chipDedustPool: 'DeDust pool',
+      chipIpfsProof: 'IPFS proof',
+      asideAria: 'RWA project details',
+      asideRegion: 'Region',
+      asideType: 'Type',
+      asideJumpDocs: 'Jump to documents',
+      asideJumpTimeline: 'Jump to timeline',
+      asideProofBundle: 'Proof bundle: IPFS + TON references. Always verify claims against linked artifacts.',
+      asideMapOpen: 'Open',
+      asideMapTitlePrefix: 'Map',
+      asideNoSelection: 'No project selected.',
+      verifiedKicker: 'VERIFIED ON-CHAIN',
+      verifiedBody:
+        'All RWA documentation is immutably stored on IPFS and anchored to TON Layer 1. The whitepaper CID {cid} is the on-chain proof of the agricultural backing.',
+      verifiedCta: 'View IPFS Proof ↗',
+    },
+    ecosystemIndexUi: {
+      kicker: 'MARKET ECOSYSTEM',
+      titleLead: 'The',
+      titleAccent: 'Crypto Landscape',
+      titleTail: 'CET Operates In',
+      subtitle:
+        'Solaris CET is part of a growing decentralized economy. Explore the top 40+ projects that define the market — from Layer-1 blockchains to stablecoins, DeFi protocols, and the CoinMarketCap 20 Index.',
+      uniqueKicker: 'UNIQUE POSITION',
+      uniqueBodyPrefix: 'Unlike any other token in this index,',
+      uniqueTokenName: 'Solaris CET',
+      uniqueBodySuffix:
+        'combines a fixed supply of 9,000 tokens, Real-World Asset backing, and a fully AI-native corporate structure — making it the only token in the ecosystem that operates an autonomous workforce of 200,000 agents.',
+      featuredKicker: 'FEATURED INDEX',
+      featuredBody:
+        'A diversified on-chain index of the top 20 cryptocurrencies by market cap, powered by the Reserve Protocol on BNB Smart Chain. Track the performance of the entire market in a single tokenized position.',
+      projectsUnit: 'projects',
+      categories: {
+        l1: 'L1 Blockchains',
+        stablecoin: 'Stablecoins',
+        ai: 'AI & Agent Tokens',
+        defi: 'DeFi & Infrastructure',
+        meme: 'Meme & Community',
+        other: 'Other Major Projects',
+      },
+    },
+    howToBuyUi: howToBuyUiEn,
+    tokenomicsUi: tokenomicsUiEn,
+    footerUi: footerUiEn,
+    novaAppUi: novaAppUiEn,
+    competitionUi: competitionUiEn,
+    highIntelligenceUi: highIntelligenceUiEn,
+    hybridEngineUi: hybridEngineUiEn,
+    intelligenceCoreUi: intelligenceCoreUiEn,
+    complianceUi: complianceUiEn,
+    agenticEngineUi: agenticEngineUiEn,
+    hierarchyGraphUi: hierarchyGraphUiEn,
+    resourcesUi: resourcesUiEn,
+    networkPulseUi: networkPulseUiEn,
+    whitepaperUi: whitepaperUiEn,
+    aiTeamUi: aiTeamUiEn,
+    roadmapUi: roadmapUiEn,
+    securityUi: securityUiEn,
+    rwaContentUi: rwaContentUiEn,
     ui: {
       toggleSidebar: 'Toggle Sidebar',
       paginationNav: 'Pagination',
@@ -722,6 +2416,8 @@ const translations: Record<LangCode, Translations> = {
       title: 'Proof you can verify — not hype you can’t',
       subtitle:
         'Every surface on Solaris CET is built to reduce cognitive load: technical proof, on-chain scarcity, a legal/geographic anchor, and operational transparency.',
+      listedOnLabel: 'LISTED ON',
+      partnersLabel: 'PARTNERS',
       pillar1Title: 'Technical proof',
       pillar1Body:
         'Cyberscope-audited contract, KYC-verified team, and TON-native execution with verifiable traces — not a black box.',
@@ -758,6 +2454,7 @@ const translations: Record<LangCode, Translations> = {
       networkAtAGlance: 'NETWORK AT A GLANCE',
       meetAgents: 'Meet the agents',
       verifiedBy: 'Verified by',
+      allSystemsLive: 'ALL SYSTEMS LIVE',
       labelAgents: 'Task-specialist AI agents',
       sublabelAgents:
         '~200k simulated narrow agents for routing, retrieval & validation · 10 departments · orchestrated for CET AI',
@@ -771,6 +2468,9 @@ const translations: Record<LangCode, Translations> = {
       badgeScarce: 'SCARCE',
       badgeFastest: 'FASTEST',
       badgeLongTerm: 'LONG TERM',
+      trustBadgeAudited: 'Cyberscope Audited',
+      trustBadgeKyc: 'KYC Verified',
+      trustBadgeOpenSource: 'Open Source',
     },
     aiTeam: {
       corporateStructure: 'AI CORPORATE STRUCTURE',
@@ -1064,6 +2764,126 @@ const translations: Record<LangCode, Translations> = {
       bftNodeHonest: 'Validador honesto (ilustrativo)',
       authorityTrust: 'Pilares de autoridad y confianza',
     },
+    rwaUi: {
+      map: {
+        ariaLabel: 'RWA portfolio map',
+        controlsAria: 'Map controls',
+        zoomInAria: 'Zoom in',
+        zoomOutAria: 'Zoom out',
+        resetAria: 'Reset map',
+        resetLabel: 'Reset',
+        selectionAria: 'Selection',
+        selectProjectAria: 'Select project {title}',
+        infoNote: 'Interactive map is a lightweight portfolio view; it is not a live oracle.',
+        helpLine: 'Drag to pan · Use controls to zoom · Click markers to view details',
+      },
+      timeline: {
+        ariaLabel: 'RWA timeline',
+        title: 'Timeline',
+        subtitle: 'Milestones are linked for deep navigation and can be expanded for details.',
+        legendComplete: 'COMPLETE',
+        legendActive: 'ACTIVE',
+        legendPlanned: 'PLANNED',
+      },
+      documents: {
+        ariaLabel: 'RWA documents',
+        title: 'Documents',
+        subtitle: 'Preview when possible; download links open in a new tab.',
+        searchSr: 'Search documents',
+        searchPlaceholder: 'Search…',
+        filterSr: 'Filter by type',
+        filterAll: 'All types',
+        filterWhitepaper: 'Whitepaper',
+        filterAudit: 'Audit',
+        filterIpfs: 'IPFS proof',
+        filterRegistry: 'Land registry',
+        filterTimeline: 'Timeline',
+        typeWhitepaper: 'Whitepaper',
+        typeAudit: 'Audit',
+        typeIpfs: 'IPFS proof',
+        typeRegistry: 'Land registry',
+        typeTimeline: 'Timeline',
+        preview: 'Preview',
+        download: 'Download',
+        empty: 'No documents match your filters.',
+      },
+    },
+    rwaSectionUi: {
+      kicker: 'REAL WORLD ASSETS · RWA',
+      titleLead: 'Grounded in',
+      titleAccent: 'Real Land',
+      subtitle:
+        'Solaris CET is the only AI token backed by physical real-world assets. Productive agricultural land in Cetățuia, Romania — managed by 200,000 AI agents — provides structural backing that no competitor can replicate.',
+      physicalKicker: 'PHYSICAL ASSET · LAND ANCHOR',
+      physicalHeadingLead: 'The token is tied to',
+      physicalHeadingAccent: 'real soil',
+      physicalHeadingTail: 'not screens',
+      physicalBodyPrefix: 'CET is designed as a claim on productive agricultural land in',
+      physicalLocationName: 'Cetățuia, Romania',
+      physicalBodySuffix:
+        '— the same jurisdiction and asset class referenced in RWA documentation. Each unit in the 9,000 CET supply maps to a fractional economic interest in that land-backed stack: crop yield, verified operations, and on-chain attestations (IPFS + TON) are the bridge between the token and the field.',
+      physicalQuote:
+        'This is structural backing: the project is not “digital air” — it is explicitly anchored in a named location and a tangible asset class you can verify independently.',
+      chipTonContract: 'TON contract',
+      chipDedustPool: 'DeDust pool',
+      chipIpfsProof: 'IPFS proof',
+      asideAria: 'RWA project details',
+      asideRegion: 'Region',
+      asideType: 'Type',
+      asideJumpDocs: 'Jump to documents',
+      asideJumpTimeline: 'Jump to timeline',
+      asideProofBundle: 'Proof bundle: IPFS + TON references. Always verify claims against linked artifacts.',
+      asideMapOpen: 'Open',
+      asideMapTitlePrefix: 'Map',
+      asideNoSelection: 'No project selected.',
+      verifiedKicker: 'VERIFIED ON-CHAIN',
+      verifiedBody:
+        'All RWA documentation is immutably stored on IPFS and anchored to TON Layer 1. The whitepaper CID {cid} is the on-chain proof of the agricultural backing.',
+      verifiedCta: 'View IPFS Proof ↗',
+    },
+    ecosystemIndexUi: {
+      kicker: 'MARKET ECOSYSTEM',
+      titleLead: 'The',
+      titleAccent: 'Crypto Landscape',
+      titleTail: 'CET Operates In',
+      subtitle:
+        'Solaris CET is part of a growing decentralized economy. Explore the top 40+ projects that define the market — from Layer-1 blockchains to stablecoins, DeFi protocols, and the CoinMarketCap 20 Index.',
+      uniqueKicker: 'UNIQUE POSITION',
+      uniqueBodyPrefix: 'Unlike any other token in this index,',
+      uniqueTokenName: 'Solaris CET',
+      uniqueBodySuffix:
+        'combines a fixed supply of 9,000 tokens, Real-World Asset backing, and a fully AI-native corporate structure — making it the only token in the ecosystem that operates an autonomous workforce of 200,000 agents.',
+      featuredKicker: 'FEATURED INDEX',
+      featuredBody:
+        'A diversified on-chain index of the top 20 cryptocurrencies by market cap, powered by the Reserve Protocol on BNB Smart Chain. Track the performance of the entire market in a single tokenized position.',
+      projectsUnit: 'projects',
+      categories: {
+        l1: 'L1 Blockchains',
+        stablecoin: 'Stablecoins',
+        ai: 'AI & Agent Tokens',
+        defi: 'DeFi & Infrastructure',
+        meme: 'Meme & Community',
+        other: 'Other Major Projects',
+      },
+    },
+    howToBuyUi: howToBuyUiEn,
+    tokenomicsUi: tokenomicsUiEn,
+    footerUi: footerUiEn,
+    novaAppUi: novaAppUiEn,
+    competitionUi: competitionUiEn,
+    highIntelligenceUi: highIntelligenceUiEn,
+    hybridEngineUi: hybridEngineUiEn,
+    intelligenceCoreUi: intelligenceCoreUiEn,
+    complianceUi: complianceUiEn,
+    agenticEngineUi: agenticEngineUiEn,
+    hierarchyGraphUi: hierarchyGraphUiEn,
+    resourcesUi: resourcesUiEn,
+    networkPulseUi: networkPulseUiEn,
+    whitepaperUi: whitepaperUiEn,
+    aiTeamUi: aiTeamUiEn,
+    roadmapUi: roadmapUiEn,
+    securityUi: securityUiEn,
+    rwaContentUi: rwaContentUiEn,
     ui: {
       toggleSidebar: 'Alternar barra lateral',
       paginationNav: 'Paginación',
@@ -1160,6 +2980,8 @@ const translations: Record<LangCode, Translations> = {
       title: 'Pruebas verificables — no ruido de marketing',
       subtitle:
         'Cada superficie reduce carga cognitiva: prueba técnica, escasez on-chain, ancla legal/geográfica y transparencia operativa.',
+      listedOnLabel: 'LISTADO EN',
+      partnersLabel: 'SOCIOS',
       pillar1Title: 'Prueba técnica',
       pillar1Body:
         'Contrato auditado por Cyberscope, equipo con KYC y ejecución en TON con trazas verificables.',
@@ -1196,6 +3018,7 @@ const translations: Record<LangCode, Translations> = {
       networkAtAGlance: 'RED DE UN VISTAZO',
       meetAgents: 'Conoce a los agentes',
       verifiedBy: 'Verificado por',
+      allSystemsLive: 'SISTEMAS EN VIVO',
       labelAgents: 'Agentes IA especialistas',
       sublabelAgents:
         '~200k agentes para enrutamiento, recuperación y validación · 10 departamentos · orquestados para CET AI',
@@ -1209,6 +3032,9 @@ const translations: Record<LangCode, Translations> = {
       badgeScarce: 'ESCASO',
       badgeFastest: 'RÁPIDO',
       badgeLongTerm: 'LARGO PLAZO',
+      trustBadgeAudited: 'Auditado por Cyberscope',
+      trustBadgeKyc: 'KYC verificado',
+      trustBadgeOpenSource: 'Código abierto',
     },
     aiTeam: {
       corporateStructure: 'ESTRUCTURA CORPORATIVA IA',
@@ -1501,6 +3327,126 @@ const translations: Record<LangCode, Translations> = {
       bftNodeHonest: '诚实验证者（示意）',
       authorityTrust: '信任与权威支柱',
     },
+    rwaUi: {
+      map: {
+        ariaLabel: 'RWA portfolio map',
+        controlsAria: 'Map controls',
+        zoomInAria: 'Zoom in',
+        zoomOutAria: 'Zoom out',
+        resetAria: 'Reset map',
+        resetLabel: 'Reset',
+        selectionAria: 'Selection',
+        selectProjectAria: 'Select project {title}',
+        infoNote: 'Interactive map is a lightweight portfolio view; it is not a live oracle.',
+        helpLine: 'Drag to pan · Use controls to zoom · Click markers to view details',
+      },
+      timeline: {
+        ariaLabel: 'RWA timeline',
+        title: 'Timeline',
+        subtitle: 'Milestones are linked for deep navigation and can be expanded for details.',
+        legendComplete: 'COMPLETE',
+        legendActive: 'ACTIVE',
+        legendPlanned: 'PLANNED',
+      },
+      documents: {
+        ariaLabel: 'RWA documents',
+        title: 'Documents',
+        subtitle: 'Preview when possible; download links open in a new tab.',
+        searchSr: 'Search documents',
+        searchPlaceholder: 'Search…',
+        filterSr: 'Filter by type',
+        filterAll: 'All types',
+        filterWhitepaper: 'Whitepaper',
+        filterAudit: 'Audit',
+        filterIpfs: 'IPFS proof',
+        filterRegistry: 'Land registry',
+        filterTimeline: 'Timeline',
+        typeWhitepaper: 'Whitepaper',
+        typeAudit: 'Audit',
+        typeIpfs: 'IPFS proof',
+        typeRegistry: 'Land registry',
+        typeTimeline: 'Timeline',
+        preview: 'Preview',
+        download: 'Download',
+        empty: 'No documents match your filters.',
+      },
+    },
+    rwaSectionUi: {
+      kicker: 'REAL WORLD ASSETS · RWA',
+      titleLead: 'Grounded in',
+      titleAccent: 'Real Land',
+      subtitle:
+        'Solaris CET is the only AI token backed by physical real-world assets. Productive agricultural land in Cetățuia, Romania — managed by 200,000 AI agents — provides structural backing that no competitor can replicate.',
+      physicalKicker: 'PHYSICAL ASSET · LAND ANCHOR',
+      physicalHeadingLead: 'The token is tied to',
+      physicalHeadingAccent: 'real soil',
+      physicalHeadingTail: 'not screens',
+      physicalBodyPrefix: 'CET is designed as a claim on productive agricultural land in',
+      physicalLocationName: 'Cetățuia, Romania',
+      physicalBodySuffix:
+        '— the same jurisdiction and asset class referenced in RWA documentation. Each unit in the 9,000 CET supply maps to a fractional economic interest in that land-backed stack: crop yield, verified operations, and on-chain attestations (IPFS + TON) are the bridge between the token and the field.',
+      physicalQuote:
+        'This is structural backing: the project is not “digital air” — it is explicitly anchored in a named location and a tangible asset class you can verify independently.',
+      chipTonContract: 'TON contract',
+      chipDedustPool: 'DeDust pool',
+      chipIpfsProof: 'IPFS proof',
+      asideAria: 'RWA project details',
+      asideRegion: 'Region',
+      asideType: 'Type',
+      asideJumpDocs: 'Jump to documents',
+      asideJumpTimeline: 'Jump to timeline',
+      asideProofBundle: 'Proof bundle: IPFS + TON references. Always verify claims against linked artifacts.',
+      asideMapOpen: 'Open',
+      asideMapTitlePrefix: 'Map',
+      asideNoSelection: 'No project selected.',
+      verifiedKicker: 'VERIFIED ON-CHAIN',
+      verifiedBody:
+        'All RWA documentation is immutably stored on IPFS and anchored to TON Layer 1. The whitepaper CID {cid} is the on-chain proof of the agricultural backing.',
+      verifiedCta: 'View IPFS Proof ↗',
+    },
+    ecosystemIndexUi: {
+      kicker: 'MARKET ECOSYSTEM',
+      titleLead: 'The',
+      titleAccent: 'Crypto Landscape',
+      titleTail: 'CET Operates In',
+      subtitle:
+        'Solaris CET is part of a growing decentralized economy. Explore the top 40+ projects that define the market — from Layer-1 blockchains to stablecoins, DeFi protocols, and the CoinMarketCap 20 Index.',
+      uniqueKicker: 'UNIQUE POSITION',
+      uniqueBodyPrefix: 'Unlike any other token in this index,',
+      uniqueTokenName: 'Solaris CET',
+      uniqueBodySuffix:
+        'combines a fixed supply of 9,000 tokens, Real-World Asset backing, and a fully AI-native corporate structure — making it the only token in the ecosystem that operates an autonomous workforce of 200,000 agents.',
+      featuredKicker: 'FEATURED INDEX',
+      featuredBody:
+        'A diversified on-chain index of the top 20 cryptocurrencies by market cap, powered by the Reserve Protocol on BNB Smart Chain. Track the performance of the entire market in a single tokenized position.',
+      projectsUnit: 'projects',
+      categories: {
+        l1: 'L1 Blockchains',
+        stablecoin: 'Stablecoins',
+        ai: 'AI & Agent Tokens',
+        defi: 'DeFi & Infrastructure',
+        meme: 'Meme & Community',
+        other: 'Other Major Projects',
+      },
+    },
+    howToBuyUi: howToBuyUiEn,
+    tokenomicsUi: tokenomicsUiEn,
+    footerUi: footerUiEn,
+    novaAppUi: novaAppUiEn,
+    competitionUi: competitionUiEn,
+    highIntelligenceUi: highIntelligenceUiEn,
+    hybridEngineUi: hybridEngineUiEn,
+    intelligenceCoreUi: intelligenceCoreUiEn,
+    complianceUi: complianceUiEn,
+    agenticEngineUi: agenticEngineUiEn,
+    hierarchyGraphUi: hierarchyGraphUiEn,
+    resourcesUi: resourcesUiEn,
+    networkPulseUi: networkPulseUiEn,
+    whitepaperUi: whitepaperUiEn,
+    aiTeamUi: aiTeamUiEn,
+    roadmapUi: roadmapUiEn,
+    securityUi: securityUiEn,
+    rwaContentUi: rwaContentUiEn,
     ui: {
       toggleSidebar: '切换侧边栏',
       paginationNav: '分页导航',
@@ -1594,6 +3540,8 @@ const translations: Record<LangCode, Translations> = {
       title: '可验证的证明 — 非空洞宣传',
       subtitle:
         '每个界面都降低认知负担：技术证明、链上稀缺、地理/法律锚点与运营透明。',
+      listedOnLabel: '已上线于',
+      partnersLabel: '合作伙伴',
       pillar1Title: '技术证明',
       pillar1Body: 'Cyberscope 审计合约、KYC 团队与 TON 上可验证的执行轨迹。',
       pillar2Title: '链上真实',
@@ -1626,6 +3574,7 @@ const translations: Record<LangCode, Translations> = {
       networkAtAGlance: '网络概览',
       meetAgents: '会见智能体',
       verifiedBy: '验证方',
+      allSystemsLive: '系统全在线',
       labelAgents: '任务型 AI 智能体',
       sublabelAgents: '~200k 细分智能体，负责路由、检索与验证 · 10 个部门',
       labelSupply: '固定总供应量',
@@ -1638,6 +3587,9 @@ const translations: Record<LangCode, Translations> = {
       badgeScarce: '稀缺',
       badgeFastest: '极速',
       badgeLongTerm: '长期',
+      trustBadgeAudited: 'Cyberscope 已审计',
+      trustBadgeKyc: 'KYC 已验证',
+      trustBadgeOpenSource: '开源',
     },
     aiTeam: {
       corporateStructure: 'AI 企业架构',
@@ -1928,6 +3880,126 @@ const translations: Record<LangCode, Translations> = {
       bftNodeHonest: 'Честный валидатор (иллюстрация)',
       authorityTrust: 'Столпы доверия и авторитета',
     },
+    rwaUi: {
+      map: {
+        ariaLabel: 'RWA portfolio map',
+        controlsAria: 'Map controls',
+        zoomInAria: 'Zoom in',
+        zoomOutAria: 'Zoom out',
+        resetAria: 'Reset map',
+        resetLabel: 'Reset',
+        selectionAria: 'Selection',
+        selectProjectAria: 'Select project {title}',
+        infoNote: 'Interactive map is a lightweight portfolio view; it is not a live oracle.',
+        helpLine: 'Drag to pan · Use controls to zoom · Click markers to view details',
+      },
+      timeline: {
+        ariaLabel: 'RWA timeline',
+        title: 'Timeline',
+        subtitle: 'Milestones are linked for deep navigation and can be expanded for details.',
+        legendComplete: 'COMPLETE',
+        legendActive: 'ACTIVE',
+        legendPlanned: 'PLANNED',
+      },
+      documents: {
+        ariaLabel: 'RWA documents',
+        title: 'Documents',
+        subtitle: 'Preview when possible; download links open in a new tab.',
+        searchSr: 'Search documents',
+        searchPlaceholder: 'Search…',
+        filterSr: 'Filter by type',
+        filterAll: 'All types',
+        filterWhitepaper: 'Whitepaper',
+        filterAudit: 'Audit',
+        filterIpfs: 'IPFS proof',
+        filterRegistry: 'Land registry',
+        filterTimeline: 'Timeline',
+        typeWhitepaper: 'Whitepaper',
+        typeAudit: 'Audit',
+        typeIpfs: 'IPFS proof',
+        typeRegistry: 'Land registry',
+        typeTimeline: 'Timeline',
+        preview: 'Preview',
+        download: 'Download',
+        empty: 'No documents match your filters.',
+      },
+    },
+    rwaSectionUi: {
+      kicker: 'REAL WORLD ASSETS · RWA',
+      titleLead: 'Grounded in',
+      titleAccent: 'Real Land',
+      subtitle:
+        'Solaris CET is the only AI token backed by physical real-world assets. Productive agricultural land in Cetățuia, Romania — managed by 200,000 AI agents — provides structural backing that no competitor can replicate.',
+      physicalKicker: 'PHYSICAL ASSET · LAND ANCHOR',
+      physicalHeadingLead: 'The token is tied to',
+      physicalHeadingAccent: 'real soil',
+      physicalHeadingTail: 'not screens',
+      physicalBodyPrefix: 'CET is designed as a claim on productive agricultural land in',
+      physicalLocationName: 'Cetățuia, Romania',
+      physicalBodySuffix:
+        '— the same jurisdiction and asset class referenced in RWA documentation. Each unit in the 9,000 CET supply maps to a fractional economic interest in that land-backed stack: crop yield, verified operations, and on-chain attestations (IPFS + TON) are the bridge between the token and the field.',
+      physicalQuote:
+        'This is structural backing: the project is not “digital air” — it is explicitly anchored in a named location and a tangible asset class you can verify independently.',
+      chipTonContract: 'TON contract',
+      chipDedustPool: 'DeDust pool',
+      chipIpfsProof: 'IPFS proof',
+      asideAria: 'RWA project details',
+      asideRegion: 'Region',
+      asideType: 'Type',
+      asideJumpDocs: 'Jump to documents',
+      asideJumpTimeline: 'Jump to timeline',
+      asideProofBundle: 'Proof bundle: IPFS + TON references. Always verify claims against linked artifacts.',
+      asideMapOpen: 'Open',
+      asideMapTitlePrefix: 'Map',
+      asideNoSelection: 'No project selected.',
+      verifiedKicker: 'VERIFIED ON-CHAIN',
+      verifiedBody:
+        'All RWA documentation is immutably stored on IPFS and anchored to TON Layer 1. The whitepaper CID {cid} is the on-chain proof of the agricultural backing.',
+      verifiedCta: 'View IPFS Proof ↗',
+    },
+    ecosystemIndexUi: {
+      kicker: 'MARKET ECOSYSTEM',
+      titleLead: 'The',
+      titleAccent: 'Crypto Landscape',
+      titleTail: 'CET Operates In',
+      subtitle:
+        'Solaris CET is part of a growing decentralized economy. Explore the top 40+ projects that define the market — from Layer-1 blockchains to stablecoins, DeFi protocols, and the CoinMarketCap 20 Index.',
+      uniqueKicker: 'UNIQUE POSITION',
+      uniqueBodyPrefix: 'Unlike any other token in this index,',
+      uniqueTokenName: 'Solaris CET',
+      uniqueBodySuffix:
+        'combines a fixed supply of 9,000 tokens, Real-World Asset backing, and a fully AI-native corporate structure — making it the only token in the ecosystem that operates an autonomous workforce of 200,000 agents.',
+      featuredKicker: 'FEATURED INDEX',
+      featuredBody:
+        'A diversified on-chain index of the top 20 cryptocurrencies by market cap, powered by the Reserve Protocol on BNB Smart Chain. Track the performance of the entire market in a single tokenized position.',
+      projectsUnit: 'projects',
+      categories: {
+        l1: 'L1 Blockchains',
+        stablecoin: 'Stablecoins',
+        ai: 'AI & Agent Tokens',
+        defi: 'DeFi & Infrastructure',
+        meme: 'Meme & Community',
+        other: 'Other Major Projects',
+      },
+    },
+    howToBuyUi: howToBuyUiEn,
+    tokenomicsUi: tokenomicsUiEn,
+    footerUi: footerUiEn,
+    novaAppUi: novaAppUiEn,
+    competitionUi: competitionUiEn,
+    highIntelligenceUi: highIntelligenceUiEn,
+    hybridEngineUi: hybridEngineUiEn,
+    intelligenceCoreUi: intelligenceCoreUiEn,
+    complianceUi: complianceUiEn,
+    agenticEngineUi: agenticEngineUiEn,
+    hierarchyGraphUi: hierarchyGraphUiEn,
+    resourcesUi: resourcesUiEn,
+    networkPulseUi: networkPulseUiEn,
+    whitepaperUi: whitepaperUiEn,
+    aiTeamUi: aiTeamUiEn,
+    roadmapUi: roadmapUiEn,
+    securityUi: securityUiEn,
+    rwaContentUi: rwaContentUiEn,
     ui: {
       toggleSidebar: 'Переключить боковую панель',
       paginationNav: 'Пагинация',
@@ -2024,6 +4096,8 @@ const translations: Record<LangCode, Translations> = {
       title: 'Доказательства, которые можно проверить',
       subtitle:
         'Каждый экран снижает когнитивную нагрузку: техдоказательство, ончейн-дефицит, юридико-географический якорь и прозрачность процессов.',
+      listedOnLabel: 'РАЗМЕЩЕНО НА',
+      partnersLabel: 'ПАРТНЕРЫ',
       pillar1Title: 'Техническое доказательство',
       pillar1Body:
         'Контракт с аудитом Cyberscope, команда с KYC и исполнение в TON с проверяемыми следами.',
@@ -2060,6 +4134,7 @@ const translations: Record<LangCode, Translations> = {
       networkAtAGlance: 'ОБЗОР СЕТИ',
       meetAgents: 'Встречайте агентов',
       verifiedBy: 'Проверено',
+      allSystemsLive: 'ВСЕ СИСТЕМЫ ONLINE',
       labelAgents: 'Специализированные ИИ-агенты',
       sublabelAgents: '~200k агентов для маршрутизации, поиска и проверки · 10 отделов',
       labelSupply: 'Фиксированная эмиссия',
@@ -2072,6 +4147,9 @@ const translations: Record<LangCode, Translations> = {
       badgeScarce: 'РЕДКИЙ',
       badgeFastest: 'БЫСТРЫЙ',
       badgeLongTerm: 'ДОЛГОСРОК',
+      trustBadgeAudited: 'Аудит Cyberscope',
+      trustBadgeKyc: 'KYC подтвержден',
+      trustBadgeOpenSource: 'Открытый код',
     },
     aiTeam: {
       corporateStructure: 'КОРПОРАТИВНАЯ СТРУКТУРА ИИ',
@@ -2363,6 +4441,126 @@ const translations: Record<LangCode, Translations> = {
       bftNodeHonest: 'Validator cinstit (ilustrativ)',
       authorityTrust: 'Pilonii de autoritate și încredere',
     },
+    rwaUi: {
+      map: {
+        ariaLabel: 'Hartă portofoliu RWA',
+        controlsAria: 'Controale hartă',
+        zoomInAria: 'Mărește',
+        zoomOutAria: 'Micșorează',
+        resetAria: 'Resetează harta',
+        resetLabel: 'Reset',
+        selectionAria: 'Selecție',
+        selectProjectAria: 'Selectează proiectul {title}',
+        infoNote: 'Harta interactivă este o vedere “light” a portofoliului; nu este un oracle live.',
+        helpLine: 'Trage pentru pan · Folosește controalele pentru zoom · Click pe markeri pentru detalii',
+      },
+      timeline: {
+        ariaLabel: 'Timeline RWA',
+        title: 'Timeline',
+        subtitle: 'Milestone-urile sunt linkuite pentru navigare rapidă și pot fi expandate pentru detalii.',
+        legendComplete: 'FINALIZAT',
+        legendActive: 'ÎN LUCRU',
+        legendPlanned: 'PLANIFICAT',
+      },
+      documents: {
+        ariaLabel: 'Documente RWA',
+        title: 'Documente',
+        subtitle: 'Previzualizează când e posibil; linkurile se deschid într-un tab nou.',
+        searchSr: 'Caută documente',
+        searchPlaceholder: 'Caută…',
+        filterSr: 'Filtrează după tip',
+        filterAll: 'Toate tipurile',
+        filterWhitepaper: 'Whitepaper',
+        filterAudit: 'Audit',
+        filterIpfs: 'Dovadă IPFS',
+        filterRegistry: 'Registru funciar',
+        filterTimeline: 'Timeline',
+        typeWhitepaper: 'Whitepaper',
+        typeAudit: 'Audit',
+        typeIpfs: 'Dovadă IPFS',
+        typeRegistry: 'Registru funciar',
+        typeTimeline: 'Timeline',
+        preview: 'Previzualizează',
+        download: 'Descarcă',
+        empty: 'Niciun document nu corespunde filtrelor.',
+      },
+    },
+    rwaSectionUi: {
+      kicker: 'ACTIVE DIN LUMEA REALĂ · RWA',
+      titleLead: 'Ancorat în',
+      titleAccent: 'teren real',
+      subtitle:
+        'Solaris CET este un token AI susținut de active fizice din lumea reală. Teren agricol productiv în Cetățuia, România — gestionat de 200.000 agenți AI — oferă un backing structural pe care niciun competitor nu îl poate replica.',
+      physicalKicker: 'ACTIV FIZIC · ANCORĂ ÎN TEREN',
+      physicalHeadingLead: 'Tokenul este legat de',
+      physicalHeadingAccent: 'sol real',
+      physicalHeadingTail: 'nu de ecrane',
+      physicalBodyPrefix: 'CET este gândit ca un claim economic pe teren agricol productiv în',
+      physicalLocationName: 'Cetățuia, România',
+      physicalBodySuffix:
+        '— aceeași jurisdicție și clasă de activ din documentația RWA. Fiecare unitate din supply-ul de 9.000 CET se mapează la un interes economic fracționar: randament agricol, operațiuni verificate și atestări on-chain (IPFS + TON) care fac puntea dintre token și teren.',
+      physicalQuote:
+        'Acesta e backing structural: proiectul nu este “aer digital” — este ancorat explicit într-o locație și o clasă de activ verificabile independent.',
+      chipTonContract: 'Contract TON',
+      chipDedustPool: 'Pool DeDust',
+      chipIpfsProof: 'Dovadă IPFS',
+      asideAria: 'Detalii proiect RWA',
+      asideRegion: 'Regiune',
+      asideType: 'Tip',
+      asideJumpDocs: 'Salt la documente',
+      asideJumpTimeline: 'Salt la timeline',
+      asideProofBundle: 'Pachet de dovezi: referințe IPFS + TON. Verifică întotdeauna afirmațiile în artefactele linkuite.',
+      asideMapOpen: 'Deschide',
+      asideMapTitlePrefix: 'Hartă',
+      asideNoSelection: 'Niciun proiect selectat.',
+      verifiedKicker: 'VERIFICAT ON-CHAIN',
+      verifiedBody:
+        'Documentația RWA este stocată imutabil pe IPFS și ancorată în TON L1. CID-ul whitepaper-ului {cid} este dovada on-chain a backing-ului agricol.',
+      verifiedCta: 'Vezi dovada IPFS ↗',
+    },
+    ecosystemIndexUi: {
+      kicker: 'ECOSISTEM DE PIAȚĂ',
+      titleLead: 'Peisajul',
+      titleAccent: 'crypto',
+      titleTail: 'în care operează CET',
+      subtitle:
+        'Solaris CET face parte dintr-o economie descentralizată în creștere. Explorează 40+ proiecte care definesc piața — de la blockchain-uri L1 la stablecoins, protocoale DeFi și indicele CoinMarketCap 20.',
+      uniqueKicker: 'POZIȚIE UNICĂ',
+      uniqueBodyPrefix: 'Spre deosebire de orice alt token din acest index,',
+      uniqueTokenName: 'Solaris CET',
+      uniqueBodySuffix:
+        'combină supply fix de 9.000 tokenuri, backing RWA și o structură corporate AI-native — fiind singurul proiect din ecosistem cu o forță de muncă autonomă de 200.000 agenți.',
+      featuredKicker: 'INDEX RECOMANDAT',
+      featuredBody:
+        'Un index on-chain diversificat al top 20 criptomonede după market cap, powered by Reserve Protocol pe BNB Smart Chain. Urmărești performanța pieței într-o singură poziție tokenizată.',
+      projectsUnit: 'proiecte',
+      categories: {
+        l1: 'Blockchain-uri L1',
+        stablecoin: 'Stablecoins',
+        ai: 'Tokenuri AI & Agenți',
+        defi: 'DeFi & infrastructură',
+        meme: 'Meme & comunitate',
+        other: 'Alte proiecte majore',
+      },
+    },
+    howToBuyUi: howToBuyUiRo,
+    tokenomicsUi: tokenomicsUiRo,
+    footerUi: footerUiRo,
+    novaAppUi: novaAppUiRo,
+    competitionUi: competitionUiRo,
+    highIntelligenceUi: highIntelligenceUiRo,
+    hybridEngineUi: hybridEngineUiRo,
+    intelligenceCoreUi: intelligenceCoreUiRo,
+    complianceUi: complianceUiRo,
+    agenticEngineUi: agenticEngineUiRo,
+    hierarchyGraphUi: hierarchyGraphUiRo,
+    resourcesUi: resourcesUiRo,
+    networkPulseUi: networkPulseUiRo,
+    whitepaperUi: whitepaperUiRo,
+    aiTeamUi: aiTeamUiRo,
+    roadmapUi: roadmapUiRo,
+    securityUi: securityUiRo,
+    rwaContentUi: rwaContentUiRo,
     ui: {
       toggleSidebar: 'Comută bara laterală',
       paginationNav: 'Paginare',
@@ -2459,6 +4657,8 @@ const translations: Record<LangCode, Translations> = {
       title: 'Dovezi pe care le poți verifica — nu doar marketing',
       subtitle:
         'Fiecare zonă reduce încărcarea cognitivă: dovadă tehnică, scaritate on-chain, ancoră geografică/juridică și transparență operațională.',
+      listedOnLabel: 'LISTAT PE',
+      partnersLabel: 'PARTENERI',
       pillar1Title: 'Dovadă tehnică',
       pillar1Body:
         'Contract auditat Cyberscope, echipă KYC și execuție TON cu urme verificabile.',
@@ -2495,6 +4695,7 @@ const translations: Record<LangCode, Translations> = {
       networkAtAGlance: 'REȚEAUA PE SCURT',
       meetAgents: 'Întâlnește agenții',
       verifiedBy: 'Verificat de',
+      allSystemsLive: 'TOATE SISTEMELE LIVE',
       labelAgents: 'Agenți AI specializați',
       sublabelAgents:
         '~200k agenți pentru rutare, recuperare și validare · 10 departamente · orchestrați pentru CET AI',
@@ -2508,6 +4709,9 @@ const translations: Record<LangCode, Translations> = {
       badgeScarce: 'RAR',
       badgeFastest: 'RAPID',
       badgeLongTerm: 'TERMEN LUNG',
+      trustBadgeAudited: 'Audit Cyberscope',
+      trustBadgeKyc: 'KYC verificat',
+      trustBadgeOpenSource: 'Open source',
     },
     aiTeam: {
       corporateStructure: 'STRUCTURĂ CORPORATIVĂ AI',
@@ -2801,6 +5005,126 @@ const translations: Record<LangCode, Translations> = {
       bftNodeHonest: 'Validador honesto (ilustrativo)',
       authorityTrust: 'Pilares de autoridade e confiança',
     },
+    rwaUi: {
+      map: {
+        ariaLabel: 'RWA portfolio map',
+        controlsAria: 'Map controls',
+        zoomInAria: 'Zoom in',
+        zoomOutAria: 'Zoom out',
+        resetAria: 'Reset map',
+        resetLabel: 'Reset',
+        selectionAria: 'Selection',
+        selectProjectAria: 'Select project {title}',
+        infoNote: 'Interactive map is a lightweight portfolio view; it is not a live oracle.',
+        helpLine: 'Drag to pan · Use controls to zoom · Click markers to view details',
+      },
+      timeline: {
+        ariaLabel: 'RWA timeline',
+        title: 'Timeline',
+        subtitle: 'Milestones are linked for deep navigation and can be expanded for details.',
+        legendComplete: 'COMPLETE',
+        legendActive: 'ACTIVE',
+        legendPlanned: 'PLANNED',
+      },
+      documents: {
+        ariaLabel: 'RWA documents',
+        title: 'Documents',
+        subtitle: 'Preview when possible; download links open in a new tab.',
+        searchSr: 'Search documents',
+        searchPlaceholder: 'Search…',
+        filterSr: 'Filter by type',
+        filterAll: 'All types',
+        filterWhitepaper: 'Whitepaper',
+        filterAudit: 'Audit',
+        filterIpfs: 'IPFS proof',
+        filterRegistry: 'Land registry',
+        filterTimeline: 'Timeline',
+        typeWhitepaper: 'Whitepaper',
+        typeAudit: 'Audit',
+        typeIpfs: 'IPFS proof',
+        typeRegistry: 'Land registry',
+        typeTimeline: 'Timeline',
+        preview: 'Preview',
+        download: 'Download',
+        empty: 'No documents match your filters.',
+      },
+    },
+    rwaSectionUi: {
+      kicker: 'REAL WORLD ASSETS · RWA',
+      titleLead: 'Grounded in',
+      titleAccent: 'Real Land',
+      subtitle:
+        'Solaris CET is the only AI token backed by physical real-world assets. Productive agricultural land in Cetățuia, Romania — managed by 200,000 AI agents — provides structural backing that no competitor can replicate.',
+      physicalKicker: 'PHYSICAL ASSET · LAND ANCHOR',
+      physicalHeadingLead: 'The token is tied to',
+      physicalHeadingAccent: 'real soil',
+      physicalHeadingTail: 'not screens',
+      physicalBodyPrefix: 'CET is designed as a claim on productive agricultural land in',
+      physicalLocationName: 'Cetățuia, Romania',
+      physicalBodySuffix:
+        '— the same jurisdiction and asset class referenced in RWA documentation. Each unit in the 9,000 CET supply maps to a fractional economic interest in that land-backed stack: crop yield, verified operations, and on-chain attestations (IPFS + TON) are the bridge between the token and the field.',
+      physicalQuote:
+        'This is structural backing: the project is not “digital air” — it is explicitly anchored in a named location and a tangible asset class you can verify independently.',
+      chipTonContract: 'TON contract',
+      chipDedustPool: 'DeDust pool',
+      chipIpfsProof: 'IPFS proof',
+      asideAria: 'RWA project details',
+      asideRegion: 'Region',
+      asideType: 'Type',
+      asideJumpDocs: 'Jump to documents',
+      asideJumpTimeline: 'Jump to timeline',
+      asideProofBundle: 'Proof bundle: IPFS + TON references. Always verify claims against linked artifacts.',
+      asideMapOpen: 'Open',
+      asideMapTitlePrefix: 'Map',
+      asideNoSelection: 'No project selected.',
+      verifiedKicker: 'VERIFIED ON-CHAIN',
+      verifiedBody:
+        'All RWA documentation is immutably stored on IPFS and anchored to TON Layer 1. The whitepaper CID {cid} is the on-chain proof of the agricultural backing.',
+      verifiedCta: 'View IPFS Proof ↗',
+    },
+    ecosystemIndexUi: {
+      kicker: 'MARKET ECOSYSTEM',
+      titleLead: 'The',
+      titleAccent: 'Crypto Landscape',
+      titleTail: 'CET Operates In',
+      subtitle:
+        'Solaris CET is part of a growing decentralized economy. Explore the top 40+ projects that define the market — from Layer-1 blockchains to stablecoins, DeFi protocols, and the CoinMarketCap 20 Index.',
+      uniqueKicker: 'UNIQUE POSITION',
+      uniqueBodyPrefix: 'Unlike any other token in this index,',
+      uniqueTokenName: 'Solaris CET',
+      uniqueBodySuffix:
+        'combines a fixed supply of 9,000 tokens, Real-World Asset backing, and a fully AI-native corporate structure — making it the only token in the ecosystem that operates an autonomous workforce of 200,000 agents.',
+      featuredKicker: 'FEATURED INDEX',
+      featuredBody:
+        'A diversified on-chain index of the top 20 cryptocurrencies by market cap, powered by the Reserve Protocol on BNB Smart Chain. Track the performance of the entire market in a single tokenized position.',
+      projectsUnit: 'projects',
+      categories: {
+        l1: 'L1 Blockchains',
+        stablecoin: 'Stablecoins',
+        ai: 'AI & Agent Tokens',
+        defi: 'DeFi & Infrastructure',
+        meme: 'Meme & Community',
+        other: 'Other Major Projects',
+      },
+    },
+    howToBuyUi: howToBuyUiEn,
+    tokenomicsUi: tokenomicsUiEn,
+    footerUi: footerUiEn,
+    novaAppUi: novaAppUiEn,
+    competitionUi: competitionUiEn,
+    highIntelligenceUi: highIntelligenceUiEn,
+    hybridEngineUi: hybridEngineUiEn,
+    intelligenceCoreUi: intelligenceCoreUiEn,
+    complianceUi: complianceUiEn,
+    agenticEngineUi: agenticEngineUiEn,
+    hierarchyGraphUi: hierarchyGraphUiEn,
+    resourcesUi: resourcesUiEn,
+    networkPulseUi: networkPulseUiEn,
+    whitepaperUi: whitepaperUiEn,
+    aiTeamUi: aiTeamUiEn,
+    roadmapUi: roadmapUiEn,
+    securityUi: securityUiEn,
+    rwaContentUi: rwaContentUiEn,
     ui: {
       toggleSidebar: 'Alternar barra lateral',
       paginationNav: 'Paginação',
@@ -2897,6 +5221,8 @@ const translations: Record<LangCode, Translations> = {
       title: 'Provas que pode verificar — não só marketing',
       subtitle:
         'Cada superfície reduz carga cognitiva: prova técnica, escassez on-chain, âncora legal/geográfica e transparência operacional.',
+      listedOnLabel: 'LISTADO EM',
+      partnersLabel: 'PARCEIROS',
       pillar1Title: 'Prova técnica',
       pillar1Body:
         'Contrato auditado pela Cyberscope, equipa com KYC e execução em TON com rastos verificáveis.',
@@ -2933,6 +5259,7 @@ const translations: Record<LangCode, Translations> = {
       networkAtAGlance: 'VISÃO GERAL DA REDE',
       meetAgents: 'Conheça os agentes',
       verifiedBy: 'Verificado por',
+      allSystemsLive: 'TODOS OS SISTEMAS AO VIVO',
       labelAgents: 'Agentes IA especialistas',
       sublabelAgents:
         '~200k agentes especializados para roteamento, recuperação e validação · 10 departamentos',
@@ -2946,6 +5273,9 @@ const translations: Record<LangCode, Translations> = {
       badgeScarce: 'ESCASSO',
       badgeFastest: 'MAIS RÁPIDO',
       badgeLongTerm: 'LONGO PRAZO',
+      trustBadgeAudited: 'Auditado pela Cyberscope',
+      trustBadgeKyc: 'KYC verificado',
+      trustBadgeOpenSource: 'Código aberto',
     },
     aiTeam: {
       corporateStructure: 'ESTRUTURA CORPORATIVA IA',
@@ -3239,6 +5569,126 @@ const translations: Record<LangCode, Translations> = {
       bftNodeHonest: 'Ehrlicher Validator (illustrativ)',
       authorityTrust: 'Vertrauens- und Autoritätssäulen',
     },
+    rwaUi: {
+      map: {
+        ariaLabel: 'RWA portfolio map',
+        controlsAria: 'Map controls',
+        zoomInAria: 'Zoom in',
+        zoomOutAria: 'Zoom out',
+        resetAria: 'Reset map',
+        resetLabel: 'Reset',
+        selectionAria: 'Selection',
+        selectProjectAria: 'Select project {title}',
+        infoNote: 'Interactive map is a lightweight portfolio view; it is not a live oracle.',
+        helpLine: 'Drag to pan · Use controls to zoom · Click markers to view details',
+      },
+      timeline: {
+        ariaLabel: 'RWA timeline',
+        title: 'Timeline',
+        subtitle: 'Milestones are linked for deep navigation and can be expanded for details.',
+        legendComplete: 'COMPLETE',
+        legendActive: 'ACTIVE',
+        legendPlanned: 'PLANNED',
+      },
+      documents: {
+        ariaLabel: 'RWA documents',
+        title: 'Documents',
+        subtitle: 'Preview when possible; download links open in a new tab.',
+        searchSr: 'Search documents',
+        searchPlaceholder: 'Search…',
+        filterSr: 'Filter by type',
+        filterAll: 'All types',
+        filterWhitepaper: 'Whitepaper',
+        filterAudit: 'Audit',
+        filterIpfs: 'IPFS proof',
+        filterRegistry: 'Land registry',
+        filterTimeline: 'Timeline',
+        typeWhitepaper: 'Whitepaper',
+        typeAudit: 'Audit',
+        typeIpfs: 'IPFS proof',
+        typeRegistry: 'Land registry',
+        typeTimeline: 'Timeline',
+        preview: 'Preview',
+        download: 'Download',
+        empty: 'No documents match your filters.',
+      },
+    },
+    rwaSectionUi: {
+      kicker: 'REAL WORLD ASSETS · RWA',
+      titleLead: 'Grounded in',
+      titleAccent: 'Real Land',
+      subtitle:
+        'Solaris CET is the only AI token backed by physical real-world assets. Productive agricultural land in Cetățuia, Romania — managed by 200,000 AI agents — provides structural backing that no competitor can replicate.',
+      physicalKicker: 'PHYSICAL ASSET · LAND ANCHOR',
+      physicalHeadingLead: 'The token is tied to',
+      physicalHeadingAccent: 'real soil',
+      physicalHeadingTail: 'not screens',
+      physicalBodyPrefix: 'CET is designed as a claim on productive agricultural land in',
+      physicalLocationName: 'Cetățuia, Romania',
+      physicalBodySuffix:
+        '— the same jurisdiction and asset class referenced in RWA documentation. Each unit in the 9,000 CET supply maps to a fractional economic interest in that land-backed stack: crop yield, verified operations, and on-chain attestations (IPFS + TON) are the bridge between the token and the field.',
+      physicalQuote:
+        'This is structural backing: the project is not “digital air” — it is explicitly anchored in a named location and a tangible asset class you can verify independently.',
+      chipTonContract: 'TON contract',
+      chipDedustPool: 'DeDust pool',
+      chipIpfsProof: 'IPFS proof',
+      asideAria: 'RWA project details',
+      asideRegion: 'Region',
+      asideType: 'Type',
+      asideJumpDocs: 'Jump to documents',
+      asideJumpTimeline: 'Jump to timeline',
+      asideProofBundle: 'Proof bundle: IPFS + TON references. Always verify claims against linked artifacts.',
+      asideMapOpen: 'Open',
+      asideMapTitlePrefix: 'Map',
+      asideNoSelection: 'No project selected.',
+      verifiedKicker: 'VERIFIED ON-CHAIN',
+      verifiedBody:
+        'All RWA documentation is immutably stored on IPFS and anchored to TON Layer 1. The whitepaper CID {cid} is the on-chain proof of the agricultural backing.',
+      verifiedCta: 'View IPFS Proof ↗',
+    },
+    ecosystemIndexUi: {
+      kicker: 'MARKET ECOSYSTEM',
+      titleLead: 'The',
+      titleAccent: 'Crypto Landscape',
+      titleTail: 'CET Operates In',
+      subtitle:
+        'Solaris CET is part of a growing decentralized economy. Explore the top 40+ projects that define the market — from Layer-1 blockchains to stablecoins, DeFi protocols, and the CoinMarketCap 20 Index.',
+      uniqueKicker: 'UNIQUE POSITION',
+      uniqueBodyPrefix: 'Unlike any other token in this index,',
+      uniqueTokenName: 'Solaris CET',
+      uniqueBodySuffix:
+        'combines a fixed supply of 9,000 tokens, Real-World Asset backing, and a fully AI-native corporate structure — making it the only token in the ecosystem that operates an autonomous workforce of 200,000 agents.',
+      featuredKicker: 'FEATURED INDEX',
+      featuredBody:
+        'A diversified on-chain index of the top 20 cryptocurrencies by market cap, powered by the Reserve Protocol on BNB Smart Chain. Track the performance of the entire market in a single tokenized position.',
+      projectsUnit: 'projects',
+      categories: {
+        l1: 'L1 Blockchains',
+        stablecoin: 'Stablecoins',
+        ai: 'AI & Agent Tokens',
+        defi: 'DeFi & Infrastructure',
+        meme: 'Meme & Community',
+        other: 'Other Major Projects',
+      },
+    },
+    howToBuyUi: howToBuyUiEn,
+    tokenomicsUi: tokenomicsUiEn,
+    footerUi: footerUiEn,
+    novaAppUi: novaAppUiEn,
+    competitionUi: competitionUiEn,
+    highIntelligenceUi: highIntelligenceUiEn,
+    hybridEngineUi: hybridEngineUiEn,
+    intelligenceCoreUi: intelligenceCoreUiEn,
+    complianceUi: complianceUiEn,
+    agenticEngineUi: agenticEngineUiEn,
+    hierarchyGraphUi: hierarchyGraphUiEn,
+    resourcesUi: resourcesUiEn,
+    networkPulseUi: networkPulseUiEn,
+    whitepaperUi: whitepaperUiEn,
+    aiTeamUi: aiTeamUiEn,
+    roadmapUi: roadmapUiEn,
+    securityUi: securityUiEn,
+    rwaContentUi: rwaContentUiEn,
     ui: {
       toggleSidebar: 'Seitenleiste umschalten',
       paginationNav: 'Seitennummerierung',
@@ -3335,6 +5785,8 @@ const translations: Record<LangCode, Translations> = {
       title: 'Nachweise, die du prüfen kannst — kein leeres Marketing',
       subtitle:
         'Jede Fläche reduziert kognitive Last: technischer Nachweis, On-Chain-Knappheit, geo-/rechtlicher Anker und operative Transparenz.',
+      listedOnLabel: 'GELISTET AUF',
+      partnersLabel: 'PARTNER',
       pillar1Title: 'Technischer Nachweis',
       pillar1Body:
         'Cyberscope-geprüfter Vertrag, KYC-Team und TON-Ausführung mit verifizierbaren Spuren.',
@@ -3371,6 +5823,7 @@ const translations: Record<LangCode, Translations> = {
       networkAtAGlance: 'NETZWERK IM ÜBERBLICK',
       meetAgents: 'Treffen Sie die Agenten',
       verifiedBy: 'Verifiziert durch',
+      allSystemsLive: 'ALLE SYSTEME LIVE',
       labelAgents: 'KI-Spezialisten-Agenten',
       sublabelAgents:
         '~200k spezialisierte Agenten für Routing, Retrieval & Validierung · 10 Abteilungen',
@@ -3384,6 +5837,9 @@ const translations: Record<LangCode, Translations> = {
       badgeScarce: 'KNAPP',
       badgeFastest: 'SCHNELLSTE',
       badgeLongTerm: 'LANGFRISTIG',
+      trustBadgeAudited: 'Von Cyberscope geprüft',
+      trustBadgeKyc: 'KYC verifiziert',
+      trustBadgeOpenSource: 'Open Source',
     },
     aiTeam: {
       corporateStructure: 'KI-UNTERNEHMENSSTRUKTUR',

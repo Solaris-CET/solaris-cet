@@ -2,6 +2,7 @@ import { useMemo, useRef, useState, type PointerEvent } from 'react';
 import { MapPin, Minus, Plus, RotateCcw } from 'lucide-react';
 import type { RwaProject } from '@/lib/rwaPortfolio';
 import { statusChipClass } from '@/lib/rwaPortfolio';
+import { useLanguage } from '@/hooks/useLanguage';
 
 type Viewport = {
   zoom: number;
@@ -25,6 +26,8 @@ export function RwaPortfolioMap({
   selectedProjectId: string | null;
   onSelectProject: (id: string) => void;
 }) {
+  const { t } = useLanguage();
+  const tx = t.rwaUi.map;
   const containerRef = useRef<HTMLDivElement | null>(null);
   const dragRef = useRef<{
     isDown: boolean;
@@ -80,19 +83,23 @@ export function RwaPortfolioMap({
       ref={containerRef}
       className="relative rounded-2xl overflow-hidden border border-white/10 bg-black/40 shadow-depth"
       role="region"
-      aria-label="RWA portfolio map"
+      aria-label={tx.ariaLabel}
     >
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(34,211,238,0.10),transparent_52%),radial-gradient(circle_at_70%_60%,rgba(242,201,76,0.12),transparent_60%)]" />
         <div className="absolute inset-0 opacity-[0.18] bg-[linear-gradient(to_right,rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[size:22px_22px]" />
       </div>
 
-      <div className="absolute left-4 top-4 z-10 flex items-center gap-2" role="group" aria-label="Map controls">
+      <div
+        className="absolute left-4 top-4 z-10 flex items-center gap-2"
+        role="group"
+        aria-label={tx.controlsAria}
+      >
         <button
           type="button"
           onClick={() => setZoom(viewport.zoom + 0.2)}
           className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-white/10 bg-black/60 text-solaris-text hover:bg-black/80 transition-colors"
-          aria-label="Zoom in"
+          aria-label={tx.zoomInAria}
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -100,7 +107,7 @@ export function RwaPortfolioMap({
           type="button"
           onClick={() => setZoom(viewport.zoom - 0.2)}
           className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-white/10 bg-black/60 text-solaris-text hover:bg-black/80 transition-colors"
-          aria-label="Zoom out"
+          aria-label={tx.zoomOutAria}
         >
           <Minus className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -108,14 +115,18 @@ export function RwaPortfolioMap({
           type="button"
           onClick={resetView}
           className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/10 bg-black/60 px-3 text-solaris-text hover:bg-black/80 transition-colors"
-          aria-label="Reset map"
+          aria-label={tx.resetAria}
         >
           <RotateCcw className="h-4 w-4" aria-hidden="true" />
-          <span className="ml-2 text-xs font-semibold">Reset</span>
+          <span className="ml-2 text-xs font-semibold">{tx.resetLabel}</span>
         </button>
       </div>
 
-      <div className="absolute right-4 top-4 z-10 flex items-center gap-2" aria-label="Selection" role="status">
+      <div
+        className="absolute right-4 top-4 z-10 flex items-center gap-2"
+        aria-label={tx.selectionAria}
+        role="status"
+      >
         {selection ? (
           <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-mono ${statusChipClass(selection.status)}`}>
             <span className="inline-flex h-2 w-2 rounded-full bg-current opacity-80" aria-hidden="true" />
@@ -162,7 +173,7 @@ export function RwaPortfolioMap({
                     : 'bg-black/50 border-white/15 text-solaris-text hover:border-solaris-gold/40 hover:text-solaris-gold')
                 }
                 style={{ left: `${p.marker.xPct}%`, top: `${p.marker.yPct}%` }}
-                aria-label={`Select project ${p.title}`}
+                aria-label={tx.selectProjectAria.replace('{title}', p.title)}
               >
                 <span className="inline-flex min-h-11 min-w-11 items-center justify-center">
                   <MapPin className="h-4 w-4" aria-hidden="true" />
@@ -177,10 +188,10 @@ export function RwaPortfolioMap({
           >
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs text-solaris-muted">
-                Interactive map is a lightweight portfolio view; it is not a live oracle.
+                {tx.infoNote}
               </p>
               <p className="text-[10px] font-mono text-solaris-muted">
-                Drag to pan · Use controls to zoom · Click markers to view details
+                {tx.helpLine}
               </p>
             </div>
           </div>

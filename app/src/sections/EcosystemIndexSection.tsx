@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
 import { TrendingUp, ExternalLink, BarChart2 } from 'lucide-react';
@@ -77,53 +78,57 @@ interface CategoryConfig {
   badgeText: string;
 }
 
-const categoryConfig: CategoryConfig[] = [
-  {
-    id: 'l1',
-    label: 'L1 Blockchains',
-    color: 'text-solaris-cyan',
-    badgeBg: 'bg-solaris-cyan/15',
-    badgeText: 'text-solaris-cyan',
-  },
-  {
-    id: 'stablecoin',
-    label: 'Stablecoins',
-    color: 'text-solaris-gold',
-    badgeBg: 'bg-solaris-gold/15',
-    badgeText: 'text-solaris-gold',
-  },
-  {
-    id: 'ai',
-    label: 'AI & Agent Tokens',
-    color: 'text-purple-400',
-    badgeBg: 'bg-purple-400/15',
-    badgeText: 'text-purple-400',
-  },
-  {
-    id: 'defi',
-    label: 'DeFi & Infrastructure',
-    color: 'text-emerald-400',
-    badgeBg: 'bg-emerald-400/15',
-    badgeText: 'text-emerald-400',
-  },
-  {
-    id: 'meme',
-    label: 'Meme & Community',
-    color: 'text-violet-400',
-    badgeBg: 'bg-violet-400/15',
-    badgeText: 'text-violet-400',
-  },
-  {
-    id: 'other',
-    label: 'Other Major Projects',
-    color: 'text-slate-400',
-    badgeBg: 'bg-slate-400/15',
-    badgeText: 'text-slate-400',
-  },
-];
-
 const EcosystemIndexSection = () => {
   const { t } = useLanguage();
+  const tx = t.ecosystemIndexUi;
+
+  const categoryConfig: CategoryConfig[] = useMemo(() => {
+    return [
+      {
+        id: 'l1',
+        label: tx.categories.l1,
+        color: 'text-solaris-cyan',
+        badgeBg: 'bg-solaris-cyan/15',
+        badgeText: 'text-solaris-cyan',
+      },
+      {
+        id: 'stablecoin',
+        label: tx.categories.stablecoin,
+        color: 'text-solaris-gold',
+        badgeBg: 'bg-solaris-gold/15',
+        badgeText: 'text-solaris-gold',
+      },
+      {
+        id: 'ai',
+        label: tx.categories.ai,
+        color: 'text-purple-400',
+        badgeBg: 'bg-purple-400/15',
+        badgeText: 'text-purple-400',
+      },
+      {
+        id: 'defi',
+        label: tx.categories.defi,
+        color: 'text-emerald-400',
+        badgeBg: 'bg-emerald-400/15',
+        badgeText: 'text-emerald-400',
+      },
+      {
+        id: 'meme',
+        label: tx.categories.meme,
+        color: 'text-violet-400',
+        badgeBg: 'bg-violet-400/15',
+        badgeText: 'text-violet-400',
+      },
+      {
+        id: 'other',
+        label: tx.categories.other,
+        color: 'text-slate-400',
+        badgeBg: 'bg-slate-400/15',
+        badgeText: 'text-slate-400',
+      },
+    ];
+  }, [tx.categories.ai, tx.categories.defi, tx.categories.l1, tx.categories.meme, tx.categories.other, tx.categories.stablecoin]);
+
   return (
     <section
       id="ecosystem-index"
@@ -144,19 +149,16 @@ const EcosystemIndexSection = () => {
             <div className="w-10 h-10 rounded-xl bg-solaris-gold/10 flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-solaris-gold" />
             </div>
-            <span className="hud-label text-solaris-gold">MARKET ECOSYSTEM</span>
+            <span className="hud-label text-solaris-gold">{tx.kicker}</span>
           </div>
 
           <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text mb-4">
-            The{' '}
-            <span className="text-gradient-gold">Crypto Landscape</span>{' '}
-            CET Operates In
+            {tx.titleLead ? <>{tx.titleLead} </> : null}
+            <span className="text-gradient-gold">{tx.titleAccent}</span> {tx.titleTail}
           </h2>
 
           <p className="text-solaris-muted text-base lg:text-lg leading-relaxed">
-            Solaris CET is part of a growing decentralized economy. Explore the top 40+ projects
-            that define the market — from Layer-1 blockchains to stablecoins, DeFi protocols,
-            and the CoinMarketCap 20 Index.
+            {tx.subtitle}
           </p>
         </ScrollFadeUp>
 
@@ -166,11 +168,10 @@ const EcosystemIndexSection = () => {
             <TrendingUp className="w-5 h-5 text-solaris-gold" />
           </div>
           <div>
-            <div className="hud-label text-solaris-gold mb-1">UNIQUE POSITION</div>
+            <div className="hud-label text-solaris-gold mb-1">{tx.uniqueKicker}</div>
             <p className="text-solaris-muted text-sm leading-relaxed">
-              Unlike any other token in this index, <span className="text-solaris-text font-semibold">Solaris CET</span> combines
-              a fixed supply of 9,000 tokens, Real-World Asset backing, and a fully AI-native corporate structure —
-              making it the only token in the ecosystem that operates an autonomous workforce of 200,000 agents.
+              {tx.uniqueBodyPrefix} <span className="text-solaris-text font-semibold">{tx.uniqueTokenName}</span>{' '}
+              {tx.uniqueBodySuffix}
             </p>
           </div>
         </div>
@@ -181,14 +182,14 @@ const EcosystemIndexSection = () => {
             href="https://app.reserve.org/bsc/index-dtf/0x2f8a339b5889ffac4c5a956787cda593b3c36867/overview"
             target="_blank"
             rel="noopener noreferrer"
-            className="group bento-card p-6 lg:p-8 border border-solaris-gold/30 hover:border-solaris-gold/60 flex flex-col md:flex-row md:items-center gap-6 transition-all duration-300"
+            className="group bento-card p-6 lg:p-8 border border-solaris-gold/30 hover:border-solaris-gold/60 flex flex-col md:flex-row md:items-center gap-6 transition-all duration-300 btn-quantum"
           >
             <div className="flex items-center gap-4 shrink-0">
               <div className="w-14 h-14 rounded-2xl bg-solaris-gold/10 border border-solaris-gold/20 flex items-center justify-center">
                 <BarChart2 className="w-7 h-7 text-solaris-gold" />
               </div>
               <div>
-                <span className="hud-label text-solaris-gold text-[10px]">FEATURED INDEX</span>
+                <span className="hud-label text-solaris-gold text-[10px]">{tx.featuredKicker}</span>
                 <h3 className="font-display font-bold text-solaris-text text-xl mt-0.5">
                   CoinMarketCap 20 Index
                 </h3>
@@ -197,9 +198,7 @@ const EcosystemIndexSection = () => {
 
             <div className="flex-1">
               <p className="text-solaris-muted text-sm leading-relaxed">
-                A diversified on-chain index of the top 20 cryptocurrencies by market cap,
-                powered by the Reserve Protocol on BNB Smart Chain. Track the performance of
-                the entire market in a single tokenized position.
+                {tx.featuredBody}
               </p>
             </div>
 
@@ -219,7 +218,9 @@ const EcosystemIndexSection = () => {
                 <div className="flex items-center gap-3 mb-4">
                   <span className={`hud-label ${cat.color}`}>{cat.label.toUpperCase()}</span>
                   <div className="flex-1 h-[1px] bg-white/5" />
-                  <span className="font-mono text-[11px] text-solaris-muted">{catProjects.length} projects</span>
+                  <span className="font-mono text-[11px] text-solaris-muted">
+                    {catProjects.length} {tx.projectsUnit}
+                  </span>
                 </div>
                 <div className="flex flex-wrap gap-2.5">
                   {catProjects.map((project) => (
@@ -228,7 +229,7 @@ const EcosystemIndexSection = () => {
                       href={project.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`group flex items-center gap-2 px-3 py-2 rounded-lg border border-white/8 ${cat.badgeBg} hover:border-white/20 transition-all duration-200`}
+                      className={`group flex items-center gap-2 px-3 py-2 rounded-lg border border-white/8 ${cat.badgeBg} hover:border-white/20 transition-all duration-200 btn-quantum`}
                     >
                       <span className={`font-mono font-semibold text-xs ${cat.badgeText}`}>
                         {project.symbol}

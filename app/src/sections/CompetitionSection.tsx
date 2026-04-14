@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 import { CheckCircle, XCircle, Minus, Trophy, Zap, Shield, Brain, Coins } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
 import { ChartLazyFallback } from '@/components/ChartLazyFallback';
@@ -34,90 +34,6 @@ interface Competitor {
   isCET?: boolean;
 }
 
-const fmtIntEn = (n: number) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n);
-
-const competitors: Competitor[] = [
-  {
-    name: 'Solaris CET',
-    symbol: 'CET',
-    chain: 'TON',
-    supply: fmtIntEn(CET_FIXED_SUPPLY_CAP),
-    tps: 'High (sharded)',
-    agents: `${fmtIntEn(TASK_AGENT_MESH_TOTAL)} (simulated)`,
-    rwa: true,
-    dualAi: true,
-    mining: true,
-    auditKyc: true,
-    marginalCost: '$0',
-    isCET: true,
-  },
-  {
-    name: 'Fetch.ai',
-    symbol: 'FET',
-    chain: 'Cosmos',
-    supply: '1.15B',
-    tps: 'Varies',
-    agents: 'Marketplace',
-    rwa: false,
-    dualAi: false,
-    mining: false,
-    auditKyc: true,
-    marginalCost: 'Variable',
-  },
-  {
-    name: 'Bittensor',
-    symbol: 'TAO',
-    chain: 'Custom',
-    supply: '21M',
-    tps: 'Varies',
-    agents: 'Subnet miners',
-    rwa: false,
-    dualAi: false,
-    mining: true,
-    auditKyc: true,
-    marginalCost: 'Variable',
-  },
-  {
-    name: 'SingularityNET',
-    symbol: 'AGIX',
-    chain: 'ETH/BNB',
-    supply: '2B',
-    tps: 'L1/L2 dependent',
-    agents: 'Marketplace',
-    rwa: false,
-    dualAi: false,
-    mining: false,
-    auditKyc: true,
-    marginalCost: 'Variable',
-  },
-  {
-    name: 'Ocean Protocol',
-    symbol: 'OCEAN',
-    chain: 'ETH/Polygon',
-    supply: '1.41B',
-    tps: 'L1/L2 dependent',
-    agents: 'Data agents',
-    rwa: 'partial',
-    dualAi: false,
-    mining: false,
-    auditKyc: true,
-    marginalCost: 'Variable',
-  },
-  {
-    name: 'ASI Alliance',
-    symbol: 'ASI',
-    chain: 'Multi',
-    supply: '~4.6B',
-    tps: 'Varies',
-    agents: 'Marketplace',
-    rwa: false,
-    dualAi: false,
-    mining: false,
-    auditKyc: true,
-    marginalCost: 'Variable',
-  },
-];
-
 function BoolCell({ value }: { value: boolean | 'partial' }) {
   if (value === true) return <CheckCircle className="w-4 h-4 text-emerald-400 mx-auto" />;
   if (value === 'partial') return <Minus className="w-4 h-4 text-solaris-gold mx-auto" />;
@@ -135,7 +51,94 @@ function TextCell({ value, isCET }: { value: string; isCET?: boolean }) {
 const CompetitionSection = () => {
   const { t } = useLanguage();
   const cs = t.competitionSection;
+  const tx = t.competitionUi;
   const { isNearScreen: chartsNearViewport, fromRef: chartsGateRef } = useNearScreen({ distance: '320px' });
+
+  const competitors: Competitor[] = useMemo(() => {
+    const fmt = (n: number) =>
+      new Intl.NumberFormat(tx.numberLocale, { maximumFractionDigits: 0 }).format(n);
+    return [
+      {
+        name: 'Solaris CET',
+        symbol: 'CET',
+        chain: 'TON',
+        supply: fmt(CET_FIXED_SUPPLY_CAP),
+        tps: tx.tpsHigh,
+        agents: `${fmt(TASK_AGENT_MESH_TOTAL)} ${tx.simulatedSuffix}`,
+        rwa: true,
+        dualAi: true,
+        mining: true,
+        auditKyc: true,
+        marginalCost: '$0',
+        isCET: true,
+      },
+      {
+        name: 'Fetch.ai',
+        symbol: 'FET',
+        chain: 'Cosmos',
+        supply: '1.15B',
+        tps: tx.tpsVaries,
+        agents: tx.agentsMarketplace,
+        rwa: false,
+        dualAi: false,
+        mining: false,
+        auditKyc: true,
+        marginalCost: tx.marginalVariable,
+      },
+      {
+        name: 'Bittensor',
+        symbol: 'TAO',
+        chain: tx.chainCustom,
+        supply: '21M',
+        tps: tx.tpsVaries,
+        agents: tx.agentsSubnetMiners,
+        rwa: false,
+        dualAi: false,
+        mining: true,
+        auditKyc: true,
+        marginalCost: tx.marginalVariable,
+      },
+      {
+        name: 'SingularityNET',
+        symbol: 'AGIX',
+        chain: 'ETH/BNB',
+        supply: '2B',
+        tps: tx.tpsL1L2Dependent,
+        agents: tx.agentsMarketplace,
+        rwa: false,
+        dualAi: false,
+        mining: false,
+        auditKyc: true,
+        marginalCost: tx.marginalVariable,
+      },
+      {
+        name: 'Ocean Protocol',
+        symbol: 'OCEAN',
+        chain: 'ETH/Polygon',
+        supply: '1.41B',
+        tps: tx.tpsL1L2Dependent,
+        agents: tx.agentsDataAgents,
+        rwa: 'partial',
+        dualAi: false,
+        mining: false,
+        auditKyc: true,
+        marginalCost: tx.marginalVariable,
+      },
+      {
+        name: 'ASI Alliance',
+        symbol: 'ASI',
+        chain: tx.chainMulti,
+        supply: '~4.6B',
+        tps: tx.tpsVaries,
+        agents: tx.agentsMarketplace,
+        rwa: false,
+        dualAi: false,
+        mining: false,
+        auditKyc: true,
+        marginalCost: tx.marginalVariable,
+      },
+    ];
+  }, [tx.agentsDataAgents, tx.agentsMarketplace, tx.agentsSubnetMiners, tx.chainCustom, tx.chainMulti, tx.marginalVariable, tx.numberLocale, tx.simulatedSuffix, tx.tpsHigh, tx.tpsL1L2Dependent, tx.tpsVaries]);
 
   const advantageCards = [
     { icon: Coins, title: cs.advScarcityTitle, body: cs.advScarcityBody, color: 'text-solaris-gold', bg: 'bg-solaris-gold/10', border: 'border-solaris-gold/20' },

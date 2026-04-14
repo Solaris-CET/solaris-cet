@@ -233,6 +233,7 @@ const MiningCalculatorSection = () => {
                       onClick={() => handleDeviceChange(deviceType)}
                       aria-pressed={device === deviceType}
                       title={meshStandardBurstFromKey(`miningCalc|device|${deviceType}`)}
+                      type="button"
                       className={`p-3 rounded-xl border transition-all duration-300 flex flex-col items-center gap-2 ${
                         device === deviceType
                           ? 'bg-solaris-gold/10 border-solaris-gold'

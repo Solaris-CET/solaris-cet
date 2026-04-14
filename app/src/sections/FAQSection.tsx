@@ -130,6 +130,7 @@ const FAQSection = () => {
                 aria-controls={`faq-panel-${i}`}
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
                 onKeyDown={(e) => handleKeyDown(e, i)}
+                type="button"
               >
                 <span className="font-display font-semibold text-solaris-text text-base group-hover:text-solaris-gold transition-colors pr-4">
                   {faq.question}
@@ -155,7 +156,7 @@ const FAQSection = () => {
                       href={faq.link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center text-sm font-semibold text-solaris-gold hover:opacity-80 transition-opacity"
+                      className="inline-flex items-center text-sm font-semibold text-solaris-gold hover:opacity-90 transition-opacity btn-quantum"
                     >
                       {faq.link.label}
                     </a>
