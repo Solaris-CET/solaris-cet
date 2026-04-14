@@ -18,6 +18,7 @@
 import OpenAI from 'openai';
 import { getAllowedOrigin } from '../lib/cors';
 import { resolveApiKey } from '../lib/crypto';
+import { buildCetAiRetrievalBlock } from '../lib/cetAiRetrieval';
 import { CET_CONTRACT_ADDRESS } from '../../app/src/lib/cetContract';
 import { CET_AI_MAX_QUERY_CHARS } from '../../app/src/lib/cetAiConstants';
 import { DEDUST_POOL_ADDRESS } from '../../app/src/lib/dedustUrls';
@@ -260,6 +261,8 @@ export default async function handler(req: Request): Promise<Response> {
       `- 24h volume: $${onChain.volume24hUsd}`
     : '';
 
+  const retrieval = await buildCetAiRetrievalBlock(trimmedQuery);
+
   const multiTurnHint =
     conversation.length > 0
       ? `MULTI-TURN: Prior user/assistant messages are included below. Answer the **latest** user message ` +
@@ -288,7 +291,14 @@ export default async function handler(req: Request): Promise<Response> {
     `2. Persona: Hyper-analytical, authoritative, precise — mechanics, probabilities, verifiable claims. No filler, no sycophancy.\n` +
     `3. Audience: DeFi-native users and builders. Signal-per-token maximisation; omit hedging paragraphs.\n` +
     `4. If LIVE ON-CHAIN DATA is missing, say so briefly and reason from tokenomics/architecture without fabricating spot prices.\n` +
-    onChainBlock;
+    onChainBlock +
+    retrieval.block +
+    (retrieval.sources.length > 0
+      ? `\n\nCITATIONS:\n` +
+        `- If RETRIEVAL SOURCES are present, end your [DIRECTIVĂ DE ACȚIUNE] with a line:\n` +
+        `  SOURCES: <up to 5 URLs you used>\n` +
+        `- Never invent URLs. If you did not use any, write: SOURCES: none.\n`
+      : '');
 
   // ── GEMINI — REASON PHASE ─────────────────────────────────────────────────
   // Gemini generates the [DIAGNOSTIC INTERN] section (analytical thought).
@@ -404,7 +414,7 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   // 6. Return EXACT format expected by frontend ({ response: string })
-  return new Response(JSON.stringify({ response: reply }), {
+  return new Response(JSON.stringify({ response: reply, sources: retrieval.sources }), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
