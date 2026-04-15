@@ -4,7 +4,7 @@ This map is the **single orientation** for where code lives before shipping to *
 
 | Area | Path | Role |
 |------|------|------|
-| **Web app (canonical)** | `app/` | Vite + React + TypeScript; `npm run build` → `app/dist/` |
+| **Web app (canonical)** | `app/` | Vite + React + TypeScript; `npm run app:build` → `app/dist/` |
 | **CET AI (UI + telemetry)** | `app/src/components/CetAiSearch.tsx`; `cetAiConstants.ts`, `cetAiConversation.ts`, `cetAiQueryUi.ts`, `cetAiTelemetry.ts`, … | Dual-model chat (Grok × Gemini); headers `X-Cet-Ai-Source`; query caps in `cetAiConstants.ts` |
 | **Brand / TON Connect / PWA** | `app/src/lib/brandAssetFilenames.ts`, `brandAssets.ts`; `app/vite.config.ts` (`includeAssets`); `app/public/tonconnect-manifest.json` | `productionBrandLogoUrl` (lockup JPG in JSON-LD) vs `productionTonConnectIconUrl` (square `icon-192.png` for wallets); precached rasters |
 | **Edge API** | `app/api/chat/route.ts`; `app/api/lib/cors.ts` (`getAllowedOrigin`, Vitest: `app/src/__tests__/apiCors.test.ts`) | POST `/api/chat`; CORS allowlist uses `PRODUCTION_SITE_ORIGIN` — deploy with the app build root |

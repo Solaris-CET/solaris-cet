@@ -5,7 +5,7 @@ Blueprint + Tact sources for the **MultiSig Wrapper** and related tooling.
 ## Prerequisites
 
 - **Node.js ≥ 22** (aligned with repo CI)
-- Dependencies: `npm ci` in this directory
+- Dependencies: from repo root run `npm ci` (single lockfile at root)
 
 ## Commands
 

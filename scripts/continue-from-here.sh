@@ -58,13 +58,13 @@ done
 echo
 
 echo ">>> Manual verify (after you resume work)"
-echo "  cd app && npm test && npm run build"
+echo "  cd /root/solaris-cet && npm run app:verify"
 echo
 
 echo ">>> Paste this into the next chat (edit priority line):"
 cat <<'PROMPT'
 Continuă de unde s-a oprit sesiunea anterioară. Starea repo e în output-ul comenzii continue-from-here.
 Prioritate: [scrie aici: ex. skill genome, i18n, teste].
-Rulează în app/: npm test && npm run build dacă atingi cod.
+Rulează din repo root: npm run app:verify dacă atingi cod.
 PROMPT
 echo "========== end checkpoint ================================="

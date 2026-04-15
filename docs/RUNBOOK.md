@@ -30,7 +30,7 @@ Operational notes for the static SPA + Docker/nginx deploy (Coolify → VPS). **
 
 **Fix:**
 
-1. Run locally: `node scripts/sync-sovereign-to-public.mjs` from repo root, then `npm run build` in `app/`.
+1. Run locally: `node scripts/sync-sovereign-to-public.mjs` from repo root, then `npm run build --workspace=app`.
 2. Redeploy. Ensure **`location ^~ /sovereign/`** in `docker/nginx.conf` is present so the SPA does not swallow `/sovereign/*`.
 
 ### 3. Pool / DeDust stats unavailable (LivePoolStats)

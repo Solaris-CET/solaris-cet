@@ -17,10 +17,11 @@ We will acknowledge your report within **72 hours** and aim to release a fix wit
 
 ## Security Best Practices
 
-This project is a static frontend application. The following measures are in place:
+This project is primarily a static frontend application, with optional API routes under `app/api/` for CET AI chat and authentication in production. The following measures are in place:
 
 - **Content Security Policy (CSP)** — restricts the sources from which scripts, styles, and other resources can be loaded.
-- **No server-side secrets** — all blockchain interactions are read-only via public TON APIs.
+- **Secrets stay in the host environment** — never commit API keys, database credentials, or encryption secrets; store them as environment variables (e.g. Coolify).
+- **Encrypted API keys (preferred)** — `*_API_KEY_ENC` values are decrypted at request time using `ENCRYPTION_SECRET` (see `app/api/lib/crypto.ts` and `scripts/encrypt-key.mjs`).
 - **Dependabot** — automated dependency vulnerability scanning and version-update pull requests are configured via `.github/dependabot.yml` for both npm (`app/`) and GitHub Actions ecosystems.
 - **CodeQL SAST** — static application security testing via the CodeQL workflow (`.github/workflows/codeql.yml`) runs on every push and pull request targeting `main`, as well as on a weekly schedule, scanning for data-flow vulnerabilities, XSS patterns, and other insecure code patterns.
 - **Native platform APIs** — cryptographically secure randomness is sourced from the Web Crypto API (`crypto.getRandomValues()`) wherever unique values are generated, avoiding non-cryptographic `Math.random()` for such purposes.

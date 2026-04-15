@@ -28,6 +28,27 @@ spec:
                 secretKeyRef:
                   name: cet-secrets
                   key: GEMINI_API_KEY
+            - name: ENCRYPTION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: cet-secrets
+                  key: ENCRYPTION_SECRET
+            - name: CET_AI_ENABLE_WEB
+              value: "0"
+            - name: CET_AI_WEB_ALLOWLIST
+              value: "docs.ton.org,ton.org,dedust.io,github.com"
+            - name: TAVILY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cet-secrets
+                  key: TAVILY_API_KEY
+                  optional: true
+            - name: TAVILY_API_KEY_ENC
+              valueFrom:
+                secretKeyRef:
+                  name: cet-secrets
+                  key: TAVILY_API_KEY_ENC
+                  optional: true
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
@@ -54,4 +75,3 @@ spec:
       targetPort: 3000
       protocol: TCP
       name: http
-
