@@ -90,7 +90,7 @@ export default function StakingCalculatorSection() {
   return (
     <section
       id="staking-calculator"
-      className="relative section-glass py-20 lg:py-28 overflow-hidden mesh-bg"
+      className="relative section-glass section-padding-y overflow-hidden mesh-bg"
       aria-label={t.sectionAria.stakingCalculator}
     >
       <GlowOrbs variant="mixed" />

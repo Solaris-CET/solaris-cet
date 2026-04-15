@@ -179,16 +179,22 @@ function AppContent() {
     };
   }, [isLoaded, buildSnapTo]);
 
-  /** When the server serves `index.html` for `/mining`, scroll to the calculator after lazy sections mount. */
+  /** When the server serves `index.html` for a route, scroll to the matching section after lazy sections mount. */
   useEffect(() => {
     if (!isLoaded) return;
     const path = window.location.pathname.replace(/\/$/, '') || '/';
-    if (path !== '/mining') return;
+    const routeToSectionId: Record<string, string> = {
+      '/mining': 'mining',
+      '/rwa': 'rwa',
+      '/cet-ai': 'nova-app',
+    };
+    const targetId = routeToSectionId[path];
+    if (!targetId) return;
 
     const maxWaitMs = 12_000;
     const started = performance.now();
     const id = window.setInterval(() => {
-      const el = document.getElementById('mining');
+      const el = document.getElementById(targetId);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         window.clearInterval(id);
@@ -201,6 +207,51 @@ function AppContent() {
 
     return () => window.clearInterval(id);
   }, [isLoaded]);
+
+  useEffect(() => {
+    const path = window.location.pathname.replace(/\/$/, '') || '/';
+    const routeMeta: Record<string, { title: string; description: string }> = {
+      '/': {
+        title: 'Home | Solaris CET',
+        description:
+          "Solaris CET is an AI-native RWA token on TON blockchain. 9,000 CET fixed supply. 200,000 autonomous AI agents via Grok × Gemini dual-AI RAV Protocol.",
+      },
+      '/rwa': {
+        title: 'RWA | Solaris CET',
+        description:
+          'Explore Solaris CET real-world asset proof surface: evidence links, timeline, and project documents anchored in Cetățuia, Romania.',
+      },
+      '/cet-ai': {
+        title: 'CET AI Demo | Solaris CET',
+        description:
+          'Try the CET AI demo UI with secure /api/chat integration, UX error states, and privacy guidance (do not enter personal data).',
+      },
+    };
+    const meta = routeMeta[path];
+    if (!meta) return;
+
+    const absoluteUrl = `${PRODUCTION_SITE_ORIGIN}${path === '/' ? '' : path}`;
+    document.title = meta.title;
+
+    const setMeta = (selector: string, content: string) => {
+      const el = document.querySelector(selector) as HTMLMetaElement | null;
+      if (el) el.setAttribute('content', content);
+    };
+
+    const setLink = (selector: string, href: string) => {
+      const el = document.querySelector(selector) as HTMLLinkElement | null;
+      if (el) el.setAttribute('href', href);
+    };
+
+    setMeta('meta[name="description"]', meta.description);
+    setMeta('meta[property="og:url"]', absoluteUrl);
+    setMeta('meta[property="og:title"]', meta.title);
+    setMeta('meta[property="og:description"]', meta.description);
+    setMeta('meta[name="twitter:url"]', absoluteUrl);
+    setMeta('meta[name="twitter:title"]', meta.title);
+    setMeta('meta[name="twitter:description"]', meta.description);
+    setLink('link[rel="canonical"]', absoluteUrl);
+  }, []);
 
   return (
     <LanguageContext.Provider value={langState}>
