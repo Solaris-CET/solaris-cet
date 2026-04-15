@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
     "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "lib": ["ES2022", "DOM"],
+    "resolveJsonModule": true,
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "isolatedModules": true,
-    "types": ["node"],
-    "typeRoots": ["../app/node_modules/@types"]
+    "types": ["node"]
   },
-  "include": ["./**/*.ts"]
+  "include": ["**/*.ts"]
 }
+

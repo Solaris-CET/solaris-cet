@@ -2,6 +2,9 @@
   "name": "solaris-cet-api",
   "private": true,
   "type": "module",
+  "scripts": {
+    "typecheck": "npx tsc --noEmit"
+  },
   "dependencies": {
     "openai": "^6.33.0"
   }
