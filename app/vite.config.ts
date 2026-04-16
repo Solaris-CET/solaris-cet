@@ -188,6 +188,9 @@ export default defineConfig({
           '**/assets/@mermaid-js/**',
           '**/assets/cytoscape-*.js*',
           '**/assets/cytoscape-*/*.js*',
+          '**/assets/three-*.js*',
+          '**/assets/three-stdlib-*.js*',
+          '**/assets/@react-three/**',
         ],
         /**
          * SPA shell for client routes (must stay index.html — not offline.html, or SPA breaks).

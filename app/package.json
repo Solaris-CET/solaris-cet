@@ -91,6 +91,8 @@
     "@radix-ui/react-toggle": "^1.1.10",
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.0",
     "@ton/core": "^0.63.1",
     "@ton/ton": "16.2.4",
     "@tonconnect/ui-react": "^2.4.4",
@@ -118,6 +120,7 @@
     "recharts": "^3.8.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
+    "three": "^0.184.0",
     "vaul": "^1.1.2",
     "zod": "^4.3.5"
   },

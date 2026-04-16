@@ -29,7 +29,7 @@ const ResourcesSection = lazy(() => import('@/sections/ResourcesSection'));
 const FAQSection = lazy(() => import('@/sections/FAQSection'));
 const FooterSection = lazy(() => import('@/sections/FooterSection'));
 
-export default function HomePage() {
+export default function HomePage({ heroCinematic = false }: { heroCinematic?: boolean }) {
   const { t } = useLanguage();
 
   return (
@@ -39,7 +39,7 @@ export default function HomePage() {
     >
       <section id="hero" aria-label={t.landmarks.hero} className="relative z-10">
         <ErrorBoundary>
-          <HeroSection />
+          <HeroSection cinematic={heroCinematic} />
         </ErrorBoundary>
       </section>
 
@@ -287,4 +287,3 @@ export default function HomePage() {
     </main>
   );
 }
-

@@ -23,6 +23,7 @@ import CookieConsentBanner from './components/CookieConsentBanner';
 const HomePage = lazy(() => import('./pages/HomePage'));
 const RwaPage = lazy(() => import('./pages/RwaPage'));
 const CetAiPage = lazy(() => import('./pages/CetAiPage'));
+const DemoPage = lazy(() => import('./pages/DemoPage'));
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -116,7 +117,7 @@ function AppContent() {
 
   useEffect(() => {
     if (!isLoaded) return;
-    if (routePath !== '/') return;
+    if (routePath !== '/' && routePath !== '/demo') return;
 
     // Below 1024 px (tablets/small laptops), free scrolling is more natural
     const isBelowDesktop = typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches;
@@ -203,6 +204,11 @@ function AppContent() {
         title: 'Home | Solaris CET',
         description:
           "Solaris CET is an AI-native RWA token on TON blockchain. 9,000 CET fixed supply. 200,000 autonomous AI agents via Grok × Gemini dual-AI RAV Protocol.",
+      },
+      '/demo': {
+        title: 'Demo | Solaris CET',
+        description:
+          'Experimental cinematic demo build: hologram visuals, progressive WebGL, and motion choreography. Falls back safely on low-end devices.',
       },
       '/rwa': {
         title: 'RWA | Solaris CET',
@@ -341,6 +347,8 @@ function AppContent() {
         <Suspense fallback={null}>
           {routePath === '/rwa' ? (
             <RwaPage />
+          ) : routePath === '/demo' ? (
+            <DemoPage />
           ) : routePath === '/cet-ai' ? (
             <CetAiPage />
           ) : (

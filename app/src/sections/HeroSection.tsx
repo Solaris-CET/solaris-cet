@@ -1,8 +1,9 @@
-import React, { useRef, useLayoutEffect, useMemo, memo, useEffect, useState } from 'react';
+import React, { lazy, Suspense, useRef, useLayoutEffect, useMemo, memo, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { ShieldCheck, TrendingUp, CheckCircle, ChevronDown, FileText } from 'lucide-react';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useLanguage } from '../hooks/useLanguage';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { formatCetSupplyWithSuffix, formatTaskAgentMeshHeadline } from '@/lib/numerals';
 import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '../components/ui/tooltip';
 import { TonConnectButton } from '@tonconnect/ui-react';
@@ -13,6 +14,8 @@ import { useLivePoolData } from '@/hooks/use-live-pool-data';
 import { useCommunityProof } from '@/hooks/use-community-proof';
 import CetAiSearch from '../components/CetAiSearch';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
+
+const HeroTokenHologram = lazy(() => import('@/experience/HeroTokenHologram'));
 
 const TICKER_DATA = [
   { label: 'AI AGENTS', value: '' },
@@ -53,13 +56,18 @@ function parseTotalSupply(input: unknown): number | null {
   return n;
 }
 
-const HeroSection: React.FC = () => {
+type HeroSectionProps = {
+  cinematic?: boolean;
+};
+
+const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
   const titleContainerRef = useRef<HTMLDivElement>(null);
   const tickerContainerRef = useRef<HTMLDivElement>(null);
 
   const prefersReducedMotion = useReducedMotion();
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
   const { t, lang } = useLanguage();
   const pool = useLivePoolData();
   const community = useCommunityProof();
@@ -78,6 +86,20 @@ const HeroSection: React.FC = () => {
       return row;
     });
   }, [lang]);
+
+  const enableHologram = useMemo(() => {
+    if (!cinematic) return false;
+    if (prefersReducedMotion) return false;
+    if (!isDesktop) return false;
+    const navAny =
+      typeof navigator !== 'undefined'
+        ? (navigator as unknown as { connection?: { saveData?: boolean }; deviceMemory?: number })
+        : null;
+    const saveData = navAny?.connection?.saveData === true;
+    const dm = typeof navAny?.deviceMemory === 'number' ? navAny.deviceMemory : null;
+    const okMem = dm === null ? true : dm >= 4;
+    return !saveData && okMem;
+  }, [cinematic, prefersReducedMotion, isDesktop]);
 
   useLayoutEffect(() => {
     const isMobile =
@@ -205,6 +227,8 @@ const HeroSection: React.FC = () => {
           <div className="absolute inset-0 hidden sm:block hero-holo-grid" aria-hidden />
           <div className="absolute inset-0 hidden sm:block hero-holo-scanline" aria-hidden />
         </div>
+
+        <Suspense fallback={null}>{enableHologram ? <HeroTokenHologram /> : null}</Suspense>
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 flex flex-col gap-12 lg:gap-16 pt-12 md:pt-16">
           

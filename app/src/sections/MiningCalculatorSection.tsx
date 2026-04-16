@@ -1,4 +1,5 @@
 import { useRef, useLayoutEffect, useState, useEffect, useCallback } from 'react';
+import type { ComponentType } from 'react';
 import { gsap } from 'gsap';
 import { Calculator, Smartphone, Laptop, Monitor, Server, TrendingUp } from 'lucide-react';
 import type { MiningInput, MiningResult } from '../lib/mining-math';
@@ -11,7 +12,7 @@ const BTC_S_SYMBOL = 'BTC-S';
 type DeviceType = 'smartphone' | 'laptop' | 'desktop' | 'node';
 
 interface DeviceSpec {
-  icon: React.ElementType;
+  icon: ComponentType<{ className?: string }>;
   baseHashrate: number;
   efficiency: number;
 }
