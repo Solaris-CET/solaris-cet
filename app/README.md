@@ -48,4 +48,4 @@ E2E (Chromium): from `app/`, **`npm run test:e2e`** (install browsers once: `npx
 
 - **Coolify (production):** run `npm run start:full` (serves `dist/` + `/api/*` from the same container via `server/index.cjs`). Set the same env vars as below.
 - **GitHub Pages:** static `dist/` only; `/api/chat` and `/api/auth` need a separate backend unless you disable those features.
-- `vercel.json` exists for teams that still deploy on Vercel; it maps `/api/chat` and `/api/auth` when the project root is **`app`**.
+- Deployment is managed via **Coolify + VPS** (production path).

@@ -1,5 +1,5 @@
 /**
- * PostgreSQL client for Node.js API routes (Coolify, Vercel Node, etc.).
+ * PostgreSQL client for Node.js API routes (Coolify, etc.).
  * Do not import this from `runtime: 'edge'` handlers — Edge has no TCP to Postgres.
  * Use a Node runtime (or a serverless HTTP proxy) for routes that persist data.
  */

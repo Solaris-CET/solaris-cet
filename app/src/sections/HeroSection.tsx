@@ -68,6 +68,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
 
   const prefersReducedMotion = useReducedMotion();
   const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const isMobile = useMediaQuery('(max-width: 767px)');
   const { t, lang } = useLanguage();
   const pool = useLivePoolData();
   const community = useCommunityProof();
@@ -87,24 +88,27 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
     });
   }, [lang]);
 
-  const enableHologram = useMemo(() => {
-    if (!cinematic) return false;
-    if (prefersReducedMotion) return false;
-    if (!isDesktop) return false;
+  const holoQuality = useMemo(() => {
+    if (!cinematic) return null;
+    if (prefersReducedMotion) return null;
     const navAny =
       typeof navigator !== 'undefined'
         ? (navigator as unknown as { connection?: { saveData?: boolean }; deviceMemory?: number })
         : null;
     const saveData = navAny?.connection?.saveData === true;
     const dm = typeof navAny?.deviceMemory === 'number' ? navAny.deviceMemory : null;
-    const okMem = dm === null ? true : dm >= 4;
-    return !saveData && okMem;
-  }, [cinematic, prefersReducedMotion, isDesktop]);
+    if (saveData) return null;
+    if (isMobile) {
+      if (dm !== null && dm < 4) return null;
+      return 'low' as const;
+    }
+    if (isDesktop && dm !== null && dm >= 6) return 'high' as const;
+    return 'low' as const;
+  }, [cinematic, prefersReducedMotion, isDesktop, isMobile]);
+
+  const enableHologram = holoQuality !== null;
 
   useLayoutEffect(() => {
-    const isMobile =
-      typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches;
-
     if (isMobile || prefersReducedMotion) {
       if (titleContainerRef.current) {
         titleContainerRef.current.style.opacity = '1';
@@ -126,7 +130,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
     }, containerRef);
 
     return () => ctx.revert();
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, isMobile]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -228,7 +232,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
           <div className="absolute inset-0 hidden sm:block hero-holo-scanline" aria-hidden />
         </div>
 
-        <Suspense fallback={null}>{enableHologram ? <HeroTokenHologram /> : null}</Suspense>
+        <Suspense fallback={null}>
+          {enableHologram ? <HeroTokenHologram quality={holoQuality ?? undefined} /> : null}
+        </Suspense>
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 flex flex-col gap-12 lg:gap-16 pt-12 md:pt-16">
           

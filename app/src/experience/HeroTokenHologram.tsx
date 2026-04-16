@@ -5,7 +5,9 @@ import { Bloom, ChromaticAberration, EffectComposer, Noise, Vignette } from '@re
 import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
 
-function AgentsMesh({ count }: { count: number }) {
+type HologramQuality = 'low' | 'high';
+
+function AgentsMesh({ count, pointerScale }: { count: number; pointerScale: number }) {
   const pointsRef = useRef<THREE.Points>(null);
   const material = useMemo(() => {
     const m = new THREE.PointsMaterial({
@@ -51,8 +53,8 @@ function AgentsMesh({ count }: { count: number }) {
     const p = pointsRef.current;
     if (!p) return;
     const t = state.clock.elapsedTime;
-    p.rotation.y = t * 0.06 + state.pointer.x * 0.18;
-    p.rotation.x = Math.sin(t * 0.18) * 0.08 + state.pointer.y * 0.14;
+    p.rotation.y = t * 0.06 + state.pointer.x * 0.18 * pointerScale;
+    p.rotation.x = Math.sin(t * 0.18) * 0.08 + state.pointer.y * 0.14 * pointerScale;
   });
 
   return <points ref={pointsRef} geometry={geometry} material={material} />;
@@ -96,9 +98,12 @@ function TokenMesh() {
   );
 }
 
-function HeroTokenHologram() {
-  const [dpr, setDpr] = useState<number | [number, number]>([1, 1.6]);
-  const caOffset = useMemo(() => new THREE.Vector2(0.0011, 0.0007), []);
+function HeroTokenHologram({ quality = 'high' }: { quality?: HologramQuality }) {
+  const [dpr, setDpr] = useState<number | [number, number]>(quality === 'high' ? [1, 1.6] : 1);
+  const caOffset = useMemo(
+    () => (quality === 'high' ? new THREE.Vector2(0.0011, 0.0007) : new THREE.Vector2(0, 0)),
+    [quality],
+  );
   const agentCount = useMemo(() => {
     const navAny =
       typeof navigator !== 'undefined'
@@ -106,15 +111,21 @@ function HeroTokenHologram() {
         : null;
     const saveData = navAny?.connection?.saveData === true;
     const dm = typeof navAny?.deviceMemory === 'number' ? navAny.deviceMemory : null;
-    if (saveData) return 8_000;
+    if (saveData) return quality === 'high' ? 8_000 : 4_000;
+    if (quality === 'low') {
+      if (dm !== null && dm <= 4) return 6_000;
+      return 10_000;
+    }
     if (dm !== null && dm <= 4) return 14_000;
     return 22_000;
-  }, []);
+  }, [quality]);
+
+  const pointerScale = quality === 'high' ? 1 : 0.55;
 
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-0 z-[6] hidden lg:block"
+      className="pointer-events-none absolute inset-0 z-[6] opacity-70 sm:opacity-85 lg:opacity-100"
       style={{
         maskImage:
           'radial-gradient(ellipse 55% 55% at 50% 40%, rgba(0,0,0,1) 0%, rgba(0,0,0,0.92) 35%, rgba(0,0,0,0) 72%)',
@@ -129,20 +140,29 @@ function HeroTokenHologram() {
       >
         <PerformanceMonitor
           onDecline={() => setDpr(1)}
-          onIncline={() => setDpr([1, 1.6])}
+          onIncline={() => setDpr(quality === 'high' ? [1, 1.6] : 1)}
         />
         <color attach="background" args={['#000000']} />
         <ambientLight intensity={0.8} />
         <directionalLight position={[3, 2, 4]} intensity={1.25} color="#FFE3A1" />
         <directionalLight position={[-3, -2, 2]} intensity={0.55} color="#55F0FF" />
         <fog attach="fog" args={['#020512', 2.8, 9]} />
-        <AgentsMesh count={agentCount} />
+        <AgentsMesh count={agentCount} pointerScale={pointerScale} />
         <TokenMesh />
         <EffectComposer multisampling={0}>
-          <Bloom intensity={0.9} luminanceThreshold={0.1} luminanceSmoothing={0.2} mipmapBlur />
+          <Bloom
+            intensity={quality === 'high' ? 0.9 : 0.5}
+            luminanceThreshold={0.1}
+            luminanceSmoothing={0.2}
+            mipmapBlur
+          />
           <ChromaticAberration offset={caOffset} radialModulation modulationOffset={0.2} />
-          <Noise premultiply blendFunction={BlendFunction.SOFT_LIGHT} opacity={0.18} />
-          <Vignette eskil={false} offset={0.2} darkness={0.65} />
+          <Noise
+            premultiply
+            blendFunction={BlendFunction.SOFT_LIGHT}
+            opacity={quality === 'high' ? 0.18 : 0.14}
+          />
+          <Vignette eskil={false} offset={0.2} darkness={quality === 'high' ? 0.65 : 0.58} />
         </EffectComposer>
         <Environment preset="city" />
       </Canvas>

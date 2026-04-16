@@ -15,7 +15,7 @@
  * If one provider is unavailable the other generates the full 3-part
  * RAV response so CET AI never goes silent.
  *
- * `runtime: 'edge'` matches Vercel-style adapters and compatible hosts (e.g. Coolify).
+ * `runtime: 'edge'` matches edge-style adapters and compatible hosts (e.g. Coolify).
  */
 import OpenAI from 'openai';
 import { getAllowedOrigin } from '../lib/cors';
