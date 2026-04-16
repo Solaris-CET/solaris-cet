@@ -67,18 +67,32 @@ const Navigation = () => {
 
   const navLinks = useMemo(
     () =>
-      NAV_PRIMARY_IN_PAGE.map(({ navKey, href }) => ({
-        navKey,
-        label: t.nav[navKey],
-        href,
-      })),
+      NAV_PRIMARY_IN_PAGE.map(({ navKey, href }) => {
+        const withLang =
+          typeof window !== 'undefined' && href.startsWith('/') ? `${href}${window.location.search}` : href;
+        return {
+          navKey,
+          label: t.nav[navKey],
+          href: withLang,
+        };
+      }),
     [t],
   );
+
+  const currentPath = useMemo(() => {
+    if (typeof window === 'undefined') return '/';
+    return window.location.pathname.replace(/\/$/, '') || '/';
+  }, []);
+  const isRouteMode = currentPath === '/rwa' || currentPath === '/cet-ai';
 
   const primaryDesktopHrefs = useMemo(() => new Set(navLinks.slice(0, 4).map((l) => l.href)), [navLinks]);
   const [activeHref, setActiveHref] = useState<string>(() => {
     const hash = typeof window !== 'undefined' ? window.location.hash : '';
-    return navLinks.some((l) => l.href === hash) ? hash : (navLinks[0]?.href ?? '#');
+    const path = typeof window !== 'undefined' ? window.location.pathname.replace(/\/$/, '') || '/' : '/';
+    const routeMatch = navLinks.find((l) => l.href.startsWith('/') && l.href.split('?')[0] === path);
+    if (routeMatch) return routeMatch.href;
+    if (navLinks.some((l) => l.href === hash)) return hash;
+    return navLinks[0]?.href ?? '#';
   });
 
   useEffect(() => {
@@ -95,6 +109,7 @@ const Navigation = () => {
   }, []);
 
   useEffect(() => {
+    if (isRouteMode) return;
     const sections = navLinks.flatMap((link) => {
       const id = link.href.startsWith('#') ? link.href.slice(1) : '';
       const el = id ? document.getElementById(id) : null;
@@ -214,7 +229,7 @@ const Navigation = () => {
         */}
         <div className="flex h-16 w-full items-center justify-between gap-2 sm:gap-3 lg:grid lg:h-20 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center lg:gap-4 2xl:gap-6">
           <a
-            href="#main-content"
+            href={isRouteMode ? '/' : '#main-content'}
             className="group relative z-20 flex shrink-0 items-center"
             aria-label="Solaris CET"
           >

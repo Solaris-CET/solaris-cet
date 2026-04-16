@@ -17,11 +17,11 @@ describe('navPrimaryHrefs', () => {
     }
   });
 
-  it('uses expected hash targets for core conversion sections', () => {
+  it('uses expected targets for core conversion sections', () => {
     const hrefByKey = Object.fromEntries(NAV_PRIMARY_IN_PAGE.map((e) => [e.navKey, e.href]));
     expect(hrefByKey.tokenomics).toBe('#staking');
-    expect(hrefByKey.rwa).toBe('#rwa');
-    expect(hrefByKey.cetAi).toBe('#cet-ai');
+    expect(hrefByKey.rwa).toBe('/rwa');
+    expect(hrefByKey.cetAi).toBe('/cet-ai');
     expect(hrefByKey.whitepaper).toBe('#whitepaper');
     expect(hrefByKey.faq).toBe('#faq');
   });

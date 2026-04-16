@@ -1,4 +1,4 @@
-import { lazy, useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { PRODUCTION_SITE_ORIGIN } from '@/lib/brandAssets';
@@ -10,44 +10,19 @@ import { SolarisLogoMark } from './components/SolarisLogoMark';
 import CursorGlow from './components/CursorGlow';
 import { InteractionEffectsManager } from '@/components/InteractionEffectsManager';
 import { CinematicBackground } from '@/components/CinematicBackground';
-import LazyLoadWrapper from './components/LazyLoadWrapper';
-import { ErrorBoundary } from './components/ErrorBoundary';
 import BackToTop from './components/BackToTop';
 import MobileConversionDock from './components/MobileConversionDock';
 import PwaInstallPrompt from './components/PwaInstallPrompt';
 import { BuildSeal } from './components/BuildSeal';
-import { ScrollFadeUp } from './components/ScrollFadeUp';
-// Pinned sections — loaded eagerly so the snap/scroll setup can find their ScrollTriggers
-import HeroSection from './sections/HeroSection';
-import HybridEngineSection from './sections/HybridEngineSection';
-import StatsBentoSection from './sections/StatsBentoSection';
-import AuthorityTrustSection from './sections/AuthorityTrustSection';
-import IntelligenceCoreSection from './sections/IntelligenceCoreSection';
-import NovaAppSection from './sections/NovaAppSection';
-import TokenomicsSection from './sections/TokenomicsSection';
-import ComplianceSection from './sections/ComplianceSection';
-// Non-pinned sections — lazy-loaded when they approach the viewport
-const AgenticEngineSection = lazy(() => import('./sections/AgenticEngineSection'));
-const RoadmapSection = lazy(() => import('./sections/RoadmapSection'));
-const AITeamSection = lazy(() => import('./sections/AITeamSection'));
-const CompetitionSection = lazy(() => import('./sections/CompetitionSection'));
-const NetworkPulseSection = lazy(() => import('./sections/NetworkPulseSection'));
-const HowToBuySection = lazy(() => import('./sections/HowToBuySection'));
-const MiningCalculatorSection = lazy(() => import('./sections/MiningCalculatorSection'));
-const StakingCalculatorSection = lazy(() => import('./sections/StakingCalculatorSection'));
-const SecuritySection = lazy(() => import('./sections/SecuritySection'));
-const WhitepaperSection = lazy(() => import('./sections/WhitepaperSection'));
-const HighIntelligenceSection = lazy(() => import('./sections/HighIntelligenceSection'));
-const EcosystemIndexSection = lazy(() => import('./sections/EcosystemIndexSection'));
-const RwaSection = lazy(() => import('./sections/RwaSection'));
-const ResourcesSection = lazy(() => import('./sections/ResourcesSection'));
-const FAQSection = lazy(() => import('./sections/FAQSection'));
-const FooterSection = lazy(() => import('./sections/FooterSection'));
 import { LanguageContext, useLanguageState } from './hooks/useLanguage';
 import { useSmoothAnchors } from './hooks/useSmoothAnchors';
 import './App.css';
 import { shortSkillWhisper, skillSeedFromLabel } from './lib/meshSkillFeed';
 import CookieConsentBanner from './components/CookieConsentBanner';
+
+const HomePage = lazy(() => import('./pages/HomePage'));
+const RwaPage = lazy(() => import('./pages/RwaPage'));
+const CetAiPage = lazy(() => import('./pages/CetAiPage'));
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -64,6 +39,7 @@ function AppContent() {
   const langState = useLanguageState();
 
   useSmoothAnchors();
+  const routePath = typeof window !== 'undefined' ? window.location.pathname.replace(/\/$/, '') || '/' : '/';
 
   useEffect(() => {
     const loadingEl = loadingRef.current;
@@ -114,7 +90,7 @@ function AppContent() {
   useEffect(() => {
     // Ensure all ScrollTriggers are released if AppContent unmounts (HMR, route-level remounts).
     return () => {
-      ScrollTrigger.getAll().forEach((st) => st.kill());
+      ScrollTrigger.getAll().forEach((st: ScrollTrigger) => st.kill());
     };
   }, []);
 
@@ -140,6 +116,7 @@ function AppContent() {
 
   useEffect(() => {
     if (!isLoaded) return;
+    if (routePath !== '/') return;
 
     // Below 1024 px (tablets/small laptops), free scrolling is more natural
     const isBelowDesktop = typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches;
@@ -148,13 +125,13 @@ function AppContent() {
 
     const setupSnap = () => {
       const pinned = ScrollTrigger.getAll()
-        .filter((st) => st.vars.pin)
-        .sort((a, b) => a.start - b.start);
+        .filter((st: ScrollTrigger) => st.vars.pin)
+        .sort((a: ScrollTrigger, b: ScrollTrigger) => a.start - b.start);
 
       const maxScroll = ScrollTrigger.maxScroll(window);
       if (!maxScroll || pinned.length === 0) return;
 
-      const pinnedRanges = pinned.map((st) => ({
+      const pinnedRanges = pinned.map((st: ScrollTrigger) => ({
         start: st.start / maxScroll,
         end: (st.end ?? st.start) / maxScroll,
         center: (st.start + ((st.end ?? st.start) - st.start) * 0.5) / maxScroll,
@@ -171,24 +148,41 @@ function AppContent() {
       });
     };
 
-    const timer = window.setTimeout(setupSnap, 500);
+    const maxWaitMs = 12_000;
+    const started = performance.now();
+    const id = window.setInterval(() => {
+      setupSnap();
+      if (snapTriggerRef.current) {
+        window.clearInterval(id);
+        return;
+      }
+      if (performance.now() - started > maxWaitMs) {
+        window.clearInterval(id);
+      }
+    }, 300);
     return () => {
-      window.clearTimeout(timer);
+      window.clearInterval(id);
       snapTriggerRef.current?.kill();
       snapTriggerRef.current = null;
     };
-  }, [isLoaded, buildSnapTo]);
+  }, [isLoaded, buildSnapTo, routePath]);
 
-  /** When the server serves `index.html` for `/mining`, scroll to the calculator after lazy sections mount. */
+  /** When the server serves `index.html` for a route, scroll to the matching section after lazy sections mount. */
   useEffect(() => {
     if (!isLoaded) return;
     const path = window.location.pathname.replace(/\/$/, '') || '/';
-    if (path !== '/mining') return;
+    const routeToSectionId: Record<string, string> = {
+      '/mining': 'mining',
+      '/rwa': 'rwa',
+      '/cet-ai': 'cet-ai',
+    };
+    const targetId = routeToSectionId[path];
+    if (!targetId) return;
 
     const maxWaitMs = 12_000;
     const started = performance.now();
     const id = window.setInterval(() => {
-      const el = document.getElementById('mining');
+      const el = document.getElementById(targetId);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         window.clearInterval(id);
@@ -201,6 +195,51 @@ function AppContent() {
 
     return () => window.clearInterval(id);
   }, [isLoaded]);
+
+  useEffect(() => {
+    const path = window.location.pathname.replace(/\/$/, '') || '/';
+    const routeMeta: Record<string, { title: string; description: string }> = {
+      '/': {
+        title: 'Home | Solaris CET',
+        description:
+          "Solaris CET is an AI-native RWA token on TON blockchain. 9,000 CET fixed supply. 200,000 autonomous AI agents via Grok × Gemini dual-AI RAV Protocol.",
+      },
+      '/rwa': {
+        title: 'RWA | Solaris CET',
+        description:
+          'Explore Solaris CET real-world asset proof surface: evidence links, timeline, and project documents anchored in Cetățuia, Romania.',
+      },
+      '/cet-ai': {
+        title: 'CET AI Demo | Solaris CET',
+        description:
+          'Try the CET AI demo UI with secure /api/chat integration, UX error states, and privacy guidance (do not enter personal data).',
+      },
+    };
+    const meta = routeMeta[path];
+    if (!meta) return;
+
+    const absoluteUrl = `${PRODUCTION_SITE_ORIGIN}${path === '/' ? '' : path}`;
+    document.title = meta.title;
+
+    const setMeta = (selector: string, content: string) => {
+      const el = document.querySelector(selector) as HTMLMetaElement | null;
+      if (el) el.setAttribute('content', content);
+    };
+
+    const setLink = (selector: string, href: string) => {
+      const el = document.querySelector(selector) as HTMLLinkElement | null;
+      if (el) el.setAttribute('href', href);
+    };
+
+    setMeta('meta[name="description"]', meta.description);
+    setMeta('meta[property="og:url"]', absoluteUrl);
+    setMeta('meta[property="og:title"]', meta.title);
+    setMeta('meta[property="og:description"]', meta.description);
+    setMeta('meta[name="twitter:url"]', absoluteUrl);
+    setMeta('meta[name="twitter:title"]', meta.title);
+    setMeta('meta[name="twitter:description"]', meta.description);
+    setLink('link[rel="canonical"]', absoluteUrl);
+  }, []);
 
   return (
     <LanguageContext.Provider value={langState}>
@@ -299,263 +338,15 @@ function AppContent() {
         <Toaster />
         <StatusBar />
         
-        {/* Main content — conversion flow: Hero → Problem → Solution → Tokenomics → RWA → Roadmap → Footer */}
-        <main
-          id="main-content"
-          className="relative w-full overflow-x-clip pb-[var(--mobile-conversion-dock-reserve)] xl:pb-0"
-        >
-          {/* 1. Hero — Atenție */}
-          <section
-            id="hero"
-            aria-label={langState.t.landmarks.hero}
-            className="relative z-10"
-          >
-            <ErrorBoundary>
-              {/* Hero: GSAP entrance only (no pin — avoids scroll-jacking); ScrollFadeUp here caused double opacity */}
-              <HeroSection />
-            </ErrorBoundary>
-          </section>
-
-          {/* 2. Problema agriculturii — impact, gap AI, infrastructură hibridă */}
-          <section
-            id="problem-agriculture"
-            aria-label={langState.t.landmarks.problemAgriculture}
-            className="relative z-[15]"
-          >
-            <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-              <div className="cosmic-burst -top-[10%] left-[10%] opacity-35" />
-              <div className="cosmic-burst bottom-[-20%] right-[-10%] opacity-25" style={{ animationDelay: '1.4s' }} />
-            </div>
-            <div className="cosmic-event-stamp absolute right-5 top-6 sm:right-8 sm:top-8" aria-hidden>
-              EVENT · QUANTUM LATTICE
-            </div>
-            <div className="relative z-[15]">
-              <LazyLoadWrapper>
-                <ScrollFadeUp>
-                  <StatsBentoSection />
-                </ScrollFadeUp>
-              </LazyLoadWrapper>
-            </div>
-            <div className="relative z-[16]">
-              <LazyLoadWrapper>
-                <ScrollFadeUp>
-                  <AuthorityTrustSection />
-                </ScrollFadeUp>
-              </LazyLoadWrapper>
-            </div>
-            <div className="relative z-20">
-              <ErrorBoundary>
-                <ScrollFadeUp>
-                  <IntelligenceCoreSection />
-                </ScrollFadeUp>
-              </ErrorBoundary>
-            </div>
-            <div className="relative z-30">
-              <ErrorBoundary>
-                <ScrollFadeUp>
-                  <HybridEngineSection />
-                </ScrollFadeUp>
-              </ErrorBoundary>
-            </div>
-            <div className="relative z-[32]">
-              <LazyLoadWrapper>
-                <ScrollFadeUp>
-                  <ErrorBoundary>
-                    <AgenticEngineSection />
-                  </ErrorBoundary>
-                </ScrollFadeUp>
-              </LazyLoadWrapper>
-            </div>
-          </section>
-
-          {/* 3. Soluția Solaris AI — aplicația & motorul (id matches nav #nova-app) */}
-          <section
-            id="nova-app"
-            aria-label={langState.t.landmarks.novaApp}
-            className="relative z-40 scroll-mt-24"
-          >
-            <ErrorBoundary>
-              <ScrollFadeUp>
-                <NovaAppSection />
-              </ScrollFadeUp>
-            </ErrorBoundary>
-          </section>
-
-          {/* 4. Tokenomics — 9,000 CET dashboard (id matches nav #staking) */}
-          <section
-            id="staking"
-            aria-label={langState.t.landmarks.tokenomics}
-            className="relative z-50 scroll-mt-24"
-          >
-            <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-              <div className="cosmic-burst -top-[18%] left-1/2 -translate-x-1/2 opacity-30" style={{ animationDelay: '0.6s' }} />
-              <div className="cosmic-shockwave" />
-            </div>
-            <div className="cosmic-event-stamp absolute left-5 top-6 sm:left-8 sm:top-8" aria-hidden>
-              EVENT · BIG BANG 9,000 CET
-            </div>
-            <ErrorBoundary>
-              <ScrollFadeUp>
-                <TokenomicsSection />
-              </ScrollFadeUp>
-            </ErrorBoundary>
-          </section>
-
-          {/* 5. RWA — Cetățuia, real estate */}
-          <section
-            aria-label={langState.t.landmarks.rwa}
-            className="relative z-[55]"
-          >
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><RwaSection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </section>
-
-          {/* 6. Roadmap (id matches nav #roadmap) */}
-          <section
-            aria-label={langState.t.landmarks.roadmap}
-            className="relative z-[70] scroll-mt-24"
-          >
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><RoadmapSection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </section>
-
-          {/* Secțiuni suport (nav / mining / FAQ) — după roadmap, înainte de footer */}
-          {/* Compliance — after core story arc (z above Roadmap so stacking matches DOM order) */}
-          <div className="relative z-[72]">
-            <ErrorBoundary>
-              <ScrollFadeUp>
-                <ComplianceSection />
-              </ScrollFadeUp>
-            </ErrorBoundary>
-          </div>
-
-          {/* Section 8: AI Team - pin: false */}
-          <div className="relative z-[75]">
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><AITeamSection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </div>
-
-          {/* Section 9: Competition - pin: false */}
-          <div className="relative z-[78]">
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><CompetitionSection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </div>
-
-          {/* Section 9.5: Network Pulse — live TON + CET stats */}
-          <div className="relative z-[79]">
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><NetworkPulseSection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </div>
-
-          {/* Section 10: How to Buy - pin: false */}
-          <div className="relative z-[80]">
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><HowToBuySection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </div>
-
-          {/* Section 11: Mining Calculator - pin: false */}
-          <div className="relative z-[90]">
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><MiningCalculatorSection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </div>
-
-          {/* Section 11.5: Staking Calculator - pin: false */}
-          <div className="relative z-[95]">
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><StakingCalculatorSection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </div>
-
-          {/* Section 12: Security - pin: false */}
-          <div className="relative z-[100]">
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><SecuritySection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </div>
-          
-          {/* Section 13: Whitepaper - pin: false */}
-          <div className="relative z-[105]">
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><WhitepaperSection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </div>
-
-          {/* Section 14: High Intelligence - pin: false */}
-          <div className="relative z-[108]">
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><HighIntelligenceSection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </div>
-          
-          {/* Section 15: Ecosystem Index - pin: false */}
-          <div className="relative z-[109]">
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><EcosystemIndexSection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </div>
-
-          {/* Section 16: Resources - pin: false */}
-          <div className="relative z-[110]">
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><ResourcesSection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </div>
-
-          {/* Section 17: FAQ - pin: false */}
-          <div className="relative z-[112]">
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><FAQSection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </div>
-
-          {/* 7. Footer — landmark lives here; FooterSection is nested inside LazyLoadWrapper */}
-          <section
-            aria-label={langState.t.landmarks.footer}
-            data-testid="footer-landmark-section"
-            className="relative z-[113]"
-          >
-            <LazyLoadWrapper>
-              <ScrollFadeUp>
-                <ErrorBoundary><FooterSection /></ErrorBoundary>
-              </ScrollFadeUp>
-            </LazyLoadWrapper>
-          </section>
-        </main>
+        <Suspense fallback={null}>
+          {routePath === '/rwa' ? (
+            <RwaPage />
+          ) : routePath === '/cet-ai' ? (
+            <CetAiPage />
+          ) : (
+            <HomePage />
+          )}
+        </Suspense>
       </div>
       <PwaInstallPrompt />
       <MobileConversionDock />

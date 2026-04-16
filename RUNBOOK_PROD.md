@@ -14,10 +14,7 @@ q
 
 ```bash
 cd /root/solaris-cet
-npm run app:verify
-PW_WORKERS=1 npm run app:test:e2e
-npm run contracts:test
-npm run contracts:typecheck
+npm run verify:all
 ```
 
 ## 2) Git save (commit + push)
@@ -47,6 +44,9 @@ Rule:
 - `ENCRYPTION_SECRET`
 - `GROK_API_KEY_ENC` or `GROK_API_KEY`
 - `GEMINI_API_KEY_ENC` or `GEMINI_API_KEY`
+- `CET_AI_ENABLE_WEB` (optional; set `1` to enable web retrieval)
+- `CET_AI_WEB_ALLOWLIST` (optional; comma-separated domains)
+- `TAVILY_API_KEY_ENC` or `TAVILY_API_KEY` (optional; required only if web retrieval is enabled)
 - `JWT_SECRET`
 - `TONCENTER_RPC_URL`
 - `TONCENTER_API_KEY` (optional)
@@ -93,4 +93,3 @@ AI is configured only when:
 ```bash
 curl -sS "https://solaris-cet.com/api/ton/balance?address=<TON_ADDRESS>"
 ```
-

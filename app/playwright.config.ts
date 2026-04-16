@@ -60,7 +60,7 @@ export default defineConfig({
      so baseURL/webServer.url never silently point at the wrong port. */
   webServer: {
     /* Preview only — run `npm run build` (or `npm run verify`) first so `dist/` exists. A second build
-       here after `verify:full` was redundant and could fail with ENOTEMPTY on `dist/vendor/onnxruntime`.
+       here after the monorepo gate (`npm run verify:all`) was redundant and could fail with ENOTEMPTY on `dist/vendor/onnxruntime`.
        `preview:e2e` binds 127.0.0.1 and raises Node heap to reduce mid-suite OOMs that surface as
        :4173 ERR_CONNECTION_REFUSED. */
     command: 'npm run preview:e2e',

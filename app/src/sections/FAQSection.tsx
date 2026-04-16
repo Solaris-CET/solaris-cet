@@ -94,7 +94,7 @@ const FAQSection = () => {
     <section
       id="faq"
       aria-label={t.sectionAria.faq}
-      className="relative section-glass py-20 lg:py-28 overflow-hidden mesh-bg"
+      className="relative section-glass section-padding-y overflow-hidden mesh-bg"
     >
       <GlowOrbs variant="cyan" />
 

@@ -201,6 +201,9 @@ export interface Translations {
     /** Trust pillars — authority & conversion (Vibe Founder playbook). */
     authorityTrust: string;
   };
+  meshSkillRibbonUi: {
+    sampleLabel: string;
+  };
   /** shadcn-style UI primitives (may be unused but kept i18n-ready). */
   ui: {
     toggleSidebar: string;
@@ -417,6 +420,7 @@ export interface Translations {
     /** Screen reader announcement when CET AI finishes (aria-live). */
     announceCetAiReady: string;
     askNextLabel: string;
+    sourcesLabel: string;
     copyForAiQuestionLabel: string;
     copyForAiAnswerLabel: string;
     copyForAiInstructions: string;
@@ -626,6 +630,9 @@ const translations: Record<LangCode, Translations> = {
       bftNodeHonest: 'Honest validator (illustrative)',
       authorityTrust: 'Authority and trust pillars',
     },
+    meshSkillRibbonUi: {
+      sampleLabel: 'Mesh skill sample · live rotation',
+    },
     ui: {
       toggleSidebar: 'Toggle Sidebar',
       paginationNav: 'Pagination',
@@ -818,6 +825,7 @@ const translations: Record<LangCode, Translations> = {
       copyForAiAriaLabel: 'Copy question and answer as handoff for another assistant',
       announceCetAiReady: 'CET AI response ready.',
       askNextLabel: 'Ask next:',
+      sourcesLabel: 'Sources',
       copyForAiQuestionLabel: '## Question',
       copyForAiAnswerLabel: '## Answer',
       copyForAiInstructions:
@@ -1064,6 +1072,9 @@ const translations: Record<LangCode, Translations> = {
       bftNodeHonest: 'Validador honesto (ilustrativo)',
       authorityTrust: 'Pilares de autoridad y confianza',
     },
+    meshSkillRibbonUi: {
+      sampleLabel: 'Muestra de skill mesh · rotación en vivo',
+    },
     ui: {
       toggleSidebar: 'Alternar barra lateral',
       paginationNav: 'Paginación',
@@ -1256,6 +1267,7 @@ const translations: Record<LangCode, Translations> = {
       copyForAiAriaLabel: 'Copiar pregunta y respuesta como contexto para otro asistente',
       announceCetAiReady: 'Respuesta del Oráculo lista.',
       askNextLabel: 'Siguiente pregunta:',
+      sourcesLabel: 'Fuentes',
       copyForAiQuestionLabel: '## Pregunta',
       copyForAiAnswerLabel: '## Respuesta',
       copyForAiInstructions:
@@ -1501,6 +1513,9 @@ const translations: Record<LangCode, Translations> = {
       bftNodeHonest: '诚实验证者（示意）',
       authorityTrust: '信任与权威支柱',
     },
+    meshSkillRibbonUi: {
+      sampleLabel: '网格技能示例 · 实时轮换',
+    },
     ui: {
       toggleSidebar: '切换侧边栏',
       paginationNav: '分页导航',
@@ -1683,6 +1698,7 @@ const translations: Record<LangCode, Translations> = {
       copyForAiAriaLabel: '复制问答作为其他助手的上下文',
       announceCetAiReady: '预言机回复已就绪。',
       askNextLabel: '继续问：',
+      sourcesLabel: '来源',
       copyForAiQuestionLabel: '## 问题',
       copyForAiAnswerLabel: '## 回答',
       copyForAiInstructions:
@@ -1928,6 +1944,9 @@ const translations: Record<LangCode, Translations> = {
       bftNodeHonest: 'Честный валидатор (иллюстрация)',
       authorityTrust: 'Столпы доверия и авторитета',
     },
+    meshSkillRibbonUi: {
+      sampleLabel: 'Образец mesh-навыка · живая ротация',
+    },
     ui: {
       toggleSidebar: 'Переключить боковую панель',
       paginationNav: 'Пагинация',
@@ -2117,6 +2136,7 @@ const translations: Record<LangCode, Translations> = {
       copyForAiAriaLabel: 'Скопировать вопрос и ответ для другого ассистента',
       announceCetAiReady: 'Ответ Оракула готов.',
       askNextLabel: 'Спросить дальше:',
+      sourcesLabel: 'Источники',
       copyForAiQuestionLabel: '## Вопрос',
       copyForAiAnswerLabel: '## Ответ',
       copyForAiInstructions:
@@ -2363,6 +2383,9 @@ const translations: Record<LangCode, Translations> = {
       bftNodeHonest: 'Validator cinstit (ilustrativ)',
       authorityTrust: 'Pilonii de autoritate și încredere',
     },
+    meshSkillRibbonUi: {
+      sampleLabel: 'Exemplu skill mesh · rotație live',
+    },
     ui: {
       toggleSidebar: 'Comută bara laterală',
       paginationNav: 'Paginare',
@@ -2555,6 +2578,7 @@ const translations: Record<LangCode, Translations> = {
       copyForAiAriaLabel: 'Copiază întrebarea și răspunsul pentru alt asistent',
       announceCetAiReady: 'Răspunsul Oracolului este gata.',
       askNextLabel: 'Întreabă în continuare:',
+      sourcesLabel: 'Surse',
       copyForAiQuestionLabel: '## Întrebare',
       copyForAiAnswerLabel: '## Răspuns',
       copyForAiInstructions:
@@ -2801,6 +2825,9 @@ const translations: Record<LangCode, Translations> = {
       bftNodeHonest: 'Validador honesto (ilustrativo)',
       authorityTrust: 'Pilares de autoridade e confiança',
     },
+    meshSkillRibbonUi: {
+      sampleLabel: 'Amostra de skill mesh · rotação ao vivo',
+    },
     ui: {
       toggleSidebar: 'Alternar barra lateral',
       paginationNav: 'Paginação',
@@ -2993,6 +3020,7 @@ const translations: Record<LangCode, Translations> = {
       copyForAiAriaLabel: 'Copiar pergunta e resposta para outro assistente',
       announceCetAiReady: 'Resposta do Oráculo pronta.',
       askNextLabel: 'Pergunte a seguir:',
+      sourcesLabel: 'Fontes',
       copyForAiQuestionLabel: '## Pergunta',
       copyForAiAnswerLabel: '## Resposta',
       copyForAiInstructions:
@@ -3239,6 +3267,9 @@ const translations: Record<LangCode, Translations> = {
       bftNodeHonest: 'Ehrlicher Validator (illustrativ)',
       authorityTrust: 'Vertrauens- und Autoritätssäulen',
     },
+    meshSkillRibbonUi: {
+      sampleLabel: 'Mesh-Skill-Beispiel · Live-Rotation',
+    },
     ui: {
       toggleSidebar: 'Seitenleiste umschalten',
       paginationNav: 'Seitennummerierung',
@@ -3431,6 +3462,7 @@ const translations: Record<LangCode, Translations> = {
       copyForAiAriaLabel: 'Frage und Antwort für einen anderen Assistenten kopieren',
       announceCetAiReady: 'Orakel-Antwort bereit.',
       askNextLabel: 'Als Nächstes fragen:',
+      sourcesLabel: 'Quellen',
       copyForAiQuestionLabel: '## Frage',
       copyForAiAnswerLabel: '## Antwort',
       copyForAiInstructions:

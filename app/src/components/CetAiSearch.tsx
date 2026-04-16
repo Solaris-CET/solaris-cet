@@ -116,6 +116,7 @@ function chatHistoryToConversation(history: CetAiChatEntry[]): { role: 'user' | 
 interface CetAiFetchResult {
   text: string | null;
   sourceHeader: string | null;
+  sources: Array<{ id: string; title: string; url: string; snippet: string }>;
   /** True if /api/chat responded with a non-success or empty body (helps explain fallback). */
   liveEndpointError: boolean;
   /** Parsed `message` or `error` from JSON body when the call did not yield a response. */
@@ -145,7 +146,7 @@ async function fetchCetAiChat(
         }, { once: true });
       });
       if (signal.aborted)
-        return { text: null, sourceHeader: null, liveEndpointError: false, errorDetail: null, httpStatus: null };
+        return { text: null, sourceHeader: null, sources: [], liveEndpointError: false, errorDetail: null, httpStatus: null };
     }
     try {
       const res = await fetch('/api/chat', {
@@ -156,15 +157,30 @@ async function fetchCetAiChat(
       });
       const sourceHeader = res.headers.get('X-Cet-Ai-Source');
       const raw = await res.text();
-      let data: { response?: string; message?: string; error?: string } = {};
+      let data: { response?: string; message?: string; error?: string; sources?: unknown } = {};
       try {
-        data = JSON.parse(raw) as { response?: string; message?: string; error?: string };
+        data = JSON.parse(raw) as { response?: string; message?: string; error?: string; sources?: unknown };
       } catch {
         /* non-JSON error body */
       }
       const responseText = typeof data.response === 'string' ? data.response.trim() : '';
       const msg = typeof data.message === 'string' ? data.message.trim() : '';
       const err = typeof data.error === 'string' ? data.error.trim() : '';
+      const sources = Array.isArray(data.sources)
+        ? data.sources
+            .map((s): { id: string; title: string; url: string; snippet: string } | null => {
+              if (!s || typeof s !== 'object') return null;
+              const rec = s as Record<string, unknown>;
+              const id = typeof rec.id === 'string' ? rec.id : '';
+              const title = typeof rec.title === 'string' ? rec.title : '';
+              const url = typeof rec.url === 'string' ? rec.url : '';
+              const snippet = typeof rec.snippet === 'string' ? rec.snippet : '';
+              if (!id || !title || !url) return null;
+              return { id, title, url, snippet };
+            })
+            .filter((x): x is { id: string; title: string; url: string; snippet: string } => Boolean(x))
+            .slice(0, 5)
+        : [];
       const pickDetail = (): string | null => {
         const d = msg || err;
         if (!d) return null;
@@ -174,6 +190,7 @@ async function fetchCetAiChat(
         return {
           text: responseText,
           sourceHeader,
+          sources,
           liveEndpointError: false,
           errorDetail: null,
           httpStatus: null,
@@ -189,12 +206,13 @@ async function fetchCetAiChat(
       }
     } catch {
       if (signal.aborted)
-        return { text: null, sourceHeader: null, liveEndpointError: false, errorDetail: null, httpStatus: null };
+        return { text: null, sourceHeader: null, sources: [], liveEndpointError: false, errorDetail: null, httpStatus: null };
     }
   }
   return {
     text: null,
     sourceHeader: null,
+    sources: [],
     liveEndpointError: sawHttpOrEmptyError,
     errorDetail: lastErrorDetail,
     httpStatus: lastHttpStatus,
@@ -788,6 +806,7 @@ export default function CetAiSearch() {
   const [detectedTopic, setDetectedTopic] = useState<string>('default');
   /** False when the last completed answer used local knowledge (no /api/chat). */
   const [responseUsedLiveApi, setResponseUsedLiveApi] = useState(false);
+  const [responseSources, setResponseSources] = useState<Array<{ id: string; title: string; url: string; snippet: string }>>([]);
   /** True when /api/chat returned an error/empty body and we fell back to built-in knowledge. */
   const [liveApiReturnedError, setLiveApiReturnedError] = useState(false);
   /** Optional server message from JSON (`message` / `error`) when live API failed. */
@@ -890,6 +909,7 @@ export default function CetAiSearch() {
     setPhase('complete');
     setFinalResponse(t.cetAi.generationStopped);
     setResponseUsedLiveApi(false);
+    setResponseSources([]);
     setLiveApiReturnedError(false);
     setLiveApiErrorDetail(null);
     setLiveApiHttpStatus(null);
@@ -932,6 +952,7 @@ export default function CetAiSearch() {
     setCetAiConfidence(0);
     setMetrics({ confidence: 0, latency: 0, cetCost: 0 });
     setResponseUsedLiveApi(false);
+    setResponseSources([]);
     setLiveApiReturnedError(false);
     setLiveApiErrorDetail(null);
     setLiveApiHttpStatus(null);
@@ -1007,6 +1028,7 @@ export default function CetAiSearch() {
                 resolve({
                   text: null,
                   sourceHeader: null,
+                  sources: [],
                   liveEndpointError: false,
                   errorDetail: null,
                   httpStatus: null,
@@ -1017,6 +1039,7 @@ export default function CetAiSearch() {
         ]).catch((): CetAiFetchResult => ({
           text: null,
           sourceHeader: null,
+          sources: [],
           liveEndpointError: false,
           errorDetail: null,
           httpStatus: null,
@@ -1028,6 +1051,7 @@ export default function CetAiSearch() {
         const usedLive = hasRemoteText && raced.sourceHeader === 'live';
         const text = hasRemoteText ? remote!.trim() : localAnswer;
         const conf = hasRemoteText ? Math.min(99.2, confidence + 1.5) : confidence;
+        setResponseSources(hasRemoteText ? raced.sources : []);
         setLiveApiReturnedError(!hasRemoteText && raced.liveEndpointError);
         setLiveApiErrorDetail(
           !hasRemoteText && raced.liveEndpointError ? (raced.errorDetail ?? null) : null,
@@ -1482,6 +1506,33 @@ export default function CetAiSearch() {
                             />
                           )}
                         </div>
+                        {responseSources.length > 0 ? (
+                          <div
+                            data-testid="cet-ai-sources"
+                            className="mt-5 rounded-xl border border-gray-800/90 bg-black/25 px-4 py-3"
+                          >
+                            <p className="text-[10px] font-mono uppercase tracking-widest text-gray-500 mb-2">
+                              {t.cetAi.sourcesLabel}
+                            </p>
+                            <ul className="space-y-1">
+                              {responseSources.map((s) => (
+                                <li key={s.id} className="flex items-start gap-2">
+                                  <a
+                                    href={s.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    data-testid="cet-ai-source-link"
+                                    className="inline-flex items-center gap-2 text-xs text-gray-300 hover:text-cyan-300 transition-colors break-all"
+                                    title={s.title}
+                                  >
+                                    <ExternalLink className="w-3.5 h-3.5 shrink-0 opacity-70" aria-hidden />
+                                    <span className="font-mono">{s.title}</span>
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ) : null}
                         <div className="mt-5 pt-4 border-t border-green-500/10">
                           <p className="text-gray-600 text-[10px] font-mono uppercase tracking-widest mb-2">{t.cetAi.askNextLabel}</p>
                           <div className="flex flex-wrap gap-2">

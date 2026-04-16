@@ -8,9 +8,15 @@ export const E2E_I18N_START = '/?lang=en';
 export type NavPrimaryInPageHref = (typeof NAV_PRIMARY_IN_PAGE)[number]['href'];
 
 /** Hash links: pointer hit-test can fail in headless (logo / glass layers). */
-export async function clickHeaderNavHash(page: Page, href: NavPrimaryInPageHref): Promise<void> {
+export async function clickHeaderNav(page: Page, href: NavPrimaryInPageHref): Promise<void> {
+  if (href.startsWith('#')) {
+    await page
+      .locator(`header nav a[href="${href}"]`)
+      .evaluate((el) => (el as HTMLAnchorElement).click());
+    return;
+  }
   await page
-    .locator(`header nav a[href="${href}"]`)
+    .locator(`header nav a[href^="${href}"]`)
     .evaluate((el) => (el as HTMLAnchorElement).click());
 }
 
@@ -23,13 +29,13 @@ const desktopAssertByHref: {
     await staking.scrollIntoViewIfNeeded();
     await expect(staking.getByText('9,000').first()).toBeVisible({ timeout: 10_000 });
   },
-  '#rwa': async (page) => {
+  '/rwa': async (page) => {
     await scrollUntilSelectorAttached(page, '#rwa');
     await expect(page.locator('#rwa').getByText('REAL WORLD ASSETS · RWA')).toBeVisible({
       timeout: 15_000,
     });
   },
-  '#cet-ai': async (page) => {
+  '/cet-ai': async (page) => {
     await scrollUntilSelectorAttached(page, '#cet-ai');
     await expect(page.getByTestId('cet-ai-hero')).toBeVisible({ timeout: 15_000 });
   },
@@ -60,8 +66,12 @@ const desktopAssertByHref: {
 };
 
 export async function runDesktopNavPrimaryCase(page: Page, href: NavPrimaryInPageHref): Promise<void> {
-  await clickHeaderNavHash(page, href);
-  await expect(page).toHaveURL((u) => u.hash === href);
+  await clickHeaderNav(page, href);
+  if (href.startsWith('#')) {
+    await expect(page).toHaveURL((u) => u.hash === href);
+  } else {
+    await expect(page).toHaveURL((u) => u.pathname.replace(/\/$/, '') === href);
+  }
   await desktopAssertByHref[href](page);
 }
 

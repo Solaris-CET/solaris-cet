@@ -5,7 +5,7 @@ This document describes how the project can be **rebuilt and redeployed** withou
 ## Repository & deploy
 
 - **Source:** clone this repo and follow `README.md` for the Vite app under `app/`.
-- **Production build:** Coolify (or equivalent) should run `npm ci` and `npm run build` in `app/` with the same Node version as CI (see `.github/workflows/ci.yml`).
+- **Production build:** Coolify (or equivalent) should run `npm ci` in the repo root, then `npm run build --workspace=app` with the same Node version as CI (see `.github/workflows/ci.yml`).
 - **Environment:** API keys, RPC endpoints, and any genesis-related material live **only** in the host environment (e.g. Coolify env vars). Never commit them.
 
 ## Static OMEGA surface
@@ -42,7 +42,7 @@ Public community links (e.g. Telegram, GitHub) are listed on the live site. **Do
 
 ## CI expectations
 
-- `.github/workflows/ci.yml` enforces lint, tests, and a **main bundle size budget** (see workflow).
+- `.github/workflows/ci.yml` enforces lint, tests, and a **main bundle size budget (gzip)** (see workflow).
 - Lighthouse thresholds for static `dist/` are in `app/lighthouserc.cjs` and mirrored in `.github/workflows/lighthouse-ci.yml` so PRs cannot silently weaken gates by editing only one file.
 
 ## TLS / HSTS

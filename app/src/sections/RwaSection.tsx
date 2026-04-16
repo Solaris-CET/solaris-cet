@@ -176,7 +176,7 @@ const RwaSection = () => {
     <section
       id="rwa"
       aria-label={t.sectionAria.rwa}
-      className="relative section-glass py-20 lg:py-28 overflow-hidden mesh-bg"
+      className="relative section-glass section-padding-y overflow-hidden mesh-bg"
     >
       <GlowOrbs variant="gold" />
       <div className="scan-overlay absolute inset-0 pointer-events-none" aria-hidden="true" />

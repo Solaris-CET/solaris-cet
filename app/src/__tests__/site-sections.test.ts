@@ -3,20 +3,11 @@ import translations from "../i18n/translations";
 import { CET_CONTRACT_ADDRESS as CET_CONTRACT } from "@/lib/cetContract";
 import { PRODUCTION_SITE_ORIGIN } from "@/lib/brandAssetFilenames";
 import { DEDUST_POOL_ADDRESS, DEDUST_SWAP_URL } from "@/lib/dedustUrls";
+import { NAV_PRIMARY_IN_PAGE } from "@/lib/navPrimaryHrefs";
 
 const SITE_ROOT = `${PRODUCTION_SITE_ORIGIN}/`;
 
 // ─── Navigation + section IDs ─────────────────────────────────────────────
-
-const NAV_HREFS = [
-  { key: "cetApp", href: "#nova-app" },
-  { key: "tokenomics", href: "#staking" },
-  { key: "roadmap", href: "#roadmap" },
-  { key: "team", href: "#team" },
-  { key: "howToBuy", href: "#how-to-buy" },
-  { key: "resources", href: "#resources" },
-  { key: "faq", href: "#faq" },
-] as const;
 
 const SECTION_IDS = [
   "main-content",
@@ -33,31 +24,27 @@ const SECTION_IDS = [
   "resources",
   "faq",
   "security",
+  "rwa",
+  "cet-ai",
+  "whitepaper",
 ];
 
 describe("Navigation + section IDs", () => {
-  it("NAV_HREFS integrity and every href maps to a section id", () => {
-    expect(NAV_HREFS).toHaveLength(7);
-    NAV_HREFS.forEach((item) => {
-      expect(item.href).toMatch(/^#/);
-      expect(item.href.slice(1)).toMatch(/^[a-z0-9-]+$/);
-    });
-    const keys = NAV_HREFS.map((i) => i.key);
-    const hrefs = NAV_HREFS.map((i) => i.href);
-    expect(new Set(keys).size).toBe(keys.length);
+  it("NAV_PRIMARY_IN_PAGE integrity and every hash href maps to a section id", () => {
+    expect(NAV_PRIMARY_IN_PAGE).toHaveLength(7);
+    const hrefs = NAV_PRIMARY_IN_PAGE.map((i) => i.href);
     expect(new Set(hrefs).size).toBe(hrefs.length);
-    expect(NAV_HREFS.find((i) => i.key === "howToBuy")?.href).toBe("#how-to-buy");
-    expect(NAV_HREFS.map((i) => String(i.key))).not.toContain("competition");
-    expect(NAV_HREFS[NAV_HREFS.length - 1].key).toBe("faq");
-    expect(NAV_HREFS[0].key).toBe("cetApp");
+    expect(NAV_PRIMARY_IN_PAGE.find((i) => i.navKey === "howToBuy")?.href).toBe("#how-to-buy");
+    expect(NAV_PRIMARY_IN_PAGE.find((i) => i.navKey === "rwa")?.href).toBe("/rwa");
+    expect(NAV_PRIMARY_IN_PAGE.find((i) => i.navKey === "cetAi")?.href).toBe("/cet-ai");
 
-    NAV_HREFS.forEach((item) => {
+    NAV_PRIMARY_IN_PAGE.forEach((item) => {
+      if (!item.href.startsWith("#")) return;
+      expect(item.href.slice(1)).toMatch(/^[a-z0-9-]+$/);
       expect(SECTION_IDS).toContain(item.href.slice(1));
     });
+
     expect(new Set(SECTION_IDS).size).toBe(SECTION_IDS.length);
-    expect(SECTION_IDS).toContain("main-content");
-    expect(SECTION_IDS).toContain("network-pulse");
-    expect(SECTION_IDS).toContain("authority-trust");
   });
 });
 

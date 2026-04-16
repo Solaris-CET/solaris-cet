@@ -51,8 +51,6 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: javascript-typescript
-          # Use the security-extended query suite for a broader set of checks
           languages: ${{ matrix.language }}
           # Use the default CodeQL query suite plus the security-extended pack
           # which covers OWASP Top 10 and other high-severity patterns.
@@ -66,19 +64,12 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        working-directory: app
         run: npm ci
 
-      - name: Build application (for CodeQL autobuild context)
-        working-directory: app
-        run: npm run build
-        continue-on-error: true
       - name: Build application (for CodeQL analysis)
-        working-directory: app
-        run: npm run build
+        run: npm run build --workspace=app
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
-          category: "/language:javascript-typescript"
           category: "/language:${{ matrix.language }}"

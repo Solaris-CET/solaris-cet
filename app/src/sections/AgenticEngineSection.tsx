@@ -63,7 +63,7 @@ const AgenticEngineSection = () => {
       ref={sectionRef}
       id="agentic-engine"
       aria-label={t.sectionAria.agenticEngine}
-      className="relative section-glass py-20 lg:py-28 overflow-hidden mesh-bg"
+      className="relative section-glass section-padding-y overflow-hidden mesh-bg"
     >
       <AgenticSignalUnlock active={sectionVisible} />
       <GlowOrbs variant="cyan" />

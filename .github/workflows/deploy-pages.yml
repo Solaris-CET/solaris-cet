@@ -29,19 +29,19 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci
 
       - name: Security audit
-        working-directory: app
         run: npm audit --audit-level=high
 
       - name: Run ESLint
-        working-directory: app
-        run: npm run lint
+        run: npm run lint --workspace=app
 
       - name: TypeScript type-check
-        working-directory: app
-        run: npm run typecheck
+        run: npm run typecheck --workspace=app
+
+      - name: API type-check
+        run: npm run api:typecheck
 
   build:
     runs-on: ubuntu-latest
@@ -66,7 +66,6 @@ jobs:
             vite-cache-${{ runner.os }}-
 
       - name: Install dependencies
-        working-directory: app
         run: npm ci
 
       - name: Build application

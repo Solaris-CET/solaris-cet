@@ -24,5 +24,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["vite.config.ts", "drizzle.config.ts", "db/**/*.ts", "api/**/*.ts"]
+  "include": ["vite.config.ts", "playwright.config.ts", "drizzle.config.ts", "db/**/*.ts", "api/**/*.ts"]
 }

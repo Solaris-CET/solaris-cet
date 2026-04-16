@@ -143,12 +143,13 @@ solaris-cet/
 ```bash
 # 1. Clone the repository (or your fork)
 git clone https://github.com/Solaris-CET/solaris-cet.git
-cd solaris-cet/app
+cd solaris-cet
 
 # 2. Install dependencies
 npm install
 
 # 3. Start the development server
+cd app
 npm run dev
 # → Available at http://localhost:5173
 ```
@@ -178,7 +179,7 @@ npm run preview
 |---------------|-------------------------------------------------|
 | UI Framework  | [React 19](https://react.dev/)                  |
 | Language      | [TypeScript 5](https://www.typescriptlang.org/) |
-| Bundler       | [Vite 8](https://vite.dev/) + Rolldown          |
+| Bundler       | [Vite 7](https://vite.dev/)                     |
 | Styling       | [Tailwind CSS 4](https://tailwindcss.com/)      |
 | Components    | [shadcn/ui](https://ui.shadcn.com/) (Radix)     |
 | Animations    | [GSAP 3](https://gsap.com/)                     |
@@ -205,4 +206,3 @@ You are free to fork, modify, and host your own instance under the same license 
 The **"Solaris CET"** name, logo, and CET token brand are proprietary trademarks
 of the Solaris CET Team and are not covered by the MIT License.
 See [NOTICE](./NOTICE) for third-party attributions and [PATENTS](./PATENTS) for the patent grant.
-

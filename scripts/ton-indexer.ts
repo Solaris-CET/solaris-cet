@@ -26,8 +26,6 @@ import { TOKEN_NAME, TOKEN_SYMBOL, TOKEN_DECIMALS } from '../app/src/constants/t
 
 const TON_ENDPOINT = process.env['TON_RPC_ENDPOINT'] ?? 'https://toncenter.com/api/v2/jsonRPC';
 
-// Number of nano-units per whole token (TON uses 9 decimals)
-const NANO_TON = 1_000_000_000n;
 const NANO_CET = BigInt(10 ** TOKEN_DECIMALS);
 
 // ── TON client setup ─────────────────────────────────────────────────────────

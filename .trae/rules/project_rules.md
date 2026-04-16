@@ -16,6 +16,5 @@ Notes:
 
 - Do not run commit/push automatically unless the user explicitly requests it.
 - Always recommend running repo checks before committing:
-  - `cd app && npm run verify && PW_WORKERS=1 npm run test:e2e`
-  - `cd contracts && npm test && npx tsc --noEmit`
-
+  - `cd /root/solaris-cet && npm run verify:fast`
+  - `cd /root/solaris-cet && npm run verify:all` (includes Playwright E2E stable)

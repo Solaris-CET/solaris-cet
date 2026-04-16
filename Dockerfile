@@ -8,7 +8,7 @@ COPY app/package.json app/package.json
 COPY api/package.json api/package.json
 COPY contracts/package.json contracts/package.json
 COPY scripts/package.json scripts/package.json
-RUN npm ci --legacy-peer-deps
+RUN npm ci
 
 # Build prerequisites used by app prebuild script.
 COPY scripts/ scripts/

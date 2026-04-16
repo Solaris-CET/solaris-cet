@@ -416,7 +416,7 @@ const WhitepaperSection = () => {
       ref={sectionRef}
       id="whitepaper"
       aria-label={t.sectionAria.whitepaperSection}
-      className="relative section-glass py-20 lg:py-28 overflow-hidden mesh-bg"
+      className="relative section-glass section-padding-y overflow-hidden mesh-bg"
     >
       <div className="sticky top-0 z-30 h-1 w-full bg-transparent">
         <div

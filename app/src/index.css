@@ -1645,6 +1645,10 @@
   .section-padding-x {
     @apply px-5 sm:px-8 md:px-10 lg:px-12;
   }
+
+  .section-padding-y {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
 }
 
 /* ─────────────────────────────────────────────

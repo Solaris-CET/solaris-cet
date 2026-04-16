@@ -1,9 +1,9 @@
 services:
   frontend:
     image: node:22
-    working_dir: /app
+    working_dir: /repo
     volumes:
-      - ../app:/app
+      - ../:/repo
     environment:
       - VITE_PUBLIC_SITE_URL=${VITE_PUBLIC_SITE_URL}
       - VITE_GOOGLE_SITE_VERIFICATION=${VITE_GOOGLE_SITE_VERIFICATION}
@@ -12,6 +12,10 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - GEMINI_API_KEY_ENC=${GEMINI_API_KEY_ENC}
       - ENCRYPTION_SECRET=${ENCRYPTION_SECRET}
+      - CET_AI_ENABLE_WEB=${CET_AI_ENABLE_WEB}
+      - CET_AI_WEB_ALLOWLIST=${CET_AI_WEB_ALLOWLIST}
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
+      - TAVILY_API_KEY_ENC=${TAVILY_API_KEY_ENC}
       - JWT_SECRET=${JWT_SECRET}
       - DATABASE_URL=${DATABASE_URL}
       - TONCENTER_RPC_URL=${TONCENTER_RPC_URL}
@@ -19,7 +23,7 @@ services:
       - UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL}
       - UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN}
       - VITE_UX_TEST_SRC=${VITE_UX_TEST_SRC}
-    command: sh -lc "npm ci && npm run build && npm run api:build && PORT=3000 npm run start:node"
+    command: sh -lc "npm ci && npm run app:build && npm run api:build --workspace=app && PORT=3000 npm run start:node --workspace=app"
     ports:
       - "3000:3000"
     healthcheck:

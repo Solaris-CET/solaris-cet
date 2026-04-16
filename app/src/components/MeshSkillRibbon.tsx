@@ -53,7 +53,7 @@ const MeshSkillRibbon = ({ saltOffset = 60, className = '', variant = 'default' 
       aria-label={t.sectionAria.meshSkillExpression}
     >
       <div className="text-[8px] font-mono uppercase tracking-[0.2em] text-fuchsia-400/90 mb-1">
-        Mesh skill sample · live rotation
+        {t.meshSkillRibbonUi.sampleLabel}
       </div>
       <p className="text-xs sm:text-sm font-mono text-fuchsia-100/88 leading-snug line-clamp-2" title={line}>
         {line}

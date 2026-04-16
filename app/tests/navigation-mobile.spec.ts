@@ -15,14 +15,19 @@ test.describe('Primary navigation (mobile sheet)', () => {
     await waitForAppReady(page);
   });
 
-  test('sheet lists the same seven in-page hrefs in order', async ({ page }) => {
+  test('sheet lists the same seven primary hrefs in order', async ({ page }) => {
     await page.getByTestId('mobile-menu-toggle').click();
     const sheetNav = page.locator('#mobile-menu nav').first();
-    const inPageLinks = sheetNav.locator('a[href^="#"]');
-    await expect(inPageLinks).toHaveCount(NAV_PRIMARY_IN_PAGE.length);
+    const links = sheetNav.locator(':scope > a');
+    await expect(links).toHaveCount(NAV_PRIMARY_IN_PAGE.length);
 
     for (let i = 0; i < NAV_PRIMARY_IN_PAGE.length; i += 1) {
-      await expect(inPageLinks.nth(i)).toHaveAttribute('href', NAV_PRIMARY_IN_PAGE[i].href);
+      const expected = NAV_PRIMARY_IN_PAGE[i].href;
+      if (expected.startsWith('/')) {
+        await expect(links.nth(i)).toHaveAttribute('href', new RegExp(`^${expected}(\\?|$)`));
+      } else {
+        await expect(links.nth(i)).toHaveAttribute('href', expected);
+      }
     }
   });
 

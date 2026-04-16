@@ -160,6 +160,41 @@ test.describe('Solaris CET AI widget — desktop', () => {
     await expect(offlineHint).toBeVisible({ timeout: 16_000 });
     await expect(offlineHint).toContainText(/built-in|No live API/i);
   });
+
+  test('renders sources list when live /api/chat returns sources', async ({ page }) => {
+    await page.route('**/api/chat', async (route) => {
+      await route.fulfill({
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Cet-Ai-Source': 'live',
+        },
+        body: JSON.stringify({
+          response:
+            '[DIAGNOSTIC INTERN]\\nReason.\\n\\n[DECODARE ORACOL]\\nAction.\\n\\n[DIRECTIVĂ DE ACȚIUNE]\\nSOURCES: https://docs.ton.org/',
+          sources: [
+            {
+              id: 'SRC_001',
+              title: 'TON Docs',
+              url: 'https://docs.ton.org/',
+              snippet: 'TON documentation entry point.',
+            },
+          ],
+        }),
+      });
+    });
+
+    const heroWidget = await scrollCetAiHeroIntoView(page);
+    const chip = heroWidget.getByRole('button', { name: /What is the RAV Protocol/i });
+    await chip.evaluate((el: HTMLElement) => el.scrollIntoView({ block: 'center', inline: 'nearest' }));
+    await chip.evaluate((btn: HTMLElement) => (btn as HTMLButtonElement).click());
+
+    await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
+    await expect(page.getByTestId('cet-ai-sources')).toBeVisible({ timeout: 20_000 });
+    const link = page.getByTestId('cet-ai-sources').getByTestId('cet-ai-source-link');
+    await expect(link).toHaveAttribute('href', 'https://docs.ton.org/');
+    await expect(link).toContainText('TON Docs');
+  });
 });
 
 test.describe('Solaris CET AI widget — mobile viewport', () => {
