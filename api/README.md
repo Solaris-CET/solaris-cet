@@ -12,7 +12,7 @@ The app’s API lives under **`app/api/`**:
 
 **Production:** [https://solaris-cet.com](https://solaris-cet.com) is deployed via **Coolify** on the project VPS; run the same handlers beside the static `app/dist` build (or use a compatible edge/Node adapter).
 
-`app/vercel.json` rewrites `/api/chat` and `/api/auth` when the deploy root is **`app`** (e.g. Vercel).
+This repository is designed to deploy on **Coolify + VPS** (production). Keep `/api/*` served by the same container as `app/dist` via `server/index.cjs`.
 
 ## This folder
 
@@ -23,5 +23,5 @@ The app’s API lives under **`app/api/`**:
 
 ## Security notes
 
-- CORS is **not** `*`: only known production origins (`solaris-cet.com`, mirrors), `*.vercel.app` previews, and `http://localhost*` are reflected.
+- CORS is **not** `*`: only known production origins (`solaris-cet.com`, mirrors) and `http://localhost*` (local dev) are reflected.
 - Long prompts are capped (`MAX_QUERY_LENGTH` in `chat/route.ts`; keep the value aligned with `app/src/lib/cetAiConstants.ts`).

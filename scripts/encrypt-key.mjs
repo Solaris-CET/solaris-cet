@@ -3,7 +3,7 @@
  * scripts/encrypt-key.mjs
  *
  * CLI utility for encrypting a raw API key with AES-256-GCM before storing
- * it in production environment variables (Coolify, Vercel, etc.).
+ * it in production environment variables (Coolify, etc.).
  *
  * Usage:
  *   node scripts/encrypt-key.mjs <ENCRYPTION_SECRET> <RAW_API_KEY>

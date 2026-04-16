@@ -13,13 +13,11 @@ describe("getAllowedOrigin", () => {
 
   it("echoes www and legacy preview hosts in the allowlist", () => {
     expect(getAllowedOrigin("https://www.solaris-cet.com")).toBe("https://www.solaris-cet.com");
-    expect(getAllowedOrigin("https://solaris-cet.vercel.app")).toBe("https://solaris-cet.vercel.app");
     expect(getAllowedOrigin("https://solaris-cet.github.io")).toBe("https://solaris-cet.github.io");
   });
 
-  it("allows localhost and arbitrary Vercel preview subdomains", () => {
+  it("allows localhost during local development", () => {
     expect(getAllowedOrigin("http://localhost:5173")).toBe("http://localhost:5173");
-    expect(getAllowedOrigin("https://foo.vercel.app")).toBe("https://foo.vercel.app");
   });
 
   it("falls back to production origin for unknown hosts", () => {
