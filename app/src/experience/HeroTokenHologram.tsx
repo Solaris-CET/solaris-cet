@@ -4,11 +4,14 @@ import { Environment, Float, PerformanceMonitor } from '@react-three/drei';
 import { Bloom, ChromaticAberration, EffectComposer, Noise, Vignette } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
+import { EntanglementLines, HologramToken } from '@/experience/HologramToken';
 
 type HologramQuality = 'low' | 'high';
 
 function AgentsMesh({ count, pointerScale }: { count: number; pointerScale: number }) {
   const pointsRef = useRef<THREE.Points>(null);
+  const targetPointerRef = useRef(new THREE.Vector2(0, 0));
+  const smoothedPointerRef = useRef(new THREE.Vector2(0, 0));
   const material = useMemo(() => {
     const m = new THREE.PointsMaterial({
       size: 0.012,
@@ -53,49 +56,15 @@ function AgentsMesh({ count, pointerScale }: { count: number; pointerScale: numb
     const p = pointsRef.current;
     if (!p) return;
     const t = state.clock.elapsedTime;
-    p.rotation.y = t * 0.06 + state.pointer.x * 0.18 * pointerScale;
-    p.rotation.x = Math.sin(t * 0.18) * 0.08 + state.pointer.y * 0.14 * pointerScale;
+    targetPointerRef.current.set(state.pointer.x, state.pointer.y);
+    smoothedPointerRef.current.lerp(targetPointerRef.current, 0.08);
+    const px = smoothedPointerRef.current.x;
+    const py = smoothedPointerRef.current.y;
+    p.rotation.y = t * 0.06 + px * 0.18 * pointerScale;
+    p.rotation.x = Math.sin(t * 0.18) * 0.08 + py * 0.14 * pointerScale;
   });
 
   return <points ref={pointsRef} geometry={geometry} material={material} />;
-}
-
-function TokenMesh() {
-  const groupRef = useRef<THREE.Group>(null);
-  const color = useMemo(() => new THREE.Color('#F2C94C'), []);
-  const emissive = useMemo(() => new THREE.Color('#7CF7FF'), []);
-
-  useFrame((state, delta) => {
-    const g = groupRef.current;
-    if (!g) return;
-    g.rotation.y += delta * 0.35;
-    g.rotation.x = Math.sin(state.clock.elapsedTime * 0.4) * 0.12;
-  });
-
-  return (
-    <Float speed={1.1} rotationIntensity={0.35} floatIntensity={0.35}>
-      <group ref={groupRef}>
-        <mesh>
-          <torusKnotGeometry args={[0.8, 0.26, 220, 18]} />
-          <meshPhysicalMaterial
-            color={color}
-            emissive={emissive}
-            emissiveIntensity={0.35}
-            roughness={0.22}
-            metalness={0.65}
-            transparent
-            opacity={0.92}
-            clearcoat={1}
-            clearcoatRoughness={0.15}
-          />
-        </mesh>
-        <mesh scale={1.01}>
-          <torusKnotGeometry args={[0.8, 0.26, 140, 12]} />
-          <meshBasicMaterial color="#9BE9FF" transparent opacity={0.12} wireframe />
-        </mesh>
-      </group>
-    </Float>
-  );
 }
 
 function HeroTokenHologram({ quality = 'high' }: { quality?: HologramQuality }) {
@@ -148,7 +117,10 @@ function HeroTokenHologram({ quality = 'high' }: { quality?: HologramQuality }) 
         <directionalLight position={[-3, -2, 2]} intensity={0.55} color="#55F0FF" />
         <fog attach="fog" args={['#020512', 2.8, 9]} />
         <AgentsMesh count={agentCount} pointerScale={pointerScale} />
-        <TokenMesh />
+        <Float speed={1.05} rotationIntensity={0.35} floatIntensity={0.35}>
+          <EntanglementLines quality={quality} />
+          <HologramToken quality={quality} />
+        </Float>
         <EffectComposer multisampling={0}>
           <Bloom
             intensity={quality === 'high' ? 0.9 : 0.5}
