@@ -147,7 +147,7 @@ const Navigation = () => {
 
     for (const s of sections) observer.observe(s.el);
     return () => observer.disconnect();
-  }, [navLinks, activeHref]);
+  }, [navLinks, activeHref, isRouteMode]);
 
   // Stable handler reference: same function instance for add + removeEventListener (no duplicate document listeners).
   const handleMobileMenuKeyDown = useCallback((event: KeyboardEvent) => {

@@ -484,10 +484,53 @@ export interface Translations {
     knowledge: CetAiKnowledge;
   };
   /** FAQ accordion copy (`faqContent.data.ts`). */
+  howToBuyUi: HowToBuyUi;
+  tokenomicsUi: TokenomicsUi;
+  footerUi: FooterUi;
+  novaAppUi: NovaAppUi;
+  competitionUi: CompetitionUi;
+  highIntelligenceUi: HighIntelligenceUi;
+  hybridEngineUi: HybridEngineUi;
+  intelligenceCoreUi: IntelligenceCoreUi;
+  complianceUi: ComplianceUi;
+  agenticEngineUi: AgenticEngineUi;
+  hierarchyGraphUi: HierarchyGraphUi;
+  resourcesUi: ResourcesUi;
+  networkPulseUi: NetworkPulseUi;
+  whitepaperUi: WhitepaperUi;
+  aiTeamUi: AiTeamUi;
+  roadmapUi: RoadmapUi;
+  securityUi: SecurityUi;
+  rwaUi: RwaUi;
+  rwaSectionUi: RwaSectionUi;
+  ecosystemIndexUi: EcosystemIndexUi;
+  rwaContentUi: RwaContentUi;
   faqContent: FaqContent;
 }
 
-const howToBuyUiEn: Translations['howToBuyUi'] = {
+export type HowToBuyUi = typeof howToBuyUiEn;
+export type TokenomicsUi = typeof tokenomicsUiEn;
+export type FooterUi = typeof footerUiEn;
+export type NovaAppUi = typeof novaAppUiEn;
+export type CompetitionUi = typeof competitionUiEn;
+export type HighIntelligenceUi = typeof highIntelligenceUiEn;
+export type HybridEngineUi = typeof hybridEngineUiEn;
+export type IntelligenceCoreUi = typeof intelligenceCoreUiEn;
+export type ComplianceUi = typeof complianceUiEn;
+export type AgenticEngineUi = typeof agenticEngineUiEn;
+export type HierarchyGraphUi = typeof hierarchyGraphUiEn;
+export type ResourcesUi = typeof resourcesUiEn;
+export type NetworkPulseUi = typeof networkPulseUiEn;
+export type WhitepaperUi = typeof whitepaperUiEn;
+export type AiTeamUi = typeof aiTeamUiEn;
+export type RoadmapUi = typeof roadmapUiEn;
+export type SecurityUi = typeof securityUiEn;
+export type RwaUi = typeof rwaUiEn;
+export type RwaSectionUi = typeof rwaSectionUiEn;
+export type EcosystemIndexUi = typeof ecosystemIndexUiEn;
+export type RwaContentUi = typeof rwaContentUiEn;
+
+const howToBuyUiEn = {
   kicker: 'HOW TO BUY',
   titleLead: 'Get',
   titleToken: 'Solaris CET',
@@ -521,7 +564,7 @@ const howToBuyUiEn: Translations['howToBuyUi'] = {
   },
 };
 
-const howToBuyUiRo: Translations['howToBuyUi'] = {
+const howToBuyUiRo = {
   kicker: 'CUM CUMPERI',
   titleLead: 'Cumpără',
   titleToken: 'Solaris CET',
@@ -555,7 +598,7 @@ const howToBuyUiRo: Translations['howToBuyUi'] = {
   },
 };
 
-const tokenomicsUiEn: Translations['tokenomicsUi'] = {
+const tokenomicsUiEn = {
   pillMining: 'Mining',
   pillTeam: 'Team',
   aiReason: 'REASON',
@@ -585,7 +628,7 @@ const tokenomicsUiEn: Translations['tokenomicsUi'] = {
   chartSelected: 'SELECTED',
 };
 
-const tokenomicsUiRo: Translations['tokenomicsUi'] = {
+const tokenomicsUiRo = {
   pillMining: 'Minerit',
   pillTeam: 'Echipă',
   aiReason: 'RAȚIUNE',
@@ -615,7 +658,7 @@ const tokenomicsUiRo: Translations['tokenomicsUi'] = {
   chartSelected: 'SELECTAT',
 };
 
-const footerUiEn: Translations['footerUi'] = {
+const footerUiEn = {
   waitlistAdded: 'Added to waitlist',
   waitlistUnavailable: 'Waitlist unavailable',
   mailtoSubject: 'Solaris CET Waitlist',
@@ -650,7 +693,7 @@ const footerUiEn: Translations['footerUi'] = {
   architectedBy: 'Architected by Claudiu',
 };
 
-const footerUiRo: Translations['footerUi'] = {
+const footerUiRo = {
   waitlistAdded: 'Adăugat în lista de așteptare',
   waitlistUnavailable: 'Lista de așteptare indisponibilă',
   mailtoSubject: 'Solaris CET — Lista de așteptare',
@@ -685,7 +728,7 @@ const footerUiRo: Translations['footerUi'] = {
   architectedBy: 'Arhitectură: Claudiu',
 };
 
-const novaAppUiEn: Translations['novaAppUi'] = {
+const novaAppUiEn = {
   ticker: {
     hashrate: 'Hashrate',
     earnings: 'Earnings',
@@ -710,7 +753,7 @@ const novaAppUiEn: Translations['novaAppUi'] = {
   badgeBatterySavings: '90% Battery Savings',
 };
 
-const novaAppUiRo: Translations['novaAppUi'] = {
+const novaAppUiRo = {
   ticker: {
     hashrate: 'Hashrate',
     earnings: 'Câștig',
@@ -735,7 +778,7 @@ const novaAppUiRo: Translations['novaAppUi'] = {
   badgeBatterySavings: '−90% consum baterie',
 };
 
-const competitionUiEn: Translations['competitionUi'] = {
+const competitionUiEn = {
   numberLocale: 'en-US',
   tpsHigh: 'High (sharded)',
   tpsVaries: 'Varies',
@@ -749,7 +792,7 @@ const competitionUiEn: Translations['competitionUi'] = {
   simulatedSuffix: '(simulated)',
 };
 
-const competitionUiRo: Translations['competitionUi'] = {
+const competitionUiRo = {
   numberLocale: 'ro-RO',
   tpsHigh: 'Ridicat (sharded)',
   tpsVaries: 'Variabil',
@@ -763,7 +806,7 @@ const competitionUiRo: Translations['competitionUi'] = {
   simulatedSuffix: '(simulat)',
 };
 
-const highIntelligenceUiEn: Translations['highIntelligenceUi'] = {
+const highIntelligenceUiEn = {
   kicker: 'HIGH INTELLIGENCE · LIVE DEMOS',
   titleLead: 'Experience',
   titleAccent: 'High Intelligence',
@@ -831,7 +874,7 @@ const highIntelligenceUiEn: Translations['highIntelligenceUi'] = {
   },
 };
 
-const highIntelligenceUiRo: Translations['highIntelligenceUi'] = {
+const highIntelligenceUiRo = {
   kicker: 'HIGH INTELLIGENCE · DEMO LIVE',
   titleLead: 'Experimentează',
   titleAccent: 'High Intelligence',
@@ -900,7 +943,7 @@ const highIntelligenceUiRo: Translations['highIntelligenceUi'] = {
   },
 };
 
-const hybridEngineUiEn: Translations['hybridEngineUi'] = {
+const hybridEngineUiEn = {
   titleLead: 'The',
   titleAccent: 'Hybrid',
   titleTail: 'Engine',
@@ -915,7 +958,7 @@ const hybridEngineUiEn: Translations['hybridEngineUi'] = {
   dposLayerDetail: 'Delegated proof-of-stake enables high throughput while inheriting PoW security guarantees.',
 };
 
-const hybridEngineUiRo: Translations['hybridEngineUi'] = {
+const hybridEngineUiRo = {
   titleLead: 'Motorul',
   titleAccent: 'Hibrid',
   titleTail: '\u200B',
@@ -930,7 +973,7 @@ const hybridEngineUiRo: Translations['hybridEngineUi'] = {
   dposLayerDetail: 'Delegated proof-of-stake oferă throughput ridicat, păstrând garanțiile de securitate ale stratului PoW.',
 };
 
-const intelligenceCoreUiEn: Translations['intelligenceCoreUi'] = {
+const intelligenceCoreUiEn = {
   aiIntegrationLabel: 'AI Integration',
   titleLead: 'The Intelligence',
   titleAccent: 'Core',
@@ -961,7 +1004,7 @@ const intelligenceCoreUiEn: Translations['intelligenceCoreUi'] = {
   ],
 };
 
-const intelligenceCoreUiRo: Translations['intelligenceCoreUi'] = {
+const intelligenceCoreUiRo = {
   aiIntegrationLabel: 'Integrare AI',
   titleLead: 'Nucleul de',
   titleAccent: 'Inteligență',
@@ -992,7 +1035,7 @@ const intelligenceCoreUiRo: Translations['intelligenceCoreUi'] = {
   ],
 };
 
-const complianceUiEn: Translations['complianceUi'] = {
+const complianceUiEn = {
   titleLead: 'Compliance',
   titleAccent: '& Enterprise',
   cardAuditTitle: 'EU AI Act Ready',
@@ -1001,7 +1044,7 @@ const complianceUiEn: Translations['complianceUi'] = {
   cardDataBody: 'Sovereign AI infrastructure that keeps data local while control is global.',
 };
 
-const complianceUiRo: Translations['complianceUi'] = {
+const complianceUiRo = {
   titleLead: 'Conformitate',
   titleAccent: '& Enterprise',
   cardAuditTitle: 'EU AI Act Ready',
@@ -1011,7 +1054,7 @@ const complianceUiRo: Translations['complianceUi'] = {
   cardDataBody: 'Infrastructură Sovereign AI: datele rămân locale, controlul rămâne global.',
 };
 
-const agenticEngineUiEn: Translations['agenticEngineUi'] = {
+const agenticEngineUiEn = {
   kicker: 'AGENTIC ENGINE · 200,000 AGENTS',
   headlineBefore: 'Data plane,',
   headlineHighlight: 'reasoning plane,',
@@ -1023,7 +1066,7 @@ const agenticEngineUiEn: Translations['agenticEngineUi'] = {
     'A four-hour wall-clock run at “full mesh” would mean billions of micro-gradient and retrieval steps across shards — impossible to replay in a browser. The live feed above models that aggregate behaviour: throughput, verification, and queue health, so stakeholders can reason about scale without a datacenter in the tab.',
 };
 
-const agenticEngineUiRo: Translations['agenticEngineUi'] = {
+const agenticEngineUiRo = {
   kicker: 'MOTOR AGENTIC · 200.000 AGENȚI',
   headlineBefore: 'Plan de date,',
   headlineHighlight: 'plan de raționament,',
@@ -1035,7 +1078,7 @@ const agenticEngineUiRo: Translations['agenticEngineUi'] = {
     'O execuție de patru ore “full mesh” ar însemna miliarde de pași micro-gradient și retrieval pe shards — imposibil de reluat într-un browser. Feed-ul live de mai sus modelează acest comportament agregat: throughput, verificare și sănătatea cozii, astfel încât stakeholderii să poată evalua scala fără un datacenter în tab.',
 };
 
-const hierarchyGraphUiEn: Translations['hierarchyGraphUi'] = {
+const hierarchyGraphUiEn = {
   title: 'DECISION MAP (MERMAID)',
   render: 'Render',
   rendered: 'Rendered',
@@ -1057,7 +1100,7 @@ const hierarchyGraphUiEn: Translations['hierarchyGraphUi'] = {
   localLinks: 'Show links + calculators',
 };
 
-const hierarchyGraphUiRo: Translations['hierarchyGraphUi'] = {
+const hierarchyGraphUiRo = {
   title: 'HARTĂ DECIZIE (MERMAID)',
   render: 'Randează',
   rendered: 'Randat',
@@ -1079,7 +1122,7 @@ const hierarchyGraphUiRo: Translations['hierarchyGraphUi'] = {
   localLinks: 'Arată linkuri + calculatoare',
 };
 
-const resourcesUiEn: Translations['resourcesUi'] = {
+const resourcesUiEn = {
   kicker: 'ECOSYSTEM RESOURCES',
   titleLead: 'Everything You Need to',
   titleHighlight: 'Navigate',
@@ -1156,7 +1199,7 @@ const resourcesUiEn: Translations['resourcesUi'] = {
   },
 };
 
-const resourcesUiRo: Translations['resourcesUi'] = {
+const resourcesUiRo = {
   kicker: 'RESURSE ECOSISTEM',
   titleLead: 'Tot ce ai nevoie ca să',
   titleHighlight: 'navighezi',
@@ -1231,7 +1274,7 @@ const resourcesUiRo: Translations['resourcesUi'] = {
   },
 };
 
-const networkPulseUiEn: Translations['networkPulseUi'] = {
+const networkPulseUiEn = {
   kicker: 'NETWORK LIVE · REAL-TIME DATA',
   titleLead: 'TON Network',
   titleHighlight: 'Pulse',
@@ -1250,7 +1293,7 @@ const networkPulseUiEn: Translations['networkPulseUi'] = {
     '* Block and transaction counts are extrapolated from public TON network data (avg ~5 blocks/s, ~120 txns/s since genesis). Agent action counts start from the verified Q1 2026 milestone baseline. Validator count and uptime are observed mainnet values.',
 };
 
-const networkPulseUiRo: Translations['networkPulseUi'] = {
+const networkPulseUiRo = {
   kicker: 'REȚEA LIVE · DATE ÎN TIMP REAL',
   titleLead: 'Puls',
   titleHighlight: 'TON',
@@ -1269,7 +1312,7 @@ const networkPulseUiRo: Translations['networkPulseUi'] = {
     '* Numărul de blocuri și tranzacții este extrapolat din date publice TON (medie ~5 blocuri/s, ~120 tx/s de la genesis). Acțiunile agenților pornesc de la un baseline verificat (Q1 2026). Numărul de validatori și uptime sunt valori observate în mainnet.',
 };
 
-const whitepaperUiEn: Translations['whitepaperUi'] = {
+const whitepaperUiEn = {
   kicker: 'WHITEPAPER · INLINE EDITION',
   headlineHighlight: 'Technical Overview',
   intro:
@@ -1283,7 +1326,7 @@ const whitepaperUiEn: Translations['whitepaperUi'] = {
   downloadLabel: 'Download PDF (IPFS)',
 };
 
-const whitepaperUiRo: Translations['whitepaperUi'] = {
+const whitepaperUiRo = {
   kicker: 'WHITEPAPER · EDIȚIE INLINE',
   headlineHighlight: 'Prezentare tehnică',
   intro:
@@ -1297,7 +1340,7 @@ const whitepaperUiRo: Translations['whitepaperUi'] = {
   downloadLabel: 'Descarcă PDF (IPFS)',
 };
 
-const aiTeamUiEn: Translations['aiTeamUi'] = {
+const aiTeamUiEn = {
   kicker: 'AI CORPORATE STRUCTURE',
   headlineLead: '200,000 Agents.',
   headlineHighlight: 'Zero Marginal Cost.',
@@ -1319,7 +1362,7 @@ const aiTeamUiEn: Translations['aiTeamUi'] = {
   competitiveParityTail: ': zero HR overhead, zero downtime, infinite parallelism.',
 };
 
-const aiTeamUiRo: Translations['aiTeamUi'] = {
+const aiTeamUiRo = {
   kicker: 'STRUCTURĂ CORPORATE AI',
   headlineLead: '200.000 agenți.',
   headlineHighlight: 'Cost marginal zero.',
@@ -1341,7 +1384,7 @@ const aiTeamUiRo: Translations['aiTeamUi'] = {
   competitiveParityTail: ': overhead HR zero, downtime zero, paralelism practic nelimitat.',
 };
 
-const roadmapUiEn: Translations['roadmapUi'] = {
+const roadmapUiEn = {
   kicker: 'ROADMAP',
   titleLead: 'The Path to',
   titleHighlight: 'Sustainable Growth',
@@ -1355,7 +1398,7 @@ const roadmapUiEn: Translations['roadmapUi'] = {
   status: { done: 'Completed', active: 'In Progress', upcoming: 'Planned' },
 };
 
-const roadmapUiRo: Translations['roadmapUi'] = {
+const roadmapUiRo = {
   kicker: 'FOAIE DE PARCURS',
   titleLead: 'Drumul către',
   titleHighlight: 'creștere sustenabilă',
@@ -1369,7 +1412,7 @@ const roadmapUiRo: Translations['roadmapUi'] = {
   status: { done: 'Finalizat', active: 'În lucru', upcoming: 'Planificat' },
 };
 
-const securityUiEn: Translations['securityUi'] = {
+const securityUiEn = {
   titleLead: 'Security',
   titleHighlight: 'First',
   proofCyberscope: 'Cyberscope audited',
@@ -1410,7 +1453,7 @@ const securityUiEn: Translations['securityUi'] = {
   },
 };
 
-const securityUiRo: Translations['securityUi'] = {
+const securityUiRo = {
   titleLead: 'Securitate',
   titleHighlight: 'prima',
   proofCyberscope: 'Audit Cyberscope',
@@ -1451,7 +1494,7 @@ const securityUiRo: Translations['securityUi'] = {
   },
 };
 
-const rwaContentUiEn: Translations['rwaContentUi'] = {
+const rwaContentUiEn = {
   stats: {
     locationLabel: 'Location',
     locationValue: 'Cetățuia, Romania',
@@ -1482,7 +1525,7 @@ const rwaContentUiEn: Translations['rwaContentUi'] = {
   },
 };
 
-const rwaContentUiRo: Translations['rwaContentUi'] = {
+const rwaContentUiRo = {
   stats: {
     locationLabel: 'Locație',
     locationValue: 'Cetățuia, România',
@@ -1510,6 +1553,204 @@ const rwaContentUiRo: Translations['rwaContentUi'] = {
     scarcityTitle: 'Raritate structurală',
     scarcityDescription:
       'Cu doar 9.000 CET vreodată emise, fiecare token reprezintă o parte proporțională dintr-un activ real. Niciun competitor nu combină infrastructură de agenți AI, supply hard-capped și backing fizic.',
+  },
+};
+
+const rwaUiEn = {
+  documents: {
+    title: 'Documents',
+    ariaLabel: 'RWA documents and proofs',
+    subtitle: 'Search and filter proof files. Open previews or download originals.',
+    searchSr: 'Search documents',
+    searchPlaceholder: 'Search documents',
+    filterSr: 'Filter documents',
+    filterAll: 'All',
+    filterWhitepaper: 'Whitepaper',
+    filterAudit: 'Audit',
+    filterIpfs: 'IPFS proof',
+    filterRegistry: 'Land registry',
+    filterTimeline: 'Timeline',
+    typeWhitepaper: 'WHITEPAPER',
+    typeRegistry: 'REGISTRY',
+    typeAudit: 'AUDIT',
+    typeIpfs: 'IPFS',
+    typeTimeline: 'TIMELINE',
+    preview: 'Preview',
+    download: 'Download',
+    empty: 'No documents match your filters.',
+  },
+  timeline: {
+    title: 'Timeline',
+    ariaLabel: 'RWA milestone timeline',
+    subtitle: 'Progress and proof milestones for Cetățuia.',
+    legendComplete: 'COMPLETE',
+    legendActive: 'ACTIVE',
+    legendPlanned: 'PLANNED',
+  },
+  map: {
+    ariaLabel: 'RWA portfolio map',
+    controlsAria: 'Map controls',
+    zoomInAria: 'Zoom in',
+    zoomOutAria: 'Zoom out',
+    resetAria: 'Reset view',
+    resetLabel: 'Reset',
+    selectionAria: 'Project selection',
+    selectProjectAria: 'Select project',
+    infoNote: 'Map uses approximate coordinates for disclosure and privacy.',
+    helpLine: 'Use the sidebar to jump to documents and timeline proof.',
+  },
+};
+
+const rwaUiRo = {
+  documents: {
+    title: 'Documente',
+    ariaLabel: 'Documente și dovezi RWA',
+    subtitle: 'Caută și filtrează fișierele de dovadă. Deschide preview sau descarcă originalul.',
+    searchSr: 'Caută în documente',
+    searchPlaceholder: 'Caută documente',
+    filterSr: 'Filtrează documente',
+    filterAll: 'Toate',
+    filterWhitepaper: 'Whitepaper',
+    filterAudit: 'Audit',
+    filterIpfs: 'Dovadă IPFS',
+    filterRegistry: 'Carte funciară',
+    filterTimeline: 'Timeline',
+    typeWhitepaper: 'WHITEPAPER',
+    typeRegistry: 'REGISTRU',
+    typeAudit: 'AUDIT',
+    typeIpfs: 'IPFS',
+    typeTimeline: 'TIMELINE',
+    preview: 'Preview',
+    download: 'Descarcă',
+    empty: 'Nu există documente pentru filtrele selectate.',
+  },
+  timeline: {
+    title: 'Timeline',
+    ariaLabel: 'Timeline milestone RWA',
+    subtitle: 'Progres și milestone-uri de dovadă pentru Cetățuia.',
+    legendComplete: 'FINALIZAT',
+    legendActive: 'ACTIV',
+    legendPlanned: 'PLANIFICAT',
+  },
+  map: {
+    ariaLabel: 'Hartă portofoliu RWA',
+    controlsAria: 'Controale hartă',
+    zoomInAria: 'Mărește',
+    zoomOutAria: 'Micșorează',
+    resetAria: 'Resetează vizualizarea',
+    resetLabel: 'Reset',
+    selectionAria: 'Selecție proiect',
+    selectProjectAria: 'Selectează proiect',
+    infoNote: 'Harta folosește coordonate aproximative pentru dezvăluire și confidențialitate.',
+    helpLine: 'Folosește panoul din dreapta pentru documente și timeline.',
+  },
+};
+
+const rwaSectionUiEn = {
+  kicker: 'REAL WORLD ASSETS · RWA',
+  titleLead: 'Cetățuia',
+  titleAccent: 'Agricultural Land',
+  subtitle: 'A real asset surface anchored to TON. Evidence, proofs, and timeline for RWA backing.',
+  physicalKicker: 'PHYSICAL ASSET',
+  physicalHeadingLead: 'Token ↔',
+  physicalHeadingAccent: 'Land',
+  physicalHeadingTail: 'not digital air',
+  physicalBodyPrefix: 'Solaris CET is anchored to',
+  physicalLocationName: 'Cetățuia, Romania',
+  physicalBodySuffix: 'with verifiable proof surfaces.',
+  physicalQuote: 'Real yield is produced by land. Tokens represent proportional backing.',
+  chipTonContract: 'TON Contract',
+  chipDedustPool: 'DeDust Pool',
+  chipIpfsProof: 'IPFS Proof',
+  asideAria: 'Selected project details',
+  asideRegion: 'Region',
+  asideType: 'Type',
+  asideJumpDocs: 'Open Documents',
+  asideJumpTimeline: 'Open Timeline',
+  asideProofBundle: 'Proof bundle: docs + IPFS + on-chain anchors.',
+  asideMapTitlePrefix: 'MAP',
+  asideMapOpen: 'Open',
+  asideNoSelection: 'Select a project on the map to view details and jump to proofs.',
+  verifiedKicker: 'VERIFIED · IPFS',
+  verifiedBody:
+    'Verify the proof bundle on IPFS using CID bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a. Anyone can independently validate the backing.',
+  verifiedCta: 'Open Proof Bundle',
+};
+
+const rwaSectionUiRo = {
+  kicker: 'REAL WORLD ASSETS · RWA',
+  titleLead: 'Cetățuia',
+  titleAccent: 'Teren agricol',
+  subtitle: 'Suprafață de activ real ancorată în TON. Dovezi, proof-uri și timeline pentru backing RWA.',
+  physicalKicker: 'ACTIV FIZIC',
+  physicalHeadingLead: 'Token ↔',
+  physicalHeadingAccent: 'Teren',
+  physicalHeadingTail: 'nu “digital air”',
+  physicalBodyPrefix: 'Solaris CET este ancorat în',
+  physicalLocationName: 'Cetățuia, România',
+  physicalBodySuffix: 'cu suprafețe de dovadă verificabile.',
+  physicalQuote: 'Randamentul real este produs de teren. Token-urile reprezintă backing proporțional.',
+  chipTonContract: 'Contract TON',
+  chipDedustPool: 'Pool DeDust',
+  chipIpfsProof: 'Dovadă IPFS',
+  asideAria: 'Detalii proiect selectat',
+  asideRegion: 'Regiune',
+  asideType: 'Tip',
+  asideJumpDocs: 'Deschide documente',
+  asideJumpTimeline: 'Deschide timeline',
+  asideProofBundle: 'Bundle dovadă: documente + IPFS + ancore on-chain.',
+  asideMapTitlePrefix: 'HARTĂ',
+  asideMapOpen: 'Deschide',
+  asideNoSelection: 'Selectează un proiect pe hartă pentru detalii și proof-uri.',
+  verifiedKicker: 'VERIFICAT · IPFS',
+  verifiedBody:
+    'Verifică bundle-ul de dovadă pe IPFS folosind CID bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a. Oricine poate valida backing-ul independent.',
+  verifiedCta: 'Deschide bundle',
+};
+
+const ecosystemIndexUiEn = {
+  kicker: 'ECOSYSTEM INDEX',
+  titleLead: 'CET',
+  titleAccent: 'Network',
+  titleTail: 'Signals',
+  subtitle: 'A curated index of TON ecosystem references around CET and related primitives.',
+  uniqueKicker: 'UNIQUE',
+  uniqueBodyPrefix: 'Only one token matches:',
+  uniqueTokenName: 'SOLARIS CET',
+  uniqueBodySuffix: 'with a fixed cap of 9,000.',
+  featuredKicker: 'FEATURED',
+  featuredBody: 'Top ecosystem references and integrations.',
+  projectsUnit: 'projects',
+  categories: {
+    l1: 'L1',
+    stablecoin: 'Stablecoin',
+    ai: 'AI',
+    defi: 'DeFi',
+    meme: 'Meme',
+    other: 'Other',
+  },
+};
+
+const ecosystemIndexUiRo = {
+  kicker: 'ECOSYSTEM INDEX',
+  titleLead: 'CET',
+  titleAccent: 'Network',
+  titleTail: 'Signals',
+  subtitle: 'Index curatat de referințe din ecosistemul TON pentru CET și primitive conexe.',
+  uniqueKicker: 'UNIC',
+  uniqueBodyPrefix: 'Există un singur token:',
+  uniqueTokenName: 'SOLARIS CET',
+  uniqueBodySuffix: 'cu supply fix 9.000.',
+  featuredKicker: 'FEATURED',
+  featuredBody: 'Referințe și integrări de top.',
+  projectsUnit: 'proiecte',
+  categories: {
+    l1: 'L1',
+    stablecoin: 'Stablecoin',
+    ai: 'AI',
+    defi: 'DeFi',
+    meme: 'Meme',
+    other: 'Altele',
   },
 };
 
@@ -1960,6 +2201,27 @@ const translations: Record<LangCode, Translations> = {
       tooltipTpsUnit: 'index',
       tooltipSupplyUnit: 'tokens (circulating / target supply)',
     },
+    howToBuyUi: howToBuyUiEn,
+    tokenomicsUi: tokenomicsUiEn,
+    footerUi: footerUiEn,
+    novaAppUi: novaAppUiEn,
+    competitionUi: competitionUiEn,
+    highIntelligenceUi: highIntelligenceUiEn,
+    hybridEngineUi: hybridEngineUiEn,
+    intelligenceCoreUi: intelligenceCoreUiEn,
+    complianceUi: complianceUiEn,
+    agenticEngineUi: agenticEngineUiEn,
+    hierarchyGraphUi: hierarchyGraphUiEn,
+    resourcesUi: resourcesUiEn,
+    networkPulseUi: networkPulseUiEn,
+    whitepaperUi: whitepaperUiEn,
+    aiTeamUi: aiTeamUiEn,
+    roadmapUi: roadmapUiEn,
+    securityUi: securityUiEn,
+    rwaContentUi: rwaContentUiEn,
+    rwaUi: rwaUiEn,
+    rwaSectionUi: rwaSectionUiEn,
+    ecosystemIndexUi: ecosystemIndexUiEn,
     faqContent: faqContentByLang.en,
   },
   es: {
@@ -2408,6 +2670,27 @@ const translations: Record<LangCode, Translations> = {
       tooltipTpsUnit: 'TPS',
       tooltipSupplyUnit: 'tokens (suministro en circulación / objetivo)',
     },
+    howToBuyUi: howToBuyUiEn,
+    tokenomicsUi: tokenomicsUiEn,
+    footerUi: footerUiEn,
+    novaAppUi: novaAppUiEn,
+    competitionUi: competitionUiEn,
+    highIntelligenceUi: highIntelligenceUiEn,
+    hybridEngineUi: hybridEngineUiEn,
+    intelligenceCoreUi: intelligenceCoreUiEn,
+    complianceUi: complianceUiEn,
+    agenticEngineUi: agenticEngineUiEn,
+    hierarchyGraphUi: hierarchyGraphUiEn,
+    resourcesUi: resourcesUiEn,
+    networkPulseUi: networkPulseUiEn,
+    whitepaperUi: whitepaperUiEn,
+    aiTeamUi: aiTeamUiEn,
+    roadmapUi: roadmapUiEn,
+    securityUi: securityUiEn,
+    rwaContentUi: rwaContentUiEn,
+    rwaUi: rwaUiEn,
+    rwaSectionUi: rwaSectionUiEn,
+    ecosystemIndexUi: ecosystemIndexUiEn,
     faqContent: faqContentByLang.es,
   },
   zh: {
@@ -2844,6 +3127,27 @@ const translations: Record<LangCode, Translations> = {
       tooltipTpsUnit: 'TPS',
       tooltipSupplyUnit: '代币（流通量 / 目标供应）',
     },
+    howToBuyUi: howToBuyUiEn,
+    tokenomicsUi: tokenomicsUiEn,
+    footerUi: footerUiEn,
+    novaAppUi: novaAppUiEn,
+    competitionUi: competitionUiEn,
+    highIntelligenceUi: highIntelligenceUiEn,
+    hybridEngineUi: hybridEngineUiEn,
+    intelligenceCoreUi: intelligenceCoreUiEn,
+    complianceUi: complianceUiEn,
+    agenticEngineUi: agenticEngineUiEn,
+    hierarchyGraphUi: hierarchyGraphUiEn,
+    resourcesUi: resourcesUiEn,
+    networkPulseUi: networkPulseUiEn,
+    whitepaperUi: whitepaperUiEn,
+    aiTeamUi: aiTeamUiEn,
+    roadmapUi: roadmapUiEn,
+    securityUi: securityUiEn,
+    rwaContentUi: rwaContentUiEn,
+    rwaUi: rwaUiEn,
+    rwaSectionUi: rwaSectionUiEn,
+    ecosystemIndexUi: ecosystemIndexUiEn,
     faqContent: faqContentByLang.zh,
   },
   ru: {
@@ -3289,6 +3593,27 @@ const translations: Record<LangCode, Translations> = {
       tooltipTpsUnit: 'TPS',
       tooltipSupplyUnit: 'токенов (оборот / целевая эмиссия)',
     },
+    howToBuyUi: howToBuyUiEn,
+    tokenomicsUi: tokenomicsUiEn,
+    footerUi: footerUiEn,
+    novaAppUi: novaAppUiEn,
+    competitionUi: competitionUiEn,
+    highIntelligenceUi: highIntelligenceUiEn,
+    hybridEngineUi: hybridEngineUiEn,
+    intelligenceCoreUi: intelligenceCoreUiEn,
+    complianceUi: complianceUiEn,
+    agenticEngineUi: agenticEngineUiEn,
+    hierarchyGraphUi: hierarchyGraphUiEn,
+    resourcesUi: resourcesUiEn,
+    networkPulseUi: networkPulseUiEn,
+    whitepaperUi: whitepaperUiEn,
+    aiTeamUi: aiTeamUiEn,
+    roadmapUi: roadmapUiEn,
+    securityUi: securityUiEn,
+    rwaContentUi: rwaContentUiEn,
+    rwaUi: rwaUiEn,
+    rwaSectionUi: rwaSectionUiEn,
+    ecosystemIndexUi: ecosystemIndexUiEn,
     faqContent: faqContentByLang.ru,
   },
   ro: {
@@ -3737,6 +4062,27 @@ const translations: Record<LangCode, Translations> = {
       tooltipTpsUnit: 'index',
       tooltipSupplyUnit: 'tokeni (circulant / țintă emisie)',
     },
+    howToBuyUi: howToBuyUiRo,
+    tokenomicsUi: tokenomicsUiRo,
+    footerUi: footerUiRo,
+    novaAppUi: novaAppUiRo,
+    competitionUi: competitionUiRo,
+    highIntelligenceUi: highIntelligenceUiRo,
+    hybridEngineUi: hybridEngineUiRo,
+    intelligenceCoreUi: intelligenceCoreUiRo,
+    complianceUi: complianceUiRo,
+    agenticEngineUi: agenticEngineUiRo,
+    hierarchyGraphUi: hierarchyGraphUiRo,
+    resourcesUi: resourcesUiRo,
+    networkPulseUi: networkPulseUiRo,
+    whitepaperUi: whitepaperUiRo,
+    aiTeamUi: aiTeamUiRo,
+    roadmapUi: roadmapUiRo,
+    securityUi: securityUiRo,
+    rwaContentUi: rwaContentUiRo,
+    rwaUi: rwaUiRo,
+    rwaSectionUi: rwaSectionUiRo,
+    ecosystemIndexUi: ecosystemIndexUiRo,
     faqContent: faqContentByLang.ro,
   },
   pt: {
@@ -4185,6 +4531,27 @@ const translations: Record<LangCode, Translations> = {
       tooltipTpsUnit: 'TPS',
       tooltipSupplyUnit: 'tokens (circulante / oferta-alvo)',
     },
+    howToBuyUi: howToBuyUiEn,
+    tokenomicsUi: tokenomicsUiEn,
+    footerUi: footerUiEn,
+    novaAppUi: novaAppUiEn,
+    competitionUi: competitionUiEn,
+    highIntelligenceUi: highIntelligenceUiEn,
+    hybridEngineUi: hybridEngineUiEn,
+    intelligenceCoreUi: intelligenceCoreUiEn,
+    complianceUi: complianceUiEn,
+    agenticEngineUi: agenticEngineUiEn,
+    hierarchyGraphUi: hierarchyGraphUiEn,
+    resourcesUi: resourcesUiEn,
+    networkPulseUi: networkPulseUiEn,
+    whitepaperUi: whitepaperUiEn,
+    aiTeamUi: aiTeamUiEn,
+    roadmapUi: roadmapUiEn,
+    securityUi: securityUiEn,
+    rwaContentUi: rwaContentUiEn,
+    rwaUi: rwaUiEn,
+    rwaSectionUi: rwaSectionUiEn,
+    ecosystemIndexUi: ecosystemIndexUiEn,
     faqContent: faqContentByLang.pt,
   },
   de: {
@@ -4633,6 +5000,27 @@ const translations: Record<LangCode, Translations> = {
       tooltipTpsUnit: 'TPS',
       tooltipSupplyUnit: 'Tokens (Umlauf / Zielangebot)',
     },
+    howToBuyUi: howToBuyUiEn,
+    tokenomicsUi: tokenomicsUiEn,
+    footerUi: footerUiEn,
+    novaAppUi: novaAppUiEn,
+    competitionUi: competitionUiEn,
+    highIntelligenceUi: highIntelligenceUiEn,
+    hybridEngineUi: hybridEngineUiEn,
+    intelligenceCoreUi: intelligenceCoreUiEn,
+    complianceUi: complianceUiEn,
+    agenticEngineUi: agenticEngineUiEn,
+    hierarchyGraphUi: hierarchyGraphUiEn,
+    resourcesUi: resourcesUiEn,
+    networkPulseUi: networkPulseUiEn,
+    whitepaperUi: whitepaperUiEn,
+    aiTeamUi: aiTeamUiEn,
+    roadmapUi: roadmapUiEn,
+    securityUi: securityUiEn,
+    rwaContentUi: rwaContentUiEn,
+    rwaUi: rwaUiEn,
+    rwaSectionUi: rwaSectionUiEn,
+    ecosystemIndexUi: ecosystemIndexUiEn,
     faqContent: faqContentByLang.de,
   },
 };
