@@ -115,15 +115,15 @@ const AuthorityTrustSection = () => {
 
         <div className="mt-10 lg:mt-12 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-5">
           <div className="bento-card p-5 border border-white/8 shadow-depth">
-            <div className="hud-label mb-3">LISTED ON</div>
+            <div className="hud-label mb-3">{t.authorityTrust.listedOnLabel}</div>
             <div className="hidden sm:flex flex-wrap gap-2">
               {listedOn.map((x) => (
                 <a
                   key={x.label}
                   href={x.href}
                   target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-solaris-text text-xs font-semibold transition-all duration-300 grayscale opacity-70 hover:opacity-100 hover:grayscale-0 hover:border-solaris-gold/30"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-solaris-text text-xs font-semibold transition-all duration-300 grayscale opacity-70 hover:opacity-100 hover:grayscale-0 hover:border-solaris-gold/30 btn-quantum"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-solaris-gold/80" />
                   {x.label}
@@ -137,8 +137,8 @@ const AuthorityTrustSection = () => {
                     key={`${x.label}-${i}`}
                     href={x.href}
                     target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-solaris-text text-xs font-semibold grayscale opacity-70"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-solaris-text text-xs font-semibold grayscale opacity-70 btn-quantum"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-solaris-gold/80" />
                     {x.label}
@@ -149,15 +149,15 @@ const AuthorityTrustSection = () => {
           </div>
 
           <div className="bento-card p-5 border border-white/8 shadow-depth">
-            <div className="hud-label mb-3">PARTNERS</div>
+            <div className="hud-label mb-3">{t.authorityTrust.partnersLabel}</div>
             <div className="hidden sm:flex flex-wrap gap-2">
               {partners.map((x) => (
                 <a
                   key={x.label}
                   href={x.href}
                   target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-solaris-text text-xs font-semibold transition-all duration-300 grayscale opacity-70 hover:opacity-100 hover:grayscale-0 hover:border-solaris-gold/30"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-solaris-text text-xs font-semibold transition-all duration-300 grayscale opacity-70 hover:opacity-100 hover:grayscale-0 hover:border-solaris-gold/30 btn-quantum"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-solaris-cyan/80" />
                   {x.label}
@@ -171,8 +171,8 @@ const AuthorityTrustSection = () => {
                     key={`${x.label}-${i}`}
                     href={x.href}
                     target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-solaris-text text-xs font-semibold grayscale opacity-70"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-solaris-text text-xs font-semibold grayscale opacity-70 btn-quantum"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-solaris-cyan/80" />
                     {x.label}

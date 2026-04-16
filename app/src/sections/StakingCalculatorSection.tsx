@@ -297,7 +297,7 @@ export default function StakingCalculatorSection() {
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <a
                 href="#staking"
-                className="btn-filled-gold inline-flex items-center justify-center gap-2 min-h-[48px]"
+                className="btn-filled-gold inline-flex items-center justify-center gap-2 min-h-[48px] btn-quantum"
               >
                 {t.stakingCalculator.ctaTokenomics}
               </a>
@@ -305,7 +305,7 @@ export default function StakingCalculatorSection() {
                 href="https://t.me/+tKlfzx7IWopmNWQ0"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-gold inline-flex items-center justify-center gap-2 min-h-[48px]"
+                className="btn-gold inline-flex items-center justify-center gap-2 min-h-[48px] btn-quantum"
               >
                 {t.stakingCalculator.ctaMiningBot}
               </a>

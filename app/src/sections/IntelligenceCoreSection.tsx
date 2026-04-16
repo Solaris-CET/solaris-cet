@@ -1,4 +1,4 @@
-import { useRef, useLayoutEffect, useState, useEffect } from 'react';
+import { useMemo, useRef, useLayoutEffect, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { Brain, Lightbulb, Play, Eye, Zap } from 'lucide-react';
 import AgentBridge from '../components/AgentBridge';
@@ -10,17 +10,16 @@ import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useLanguage } from '../hooks/useLanguage';
 
 
-const steps = [
-  { phase: 'THOUGHT', icon: '🧠', text: 'Analyzing blockchain data patterns...', color: 'var(--solaris-gold)' },
-  { phase: 'ACTION', icon: '⚡', text: 'Query DeDust pool liquidity metrics', color: 'var(--solaris-cyan)' },
-  { phase: 'OBSERVE', icon: '👁', text: 'Pool TVL: $2.4M | 24h Vol: $180K', color: 'rgba(52, 211, 153, 1)' },
-  { phase: 'THOUGHT', icon: '🧠', text: 'High liquidity confirms token utility', color: 'var(--solaris-gold)' },
-  { phase: 'ACTION', icon: '⚡', text: 'Execute optimal swap route...', color: 'var(--solaris-cyan)' },
-  { phase: 'OBSERVE', icon: '👁', text: 'Swap completed. Slippage: 0.12%', color: 'rgba(52, 211, 153, 1)' },
-];
+type ReactStep = { phase: string; icon: string; text: string; color: string };
+
+function parseReactStep(encoded: string): ReactStep {
+  const [phase = '', icon = '', text = '', color = ''] = encoded.split('|');
+  return { phase, icon, text, color: color || 'var(--solaris-cyan)' };
+}
 
 const IntelligenceCoreSection = () => {
   const { t } = useLanguage();
+  const tx = t.intelligenceCoreUi;
   const sectionRef = useRef<HTMLDivElement>(null);
   const leftCardRef = useRef<HTMLDivElement>(null);
   const rightCardRef = useRef<HTMLDivElement>(null);
@@ -28,12 +27,15 @@ const IntelligenceCoreSection = () => {
   const [reactStep, setReactStep] = useState(0);
   const prefersReducedMotion = useReducedMotion();
 
+  const steps: ReactStep[] = useMemo(() => tx.reactSteps.map(parseReactStep), [tx.reactSteps]);
+
   useEffect(() => {
+    if (prefersReducedMotion) return;
     const interval = setInterval(() => {
       setReactStep(prev => (prev + 1) % steps.length);
     }, 2000);
     return () => clearInterval(interval);
-  }, []);
+  }, [prefersReducedMotion, steps.length]);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -52,7 +54,7 @@ const IntelligenceCoreSection = () => {
         scrollTrigger: {
           trigger: section,
           start: 'top top',
-          end: '+=130%',
+          end: '+=70%',
           pin: true,
           scrub: 0.5,
         },
@@ -85,29 +87,7 @@ const IntelligenceCoreSection = () => {
 
       // SETTLE (30% - 70%): Hold
 
-      // EXIT (70% - 100%)
-      scrollTl.fromTo(
-        leftCardRef.current,
-        { x: 0, opacity: 1 },
-        { x: '-18vw', opacity: 0, ease: 'power2.in' },
-        0.7
-      );
-
-      scrollTl.fromTo(
-        rightCardRef.current,
-        { x: 0, opacity: 1 },
-        { x: '18vw', opacity: 0, ease: 'power2.in' },
-        0.7
-      );
-
-      if (chips) {
-        scrollTl.fromTo(
-          chips,
-          { scale: 1, opacity: 1 },
-          { scale: 0.9, opacity: 0, ease: 'power2.in' },
-          0.75
-        );
-      }
+      scrollTl.to([leftCardRef.current, rightCardRef.current], { scale: 0.99, ease: 'none' }, 0.72);
     }, section);
 
     return () => ctx.revert();
@@ -142,36 +122,36 @@ const IntelligenceCoreSection = () => {
             <div className="w-10 h-10 rounded-lg bg-solaris-cyan/10 flex items-center justify-center animate-energy-pulse">
               <Brain className="w-5 h-5 text-solaris-cyan" />
             </div>
-            <span className="hud-label text-solaris-cyan">AI Integration</span>
+            <span className="hud-label text-solaris-cyan">{tx.aiIntegrationLabel}</span>
           </div>
 
           <h2 className="font-display font-bold text-[clamp(22px,2.5vw,36px)] text-solaris-text mb-4">
-            The Intelligence{' '}
-            <span className="text-gradient-cyan">Core</span>
+            {tx.titleLead} <span className="text-gradient-cyan">{tx.titleAccent}</span> {tx.titleTail}
           </h2>
 
           <div className="space-y-4">
             <p className="text-solaris-muted text-sm lg:text-base leading-relaxed">
-              <span className="text-solaris-cyan font-semibold">ReAct Protocol</span> interleaves reasoning traces with actions—so agents explain before they execute.
+              <span className="text-solaris-cyan font-semibold">ReAct Protocol</span>{' '}
+              {tx.reactSentence}
             </p>
             <p className="text-solaris-muted text-sm lg:text-base leading-relaxed">
-              Result: clearer reasoning traces, fewer ungrounded outputs, and auditable execution paths.
+              {tx.resultSentence}
             </p>
           </div>
 
           {/* Metrics row */}
           <div className="mt-5 grid grid-cols-3 gap-3">
             <div className="p-3 rounded-lg bg-white/5 text-center">
-              <div className="font-display font-bold text-lg text-solaris-cyan">TRACE</div>
-              <div className="hud-label text-[9px]">BEFORE ACTION</div>
+              <div className="font-display font-bold text-lg text-solaris-cyan">{tx.metricTraceLabel}</div>
+              <div className="hud-label text-[9px]">{tx.metricTraceSub}</div>
             </div>
             <div className="p-3 rounded-lg bg-white/5 text-center">
-              <div className="font-display font-bold text-lg text-solaris-gold">VERIFY</div>
-              <div className="hud-label text-[9px]">AGAINST FACTS</div>
+              <div className="font-display font-bold text-lg text-solaris-gold">{tx.metricVerifyLabel}</div>
+              <div className="hud-label text-[9px]">{tx.metricVerifySub}</div>
             </div>
             <div className="p-3 rounded-lg bg-white/5 text-center">
               <div className="font-display font-bold text-lg text-emerald-400">∞</div>
-              <div className="hud-label text-[9px]">ITERATION</div>
+              <div className="hud-label text-[9px]">{tx.metricIterationSub}</div>
             </div>
           </div>
 
@@ -179,11 +159,10 @@ const IntelligenceCoreSection = () => {
           <div className="mt-4 p-4 rounded-xl bg-solaris-cyan/5 border border-solaris-cyan/20">
             <div className="hud-label text-solaris-cyan mb-2 flex items-center gap-2">
               <Zap className="w-3 h-3" />
-              BRAID Framework
+              {tx.braidLabel}
             </div>
             <p className="text-solaris-muted text-sm">
-              Structural reasoning with Mermaid-based logic graphs for{' '}
-              <span className="text-solaris-text font-semibold">more predictable multi-step reasoning</span>.
+              {tx.braidDesc}
             </p>
             <div className="mt-4">
               <HierarchyGraph />
@@ -205,10 +184,10 @@ const IntelligenceCoreSection = () => {
               <div className="w-3 h-3 rounded-full bg-red-500/60" />
               <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
               <div className="w-3 h-3 rounded-full bg-green-500/60" />
-              <span className="ml-2 text-solaris-muted text-xs">ReAct Protocol · Live</span>
+              <span className="ml-2 text-solaris-muted text-xs">{tx.terminalTitle}</span>
               <div className="ml-auto flex items-center gap-1">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-emerald-400 text-[10px]">ACTIVE</span>
+                <span className="text-emerald-400 text-[10px]">{tx.terminalActive}</span>
               </div>
             </div>
 
@@ -255,10 +234,10 @@ const IntelligenceCoreSection = () => {
           {/* ReAct label */}
           <div className="absolute bottom-6 left-6 right-6">
             <div className="holo-line mb-3" />
-            <div className="hud-label text-solaris-cyan mb-2">REASONING TRACE</div>
+            <div className="hud-label text-solaris-cyan mb-2">{tx.reasoningTraceLabel}</div>
             <div className="flex items-center gap-2 text-solaris-text text-sm">
               <div className="w-2 h-2 rounded-full bg-solaris-cyan animate-pulse" />
-              Verifiable AI Decision Loops
+              {tx.decisionLoopsLabel}
             </div>
           </div>
 
@@ -271,26 +250,26 @@ const IntelligenceCoreSection = () => {
       <div ref={chipsRef} className="hidden xl:block absolute inset-0 pointer-events-none z-20">
         <div className="hud-chip absolute right-[12vw] top-[18vh] bento-card px-4 py-2 flex items-center gap-2 animate-float shadow-depth">
           <Lightbulb className="w-4 h-4 text-solaris-gold" />
-          <span className="font-mono text-sm text-solaris-text">Thought</span>
+          <span className="font-mono text-sm text-solaris-text">{tx.chipThought}</span>
         </div>
         <div
           className="hud-chip absolute right-[6vw] top-[44vh] bento-card px-4 py-2 flex items-center gap-2 animate-float shadow-depth"
           style={{ animationDelay: '0.5s' }}
         >
           <Play className="w-4 h-4 text-solaris-cyan" />
-          <span className="font-mono text-sm text-solaris-text">Action</span>
+          <span className="font-mono text-sm text-solaris-text">{tx.chipAction}</span>
         </div>
         <div
           className="hud-chip absolute right-[14vw] top-[66vh] bento-card px-4 py-2 flex items-center gap-2 animate-float shadow-depth"
           style={{ animationDelay: '1s' }}
         >
           <Eye className="w-4 h-4 text-emerald-400" />
-          <span className="font-mono text-sm text-solaris-text">Observation</span>
+          <span className="font-mono text-sm text-solaris-text">{tx.chipObservation}</span>
         </div>
       </div>
 
       {/* AgentBridge visualization */}
-      <div className="relative z-10 w-full max-w-[820px] mx-auto xl:absolute xl:bottom-[4vh] xl:left-1/2 xl:-translate-x-1/2 xl:w-[min(80vw,800px)]">
+      <div className="relative z-10 w-full max-w-[820px] mx-auto xl:absolute xl:bottom-[4vh] xl:left-1/2 xl:-translate-x-1/2 xl:w-[min(80vw,800px)] pointer-events-none">
         <AgentBridge />
       </div>
     </section>

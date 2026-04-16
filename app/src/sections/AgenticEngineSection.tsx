@@ -20,6 +20,7 @@ import { useLanguage } from '@/hooks/useLanguage';
  */
 const AgenticEngineSection = () => {
   const { t } = useLanguage();
+  const tx = t.agenticEngineUi;
   const sectionRef = useRef<HTMLElement>(null);
   const headRef = useRef<HTMLDivElement>(null);
   const [sectionVisible, setSectionVisible] = useState(false);
@@ -83,19 +84,19 @@ const AgenticEngineSection = () => {
             <div className="w-10 h-10 rounded-xl bg-solaris-cyan/10 flex items-center justify-center">
               <Network className="w-5 h-5 text-solaris-cyan" />
             </div>
-            <span className="hud-label text-solaris-cyan">AGENTIC ENGINE · 200,000 AGENTS</span>
+            <span className="hud-label text-solaris-cyan">
+              {tx.kicker}
+            </span>
           </div>
           <h2 className="font-display font-bold text-[clamp(26px,3.2vw,44px)] text-solaris-text mb-4">
-            Data plane,{' '}
+            {tx.headlineBefore}{' '}
             <span className="relative inline-block text-solaris-gold drop-shadow-[0_0_12px_rgba(242,201,76,0.25)] after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:bg-gradient-to-r after:from-transparent after:via-solaris-gold/70 after:to-transparent after:opacity-80">
-              reasoning plane,
+              {tx.headlineHighlight}
             </span>{' '}
-            verification plane
+            {tx.headlineAfter}
           </h2>
           <p className="text-solaris-muted text-base lg:text-lg leading-relaxed">
-            The mesh does not pretend to be one brain — it is two hundred thousand narrow experts orchestrated
-            through RAV, fed by Grok and Gemini in fusion, and grounded on the same open signals that power
-            modern software: the web, public repositories, registries, and APIs.
+            {tx.paragraph}
           </p>
         </div>
 
@@ -113,12 +114,9 @@ const AgenticEngineSection = () => {
         <div className="mb-8 flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.02]">
           <Cpu className="w-5 h-5 text-solaris-gold shrink-0 mt-0.5" />
           <div>
-            <div className="hud-label text-solaris-gold text-[10px] mb-1">TRAINING HORIZON (SIMULATION)</div>
+            <div className="hud-label text-solaris-gold text-[10px] mb-1">{tx.trainingKicker}</div>
             <p className="text-solaris-muted text-xs sm:text-sm leading-relaxed">
-              A four-hour wall-clock run at “full mesh” would mean billions of micro-gradient and retrieval steps
-              across shards — impossible to replay in a browser. The live feed above models that aggregate
-              behaviour: throughput, verification, and queue health, so stakeholders can reason about scale without
-              a datacenter in the tab.
+              {tx.trainingBody}
             </p>
           </div>
         </div>

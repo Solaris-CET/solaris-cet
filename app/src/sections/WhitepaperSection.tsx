@@ -199,6 +199,168 @@ const wpSections: WPSection[] = [
   },
 ];
 
+const wpSectionsRo: WPSection[] = [
+  {
+    id: 'abstract',
+    icon: FileText,
+    color: 'gold',
+    number: '00',
+    title: 'Rezumat executiv',
+    subtitle: 'Infrastructură suverană autonomă — Era Agentică 2026',
+    content: [
+      'SOLARIS (CET) este un token RWA cu supply fix de 9.000 CET pe TON, ancorat în infrastructura agricolă și AI a Cetățuia.',
+      'Protocolul folosește RAV (Reason–Act–Verify) pentru acțiuni auditabile: urme de raționament + execuție + verificare ancorate on-chain.',
+      'Scopul: utilitate reală, execuție verificabilă și o bază tehnică orientată spre High Intelligence, fără a sacrifica transparența.',
+    ],
+    stats: [
+      { label: 'Supply total', value: '9.000 CET' },
+      { label: 'Blockchain', value: 'TON' },
+      { label: 'Protocol', value: 'RAV' },
+      { label: 'Țintă', value: '2026' },
+    ],
+  },
+  {
+    id: 'problem',
+    icon: Brain,
+    color: 'cyan',
+    number: '01',
+    title: 'Problema',
+    subtitle: 'De ce AI-ul curent nu trece pragul de inteligență',
+    content: [
+      'LLM-urile sunt puternice, dar fără “strat de verificare” pot halucina și pot eșua pe probleme noi.',
+      'Blockchain-ul e auditabil și rezistent la cenzură, dar nu are un strat nativ de raționament adaptiv.',
+      'Solaris CET țintește puntea: inteligență verificabilă + execuție on-chain, cu urme reconstruibile.',
+    ],
+  },
+  {
+    id: 'architecture',
+    icon: Cpu,
+    color: 'gold',
+    number: '02',
+    title: 'Arhitectură',
+    subtitle: 'L1 TON + L2 pentru workload AI (ancorare verificabilă)',
+    content: [
+      'CET rulează pe TON, moștenind throughput ridicat și finalitate rapidă.',
+      'Workload-urile AI sunt procesate off-chain, iar rezultatele verificate sunt ancorate pe L1 împreună cu urme de raționament.',
+      'Separarea reduce latența, fără a pierde auditabilitatea.',
+    ],
+    chips: ['TON L1', 'L2 AI', 'Ancorare', 'IPFS', 'Finalitate'],
+    stats: [
+      { label: 'L1', value: 'TON (sharded)' },
+      { label: 'Finalitate', value: '~2s (tipic)' },
+      { label: 'Stocare', value: 'IPFS' },
+      { label: 'Audit', value: 'On-chain' },
+    ],
+  },
+  {
+    id: 'rav',
+    icon: RefreshCw,
+    color: 'purple',
+    number: '03',
+    title: 'Protocol RAV',
+    subtitle: 'Reason → Act → Verify',
+    content: [
+      'REASON: descompune obiectivul și construiește urme de raționament structurat.',
+      'ACT: execută acțiunea (ex: interacțiuni DEX / operațiuni) cu parametri înregistrați.',
+      'VERIFY: verifică rezultatul și publică audit trail-ul pentru analiză ulterioară.',
+    ],
+    chips: ['Reason', 'Act', 'Verify', 'Audit', 'Trasabilitate'],
+  },
+  {
+    id: 'braid',
+    icon: Network,
+    color: 'cyan',
+    number: '04',
+    title: 'BRAID',
+    subtitle: 'Raționament structural cu grafuri logice',
+    content: [
+      'BRAID modelează raționamentul ca graf (DAG), nu ca șir liniar.',
+      'Permite ramuri paralele, reutilizare și depanare mai bună pentru multi-step.',
+      'Grafurile pot fi serializate (Mermaid) și referențiate în urme auditate.',
+    ],
+    stats: [
+      { label: 'Stil raționament', value: 'Graph-based' },
+      { label: 'Format', value: 'Mermaid' },
+      { label: 'Stocare', value: 'IPFS' },
+      { label: 'Audit lag', value: '0' },
+    ],
+  },
+  {
+    id: 'quantum',
+    icon: Atom,
+    color: 'purple',
+    number: '05',
+    title: 'Quantum OS',
+    subtitle: 'Entropie din evenimente cuantice (model + audit)',
+    content: [
+      'Entropia bună este critică pentru securitate și aleatorizare (minare, scheduling, selecție).',
+      'Quantum OS propune surse de entropie verificabile și auditabile, cu integrare QRNG când există.',
+      'Pentru fallback, se folosește un pool auditat de semnale on-chain/off-chain.',
+    ],
+    chips: ['QRNG', 'Entropie', 'Audit', 'Securitate'],
+  },
+  {
+    id: 'self-actualization',
+    icon: Zap,
+    color: 'emerald',
+    number: '06',
+    title: 'Self-Actualization',
+    subtitle: 'Agenți care își îmbunătățesc performanța',
+    content: [
+      'High Intelligence cere feedback loops: identificare gap-uri → plan → execuție → verificare.',
+      'Agenții pot menține un self-model și pot declanșa rutine de îmbunătățire pe baza diferențelor dintre așteptări și rezultate.',
+      'Totul trebuie să rămână auditabil și guvernabil de către comunitate.',
+    ],
+  },
+  {
+    id: 'tokenomics',
+    icon: Coins,
+    color: 'gold',
+    number: '07',
+    title: 'Tokenomics',
+    subtitle: 'Supply fix · utilitate · guvernanță',
+    content: [
+      'Supply maxim: 9.000 CET pe TON.',
+      'Utilitate: acces la produse/servicii + staking/minare + guvernanță protocol.',
+      'Listare/tranzacționare: DeDust (CET/USDT) cu verificare on-chain a contractului.',
+    ],
+    stats: [
+      { label: 'Supply total', value: '9.000 CET' },
+      { label: 'Exchange', value: 'DeDust' },
+      { label: 'Pair', value: 'CET/USDT' },
+      { label: 'Lanț', value: 'TON' },
+    ],
+  },
+  {
+    id: 'security',
+    icon: ShieldCheck,
+    color: 'emerald',
+    number: '08',
+    title: 'Securitate & durabilitate',
+    subtitle: 'Auditabil · rezistent · verificabil',
+    content: [
+      'Securitatea trebuie să fie demonstrabilă: audit, controale de acces, modele de risc, trasabilitate.',
+      'IPFS poate oferi permanență prin content-addressing (hash-uri verificabile).',
+      'Designul urmărește reziliență: fără dependență de un singur server sau o singură organizație.',
+    ],
+    chips: ['Audit', 'IPFS', 'Access control', 'TON anchored'],
+  },
+  {
+    id: 'developer',
+    icon: Code2,
+    color: 'cyan',
+    number: '09',
+    title: 'Platformă pentru dezvoltatori',
+    subtitle: 'SDK · API · instrumente',
+    content: [
+      'Un SDK TypeScript/Python poate standardiza operațiuni: staking, trimitere trace-uri, grafuri BRAID, entropie.',
+      'API-uri (REST/WebSocket) pentru metrici, evenimente și integrare în timp real.',
+      'Sandbox local pentru testare, fără costuri și fără dependență de mainnet în faza de dezvoltare.',
+    ],
+    chips: ['TypeScript', 'Python', 'REST', 'WebSocket', 'Sandbox'],
+  },
+];
+
 const colorMap: Record<string, { bg: string; text: string; border: string; badge: string }> = {
   gold: {
     bg: 'bg-solaris-gold/10',
@@ -305,22 +467,27 @@ const WPSectionCard = ({ section }: { section: WPSection }) => {
 // ─── Main Section ─────────────────────────────────────────────────────────────
 
 const WhitepaperSection = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const tx = t.whitepaperUi;
   const sectionRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
   const [progress, setProgress] = useState(0);
+  const sections = useMemo(
+    () => (({ ro: wpSectionsRo } as Partial<Record<string, typeof wpSections>>)[lang] ?? wpSections),
+    [lang],
+  );
 
   const readMinutes = useMemo(() => {
-    const words = wpSections
+    const words = sections
       .flatMap((s) => s.content)
       .join(' ')
       .split(/\s+/)
       .filter(Boolean).length;
     return Math.max(1, Math.round(words / 220));
-  }, []);
+  }, [sections]);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -440,20 +607,22 @@ const WhitepaperSection = () => {
             <div className="w-10 h-10 rounded-xl bg-solaris-gold/10 flex items-center justify-center">
               <FileText className="w-5 h-5 text-solaris-gold" />
             </div>
-            <span className="hud-label text-solaris-gold">WHITEPAPER · INLINE EDITION</span>
+            <span className="hud-label text-solaris-gold">
+              {tx.kicker}
+            </span>
           </div>
 
           <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text mb-4">
             Solaris CET —{' '}
-            <span className="text-gradient-gold">Technical Overview</span>
+            <span className="text-gradient-gold">{tx.headlineHighlight}</span>
           </h2>
 
           <p className="text-solaris-muted text-base lg:text-lg leading-relaxed mb-4">
-            A complete, human-readable specification of the Solaris CET protocol. Click any section to expand it. No PDF reader, no metadata, no download required — this whitepaper lives entirely on-chain and on this page.
+            {tx.intro}
           </p>
 
           <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono text-solaris-muted mb-5">
-            <span>~{readMinutes} min read</span>
+            <span>{tx.metaReadMinutes.replace('{minutes}', String(readMinutes))}</span>
             <span className="opacity-50">·</span>
             <span>{Math.round(progress * 100)}%</span>
             <span className="opacity-50">·</span>
@@ -461,7 +630,7 @@ const WhitepaperSection = () => {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            {['TON Blockchain', 'RAV Protocol', 'BRAID Framework', 'Grok × Gemini', '9,000 CET Supply'].map(tag => (
+            {tx.tags.map(tag => (
               <span
                 key={tag}
                 className="px-3 py-1 rounded-full bg-solaris-gold/10 border border-solaris-gold/20 text-solaris-gold text-xs font-mono"
@@ -474,7 +643,7 @@ const WhitepaperSection = () => {
 
         {/* Table of Contents */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
-          {wpSections.map(section => {
+          {sections.map(section => {
             const Icon = section.icon;
             const c = colorMap[section.color];
             return (
@@ -484,6 +653,7 @@ const WhitepaperSection = () => {
                   document.getElementById(`wp-card-${section.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }}
                 className={`flex flex-col items-start gap-2 p-3 rounded-xl border ${c.border} bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-200 text-left group`}
+                type="button"
               >
                 <div className={`w-8 h-8 rounded-lg ${c.bg} flex items-center justify-center shrink-0`}>
                   <Icon className={`w-4 h-4 ${c.text}`} />
@@ -501,7 +671,7 @@ const WhitepaperSection = () => {
 
         {/* Inline whitepaper sections */}
         <div ref={contentRef} className="space-y-3 mb-16">
-          {wpSections.map(section => (
+          {sections.map(section => (
             <WPSectionCard key={section.id} section={section} />
           ))}
         </div>
@@ -512,13 +682,15 @@ const WhitepaperSection = () => {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Lock className="w-4 h-4 text-solaris-gold" />
-                <span className="hud-label text-solaris-gold">PERMANENT ARCHIVE</span>
+                <span className="hud-label text-solaris-gold">
+                  {tx.archiveKicker}
+                </span>
               </div>
               <h3 className="font-display font-semibold text-solaris-text text-lg mb-1">
-                Immutably stored on IPFS
+                {tx.archiveTitle}
               </h3>
               <p className="text-solaris-muted text-sm">
-                The canonical PDF version of this whitepaper is permanently archived on IPFS — decentralised, censorship-resistant, and always available.
+                {tx.archiveBody}
               </p>
               <span className="font-mono text-solaris-muted text-[10px] break-all block mt-2">
                 ipfs://bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a
@@ -528,10 +700,10 @@ const WhitepaperSection = () => {
               href={WHITEPAPER_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="shrink-0 inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-solaris-gold text-solaris-dark font-semibold text-sm hover:bg-solaris-gold/90 active:scale-95 transition-all duration-200 group"
+              className="shrink-0 inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-solaris-gold text-solaris-dark font-semibold text-sm hover:bg-solaris-gold/90 active:scale-95 transition-all duration-200 group btn-quantum"
             >
               <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
-              Download PDF (IPFS)
+              {tx.downloadLabel}
             </a>
           </div>
         </div>

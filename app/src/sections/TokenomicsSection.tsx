@@ -31,6 +31,7 @@ const TokenomicsSection = () => {
   const [ringVisible, setRingVisible] = useState(false);
   const [showPinnedPills, setShowPinnedPills] = useState(false);
   const { t } = useLanguage();
+  const tx = t.tokenomicsUi;
   const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
@@ -85,7 +86,7 @@ const TokenomicsSection = () => {
         scrollTrigger: {
           trigger: section,
           start: 'top top',
-          end: '+=130%',
+          end: '+=70%',
           pin: true,
           scrub: 0.5,
         },
@@ -108,16 +109,7 @@ const TokenomicsSection = () => {
         );
       }
 
-      scrollTl.fromTo(
-        cardRef.current,
-        { scale: 1, y: 0, opacity: 1 },
-        { scale: 0.92, y: '-30vh', opacity: 0, ease: 'power2.in' },
-        0.7
-      );
-
-      if (pills) {
-        scrollTl.fromTo(pills, { opacity: 1 }, { opacity: 0, ease: 'power2.in' }, 0.75);
-      }
+      scrollTl.to(cardRef.current, { scale: 0.985, ease: 'none' }, 0.72);
     }, section);
 
     return () => ctx.revert();
@@ -154,7 +146,7 @@ const TokenomicsSection = () => {
         >
           <Pickaxe className="w-5 h-5 text-solaris-gold" />
           <div>
-            <div className="hud-label text-[10px]">Mining</div>
+            <div className="hud-label text-[10px]">{tx.pillMining}</div>
             <div className="font-mono tabular-nums text-solaris-gold font-semibold">66.66%</div>
           </div>
         </div>
@@ -164,7 +156,7 @@ const TokenomicsSection = () => {
         >
           <Users className="w-5 h-5 text-solaris-gold" />
           <div>
-            <div className="hud-label text-[10px]">Team</div>
+            <div className="hud-label text-[10px]">{tx.pillTeam}</div>
             <div className="font-mono tabular-nums text-solaris-gold font-semibold">0.33%</div>
           </div>
         </div>
@@ -232,15 +224,15 @@ const TokenomicsSection = () => {
               </p>
               <ul className="mt-4 space-y-2 font-mono text-[11px] text-cyan-100/85">
                 <li className="flex justify-between gap-4 border-b border-white/5 pb-2">
-                  <span className="text-solaris-muted">REASON</span>
+                  <span className="text-solaris-muted">{tx.aiReason}</span>
                   <span className="text-cyan-300 tabular-nums">Gemini</span>
                 </li>
                 <li className="flex justify-between gap-4 border-b border-white/5 pb-2">
-                  <span className="text-solaris-muted">ACT</span>
+                  <span className="text-solaris-muted">{tx.aiAct}</span>
                   <span className="text-violet-300 tabular-nums">Grok</span>
                 </li>
                 <li className="flex justify-between gap-4">
-                  <span className="text-solaris-muted">VERIFY</span>
+                  <span className="text-solaris-muted">{tx.aiVerify}</span>
                   <span className="text-emerald-400/90 tabular-nums">IPFS</span>
                 </li>
               </ul>
@@ -276,7 +268,7 @@ const TokenomicsSection = () => {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <div className="font-mono tabular-nums font-bold text-2xl text-solaris-gold">100%</div>
-                  <div className="hud-label text-[9px]">MINED</div>
+                  <div className="hud-label text-[9px]">{tx.minedLabel}</div>
                 </div>
               </div>
               <div className="mt-3 text-center">
@@ -302,7 +294,7 @@ const TokenomicsSection = () => {
                   href={DEDUST_SWAP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  title="View CET token on DeDust exchange"
+                  title={tx.dedustTitle}
                   className="font-mono text-[10px] text-cyan-400 hover:text-amber-300 transition-colors text-right"
                 >
                   EQB5…lfnB ↗
@@ -319,12 +311,11 @@ const TokenomicsSection = () => {
             >
               <div className="flex items-center gap-3 mb-3">
                 <TrendingDown className="w-5 h-5 text-solaris-gold" />
-                <div className="hud-label text-solaris-gold">DCBM Stability</div>
+                <div className="hud-label text-solaris-gold">{tx.dcbmTitle}</div>
               </div>
               <p className="text-solaris-muted text-sm leading-relaxed mb-3">
                 <span className="text-solaris-text font-medium">Dynamic-Control Buyback Mechanism</span>{' '}
-                uses PID controllers to reduce volatility by{' '}
-                <span className="font-mono tabular-nums text-solaris-gold font-semibold">66%</span>.
+                {tx.dcbmBody.replace('{pct}', '66%')}
               </p>
               <div className="flex items-center gap-1 mb-2">
                 {[1.0, 1.4, 0.7, 1.2, 0.9, 1.5, 0.8, 1.1, 0.6, 1.3].map((h, i) => (
@@ -337,7 +328,7 @@ const TokenomicsSection = () => {
               </div>
               <div className="flex items-center gap-2 text-xs text-solaris-muted">
                 <div className="w-2 h-2 rounded-full bg-solaris-gold animate-pulse" />
-                Scientific price stability
+                {tx.scientificStability}
               </div>
             </div>
           </div>
@@ -345,10 +336,10 @@ const TokenomicsSection = () => {
           {/* Mini metrics grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/10 border-t border-white/10">
             {[
-              { label: 'Launch Type', value: 'Fair Launch', valueClass: 'text-solaris-text' },
-              { label: 'Mining Period', value: '90 Years', valueClass: 'text-cyan-300' },
-              { label: 'Volatility ↓', value: '66%', valueClass: 'text-amber-300' },
-              { label: 'Target Val.', value: '€1B', valueClass: 'text-emerald-400' },
+              { label: tx.gridLaunchType, value: 'Fair Launch', valueClass: 'text-solaris-text' },
+              { label: tx.gridMiningPeriod, value: tx.gridMiningPeriodValue, valueClass: 'text-cyan-300' },
+              { label: tx.gridVolatility, value: '66%', valueClass: 'text-amber-300' },
+              { label: tx.gridTargetVal, value: '€1B', valueClass: 'text-emerald-400' },
             ].map(cell => (
               <div
                 key={cell.label}

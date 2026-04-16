@@ -34,7 +34,7 @@ export const TOKENOMICS_ALLOCATION: readonly TokenomicsAllocation[] = [
     id: 'locked_staking',
     pct: 25,
     color: '#F2C94C',
-    label: { en: 'Locked / Staking', ro: 'Locked / Staking' },
+    label: { en: 'Locked / Staking', ro: 'Blocat / Staking' },
     unlock: { en: 'Linear unlock over 36 months', ro: 'Deblocare liniară pe 36 luni' },
   },
   {
@@ -55,16 +55,15 @@ export const TOKENOMICS_ALLOCATION: readonly TokenomicsAllocation[] = [
     id: 'airdrop_marketing',
     pct: 5,
     color: '#FB7185',
-    label: { en: 'Airdrop / Marketing', ro: 'Airdrop / Marketing' },
+    label: { en: 'Airdrop / Marketing', ro: 'Airdrop / Promovare' },
     unlock: { en: '30% at launch, remainder over 6 months', ro: '30% la lansare, restul pe 6 luni' },
   },
 ];
 
 export function tokenomicsTextByLang(lang: LangCode, text: { en: string; ro: string }): string {
-  return lang === 'ro' ? text.ro : text.en;
+  return (text as Partial<Record<LangCode, string>>)[lang] ?? text.en;
 }
 
 export function tokenomicsAmountForPct(totalSupply: number, pct: number): number {
   return Math.round((totalSupply * pct) / 100);
 }
-

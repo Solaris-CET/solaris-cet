@@ -17,6 +17,8 @@ interface ReasoningStep {
   color: string;
 }
 
+type HighIntelligenceUi = ReturnType<typeof useLanguage>['t']['highIntelligenceUi'];
+
 const phaseColors: Record<string, string> = {
   OBSERVE: 'var(--solaris-cyan)',
   THINK: 'var(--solaris-gold)',
@@ -25,22 +27,36 @@ const phaseColors: Record<string, string> = {
   VERIFY: 'rgb(52 211 153)',
 };
 
-function buildReasoningSteps(query: string): ReasoningStep[] {
+function buildReasoningSteps(query: string, tx: HighIntelligenceUi): ReasoningStep[] {
+  const r = tx.reasoning;
   const q = query.trim().toLowerCase();
-  const isPrice = q.includes('price') || q.includes('value') || q.includes('worth');
-  const isMining = q.includes('mine') || q.includes('mining') || q.includes('earn');
-  const isAI = q.includes('ai') || q.includes('intelligence') || q.includes('agent');
-  const isTon = q.includes('ton') || q.includes('blockchain') || q.includes('chain');
+  const isPrice =
+    q.includes('price') || q.includes('value') || q.includes('worth') || q.includes('pret') || q.includes('valoare');
+  const isMining =
+    q.includes('mine') ||
+    q.includes('mining') ||
+    q.includes('earn') ||
+    q.includes('minare') ||
+    q.includes('mineaza') ||
+    q.includes('câștig') ||
+    q.includes('castig');
+  const isAI =
+    q.includes('ai') ||
+    q.includes('intelligence') ||
+    q.includes('agent') ||
+    q.includes('inteligen') ||
+    q.includes('agent');
+  const isTon = q.includes('ton') || q.includes('blockchain') || q.includes('chain') || q.includes('lanț') || q.includes('lant');
 
   const observe = isPrice
-    ? 'Scanning DeDust CET/USDT pool · 24h volume detected · Liquidity depth measured'
+    ? r.observePrice
     : isMining
-    ? 'Reading on-chain mining metrics · Reward schedule verified · Consistency checks running'
+    ? r.observeMining
     : isAI
-    ? 'Loading ReAct protocol trace · BRAID reasoning graph initialized · Agent context active'
+    ? r.observeAi
     : isTon
-    ? 'TON mainnet state sync · Block height confirmed · Smart contract ABI loaded'
-    : 'Indexing query tokens · Context window populated · Knowledge graph traversal started';
+    ? r.observeTon
+    : r.observeDefault;
 
   const observeBranch: ObserveLocusBranch = isPrice
     ? 'price'
@@ -55,46 +71,47 @@ function buildReasoningSteps(query: string): ReasoningStep[] {
   const observeText = `${observe} · Locus: ${observeLocusClip(q, observeBranch)}`;
 
   const think = isPrice
-    ? 'Correlating pool liquidity with 9,000 CET fixed supply → scarcity premium calculated'
+    ? r.thinkPrice
     : isMining
-    ? 'Analysing 90-year emission schedule → optimal mining window identified'
+    ? r.thinkMining
     : isAI
-    ? 'Mapping query to structured reasoning nodes → trace plan prepared'
+    ? r.thinkAi
     : isTon
-    ? 'Cross-referencing TON sharding topology with CET contract state'
-    : 'Decomposing intent → sub-goals identified → priority ordering applied';
+    ? r.thinkTon
+    : r.thinkDefault;
 
   const plan = isPrice
-    ? 'Step 1: fetch pool TVL · Step 2: compute CET/USDT rate · Step 3: apply slippage model'
+    ? r.planPrice
     : isMining
-    ? 'Step 1: confirm node eligibility · Step 2: allocate compute quota · Step 3: submit PoW'
+    ? r.planMining
     : isAI
-    ? 'Step 1: load agent memory · Step 2: reason over context · Step 3: generate verifiable action'
+    ? r.planAi
     : isTon
-    ? 'Step 1: sign transaction · Step 2: broadcast to TON · Step 3: await finality'
-    : 'Step 1: retrieve relevant facts · Step 2: synthesize response · Step 3: validate output';
+    ? r.planTon
+    : r.planDefault;
 
   const act = isPrice
-    ? 'Executing optimal swap via DeDust · Route: TON → CET · Slippage: 0.08%'
+    ? r.actPrice
     : isMining
-    ? 'Mining session initiated · Hashrate: 14.2 TH/s · Battery impact: ~0%'
+    ? r.actMining
     : isAI
-    ? 'Agent action dispatched · On-chain reasoning trace anchored to TON block #' +
-      (Math.floor(Math.random() * TON_MAINNET_BLOCK_RANGE) + TON_MAINNET_BLOCK_MIN)
+    ? r.actAi.replace(
+        '{block}',
+        String(Math.floor(Math.random() * TON_MAINNET_BLOCK_RANGE) + TON_MAINNET_BLOCK_MIN)
+      )
     : isTon
-    ? 'Transaction broadcast · Network accepted · Awaiting finality'
-    : 'High-Intelligence response generated · Confidence: ' +
-      (88 + Math.floor(Math.random() * 11)) + '%';
+    ? r.actTon
+    : r.actDefault.replace('{confidence}', String(88 + Math.floor(Math.random() * 11)));
 
   const verify = isPrice
-    ? 'Swap confirmed · CET balance updated · Price impact within tolerance ✓'
+    ? r.verifyPrice
     : isMining
-    ? 'Proof validated · Reward queued ✓'
+    ? r.verifyMining
     : isAI
-    ? 'Reasoning trace attached · Audit trail saved ✓'
+    ? r.verifyAi
     : isTon
-    ? 'Finality reached · State root updated ✓'
-    : 'Output cross-validated against on-chain facts · Integrity score: 99.2% ✓';
+    ? r.verifyTon
+    : r.verifyDefault;
 
   return [
     { phase: 'OBSERVE', text: observeText, color: phaseColors.OBSERVE },
@@ -107,6 +124,7 @@ function buildReasoningSteps(query: string): ReasoningStep[] {
 
 const NeuralReasoningEngine = () => {
   const { t } = useLanguage();
+  const tx = t.highIntelligenceUi;
   const [query, setQuery] = useState('');
   const [steps, setSteps] = useState<ReasoningStep[]>([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
@@ -122,7 +140,7 @@ const NeuralReasoningEngine = () => {
 
   const runReasoning = useCallback((q: string) => {
     clearTimer();
-    const built = buildReasoningSteps(q || 'How does Solaris CET work?');
+    const built = buildReasoningSteps(q || tx.neural.defaultQuestion, tx);
     setSteps(built);
     setVisibleIndex(0);
     setIsRunning(true);
@@ -137,7 +155,7 @@ const NeuralReasoningEngine = () => {
         setVisibleIndex(idx);
       }
     }, REASONING_STEP_DELAY_MS);
-  }, []);
+  }, [tx]);
 
   useEffect(() => () => clearTimer(), []);
 
@@ -166,20 +184,19 @@ const NeuralReasoningEngine = () => {
         <div>
           <span className="hud-label text-solaris-gold block">DEMO #1</span>
           <h3 className="font-display font-bold text-solaris-text text-lg leading-none">
-            Neural Reasoning Engine
+            {tx.neural.title}
           </h3>
         </div>
         <div className="ml-auto flex items-center gap-1.5">
           <div className={`w-2 h-2 rounded-full ${isRunning ? 'bg-solaris-gold animate-pulse' : 'bg-emerald-400'}`} />
           <span className={`font-mono text-[10px] ${isRunning ? 'text-solaris-gold' : 'text-emerald-400'}`}>
-            {isRunning ? 'PROCESSING' : 'READY'}
+            {isRunning ? tx.neural.statusProcessing : tx.neural.statusReady}
           </span>
         </div>
       </div>
 
       <p className="text-solaris-muted text-sm">
-        Ask anything about Solaris CET, mining, AI agents, or TON. Watch the{' '}
-        <span className="text-solaris-gold font-medium">High-Intelligence ReAct loop</span> process your query step by step.
+        {tx.neural.prompt}
       </p>
 
       <div className="flex gap-2">
@@ -188,20 +205,22 @@ const NeuralReasoningEngine = () => {
           value={query}
           onChange={e => setQuery(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && !isRunning && runReasoning(query)}
-          placeholder="e.g. How does CET mining work?"
+          placeholder={tx.neural.placeholder}
           className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-solaris-text placeholder:text-solaris-muted/50 focus:outline-none focus:border-solaris-gold/50 transition-colors text-sm"
         />
         <button
           onClick={() => !isRunning && runReasoning(query)}
           disabled={isRunning}
           className="px-4 py-2.5 rounded-xl bg-solaris-gold text-solaris-dark font-semibold text-sm hover:bg-solaris-gold/90 disabled:opacity-50 transition-all"
+          type="button"
         >
-          Run
+          {tx.neural.run}
         </button>
         <button
           onClick={handleReset}
           className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-solaris-muted transition-all"
           aria-label={t.sectionAria.reset}
+          type="button"
         >
           <RotateCcw className="w-4 h-4" />
         </button>
@@ -219,7 +238,7 @@ const NeuralReasoningEngine = () => {
         {steps.length === 0 && (
           <div className="text-solaris-muted/50 text-xs flex items-center gap-2 mt-8 justify-center">
             <Cpu className="w-4 h-4" />
-            Enter a query above and press Run to activate the reasoning engine
+            {tx.neural.activateHint}
           </div>
         )}
 
@@ -260,7 +279,7 @@ const NeuralReasoningEngine = () => {
         {!isRunning && visibleIndex >= 0 && steps.length > 0 && (
           <div className="mt-3 flex items-center gap-1.5 text-emerald-400">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span className="text-[10px] font-mono">REASONING COMPLETE · CHAIN VERIFIED</span>
+            <span className="text-[10px] font-mono">{tx.neural.completeLine}</span>
           </div>
         )}
 
@@ -298,6 +317,7 @@ function initQubits(): QubitState[] {
 
 const QuantumEntropyCetAi = () => {
   const { t } = useLanguage();
+  const tx = t.highIntelligenceUi;
   const [qubits, setQubits] = useState<QubitState[]>(initQubits);
   const [collapsed, setCollapsed] = useState(false);
   const [entropyBits, setEntropyBits] = useState<string>('');
@@ -386,14 +406,17 @@ const QuantumEntropyCetAi = () => {
         <div className="ml-auto flex items-center gap-1.5">
           <div className={`w-2 h-2 rounded-full ${collapsed ? 'bg-solaris-gold' : 'bg-solaris-cyan animate-pulse'}`} />
           <span className={`font-mono text-[10px] ${collapsed ? 'text-solaris-gold' : 'text-solaris-cyan'}`}>
-            {collapsed ? 'COLLAPSED' : isCollapsing ? 'COLLAPSING' : 'SUPERPOSITION'}
+            {collapsed
+              ? tx.quantum.statusCollapsed
+              : isCollapsing
+                ? tx.quantum.statusCollapsing
+                : tx.quantum.statusSuperposition}
           </span>
         </div>
       </div>
 
       <p className="text-solaris-muted text-sm">
-        Watch <span className="text-solaris-cyan font-medium">8 qubits</span> in quantum superposition. Collapse the wavefunction to generate{' '}
-        <span className="text-solaris-gold font-medium">true quantum entropy</span> — the seed for CET's cryptographic randomness.
+        {tx.quantum.desc}
       </p>
 
       {/* Qubit visualizer */}
@@ -458,7 +481,7 @@ const QuantumEntropyCetAi = () => {
           <div className="space-y-2 animate-fade-in">
             <div className="holo-line" />
             <div className="flex items-center gap-2">
-              <span className="hud-label text-[10px]">QUANTUM BITS</span>
+              <span className="hud-label text-[10px]">{tx.quantum.bitsLabel}</span>
               <div className="flex gap-1">
                 {entropyBits.split('').map((bit, i) => (
                   <span
@@ -472,11 +495,11 @@ const QuantumEntropyCetAi = () => {
               </div>
             </div>
             <div>
-              <span className="hud-label text-[10px] block mb-1">ENTROPY KEY (HEX)</span>
+              <span className="hud-label text-[10px] block mb-1">{tx.quantum.entropyKeyLabel}</span>
               <span className="font-mono text-[10px] text-solaris-gold break-all">{hexKey}</span>
             </div>
             <p className="text-solaris-muted text-[11px]">
-              This quantum-derived key cannot be predicted by any classical algorithm — it is the foundation of Quantum OS security in Solaris CET.
+              {tx.quantum.keyBody}
             </p>
           </div>
         )}
@@ -487,14 +510,20 @@ const QuantumEntropyCetAi = () => {
           onClick={collapseWavefunction}
           disabled={isCollapsing || collapsed}
           className="flex-1 py-2.5 rounded-xl bg-solaris-cyan text-solaris-dark font-semibold text-sm hover:bg-solaris-cyan/90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+          type="button"
         >
           <Atom className="w-4 h-4" />
-          {isCollapsing ? 'Collapsing…' : collapsed ? 'Wavefunction Collapsed' : 'Collapse Wavefunction'}
+          {isCollapsing
+            ? tx.quantum.collapseInProgress
+            : collapsed
+              ? tx.quantum.collapseDone
+              : tx.quantum.collapseIdle}
         </button>
         <button
           onClick={reset}
           className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-solaris-muted transition-all"
           aria-label={t.sectionAria.reset}
+          type="button"
         >
           <RotateCcw className="w-4 h-4" />
         </button>
@@ -506,6 +535,8 @@ const QuantumEntropyCetAi = () => {
 // ─── Main Section ─────────────────────────────────────────────────────────────
 
 const HighIntelligenceSection = () => {
+  const { t } = useLanguage();
+  const tx = t.highIntelligenceUi;
   const sectionRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
@@ -575,19 +606,15 @@ const HighIntelligenceSection = () => {
             <div className="w-10 h-10 rounded-xl bg-solaris-cyan/10 flex items-center justify-center">
               <Atom className="w-5 h-5 text-solaris-cyan" />
             </div>
-            <span className="hud-label text-solaris-cyan">HIGH INTELLIGENCE · LIVE DEMOS</span>
+            <span className="hud-label text-solaris-cyan">{tx.kicker}</span>
           </div>
 
           <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text mb-4">
-            Experience{' '}
-            <span className="text-gradient-aurora">High Intelligence</span>
-            {' '}&amp; Quantum OS
+            {tx.titleLead} <span className="text-gradient-aurora">{tx.titleAccent}</span> {tx.titleTail}
           </h2>
 
           <p className="text-solaris-muted text-base lg:text-lg leading-relaxed">
-            These are not simulations — they are live demonstrations of the two core technologies powering Solaris CET:{' '}
-            <span className="text-solaris-gold font-medium">Neural Reasoning via ReAct Protocol</span> and{' '}
-            <span className="text-solaris-cyan font-medium">Quantum OS Entropy</span>. Interact with them to understand what High Intelligence means.
+            {tx.subtitle}
           </p>
         </div>
 
@@ -610,21 +637,21 @@ const HighIntelligenceSection = () => {
                 color: 'text-solaris-gold',
                 bg: 'bg-solaris-gold/10',
                 label: 'ReAct Protocol',
-                desc: 'Observe → Think → Plan → Act → Verify. Every AI decision is transparent, auditable, and anchored on-chain.',
+                desc: tx.cards.reactDesc,
               },
               {
                 icon: Atom,
                 color: 'text-solaris-cyan',
                 bg: 'bg-solaris-cyan/10',
                 label: 'Quantum OS',
-                desc: 'True quantum randomness from wavefunction collapse — classical computers cannot predict or reproduce it.',
+                desc: tx.cards.quantumDesc,
               },
               {
                 icon: Cpu,
                 color: 'text-purple-400',
                 bg: 'bg-purple-400/10',
                 label: 'BRAID Framework',
-                desc: 'Structural reasoning with Mermaid-based logic graphs for 74× efficiency gains over classic AI systems.',
+                desc: tx.cards.braidDesc,
               },
             ].map(item => {
               const Icon = item.icon;

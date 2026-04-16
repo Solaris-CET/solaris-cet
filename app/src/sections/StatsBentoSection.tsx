@@ -13,12 +13,6 @@ import { TOKEN_DECIMALS } from '../constants/token';
 const BENTO_TILE_INTERACTION =
   'transition-all duration-300 hover:!-translate-y-1 hover:!scale-100 hover:!shadow-[0_0_15px_rgba(234,179,8,0.2)]';
 
-const TRUST_BADGES = [
-  { icon: Shield, label: 'Cyberscope Audited' },
-  { icon: TrendingUp, label: 'KYC Verified' },
-  { icon: Globe, label: 'Open Source' },
-];
-
 // ─── Component ────────────────────────────────────────────────────────────
 
 /**
@@ -28,6 +22,12 @@ const TRUST_BADGES = [
  */
 const StatsBento = () => {
   const { t } = useLanguage();
+
+  const TRUST_BADGES = [
+    { icon: Shield, label: t.statsBento.trustBadgeAudited },
+    { icon: TrendingUp, label: t.statsBento.trustBadgeKyc },
+    { icon: Globe, label: t.statsBento.trustBadgeOpenSource },
+  ];
 
   const stats = [
     {
@@ -159,7 +159,7 @@ const StatsBento = () => {
             {/* CTA */}
             <a
               href="#team"
-              className="mt-6 inline-flex items-center gap-2 text-solaris-gold text-sm font-semibold hover:gap-3 transition-all duration-200"
+              className="mt-6 inline-flex items-center gap-2 text-solaris-gold text-sm font-semibold hover:gap-3 transition-all duration-200 btn-quantum"
             >
               {t.statsBento.meetAgents} <ArrowRight className="w-4 h-4 text-solaris-gold" />
             </a>
@@ -223,7 +223,9 @@ const StatsBento = () => {
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
-                <span className="text-emerald-400 text-xs font-mono font-bold">ALL SYSTEMS LIVE</span>
+                <span className="text-emerald-400 text-xs font-mono font-bold">
+                  {t.statsBento.allSystemsLive}
+                </span>
               </div>
             </div>
           </div>

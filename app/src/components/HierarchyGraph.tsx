@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import MermaidDiagram from './MermaidDiagram';
+import { useLanguage } from '@/hooks/useLanguage';
 
 type MermaidAgentResponse = {
   format: 'mermaid';
@@ -11,25 +12,37 @@ type MermaidAgentResponse = {
   render: 'client';
 };
 
-function buildLocalGraph(query: string) {
+type LocalGraphUi = {
+  localUserAsks: string;
+  localIsWalletConnected: string;
+  localShowBalance: string;
+  localShowConnect: string;
+  localNextActions: string;
+  localLinks: string;
+};
+
+function buildLocalGraph(query: string, tx: LocalGraphUi) {
   const safe = query.replace(/"/g, "'").slice(0, 120);
   return [
     'graph TD',
-    `  A[User asks: "${safe}"] --> B{Is wallet connected?}`,
-    '  B -->|Yes| C[Show CET balance / staking options]',
-    '  B -->|No| D[Show connect wallet]',
-    '  C --> E[Show next actions: Buy / Stake / Learn]',
-    '  E --> F[Show links + calculators]',
+    `  A[${tx.localUserAsks}: "${safe}"] --> B{${tx.localIsWalletConnected}}`,
+    `  B -->|✓| C[${tx.localShowBalance}]`,
+    `  B -->|✕| D[${tx.localShowConnect}]`,
+    `  C --> E[${tx.localNextActions}]`,
+    `  E --> F[${tx.localLinks}]`,
   ].join('\n');
 }
 
 export default function HierarchyGraph({
   className,
-  query = 'How to stake CET?',
+  query,
 }: {
   className?: string;
   query?: string;
 }) {
+  const { t } = useLanguage();
+  const tx = t.hierarchyGraphUi;
+  const resolvedQuery = query ?? t.highIntelligenceUi.neural.defaultQuestion;
   const rootRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<MermaidAgentResponse | null>(null);
   const [failed, setFailed] = useState(false);
@@ -80,7 +93,7 @@ export default function HierarchyGraph({
         const res = await fetch('/api/mermaid/agent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query }),
+          body: JSON.stringify({ query: resolvedQuery }),
           signal: controller.signal,
         });
         if (!res.ok) throw new Error('bad response');
@@ -90,7 +103,7 @@ export default function HierarchyGraph({
         setFailed(false);
       } catch {
         if (!alive) return;
-        setData({ format: 'mermaid', render: 'client', graph: buildLocalGraph(query) });
+        setData({ format: 'mermaid', render: 'client', graph: buildLocalGraph(resolvedQuery, tx) });
         setFailed(false);
       }
     };
@@ -100,7 +113,7 @@ export default function HierarchyGraph({
       alive = false;
       controller.abort();
     };
-  }, [isActive, query]);
+  }, [isActive, resolvedQuery, tx]);
 
   const graph = data?.graph ?? null;
   const lines = useMemo(() => {
@@ -117,7 +130,7 @@ export default function HierarchyGraph({
       className={cn('rounded-xl bg-white/5 border border-white/10 p-4', className)}
     >
       <div className="flex items-center justify-between gap-3 mb-3">
-        <div className="hud-label text-solaris-muted">DECISION MAP (MERMAID)</div>
+        <div className="hud-label text-solaris-muted">{tx.title}</div>
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -132,7 +145,7 @@ export default function HierarchyGraph({
             className="px-2.5 h-8 rounded-lg border border-white/10 bg-white/5 text-[11px] text-solaris-muted hover:text-solaris-text hover:bg-white/10 transition-colors disabled:opacity-40"
             disabled={renderDiagram}
           >
-            {renderDiagram ? 'Rendered' : 'Render'}
+            {renderDiagram ? tx.rendered : tx.render}
           </button>
           <button
             type="button"
@@ -140,19 +153,19 @@ export default function HierarchyGraph({
             onClick={async () => {
               if (!graph) return;
               if (!canCopy) {
-                toast.error('Clipboard unavailable');
+                toast.error(tx.clipboardUnavailable);
                 return;
               }
               try {
                 await navigator.clipboard.writeText(graph);
-                toast.success('Mermaid graph copied');
+                toast.success(tx.graphCopied);
               } catch {
-                toast.error('Copy failed');
+                toast.error(tx.copyFailed);
               }
             }}
             className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-white/10 bg-white/5 text-solaris-muted hover:text-solaris-text hover:bg-white/10 transition-colors disabled:opacity-40"
             disabled={!graph}
-            aria-label="Copy Mermaid graph"
+            aria-label={tx.ariaCopyGraph}
           >
             <Copy className="w-4 h-4" aria-hidden />
           </button>
@@ -161,7 +174,7 @@ export default function HierarchyGraph({
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-white/10 bg-white/5 text-solaris-muted hover:text-solaris-text hover:bg-white/10 transition-colors"
-            aria-label="Open Mermaid Live Editor"
+            aria-label={tx.ariaOpenMermaid}
           >
             <ExternalLink className="w-4 h-4" aria-hidden />
           </a>
@@ -174,7 +187,7 @@ export default function HierarchyGraph({
         <Skeleton className="h-20 w-full bg-white/10" />
       ) : failed ? (
         <div className="text-solaris-muted text-xs">
-          Mermaid graph unavailable right now.
+          {tx.graphUnavailable}
         </div>
       ) : (
         <div className="space-y-3">
@@ -182,7 +195,7 @@ export default function HierarchyGraph({
             <MermaidDiagram graph={graph} />
           ) : (
             <div className="rounded-xl bg-black/20 border border-white/10 p-3 text-xs text-solaris-muted">
-              Render is optional to keep performance tight. Use the Render button if you want the SVG.
+              {tx.renderOptional}
             </div>
           )}
           <details
@@ -192,9 +205,9 @@ export default function HierarchyGraph({
             }}
           >
             <summary className="cursor-pointer select-none text-solaris-text text-xs font-mono">
-              <span className="text-solaris-muted">Source</span> ·{' '}
-              <span className="group-open:hidden">expand</span>
-              <span className="hidden group-open:inline">collapse</span>
+              <span className="text-solaris-muted">{tx.source}</span> ·{' '}
+              <span className="group-open:hidden">{tx.expand}</span>
+              <span className="hidden group-open:inline">{tx.collapse}</span>
             </summary>
             <pre className="mt-3 whitespace-pre-wrap text-[11px] leading-relaxed font-mono text-solaris-text/90">
               {graph}

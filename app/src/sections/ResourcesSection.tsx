@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
 import { BarChart2, BookOpen, Brain, Globe, ExternalLink } from 'lucide-react';
@@ -10,6 +11,7 @@ import {
   TONSCAN_CET_CONTRACT_URL,
 } from '@/lib/cetContract';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface Resource {
   name: string;
@@ -27,139 +29,8 @@ interface ResourceCategory {
   resources: Resource[];
 }
 
-// Static data defined outside component to avoid re-creation on every render
-const categories: ResourceCategory[] = [
-  {
-    id: 'market',
-    icon: BarChart2,
-    color: 'gold',
-    label: 'MARKET DATA',
-    title: 'Track & Trade',
-    resources: [
-      {
-        name: 'CoinGecko',
-        description:
-          'Search “Solaris CET” on CoinGecko for listings, charts, and volume — the same flow serious traders use for any new TON jetton.',
-        href: COINGECKO_SEARCH_CET_URL,
-        tag: 'coingecko.com',
-      },
-      {
-        name: 'CoinMarketCap',
-        description:
-          'CMC search for Solaris CET — rankings, supply context, and cross-exchange visibility when the asset is tracked.',
-        href: COINMARKETCAP_SEARCH_CET_URL,
-        tag: 'coinmarketcap.com',
-      },
-      {
-        name: 'DeDust DEX',
-        description: 'The native TON decentralised exchange where CET trades. Swap TON → CET directly in your Tonkeeper wallet.',
-        href: 'https://dedust.io',
-        tag: 'dedust.io',
-      },
-      {
-        name: 'DEX Screener',
-        description:
-          'Search by CET contract address to surface TON pool charts and liquidity depth alongside other DEX aggregators.',
-        href: DEXSCREENER_CET_SEARCH_URL,
-        tag: 'dexscreener.com',
-      },
-    ],
-  },
-  {
-    id: 'ecosystem',
-    icon: Globe,
-    color: 'cyan',
-    label: 'TON ECOSYSTEM',
-    title: 'Explore TON',
-    resources: [
-      {
-        name: 'TON Foundation',
-        description: 'Official documentation, developer guides, and the full specification of the TON blockchain — the home of CET.',
-        href: 'https://ton.org',
-        tag: 'ton.org',
-      },
-      {
-        name: 'Tonkeeper',
-        description: 'The most-used non-custodial TON wallet. Available as a mobile app and browser extension — required to hold CET.',
-        href: 'https://tonkeeper.com',
-        tag: 'tonkeeper.com',
-      },
-      {
-        name: 'Tonscan Explorer',
-        description: 'Real-time TON block explorer. Verify CET transactions, inspect contract state, and audit the DeDust pool on-chain.',
-        href: TONSCAN_CET_CONTRACT_URL,
-        tag: 'tonscan.org',
-      },
-      {
-        name: 'Tonviewer',
-        description:
-          'Wallet-style TON explorer for the CET jetton — messages, holders, and transfers in a layout many mobile wallets deep-link to.',
-        href: TONVIEWER_CET_URL,
-        tag: 'tonviewer.com',
-      },
-    ],
-  },
-  {
-    id: 'research',
-    icon: BookOpen,
-    color: 'emerald',
-    label: 'RESEARCH & NEWS',
-    title: 'Stay Informed',
-    resources: [
-      {
-        name: 'Messari',
-        description: 'Institutional-grade research, protocol reports, and on-chain data analytics — the standard for informed crypto investment.',
-        href: 'https://messari.io',
-        tag: 'messari.io',
-      },
-      {
-        name: 'CoinDesk',
-        description: 'Award-winning crypto journalism: market news, regulatory developments, and deep-dive investigative reports.',
-        href: 'https://www.coindesk.com',
-        tag: 'coindesk.com',
-      },
-      {
-        name: 'Solaris Whitepaper',
-        description: 'Read the full Solaris CET whitepaper on IPFS — tokenomics, architecture, roadmap, and the High Intelligence thesis.',
-        href: 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a',
-        tag: 'ipfs',
-      },
-    ],
-  },
-  {
-    id: 'ai',
-    icon: Brain,
-    color: 'violet',
-    label: 'AI & AGENTS',
-    title: 'Build Intelligence',
-    resources: [
-      {
-        name: 'AI Agents for Beginners',
-        description: 'Free 12-lesson course by Microsoft for building AI agents from the ground up — fundamentals, code examples, and hands-on exercises.',
-        href: 'https://github.com/microsoft/ai-agents-for-beginners',
-        tag: 'github.com/microsoft',
-      },
-      {
-        name: 'HuggingFace Agents Course',
-        description: 'Free intermediate-to-expert course on AI agents from HuggingFace — core concepts, code snippets, and practical build-and-deploy examples.',
-        href: 'https://huggingface.co/learn/agents-course/en/unit0/introduction',
-        tag: 'huggingface.co',
-      },
-      {
-        name: 'Prompt Engineering Guide',
-        description: 'Comprehensive free guide by DAIR.AI covering prompt engineering techniques essential for optimizing AI agents, with tutorials and research papers.',
-        href: 'https://github.com/dair-ai/Prompt-Engineering-Guide',
-        tag: 'github.com/dair-ai',
-      },
-      {
-        name: 'Solaris CET on GitHub',
-        description: 'Official open-source repository for the Solaris CET landing page — explore the code, open issues, or contribute to the project.',
-        href: 'https://github.com/Solaris-CET/solaris-cet',
-        tag: 'github.com/Solaris-CET',
-      },
-    ],
-  },
-];
+const WHITEPAPER_IPFS_URL =
+  'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a';
 
 const colorMap: Record<string, { bg: string; text: string; border: string; hud: string; hoverBorder: string }> = {
   gold: {
@@ -193,6 +64,139 @@ const colorMap: Record<string, { bg: string; text: string; border: string; hud: 
 };
 
 const ResourcesSection = () => {
+  const { t } = useLanguage();
+  const tx = t.resourcesUi;
+  const categories: ResourceCategory[] = useMemo(() => {
+    return [
+      {
+        id: 'market',
+        icon: BarChart2,
+        color: 'gold',
+        label: tx.categories.market.label,
+        title: tx.categories.market.title,
+        resources: [
+          {
+            name: 'CoinGecko',
+            description: tx.categories.market.resources.coinGeckoDescription,
+            href: COINGECKO_SEARCH_CET_URL,
+            tag: 'coingecko.com',
+          },
+          {
+            name: 'CoinMarketCap',
+            description: tx.categories.market.resources.coinMarketCapDescription,
+            href: COINMARKETCAP_SEARCH_CET_URL,
+            tag: 'coinmarketcap.com',
+          },
+          {
+            name: 'DeDust DEX',
+            description: tx.categories.market.resources.dedustDescription,
+            href: 'https://dedust.io',
+            tag: 'dedust.io',
+          },
+          {
+            name: 'DEX Screener',
+            description: tx.categories.market.resources.dexScreenerDescription,
+            href: DEXSCREENER_CET_SEARCH_URL,
+            tag: 'dexscreener.com',
+          },
+        ],
+      },
+      {
+        id: 'ecosystem',
+        icon: Globe,
+        color: 'cyan',
+        label: tx.categories.ecosystem.label,
+        title: tx.categories.ecosystem.title,
+        resources: [
+          {
+            name: 'TON Foundation',
+            description: tx.categories.ecosystem.resources.tonFoundationDescription,
+            href: 'https://ton.org',
+            tag: 'ton.org',
+          },
+          {
+            name: 'Tonkeeper',
+            description: tx.categories.ecosystem.resources.tonkeeperDescription,
+            href: 'https://tonkeeper.com',
+            tag: 'tonkeeper.com',
+          },
+          {
+            name: 'Tonscan Explorer',
+            description: tx.categories.ecosystem.resources.tonscanDescription,
+            href: TONSCAN_CET_CONTRACT_URL,
+            tag: 'tonscan.org',
+          },
+          {
+            name: 'Tonviewer',
+            description: tx.categories.ecosystem.resources.tonviewerDescription,
+            href: TONVIEWER_CET_URL,
+            tag: 'tonviewer.com',
+          },
+        ],
+      },
+      {
+        id: 'research',
+        icon: BookOpen,
+        color: 'emerald',
+        label: tx.categories.research.label,
+        title: tx.categories.research.title,
+        resources: [
+          {
+            name: 'Messari',
+            description: tx.categories.research.resources.messariDescription,
+            href: 'https://messari.io',
+            tag: 'messari.io',
+          },
+          {
+            name: 'CoinDesk',
+            description: tx.categories.research.resources.coindeskDescription,
+            href: 'https://www.coindesk.com',
+            tag: 'coindesk.com',
+          },
+          {
+            name: tx.categories.research.resources.whitepaperName,
+            description: tx.categories.research.resources.whitepaperDescription,
+            href: WHITEPAPER_IPFS_URL,
+            tag: 'ipfs',
+          },
+        ],
+      },
+      {
+        id: 'ai',
+        icon: Brain,
+        color: 'violet',
+        label: tx.categories.ai.label,
+        title: tx.categories.ai.title,
+        resources: [
+          {
+            name: tx.categories.ai.resources.agentsBeginnersName,
+            description: tx.categories.ai.resources.agentsBeginnersDescription,
+            href: 'https://github.com/microsoft/ai-agents-for-beginners',
+            tag: 'github.com/microsoft',
+          },
+          {
+            name: tx.categories.ai.resources.hfAgentsName,
+            description: tx.categories.ai.resources.hfAgentsDescription,
+            href: 'https://huggingface.co/learn/agents-course/en/unit0/introduction',
+            tag: 'huggingface.co',
+          },
+          {
+            name: tx.categories.ai.resources.promptGuideName,
+            description: tx.categories.ai.resources.promptGuideDescription,
+            href: 'https://github.com/dair-ai/Prompt-Engineering-Guide',
+            tag: 'github.com/dair-ai',
+          },
+          {
+            name: tx.categories.ai.resources.githubName,
+            description: tx.categories.ai.resources.githubDescription,
+            href: 'https://github.com/Solaris-CET/solaris-cet',
+            tag: 'github.com/Solaris-CET',
+          },
+        ],
+      },
+    ];
+  }, [tx]);
+
   return (
     <section
       id="resources"
@@ -212,19 +216,15 @@ const ResourcesSection = () => {
             <div className="w-10 h-10 rounded-xl bg-solaris-cyan/10 flex items-center justify-center">
               <Globe className="w-5 h-5 text-solaris-cyan" />
             </div>
-            <span className="hud-label text-solaris-cyan">ECOSYSTEM RESOURCES</span>
+            <span className="hud-label text-solaris-cyan">{tx.kicker}</span>
           </div>
 
           <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text mb-4">
-            Everything You Need to{' '}
-            <span className="text-solaris-cyan">Navigate</span>{' '}
-            the Ecosystem
+            {tx.titleLead} <span className="text-solaris-cyan">{tx.titleHighlight}</span> {tx.titleTail}
           </h2>
 
           <p className="text-solaris-muted text-base lg:text-lg leading-relaxed">
-            From tracking CET on-chain to exploring the TON network, staying informed on the
-            latest research, and learning to build AI agents — these are the trusted platforms
-            used by the Solaris community.
+            {tx.subtitle}
           </p>
         </ScrollFadeUp>
 
@@ -232,18 +232,18 @@ const ResourcesSection = () => {
         <ScrollFadeUp>
           <div className="bento-card p-4 mb-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {[
-              { label: 'Buy CET', href: DEDUST_SWAP_URL, color: 'text-solaris-gold' },
-              { label: 'Whitepaper', href: 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a', color: 'text-solaris-cyan' },
-              { label: 'GitHub', href: 'https://github.com/Solaris-CET/solaris-cet', color: 'text-solaris-text' },
-              { label: 'Telegram', href: 'https://t.me/SolarisCET', color: 'text-solaris-cyan' },
-              { label: 'CET contract', href: TONSCAN_CET_CONTRACT_URL, color: 'text-emerald-400' },
+              { label: tx.quickLinks.buyCet, href: DEDUST_SWAP_URL, color: 'text-solaris-gold' },
+              { label: tx.quickLinks.whitepaper, href: WHITEPAPER_IPFS_URL, color: 'text-solaris-cyan' },
+              { label: tx.quickLinks.github, href: 'https://github.com/Solaris-CET/solaris-cet', color: 'text-solaris-text' },
+              { label: tx.quickLinks.telegram, href: 'https://t.me/SolarisCET', color: 'text-solaris-cyan' },
+              { label: tx.quickLinks.cetContract, href: TONSCAN_CET_CONTRACT_URL, color: 'text-emerald-400' },
             ].map(({ label, href, color }) => (
               <a
-                key={label}
+                key={href}
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`flex items-center justify-center gap-2 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-sm font-semibold ${color}`}
+                className={`flex items-center justify-center gap-2 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-sm font-semibold ${color} btn-quantum`}
               >
                 {label} ↗
               </a>

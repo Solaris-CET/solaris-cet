@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { Wallet, ArrowRightLeft, Coins, Copy, Check, ExternalLink } from 'lucide-react';
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
@@ -11,45 +11,15 @@ import { toast } from 'sonner';
 
 const TONKEEPER_URL = 'https://tonkeeper.com';
 
-// Static data defined outside component to avoid re-creation on every render
-const steps = [
-  {
-    id: 'wallet',
-    step: '01',
-    icon: Wallet,
-    color: 'cyan',
-    title: 'Get a TON Wallet',
-    description:
-      'Download Tonkeeper (mobile or browser extension) and create a new wallet. Store your seed phrase securely — it is the only key to your funds.',
-    action: {
-      label: 'Get Tonkeeper',
-      href: TONKEEPER_URL,
-    },
-  },
-  {
-    id: 'fund',
-    step: '02',
-    icon: Coins,
-    color: 'gold',
-    title: 'Fund with TON',
-    description:
-      'Purchase TON on any major exchange (Bybit, OKX, Huobi) and withdraw to your Tonkeeper address. You need TON to cover both the swap and the small network gas fee.',
-    action: null,
-  },
-  {
-    id: 'swap',
-    step: '03',
-    icon: ArrowRightLeft,
-    color: 'emerald',
-    title: 'Swap for CET on DeDust',
-    description:
-      'Go to DeDust and swap TON → CET. Always use the official contract address below to verify you are trading the authentic Solaris CET token.',
-    action: {
-      label: 'Open DeDust ↗',
-      href: DEDUST_SWAP_URL,
-    },
-  },
-];
+type StepItem = {
+  id: string;
+  step: string;
+  icon: typeof Wallet;
+  color: 'gold' | 'cyan' | 'emerald';
+  title: string;
+  description: string;
+  action: { label: string; href: string } | null;
+};
 
 const colorMap: Record<string, { bg: string; text: string; border: string }> = {
   gold: { bg: 'bg-solaris-gold/10', text: 'text-solaris-gold', border: 'border-solaris-gold/30' },
@@ -59,10 +29,49 @@ const colorMap: Record<string, { bg: string; text: string; border: string }> = {
 
 const HowToBuySection = () => {
   const { t } = useLanguage();
+  const tx = t.howToBuyUi;
   const [copied, setCopied] = useState(false);
   const [copyFailed, setCopyFailed] = useState(false);
 
   const linkCopied = t.social.linkCopied;
+
+  const steps: StepItem[] = useMemo(() => {
+    return [
+      {
+        id: 'wallet',
+        step: '01',
+        icon: Wallet,
+        color: 'cyan',
+        title: tx.steps.walletTitle,
+        description: tx.steps.walletDescription,
+        action: {
+          label: tx.steps.walletCta,
+          href: TONKEEPER_URL,
+        },
+      },
+      {
+        id: 'fund',
+        step: '02',
+        icon: Coins,
+        color: 'gold',
+        title: tx.steps.fundTitle,
+        description: tx.steps.fundDescription,
+        action: null,
+      },
+      {
+        id: 'swap',
+        step: '03',
+        icon: ArrowRightLeft,
+        color: 'emerald',
+        title: tx.steps.swapTitle,
+        description: tx.steps.swapDescription,
+        action: {
+          label: tx.steps.swapCta,
+          href: DEDUST_SWAP_URL,
+        },
+      },
+    ];
+  }, [tx.steps.fundDescription, tx.steps.fundTitle, tx.steps.swapCta, tx.steps.swapDescription, tx.steps.swapTitle, tx.steps.walletCta, tx.steps.walletDescription, tx.steps.walletTitle]);
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(CET_CONTRACT_ADDRESS).then(() => {
@@ -95,18 +104,15 @@ const HowToBuySection = () => {
             <div className="w-10 h-10 rounded-xl bg-solaris-gold/10 flex items-center justify-center">
               <ArrowRightLeft className="w-5 h-5 text-solaris-gold" />
             </div>
-            <span className="hud-label text-solaris-gold">HOW TO BUY</span>
+            <span className="hud-label text-solaris-gold">{tx.kicker}</span>
           </div>
 
           <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text mb-4">
-            Get <span className="text-gradient-gold">Solaris CET</span>{' '}
-            in 3 Steps
+            {tx.titleLead} <span className="text-gradient-gold">{tx.titleToken}</span> {tx.titleTail}
           </h2>
 
           <p className="text-solaris-muted text-base lg:text-lg leading-relaxed">
-            CET trades on the TON blockchain via DeDust DEX. Follow the steps
-            below and always verify the contract address to stay safe from
-            phishing tokens.
+            {tx.subtitle}
           </p>
         </ScrollFadeUp>
 
@@ -146,7 +152,7 @@ const HowToBuySection = () => {
                     href={step.action.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`inline-flex items-center gap-2 text-sm font-semibold ${c.text} hover:opacity-80 transition-opacity`}
+                    className={`inline-flex items-center gap-2 text-sm font-semibold ${c.text} hover:opacity-90 transition-opacity btn-quantum`}
                   >
                     {step.action.label}
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -160,10 +166,10 @@ const HowToBuySection = () => {
         {/* Verified Safe trust bar */}
         <div className="mb-6 flex flex-wrap items-center gap-3">
           {[
-            { label: 'Cyberscope Audited', color: 'text-solaris-gold border-solaris-gold/30 bg-solaris-gold/5' },
-            { label: 'KYC Verified',        color: 'text-emerald-400 border-emerald-400/30 bg-emerald-400/5' },
-            { label: 'Freshcoins Listed',   color: 'text-solaris-cyan border-solaris-cyan/30 bg-solaris-cyan/5' },
-            { label: 'Open Source',         color: 'text-purple-400 border-purple-400/30 bg-purple-400/5' },
+            { label: tx.trustBadges.audit, color: 'text-solaris-gold border-solaris-gold/30 bg-solaris-gold/5' },
+            { label: tx.trustBadges.kyc, color: 'text-emerald-400 border-emerald-400/30 bg-emerald-400/5' },
+            { label: tx.trustBadges.freshcoins, color: 'text-solaris-cyan border-solaris-cyan/30 bg-solaris-cyan/5' },
+            { label: tx.trustBadges.openSource, color: 'text-purple-400 border-purple-400/30 bg-purple-400/5' },
           ].map(({ label, color }) => (
             <span
               key={label}
@@ -180,9 +186,11 @@ const HowToBuySection = () => {
           <div className="bento-card p-6 lg:p-8 border border-solaris-gold/20">
             <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8">
               <div className="shrink-0">
-                <span className="hud-label text-solaris-gold">OFFICIAL CONTRACT ADDRESS</span>
+                <span className="hud-label text-solaris-gold">
+                  {tx.contractTitle}
+                </span>
                 <p className="text-solaris-muted text-xs mt-1">
-                  Always verify before swapping — there is only one authentic CET token.
+                  {tx.contractSubtitle}
                 </p>
               </div>
 
@@ -198,9 +206,10 @@ const HowToBuySection = () => {
                       ? 'bg-red-400/10 border-red-400/30 text-red-400 hover:bg-red-400/20'
                       : 'bg-solaris-gold/10 border-solaris-gold/30 text-solaris-gold hover:bg-solaris-gold/20'
                   }`}
+                  type="button"
                 >
                   {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  {copied ? 'Copied!' : copyFailed ? 'Failed' : 'Copy'}
+                  {copied ? tx.copyCopied : copyFailed ? tx.copyFailed : tx.copyIdle}
                 </button>
               </div>
 
@@ -208,10 +217,10 @@ const HowToBuySection = () => {
                 href={DEDUST_SWAP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 btn-filled-gold text-sm"
+                className="shrink-0 btn-filled-gold text-sm btn-quantum"
               >
                 <ArrowRightLeft className="w-4 h-4" />
-                Swap on DeDust
+                {tx.swapCta}
               </a>
             </div>
           </div>

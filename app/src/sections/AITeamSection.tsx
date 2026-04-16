@@ -25,6 +25,7 @@ const TOTAL_AGENTS = departments.reduce((s, d) => s + d.agentCount, 0);
 
 const AITeamSection = () => {
   const { t } = useLanguage();
+  const tx = t.aiTeamUi;
   return (
     <section
       id="team"
@@ -48,18 +49,17 @@ const AITeamSection = () => {
             <div className="w-10 h-10 rounded-xl bg-solaris-gold/10 flex items-center justify-center">
               <Brain className="w-5 h-5 text-solaris-gold" />
             </div>
-            <span className="hud-label text-solaris-gold">AI CORPORATE STRUCTURE</span>
+            <span className="hud-label text-solaris-gold">
+              {tx.kicker}
+            </span>
           </div>
 
           <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text mb-4">
-            200,000 Agents.{' '}
-            <span className="text-solaris-gold">Zero Marginal Cost.</span>
+            {tx.headlineLead} <span className="text-solaris-gold">{tx.headlineHighlight}</span>
           </h2>
 
           <p className="text-solaris-muted text-base lg:text-lg leading-relaxed">
-            Large enterprises deploy hundreds of thousands of employees — now augmented by AI.
-            Solaris CET matches that scale entirely through autonomous agents: 200,000 specialists
-            operating 24/7, across 10 departments, at the speed of thought.
+            {tx.intro}
           </p>
         </ScrollFadeUp>
 
@@ -69,23 +69,23 @@ const AITeamSection = () => {
         <ScrollFadeUp>
           <div className="glass-card-gold p-6 mb-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
             <div>
-              <div className="hud-label text-solaris-gold mb-1">TOTAL WORKFORCE</div>
+              <div className="hud-label text-solaris-gold mb-1">{tx.totalWorkforceLabel}</div>
               <div className="font-display font-black text-4xl lg:text-5xl text-solaris-gold">
                 <AnimatedCounter end={TOTAL_AGENTS} className="tabular-nums" meshTitleKey="aiTeam|counter|totalAgents" />
               </div>
-              <div className="text-solaris-muted text-xs mt-1">Autonomous Agents Deployed</div>
+              <div className="text-solaris-muted text-xs mt-1">{tx.totalWorkforceSub}</div>
             </div>
             <div>
-              <div className="hud-label text-solaris-cyan mb-1">DEPARTMENTS</div>
+              <div className="hud-label text-solaris-cyan mb-1">{tx.departmentsLabel}</div>
               <div className="font-display font-black text-4xl lg:text-5xl text-solaris-cyan">
                 <AnimatedCounter end={10} className="tabular-nums" meshTitleKey="aiTeam|counter|departments" />
               </div>
-              <div className="text-solaris-muted text-xs mt-1">Enterprise Divisions</div>
+              <div className="text-solaris-muted text-xs mt-1">{tx.departmentsSub}</div>
             </div>
             <div>
-              <div className="hud-label text-emerald-400 mb-1">UPTIME</div>
+              <div className="hud-label text-emerald-400 mb-1">{tx.uptimeLabel}</div>
               <div className="font-display font-black text-4xl lg:text-5xl text-emerald-400">24/7</div>
-              <div className="text-solaris-muted text-xs mt-1">Always On — No Sleep, No Breaks</div>
+              <div className="text-solaris-muted text-xs mt-1">{tx.uptimeSub}</div>
             </div>
           </div>
         </ScrollFadeUp>
@@ -127,7 +127,7 @@ const AITeamSection = () => {
                       meshTitleKey={`aiTeam|counter|dept|${dept.id}`}
                     />
                   </div>
-                  <div className="hud-label text-[10px] mt-0.5">AGENTS</div>
+                  <div className="hud-label text-[10px] mt-0.5">{tx.agentsLabel}</div>
                 </div>
 
                 {/* Role + unique skill vectors (expandable) */}
@@ -154,7 +154,7 @@ const AITeamSection = () => {
                         </summary>
                         <div className="border-t border-white/[0.06] px-2 pb-2 pt-2 space-y-2">
                           <div className="text-[8px] font-mono uppercase tracking-wider text-solaris-muted/80">
-                            Curated genes
+                            {tx.curatedGenesLabel}
                           </div>
                           <div className="flex flex-wrap gap-1">
                             {role.skills.map((skill, geneIdx) => (
@@ -186,7 +186,9 @@ const AITeamSection = () => {
         <div className="mt-10">
           <div className="flex items-center gap-3 mb-4">
             <Brain className="w-4 h-4 text-solaris-gold" />
-            <span className="hud-label text-solaris-gold">AGENTS TALKING · LEARNING · SOLVING — RIGHT NOW</span>
+            <span className="hud-label text-solaris-gold">
+              {tx.liveActivityKicker}
+            </span>
           </div>
           {/* Live cumulative stats */}
           <div className="mb-4">
@@ -208,11 +210,11 @@ const AITeamSection = () => {
             <TrendingUp className="w-6 h-6 text-solaris-gold" />
           </div>
           <div>
-            <div className="hud-label text-solaris-gold mb-1">COMPETITIVE PARITY</div>
+            <div className="hud-label text-solaris-gold mb-1">{tx.competitiveParityKicker}</div>
             <p className="text-solaris-muted text-sm leading-relaxed">
-              Fortune 500 companies deploy 100,000–300,000 employees — increasingly augmented by AI.
-              Solaris CET matches that scale with <span className="text-solaris-text font-semibold">200,000 autonomous agents</span>:
-              zero HR overhead, zero downtime, infinite parallelism.
+              {tx.competitiveParityLead}
+              <span className="text-solaris-text font-semibold">{tx.competitiveParityHighlight}</span>
+              {tx.competitiveParityTail}
             </p>
           </div>
         </div>

@@ -35,7 +35,7 @@ const PHYSICAL_ASSET_PLACEHOLDER_BG =
       <rect fill="url(#grain)" width="1920" height="800"/>
       <ellipse cx="960" cy="620" rx="900" ry="120" fill="rgba(16,185,129,0.08)"/>
       <text x="960" y="380" text-anchor="middle" fill="rgba(242,201,76,0.22)" font-family="ui-sans-serif,system-ui,sans-serif" font-size="22" font-weight="700">Cetățuia, Romania</text>
-      <text x="960" y="420" text-anchor="middle" fill="rgba(148,163,184,0.45)" font-family="ui-monospace,monospace" font-size="14">Cetățuia, Romania · agricultural land</text>
+      <text x="960" y="420" text-anchor="middle" fill="rgba(148,163,184,0.45)" font-family="ui-monospace,monospace" font-size="14">Cetățuia, România · teren agricol</text>
     </svg>`
   );
 
@@ -104,10 +104,32 @@ const RWA_PILLARS = [
  */
 const RwaSection = () => {
   const { t } = useLanguage();
+  const tx = t.rwaSectionUi;
+  const cx = t.rwaContentUi;
   const prefersReducedMotion = useReducedMotion();
   const physicalBgRef = useRef<HTMLDivElement | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(RWA_PROJECTS[0]?.id ?? null);
   const [physicalAssetPhotoUrl, setPhysicalAssetPhotoUrl] = useState<string | null>(null);
+
+  const rwaStats = useMemo(() => {
+    return [
+      { ...RWA_STATS[0], label: cx.stats.locationLabel, value: cx.stats.locationValue },
+      { ...RWA_STATS[1], label: cx.stats.assetClassLabel, value: cx.stats.assetClassValue },
+      { ...RWA_STATS[2], label: cx.stats.aiIntegrationLabel, value: cx.stats.aiIntegrationValue },
+      { ...RWA_STATS[3], label: cx.stats.onChainProofLabel, value: cx.stats.onChainProofValue },
+      { ...RWA_STATS[4], label: cx.stats.yieldTypeLabel, value: cx.stats.yieldTypeValue },
+      { ...RWA_STATS[5], label: cx.stats.tokenLayerLabel, value: cx.stats.tokenLayerValue },
+    ];
+  }, [cx.stats]);
+
+  const rwaPillars = useMemo(() => {
+    return [
+      { ...RWA_PILLARS[0], title: cx.pillars.tangibleTitle, description: cx.pillars.tangibleDescription },
+      { ...RWA_PILLARS[1], title: cx.pillars.transparencyTitle, description: cx.pillars.transparencyDescription },
+      { ...RWA_PILLARS[2], title: cx.pillars.aiYieldTitle, description: cx.pillars.aiYieldDescription },
+      { ...RWA_PILLARS[3], title: cx.pillars.scarcityTitle, description: cx.pillars.scarcityDescription },
+    ];
+  }, [cx.pillars]);
 
   const selectedProject = useMemo(() => {
     return RWA_PROJECTS.find((p) => p.id === selectedProjectId) ?? RWA_PROJECTS[0] ?? null;
@@ -168,9 +190,11 @@ const RwaSection = () => {
   }, [prefersReducedMotion]);
 
   const ipfsCid = useMemo(() => ipfsCidFromUrl(PUBLIC_WHITEPAPER_IPFS_URL), []);
-  const mapsQuery = useMemo(() => encodeURIComponent(selectedProject?.region ?? 'Cetățuia, Romania'), [selectedProject]);
+  const proofCid = ipfsCid ?? 'bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a';
+  const mapsQuery = useMemo(() => encodeURIComponent(selectedProject?.region ?? tx.physicalLocationName), [selectedProject, tx.physicalLocationName]);
   const mapsEmbedUrl = useMemo(() => `https://www.google.com/maps?q=${mapsQuery}&output=embed`, [mapsQuery]);
   const mapsOpenUrl = useMemo(() => `https://www.google.com/maps?q=${mapsQuery}`, [mapsQuery]);
+  const verifiedBodyParts = useMemo(() => tx.verifiedBody.split('{cid}'), [tx.verifiedBody]);
 
   return (
     <section
@@ -189,16 +213,14 @@ const RwaSection = () => {
             <div className="w-10 h-10 rounded-xl bg-emerald-400/10 flex items-center justify-center">
               <Leaf className="w-5 h-5 text-emerald-400" />
             </div>
-            <span className="hud-label text-emerald-400">REAL WORLD ASSETS · RWA</span>
+            <span className="hud-label text-emerald-400">{tx.kicker}</span>
           </div>
           <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text mb-4">
-            Grounded in{' '}
-            <span className="text-gradient-gold">Real Land</span>
+            {tx.titleLead}{' '}
+            <span className="text-gradient-gold">{tx.titleAccent}</span>
           </h2>
           <p className="text-solaris-muted text-base lg:text-lg leading-relaxed max-w-2xl">
-            Solaris CET is the only AI token backed by physical real-world assets.
-            Productive agricultural land in Cetățuia, Romania — managed by 200,000 AI agents —
-            provides structural backing that no competitor can replicate.
+            {tx.subtitle}
           </p>
         </ScrollFadeUp>
 
@@ -223,56 +245,54 @@ const RwaSection = () => {
               <div className="w-10 h-10 rounded-xl bg-emerald-400/15 border border-emerald-400/25 flex items-center justify-center">
                 <Landmark className="w-5 h-5 text-emerald-300" aria-hidden="true" />
               </div>
-              <span className="hud-label text-emerald-300/90">PHYSICAL ASSET · LAND ANCHOR</span>
+              <span className="hud-label text-emerald-300/90">
+                {tx.physicalKicker}
+              </span>
             </div>
             <h3
               id="physical-asset-heading"
               className="font-display font-bold text-2xl md:text-3xl text-white mb-4 drop-shadow-sm"
             >
-              The token is tied to{' '}
-              <span className="text-emerald-300">real soil</span>, not screens
+              {tx.physicalHeadingLead} <span className="text-emerald-300">{tx.physicalHeadingAccent}</span>,{' '}
+              {tx.physicalHeadingTail}
             </h3>
             <p className="text-solaris-muted text-sm md:text-base leading-relaxed mb-3">
-              CET is designed as a claim on productive agricultural land in{' '}
-              <strong className="text-solaris-text font-semibold">Cetățuia, Romania</strong>
-              — the same jurisdiction and asset class referenced in RWA documentation. Each unit in the 9,000 CET supply maps to a
-              fractional economic interest in that land-backed stack: crop yield, verified operations, and on-chain attestations
-              (IPFS + TON) are the bridge between the token and the field.
+              {tx.physicalBodyPrefix} <strong className="text-solaris-text font-semibold">{tx.physicalLocationName}</strong>{' '}
+              {tx.physicalBodySuffix}
             </p>
             <p className="text-emerald-200/85 text-sm md:text-[15px] leading-relaxed border-l-2 border-emerald-400/40 pl-4">
-              This is structural backing: the project is not &ldquo;digital air&rdquo; — it is explicitly anchored in a named
-              location and a tangible asset class you can verify independently.
+              {tx.physicalQuote}
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-2">
               <a
                 href={TONSCAN_CET_CONTRACT_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1.5 text-[11px] font-mono text-emerald-200 hover:bg-emerald-400/15 transition-colors"
+                className="inline-flex items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1.5 text-[11px] font-mono text-emerald-200 hover:bg-emerald-400/15 transition-colors btn-quantum"
               >
                 <Wallet className="h-3.5 w-3.5" aria-hidden="true" />
-                TON contract
+                {tx.chipTonContract}
                 <ExternalLink className="h-3.5 w-3.5 opacity-80" aria-hidden="true" />
               </a>
               <a
                 href={DEDUST_POOL_PAGE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-solaris-gold/25 bg-solaris-gold/10 px-3 py-1.5 text-[11px] font-mono text-solaris-gold hover:bg-solaris-gold/15 transition-colors"
+                className="inline-flex items-center gap-2 rounded-full border border-solaris-gold/25 bg-solaris-gold/10 px-3 py-1.5 text-[11px] font-mono text-solaris-gold hover:bg-solaris-gold/15 transition-colors btn-quantum"
               >
                 <Shield className="h-3.5 w-3.5" aria-hidden="true" />
-                DeDust pool
+                {tx.chipDedustPool}
                 <ExternalLink className="h-3.5 w-3.5 opacity-80" aria-hidden="true" />
               </a>
               <a
                 href={PUBLIC_WHITEPAPER_IPFS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-mono text-solaris-text hover:bg-white/10 transition-colors"
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-mono text-solaris-text hover:bg-white/10 transition-colors btn-quantum"
                 title={ipfsCid ? `CID: ${ipfsCid}` : undefined}
               >
                 <Fingerprint className="h-3.5 w-3.5" aria-hidden="true" />
-                IPFS proof
+                {tx.chipIpfsProof}
                 <span className="text-solaris-muted">{ipfsCid ? ipfsCid.slice(0, 10) + '…' : ''}</span>
                 <ExternalLink className="h-3.5 w-3.5 opacity-80" aria-hidden="true" />
               </a>
@@ -283,7 +303,7 @@ const RwaSection = () => {
 
         {/* Stats grid */}
         <ScrollStaggerFadeUp className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
-          {RWA_STATS.map(stat => {
+          {rwaStats.map(stat => {
             const Icon = stat.icon;
             return (
               <div key={stat.label} className={`rwa-stat bento-card p-5 border ${stat.border} flex items-center gap-4`}>
@@ -316,7 +336,10 @@ const RwaSection = () => {
                 onSelectProject={setSelectedProjectId}
               />
             </div>
-            <aside className="lg:col-span-4 bento-card border border-white/10 p-6 shadow-depth" aria-label="RWA project details">
+            <aside
+              className="lg:col-span-4 bento-card border border-white/10 p-6 shadow-depth"
+              aria-label={tx.asideAria}
+            >
               {selectedProject ? (
                 <>
                   <div className="flex items-start justify-between gap-3">
@@ -335,11 +358,15 @@ const RwaSection = () => {
 
                   <dl className="mt-5 space-y-3">
                     <div className="flex items-center justify-between gap-3">
-                      <dt className="text-[10px] font-mono uppercase tracking-widest text-solaris-muted">Region</dt>
+                      <dt className="text-[10px] font-mono uppercase tracking-widest text-solaris-muted">
+                        {tx.asideRegion}
+                      </dt>
                       <dd className="text-xs text-solaris-text">{selectedProject.region}</dd>
                     </div>
                     <div className="flex items-center justify-between gap-3">
-                      <dt className="text-[10px] font-mono uppercase tracking-widest text-solaris-muted">Type</dt>
+                      <dt className="text-[10px] font-mono uppercase tracking-widest text-solaris-muted">
+                        {tx.asideType}
+                      </dt>
                       <dd className="text-xs text-solaris-text">{selectedProject.projectType.replace(/_/g, ' ')}</dd>
                     </div>
                   </dl>
@@ -347,41 +374,41 @@ const RwaSection = () => {
                   <div className="mt-6 flex flex-col gap-3">
                     <a
                       href="#documente"
-                      className="inline-flex min-h-11 items-center justify-center rounded-xl bg-solaris-gold/10 border border-solaris-gold/30 text-solaris-gold text-sm font-semibold hover:bg-solaris-gold/20 transition-colors"
+                      className="inline-flex min-h-11 items-center justify-center rounded-xl bg-solaris-gold/10 border border-solaris-gold/30 text-solaris-gold text-sm font-semibold hover:bg-solaris-gold/20 transition-colors btn-quantum"
                     >
-                      Jump to documents
+                      {tx.asideJumpDocs}
                     </a>
                     <a
                       href={selectedTimeline[0] ? `#milestone-${selectedTimeline[0].slug}` : '#rwa'}
-                      className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-solaris-text text-sm font-semibold hover:bg-white/10 transition-colors"
+                      className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-solaris-text text-sm font-semibold hover:bg-white/10 transition-colors btn-quantum"
                     >
-                      Jump to timeline
+                      {tx.asideJumpTimeline}
                     </a>
                   </div>
 
                   <div className="mt-6 rounded-xl border border-white/10 bg-black/30 px-4 py-3">
                     <p className="text-[11px] font-mono text-solaris-muted leading-relaxed">
-                      Proof bundle: IPFS + TON references. Always verify claims against linked artifacts.
+                      {tx.asideProofBundle}
                     </p>
                   </div>
 
                   <div className="mt-6 overflow-hidden rounded-xl border border-white/10 bg-black/30">
                     <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-white/10">
                       <div className="text-[10px] font-mono uppercase tracking-widest text-solaris-muted">
-                        Map · {selectedProject?.region ?? 'Cetățuia, Romania'}
+                        {tx.asideMapTitlePrefix} · {selectedProject?.region ?? tx.physicalLocationName}
                       </div>
                       <a
                         href={mapsOpenUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[10px] font-mono text-solaris-cyan hover:text-solaris-text transition-colors"
+                        className="inline-flex items-center gap-1 text-[10px] font-mono text-solaris-cyan hover:text-solaris-text transition-colors btn-quantum"
                       >
-                        Open
+                        {tx.asideMapOpen}
                         <ExternalLink className="h-3 w-3 opacity-80" aria-hidden="true" />
                       </a>
                     </div>
                     <iframe
-                      title={`Map: ${selectedProject?.region ?? 'Cetățuia, Romania'}`}
+                      title={`${tx.asideMapTitlePrefix}: ${selectedProject?.region ?? tx.physicalLocationName}`}
                       src={mapsEmbedUrl}
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
@@ -390,7 +417,7 @@ const RwaSection = () => {
                   </div>
                 </>
               ) : (
-                <div className="text-solaris-muted text-sm">No project selected.</div>
+                <div className="text-solaris-muted text-sm">{tx.asideNoSelection}</div>
               )}
             </aside>
           </div>
@@ -398,7 +425,7 @@ const RwaSection = () => {
 
         {/* Four pillars */}
         <ScrollStaggerFadeUp className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {RWA_PILLARS.map(pillar => {
+          {rwaPillars.map(pillar => {
             const Icon = pillar.icon;
             return (
               <div key={pillar.title} className={`rwa-pillar bento-card p-6 border ${pillar.border} shadow-depth`}>
@@ -419,23 +446,22 @@ const RwaSection = () => {
               <Shield className="w-6 h-6 text-solaris-gold" />
             </div>
             <div className="flex-1">
-              <div className="hud-label text-solaris-gold mb-1">VERIFIED ON-CHAIN</div>
+              <div className="hud-label text-solaris-gold mb-1">{tx.verifiedKicker}</div>
               <p className="text-solaris-muted text-sm leading-relaxed">
-                All RWA documentation is immutably stored on IPFS and anchored to TON Layer 1.
-                The whitepaper CID{' '}
+                {verifiedBodyParts[0]}
                 <code className="text-solaris-cyan text-[11px] font-mono bg-white/5 px-1.5 py-0.5 rounded">
-                  bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a
+                  {proofCid}
                 </code>
-                {' '}is the on-chain proof of the agricultural backing.
+                {verifiedBodyParts[1] ?? ''}
               </p>
             </div>
             <a
               href="https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a"
               target="_blank"
               rel="noopener noreferrer"
-              className="shrink-0 px-5 py-2.5 rounded-xl bg-solaris-gold/10 border border-solaris-gold/30 text-solaris-gold text-sm font-semibold hover:bg-solaris-gold/20 transition-colors"
+              className="shrink-0 px-5 py-2.5 rounded-xl bg-solaris-gold/10 border border-solaris-gold/30 text-solaris-gold text-sm font-semibold hover:bg-solaris-gold/20 transition-colors btn-quantum"
             >
-              View IPFS Proof ↗
+              {tx.verifiedCta}
             </a>
           </div>
         </ScrollFadeUp>

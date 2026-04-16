@@ -1,30 +1,34 @@
 import { Calendar, ChevronDown } from 'lucide-react';
 import type { RwaTimelineEvent } from '@/lib/rwaPortfolio';
 import { timelineChipClass } from '@/lib/rwaPortfolio';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export function RwaTimelinePanel({
   events,
-  title = 'Timeline',
+  title,
 }: {
   events: readonly RwaTimelineEvent[];
   title?: string;
 }) {
+  const { t } = useLanguage();
+  const tx = t.rwaUi.timeline;
+  const resolvedTitle = title ?? tx.title;
   return (
-    <section className="bento-card border border-white/10 p-6 shadow-depth" aria-label="RWA timeline">
+    <section className="bento-card border border-white/10 p-6 shadow-depth" aria-label={tx.ariaLabel}>
       <div className="flex items-start justify-between gap-4 mb-5">
         <div>
-          <h3 className="font-display font-bold text-base text-solaris-text">{title}</h3>
+          <h3 className="font-display font-bold text-base text-solaris-text">{resolvedTitle}</h3>
           <p className="text-solaris-muted text-sm mt-1 max-w-2xl">
-            Milestones are linked for deep navigation and can be expanded for details.
+            {tx.subtitle}
           </p>
         </div>
         <div className="hidden sm:flex items-center gap-2 text-[10px] font-mono text-solaris-muted">
           <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400/80" aria-hidden="true" />
-          COMPLETE
+          {tx.legendComplete}
           <span className="inline-flex h-2 w-2 rounded-full bg-amber-300/80 ml-3" aria-hidden="true" />
-          ACTIVE
+          {tx.legendActive}
           <span className="inline-flex h-2 w-2 rounded-full bg-cyan-300/80 ml-3" aria-hidden="true" />
-          PLANNED
+          {tx.legendPlanned}
         </div>
       </div>
 
@@ -73,4 +77,3 @@ export function RwaTimelinePanel({
     </section>
   );
 }
-

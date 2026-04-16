@@ -30,7 +30,7 @@ const AgentBridge = () => {
   const NODE_STYLE = 'bento-card p-5 text-center min-w-[130px] lg:min-w-[160px] flex flex-col items-center gap-2';
 
   return (
-    <div ref={containerRef} className="relative w-full py-6">
+    <div ref={containerRef} className="relative w-full py-6 pointer-events-none">
       <div className="flex items-center justify-between gap-3 max-w-3xl mx-auto">
 
         {/* ── Left node: 200k Agents ── */}

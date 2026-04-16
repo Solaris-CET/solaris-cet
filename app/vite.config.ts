@@ -304,7 +304,7 @@ export default defineConfig({
     },
     cssCodeSplit: true,
     sourcemap: true,
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 1600,
   },
   resolve: {
     alias: {

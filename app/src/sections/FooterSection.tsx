@@ -30,6 +30,7 @@ const socialLinks = [
 
 const FooterSection = () => {
   const { t } = useLanguage();
+  const tx = t.footerUi;
   const proof = useCommunityProof();
   /** Stable `key`s for React (not translated labels). Privacy + Terms share `href` so we cannot key by URL alone. */
   const footerLinks = [
@@ -75,21 +76,21 @@ const FooterSection = () => {
         cache: 'no-store',
       });
       if (res.ok) {
-        toast.success('Added to waitlist');
+        toast.success(tx.waitlistAdded);
         setWaitlistEmail('');
         return;
       }
       const payload = (await res.json().catch(() => null)) as { error?: unknown } | null;
-      const error = typeof payload?.error === 'string' ? payload.error : 'Waitlist unavailable';
+      const error = typeof payload?.error === 'string' ? payload.error : tx.waitlistUnavailable;
       if (res.status === 503) {
-        window.location.href = `mailto:?subject=${encodeURIComponent('Solaris CET Waitlist')}&body=${encodeURIComponent(
-          `Please add this email to the Solaris CET waitlist: ${email}`,
+        window.location.href = `mailto:?subject=${encodeURIComponent(tx.mailtoSubject)}&body=${encodeURIComponent(
+          tx.mailtoBody.replace('{email}', email),
         )}`;
         return;
       }
       toast.error(error);
     } catch {
-      toast.error('Waitlist unavailable');
+      toast.error(tx.waitlistUnavailable);
     } finally {
       setWaitlistBusy(false);
     }
@@ -111,33 +112,35 @@ const FooterSection = () => {
             <div className="relative z-10">
               <div className="hud-label text-solaris-gold mb-4 flex items-center justify-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-solaris-gold animate-pulse" />
-                AI BRIDGE TO HIGH INTELLIGENCE
+                {tx.kicker}
               </div>
               <h2 className="font-display font-bold text-[clamp(28px,3.5vw,44px)] text-solaris-text mb-4">
-                Start mining in <span className="text-gradient-gold">minutes</span>.
+                {tx.headlineLead}
+                <span className="text-gradient-gold">{tx.headlineAccent}</span>
+                {tx.headlineTail}
               </h2>
               <p className="text-solaris-muted text-base lg:text-lg mb-8 max-w-lg mx-auto">
-                Download the Solaris CET App. Connect a wallet. Begin earning on the bridge between current AI and High Intelligence.
+                {tx.subtitle}
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <a
                   href="https://t.me/+tKlfzx7IWopmNWQ0"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-filled-gold flex items-center gap-2 group"
+                  className="btn-filled-gold flex items-center gap-2 group btn-quantum"
                 >
                   <Download className="w-4 h-4" />
-                  Start Mining on Telegram
+                  {tx.ctaTelegramMining}
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </a>
                 <a
                   href={WHITEPAPER_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-gold flex items-center gap-2"
+                  className="btn-gold flex items-center gap-2 btn-quantum"
                 >
                   <FileText className="w-4 h-4" />
-                  Read the Whitepaper
+                  {tx.ctaWhitepaper}
                 </a>
               </div>
             </div>
@@ -148,22 +151,23 @@ const FooterSection = () => {
         <TeamFlipCard
           className="mb-6"
           initials="CB"
-          role="FOUNDER & CREATOR"
+          role={tx.founderRole}
           name="Claudiu Ciprian Balaban"
-          bio="Visionary behind Solaris CET · AI & Blockchain Strategist · Bridge between High Intelligence and decentralized finance on TON."
+          bio={tx.founderBio}
           linkedinUrl="https://www.linkedin.com/in/claudiu-ciprian-balaban-76ab8a394/"
         />
 
         {/* Contract address */}
         <div className="bento-card p-4 mb-3 flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <div className="hud-label text-[10px] mb-1">CET Contract Address (TON)</div>
+            <div className="hud-label text-[10px] mb-1">{tx.contractLabel}</div>
             <div className="font-mono text-xs text-solaris-muted truncate">{CET_CONTRACT_ADDRESS}</div>
           </div>
           <button
             onClick={handleCopyContract}
             className="shrink-0 p-2 rounded-lg bg-white/5 hover:bg-solaris-gold/10 transition-all duration-200"
             aria-label={t.sectionAria.copyCetAddress}
+            type="button"
           >
             {copiedContract
               ? <CheckCircle className="w-4 h-4 text-emerald-400" />
@@ -191,6 +195,7 @@ const FooterSection = () => {
             onClick={handleCopyPool}
             className="shrink-0 p-2 rounded-lg bg-white/5 hover:bg-solaris-gold/10 transition-all duration-200"
             aria-label={t.sectionAria.copyDedustPool}
+            type="button"
           >
             {copiedPool
               ? <CheckCircle className="w-4 h-4 text-emerald-400" />
@@ -206,10 +211,14 @@ const FooterSection = () => {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Send className="w-4 h-4 text-solaris-cyan" />
-                <span className="hud-label text-solaris-cyan">Join the Community</span>
+                <span className="hud-label text-solaris-cyan">{tx.communityKicker}</span>
               </div>
-              <p className="text-solaris-text">Get live updates, talk to the team, and follow the 200,000-agent build in real time.</p>
-              <p className="text-solaris-muted text-xs mt-1">Telegram · Free · No spam · Instant access</p>
+              <p className="text-solaris-text">
+                {tx.communityBody}
+              </p>
+              <p className="text-solaris-muted text-xs mt-1">
+                {tx.communityMeta}
+              </p>
               <div className="mt-5 grid grid-cols-2 gap-3 max-w-sm">
                 <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
                   <div className="flex items-center justify-between gap-2 mb-2">
@@ -259,19 +268,19 @@ const FooterSection = () => {
                 href="https://t.me/SolarisCET"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-solaris-cyan/10 border border-solaris-cyan/30 text-solaris-cyan font-semibold text-sm hover:bg-solaris-cyan/20 transition-all duration-200 active:scale-95"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-solaris-cyan/10 border border-solaris-cyan/30 text-solaris-cyan font-semibold text-sm hover:bg-solaris-cyan/20 transition-all duration-200 active:scale-95 btn-quantum"
               >
                 <Send className="w-4 h-4" />
-                Join Telegram Channel
+                {tx.ctaTelegramChannel}
               </a>
               <a
                 href="https://t.me/+tKlfzx7IWopmNWQ0"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-solaris-gold/10 border border-solaris-gold/30 text-solaris-gold font-semibold text-sm hover:bg-solaris-gold/20 transition-all duration-200 active:scale-95"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-solaris-gold/10 border border-solaris-gold/30 text-solaris-gold font-semibold text-sm hover:bg-solaris-gold/20 transition-all duration-200 active:scale-95 btn-quantum"
               >
                 <Zap className="w-4 h-4" />
-                Start Mining Bot
+                {tx.ctaMiningBot}
               </a>
             </div>
           </div>
@@ -284,10 +293,14 @@ const FooterSection = () => {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <ArrowRight className="w-4 h-4 text-solaris-gold" aria-hidden />
-                  <span className="hud-label text-solaris-gold">Email Waitlist</span>
+                  <span className="hud-label text-solaris-gold">{tx.emailWaitlistKicker}</span>
                 </div>
-                <p className="text-solaris-text">Get product drops and important announcements by email.</p>
-                <p className="text-solaris-muted text-xs mt-1">If the endpoint is not configured, we open your mail client as fallback.</p>
+                <p className="text-solaris-text">
+                  {tx.emailWaitlistBody}
+                </p>
+                <p className="text-solaris-muted text-xs mt-1">
+                  {tx.emailWaitlistFallback}
+                </p>
               </div>
               <form
                 className="flex flex-col sm:flex-row gap-3 shrink-0 w-full lg:w-auto"
@@ -303,16 +316,16 @@ const FooterSection = () => {
                   required
                   value={waitlistEmail}
                   onChange={(e) => setWaitlistEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  placeholder={tx.emailPlaceholder}
                   className="min-h-11 w-full sm:w-[320px] rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-solaris-text placeholder:text-solaris-muted focus:outline-none focus:ring-2 focus:ring-solaris-gold/30"
-                  aria-label="Email address"
+                  aria-label={tx.emailAria}
                 />
                 <button
                   type="submit"
-                  className="min-h-11 inline-flex items-center justify-center gap-2 rounded-xl bg-solaris-gold/10 border border-solaris-gold/30 text-solaris-gold px-5 text-sm font-semibold hover:bg-solaris-gold/20 transition-colors disabled:opacity-50"
+                  className="min-h-11 inline-flex items-center justify-center gap-2 rounded-xl bg-solaris-gold/10 border border-solaris-gold/30 text-solaris-gold px-5 text-sm font-semibold hover:bg-solaris-gold/20 transition-colors disabled:opacity-50 btn-quantum"
                   disabled={waitlistBusy}
                 >
-                  {waitlistBusy ? 'Sending…' : 'Notify me'}
+                  {waitlistBusy ? tx.emailSending : tx.emailNotify}
                   <Send className="w-4 h-4" aria-hidden />
                 </button>
               </form>
@@ -380,7 +393,7 @@ const FooterSection = () => {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             <div className="text-center lg:text-left">
               <p className="text-solaris-muted text-sm">
-                © {new Date().getFullYear()} Solaris CET. AI Bridge to High Intelligence. All rights reserved.
+                © {new Date().getFullYear()} Solaris CET. {tx.copyrightBridge} {tx.copyrightRights}
               </p>
               <p className="mt-2 font-mono text-[10px] uppercase tracking-widest text-solaris-muted/90">
                 {t.footerMeta.genesisCertification}
@@ -396,7 +409,7 @@ const FooterSection = () => {
               <div className="hidden md:block w-px h-4 bg-white/10" />
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-mono text-[11px] text-emerald-400">LIVE ON TON MAINNET</span>
+                <span className="font-mono text-[11px] text-emerald-400">{tx.liveOnTon}</span>
               </div>
             </div>
           </div>
@@ -408,7 +421,7 @@ const FooterSection = () => {
             />
           </div>
           <p className="mt-6 text-center font-mono text-[10px] tracking-[0.3em] uppercase text-white/20 hover:text-solaris-gold/90 transition-all duration-700 cursor-default select-none">
-            Architected by Claudiu
+            {tx.architectedBy}
           </p>
         </footer>
         </ScrollFadeUp>

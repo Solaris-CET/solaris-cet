@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Activity, Layers, Cpu, Globe, Lock, TrendingUp } from 'lucide-react';
 import GlowOrbs from '../components/GlowOrbs';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
@@ -19,68 +19,70 @@ interface LiveStat {
   description: string;
 }
 
-const LIVE_STATS: LiveStat[] = [
-  {
-    label: 'Blocks Processed',
-    base: 48_291_047,
-    perSecond: 5,
-    unit: '',
-    icon: Layers,
-    color: 'text-solaris-cyan',
-    border: 'border-solaris-cyan/20',
-    description: 'TON mainnet blocks since genesis',
-  },
-  {
-    label: 'Transactions',
-    base: 2_841_903_512,
-    perSecond: 120,
-    unit: '',
-    icon: Activity,
-    color: 'text-solaris-gold',
-    border: 'border-solaris-gold/20',
-    description: 'Total TON network transactions',
-  },
-  {
-    label: 'Validators Active',
-    base: 340,
-    perSecond: 0,
-    unit: '',
-    icon: Lock,
-    color: 'text-emerald-400',
-    border: 'border-emerald-400/20',
-    description: 'Current TON validator set',
-  },
-  {
-    label: 'Agent Actions',
-    base: 12_847_293,
-    perSecond: 8.4,
-    unit: '',
-    icon: Cpu,
-    color: 'text-purple-400',
-    border: 'border-purple-400/20',
-    description: 'Cumulative on-chain CET agent actions',
-  },
-  {
-    label: 'Countries Reached',
-    base: 147,
-    perSecond: 0,
-    unit: '',
-    icon: Globe,
-    color: 'text-pink-400',
-    border: 'border-pink-400/20',
-    description: 'Nations with active CET holders',
-  },
-  {
-    label: 'Uptime',
-    base: 99.97,
-    perSecond: 0,
-    unit: '%',
-    icon: TrendingUp,
-    color: 'text-amber-400',
-    border: 'border-amber-400/20',
-    description: 'CET protocol uptime since launch',
-  },
-];
+function buildLiveStats(tx: { stats: Record<string, { label: string; description: string }> }): LiveStat[] {
+  return [
+    {
+      label: tx.stats.blocksProcessed.label,
+      base: 48_291_047,
+      perSecond: 5,
+      unit: '',
+      icon: Layers,
+      color: 'text-solaris-cyan',
+      border: 'border-solaris-cyan/20',
+      description: tx.stats.blocksProcessed.description,
+    },
+    {
+      label: tx.stats.transactions.label,
+      base: 2_841_903_512,
+      perSecond: 120,
+      unit: '',
+      icon: Activity,
+      color: 'text-solaris-gold',
+      border: 'border-solaris-gold/20',
+      description: tx.stats.transactions.description,
+    },
+    {
+      label: tx.stats.validatorsActive.label,
+      base: 340,
+      perSecond: 0,
+      unit: '',
+      icon: Lock,
+      color: 'text-emerald-400',
+      border: 'border-emerald-400/20',
+      description: tx.stats.validatorsActive.description,
+    },
+    {
+      label: tx.stats.agentActions.label,
+      base: 12_847_293,
+      perSecond: 8.4,
+      unit: '',
+      icon: Cpu,
+      color: 'text-purple-400',
+      border: 'border-purple-400/20',
+      description: tx.stats.agentActions.description,
+    },
+    {
+      label: tx.stats.countriesReached.label,
+      base: 147,
+      perSecond: 0,
+      unit: '',
+      icon: Globe,
+      color: 'text-pink-400',
+      border: 'border-pink-400/20',
+      description: tx.stats.countriesReached.description,
+    },
+    {
+      label: tx.stats.uptime.label,
+      base: 99.97,
+      perSecond: 0,
+      unit: '%',
+      icon: TrendingUp,
+      color: 'text-amber-400',
+      border: 'border-amber-400/20',
+      description: tx.stats.uptime.description,
+    },
+  ];
+}
 
 function formatLive(n: number, unit: string): string {
   if (unit === '%') return `${n.toFixed(2)}%`;
@@ -97,7 +99,9 @@ function formatLive(n: number, unit: string): string {
  * Stats increment every second to show a living, breathing network.
  */
 const NetworkPulseSection = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const tx = t.networkPulseUi;
+  const LIVE_STATS = useMemo(() => buildLiveStats(tx), [tx]);
 
   const [counts, setCounts] = useState<number[]>(LIVE_STATS.map(s => s.base));
   const [pulse, setPulse]   = useState(false);
@@ -109,7 +113,7 @@ const NetworkPulseSection = () => {
       setPulse(p => !p);
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [LIVE_STATS]);
 
   return (
     <section
@@ -130,19 +134,22 @@ const NetworkPulseSection = () => {
             <div className="flex items-center gap-3 mb-3">
               <div className={`w-2.5 h-2.5 rounded-full bg-emerald-400 transition-opacity duration-500 ${pulse ? 'opacity-100' : 'opacity-40'}`}
                    style={{ boxShadow: '0 0 8px #10b981' }} />
-              <span className="hud-label text-emerald-400">NETWORK LIVE · REAL-TIME DATA</span>
+              <span className="hud-label text-emerald-400">
+                {tx.kicker}
+              </span>
             </div>
             <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text">
-              TON Network{' '}
-              <span className="text-gradient-cyan">Pulse</span>
+              {tx.titleLead} <span className="text-gradient-cyan">{tx.titleHighlight}</span> {tx.titleTail}
             </h2>
             <p className="text-solaris-muted text-base mt-2 max-w-xl">
-              Solaris CET rides the world&apos;s fastest L1. Every number below reflects a network that never sleeps.
+              {tx.subtitle}
             </p>
           </div>
           <div className="bento-card px-5 py-3 border border-emerald-400/20 flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-emerald-400 font-mono text-xs font-bold">MAINNET · BLOCK #{Math.floor(counts[0]).toLocaleString()}</span>
+            <span className="text-emerald-400 font-mono text-xs font-bold">
+              {tx.mainnetBlockLabel.replace('{block}', Math.floor(counts[0]).toLocaleString(lang))}
+            </span>
           </div>
         </ScrollFadeUp>
 
@@ -199,7 +206,7 @@ const NetworkPulseSection = () => {
 
         {/* Bottom note */}
         <p className="text-solaris-muted/40 text-[11px] font-mono text-center mt-6">
-          * Block and transaction counts are extrapolated from public TON network data (avg ~5 blocks/s, ~120 txns/s since genesis). Agent action counts start from the verified Q1 2026 milestone baseline. Validator count and uptime are observed mainnet values.
+          {tx.footnote}
         </p>
 
       </div>
