@@ -10,6 +10,7 @@ import { SolarisLogoMark } from './components/SolarisLogoMark';
 import CursorGlow from './components/CursorGlow';
 import { InteractionEffectsManager } from '@/components/InteractionEffectsManager';
 import { CinematicBackground } from '@/components/CinematicBackground';
+import RouteSignatureLayer from './components/RouteSignatureLayer';
 import BackToTop from './components/BackToTop';
 import MobileConversionDock from './components/MobileConversionDock';
 import PwaInstallPrompt from './components/PwaInstallPrompt';
@@ -305,6 +306,7 @@ function AppContent() {
         inert={!isLoaded ? true : undefined}
       >
         <CinematicBackground />
+        <RouteSignatureLayer routePath={routePath} />
 
         {/* Ambient solar glow — fixed, behind sections */}
         <div

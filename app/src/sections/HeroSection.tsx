@@ -4,6 +4,7 @@ import { ShieldCheck, TrendingUp, CheckCircle, ChevronDown, FileText } from 'luc
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useLanguage } from '../hooks/useLanguage';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useSessionSeed } from '@/hooks/useSessionSeed';
 import { formatCetSupplyWithSuffix, formatTaskAgentMeshHeadline } from '@/lib/numerals';
 import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '../components/ui/tooltip';
 import { TonConnectButton } from '@tonconnect/ui-react';
@@ -69,6 +70,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
   const prefersReducedMotion = useReducedMotion();
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const isMobile = useMediaQuery('(max-width: 767px)');
+  const signatureSeed = useSessionSeed('heroHologram');
   const { t, lang } = useLanguage();
   const pool = useLivePoolData();
   const community = useCommunityProof();
@@ -233,7 +235,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
         </div>
 
         <Suspense fallback={null}>
-          {enableHologram ? <HeroTokenHologram quality={holoQuality ?? undefined} /> : null}
+          {enableHologram ? (
+            <HeroTokenHologram quality={holoQuality ?? undefined} seed={signatureSeed} />
+          ) : null}
         </Suspense>
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 flex flex-col gap-12 lg:gap-16 pt-12 md:pt-16">

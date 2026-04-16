@@ -1,6 +1,7 @@
 import { memo, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { clamp01, mulberry32 } from '@/lib/seed';
 
 type Quality = 'low' | 'high';
 
@@ -90,20 +91,26 @@ void main() {
 }
 `;
 
-function makeMaterial(quality: Quality) {
-  const colorA = new THREE.Color('#7CF7FF');
-  const colorB = new THREE.Color('#F2C94C');
+function makeMaterial(quality: Quality, seed: number) {
+  const rand = mulberry32(Math.floor(seed * 4294967295) >>> 0);
+  const hueShift = (rand() - 0.5) * (quality === 'high' ? 0.08 : 0.05);
+  const satA = clamp01(0.62 + (rand() - 0.5) * 0.18);
+  const satB = clamp01(0.68 + (rand() - 0.5) * 0.18);
+  const lumA = clamp01(0.72 + (rand() - 0.5) * 0.12);
+  const lumB = clamp01(0.6 + (rand() - 0.5) * 0.12);
+  const colorA = new THREE.Color().setHSL(0.52 + hueShift, satA, lumA);
+  const colorB = new THREE.Color().setHSL(0.12 + hueShift * 0.6, satB, lumB);
   const uniforms = {
     uTime: { value: 0 },
     uColorA: { value: colorA },
     uColorB: { value: colorB },
     uPointer: { value: new THREE.Vector2(0, 0) },
     uOpacity: { value: quality === 'high' ? 0.85 : 0.72 },
-    uScanDensity: { value: quality === 'high' ? 110 : 80 },
-    uScanSpeed: { value: quality === 'high' ? 0.9 : 0.7 },
-    uNoiseAmount: { value: quality === 'high' ? 0.22 : 0.16 },
-    uFresnelPow: { value: quality === 'high' ? 3.2 : 2.6 },
-    uGlitch: { value: quality === 'high' ? 0.65 : 0.3 },
+    uScanDensity: { value: (quality === 'high' ? 110 : 80) * (0.92 + rand() * 0.18) },
+    uScanSpeed: { value: (quality === 'high' ? 0.9 : 0.7) * (0.92 + rand() * 0.18) },
+    uNoiseAmount: { value: (quality === 'high' ? 0.22 : 0.16) * (0.9 + rand() * 0.22) },
+    uFresnelPow: { value: (quality === 'high' ? 3.2 : 2.6) * (0.9 + rand() * 0.22) },
+    uGlitch: { value: (quality === 'high' ? 0.65 : 0.3) * (0.85 + rand() * 0.3) },
     uPulse: { value: 0 },
   };
 
@@ -119,11 +126,13 @@ function makeMaterial(quality: Quality) {
 
 export function HologramToken({
   quality,
+  seed,
 }: {
   quality: Quality;
+  seed: number;
 }) {
   const groupRef = useRef<THREE.Group>(null);
-  const mat = useMemo(() => makeMaterial(quality), [quality]);
+  const mat = useMemo(() => makeMaterial(quality, seed), [quality, seed]);
 
   useFrame((state, delta) => {
     const g = groupRef.current;
@@ -149,26 +158,31 @@ export function HologramToken({
 
 export function EntanglementLines({
   quality,
+  seed,
 }: {
   quality: Quality;
+  seed: number;
 }) {
   const linesRef = useRef<THREE.LineSegments>(null);
   const { geometry, material } = useMemo(() => {
-    const count = quality === 'high' ? 240 : 120;
-    const points = quality === 'high' ? 140 : 90;
-    let seed = ((count + points) * 2654435761) ^ 0x1b873593;
-    const rand = () => {
-      seed |= 0;
-      seed = (seed + 0x6d2b79f5) | 0;
-      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    const seedRng = mulberry32(Math.floor(seed * 4294967295) >>> 0);
+    const countBase = quality === 'high' ? 240 : 120;
+    const pointsBase = quality === 'high' ? 140 : 90;
+    const count = Math.max(60, Math.floor(countBase * (0.85 + seedRng() * 0.35)));
+    const points = Math.max(40, Math.floor(pointsBase * (0.85 + seedRng() * 0.35)));
+    let seed2 = ((count + points) * 2654435761) ^ 0x1b873593;
+    const rand2 = () => {
+      seed2 |= 0;
+      seed2 = (seed2 + 0x6d2b79f5) | 0;
+      let t = Math.imul(seed2 ^ (seed2 >>> 15), 1 | seed2);
       t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
     const cloud: THREE.Vector3[] = [];
     for (let i = 0; i < points; i += 1) {
-      const r = 1.15 + rand() * 2.0;
-      const theta = rand() * Math.PI * 2;
-      const phi = Math.acos(2 * rand() - 1);
+      const r = 1.15 + rand2() * 2.0;
+      const theta = rand2() * Math.PI * 2;
+      const phi = Math.acos(2 * rand2() - 1);
       cloud.push(
         new THREE.Vector3(
           r * Math.sin(phi) * Math.cos(theta),
@@ -179,8 +193,8 @@ export function EntanglementLines({
     }
     const positions = new Float32Array(count * 2 * 3);
     for (let i = 0; i < count; i += 1) {
-      const a = cloud[Math.floor(rand() * cloud.length)];
-      const b = cloud[Math.floor(rand() * cloud.length)];
+      const a = cloud[Math.floor(rand2() * cloud.length)];
+      const b = cloud[Math.floor(rand2() * cloud.length)];
       positions[i * 6 + 0] = a.x;
       positions[i * 6 + 1] = a.y;
       positions[i * 6 + 2] = a.z;
@@ -190,15 +204,17 @@ export function EntanglementLines({
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const hue = 0.52 + (seedRng() - 0.5) * 0.08;
+    const col = new THREE.Color().setHSL(hue, 0.75, 0.7);
     const m = new THREE.LineBasicMaterial({
-      color: new THREE.Color('#7CF7FF'),
+      color: col,
       transparent: true,
       opacity: quality === 'high' ? 0.18 : 0.12,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
     return { geometry: g, material: m };
-  }, [quality]);
+  }, [quality, seed]);
 
   useFrame((state) => {
     const l = linesRef.current;

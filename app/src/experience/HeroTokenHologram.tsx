@@ -67,7 +67,7 @@ function AgentsMesh({ count, pointerScale }: { count: number; pointerScale: numb
   return <points ref={pointsRef} geometry={geometry} material={material} />;
 }
 
-function HeroTokenHologram({ quality = 'high' }: { quality?: HologramQuality }) {
+function HeroTokenHologram({ quality = 'high', seed = 0.5 }: { quality?: HologramQuality; seed?: number }) {
   const [dpr, setDpr] = useState<number | [number, number]>(quality === 'high' ? [1, 1.6] : 1);
   const caOffset = useMemo(
     () => (quality === 'high' ? new THREE.Vector2(0.0011, 0.0007) : new THREE.Vector2(0, 0)),
@@ -118,8 +118,8 @@ function HeroTokenHologram({ quality = 'high' }: { quality?: HologramQuality }) 
         <fog attach="fog" args={['#020512', 2.8, 9]} />
         <AgentsMesh count={agentCount} pointerScale={pointerScale} />
         <Float speed={1.05} rotationIntensity={0.35} floatIntensity={0.35}>
-          <EntanglementLines quality={quality} />
-          <HologramToken quality={quality} />
+          <EntanglementLines quality={quality} seed={seed} />
+          <HologramToken quality={quality} seed={seed} />
         </Float>
         <EffectComposer multisampling={0}>
           <Bloom
