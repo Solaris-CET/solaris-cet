@@ -1,4 +1,4 @@
-import { memo, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Environment, Float, PerformanceMonitor } from '@react-three/drei';
 import { Bloom, ChromaticAberration, EffectComposer, Noise, Vignette } from '@react-three/postprocessing';
@@ -12,6 +12,7 @@ function AgentsMesh({ count, pointerScale }: { count: number; pointerScale: numb
   const pointsRef = useRef<THREE.Points>(null);
   const targetPointerRef = useRef(new THREE.Vector2(0, 0));
   const smoothedPointerRef = useRef(new THREE.Vector2(0, 0));
+  const scrollDriveRef = useRef(0);
   const material = useMemo(() => {
     const vertexShader = `
 uniform float uTime;
@@ -20,6 +21,7 @@ uniform float uStrength;
 uniform float uRadius;
 uniform float uTwist;
 uniform float uPointSize;
+uniform float uDrive;
 varying float vGlow;
 
 float hash13(vec3 p) {
@@ -35,12 +37,14 @@ void main() {
   float dist = length(d) + 1e-4;
   float falloff = exp(-dist * uRadius);
 
-  vec3 rep = (d / dist) * (falloff * uStrength);
-  vec3 swirl = vec3(-d.z, 0.0, d.x) * (falloff * uTwist);
+  float drive = clamp(uDrive, 0.0, 1.0);
+  float k = 0.72 + drive * 0.78;
+  vec3 rep = (d / dist) * (falloff * uStrength) * k;
+  vec3 swirl = vec3(-d.z, 0.0, d.x) * (falloff * uTwist) * (0.65 + drive * 1.05);
 
   float n = hash13(p * 2.2 + vec3(uTime * 0.05, -uTime * 0.03, uTime * 0.04));
   float wave = sin((p.y + p.x * 0.35 + p.z * 0.22) * 1.35 + uTime * 0.7) * 0.5 + 0.5;
-  vec3 jitter = normalize(p) * (n - 0.5) * 0.06 + normalize(p) * wave * 0.02;
+  vec3 jitter = normalize(p) * (n - 0.5) * (0.05 + drive * 0.06) + normalize(p) * wave * (0.015 + drive * 0.02);
 
   vec3 pp = p + rep + swirl + jitter;
 
@@ -77,6 +81,7 @@ void main() {
         uRadius: { value: 1.35 },
         uTwist: { value: 0.12 },
         uPointSize: { value: 2.35 },
+        uDrive: { value: 0 },
         uColor: { value: new THREE.Color('#7CF7FF') },
         uOpacity: { value: 0.55 },
       },
@@ -87,6 +92,32 @@ void main() {
       blending: THREE.AdditiveBlending,
     });
     return m;
+  }, []);
+
+  useEffect(() => {
+    let raf = 0;
+    let lastY = typeof window !== 'undefined' ? window.scrollY : 0;
+    let lastT = typeof performance !== 'undefined' ? performance.now() : 0;
+    const update = () => {
+      raf = 0;
+      const y = window.scrollY;
+      const t = performance.now();
+      const dy = Math.abs(y - lastY);
+      const dt = Math.max(16, t - lastT);
+      const v = dy / dt;
+      scrollDriveRef.current = Math.max(0, Math.min(1, v * 0.9));
+      lastY = y;
+      lastT = t;
+    };
+    const onScroll = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(update);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
   }, []);
 
   const geometry = useMemo(() => {
@@ -131,6 +162,9 @@ void main() {
     (m.uniforms.uPointer.value as THREE.Vector2).set(px * pointerScale, py * pointerScale);
     (m.uniforms.uStrength.value as number) = 0.32 * pointerScale;
     (m.uniforms.uTwist.value as number) = 0.12 * pointerScale;
+    const pointerMag = Math.min(1, Math.sqrt(px * px + py * py) * 1.15);
+    const drive = Math.min(1, scrollDriveRef.current + pointerMag * 0.85);
+    (m.uniforms.uDrive.value as number) = drive;
   });
 
   return <points ref={pointsRef} geometry={geometry} material={material} />;
