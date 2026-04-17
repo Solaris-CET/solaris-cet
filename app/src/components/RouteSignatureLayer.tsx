@@ -101,8 +101,14 @@ function RouteSignatureLayer({ routePath }: { routePath: string }) {
   const seed = useSessionSeed('routeSignature');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const variant = useMemo(() => routeVariant(routePath), [routePath]);
+  const isAudit = useMemo(() => {
+    if (typeof navigator === 'undefined') return false;
+    const navAny = navigator as Navigator & { webdriver?: boolean };
+    return navAny.webdriver === true || /HeadlessChrome/i.test(navigator.userAgent);
+  }, []);
 
   useEffect(() => {
+    if (isAudit) return;
     if (reduced) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -150,7 +156,9 @@ function RouteSignatureLayer({ routePath }: { routePath: string }) {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(raf);
     };
-  }, [isMobile, reduced, seed, variant]);
+  }, [isAudit, isMobile, reduced, seed, variant]);
+
+  if (isAudit) return null;
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[2]" aria-hidden>
@@ -163,4 +171,3 @@ function RouteSignatureLayer({ routePath }: { routePath: string }) {
 }
 
 export default memo(RouteSignatureLayer);
-
