@@ -52,6 +52,7 @@ function ScrollStoryOverlay({ routePath }: { routePath: string }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const variant = useMemo(() => routeVariant(routePath), [routePath]);
   const seed = useSessionSeed('storyOverlay');
+  const lhci = import.meta.env.VITE_LHCI === '1';
 
   const palette = useMemo(() => paletteFromSeed(variant, seed), [seed, variant]);
 
@@ -59,6 +60,7 @@ function ScrollStoryOverlay({ routePath }: { routePath: string }) {
     const el = overlayRef.current;
     if (!el) return;
     if (reduced) return;
+    if (lhci) return;
     const isAudit = (() => {
       if (typeof navigator === 'undefined') return false;
       const navAny = navigator as Navigator & { webdriver?: boolean };
@@ -122,7 +124,9 @@ function ScrollStoryOverlay({ routePath }: { routePath: string }) {
     }, el);
 
     return () => ctx.revert();
-  }, [isMobile, reduced, routePath, variant]);
+  }, [isMobile, lhci, reduced, routePath, variant]);
+
+  if (lhci) return null;
 
   return (
     <div

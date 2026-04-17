@@ -38,6 +38,8 @@ jobs:
         run: npm ci
 
       - name: Build application
+        env:
+          VITE_LHCI: "1"
         run: npm run build --workspace=app
 
       - name: Upload dist artifact

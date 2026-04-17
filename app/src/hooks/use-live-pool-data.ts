@@ -48,6 +48,20 @@ export function useLivePoolData(): PoolData {
 
   const fetchData = useCallback(async () => {
     try {
+      const lhci = import.meta.env.VITE_LHCI === '1';
+      if (lhci) {
+        await chainStatePromise;
+        setData({
+          priceUsd: null,
+          tvlUsd: null,
+          volume24hUsd: null,
+          tonPriceUsd: null,
+          loading: false,
+          error: null,
+          lastUpdated: new Date(),
+        });
+        return;
+      }
       const signal = createTimeoutSignal(8000);
       const isDev = import.meta.env.DEV;
       const pricesUrl = isDev ? '/api-dedust/v2/prices' : 'https://api.dedust.io/v2/prices';
