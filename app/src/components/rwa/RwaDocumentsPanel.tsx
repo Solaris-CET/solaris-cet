@@ -3,6 +3,19 @@ import { Download, ExternalLink, FileText, Search } from 'lucide-react';
 import type { RwaDocument, RwaDocType } from '@/lib/rwaPortfolio';
 import { useLanguage } from '@/hooks/useLanguage';
 
+function setGlowVars(el: HTMLElement, clientX: number, clientY: number) {
+  const r = el.getBoundingClientRect();
+  const x = clientX - r.left;
+  const y = clientY - r.top;
+  el.style.setProperty('--glow-x', `${x}px`);
+  el.style.setProperty('--glow-y', `${y}px`);
+  el.style.setProperty('--glow-on', '1');
+}
+
+function clearGlowVars(el: HTMLElement) {
+  el.style.setProperty('--glow-on', '0');
+}
+
 function labelForType(t: RwaDocType, tx: ReturnType<typeof useLanguage>['t']['rwaUi']['documents']): string {
   if (t === 'whitepaper') return tx.typeWhitepaper;
   if (t === 'land_registry') return tx.typeRegistry;
@@ -80,8 +93,19 @@ export function RwaDocumentsPanel({
         {filtered.map((d) => (
           <article
             key={d.id}
-            className="rounded-2xl border border-white/10 bg-black/30 p-5 hover:bg-black/40 transition-colors"
+            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/30 p-5 hover:bg-black/40 transition-colors"
+            onPointerMove={(e) => setGlowVars(e.currentTarget, e.clientX, e.clientY)}
+            onPointerLeave={(e) => clearGlowVars(e.currentTarget)}
           >
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300"
+              style={{
+                opacity: 'var(--glow-on, 0)' as unknown as number,
+                background:
+                  'radial-gradient(240px circle at var(--glow-x, 50%) var(--glow-y, 50%), rgba(16,185,129,0.18), rgba(242,201,76,0.08) 42%, transparent 70%)',
+              }}
+            />
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center shrink-0">
                 <FileText className="w-5 h-5 text-solaris-gold" aria-hidden="true" />

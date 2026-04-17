@@ -3,6 +3,19 @@ import type { RwaTimelineEvent } from '@/lib/rwaPortfolio';
 import { timelineChipClass } from '@/lib/rwaPortfolio';
 import { useLanguage } from '@/hooks/useLanguage';
 
+function setGlowVars(el: HTMLElement, clientX: number, clientY: number) {
+  const r = el.getBoundingClientRect();
+  const x = clientX - r.left;
+  const y = clientY - r.top;
+  el.style.setProperty('--glow-x', `${x}px`);
+  el.style.setProperty('--glow-y', `${y}px`);
+  el.style.setProperty('--glow-on', '1');
+}
+
+function clearGlowVars(el: HTMLElement) {
+  el.style.setProperty('--glow-on', '0');
+}
+
 export function RwaTimelinePanel({
   events,
   title,
@@ -37,8 +50,19 @@ export function RwaTimelinePanel({
           <details
             key={e.id}
             id={`milestone-${e.slug}`}
-            className="group rounded-xl border border-white/10 bg-black/30 px-4 py-3 open:bg-black/40"
+            className="group relative overflow-hidden rounded-xl border border-white/10 bg-black/30 px-4 py-3 open:bg-black/40"
+            onPointerMove={(ev) => setGlowVars(ev.currentTarget, ev.clientX, ev.clientY)}
+            onPointerLeave={(ev) => clearGlowVars(ev.currentTarget)}
           >
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300"
+              style={{
+                opacity: 'var(--glow-on, 0)' as unknown as number,
+                background:
+                  'radial-gradient(220px circle at var(--glow-x, 50%) var(--glow-y, 50%), rgba(34,197,94,0.14), rgba(242,201,76,0.06) 45%, transparent 72%)',
+              }}
+            />
             <summary className="list-none cursor-pointer flex items-start justify-between gap-3 [&::-webkit-details-marker]:hidden">
               <div className="flex items-start gap-3">
                 <div className="mt-0.5 w-9 h-9 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center shrink-0">
