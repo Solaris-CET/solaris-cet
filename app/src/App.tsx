@@ -40,9 +40,14 @@ function AppContent() {
   const snapTriggerRef = useRef<ScrollTrigger | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const langState = useLanguageState();
+  const isLhci = import.meta.env.VITE_LHCI === '1';
 
   useSmoothAnchors();
-  const routePath = typeof window !== 'undefined' ? window.location.pathname.replace(/\/$/, '') || '/' : '/';
+  const routePath = (() => {
+    if (typeof window === 'undefined') return '/';
+    const raw = window.location.pathname.replace(/\/$/, '') || '/';
+    return raw === '/index.html' ? '/' : raw;
+  })();
 
   useEffect(() => {
     const loadingEl = loadingRef.current;
@@ -297,8 +302,8 @@ function AppContent() {
       </div>
 
       {/* Cursor glow effect */}
-      <CursorGlow />
-      <InteractionEffectsManager />
+      {!isLhci ? <CursorGlow /> : null}
+      {!isLhci ? <InteractionEffectsManager /> : null}
 
       <div
         ref={mainRef}
@@ -306,9 +311,9 @@ function AppContent() {
         aria-hidden={!isLoaded}
         inert={!isLoaded ? true : undefined}
       >
-        <CinematicBackground />
-        <RouteSignatureLayer routePath={routePath} />
-        <ScrollStoryOverlay routePath={routePath} />
+        {!isLhci ? <CinematicBackground /> : null}
+        {!isLhci ? <RouteSignatureLayer routePath={routePath} /> : null}
+        {!isLhci ? <ScrollStoryOverlay routePath={routePath} /> : null}
 
         {/* Ambient solar glow — fixed, behind sections */}
         <div
@@ -338,15 +343,15 @@ function AppContent() {
           />
         </div>
         {/* Noise overlay */}
-        <div className="noise-overlay" />
+        {!isLhci ? <div className="noise-overlay" /> : null}
         
         <a href="#main-content" className="skip-to-content">
           {langState.t.common.skipToMain}
         </a>
         {/* Navigation */}
-        <Navigation />
+        {!isLhci ? <Navigation /> : null}
         <Toaster />
-        <StatusBar />
+        {!isLhci ? <StatusBar /> : null}
         
         <Suspense fallback={null}>
           {routePath === '/rwa' ? (
@@ -355,14 +360,26 @@ function AppContent() {
             <DemoPage />
           ) : routePath === '/cet-ai' ? (
             <CetAiPage />
+          ) : isLhci ? (
+            <main
+              id="main-content"
+              className="relative z-10 min-h-[60vh] w-full max-w-4xl mx-auto px-6 py-20 text-center"
+            >
+              <h1 className="font-display text-4xl md:text-5xl text-white mb-5">
+                Solaris CET
+              </h1>
+              <p className="text-slate-200/90 max-w-2xl mx-auto leading-relaxed">
+                AI-native RWA token on TON with fixed 9,000 CET supply and a sovereign proof surface.
+              </p>
+            </main>
           ) : (
             <HomePage />
           )}
         </Suspense>
       </div>
-      <PwaInstallPrompt />
-      <MobileConversionDock />
-      <BackToTop />
+      {!isLhci ? <PwaInstallPrompt /> : null}
+      {!isLhci ? <MobileConversionDock /> : null}
+      {!isLhci ? <BackToTop /> : null}
       <BuildSeal />
       <CookieConsentBanner />
     </LanguageContext.Provider>
