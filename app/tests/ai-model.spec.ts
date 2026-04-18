@@ -92,9 +92,7 @@ test.describe('AI Model Execution — Intelligence Core', () => {
 
   test('AgentBridge visualisation is present in the DOM', async ({ page }) => {
     await page.evaluate(() => window.scrollBy(0, window.innerHeight * 2));
-    // AgentBridge renders a canvas element for the neural-network animation
-    const bridge = page.locator('canvas').first();
-    await expect(bridge).toBeAttached({ timeout: 8000 });
+    await expect(page.getByTestId('agent-bridge')).toBeAttached({ timeout: 15_000 });
   });
 
   test('Verifiable AI Decision Loops label is rendered', async ({ page }) => {

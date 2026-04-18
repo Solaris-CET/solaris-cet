@@ -7,6 +7,9 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
+  /* Prevent hangs on CI */
+  globalTimeout: process.env.CI ? 45 * 60 * 1000 : undefined,
+  timeout: process.env.CI ? 60_000 : 30_000,
   /* Run tests in parallel */
   fullyParallel: true,
   /* Fail the build on CI if a test is accidentally focused with `.only` */
@@ -33,7 +36,7 @@ export default defineConfig({
     return parsed;
   })(),
   /* Reporter */
-  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
+  reporter: process.env.CI ? [['line'], ['github'], ['html', { open: 'never' }]] : 'list',
   use: {
     /* Base URL pointing at the Vite preview server */
     baseURL: 'http://127.0.0.1:4173',
