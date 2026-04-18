@@ -124,7 +124,7 @@ function AppContent() {
 
   useEffect(() => {
     if (!isLoaded) return;
-    if (routePath !== '/' && routePath !== '/demo') return;
+    if (routePath !== '/') return;
 
     // Below 1024 px (tablets/small laptops), free scrolling is more natural
     const isBelowDesktop = typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches;

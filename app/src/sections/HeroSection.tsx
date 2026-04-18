@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useRef, useLayoutEffect, useMemo, memo, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ShieldCheck, TrendingUp, CheckCircle, ChevronDown, FileText } from 'lucide-react';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useLanguage } from '../hooks/useLanguage';
@@ -17,6 +18,8 @@ import CetAiSearch from '../components/CetAiSearch';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 
 const HeroTokenHologram = lazy(() => import('@/experience/HeroTokenHologram'));
+
+gsap.registerPlugin(ScrollTrigger);
 
 const TICKER_DATA = [
   { label: 'AI AGENTS', value: '' },
@@ -109,6 +112,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
   }, [cinematic, prefersReducedMotion, isDesktop, isMobile]);
 
   const enableHologram = holoQuality !== null;
+  const isDemoRoute = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    const path = window.location.pathname.replace(/\/$/, '') || '/';
+    return path === '/demo';
+  }, []);
+  const superCinematic = cinematic && isDemoRoute && isDesktop && !isMobile && !prefersReducedMotion;
 
   useLayoutEffect(() => {
     if (isMobile || prefersReducedMotion) {
@@ -133,6 +142,40 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
 
     return () => ctx.revert();
   }, [prefersReducedMotion, isMobile]);
+
+  useLayoutEffect(() => {
+    if (!superCinematic) return;
+    const el = containerRef.current;
+    const bg = backgroundRef.current;
+    const title = titleContainerRef.current;
+    const ticker = tickerContainerRef.current;
+    if (!el || !bg || !title || !ticker) return;
+
+    const ctx = gsap.context(() => {
+      gsap.set(bg, { transformOrigin: '50% 50%', willChange: 'transform' });
+      gsap.set(title, { willChange: 'transform, opacity' });
+      gsap.set(ticker, { willChange: 'transform, opacity' });
+
+      const tl = gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+          trigger: el,
+          start: 'top top',
+          end: '+=180%',
+          scrub: 1,
+          pin: true,
+          anticipatePin: 1,
+          pinSpacing: true,
+        },
+      });
+
+      tl.to(bg, { y: -80, scale: 1.08 }, 0);
+      tl.to(title, { y: -44, scale: 0.975, opacity: 0.88 }, 0);
+      tl.to(ticker, { y: 26, scale: 0.985, opacity: 0.92 }, 0);
+    }, el);
+
+    return () => ctx.revert();
+  }, [superCinematic]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -163,6 +206,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
 
   useEffect(() => {
     if (prefersReducedMotion) return;
+    if (superCinematic) return;
     const bg = backgroundRef.current;
     if (!bg) return;
     const isBelowDesktop = typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches;
@@ -187,7 +231,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
       if (raf) window.cancelAnimationFrame(raf);
       bg.style.transform = '';
     };
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, superCinematic]);
 
   return (
     <TooltipProvider>
