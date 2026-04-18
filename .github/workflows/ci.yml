@@ -190,11 +190,8 @@ jobs:
           name: dist-${{ github.sha }}
           path: app/dist
 
-      # Optional repo variable `E2E_WORKERS` (e.g. 2) — forwarded as PW_WORKERS; empty/unset → 1 worker in CI.
       - name: Run Playwright E2E tests
-        env:
-          PW_WORKERS: ${{ vars.E2E_WORKERS }}
-        run: npm run test:e2e --workspace=app
+        run: npm run app:test:e2e:stable
 
       - name: Upload Playwright report
         if: always()

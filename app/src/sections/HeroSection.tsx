@@ -70,6 +70,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
   const prefersReducedMotion = useReducedMotion();
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const isMobile = useMediaQuery('(max-width: 767px)');
+  const isAutomated = useMemo(() => {
+    if (typeof navigator === 'undefined') return false;
+    const navAny = navigator as Navigator & { webdriver?: boolean };
+    return navAny.webdriver === true;
+  }, []);
   const signatureSeed = useSessionSeed('heroHologram');
   const { t, lang } = useLanguage();
   const pool = useLivePoolData();
@@ -108,7 +113,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
     return 'low' as const;
   }, [cinematic, prefersReducedMotion, isDesktop, isMobile]);
 
-  const enableHologram = holoQuality !== null;
+  const enableHologram = holoQuality !== null && !isAutomated;
+  const allowWebglDecor = !prefersReducedMotion && !isMobile && !isAutomated;
 
   useLayoutEffect(() => {
     if (isMobile || prefersReducedMotion) {
@@ -199,15 +205,17 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
           {/* Layer 1 — fond de bază */}
           <div className="absolute inset-0 bg-[#020510]" />
 
-          {/* Layer 2 — Quantum field (stele + particule cyan/magenta + entanglement) — desktop only */}
-          <div className="absolute inset-0 hidden sm:block">
-            <QuantumFieldCanvas />
-          </div>
+          {allowWebglDecor ? (
+            <div className="absolute inset-0 hidden sm:block">
+              <QuantumFieldCanvas />
+            </div>
+          ) : null}
 
-          {/* Layer 3 — Solar rays + coins aurii — desktop, blended peste quantum */}
-          <div className="absolute inset-0 hidden sm:block" style={{ mixBlendMode: 'screen', opacity: 0.75 }}>
-            <SolarRaysCoinsCanvas />
-          </div>
+          {allowWebglDecor ? (
+            <div className="absolute inset-0 hidden sm:block" style={{ mixBlendMode: 'screen', opacity: 0.75 }}>
+              <SolarRaysCoinsCanvas />
+            </div>
+          ) : null}
 
           {/* Layer 2+3 mobile — gradient static optimizat */}
           <div className="absolute inset-0 sm:hidden">

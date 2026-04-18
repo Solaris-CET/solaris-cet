@@ -7,6 +7,10 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
+concurrency:
+  group: lighthouse-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -42,8 +46,6 @@ jobs:
         run: npm ci
 
       - name: Build application
-        env:
-          VITE_LHCI: "1"
         run: npm run build --workspace=app
 
       - name: Upload dist artifact
@@ -57,7 +59,6 @@ jobs:
   lighthouse:
     name: Lighthouse audit (quality gate — static dist)
     runs-on: ubuntu-latest
-    needs: build
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -72,11 +73,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Download dist artifact
-        uses: actions/download-artifact@v8
+      - name: Restore Vite build cache
+        uses: actions/cache@v5
         with:
-          name: dist
-          path: app/dist
+          path: app/node_modules/.vite
+          key: vite-cache-${{ runner.os }}-${{ hashFiles('package-lock.json', 'app/vite.config.ts') }}
+          restore-keys: |
+            vite-cache-${{ runner.os }}-
+
+      - name: Build application (audit)
+        env:
+          VITE_LHCI: "1"
+        run: npm run build --workspace=app
 
       - name: Write canonical Lighthouse config
         # Overwrite whatever lighthouserc.cjs was checked out from the PR branch

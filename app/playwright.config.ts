@@ -7,7 +7,7 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
-  /* Prevent hangs on CI (stuck navigations, dead preview server, etc.) */
+  /* Prevent hangs on CI */
   globalTimeout: process.env.CI ? 45 * 60 * 1000 : undefined,
   timeout: process.env.CI ? 60_000 : 30_000,
   /* Run tests in parallel */
