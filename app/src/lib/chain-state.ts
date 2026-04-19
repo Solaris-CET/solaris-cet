@@ -24,6 +24,10 @@ export interface ChainPoolState {
   reserveTon: string | null;
   /** CET reserve as human-readable decimal string — or null if unknown */
   reserveCet: string | null;
+  /** Optional: ordered asset identifiers, e.g. ["native","jetton:EQ..."] */
+  assets?: string[] | null;
+  /** Optional: ordered reserves as human-readable decimal strings aligned with `assets` */
+  reserves?: string[] | null;
   /** LP token total supply — or null if unknown */
   lpSupply: string | null;
   /** Spot price in TON per CET — or null if unknown */
