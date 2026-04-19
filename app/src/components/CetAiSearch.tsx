@@ -50,6 +50,8 @@ type ReActPhase =
   | 'verify_anchor'
   | 'complete';
 
+type AiState = 'idle' | 'loading' | 'success' | 'error';
+
 interface TelemetryLog {
   id: string;
   timestamp: string;
@@ -278,6 +280,21 @@ function CetAiTypingIndicator({ label }: { label: string }) {
           <span className="h-2 w-2 rounded-full bg-yellow-500/70 motion-safe:animate-bounce [animation-delay:-0.1s]" />
           <span className="h-2 w-2 rounded-full bg-yellow-500/60 motion-safe:animate-bounce" />
           <span className="text-[11px] font-mono text-solaris-muted">RAV · Grok × Gemini</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AiResultSkeleton({ label }: { label: string }) {
+  return (
+    <div className="flex justify-start motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300">
+      <div className="bg-black/30 border border-white/10 rounded-2xl rounded-tl-sm px-5 py-4 max-w-2xl w-full">
+        <p className="text-white/60 text-xs font-mono mb-3 uppercase tracking-widest">{label}</p>
+        <div role="status" aria-label={label}>
+          <div className="h-3 rounded bg-white/10 motion-safe:animate-pulse w-[82%]" />
+          <div className="mt-2 h-3 rounded bg-white/10 motion-safe:animate-pulse w-[64%]" />
+          <div className="mt-2 h-3 rounded bg-white/10 motion-safe:animate-pulse w-[74%]" />
         </div>
       </div>
     </div>
@@ -798,6 +815,7 @@ export default function CetAiSearch() {
   const [query, setQuery] = useState('');
   const [submittedQuestion, setSubmittedQuestion] = useState('');
   const [phase, setPhase] = useState<ReActPhase>('idle');
+  const [aiState, setAiState] = useState<AiState>('idle');
   const [logs, setLogs] = useState<TelemetryLog[]>([]);
   const [metrics, setMetrics] = useState<MetricsData>({ confidence: 0, latency: 0, cetCost: 0 });
   const [finalResponse, setFinalResponse] = useState('');
@@ -852,6 +870,7 @@ export default function CetAiSearch() {
     timersRef.current = [];
     setIsModalOpen(false);
     setPhase('idle');
+    setAiState('idle');
     setQuery('');
     setLogs([]);
     setFinalResponse('');
@@ -911,6 +930,7 @@ export default function CetAiSearch() {
     cetAiAbortRef.current?.abort();
     cetAiAbortRef.current = null;
     setPhase('complete');
+    setAiState('error');
     setFinalResponse(t.cetAi.generationStopped);
     setResponseUsedLiveApi(false);
     setResponseSources([]);
@@ -951,6 +971,7 @@ export default function CetAiSearch() {
     const startMs = performance.now();
 
     setSubmittedQuestion(question);
+    setAiState('loading');
     setLogs([]);
     setFinalResponse('');
     setCetAiConfidence(0);
@@ -1083,6 +1104,7 @@ export default function CetAiSearch() {
         }));
         setCetAiConfidence(conf);
         setFinalResponse(text);
+        setAiState('success');
         setResponseUsedLiveApi(usedLive);
       })();
     }, CET_AI_PHASE_MS[4]);
@@ -1369,12 +1391,15 @@ export default function CetAiSearch() {
                     </div>
                   </div>
 
-                  {isProcessing && (
-                    <CetAiTypingIndicator label={t.cetAi.processing} />
-                  )}
+                  {aiState === 'loading' ? (
+                    <div className="space-y-3">
+                      <AiResultSkeleton label={t.cetAi.processing} />
+                      <CetAiTypingIndicator label={t.cetAi.processing} />
+                    </div>
+                  ) : null}
 
-                  {/* Answer-first (Claude-style): completed reply before technical trace */}
-                  {phase === 'complete' && finalResponse && (
+                  {/* Answer-first (Claude-style): show response as soon as it is ready */}
+                  {finalResponse && (
                     <div className="flex justify-start motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500 motion-safe:slide-in-from-bottom-2">
                       <div className="bg-gradient-to-br from-green-950/80 to-black border border-green-500/30 rounded-2xl rounded-tl-sm p-5 md:p-6 w-full">
                         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">

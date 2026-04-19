@@ -1,3 +1,5 @@
+import { PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
+
 export type RwaStatus = 'active' | 'planned' | 'risk';
 
 export type RwaProjectType = 'agricultural_land' | 'ai_infrastructure' | 'compliance_anchor';
@@ -42,7 +44,7 @@ export const RWA_DOCUMENTS: readonly RwaDocument[] = [
     title: 'Whitepaper (IPFS)',
     docType: 'whitepaper',
     publishedAt: '2026-03-31',
-    url: 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a',
+    url: PUBLIC_WHITEPAPER_IPFS_URL,
   },
   {
     id: 'whitepaper-html',
@@ -63,7 +65,7 @@ export const RWA_DOCUMENTS: readonly RwaDocument[] = [
     title: 'IPFS CID proof (gateway)',
     docType: 'ipfs_proof',
     publishedAt: '2026-03-31',
-    url: 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a',
+    url: PUBLIC_WHITEPAPER_IPFS_URL,
   },
 ];
 

@@ -202,6 +202,17 @@ const server = http.createServer(async (req, res) => {
   try {
     const reqUrl = getRequestUrl(req);
     const p = reqUrl.pathname;
+    if (p === '/whitepaper' || p === '/whitepaper/') {
+      res.statusCode = 302;
+      setSecurityHeaders(res);
+      res.setHeader(
+        'Location',
+        'https://dweb.link/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a',
+      );
+      res.setHeader('Cache-Control', 'no-store');
+      res.end();
+      return;
+    }
     if (
       p.startsWith('/wp-admin') ||
       p.startsWith('/wp-content') ||

@@ -21,6 +21,8 @@ import { useSmoothAnchors } from './hooks/useSmoothAnchors';
 import './App.css';
 import { shortSkillWhisper, skillSeedFromLabel } from './lib/meshSkillFeed';
 import CookieConsentBanner from './components/CookieConsentBanner';
+import { NotFoundPage } from './pages/NotFoundPage';
+import { CetSymbol } from './components/CetSymbol';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const RwaPage = lazy(() => import('./pages/RwaPage'));
@@ -43,9 +45,12 @@ function AppContent() {
   const isLhci = import.meta.env.VITE_LHCI === '1';
 
   useSmoothAnchors();
-  const routePath = (() => {
+  const pathnameRaw = (() => {
     if (typeof window === 'undefined') return '/';
-    const raw = window.location.pathname.replace(/\/$/, '') || '/';
+    return window.location.pathname || '/';
+  })();
+  const routePath = (() => {
+    const raw = pathnameRaw.replace(/\/$/, '') || '/';
     return raw === '/index.html' ? '/' : raw;
   })();
 
@@ -354,7 +359,19 @@ function AppContent() {
         {!isLhci ? <StatusBar /> : null}
         
         <Suspense fallback={null}>
-          {routePath === '/rwa' ? (
+          {routePath === '/whitepaper' ? (
+            <NotFoundPage attemptedPath={pathnameRaw} staticRedirectHref="/whitepaper" />
+          ) : routePath === '/audit' ? (
+            <NotFoundPage attemptedPath={pathnameRaw} staticRedirectHref="/audit/" />
+          ) : routePath.startsWith('/sovereign') || routePath.startsWith('/apocalypse') ? (
+            <NotFoundPage attemptedPath={pathnameRaw} staticRedirectHref={pathnameRaw} />
+          ) : routePath !== '/' &&
+            routePath !== '/rwa' &&
+            routePath !== '/demo' &&
+            routePath !== '/cet-ai' &&
+            !isLhci ? (
+            <NotFoundPage attemptedPath={pathnameRaw} />
+          ) : routePath === '/rwa' ? (
             <RwaPage />
           ) : routePath === '/demo' ? (
             <DemoPage />
@@ -366,10 +383,10 @@ function AppContent() {
               className="relative z-10 min-h-[60vh] w-full max-w-4xl mx-auto px-6 py-20 text-center"
             >
               <h1 className="font-display text-4xl md:text-5xl text-white mb-5">
-                Solaris CET
+                Solaris <CetSymbol className="text-white" />
               </h1>
               <p className="text-slate-200/90 max-w-2xl mx-auto leading-relaxed">
-                AI-native RWA token on TON with fixed 9,000 CET supply and a sovereign proof surface.
+                AI-native RWA token on TON with fixed 9,000 <CetSymbol className="text-slate-200/90" /> supply and a sovereign proof surface.
               </p>
             </main>
           ) : (

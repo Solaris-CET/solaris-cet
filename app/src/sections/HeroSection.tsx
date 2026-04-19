@@ -17,6 +17,7 @@ import { useLivePoolData } from '@/hooks/use-live-pool-data';
 import { useCommunityProof } from '@/hooks/use-community-proof';
 import CetAiSearch from '../components/CetAiSearch';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
+import { CetSymbol } from '@/components/CetSymbol';
 
 const HeroTokenHologram = lazy(() => import('@/experience/HeroTokenHologram'));
 
@@ -404,7 +405,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
             <h1 className="font-display text-white leading-[1.02] tracking-[-0.04em] mb-5 drop-shadow-2xl type-h1">
               Primul token RWA ancorat în{' '}
               <span className="text-gradient-aurora">Cetățuia, România</span>
-              <span className="text-solaris-gold"> — 9,000 CET.</span>
+              <span className="text-solaris-gold">
+                {' '}
+                — 9,000 <CetSymbol className="text-solaris-gold" />.
+              </span>
               <span className="block text-white">Imutabil.</span>
             </h1>
             
