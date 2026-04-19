@@ -122,6 +122,7 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: 'autoUpdate',
+      filename: `sw-${gitShort()}.js`,
       includeAssets: [
         'favicon.svg',
         'icon-192.png',

@@ -14,42 +14,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main branch
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Python dependencies
-        run: pip install requests --quiet
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
 
-      - name: Run indexer script
-        env:
-          CET_CONTRACT: "EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX"
-          DEDUST_POOL: "EQB5_hZPl4-EI1aWdLSd21c8T9PoKyZK2IJtrDFdPJIelfnB"
-          CET_DECIMALS: "9"
-        run: python3 .github/scripts/update_state.py
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Commit state.json to gh-pages branch
+      - name: Run TON indexer (writes app/public/api/state.json)
+        run: npm run index --workspace=scripts
+
+      - name: Commit state.json to main
         run: |
           set -euo pipefail
 
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Stash the generated file before switching branches
-          cp app/public/api/state.json /tmp/state.json
-
-          # Switch to gh-pages (create orphan if it doesn't exist yet)
-          if git fetch origin gh-pages 2>/dev/null; then
-            git checkout gh-pages
-          else
-            git checkout --orphan gh-pages
-            git rm -rf . --quiet || true
-          fi
-
-          mkdir -p app/public/api
-          cp /tmp/state.json app/public/api/state.json
           git add app/public/api/state.json
 
           # Only commit when data has actually changed
@@ -57,5 +46,5 @@ jobs:
             echo "No changes to state.json — skipping commit."
           else
             git commit -m "chore(data): update CET token state"
-            git push origin gh-pages
+            git push origin main
           fi

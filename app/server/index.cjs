@@ -15,7 +15,7 @@ function setSecurityHeaders(res) {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-  res.setHeader('X-Solaris-Server', 'node-static-v2');
+  res.setHeader('X-Solaris-Server', 'node-static-v4');
 }
 
 function shouldServeBrotli(req) {
@@ -86,8 +86,8 @@ async function serveFile(res, absPath) {
   res.statusCode = 200;
   res.setHeader('Content-Type', type);
   const baseName = path.basename(basePath);
-  if (baseName === 'sw.js') {
-    res.setHeader('Cache-Control', 'no-cache');
+  if (baseName === 'sw.js' || /^sw-[a-f0-9]{7}\.js$/i.test(baseName)) {
+    res.setHeader('Cache-Control', 'no-store');
   } else if (baseExt === '.html' || baseExt === '.json' || baseExt === '.xml' || baseExt === '.txt') {
     res.setHeader('Cache-Control', 'no-store');
   } else {
