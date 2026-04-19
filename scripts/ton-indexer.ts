@@ -99,29 +99,66 @@ async function main(): Promise<void> {
   try {
     const factory = client.open(Factory.createFromAddress(MAINNET_FACTORY_ADDR));
 
+    const tonAsset = Asset.native();
     const cetAsset = Asset.jetton(cetAddress);
     const usdtAddress = Address.parse(USDT_JETTON_MASTER_ADDRESS);
     const usdtAsset = Asset.jetton(usdtAddress);
 
-    const pool = client.open(
-      await factory.getPool(PoolType.VOLATILE, [usdtAsset, cetAsset])
-    );
+    const tryGetPool = async (type: PoolType, assets: [Asset, Asset]) => {
+      const p = client.open(await factory.getPool(type, assets));
+      const [r0, r1] = await p.getReserves();
+      return { pool: p, reserves: [r0, r1] as const };
+    };
 
-    poolAddress = pool.address.toString();
+    let mode: 'usdt' | 'ton' | null = null;
+    let r0: bigint;
+    let r1: bigint;
 
-    const [r0, r1] = await pool.getReserves();
-    // reserves are aligned with requested asset order: [USDT, CET]
-    const reserveUsdt = r0;
-    reserveCet = r1;
-    reserveTon = null;
+    try {
+      const stable = await tryGetPool(PoolType.STABLE, [usdtAsset, cetAsset]);
+      poolAddress = stable.pool.address.toString();
+      [r0, r1] = stable.reserves;
+      mode = 'usdt';
+    } catch {
+      try {
+        const vol = await tryGetPool(PoolType.VOLATILE, [usdtAsset, cetAsset]);
+        poolAddress = vol.pool.address.toString();
+        [r0, r1] = vol.reserves;
+        mode = 'usdt';
+      } catch {
+        const tonVol = await tryGetPool(PoolType.VOLATILE, [tonAsset, cetAsset]);
+        poolAddress = tonVol.pool.address.toString();
+        [r0, r1] = tonVol.reserves;
+        mode = 'ton';
+      }
+    }
 
-    poolAssets = [`jetton:${USDT_JETTON_MASTER_ADDRESS}`, `jetton:${CET_CONTRACT_ADDRESS}`];
-    poolReservesReadable = [
-      bigintToDecimalString(reserveUsdt, 6),
-      bigintToDecimalString(reserveCet, decimals),
-    ];
+    const reserveCetLocal = r1;
+    reserveCet = reserveCetLocal;
 
-    console.log(`[ton-indexer] Pool reserves — USDT: ${reserveUsdt}, CET: ${reserveCet}`);
+    if (mode === 'usdt') {
+      const reserveUsdt = r0;
+      reserveTon = null;
+      poolAssets = [`jetton:${USDT_JETTON_MASTER_ADDRESS}`, `jetton:${CET_CONTRACT_ADDRESS}`];
+      poolReservesReadable = [
+        bigintToDecimalString(reserveUsdt, 6),
+        bigintToDecimalString(reserveCetLocal, decimals),
+      ];
+      console.log(`[ton-indexer] Pool reserves — USDT: ${reserveUsdt}, CET: ${reserveCetLocal}`);
+    } else if (mode === 'ton') {
+      const reserveTonLocal = r0;
+      reserveTon = reserveTonLocal;
+      poolAssets = ['native', `jetton:${CET_CONTRACT_ADDRESS}`];
+      poolReservesReadable = [
+        bigintToDecimalString(reserveTonLocal, 9),
+        bigintToDecimalString(reserveCetLocal, decimals),
+      ];
+      if (reserveCetLocal > 0n) {
+        const priceFraction = (reserveTonLocal * BigInt(10 ** decimals)) / reserveCetLocal;
+        priceTonPerCet = bigintToDecimalString(priceFraction, 9);
+      }
+      console.log(`[ton-indexer] Pool reserves — TON: ${reserveTonLocal}, CET: ${reserveCetLocal}`);
+    }
   } catch (err) {
     console.warn('[ton-indexer] Failed to fetch DeDust pool data via SDK:', err);
 
