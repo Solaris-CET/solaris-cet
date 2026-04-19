@@ -41,6 +41,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Guard robots baseline
+        run: |
+          test -f app/public/robots.txt
+          grep -Eq '^Sitemap:\s+https://solaris-cet\.com/sitemap\.xml$' app/public/robots.txt
+          if grep -Eq '^Disallow:\s*/\s*$' app/public/robots.txt; then
+            echo "robots.txt blocks all crawling (Disallow: /)."
+            exit 1
+          fi
+
       - name: Build application
         run: npm run build --workspace=app
 
