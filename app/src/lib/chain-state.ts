@@ -20,6 +20,7 @@ export interface ChainTokenState {
 
 export interface ChainPoolState {
   address: string;
+  type?: 'volatile' | 'stable' | null;
   /** TON reserve as human-readable decimal string — or null if unknown */
   reserveTon: string | null;
   /** CET reserve as human-readable decimal string — or null if unknown */

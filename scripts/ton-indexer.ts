@@ -44,6 +44,7 @@ interface TokenState {
 
 interface PoolState {
   address: string;
+  type?: 'volatile' | 'stable' | null;
   reserveTon: string | null;
   reserveCet: string | null;
   assets?: string[] | null;
@@ -118,6 +119,7 @@ async function main(): Promise<void> {
   let reserveCet: bigint | null = null;
   let priceTonPerCet: string | null = null;
   let poolAddress: string | null = null;
+  let poolType: 'volatile' | 'stable' | null = null;
   let poolAssets: string[] | null = null;
   let poolReservesReadable: string[] | null = null;
 
@@ -203,6 +205,7 @@ async function main(): Promise<void> {
     },
     pool: {
       address: poolAddress ?? 'unknown',
+      type: poolType,
       reserveTon: reserveTon !== null
         ? bigintToDecimalString(reserveTon, 9)
         : null,
