@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { chainStatePromise } from '@/lib/chain-state';
 
 import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';
+import { USDT_JETTON_MASTER_ADDRESS } from '@/lib/usdtContract';
 const REFRESH_INTERVAL_MS = 60_000;
 
 interface DeDustPrice {
@@ -99,6 +100,18 @@ export function useLivePoolData(): PoolData {
       const { pool } = state;
       const reserveTon = pool.reserveTon ? parseFloat(pool.reserveTon) : null;
       const reserveCetReadable = pool.reserveCet ? parseFloat(pool.reserveCet) : null;
+      const assets = Array.isArray(pool.assets) ? pool.assets : null;
+      const reserves = Array.isArray(pool.reserves) ? pool.reserves : null;
+
+      let reserveUsdtReadable: number | null = null;
+      if (assets && reserves && assets.length === reserves.length) {
+        const usdtKey = `jetton:${USDT_JETTON_MASTER_ADDRESS}`;
+        const usdtIndex = assets.indexOf(usdtKey);
+        if (usdtIndex !== -1) {
+          const v = parseFloat(reserves[usdtIndex] ?? '');
+          reserveUsdtReadable = Number.isFinite(v) ? v : null;
+        }
+      }
 
       // Look up CET price directly from prices endpoint
       const cetAddressLower = CET_CONTRACT_ADDRESS.toLowerCase();
@@ -111,6 +124,11 @@ export function useLivePoolData(): PoolData {
 
       let tvlUsd: number | null = null;
       let volume24hUsd: number | null = null;
+
+      if (reserveUsdtReadable !== null && reserveCetReadable !== null && reserveCetReadable > 0) {
+        priceUsd = reserveUsdtReadable / reserveCetReadable;
+        tvlUsd = reserveUsdtReadable + reserveCetReadable * priceUsd;
+      }
 
       if (reserveTon !== null && reserveCetReadable !== null && tonPriceUsd) {
         // Calculate CET price from reserves if not available in prices endpoint

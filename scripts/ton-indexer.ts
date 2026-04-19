@@ -19,14 +19,12 @@ import { writeFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { CET_CONTRACT_ADDRESS } from '../app/src/lib/cetContract';
-import { DEDUST_POOL_ADDRESS } from '../app/src/lib/dedustUrls';
+import { USDT_JETTON_MASTER_ADDRESS } from '../app/src/lib/usdtContract';
 import { TOKEN_NAME, TOKEN_SYMBOL, TOKEN_DECIMALS } from '../app/src/constants/token';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const TON_ENDPOINT = process.env['TON_RPC_ENDPOINT'] ?? 'https://toncenter.com/api/v2/jsonRPC';
-
-const NANO_CET = BigInt(10 ** TOKEN_DECIMALS);
 
 // ── TON client setup ─────────────────────────────────────────────────────────
 
@@ -46,6 +44,8 @@ interface PoolState {
   address: string;
   reserveTon: string | null;
   reserveCet: string | null;
+  assets?: string[] | null;
+  reserves?: string[] | null;
   lpSupply: string | null;
   priceTonPerCet: string | null;
 }
@@ -92,53 +92,40 @@ async function main(): Promise<void> {
   let reserveTon: bigint | null = null;
   let reserveCet: bigint | null = null;
   let priceTonPerCet: string | null = null;
+  let poolAddress: string | null = null;
+  let poolAssets: string[] | null = null;
+  let poolReservesReadable: string[] | null = null;
 
   try {
     const factory = client.open(Factory.createFromAddress(MAINNET_FACTORY_ADDR));
 
-    const tonAsset = Asset.native();
     const cetAsset = Asset.jetton(cetAddress);
+    const usdtAddress = Address.parse(USDT_JETTON_MASTER_ADDRESS);
+    const usdtAsset = Asset.jetton(usdtAddress);
 
     const pool = client.open(
-      await factory.getPool(PoolType.VOLATILE, [tonAsset, cetAsset])
+      await factory.getPool(PoolType.VOLATILE, [usdtAsset, cetAsset])
     );
 
+    poolAddress = pool.address.toString();
+
     const [r0, r1] = await pool.getReserves();
-    // reserves are [TON, CET] because assets were ordered [native, jetton]
-    reserveTon = r0;
+    // reserves are aligned with requested asset order: [USDT, CET]
+    const reserveUsdt = r0;
     reserveCet = r1;
+    reserveTon = null;
 
-    if (reserveTon !== null && reserveCet !== null && reserveCet > 0n) {
-      // Price in TON per CET: (TON / 10^9) / (CET / 10^TOKEN_DECIMALS)
-      // = (TON * 10^TOKEN_DECIMALS) / (CET * 10^9)
-      const priceFraction = (reserveTon * NANO_CET) / reserveCet;
-      priceTonPerCet = bigintToDecimalString(priceFraction, 9);
-    }
+    poolAssets = [`jetton:${USDT_JETTON_MASTER_ADDRESS}`, `jetton:${CET_CONTRACT_ADDRESS}`];
+    poolReservesReadable = [
+      bigintToDecimalString(reserveUsdt, 6),
+      bigintToDecimalString(reserveCet, decimals),
+    ];
 
-    console.log(`[ton-indexer] Pool reserves — TON: ${reserveTon}, CET: ${reserveCet}`);
+    console.log(`[ton-indexer] Pool reserves — USDT: ${reserveUsdt}, CET: ${reserveCet}`);
   } catch (err) {
     console.warn('[ton-indexer] Failed to fetch DeDust pool data via SDK:', err);
 
-    // Graceful fallback: query DeDust REST API
-    try {
-      const res = await fetch(`https://api.dedust.io/v2/pools/${DEDUST_POOL_ADDRESS}`);
-      if (res.ok) {
-        const json = await res.json() as {
-          reserves?: [string, string];
-        };
-        if (Array.isArray(json.reserves)) {
-          reserveTon = BigInt(json.reserves[0]);
-          reserveCet = BigInt(json.reserves[1]);
-          if (reserveCet > 0n) {
-            const priceFraction = (reserveTon * NANO_CET) / reserveCet;
-            priceTonPerCet = bigintToDecimalString(priceFraction, 9);
-          }
-        }
-        console.log('[ton-indexer] Fallback DeDust REST API success');
-      }
-    } catch (fallbackErr) {
-      console.warn('[ton-indexer] DeDust REST fallback also failed:', fallbackErr);
-    }
+    void 0;
   }
 
   // ── 3. Build output ────────────────────────────────────────────────────────
@@ -153,13 +140,15 @@ async function main(): Promise<void> {
       decimals,
     },
     pool: {
-      address: DEDUST_POOL_ADDRESS,
+      address: poolAddress ?? 'unknown',
       reserveTon: reserveTon !== null
         ? bigintToDecimalString(reserveTon, 9)
         : null,
       reserveCet: reserveCet !== null
         ? bigintToDecimalString(reserveCet, decimals)
         : null,
+      assets: poolAssets,
+      reserves: poolReservesReadable,
       lpSupply: null,
       priceTonPerCet,
     },
