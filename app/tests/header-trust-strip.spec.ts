@@ -1,7 +1,5 @@
-import test from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { waitForAppReady } from './e2e-helpers';
-
-const expect = (test as any).expect as typeof import('@playwright/test').expect;
 
 test.describe('Header trust strip', () => {
   test.beforeEach(async ({ page }) => {
