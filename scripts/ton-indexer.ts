@@ -25,10 +25,12 @@ import { TOKEN_NAME, TOKEN_SYMBOL, TOKEN_DECIMALS } from '../app/src/constants/t
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const TON_ENDPOINT = process.env['TON_RPC_ENDPOINT'] ?? 'https://toncenter.com/api/v2/jsonRPC';
+const TON_API_KEY =
+  process.env['TON_RPC_API_KEY'] ?? process.env['TONCENTER_API_KEY'] ?? process.env['TON_API_KEY'] ?? undefined;
 
 // ── TON client setup ─────────────────────────────────────────────────────────
 
-const client = new TonClient({ endpoint: TON_ENDPOINT });
+const client = new TonClient({ endpoint: TON_ENDPOINT, apiKey: TON_API_KEY && TON_API_KEY.length > 0 ? TON_API_KEY : undefined });
 
 // ── Output schema ─────────────────────────────────────────────────────────────
 
@@ -66,6 +68,29 @@ function bigintToDecimalString(value: bigint, decimals: number): string {
   return fracStr.length > 0 ? `${whole}.${fracStr}` : `${whole}`;
 }
 
+async function sleep(ms: number) {
+  await new Promise((r) => setTimeout(r, ms));
+}
+
+async function retry<T>(fn: () => Promise<T>, label: string): Promise<T> {
+  let lastErr: unknown;
+  for (const delayMs of [0, 800, 1600, 2600]) {
+    if (delayMs) await sleep(delayMs);
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      const msg = String((err as any)?.message ?? err);
+      const status = (err as any)?.response?.status ?? (err as any)?.status ?? null;
+      const body = (err as any)?.response?.data ?? null;
+      const isRateLimited = status === 429 || msg.toLowerCase().includes('ratelimit') || String(body).includes('429');
+      if (!isRateLimited) break;
+      console.warn(`[ton-indexer] ${label} rate-limited, retrying…`);
+    }
+  }
+  throw lastErr;
+}
+
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
@@ -81,7 +106,7 @@ async function main(): Promise<void> {
 
   try {
     const jettonRoot = client.open(JettonRoot.createFromAddress(cetAddress));
-    const jettonData = await jettonRoot.getJettonData();
+    const jettonData = await retry(() => jettonRoot.getJettonData(), 'getJettonData');
     totalSupply = jettonData.totalSupply;
     console.log(`[ton-indexer] CET total supply: ${totalSupply}`);
   } catch (err) {
@@ -99,29 +124,66 @@ async function main(): Promise<void> {
   try {
     const factory = client.open(Factory.createFromAddress(MAINNET_FACTORY_ADDR));
 
+    const tonAsset = Asset.native();
     const cetAsset = Asset.jetton(cetAddress);
     const usdtAddress = Address.parse(USDT_JETTON_MASTER_ADDRESS);
     const usdtAsset = Asset.jetton(usdtAddress);
 
-    const pool = client.open(
-      await factory.getPool(PoolType.VOLATILE, [usdtAsset, cetAsset])
-    );
+    const tryGetPool = async (type: PoolType, assets: [Asset, Asset]) => {
+      const p = client.open(await retry(() => factory.getPool(type, assets), 'factory.getPool'));
+      const [r0, r1] = await retry(() => p.getReserves(), 'pool.getReserves');
+      return { pool: p, reserves: [r0, r1] as const };
+    };
 
-    poolAddress = pool.address.toString();
+    let mode: 'usdt' | 'ton' | null = null;
+    let r0: bigint;
+    let r1: bigint;
 
-    const [r0, r1] = await pool.getReserves();
-    // reserves are aligned with requested asset order: [USDT, CET]
-    const reserveUsdt = r0;
-    reserveCet = r1;
-    reserveTon = null;
+    try {
+      const stable = await tryGetPool(PoolType.STABLE, [usdtAsset, cetAsset]);
+      poolAddress = stable.pool.address.toString();
+      [r0, r1] = stable.reserves;
+      mode = 'usdt';
+    } catch {
+      try {
+        const vol = await tryGetPool(PoolType.VOLATILE, [usdtAsset, cetAsset]);
+        poolAddress = vol.pool.address.toString();
+        [r0, r1] = vol.reserves;
+        mode = 'usdt';
+      } catch {
+        const tonVol = await tryGetPool(PoolType.VOLATILE, [tonAsset, cetAsset]);
+        poolAddress = tonVol.pool.address.toString();
+        [r0, r1] = tonVol.reserves;
+        mode = 'ton';
+      }
+    }
 
-    poolAssets = [`jetton:${USDT_JETTON_MASTER_ADDRESS}`, `jetton:${CET_CONTRACT_ADDRESS}`];
-    poolReservesReadable = [
-      bigintToDecimalString(reserveUsdt, 6),
-      bigintToDecimalString(reserveCet, decimals),
-    ];
+    const reserveCetLocal = r1;
+    reserveCet = reserveCetLocal;
 
-    console.log(`[ton-indexer] Pool reserves — USDT: ${reserveUsdt}, CET: ${reserveCet}`);
+    if (mode === 'usdt') {
+      const reserveUsdt = r0;
+      reserveTon = null;
+      poolAssets = [`jetton:${USDT_JETTON_MASTER_ADDRESS}`, `jetton:${CET_CONTRACT_ADDRESS}`];
+      poolReservesReadable = [
+        bigintToDecimalString(reserveUsdt, 6),
+        bigintToDecimalString(reserveCetLocal, decimals),
+      ];
+      console.log(`[ton-indexer] Pool reserves — USDT: ${reserveUsdt}, CET: ${reserveCetLocal}`);
+    } else if (mode === 'ton') {
+      const reserveTonLocal = r0;
+      reserveTon = reserveTonLocal;
+      poolAssets = ['native', `jetton:${CET_CONTRACT_ADDRESS}`];
+      poolReservesReadable = [
+        bigintToDecimalString(reserveTonLocal, 9),
+        bigintToDecimalString(reserveCetLocal, decimals),
+      ];
+      if (reserveCetLocal > 0n) {
+        const priceFraction = (reserveTonLocal * BigInt(10 ** decimals)) / reserveCetLocal;
+        priceTonPerCet = bigintToDecimalString(priceFraction, 9);
+      }
+      console.log(`[ton-indexer] Pool reserves — TON: ${reserveTonLocal}, CET: ${reserveCetLocal}`);
+    }
   } catch (err) {
     console.warn('[ton-indexer] Failed to fetch DeDust pool data via SDK:', err);
 
