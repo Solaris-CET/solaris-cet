@@ -11,6 +11,12 @@ interface DeDustPrice {
   price: string | number;
 }
 
+interface DeDustGqlPool {
+  assets: string[];
+  reserves: string[];
+  address: string;
+}
+
 export interface PoolData {
   priceUsd: number | null;
   tvlUsd: number | null;
@@ -88,6 +94,19 @@ export function useLivePoolData(): PoolData {
         return null;
       };
 
+      const bigintToDecimalString = (raw: string, decimals: number): string | null => {
+        try {
+          const v = BigInt(raw);
+          const div = BigInt(10) ** BigInt(decimals);
+          const whole = v / div;
+          const frac = v % div;
+          const fracStr = frac.toString().padStart(decimals, '0').replace(/0+$/, '');
+          return fracStr.length ? `${whole}.${fracStr}` : `${whole}`;
+        } catch {
+          return null;
+        }
+      };
+
       // Get TON USD price from prices endpoint
       const tonEntry = prices.find(
         (p) => p.address === 'native' || p.symbol?.toUpperCase() === 'TON',
@@ -128,6 +147,52 @@ export function useLivePoolData(): PoolData {
       if (reserveUsdtReadable !== null && reserveCetReadable !== null && reserveCetReadable > 0) {
         priceUsd = reserveUsdtReadable / reserveCetReadable;
         tvlUsd = reserveUsdtReadable + reserveCetReadable * priceUsd;
+      }
+
+      if (priceUsd === null) {
+        const gqlSignal = createTimeoutSignal(4500);
+        const gqlRes = await fetch('https://mainnet.api.dedust.io/v3/graphql', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            query:
+              'query($f:PoolsFiltersInput){ pools(filter:$f){ address assets reserves } }',
+            variables: {
+              f: {
+                assets: {
+                  in: [
+                    `jetton:${USDT_JETTON_MASTER_ADDRESS}`,
+                    `jetton:${CET_CONTRACT_ADDRESS}`,
+                  ],
+                },
+              },
+            },
+          }),
+          signal: gqlSignal,
+        });
+        if (gqlRes.ok) {
+          const gqlJson = (await gqlRes.json()) as {
+            data?: { pools?: DeDustGqlPool[] };
+          };
+          const pools = Array.isArray(gqlJson.data?.pools) ? gqlJson.data!.pools! : [];
+          const pool = pools[0];
+          if (pool && Array.isArray(pool.assets) && Array.isArray(pool.reserves) && pool.assets.length === pool.reserves.length) {
+            const usdtKey = `jetton:${USDT_JETTON_MASTER_ADDRESS}`;
+            const cetKey = `jetton:${CET_CONTRACT_ADDRESS}`;
+            const usdtIndex = pool.assets.indexOf(usdtKey);
+            const cetIndex = pool.assets.indexOf(cetKey);
+            if (usdtIndex !== -1 && cetIndex !== -1) {
+              const usdtDec = bigintToDecimalString(pool.reserves[usdtIndex] ?? '0', 6);
+              const cetDec = bigintToDecimalString(pool.reserves[cetIndex] ?? '0', 6);
+              const usdtN = usdtDec ? Number.parseFloat(usdtDec) : null;
+              const cetN = cetDec ? Number.parseFloat(cetDec) : null;
+              if (usdtN !== null && cetN !== null && Number.isFinite(usdtN) && Number.isFinite(cetN) && cetN > 0) {
+                priceUsd = usdtN / cetN;
+                tvlUsd = usdtN + cetN * priceUsd;
+              }
+            }
+          }
+        }
       }
 
       if (reserveTon !== null && reserveCetReadable !== null && tonPriceUsd) {

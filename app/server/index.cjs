@@ -85,7 +85,10 @@ async function serveFile(res, absPath) {
   const type = contentTypes[baseExt] ?? 'application/octet-stream';
   res.statusCode = 200;
   res.setHeader('Content-Type', type);
-  if (baseExt === '.html' || baseExt === '.json' || baseExt === '.xml' || baseExt === '.txt') {
+  const baseName = path.basename(basePath);
+  if (baseName === 'sw.js') {
+    res.setHeader('Cache-Control', 'no-cache');
+  } else if (baseExt === '.html' || baseExt === '.json' || baseExt === '.xml' || baseExt === '.txt') {
     res.setHeader('Cache-Control', 'no-store');
   } else {
     res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
