@@ -7,11 +7,16 @@
     "module": "ESNext",
     "types": ["node"],
     "skipLibCheck": true,
+    "ignoreDeprecations": "6.0",
 
+    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"
-      ]
+      ],
+      "lucide-react": ["../node_modules/lucide-react/dist/lucide-react.d.ts"],
+      "sonner": ["../node_modules/sonner/dist/index.d.ts"],
+      "@radix-ui/react-dialog": ["../node_modules/@radix-ui/react-dialog/dist/index.d.ts"]
     },
     /* Bundler mode */
     "moduleResolution": "bundler",

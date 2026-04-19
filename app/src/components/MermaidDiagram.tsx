@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import DOMPurify from 'dompurify';
+import { SafeHtml } from './SafeHtml';
 
 export default function MermaidDiagram({ graph }: { graph: string }) {
   const [svg, setSvg] = useState<string | null>(null);
@@ -19,11 +19,7 @@ export default function MermaidDiagram({ graph }: { graph: string }) {
         const id = `mermaid-${Math.random().toString(16).slice(2)}`;
         const { svg } = await mermaid.render(id, graph);
         if (!alive) return;
-        setSvg(
-          DOMPurify.sanitize(svg, {
-            USE_PROFILES: { svg: true, svgFilters: true },
-          }),
-        );
+        setSvg(svg);
         setFailed(false);
       } catch {
         if (!alive) return;
@@ -49,10 +45,11 @@ export default function MermaidDiagram({ graph }: { graph: string }) {
   if (!content) return null;
 
   return (
-    <div
-      data-testid="mermaid-svg"
+    <SafeHtml
+      html={content}
+      config={{ kind: 'svg' }}
+      dataTestId="mermaid-svg"
       className="w-full overflow-x-auto rounded-xl bg-black/20 border border-white/10 p-3"
-      dangerouslySetInnerHTML={{ __html: content }}
     />
   );
 }

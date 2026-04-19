@@ -35,5 +35,5 @@ export function productionOgImageUrl(): string {
 
 /** Absolute URL for `tonconnect-manifest.json` `iconUrl` (square icon for wallet UIs). */
 export function productionTonConnectIconUrl(): string {
-  return "https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreid6hoewfj66y6wwefhiyp46madxlqtgnvut6tz7y2i4xwbj5yda3a";
+  return "https://dweb.link/ipfs/bafkreid6hoewfj66y6wwefhiyp46madxlqtgnvut6tz7y2i4xwbj5yda3a";
 }

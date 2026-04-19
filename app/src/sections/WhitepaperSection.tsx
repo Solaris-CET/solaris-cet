@@ -18,9 +18,14 @@ import {
 } from 'lucide-react';
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 import { useLanguage } from '../hooks/useLanguage';
+import { PUBLIC_WHITEPAPER_IPFS_CID, PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
 
-const WHITEPAPER_URL =
-  'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a';
+const WHITEPAPER_GATEWAY_URLS = [
+  PUBLIC_WHITEPAPER_IPFS_URL,
+  `https://cloudflare-ipfs.com/ipfs/${PUBLIC_WHITEPAPER_IPFS_CID}`,
+  `https://ipfs.io/ipfs/${PUBLIC_WHITEPAPER_IPFS_CID}`,
+  `https://gateway.pinata.cloud/ipfs/${PUBLIC_WHITEPAPER_IPFS_CID}`,
+] as const;
 
 // ─── Whitepaper sections data ─────────────────────────────────────────────────
 
@@ -693,11 +698,11 @@ const WhitepaperSection = () => {
                 {tx.archiveBody}
               </p>
               <span className="font-mono text-solaris-muted text-[10px] break-all block mt-2">
-                ipfs://bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a
+                ipfs://{PUBLIC_WHITEPAPER_IPFS_CID}
               </span>
             </div>
             <a
-              href={WHITEPAPER_URL}
+              href={WHITEPAPER_GATEWAY_URLS[0]}
               target="_blank"
               rel="noopener noreferrer"
               className="shrink-0 inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-solaris-gold text-solaris-dark font-semibold text-sm hover:bg-solaris-gold/90 active:scale-95 transition-all duration-200 group btn-quantum"
@@ -705,6 +710,19 @@ const WhitepaperSection = () => {
               <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
               {tx.downloadLabel}
             </a>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-[11px] text-solaris-muted">
+            {WHITEPAPER_GATEWAY_URLS.slice(1).map((url) => (
+              <a
+                key={url}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-solaris-text transition-colors break-all"
+              >
+                {new URL(url).hostname}
+              </a>
+            ))}
           </div>
         </div>
 

@@ -17,7 +17,7 @@ test.describe('Security section', () => {
 
     await expect(section.locator('a[href*="cyberscope.io"]').first()).toBeVisible();
     await expect(section.locator('a[href*="freshcoins.io"]').first()).toBeVisible();
-    await expect(section.locator('a[href*="mypinata.cloud/ipfs"]').first()).toBeVisible();
+    await expect(section.locator('a[href*="bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a"]').first()).toBeVisible();
     await expect(section.locator('a[href="https://github.com/Solaris-CET/solaris-cet"]').first()).toBeVisible();
   });
 

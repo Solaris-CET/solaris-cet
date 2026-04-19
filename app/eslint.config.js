@@ -26,5 +26,21 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']",
+          message: 'Use SafeHtml component instead of dangerouslySetInnerHTML.',
+        },
+      ],
+      'react-hooks/exhaustive-deps': 'error',
+    },
+  },
+  {
+    files: ['src/components/SafeHtml.tsx'],
+    rules: {
+      'no-restricted-syntax': 'off',
+    },
   },
 ])

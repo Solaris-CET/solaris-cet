@@ -6,6 +6,7 @@ import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
 import { useLanguage } from '../hooks/useLanguage';
 import type { FaqContent } from '../i18n/faqContent.types';
+import { PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
 
 interface FAQLink {
   label: string;
@@ -20,8 +21,7 @@ interface FAQ {
 }
 
 /** Canonical URLs — labels come from `t.faqContent`. */
-const FAQ_HREF_WHITEPAPER =
-  'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a';
+const FAQ_HREF_WHITEPAPER = PUBLIC_WHITEPAPER_IPFS_URL;
 const FAQ_HREF_TELEGRAM = 'https://t.me/SolarisCET';
 const FAQ_HREF_GITHUB = 'https://github.com/Solaris-CET/solaris-cet';
 const FAQ_HREF_COMPARISON = '#competition';
