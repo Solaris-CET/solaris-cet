@@ -3,6 +3,6 @@
 # Humans & pointers: https://solaris-cet.com/humans.txt
 
 User-agent: *
-Allow: /
+Disallow:
 
 Sitemap: https://solaris-cet.com/sitemap.xml
