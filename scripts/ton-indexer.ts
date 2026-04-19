@@ -25,10 +25,12 @@ import { TOKEN_NAME, TOKEN_SYMBOL, TOKEN_DECIMALS } from '../app/src/constants/t
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const TON_ENDPOINT = process.env['TON_RPC_ENDPOINT'] ?? 'https://toncenter.com/api/v2/jsonRPC';
+const TON_API_KEY =
+  process.env['TON_RPC_API_KEY'] ?? process.env['TONCENTER_API_KEY'] ?? process.env['TON_API_KEY'] ?? undefined;
 
 // ── TON client setup ─────────────────────────────────────────────────────────
 
-const client = new TonClient({ endpoint: TON_ENDPOINT });
+const client = new TonClient({ endpoint: TON_ENDPOINT, apiKey: TON_API_KEY && TON_API_KEY.length > 0 ? TON_API_KEY : undefined });
 
 // ── Output schema ─────────────────────────────────────────────────────────────
 
@@ -66,6 +68,29 @@ function bigintToDecimalString(value: bigint, decimals: number): string {
   return fracStr.length > 0 ? `${whole}.${fracStr}` : `${whole}`;
 }
 
+async function sleep(ms: number) {
+  await new Promise((r) => setTimeout(r, ms));
+}
+
+async function retry<T>(fn: () => Promise<T>, label: string): Promise<T> {
+  let lastErr: unknown;
+  for (const delayMs of [0, 800, 1600, 2600]) {
+    if (delayMs) await sleep(delayMs);
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      const msg = String((err as any)?.message ?? err);
+      const status = (err as any)?.response?.status ?? (err as any)?.status ?? null;
+      const body = (err as any)?.response?.data ?? null;
+      const isRateLimited = status === 429 || msg.toLowerCase().includes('ratelimit') || String(body).includes('429');
+      if (!isRateLimited) break;
+      console.warn(`[ton-indexer] ${label} rate-limited, retrying…`);
+    }
+  }
+  throw lastErr;
+}
+
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
@@ -81,7 +106,7 @@ async function main(): Promise<void> {
 
   try {
     const jettonRoot = client.open(JettonRoot.createFromAddress(cetAddress));
-    const jettonData = await jettonRoot.getJettonData();
+    const jettonData = await retry(() => jettonRoot.getJettonData(), 'getJettonData');
     totalSupply = jettonData.totalSupply;
     console.log(`[ton-indexer] CET total supply: ${totalSupply}`);
   } catch (err) {
@@ -105,8 +130,8 @@ async function main(): Promise<void> {
     const usdtAsset = Asset.jetton(usdtAddress);
 
     const tryGetPool = async (type: PoolType, assets: [Asset, Asset]) => {
-      const p = client.open(await factory.getPool(type, assets));
-      const [r0, r1] = await p.getReserves();
+      const p = client.open(await retry(() => factory.getPool(type, assets), 'factory.getPool'));
+      const [r0, r1] = await retry(() => p.getReserves(), 'pool.getReserves');
       return { pool: p, reserves: [r0, r1] as const };
     };
 

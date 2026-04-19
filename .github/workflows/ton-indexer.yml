@@ -30,6 +30,9 @@ jobs:
         run: npm ci
 
       - name: Run TON indexer (writes app/public/api/state.json)
+        env:
+          TON_RPC_ENDPOINT: "https://toncenter.com/api/v2/jsonRPC"
+          TON_RPC_API_KEY: ${{ secrets.TON_RPC_API_KEY || secrets.TONCENTER_API_KEY || secrets.TON_API_KEY }}
         run: npm run index --workspace=scripts
 
       - name: Commit state.json to main
