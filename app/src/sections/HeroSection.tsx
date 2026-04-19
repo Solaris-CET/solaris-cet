@@ -6,6 +6,7 @@ import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useLanguage } from '../hooks/useLanguage';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useSessionSeed } from '@/hooks/useSessionSeed';
+import { useDemoBeatAudio } from '@/hooks/useDemoBeatAudio';
 import { formatCetSupplyWithSuffix, formatTaskAgentMeshHeadline } from '@/lib/numerals';
 import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '../components/ui/tooltip';
 import { TonConnectButton } from '@tonconnect/ui-react';
@@ -125,6 +126,17 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
   }, []);
   const superCinematic =
     cinematic && isDemoRoute && isDesktop && !isMobile && !prefersReducedMotion && !isAutomated;
+
+  const [demoSound, setDemoSound] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return window.localStorage.getItem('solarisDemoSound') === '1';
+    } catch {
+      return false;
+    }
+  });
+
+  useDemoBeatAudio(demoSound && superCinematic);
 
   useLayoutEffect(() => {
     if (isMobile || prefersReducedMotion) {
@@ -246,6 +258,28 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
         ref={containerRef}
         className="relative min-h-dvh bg-[color:var(--solaris-void)] overflow-x-hidden lg:overflow-hidden flex flex-col justify-center items-center pt-20 pb-16 lg:pb-24 lg:pt-16"
       >
+        {isDemoRoute && cinematic && isDesktop && !isMobile && !isAutomated ? (
+          <button
+            type="button"
+            aria-pressed={demoSound}
+            aria-label="Toggle demo sound"
+            onClick={() => {
+              const next = !demoSound;
+              setDemoSound(next);
+              try {
+                window.localStorage.setItem('solarisDemoSound', next ? '1' : '0');
+              } catch {
+                void 0;
+              }
+            }}
+            className={[
+              'absolute right-5 top-5 z-20 rounded-full border px-3 py-1.5 text-[11px] font-semibold tracking-wide backdrop-blur transition-colors',
+              demoSound ? 'border-emerald-400/35 bg-emerald-400/10 text-emerald-200' : 'border-white/15 bg-black/30 text-white/80 hover:bg-black/40',
+            ].join(' ')}
+          >
+            SOUND {demoSound ? 'ON' : 'OFF'}
+          </button>
+        ) : null}
         <div ref={backgroundRef} className="absolute inset-0 z-0 overflow-hidden pointer-events-none will-change-transform" aria-hidden>
           {/* Layer 1 — fond de bază */}
           <div className="absolute inset-0 bg-[#020510]" />
