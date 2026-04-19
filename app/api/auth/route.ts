@@ -6,7 +6,8 @@ import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { getAllowedOrigin } from '../lib/cors';
 import { getDb, schema } from '../../db/client';
-import { signJwt, verifyJwt } from '../lib/jwt';
+import { getJwtSecretsFromEnv, signJwt, verifyJwtWithSecrets } from '../lib/jwt';
+import { tonAddressSchema } from '../lib/validation';
 
 export const config = { runtime: 'nodejs' };
 
@@ -46,17 +47,17 @@ export default async function handler(req: Request): Promise<Response> {
     });
   }
 
-  if (req.method === 'GET') {
+  if (req.method === 'GET' || req.method === 'DELETE') {
     const auth = req.headers.get('Authorization') ?? '';
     const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-    const secret = process.env.JWT_SECRET?.trim();
-    if (!token || !secret) {
+    const secrets = getJwtSecretsFromEnv();
+    if (!token || secrets.length === 0) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
       });
     }
-    const decoded = verifyJwt(token, secret);
+    const decoded = verifyJwtWithSecrets(token, secrets);
     if (!decoded || typeof decoded.wallet !== 'string') {
       return new Response(JSON.stringify({ error: 'Invalid token' }), {
         status: 401,
@@ -67,6 +68,16 @@ export default async function handler(req: Request): Promise<Response> {
     if (typeof decoded.sid === 'string') {
       try {
         const db = getDb();
+        if (req.method === 'DELETE') {
+          await db
+            .update(schema.sessions)
+            .set({ revokedAt: new Date() })
+            .where(eq(schema.sessions.id, decoded.sid));
+          return new Response(null, {
+            status: 204,
+            headers: { 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
+          });
+        }
         const [s] = await db
           .select()
           .from(schema.sessions)
@@ -77,12 +88,23 @@ export default async function handler(req: Request): Promise<Response> {
             headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
           });
         }
+        await db
+          .update(schema.sessions)
+          .set({ lastUsedAt: new Date() })
+          .where(eq(schema.sessions.id, decoded.sid));
       } catch {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), {
           status: 401,
           headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
         });
       }
+    }
+
+    if (req.method === 'DELETE') {
+      return new Response(null, {
+        status: 204,
+        headers: { 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
+      });
     }
 
     return new Response(JSON.stringify({ user: { wallet: decoded.wallet } }), {
@@ -111,16 +133,16 @@ export default async function handler(req: Request): Promise<Response> {
       });
     }
 
-    const walletAddress =
+    const rawWallet =
       typeof body === 'object' &&
       body !== null &&
       'walletAddress' in body &&
       typeof (body as { walletAddress: unknown }).walletAddress === 'string'
-        ? (body as { walletAddress: string }).walletAddress.trim()
+        ? (body as { walletAddress: string }).walletAddress
         : '';
-
-    if (!walletAddress) {
-      return new Response(JSON.stringify({ error: 'Adresa lipsește' }), {
+    const parsedWallet = tonAddressSchema.safeParse(rawWallet);
+    if (!parsedWallet.success) {
+      return new Response(JSON.stringify({ error: 'Adresă invalidă' }), {
         status: 400,
         headers: {
           'Content-Type': 'application/json',
@@ -129,6 +151,7 @@ export default async function handler(req: Request): Promise<Response> {
         },
       });
     }
+    const walletAddress = parsedWallet.data.toString();
 
     const db = getDb();
 
@@ -138,7 +161,7 @@ export default async function handler(req: Request): Promise<Response> {
       .where(eq(schema.users.walletAddress, walletAddress));
 
     if (existing) {
-      const secret = process.env.JWT_SECRET?.trim();
+    const secret = getJwtSecretsFromEnv()[0];
       let token: string | undefined;
       if (secret) {
         try {
@@ -179,7 +202,7 @@ export default async function handler(req: Request): Promise<Response> {
           })
           .returning();
 
-        const secret = process.env.JWT_SECRET?.trim();
+        const secret = getJwtSecretsFromEnv()[0];
         let token: string | undefined;
         if (secret) {
           try {

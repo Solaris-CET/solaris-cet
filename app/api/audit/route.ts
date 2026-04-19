@@ -1,6 +1,6 @@
 import { getAllowedOrigin } from '../lib/cors';
 import { getDb, schema } from '../../db/client';
-import { verifyJwt } from '../lib/jwt';
+import { getJwtSecretsFromEnv, verifyJwtWithSecrets } from '../lib/jwt';
 
 export const config = { runtime: 'nodejs' };
 
@@ -31,8 +31,8 @@ export default async function handler(req: Request): Promise<Response> {
     const body: unknown = await req.json();
     const auth = req.headers.get('Authorization') ?? '';
     const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-    const secret = process.env.JWT_SECRET?.trim() ?? '';
-    const decoded = token && secret ? verifyJwt(token, secret) : null;
+    const secrets = getJwtSecretsFromEnv();
+    const decoded = token && secrets.length > 0 ? verifyJwtWithSecrets(token, secrets) : null;
     const walletFromToken = decoded && typeof decoded.wallet === 'string' ? decoded.wallet : null;
 
     const payload = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};

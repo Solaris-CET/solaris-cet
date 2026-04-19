@@ -36,4 +36,17 @@ describe('Oracle', () => {
       success: false,
     });
   });
+
+  it('supports two-step admin rotation', async () => {
+    const nextAdmin = await blockchain.treasury('nextAdmin');
+    await oracle.send(admin.getSender(), { value: toNano('0.1') }, { $$type: 'ProposeAdmin', queryId: 1n, newAdmin: nextAdmin.address });
+    expect(await oracle.getPendingAdmin()).toEqualAddress(nextAdmin.address);
+
+    const badAccept = await oracle.send(user.getSender(), { value: toNano('0.1') }, { $$type: 'AcceptAdmin', queryId: 2n });
+    expect(badAccept.transactions).toHaveTransaction({ from: user.address, to: oracle.address, success: false });
+
+    await oracle.send(nextAdmin.getSender(), { value: toNano('0.1') }, { $$type: 'AcceptAdmin', queryId: 3n });
+    expect(await oracle.getAdmin()).toEqualAddress(nextAdmin.address);
+    expect(await oracle.getPendingAdmin()).toBeNull();
+  });
 });

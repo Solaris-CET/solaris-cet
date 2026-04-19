@@ -1,37 +1,7 @@
 import { getAllowedOrigin } from '../lib/cors';
+import { withUpstashRateLimit } from '../lib/rateLimit';
 
 export const config = { runtime: 'edge' };
-
-async function withRateLimit(req: Request, allowedOrigin: string): Promise<Response | null> {
-  const url = (process.env.UPSTASH_REDIS_REST_URL ?? '').trim();
-  const token = (process.env.UPSTASH_REDIS_REST_TOKEN ?? '').trim();
-  if (!url || !token) return null;
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
-  const key = `waitlist:${ip}`;
-  try {
-    const incr = await fetch(`${url}/incr/${encodeURIComponent(key)}`, {
-      headers: { Authorization: `Bearer ${token}` },
-      cache: 'no-store',
-    });
-    const payload = (await incr.json()) as { result?: unknown };
-    const count = typeof payload.result === 'number' ? payload.result : Number.NaN;
-    if (Number.isFinite(count) && count === 1) {
-      await fetch(`${url}/expire/${encodeURIComponent(key)}/60`, {
-        headers: { Authorization: `Bearer ${token}` },
-        cache: 'no-store',
-      });
-    }
-    if (Number.isFinite(count) && count > 6) {
-      return new Response(JSON.stringify({ error: 'Rate limited' }), {
-        status: 429,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
-      });
-    }
-  } catch {
-    return null;
-  }
-  return null;
-}
 
 function isValidEmail(email: string): boolean {
   const e = email.trim();
@@ -62,7 +32,11 @@ export default async function handler(req: Request): Promise<Response> {
     });
   }
 
-  const limited = await withRateLimit(req, allowedOrigin);
+  const limited = await withUpstashRateLimit(req, allowedOrigin, {
+    keyPrefix: 'waitlist',
+    limit: 6,
+    windowSeconds: 60,
+  });
   if (limited) return limited;
 
   let body: unknown;
