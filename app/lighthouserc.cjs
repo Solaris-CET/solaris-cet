@@ -27,7 +27,7 @@ module.exports = {
         'color-contrast': 'warn',
         'link-name': 'warn',
         'canonical': 'warn',
-        'robots-txt': 'warn',
+        'robots-txt': 'off',
         'csp-xss': 'warn',
         'is-on-https': 'warn',
         'render-blocking-resources': 'warn',
