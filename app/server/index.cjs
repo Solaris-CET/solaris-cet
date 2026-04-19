@@ -15,6 +15,7 @@ function setSecurityHeaders(res) {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  res.setHeader('X-Solaris-Server', 'node-static-v2');
 }
 
 function shouldServeBrotli(req) {
