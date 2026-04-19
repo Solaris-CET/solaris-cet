@@ -6,15 +6,6 @@ name: Stale Issues & PRs
 
 on:
   schedule:
-    # Run every day at 02:00 UTC
-    - cron: "0 2 * * *"
-# Runs daily at 01:00 UTC.
-# Labels issues/PRs that have had no activity for 30 days as "stale",
-# then closes them after a further 7 days of inactivity — keeping the
-# backlog clean without manual triage.
-
-on:
-  schedule:
     # Every day at 01:00 UTC
     - cron: "0 1 * * *"
   workflow_dispatch:
@@ -31,7 +22,7 @@ jobs:
       - name: Run stale action
         uses: actions/stale@v10
         with:
-          # ── Issues ────────────────────────────────────────────────────────
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           days-before-issue-stale: 30
           days-before-issue-close: 14
           stale-issue-label: "stale"
@@ -43,58 +34,19 @@ jobs:
           close-issue-message: |
             🔒 This issue has been automatically closed due to inactivity.
             Feel free to re-open it if the problem persists or the feature is still needed.
-
-          # ── Pull Requests ─────────────────────────────────────────────────
-          days-before-pr-stale: 14
+          days-before-pr-stale: 21
           days-before-pr-close: 7
           stale-pr-label: "stale"
           close-pr-label: "wontfix"
           stale-pr-message: |
-            👋 This pull request has been inactive for **14 days**.
+            👋 This pull request has been inactive for **21 days**.
             It will be automatically closed in **7 days** unless there is new activity.
             If this PR is still relevant, please push a new commit or leave a comment.
           close-pr-message: |
             🔒 This pull request has been automatically closed due to inactivity.
             Feel free to re-open it if the changes are still needed.
-
-          # ── Exemptions ────────────────────────────────────────────────────
-          # Issues/PRs with these labels are never marked stale
           exempt-issue-labels: "pinned,security,in-progress,blocked"
           exempt-pr-labels: "pinned,security,in-progress,blocked,dependencies"
           exempt-all-milestones: true
-
-          # Operate on up to 100 items per run to avoid rate-limit issues
-      - uses: actions/stale@v10
-        with:
-          # ── Issues ──────────────────────────────────────────────────────────
-          days-before-issue-stale: 30
-          days-before-issue-close: 7
-          stale-issue-label: "stale"
-          stale-issue-message: >
-            👋 This issue has been open for 30 days with no recent activity.
-            It will be closed automatically in **7 days** unless there is a
-            new comment. Feel free to re-open if it is still relevant!
-          close-issue-message: >
-            🔒 Closing due to prolonged inactivity. Please re-open or reference
-            this issue in a new one if you encounter the problem again. Thank you!
-
-          # ── Pull Requests ───────────────────────────────────────────────────
-          days-before-pr-stale: 21
-          days-before-pr-close: 7
-          stale-pr-label: "stale"
-          stale-pr-message: >
-            👋 This pull request has had no activity for 21 days.
-            It will be closed automatically in **7 days** unless there is a
-            new review, comment, or push. Reopen it if you resume work on it!
-          close-pr-message: >
-            🔒 Closing this PR due to prolonged inactivity. You can always
-            re-open it or open a new one when you are ready to continue. Thank you!
-
-          # ── Common ──────────────────────────────────────────────────────────
-          # Never stale items with these labels
-          exempt-issue-labels: "pinned,security,bug,in-progress"
-          exempt-pr-labels: "pinned,security,in-progress,do-not-close"
-          # Do not count comments from bots as activity
-          exempt-all-assignees: false
           remove-stale-when-updated: true
           operations-per-run: 100
