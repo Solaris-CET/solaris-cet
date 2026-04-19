@@ -95,31 +95,41 @@ async function serveFile(res, absPath) {
 async function tryServeStatic(req, reqUrl, res) {
   let pathname = decodeURIComponent(reqUrl.pathname);
   if (pathname.includes('\0')) return false;
-  if (pathname === '/') pathname = '/index.html';
-  const absPath = path.join(distDir, path.normalize(pathname));
-  if (!absPath.startsWith(distDir)) return false;
+  const candidates = [];
+  if (pathname === '/') {
+    candidates.push('/index.html');
+  } else {
+    candidates.push(pathname);
+    if (pathname.endsWith('/')) candidates.push(`${pathname}index.html`);
+    else candidates.push(`${pathname}/index.html`);
+  }
   try {
-    if (shouldServeBrotli(req)) {
-      try {
-        const brPath = `${absPath}.br`;
-        const brStat = await stat(brPath);
-        if (brStat.isFile()) {
-          setSecurityHeaders(res);
-          res.setHeader('Content-Encoding', 'br');
-          res.setHeader('Vary', 'Accept-Encoding');
-          await serveFile(res, brPath);
-          return true;
+    for (const candidate of candidates) {
+      const absPath = path.join(distDir, path.normalize(candidate));
+      if (!absPath.startsWith(distDir)) continue;
+      if (shouldServeBrotli(req)) {
+        try {
+          const brPath = `${absPath}.br`;
+          const brStat = await stat(brPath);
+          if (brStat.isFile()) {
+            setSecurityHeaders(res);
+            res.setHeader('Content-Encoding', 'br');
+            res.setHeader('Vary', 'Accept-Encoding');
+            await serveFile(res, brPath);
+            return true;
+          }
+        } catch {
+          void 0;
         }
-      } catch {
-        void 0;
       }
-    }
 
-    const st = await stat(absPath);
-    if (!st.isFile()) return false;
-    setSecurityHeaders(res);
-    await serveFile(res, absPath);
-    return true;
+      const st = await stat(absPath);
+      if (!st.isFile()) continue;
+      setSecurityHeaders(res);
+      await serveFile(res, absPath);
+      return true;
+    }
+    return false;
   } catch {
     return false;
   }
