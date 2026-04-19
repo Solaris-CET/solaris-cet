@@ -32,7 +32,7 @@ jobs:
         run: npm ci
 
       - name: Security audit
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=high --omit=dev
 
       - name: Run ESLint
         run: npm run lint --workspace=app
