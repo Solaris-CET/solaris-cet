@@ -21,6 +21,8 @@
     "contracts:test": "npm test --workspace=contracts",
     "contracts:typecheck": "npx tsc --noEmit -p contracts/tsconfig.json",
     "scripts:typecheck": "npm run typecheck --workspace=scripts",
+    "licenses:prod": "node scripts/generate-third-party-licenses.mjs",
+    "licenses:all": "node scripts/generate-third-party-licenses.mjs --all",
     "verify:fast": "npm run audit:prod && npm run api:typecheck && npm run scripts:typecheck && npm run contracts:test && npm run contracts:typecheck && npm run app:verify",
     "verify:all": "npm run verify:fast && npm run app:test:e2e:stable"
   },

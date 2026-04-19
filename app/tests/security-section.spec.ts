@@ -1,5 +1,7 @@
-import { test, expect } from '@playwright/test';
+import test from '@playwright/test';
 import { waitForAppReady, scrollUntilSelectorAttached } from './e2e-helpers';
+
+const expect = (test as any).expect as typeof import('@playwright/test').expect;
 
 test.describe('Security section', () => {
   test.setTimeout(60_000);
@@ -17,7 +19,7 @@ test.describe('Security section', () => {
 
     await expect(section.locator('a[href*="cyberscope.io"]').first()).toBeVisible();
     await expect(section.locator('a[href*="freshcoins.io"]').first()).toBeVisible();
-    await expect(section.locator('a[href*="mypinata.cloud/ipfs"]').first()).toBeVisible();
+    await expect(section.locator('a[href*="bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a"]').first()).toBeVisible();
     await expect(section.locator('a[href="https://github.com/Solaris-CET/solaris-cet"]').first()).toBeVisible();
   });
 

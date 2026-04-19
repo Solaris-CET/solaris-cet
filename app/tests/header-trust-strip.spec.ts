@@ -1,5 +1,7 @@
-import { test, expect } from '@playwright/test';
+import test from '@playwright/test';
 import { waitForAppReady } from './e2e-helpers';
+
+const expect = (test as any).expect as typeof import('@playwright/test').expect;
 
 test.describe('Header trust strip', () => {
   test.beforeEach(async ({ page }) => {
@@ -13,7 +15,7 @@ test.describe('Header trust strip', () => {
     const header = page.locator('header');
     await expect(header.getByRole('link', { name: /Cyberscope/ })).toBeVisible();
     await expect(header.getByRole('link', { name: /Freshcoins/ })).toBeVisible();
-    await expect(header.locator('a[href*="mypinata.cloud/ipfs"]').first()).toBeVisible();
+    await expect(header.locator('a[href*="bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a"]').first()).toBeVisible();
   });
 
   test('mobile sheet exposes the same trust links after opening the menu', async ({ page }) => {
@@ -23,6 +25,6 @@ test.describe('Header trust strip', () => {
     const sheet = page.locator('#mobile-menu');
     await expect(sheet.getByRole('link', { name: /Cyberscope/ })).toBeVisible();
     await expect(sheet.getByRole('link', { name: /Freshcoins/ })).toBeVisible();
-    await expect(sheet.locator('a[href*="mypinata.cloud/ipfs"]').first()).toBeVisible();
+    await expect(sheet.locator('a[href*="bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a"]').first()).toBeVisible();
   });
 });

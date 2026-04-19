@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Download, FileText, ArrowRight, Globe, X, Send, Copy, CheckCircle, Zap, Shield, Users, CalendarClock } from 'lucide-react';
+import { Download, FileText, ArrowRight, Globe, X, Send, Copy, CheckCircle, Zap, Shield, Users, CalendarClock } from "lucide-react";
 import { SolarisLogoMark } from '../components/SolarisLogoMark';
 import SocialShare from '../components/SocialShare';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
@@ -8,7 +8,7 @@ import AnimatedCounter from '../components/AnimatedCounter';
 import TeamFlipCard from '../components/TeamFlipCard';
 import { useCommunityProof } from '../hooks/use-community-proof';
 import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';
-import { toast } from 'sonner';
+import { toast } from "sonner";
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { HeaderTrustStrip } from '@/components/HeaderTrustStrip';
 import {
@@ -16,10 +16,11 @@ import {
   DEDUST_POOL_DEPOSIT_URL,
   DEDUST_SWAP_URL,
 } from '@/lib/dedustUrls';
+import { PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
 
 // Constants defined once to avoid duplication and maintain a single source of truth
 const GITHUB_URL = 'https://github.com/Solaris-CET/solaris-cet';
-const WHITEPAPER_URL = 'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a';
+const WHITEPAPER_URL = PUBLIC_WHITEPAPER_IPFS_URL;
 
 const socialLinks = [
   { icon: X, href: 'https://twitter.com/SolarisCET', label: 'X', color: 'hover:text-solaris-cyan hover:bg-solaris-cyan/10' },

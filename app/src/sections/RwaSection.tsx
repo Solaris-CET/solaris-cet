@@ -14,7 +14,7 @@ import { RWA_DOCUMENTS, RWA_PROJECTS, RWA_TIMELINE, statusChipClass } from '@/li
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { TONSCAN_CET_CONTRACT_URL } from '@/lib/cetContract';
 import { DEDUST_POOL_PAGE_URL } from '@/lib/dedustUrls';
-import { PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
+import { PUBLIC_WHITEPAPER_IPFS_CID, PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
 
 /** Inline SVG placeholder — replace with on-site photography of Cetățuia land when available */
 const PHYSICAL_ASSET_PLACEHOLDER_BG =
@@ -190,7 +190,7 @@ const RwaSection = () => {
   }, [prefersReducedMotion]);
 
   const ipfsCid = useMemo(() => ipfsCidFromUrl(PUBLIC_WHITEPAPER_IPFS_URL), []);
-  const proofCid = ipfsCid ?? 'bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a';
+  const proofCid = ipfsCid ?? PUBLIC_WHITEPAPER_IPFS_CID;
   const mapsQuery = useMemo(() => encodeURIComponent(selectedProject?.region ?? tx.physicalLocationName), [selectedProject, tx.physicalLocationName]);
   const mapsEmbedUrl = useMemo(() => `https://www.google.com/maps?q=${mapsQuery}&output=embed`, [mapsQuery]);
   const mapsOpenUrl = useMemo(() => `https://www.google.com/maps?q=${mapsQuery}`, [mapsQuery]);
@@ -456,7 +456,7 @@ const RwaSection = () => {
               </p>
             </div>
             <a
-              href="https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a"
+              href={PUBLIC_WHITEPAPER_IPFS_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="shrink-0 px-5 py-2.5 rounded-xl bg-solaris-gold/10 border border-solaris-gold/30 text-solaris-gold text-sm font-semibold hover:bg-solaris-gold/20 transition-colors btn-quantum"

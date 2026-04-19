@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import DOMPurify from 'dompurify';
-import * as DialogPrimitive from '@radix-ui/react-dialog';
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { SafeHtml } from './SafeHtml';
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import {
   X,
   Send,
@@ -14,7 +14,7 @@ import {
   StopCircle,
   RefreshCw,
   ClipboardList,
-} from 'lucide-react';
+} from "lucide-react";
 import { useLanguage } from '../hooks/useLanguage';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { CetAiKnowledge, Translations } from '../i18n/translations';
@@ -139,11 +139,21 @@ async function fetchCetAiChat(
     if (attempt > 0) {
       await new Promise<void>(resolve => {
         const delay = 300 + Math.random() * 400;
-        const id = setTimeout(resolve, delay);
-        signal.addEventListener('abort', () => {
+        const onAbort = () => {
           clearTimeout(id);
+          signal.removeEventListener('abort', onAbort);
           resolve();
-        }, { once: true });
+        };
+        if (signal.aborted) {
+          resolve();
+          return;
+        }
+        const onTimeout = () => {
+          signal.removeEventListener('abort', onAbort);
+          resolve();
+        };
+        const id = setTimeout(onTimeout, delay);
+        signal.addEventListener('abort', onAbort);
       });
       if (signal.aborted)
         return { text: null, sourceHeader: null, sources: [], liveEndpointError: false, errorDetail: null, httpStatus: null };
@@ -322,17 +332,11 @@ function buildContextualResponse(q: string, knowledge: CetAiKnowledge): { answer
   return { answer: knowledge.default, confidence: CONFIDENCE_SCORES.default };
 }
 
-function sanitizeHtml(html: string): string {
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'a', 'ul', 'ol', 'li'],
-    ALLOWED_ATTR: ['href', 'target', 'rel'],
-  });
-}
-
-function SanitizedHtml({ html }: { html: string }) {
-  const sanitizedHtml = React.useMemo(() => sanitizeHtml(html), [html]);
-  return <div dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
-}
+const CET_AI_SAFE_HTML_CONFIG = {
+  kind: 'limited' as const,
+  allowedTags: ['p', 'br', 'strong', 'em', 'a', 'ul', 'ol', 'li'],
+  allowedAttributes: ['href', 'target', 'rel'],
+};
 
 // --- ReAct phase status helper ---
 function getReActPhaseStatus(phase: ReActPhase, targetPhases: ReActPhase[]): string {
@@ -1495,9 +1499,12 @@ export default function CetAiSearch() {
                             ) : null}
                           </div>
                         )}
-                        <div className="text-white">
+                        <div className="text-white" role="status" aria-live="polite" aria-atomic="true">
                           {/<\/?.+?>/.test(finalResponse) ? (
-                            <SanitizedHtml html={finalResponse.replace(/\n/g, '<br/>')} />
+                            <SafeHtml
+                              html={finalResponse.replace(/\n/g, '<br/>')}
+                              config={CET_AI_SAFE_HTML_CONFIG}
+                            />
                           ) : (
                             <MarkdownText
                               text={finalResponse}

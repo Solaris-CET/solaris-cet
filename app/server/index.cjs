@@ -11,6 +11,22 @@ const port = Number.parseInt(process.env.PORT ?? '3000', 10);
 const host = process.env.HOST ?? '0.0.0.0';
 
 function setSecurityHeaders(res) {
+  res.setHeader(
+    'Content-Security-Policy',
+    [
+      "default-src 'self'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+      "object-src 'none'",
+      "img-src 'self' data: https:",
+      "font-src 'self' data:",
+      "style-src 'self' 'unsafe-inline'",
+      "script-src 'self' 'wasm-unsafe-eval'",
+      "worker-src 'self' blob:",
+      "connect-src 'self' https://mainnet.api.dedust.io https://api.dedust.io https://toncenter.com https://rpc.ankr.com https://api.dexscreener.com wss://bridge.tonapi.io wss://bridge.ton.space",
+    ].join('; '),
+  );
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');

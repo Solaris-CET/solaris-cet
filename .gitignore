@@ -84,6 +84,9 @@ pulls/
 /solaris-cet-deploy
 /solaris-cet-main/
 
+# Local compliance artifacts (generated third-party license reports)
+/artifacts/
+
 # Babel / transpiler helpers directories
 /code-frame/
 /compat-data/

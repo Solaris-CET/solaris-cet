@@ -12,6 +12,7 @@ import {
 } from '@/lib/cetContract';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 import { useLanguage } from '@/hooks/useLanguage';
+import { PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
 
 interface Resource {
   name: string;
@@ -29,8 +30,7 @@ interface ResourceCategory {
   resources: Resource[];
 }
 
-const WHITEPAPER_IPFS_URL =
-  'https://scarlet-past-walrus-15.mypinata.cloud/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a';
+const WHITEPAPER_IPFS_URL = PUBLIC_WHITEPAPER_IPFS_URL;
 
 const colorMap: Record<string, { bg: string; text: string; border: string; hud: string; hoverBorder: string }> = {
   gold: {
