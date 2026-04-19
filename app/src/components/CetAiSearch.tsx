@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { SafeHtml } from './SafeHtml';
-import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { Dialog, DialogTitle, FullscreenDialogContent } from "@/components/ui/dialog";
 import {
   X,
   Send,
@@ -1264,15 +1264,13 @@ export default function CetAiSearch() {
       </div>
 
       {/* ── Full-screen CET AI modal (Radix Dialog — focus trap, Esc) ───────── */}
-      <DialogPrimitive.Root
+      <Dialog
         open={isModalOpen}
         onOpenChange={(open: boolean) => {
           if (!open) handleClose();
         }}
       >
-        <DialogPrimitive.Portal>
-          <DialogPrimitive.Overlay className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-          <DialogPrimitive.Content
+          <FullscreenDialogContent
             data-testid="cet-ai-modal-dialog"
             aria-describedby="cet-ai-dialog-desc"
             aria-busy={isProcessing}
@@ -1281,9 +1279,11 @@ export default function CetAiSearch() {
               requestAnimationFrame(() => modalInputRef.current?.focus());
             }}
             onCloseAutoFocus={(e: Event) => e.preventDefault()}
+            showCloseButton={false}
+            overlayClassName="bg-black/95 backdrop-blur-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
             className="fixed inset-0 z-[9999] flex flex-col font-sans pt-[env(safe-area-inset-top,0px)] outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
           >
-          <DialogPrimitive.Title className="sr-only">{t.cetAi.title}</DialogPrimitive.Title>
+          <DialogTitle className="sr-only">{t.cetAi.title}</DialogTitle>
           <p id="cet-ai-dialog-desc" className="sr-only">
             {t.cetAi.modalDescription}
           </p>
@@ -1770,9 +1770,8 @@ export default function CetAiSearch() {
               {t.cetAi.escToClose}
             </p>
           </div>
-        </DialogPrimitive.Content>
-        </DialogPrimitive.Portal>
-      </DialogPrimitive.Root>
+          </FullscreenDialogContent>
+      </Dialog>
     </>
   );
 }

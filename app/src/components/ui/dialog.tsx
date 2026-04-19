@@ -78,6 +78,47 @@ function DialogContent({
   )
 }
 
+function FullscreenDialogContent({
+  className,
+  children,
+  showCloseButton = true,
+  overlayClassName,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Content> & {
+  showCloseButton?: boolean
+  overlayClassName?: string
+}) {
+  return (
+    <DialogPortal data-slot="dialog-portal">
+      <DialogOverlay
+        className={cn(
+          "bg-black/95 backdrop-blur-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+          overlayClassName
+        )}
+      />
+      <DialogPrimitive.Content
+        data-slot="dialog-content"
+        className={cn(
+          "fixed inset-0 z-[9999] w-full h-full outline-none",
+          className
+        )}
+        {...props}
+      >
+        {children}
+        {showCloseButton && (
+          <DialogPrimitive.Close
+            data-slot="dialog-close"
+            className="absolute top-4 right-4 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-white/90 hover:bg-black/60 transition-colors"
+          >
+            <XIcon className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </DialogPrimitive.Close>
+        )}
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  )
+}
+
 function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -131,6 +172,7 @@ export {
   Dialog,
   DialogClose,
   DialogContent,
+  FullscreenDialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
