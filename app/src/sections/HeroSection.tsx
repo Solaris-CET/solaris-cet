@@ -22,6 +22,10 @@ const HeroTokenHologram = lazy(() => import('@/experience/HeroTokenHologram'));
 
 gsap.registerPlugin(ScrollTrigger);
 
+function clamp01(v: number) {
+  return Math.min(1, Math.max(0, v));
+}
+
 const TICKER_DATA = [
   { label: 'AI AGENTS', value: '' },
   { label: 'SUPPLY', value: '' },
@@ -179,11 +183,19 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
       gsap.set(cut, { willChange: 'transform, opacity', opacity: 0, yPercent: 110 });
 
       const setScrub = (p: number) => {
-        const v = Math.max(0, Math.min(1, p));
+        const v = clamp01(p);
         document.documentElement.style.setProperty('--demo-scrub', v.toFixed(3));
         window.dispatchEvent(new CustomEvent('solaris:demoScrub', { detail: { progress: v } }));
       };
       setScrub(0);
+
+      const hardCut = () => {
+        const target = document.querySelector<HTMLElement>('#problem-agriculture');
+        if (!target) return;
+        window.dispatchEvent(new CustomEvent('solaris:demoBeat', { detail: { intensity: 1 } }));
+        const y = target.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      };
 
       const tl = gsap.timeline({
         defaults: { ease: 'none' },
@@ -196,6 +208,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
           anticipatePin: 1,
           pinSpacing: true,
           onUpdate: (self) => setScrub(self.progress),
+          onLeave: () => hardCut(),
         },
       });
 
