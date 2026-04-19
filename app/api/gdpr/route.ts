@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { getAllowedOrigin } from '../lib/cors';
 import { getDb, schema } from '../../db/client';
-import { verifyJwt } from '../lib/jwt';
+import { getJwtSecretsFromEnv, verifyJwtWithSecrets } from '../lib/jwt';
 
 export const config = { runtime: 'nodejs' };
 
@@ -43,8 +43,8 @@ export default async function handler(req: Request): Promise<Response> {
     }
 
     const db = getDb();
-    const secret = process.env.JWT_SECRET?.trim();
-    if (!secret) {
+    const secrets = getJwtSecretsFromEnv();
+    if (secrets.length === 0) {
       return new Response(JSON.stringify({ error: 'Not configured' }), {
         status: 501,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
@@ -52,7 +52,7 @@ export default async function handler(req: Request): Promise<Response> {
     }
     const auth = req.headers.get('Authorization') ?? '';
     const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-    const decoded = token ? verifyJwt(token, secret) : null;
+    const decoded = token ? verifyJwtWithSecrets(token, secrets) : null;
     const wallet = decoded && typeof decoded.wallet === 'string' ? decoded.wallet : null;
     if (!wallet) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {

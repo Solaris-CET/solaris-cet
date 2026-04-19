@@ -1,21 +1,6 @@
 import { TonClient } from '@ton/ton';
-import { Address } from '@ton/core';
 
 let client: TonClient | null = null;
-
-export function parseTonAddress(raw: string): Address | null {
-  const v = raw.trim();
-  if (!v) return null;
-  try {
-    return Address.parse(v);
-  } catch {
-    try {
-      return Address.parseFriendly(v).address;
-    } catch {
-      return null;
-    }
-  }
-}
 
 export function getTonClient(): TonClient | null {
   if (client) return client;

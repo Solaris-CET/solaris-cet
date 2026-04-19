@@ -12,6 +12,19 @@ function b64urlDecode(input: string): Buffer {
 
 export type JwtPayload = Record<string, unknown>;
 
+export function getJwtSecretsFromEnv(): string[] {
+  const list = (process.env.JWT_SECRETS ?? '').trim();
+  if (list) {
+    const secrets = list
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (secrets.length > 0) return secrets;
+  }
+  const single = process.env.JWT_SECRET?.trim();
+  return single ? [single] : [];
+}
+
 export async function signJwt(
   payload: JwtPayload,
   secret: string,
@@ -58,3 +71,10 @@ export function verifyJwt(token: string, secret: string): JwtPayload | null {
   return payload;
 }
 
+export function verifyJwtWithSecrets(token: string, secrets: string[]): JwtPayload | null {
+  for (const secret of secrets) {
+    const decoded = verifyJwt(token, secret);
+    if (decoded) return decoded;
+  }
+  return null;
+}
