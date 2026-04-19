@@ -21,22 +21,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: "npm"
           cache-dependency-path: package-lock.json
-
-      - name: Restore Vite build cache
-        uses: actions/cache@v5
-        with:
-          path: app/node_modules/.vite
-          key: vite-cache-${{ runner.os }}-${{ hashFiles('package-lock.json', 'app/vite.config.ts') }}
-          restore-keys: |
-            vite-cache-${{ runner.os }}-
 
       - name: Install dependencies
         run: npm ci
@@ -54,7 +46,7 @@ jobs:
         run: npm run build --workspace=app
 
       - name: Upload dist artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: app/dist
@@ -66,10 +58,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: "npm"
@@ -77,14 +69,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Restore Vite build cache
-        uses: actions/cache@v5
-        with:
-          path: app/node_modules/.vite
-          key: vite-cache-${{ runner.os }}-${{ hashFiles('package-lock.json', 'app/vite.config.ts') }}
-          restore-keys: |
-            vite-cache-${{ runner.os }}-
 
       - name: Build application (audit)
         env:
@@ -159,7 +143,7 @@ jobs:
 
       - name: Upload Lighthouse report
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: lighthouse-report
           path: app/.lighthouseci
@@ -174,10 +158,10 @@ jobs:
     timeout-minutes: 45
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: "npm"
@@ -187,7 +171,7 @@ jobs:
         run: npm ci
 
       - name: Cache Playwright browsers
-        uses: actions/cache@v5
+        uses: actions/cache@v4
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
@@ -204,7 +188,7 @@ jobs:
         run: npx playwright install-deps chromium
 
       - name: Download dist artifact
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v4
         with:
           name: dist
           path: app/dist
@@ -214,7 +198,7 @@ jobs:
 
       - name: Upload Playwright report
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: playwright-report
           path: app/playwright-report
