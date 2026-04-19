@@ -75,6 +75,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
   const titleContainerRef = useRef<HTMLDivElement>(null);
   const tickerContainerRef = useRef<HTMLDivElement>(null);
   const demoCutRef = useRef<HTMLDivElement>(null);
+  const demoHardCutDoneRef = useRef(false);
 
   const prefersReducedMotion = useReducedMotion();
   const isDesktop = useMediaQuery('(min-width: 1024px)');
@@ -190,11 +191,17 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
       setScrub(0);
 
       const hardCut = () => {
+        if (demoHardCutDoneRef.current) return;
         const target = document.querySelector<HTMLElement>('#problem-agriculture');
         if (!target) return;
+        demoHardCutDoneRef.current = true;
         window.dispatchEvent(new CustomEvent('solaris:demoBeat', { detail: { intensity: 1 } }));
         const y = target.getBoundingClientRect().top + window.scrollY;
-        window.scrollTo({ top: y, behavior: 'smooth' });
+        window.scrollTo(0, y);
+        gsap.killTweensOf(cut);
+        gsap.set(cut, { opacity: 0, yPercent: 0 });
+        gsap.to(cut, { opacity: 1, duration: 0.08, ease: 'power2.out', overwrite: true });
+        gsap.to(cut, { opacity: 0, duration: 0.22, ease: 'power2.in', delay: 0.08, overwrite: true });
       };
 
       const tl = gsap.timeline({
@@ -209,6 +216,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
           pinSpacing: true,
           onUpdate: (self) => setScrub(self.progress),
           onLeave: () => hardCut(),
+          onEnterBack: () => {
+            demoHardCutDoneRef.current = false;
+          },
         },
       });
 
