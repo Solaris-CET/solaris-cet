@@ -43,8 +43,17 @@ export default async function handler(req: Request): Promise<Response> {
   const hasTonRpcUrl = Boolean(process.env.TONCENTER_RPC_URL?.trim());
   const hasTonApiKey = Boolean(process.env.TONCENTER_API_KEY?.trim());
   const hasJwt = Boolean(process.env.JWT_SECRET?.trim());
+  const hasJwtSecrets = Boolean(process.env.JWT_SECRETS?.trim());
   const hasUpstashUrl = Boolean(process.env.UPSTASH_REDIS_REST_URL?.trim());
   const hasUpstashToken = Boolean(process.env.UPSTASH_REDIS_REST_TOKEN?.trim());
+  const gitSha =
+    process.env.GIT_SHA?.trim() ||
+    process.env.GIT_COMMIT?.trim() ||
+    process.env.SOURCE_VERSION?.trim() ||
+    process.env.VERCEL_GIT_COMMIT_SHA?.trim() ||
+    process.env.CF_PAGES_COMMIT_SHA?.trim() ||
+    process.env.GITHUB_SHA?.trim() ||
+    'unknown';
 
   const aiConfigured = Boolean(
     (hasGrokPlain || (hasGrokEnc && hasEncSecret)) && (hasGeminiPlain || (hasGeminiEnc && hasEncSecret)),
@@ -60,6 +69,9 @@ export default async function handler(req: Request): Promise<Response> {
     '# HELP solaris_time_seconds Current server time in seconds since epoch.',
     '# TYPE solaris_time_seconds gauge',
     `solaris_time_seconds ${now}`,
+    '# HELP solaris_build_info Build metadata.',
+    '# TYPE solaris_build_info gauge',
+    `solaris_build_info{git_sha="${gitSha.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/"/g, '\\"')}"} 1`,
     '# HELP solaris_ai_configured AI env keys configured.',
     '# TYPE solaris_ai_configured gauge',
     `solaris_ai_configured ${aiConfigured ? 1 : 0}`,
@@ -90,6 +102,9 @@ export default async function handler(req: Request): Promise<Response> {
     '# HELP solaris_env_jwt_secret_present JWT_SECRET present.',
     '# TYPE solaris_env_jwt_secret_present gauge',
     `solaris_env_jwt_secret_present ${hasJwt ? 1 : 0}`,
+    '# HELP solaris_env_jwt_secrets_present JWT_SECRETS present.',
+    '# TYPE solaris_env_jwt_secrets_present gauge',
+    `solaris_env_jwt_secrets_present ${hasJwtSecrets ? 1 : 0}`,
     '# HELP solaris_env_toncenter_rpc_url_present TONCENTER_RPC_URL present.',
     '# TYPE solaris_env_toncenter_rpc_url_present gauge',
     `solaris_env_toncenter_rpc_url_present ${hasTonRpcUrl ? 1 : 0}`,

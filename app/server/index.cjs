@@ -10,6 +10,161 @@ const apiDistDir = path.join(appRoot, '.api-dist');
 const port = Number.parseInt(process.env.PORT ?? '3000', 10);
 const host = process.env.HOST ?? '0.0.0.0';
 
+const sentryDsn = String(process.env.SENTRY_DSN ?? '').trim();
+const sentryEnabled = Boolean(sentryDsn);
+let sentry = null;
+
+if (sentryEnabled) {
+  try {
+    sentry = require('@sentry/node');
+    sentry.init({
+      dsn: sentryDsn,
+      environment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV || 'production',
+      tracesSampleRate: Number.parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE ?? '0'),
+      sendDefaultPii: false,
+    });
+    process.on('unhandledRejection', (reason) => {
+      try {
+        sentry.captureException(reason);
+      } catch {
+        void 0;
+      }
+    });
+    process.on('uncaughtException', (err) => {
+      try {
+        sentry.captureException(err);
+      } catch {
+        void 0;
+      }
+    });
+  } catch {
+    sentry = null;
+  }
+}
+
+const serverStartMs = Date.now();
+
+function getBuildSha() {
+  const candidates = [
+    process.env.GIT_SHA,
+    process.env.GIT_COMMIT,
+    process.env.SOURCE_VERSION,
+    process.env.VERCEL_GIT_COMMIT_SHA,
+    process.env.CF_PAGES_COMMIT_SHA,
+    process.env.GITHUB_SHA,
+  ];
+  for (const v of candidates) {
+    const s = String(v ?? '').trim();
+    if (s) return s;
+  }
+  return 'unknown';
+}
+
+function normalizeMetricsPath(pathname) {
+  if (!pathname) return '/';
+  if (pathname === '/' || pathname === '/index.html') return '/';
+  if (pathname.startsWith('/assets/')) return '/assets/*';
+  if (pathname.startsWith('/vendor/')) return '/vendor/*';
+  if (pathname.startsWith('/sovereign/')) return '/sovereign/*';
+  if (pathname.startsWith('/apocalypse/')) return '/apocalypse/*';
+  if (pathname.startsWith('/api/')) {
+    const parts = pathname.split('/').filter(Boolean);
+    const a = parts[0] ?? 'api';
+    const b = parts[1] ?? '*';
+    const c = parts[2];
+    return c ? `/${a}/${b}/${c}` : `/${a}/${b}`;
+  }
+  return pathname.replace(/\d+/g, ':n');
+}
+
+function escapePromLabel(v) {
+  return String(v).replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/"/g, '\\"');
+}
+
+const metrics = {
+  requestsTotal: new Map(),
+  requestsDurationMsSum: new Map(),
+  requestsDurationMsCount: new Map(),
+};
+
+function metricsKey(method, path, status) {
+  return `${method}|${path}|${status}`;
+}
+
+function incMap(map, key, by) {
+  map.set(key, (map.get(key) ?? 0) + by);
+}
+
+function recordRequestMetric(method, pathname, statusCode, durationMs) {
+  const pathLabel = normalizeMetricsPath(pathname);
+  const methodLabel = (method || 'GET').toUpperCase();
+  const statusLabel = String(statusCode || 0);
+  const k = metricsKey(methodLabel, pathLabel, statusLabel);
+  incMap(metrics.requestsTotal, k, 1);
+  incMap(metrics.requestsDurationMsSum, k, durationMs);
+  incMap(metrics.requestsDurationMsCount, k, 1);
+}
+
+function formatPromMetrics() {
+  const now = Math.floor(Date.now() / 1000);
+  const upSeconds = Math.max(0, Math.floor((Date.now() - serverStartMs) / 1000));
+  const sha = getBuildSha();
+  const lines = [
+    '# HELP solaris_up Service is up.',
+    '# TYPE solaris_up gauge',
+    'solaris_up 1',
+    '# HELP solaris_uptime_seconds Process uptime in seconds.',
+    '# TYPE solaris_uptime_seconds gauge',
+    `solaris_uptime_seconds ${upSeconds}`,
+    '# HELP solaris_time_seconds Current server time in seconds since epoch.',
+    '# TYPE solaris_time_seconds gauge',
+    `solaris_time_seconds ${now}`,
+    '# HELP solaris_build_info Build metadata.',
+    '# TYPE solaris_build_info gauge',
+    `solaris_build_info{git_sha="${escapePromLabel(sha)}",node="${escapePromLabel(process.version)}"} 1`,
+    '# HELP solaris_http_requests_total Total HTTP requests processed by the Node server.',
+    '# TYPE solaris_http_requests_total counter',
+  ];
+
+  for (const [k, v] of metrics.requestsTotal.entries()) {
+    const [method, path, status] = k.split('|');
+    lines.push(
+      `solaris_http_requests_total{method="${escapePromLabel(method)}",path="${escapePromLabel(
+        path,
+      )}",status="${escapePromLabel(status)}"} ${v}`,
+    );
+  }
+
+  lines.push(
+    '# HELP solaris_http_request_duration_ms_sum Total request duration (ms) sum.',
+    '# TYPE solaris_http_request_duration_ms_sum counter',
+  );
+  for (const [k, v] of metrics.requestsDurationMsSum.entries()) {
+    const [method, path, status] = k.split('|');
+    lines.push(
+      `solaris_http_request_duration_ms_sum{method="${escapePromLabel(method)}",path="${escapePromLabel(
+        path,
+      )}",status="${escapePromLabel(status)}"} ${v}`,
+    );
+  }
+
+  lines.push(
+    '# HELP solaris_http_request_duration_ms_count Total request duration (ms) count.',
+    '# TYPE solaris_http_request_duration_ms_count counter',
+  );
+  for (const [k, v] of metrics.requestsDurationMsCount.entries()) {
+    const [method, path, status] = k.split('|');
+    lines.push(
+      `solaris_http_request_duration_ms_count{method="${escapePromLabel(method)}",path="${escapePromLabel(
+        path,
+      )}",status="${escapePromLabel(status)}"} ${v}`,
+    );
+  }
+
+  lines.push('');
+  return lines.join('\n');
+}
+
 function setSecurityHeaders(res) {
   res.setHeader(
     'Content-Security-Policy',
@@ -199,9 +354,33 @@ async function serveApi(req, res, reqUrl) {
 }
 
 const server = http.createServer(async (req, res) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    try {
+      const pathname = (() => {
+        try {
+          return getRequestUrl(req).pathname;
+        } catch {
+          return '/';
+        }
+      })();
+      recordRequestMetric(req.method ?? 'GET', pathname, res.statusCode, Date.now() - start);
+    } catch {
+      void 0;
+    }
+  });
+
   try {
     const reqUrl = getRequestUrl(req);
     const p = reqUrl.pathname;
+    if (p === '/metrics') {
+      res.statusCode = 200;
+      setSecurityHeaders(res);
+      res.setHeader('Content-Type', 'text/plain; version=0.0.4; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-store');
+      res.end(formatPromMetrics());
+      return;
+    }
     if (p === '/whitepaper' || p === '/whitepaper/') {
       res.statusCode = 302;
       setSecurityHeaders(res);
@@ -239,6 +418,11 @@ const server = http.createServer(async (req, res) => {
     await serveIndex(res);
   } catch (err) {
     console.error(err);
+    try {
+      if (sentry) sentry.captureException(err);
+    } catch {
+      void 0;
+    }
     res.statusCode = 500;
     setSecurityHeaders(res);
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
