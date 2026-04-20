@@ -24,11 +24,18 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-COPY --from=builder /repo/node_modules /app/node_modules
-COPY --from=builder /repo/app/dist /app/dist
-COPY --from=builder /repo/app/.api-dist /app/.api-dist
-COPY --from=builder /repo/app/server /app/server
+RUN addgroup -S app && adduser -S app -G app
+
+COPY --from=builder --chown=app:app /repo/node_modules /app/node_modules
+COPY --from=builder --chown=app:app /repo/app/dist /app/dist
+COPY --from=builder --chown=app:app /repo/app/.api-dist /app/.api-dist
+COPY --from=builder --chown=app:app /repo/app/server /app/server
 
 EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:3000/health.json >/dev/null || exit 1
+
+USER app
 
 CMD ["node", "server/index.cjs"]

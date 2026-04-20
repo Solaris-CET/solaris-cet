@@ -1,138 +1,61 @@
 version: 2
 updates:
-  # ── App (npm) ─────────────────────────────────────────────────────────────
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      npm-workspaces:
+        patterns:
+          - "*"
+
   - package-ecosystem: "npm"
     directory: "/app"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "09:00"
-      timezone: "Europe/Bucharest"
     open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "security"
-    commit-message:
-      prefix: "chore(deps)"
-      prefix-development: "chore(deps-dev)"
     groups:
-      radix-ui:
+      app:
         patterns:
-          - "@radix-ui/*"
-      react:
-        patterns:
-          - "react"
-          - "react-dom"
-          - "@types/react"
-          - "@types/react-dom"
-      gsap:
-        patterns:
-          - "gsap"
-          - "@gsap/*"
-      lucide:
-        patterns:
-          - "lucide-react"
-      tailwind:
-        patterns:
-          - "tailwindcss"
-          - "tailwindcss-*"
-          - "@tailwindcss/*"
-          - "tailwind-merge"
-          - "tailwindcss-animate"
-          - "tw-animate-css"
-          - "autoprefixer"
-          - "postcss"
-      vite:
-        patterns:
-          - "vite"
-          - "@vitejs/*"
-          - "vite-plugin-*"
-      typescript-eslint:
-        patterns:
-          - "typescript"
-          - "typescript-eslint"
-          - "eslint"
-          - "eslint-plugin-*"
-          - "@eslint/*"
-          - "globals"
-      testing:
-        patterns:
-          - "vitest"
-          - "@vitest/*"
-          - "@playwright/test"
-      forms:
-        patterns:
-          - "react-hook-form"
-          - "@hookform/*"
-          - "zod"
-      ton:
-        patterns:
-          - "@tonconnect/*"
-      recharts:
-        patterns:
-          - "recharts"
+          - "*"
 
-  # ── Contracts (npm) ───────────────────────────────────────────────────────
+  - package-ecosystem: "npm"
+    directory: "/api"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      api:
+        patterns:
+          - "*"
+
   - package-ecosystem: "npm"
     directory: "/contracts"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "09:00"
-      timezone: "Europe/Bucharest"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "smart-contracts"
-    commit-message:
-      prefix: "chore(contracts-deps)"
-      prefix-development: "chore(contracts-deps-dev)"
+    open-pull-requests-limit: 10
     groups:
-      vitest:
+      contracts:
         patterns:
-          - "vitest"
-          - "@vitest/*"
-      typescript:
-        patterns:
-          - "typescript"
-          - "typescript-eslint"
-          - "@types/*"
-      eslint:
-        patterns:
-          - "eslint"
-          - "eslint-plugin-*"
-          - "@eslint/*"
-      tonconnect:
-        patterns:
-          - "@tonconnect/*"
+          - "*"
 
-  # ── Scripts (npm) ───────────────────────────────────────────────────────────
   - package-ecosystem: "npm"
     directory: "/scripts"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "09:00"
-      timezone: "Europe/Bucharest"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "scripts"
-    commit-message:
-      prefix: "chore(scripts-deps)"
-      prefix-development: "chore(scripts-deps-dev)"
+    open-pull-requests-limit: 10
+    groups:
+      scripts:
+        patterns:
+          - "*"
 
-  # ── GitHub Actions ──────────────────────────────────────────────────────────
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "09:00"
-      timezone: "Europe/Bucharest"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "ci"
-    commit-message:
-      prefix: "chore(ci)"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+

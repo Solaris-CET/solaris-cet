@@ -1,0 +1,43 @@
+name: Uptime — External Probes
+
+on:
+  schedule:
+    - cron: "11 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe health.json
+        run: |
+          set -e
+          curl -fsS https://solaris-cet.com/health.json | head -c 200
+
+      - name: Probe API health
+        run: |
+          set -e
+          curl -fsS https://solaris-cet.com/api/health | head -c 400
+
+      - name: Probe metrics
+        run: |
+          set -e
+          curl -fsS https://solaris-cet.com/api/metrics | head -c 400
+
+      - name: Probe whitepaper route
+        run: |
+          set -e
+          code=$(curl -sS -o /dev/null -w "%{http_code}" -L https://solaris-cet.com/whitepaper)
+          if [ "$code" -lt 200 ] || [ "$code" -ge 400 ]; then
+            echo "Unexpected HTTP code: $code"
+            exit 1
+          fi
+
+      - name: Probe IPFS gateway (CID)
+        run: |
+          set -e
+          CID=bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a
+          curl -fsS "https://dweb.link/ipfs/${CID}" | head -c 200
