@@ -42,6 +42,18 @@ export default async function handler(req: Request): Promise<Response> {
   const hasGeminiEnc = Boolean(process.env.GEMINI_API_KEY_ENC?.trim());
   const hasTonRpcUrl = Boolean(process.env.TONCENTER_RPC_URL?.trim());
   const hasTonApiKey = Boolean(process.env.TONCENTER_API_KEY?.trim());
+  const hasUpstashUrl = Boolean(process.env.UPSTASH_REDIS_REST_URL?.trim());
+  const hasUpstashToken = Boolean(process.env.UPSTASH_REDIS_REST_TOKEN?.trim());
+  const hasJwtSecret = Boolean(process.env.JWT_SECRET?.trim());
+  const hasJwtSecrets = Boolean(process.env.JWT_SECRETS?.trim());
+  const gitSha =
+    process.env.GIT_SHA?.trim() ||
+    process.env.GIT_COMMIT?.trim() ||
+    process.env.SOURCE_VERSION?.trim() ||
+    process.env.VERCEL_GIT_COMMIT_SHA?.trim() ||
+    process.env.CF_PAGES_COMMIT_SHA?.trim() ||
+    process.env.GITHUB_SHA?.trim() ||
+    null;
 
   const dbConfigured = hasDbUrl;
   const aiConfigured = Boolean(
@@ -56,6 +68,8 @@ export default async function handler(req: Request): Promise<Response> {
         db: dbConfigured ? 'configured' : 'missing',
         ai: aiConfigured ? 'configured' : 'missing',
         ton: tonConfigured ? 'configured' : 'missing',
+        rateLimit: hasUpstashUrl && hasUpstashToken ? 'configured' : 'missing',
+        jwt: hasJwtSecrets || hasJwtSecret ? 'configured' : 'missing',
       },
       env: {
         db: { databaseUrl: hasDbUrl },
@@ -70,6 +84,18 @@ export default async function handler(req: Request): Promise<Response> {
           rpcUrl: hasTonRpcUrl,
           apiKey: hasTonApiKey,
         },
+        upstash: {
+          url: hasUpstashUrl,
+          token: hasUpstashToken,
+        },
+        jwt: {
+          secret: hasJwtSecret,
+          secrets: hasJwtSecrets,
+        },
+      },
+      build: {
+        gitSha,
+        node: typeof process !== 'undefined' ? process.version : null,
       },
       time: new Date().toISOString(),
     },

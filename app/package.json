@@ -94,6 +94,7 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.0",
     "@react-three/postprocessing": "^3.0.4",
+    "@sentry/node": "^10.49.0",
     "@ton/core": "^0.63.1",
     "@ton/ton": "16.2.4",
     "@tonconnect/ui-react": "^2.4.4",
