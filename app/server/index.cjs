@@ -177,15 +177,19 @@ function setSecurityHeaders(res) {
       "img-src 'self' data: https:",
       "font-src 'self' data:",
       "style-src 'self' 'unsafe-inline'",
-      "script-src 'self' 'wasm-unsafe-eval'",
+      "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://telegram.org",
       "worker-src 'self' blob:",
-      "connect-src 'self' https://mainnet.api.dedust.io https://api.dedust.io https://toncenter.com https://rpc.ankr.com https://api.dexscreener.com wss://bridge.tonapi.io wss://bridge.ton.space",
+      "connect-src 'self' https://toncenter.com https://tonapi.io https://github.com https://api.dedust.io https://mainnet.api.dedust.io https://bridge.tonapi.io https://tonconnectapi.com https://telegram.org https://config.ton.org https://api.country.is https://api.coingecko.com https://rpc.ankr.com https://api.dexscreener.com wss:",
+      "frame-src https://www.google.com",
     ].join('; '),
   );
+  res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-DNS-Prefetch-Control', 'off');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
   res.setHeader('X-Solaris-Server', 'node-static-v4');
 }
 
