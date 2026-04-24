@@ -10,6 +10,8 @@ const apiDistDir = path.join(appRoot, '.api-dist');
 const port = Number.parseInt(process.env.PORT ?? '3000', 10);
 const host = process.env.HOST ?? '0.0.0.0';
 
+const metricsToken = String(process.env.METRICS_TOKEN ?? '').trim();
+
 const sentryDsn = String(process.env.SENTRY_DSN ?? '').trim();
 const sentryEnabled = Boolean(sentryDsn);
 let sentry = null;
@@ -163,6 +165,19 @@ function formatPromMetrics() {
 
   lines.push('');
   return lines.join('\n');
+}
+
+function isMetricsAuthorized(req) {
+  if (!metricsToken) return true;
+  const url = getRequestUrl(req);
+  const tokenQuery = url.searchParams.get('token');
+  if (tokenQuery && tokenQuery === metricsToken) return true;
+  const auth = String(req.headers.authorization ?? '');
+  if (auth.toLowerCase().startsWith('bearer ')) {
+    const token = auth.slice('bearer '.length).trim();
+    return token === metricsToken;
+  }
+  return false;
 }
 
 function setSecurityHeaders(res) {
@@ -378,6 +393,14 @@ const server = http.createServer(async (req, res) => {
     const reqUrl = getRequestUrl(req);
     const p = reqUrl.pathname;
     if (p === '/metrics') {
+      if (!isMetricsAuthorized(req)) {
+        res.statusCode = 401;
+        setSecurityHeaders(res);
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-store');
+        res.end('unauthorized');
+        return;
+      }
       res.statusCode = 200;
       setSecurityHeaders(res);
       res.setHeader('Content-Type', 'text/plain; version=0.0.4; charset=utf-8');
