@@ -11,6 +11,11 @@ Operational notes for the static SPA + Docker/nginx deploy (Coolify → VPS). **
 
 ## Critical scenarios
 
+## Metrics
+
+- Node server exports Prometheus metrics at **`GET /metrics`** (request counters + latency + build info).
+- Edge handlers also export basic env/config gauges at **`GET /api/metrics`**.
+
 ### 1. React white screen / ErrorBoundary
 
 **Signs:** User sees the error recovery UI (not a blank page — boundary wraps the app in `main.tsx`).

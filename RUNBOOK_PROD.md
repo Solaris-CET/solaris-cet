@@ -67,6 +67,8 @@ curl -sS https://solaris-cet.com/api/health
 echo
 curl -sS https://solaris-cet.com/api/metrics | egrep 'solaris_env_|solaris_(ai|db|ton)_configured' | head -n 120
 echo
+curl -sS https://solaris-cet.com/metrics | head -n 80
+echo
 ```
 
 ## 5) How to read the metrics (fast triage)

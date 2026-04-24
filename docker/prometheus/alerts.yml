@@ -1,0 +1,28 @@
+groups:
+  - name: solaris.rules
+    rules:
+      - alert: SolarisInstanceDown
+        expr: up{job="solaris"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Solaris is down
+
+      - alert: SolarisHigh5xxRate
+        expr: >-
+          (sum(rate(solaris_http_requests_total{status=~"5.."}[5m])) / sum(rate(solaris_http_requests_total[5m]))) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High 5xx rate (>5%)
+
+      - alert: SolarisHighLatency
+        expr: >-
+          (sum(rate(solaris_http_request_duration_ms_sum[5m])) / sum(rate(solaris_http_request_duration_ms_count[5m]))) > 800
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: High average latency (>800ms)

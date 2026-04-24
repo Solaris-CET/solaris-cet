@@ -16,7 +16,7 @@
     "app:verify": "npm run verify --workspace=app",
     "app:test:e2e": "npm run test:e2e --workspace=app",
     "app:test:e2e:stable": "PW_WORKERS=1 npm run test:e2e --workspace=app",
-    "audit:prod": "npm audit --omit=dev",
+    "audit:prod": "npm audit --omit=dev --audit-level=high",
     "api:typecheck": "npm run typecheck --workspace=api",
     "contracts:test": "npm test --workspace=contracts",
     "contracts:typecheck": "npx tsc --noEmit -p contracts/tsconfig.json",

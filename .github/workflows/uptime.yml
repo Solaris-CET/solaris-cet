@@ -27,6 +27,17 @@ jobs:
           set -e
           curl -fsS https://solaris-cet.com/api/metrics | head -c 400
 
+      - name: Probe server /metrics
+        env:
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+        run: |
+          set -e
+          if [ -n "${METRICS_TOKEN}" ]; then
+            curl -fsS -H "Authorization: Bearer ${METRICS_TOKEN}" https://solaris-cet.com/metrics | head -c 200
+          else
+            curl -fsS https://solaris-cet.com/metrics | head -c 200
+          fi
+
       - name: Probe whitepaper route
         run: |
           set -e

@@ -10,6 +10,8 @@ const apiDistDir = path.join(appRoot, '.api-dist');
 const port = Number.parseInt(process.env.PORT ?? '3000', 10);
 const host = process.env.HOST ?? '0.0.0.0';
 
+const metricsToken = String(process.env.METRICS_TOKEN ?? '').trim();
+
 const sentryDsn = String(process.env.SENTRY_DSN ?? '').trim();
 const sentryEnabled = Boolean(sentryDsn);
 let sentry = null;
@@ -165,6 +167,19 @@ function formatPromMetrics() {
   return lines.join('\n');
 }
 
+function isMetricsAuthorized(req) {
+  if (!metricsToken) return true;
+  const url = getRequestUrl(req);
+  const tokenQuery = url.searchParams.get('token');
+  if (tokenQuery && tokenQuery === metricsToken) return true;
+  const auth = String(req.headers.authorization ?? '');
+  if (auth.toLowerCase().startsWith('bearer ')) {
+    const token = auth.slice('bearer '.length).trim();
+    return token === metricsToken;
+  }
+  return false;
+}
+
 function setSecurityHeaders(res) {
   res.setHeader(
     'Content-Security-Policy',
@@ -177,15 +192,19 @@ function setSecurityHeaders(res) {
       "img-src 'self' data: https:",
       "font-src 'self' data:",
       "style-src 'self' 'unsafe-inline'",
-      "script-src 'self' 'wasm-unsafe-eval'",
+      "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://telegram.org",
       "worker-src 'self' blob:",
-      "connect-src 'self' https://mainnet.api.dedust.io https://api.dedust.io https://toncenter.com https://rpc.ankr.com https://api.dexscreener.com wss://bridge.tonapi.io wss://bridge.ton.space",
+      "connect-src 'self' https://toncenter.com https://tonapi.io https://github.com https://api.dedust.io https://mainnet.api.dedust.io https://bridge.tonapi.io https://tonconnectapi.com https://telegram.org https://config.ton.org https://api.country.is https://api.coingecko.com https://rpc.ankr.com https://api.dexscreener.com wss:",
+      "frame-src https://www.google.com",
     ].join('; '),
   );
+  res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-DNS-Prefetch-Control', 'off');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
   res.setHeader('X-Solaris-Server', 'node-static-v4');
 }
 
@@ -374,6 +393,14 @@ const server = http.createServer(async (req, res) => {
     const reqUrl = getRequestUrl(req);
     const p = reqUrl.pathname;
     if (p === '/metrics') {
+      if (!isMetricsAuthorized(req)) {
+        res.statusCode = 401;
+        setSecurityHeaders(res);
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-store');
+        res.end('unauthorized');
+        return;
+      }
       res.statusCode = 200;
       setSecurityHeaders(res);
       res.setHeader('Content-Type', 'text/plain; version=0.0.4; charset=utf-8');
