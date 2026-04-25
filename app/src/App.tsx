@@ -18,16 +18,28 @@ import PwaInstallPrompt from './components/PwaInstallPrompt';
 import { BuildSeal } from './components/BuildSeal';
 import { LanguageContext, useLanguageState } from './hooks/useLanguage';
 import { useSmoothAnchors } from './hooks/useSmoothAnchors';
+import { applySpaSeo } from '@/lib/spaSeo';
 import './App.css';
 import { shortSkillWhisper, skillSeedFromLabel } from './lib/meshSkillFeed';
 import CookieConsentBanner from './components/CookieConsentBanner';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { CetSymbol } from './components/CetSymbol';
+import {
+  URL_LOCALES,
+  localizePathname,
+  parseUrlLocaleFromPathname,
+  shouldLocalePrefixPathname,
+  urlLocaleFromLang,
+} from '@/i18n/urlRouting';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const RwaPage = lazy(() => import('./pages/RwaPage'));
 const CetAiPage = lazy(() => import('./pages/CetAiPage'));
 const DemoPage = lazy(() => import('./pages/DemoPage'));
+const AccessibilityPage = lazy(() => import('./pages/AccessibilityPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const AccountPage = lazy(() => import('./pages/AccountPage'));
+const AdminPage = lazy(() => import('./pages/AdminPage'));
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -49,10 +61,30 @@ function AppContent() {
     if (typeof window === 'undefined') return '/';
     return window.location.pathname || '/';
   })();
-  const routePath = (() => {
-    const raw = pathnameRaw.replace(/\/$/, '') || '/';
-    return raw === '/index.html' ? '/' : raw;
-  })();
+  const parsedPath = parseUrlLocaleFromPathname(pathnameRaw);
+  const activeUrlLocale = parsedPath.locale ?? urlLocaleFromLang(langState.lang);
+  const routePath = parsedPath.pathnameNoLocale;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    const parsed = parseUrlLocaleFromPathname(url.pathname);
+
+    const qpLang = url.searchParams.get('lang');
+    const qpLocale = qpLang ? qpLang.slice(0, 2).toLowerCase() : '';
+    if (qpLocale && (URL_LOCALES as readonly string[]).includes(qpLocale)) {
+      url.pathname = localizePathname(parsed.pathnameNoLocale, qpLocale as (typeof URL_LOCALES)[number]);
+      url.searchParams.delete('lang');
+      window.location.replace(url.toString());
+      return;
+    }
+
+    if (parsed.locale) return;
+    if (!shouldLocalePrefixPathname(url.pathname)) return;
+    url.pathname = localizePathname(parsed.pathnameNoLocale, activeUrlLocale);
+    url.searchParams.delete('lang');
+    window.location.replace(url.toString());
+  }, [activeUrlLocale]);
 
   useEffect(() => {
     const loadingEl = loadingRef.current;
@@ -183,7 +215,9 @@ function AppContent() {
   /** When the server serves `index.html` for a route, scroll to the matching section after lazy sections mount. */
   useEffect(() => {
     if (!isLoaded) return;
-    const path = window.location.pathname.replace(/\/$/, '') || '/';
+    const reducedMotion =
+      typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const path = routePath;
     const routeToSectionId: Record<string, string> = {
       '/mining': 'mining',
       '/rwa': 'rwa',
@@ -197,7 +231,7 @@ function AppContent() {
     const id = window.setInterval(() => {
       const el = document.getElementById(targetId);
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        el.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
         window.clearInterval(id);
         return;
       }
@@ -207,57 +241,42 @@ function AppContent() {
     }, 120);
 
     return () => window.clearInterval(id);
-  }, [isLoaded]);
+  }, [isLoaded, routePath]);
 
   useEffect(() => {
-    const path = window.location.pathname.replace(/\/$/, '') || '/';
+    const seo = (langState.t as unknown as { seo?: Record<string, string> }).seo ?? {};
     const routeMeta: Record<string, { title: string; description: string }> = {
-      '/': {
-        title: 'Home | Solaris CET',
-        description:
-          "Solaris CET is an AI-native RWA token on TON blockchain. 9,000 CET fixed supply. 200,000 autonomous AI agents via Grok × Gemini dual-AI RAV Protocol.",
-      },
-      '/demo': {
-        title: 'Demo | Solaris CET',
-        description:
-          'Experimental cinematic demo build: hologram visuals, progressive WebGL, and motion choreography. Falls back safely on low-end devices.',
-      },
-      '/rwa': {
-        title: 'RWA | Solaris CET',
-        description:
-          'Explore Solaris CET real-world asset proof surface: evidence links, timeline, and project documents anchored in Cetățuia, Romania.',
-      },
-      '/cet-ai': {
-        title: 'CET AI Demo | Solaris CET',
-        description:
-          'Try the CET AI demo UI with secure /api/chat integration, UX error states, and privacy guidance (do not enter personal data).',
+      '/': { title: seo.homeTitle, description: seo.homeDescription },
+      '/demo': { title: seo.demoTitle, description: seo.demoDescription },
+      '/rwa': { title: seo.rwaTitle, description: seo.rwaDescription },
+      '/cet-ai': { title: seo.cetAiTitle, description: seo.cetAiDescription },
+      '/mining': { title: seo.miningTitle, description: seo.miningDescription },
+      '/accessibility': {
+        title: seo.accessibilityTitle ?? seo.homeTitle,
+        description: seo.accessibilityDescription ?? seo.homeDescription,
       },
     };
-    const meta = routeMeta[path];
-    if (!meta) return;
+    const meta = routeMeta[routePath];
+    if (!meta) {
+      applySpaSeo({
+        origin: PRODUCTION_SITE_ORIGIN,
+        pathnameNoLocale: routePath,
+        locale: activeUrlLocale,
+        title: seo.homeTitle,
+        description: seo.homeDescription,
+        noindex: true,
+      });
+      return;
+    }
 
-    const absoluteUrl = `${PRODUCTION_SITE_ORIGIN}${path === '/' ? '' : path}`;
-    document.title = meta.title;
-
-    const setMeta = (selector: string, content: string) => {
-      const el = document.querySelector(selector) as HTMLMetaElement | null;
-      if (el) el.setAttribute('content', content);
-    };
-
-    const setLink = (selector: string, href: string) => {
-      const el = document.querySelector(selector) as HTMLLinkElement | null;
-      if (el) el.setAttribute('href', href);
-    };
-
-    setMeta('meta[name="description"]', meta.description);
-    setMeta('meta[property="og:url"]', absoluteUrl);
-    setMeta('meta[property="og:title"]', meta.title);
-    setMeta('meta[property="og:description"]', meta.description);
-    setMeta('meta[name="twitter:url"]', absoluteUrl);
-    setMeta('meta[name="twitter:title"]', meta.title);
-    setMeta('meta[name="twitter:description"]', meta.description);
-    setLink('link[rel="canonical"]', absoluteUrl);
-  }, []);
+    applySpaSeo({
+      origin: PRODUCTION_SITE_ORIGIN,
+      pathnameNoLocale: routePath,
+      locale: activeUrlLocale,
+      title: meta.title,
+      description: meta.description,
+    });
+  }, [activeUrlLocale, langState.t, routePath]);
 
   return (
     <LanguageContext.Provider value={langState}>
@@ -369,8 +388,23 @@ function AppContent() {
             routePath !== '/rwa' &&
             routePath !== '/demo' &&
             routePath !== '/cet-ai' &&
+            routePath !== '/mining' &&
+            routePath !== '/accessibility' &&
+            routePath !== '/login' &&
+            routePath !== '/app' &&
+            routePath !== '/admin' &&
             !isLhci ? (
             <NotFoundPage attemptedPath={pathnameRaw} />
+          ) : routePath === '/mining' ? (
+            <HomePage />
+          ) : routePath === '/accessibility' ? (
+            <AccessibilityPage />
+          ) : routePath === '/login' ? (
+            <LoginPage />
+          ) : routePath === '/app' ? (
+            <AccountPage />
+          ) : routePath === '/admin' ? (
+            <AdminPage />
           ) : routePath === '/rwa' ? (
             <RwaPage />
           ) : routePath === '/demo' ? (
@@ -415,4 +449,5 @@ function App() {
   );
 }
 
+export { App };
 export default App;

@@ -74,6 +74,34 @@ export interface Translations {
     /** `BuildSeal` — replace `{commit}` and `{date}` (YYYY-MM-DD). */
     buildSealAriaLabel: string;
   };
+  region: {
+    ariaLabel: string;
+    eu: string;
+    asia: string;
+    disclaimerEu: string;
+    disclaimerAsia: string;
+  };
+  seo: {
+    homeTitle: string;
+    homeDescription: string;
+    demoTitle: string;
+    demoDescription: string;
+    rwaTitle: string;
+    rwaDescription: string;
+    cetAiTitle: string;
+    cetAiDescription: string;
+    miningTitle: string;
+    miningDescription: string;
+    accessibilityTitle: string;
+    accessibilityDescription: string;
+  };
+  notFound: {
+    heading: string;
+    description: string;
+    pathLabel: string;
+    goHome: string;
+    openStatic: string;
+  };
   /** Footer / resource strip social actions. */
   social: {
     shareOnX: string;
@@ -1791,6 +1819,38 @@ const translations: Record<LangCode, Translations> = {
       buildSealAriaLabel:
         'Deployment artifact: short commit {commit}, build date {date}. Compare with the repository to verify this deployment.',
     },
+    region: {
+      ariaLabel: 'Select region',
+      eu: 'Europe (EU)',
+      asia: 'Asia',
+      disclaimerEu: 'Region: EU. Content is localized for EU visitors where applicable.',
+      disclaimerAsia: 'Region: Asia. Content is localized for Asia visitors where applicable.',
+    },
+    seo: {
+      homeTitle: 'Home | Solaris CET',
+      homeDescription:
+        'Solaris CET is an AI-native RWA token on TON blockchain. 9,000 CET fixed supply. 200,000 autonomous AI agents via Grok × Gemini dual-AI RAV Protocol.',
+      demoTitle: 'Demo | Solaris CET',
+      demoDescription:
+        'Experimental cinematic demo build: hologram visuals, progressive WebGL, and motion choreography. Falls back safely on low-end devices.',
+      rwaTitle: 'RWA | Solaris CET',
+      rwaDescription:
+        'Explore Solaris CET real-world asset proof surface: evidence links, timeline, and project documents anchored in Cetățuia, Romania.',
+      cetAiTitle: 'CET AI Demo | Solaris CET',
+      cetAiDescription:
+        'Try the CET AI demo UI with secure /api/chat integration, UX error states, and privacy guidance (do not enter personal data).',
+      miningTitle: 'Mining | Solaris CET',
+      miningDescription: 'Mining overview and calculator for Solaris CET (landing section).',
+      accessibilityTitle: 'Accessibility | Solaris CET',
+      accessibilityDescription: 'Accessibility statement for the Solaris CET website.',
+    },
+    notFound: {
+      heading: 'Page not found',
+      description: 'The requested page does not exist or has moved.',
+      pathLabel: 'Path',
+      goHome: 'Go home',
+      openStatic: 'Open static page',
+    },
     social: {
       shareOnX: 'Share on X',
       shareLink: 'Share',
@@ -1850,6 +1910,11 @@ const translations: Record<LangCode, Translations> = {
       authorityTrust: 'Trust & proof',
       sovereignNoJs: 'Sovereign (no JS)',
       github: 'GitHub',
+    },
+    region: {
+      ariaLabel: 'Region',
+      eu: 'Europe',
+      asia: 'Asia',
     },
     footerMeta: {
       genesisCertification:
@@ -2260,6 +2325,38 @@ const translations: Record<LangCode, Translations> = {
       buildSealAriaLabel:
         'Artefacto de despliegue: commit corto {commit}, fecha de build {date}. Compare con el repositorio para verificar este despliegue.',
     },
+    region: {
+      ariaLabel: 'Seleccionar región',
+      eu: 'Europa (UE)',
+      asia: 'Asia',
+      disclaimerEu: 'Región: UE. El contenido se localiza para visitantes de la UE cuando aplica.',
+      disclaimerAsia: 'Región: Asia. El contenido se localiza para visitantes de Asia cuando aplica.',
+    },
+    seo: {
+      homeTitle: 'Inicio | Solaris CET',
+      homeDescription:
+        'Solaris CET es un token RWA nativo de IA en la blockchain TON. Oferta fija de 9.000 CET. 200.000 agentes autónomos de IA vía el protocolo dual Grok × Gemini (RAV).',
+      demoTitle: 'Demo | Solaris CET',
+      demoDescription:
+        'Build demo cinematográfico: visuales holográficos, WebGL progresivo y coreografía de motion. Fallback seguro en dispositivos de gama baja.',
+      rwaTitle: 'RWA | Solaris CET',
+      rwaDescription:
+        'Explora la superficie de prueba RWA de Solaris CET: evidencias, timeline y documentos anclados en Cetățuia, Rumanía.',
+      cetAiTitle: 'Demo CET AI | Solaris CET',
+      cetAiDescription:
+        'Prueba la demo CET AI con integración segura /api/chat, estados de error UX y guía de privacidad (no ingreses datos personales).',
+      miningTitle: 'Minería | Solaris CET',
+      miningDescription: 'Resumen de minería y calculadora para Solaris CET (sección de landing).',
+      accessibilityTitle: 'Accesibilidad | Solaris CET',
+      accessibilityDescription: 'Declaración de accesibilidad para el sitio Solaris CET.',
+    },
+    notFound: {
+      heading: 'Página no encontrada',
+      description: 'La página solicitada no existe o fue movida.',
+      pathLabel: 'Ruta',
+      goHome: 'Ir al inicio',
+      openStatic: 'Abrir página estática',
+    },
     social: {
       shareOnX: 'Compartir en X',
       shareLink: 'Compartir',
@@ -2319,6 +2416,11 @@ const translations: Record<LangCode, Translations> = {
       authorityTrust: 'Confianza y pruebas',
       sovereignNoJs: 'Soberano (sin JS)',
       github: 'GitHub',
+    },
+    region: {
+      ariaLabel: 'Región',
+      eu: 'Europa',
+      asia: 'Asia',
     },
     footerMeta: {
       genesisCertification:
@@ -2788,6 +2890,11 @@ const translations: Record<LangCode, Translations> = {
       authorityTrust: '信任与证明',
       sovereignNoJs: '主权（无 JS）',
       github: 'GitHub',
+    },
+    region: {
+      ariaLabel: '地区',
+      eu: '欧洲',
+      asia: '亚洲',
     },
     footerMeta: {
       genesisCertification:
@@ -3651,6 +3758,38 @@ const translations: Record<LangCode, Translations> = {
       skipToMain: 'Sari la conținutul principal',
       buildSealAriaLabel:
         'Artefact de deployment: commit scurt {commit}, dată build {date}. Compară cu depozitul pentru a verifica.',
+    },
+    region: {
+      ariaLabel: 'Selectează regiunea',
+      eu: 'Europa (UE)',
+      asia: 'Asia',
+      disclaimerEu: 'Regiune: UE. Conținutul este localizat pentru vizitatori UE când se aplică.',
+      disclaimerAsia: 'Regiune: Asia. Conținutul este localizat pentru vizitatori Asia când se aplică.',
+    },
+    seo: {
+      homeTitle: 'Acasă | Solaris CET',
+      homeDescription:
+        'Solaris CET este un token RWA nativ AI pe blockchain-ul TON. Supply fix 9.000 CET. 200.000 agenți autonomi AI via protocolul dual Grok × Gemini (RAV).',
+      demoTitle: 'Demo | Solaris CET',
+      demoDescription:
+        'Build demo cinematic: vizualuri holografice, WebGL progresiv și coregrafie de motion. Fallback sigur pe device-uri slabe.',
+      rwaTitle: 'RWA | Solaris CET',
+      rwaDescription:
+        'Explorează „proof surface” pentru RWA: linkuri de dovadă, timeline și documente ale proiectului ancorate în Cetățuia, România.',
+      cetAiTitle: 'Demo CET AI | Solaris CET',
+      cetAiDescription:
+        'Încearcă demo-ul CET AI cu integrare /api/chat, stări UX de eroare și ghid de confidențialitate (nu introduce date personale).',
+      miningTitle: 'Mining | Solaris CET',
+      miningDescription: 'Prezentare mining și calculator pentru Solaris CET (secțiune landing).',
+      accessibilityTitle: 'Accesibilitate | Solaris CET',
+      accessibilityDescription: 'Declarație de accesibilitate pentru site-ul Solaris CET.',
+    },
+    notFound: {
+      heading: 'Pagină negăsită',
+      description: 'Pagina solicitată nu există sau a fost mutată.',
+      pathLabel: 'Rută',
+      goHome: 'Înapoi acasă',
+      openStatic: 'Deschide pagina statică',
     },
     social: {
       shareOnX: 'Distribuie pe X',
