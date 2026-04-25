@@ -18,13 +18,7 @@ import {
 } from 'lucide-react';
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 import { useLanguage } from '../hooks/useLanguage';
-{
-  "log-driver": "json-file",
-  "log-opts": { "max-size": "10m", "max-file": "3" }
-}{
-  "log-driver": "json-file",
-  "log-opts": { "max-size": "10m", "max-file": "3" }
-}import { useReducedMotion } from '../hooks/useReducedMotion';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import { PUBLIC_WHITEPAPER_IPFS_CID, PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
 
 const WHITEPAPER_GATEWAY_URLS = [
