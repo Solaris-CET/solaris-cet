@@ -23,17 +23,42 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Decide if safe to auto-merge
+        id: decide
+        run: |
+          set -e
+          update_type='${{ steps.meta.outputs.update-type }}'
+          dependency_type='${{ steps.meta.outputs.dependency-type }}'
+          updated='${{ steps.meta.outputs.updated-dependencies-json }}'
+
+          safe=false
+          if [ "$update_type" = 'version-update:semver-patch' ]; then
+            safe=true
+          fi
+          if [ "$update_type" = 'version-update:semver-minor' ] && [ "$dependency_type" != 'direct:production' ]; then
+            safe=true
+          fi
+
+          count=999
+          if [ -n "$updated" ]; then
+            count=$(printf '%s' "$updated" | jq -r 'length' 2>/dev/null || echo 999)
+          fi
+          if [ "$count" -gt 5 ]; then
+            safe=false
+          fi
+
+          echo "safe=$safe" >> $GITHUB_OUTPUT
+
       - name: Approve PR (patch/minor)
-        if: ${{ steps.meta.outputs.update-type == 'version-update:semver-patch' || steps.meta.outputs.update-type == 'version-update:semver-minor' }}
+        if: ${{ steps.decide.outputs.safe == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr review ${{ github.event.pull_request.number }} --approve --body "Auto-approve Dependabot (patch/minor)."
 
       - name: Enable auto-merge (patch/minor)
-        if: ${{ steps.meta.outputs.update-type == 'version-update:semver-patch' || steps.meta.outputs.update-type == 'version-update:semver-minor' }}
+        if: ${{ steps.decide.outputs.safe == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr merge ${{ github.event.pull_request.number }} --auto --squash --delete-branch
-
