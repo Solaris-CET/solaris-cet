@@ -59,13 +59,10 @@ function AppContent() {
   const isLhci = import.meta.env.VITE_LHCI === '1';
 
   useSmoothAnchors();
-  const pathnameRaw = (() => {
-    if (typeof window === 'undefined') return '/';
-    return window.location.pathname || '/';
-  })();
+  const pathnameRaw = typeof window === 'undefined' ? '/' : window.location.pathname || '/';
   const parsedPath = parseUrlLocaleFromPathname(pathnameRaw);
   const activeUrlLocale = parsedPath.locale ?? urlLocaleFromLang(langState.lang);
-  const routePath = parsedPath.pathnameNoLocale;
+  const routePath = (parsedPath.pathnameNoLocale.replace(/\/$/, '') || '/').replace('/index.html', '/') || '/';
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -81,8 +78,14 @@ function AppContent() {
       return;
     }
 
+    if (parsed.locale === 'en' && url.pathname.startsWith('/en')) {
+      url.pathname = localizePathname(parsed.pathnameNoLocale, 'en');
+      window.location.replace(url.toString());
+      return;
+    }
     if (parsed.locale) return;
     if (!shouldLocalePrefixPathname(url.pathname)) return;
+    if (activeUrlLocale === 'en') return;
     url.pathname = localizePathname(parsed.pathnameNoLocale, activeUrlLocale);
     url.searchParams.delete('lang');
     window.location.replace(url.toString());
@@ -247,7 +250,7 @@ function AppContent() {
 
   useEffect(() => {
     const seo = (langState.t as unknown as { seo?: Record<string, string> }).seo ?? {};
-    const routeMeta: Record<string, { title: string; description: string }> = {
+    const routeMeta: Record<string, { title: string; description: string; noindex?: boolean }> = {
       '/': { title: seo.homeTitle, description: seo.homeDescription },
       '/demo': { title: seo.demoTitle, description: seo.demoDescription },
       '/rwa': { title: seo.rwaTitle, description: seo.rwaDescription },
@@ -257,7 +260,23 @@ function AppContent() {
         title: seo.accessibilityTitle ?? seo.homeTitle,
         description: seo.accessibilityDescription ?? seo.homeDescription,
       },
+      '/login': {
+        title: 'Login | Solaris CET',
+        description: 'Login for Solaris CET web app.',
+        noindex: true,
+      },
+      '/app': {
+        title: 'Account | Solaris CET',
+        description: 'Solaris CET account area.',
+        noindex: true,
+      },
+      '/admin': {
+        title: 'Admin | Solaris CET',
+        description: 'Solaris CET admin area.',
+        noindex: true,
+      },
     };
+
     const meta = routeMeta[routePath];
     if (!meta) {
       applySpaSeo({
@@ -270,13 +289,13 @@ function AppContent() {
       });
       return;
     }
-
     applySpaSeo({
       origin: PRODUCTION_SITE_ORIGIN,
       pathnameNoLocale: routePath,
       locale: activeUrlLocale,
       title: meta.title,
       description: meta.description,
+      noindex: meta.noindex,
     });
   }, [activeUrlLocale, langState.t, routePath]);
 

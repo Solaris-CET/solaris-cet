@@ -215,7 +215,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
           pin: true,
           anticipatePin: 1,
           pinSpacing: true,
-          onUpdate: (self) => setScrub(self.progress),
+          onUpdate: (self: { progress: number }) => setScrub(self.progress),
           onLeave: () => hardCut(),
           onEnterBack: () => {
             demoHardCutDoneRef.current = false;

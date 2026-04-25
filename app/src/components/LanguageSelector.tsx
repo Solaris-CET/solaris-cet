@@ -1,19 +1,40 @@
-import { Globe } from 'lucide-react';
-import { useLanguage, SUPPORTED_LANGS, type LangCode } from '../hooks/useLanguage';
+import { ChevronDown, Globe } from 'lucide-react';
+import { useLanguage, type LangCode } from '../hooks/useLanguage';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+import {
+  URL_LOCALES,
+  type UrlLocale,
+  localizePathname,
+  parseUrlLocaleFromPathname,
+  urlLocaleFromLang,
+} from '@/i18n/urlRouting';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 
-const LANG_LABELS: Record<LangCode, string> = {
-  en: 'EN',
-  es: 'ES',
-  zh: '中文',
-  ru: 'RU',
-  ro: 'RO',
-  pt: 'PT',
-  de: 'DE',
+const LOCALE_LABELS: Record<UrlLocale, { code: string; flag: string; native: string }> = {
+  en: { code: 'EN', flag: '🇬🇧', native: 'English' },
+  ro: { code: 'RO', flag: '🇷🇴', native: 'Română' },
+  de: { code: 'DE', flag: '🇩🇪', native: 'Deutsch' },
+  es: { code: 'ES', flag: '🇪🇸', native: 'Español' },
+  pt: { code: 'PT', flag: '🇵🇹', native: 'Português' },
+  ru: { code: 'RU', flag: '🇷🇺', native: 'Русский' },
+  zh: { code: 'ZH', flag: '🇨🇳', native: '中文' },
 };
+
+function getActiveUrlLocale(lang: LangCode): UrlLocale {
+  if (typeof window === 'undefined') return urlLocaleFromLang(lang);
+  return parseUrlLocaleFromPathname(window.location.pathname).locale ?? urlLocaleFromLang(lang);
+}
 
 const LanguageSelector = () => {
   const { lang, setLang, t } = useLanguage();
+  const active = getActiveUrlLocale(lang);
 
   return (
     <div
@@ -21,22 +42,50 @@ const LanguageSelector = () => {
       title={shortSkillWhisper(skillSeedFromLabel(`langSelector|${lang}`))}
     >
       <Globe className="w-4 h-4 text-solaris-muted shrink-0" />
-      <div className="flex items-center gap-1">
-        {SUPPORTED_LANGS.map((code) => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
           <button
-            key={code}
-            onClick={() => setLang(code)}
-            aria-label={`${t.common.switchLanguagePrefix} ${LANG_LABELS[code]}`}
-            className={`px-2 py-1.5 rounded text-[11px] font-mono transition-all duration-150 min-h-[44px] min-w-[44px] flex items-center justify-center ${
-              lang === code
-                ? 'text-solaris-gold bg-solaris-gold/10'
-                : 'text-solaris-muted hover:text-solaris-text'
-            }`}
+            type="button"
+            aria-label={`${t.common.switchLanguagePrefix} ${LOCALE_LABELS[active].code}`}
+            className={cn(
+              'min-h-[44px] min-w-[44px] rounded-md px-2.5 py-1.5 text-[11px] font-mono text-solaris-muted hover:text-solaris-text transition-colors',
+              'bg-white/[0.03] border border-white/10',
+              'inline-flex items-center gap-2',
+            )}
           >
-            {LANG_LABELS[code]}
+            <span aria-hidden className="text-sm leading-none">
+              {LOCALE_LABELS[active].flag}
+            </span>
+            <span>{LOCALE_LABELS[active].code}</span>
+            <ChevronDown className="w-3.5 h-3.5 opacity-70" aria-hidden />
           </button>
-        ))}
-      </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="min-w-[220px]">
+          <DropdownMenuRadioGroup
+            value={active}
+            onValueChange={(next) => {
+              if (!(URL_LOCALES as readonly string[]).includes(next)) return;
+              const nextLocale = next as UrlLocale;
+              setLang(nextLocale as unknown as LangCode);
+              const url = new URL(window.location.href);
+              const { pathnameNoLocale } = parseUrlLocaleFromPathname(url.pathname);
+              url.pathname = localizePathname(pathnameNoLocale, nextLocale);
+              url.searchParams.delete('lang');
+              window.location.assign(url.toString());
+            }}
+          >
+            {URL_LOCALES.map((locale) => (
+              <DropdownMenuRadioItem key={locale} value={locale}>
+                <span className="w-5 text-base leading-none" aria-hidden>
+                  {LOCALE_LABELS[locale].flag}
+                </span>
+                <span className="font-medium">{LOCALE_LABELS[locale].native}</span>
+                <span className="ml-auto font-mono text-xs text-muted-foreground">{LOCALE_LABELS[locale].code}</span>
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };
