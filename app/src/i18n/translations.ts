@@ -4729,6 +4729,38 @@ const translations: Record<LangCode, Translations> = {
       buildSealAriaLabel:
         'Deployment-Artefakt: Kurz-Commit {commit}, Build-Datum {date}. Mit dem Repository abgleichen, um dieses Deployment zu prüfen.',
     },
+    region: {
+      ariaLabel: 'Region auswählen',
+      eu: 'Europa (EU)',
+      asia: 'Asien',
+      disclaimerEu: 'Region: EU. Inhalte werden – wo relevant – für EU-Besucher lokalisiert.',
+      disclaimerAsia: 'Region: Asien. Inhalte werden – wo relevant – für Asien-Besucher lokalisiert.',
+    },
+    seo: {
+      homeTitle: 'Startseite | Solaris CET',
+      homeDescription:
+        'Solaris CET ist ein KI-nativer RWA-Token auf der TON-Blockchain. Fixes Angebot: 9.000 CET. 200.000 autonome KI-Agenten über das Dual-AI-Protokoll Grok × Gemini (RAV).',
+      demoTitle: 'Demo | Solaris CET',
+      demoDescription:
+        'Kinematischer Demo-Build: Hologramm-Visuals, progressives WebGL und Motion-Choreografie. Sicherer Fallback auf schwächeren Geräten.',
+      rwaTitle: 'RWA | Solaris CET',
+      rwaDescription:
+        'Entdecke die RWA-Proof-Surface von Solaris CET: Evidenz-Links, Timeline und Projektdokumente mit Anker in Cetățuia, Rumänien.',
+      cetAiTitle: 'CET AI Demo | Solaris CET',
+      cetAiDescription:
+        'Teste die CET-AI-Demo mit sicherer /api/chat-Integration, UX-Fehlerzuständen und Privacy-Hinweisen (keine personenbezogenen Daten eingeben).',
+      miningTitle: 'Mining | Solaris CET',
+      miningDescription: 'Mining-Übersicht und Rechner für Solaris CET (Landing-Sektion).',
+      accessibilityTitle: 'Barrierefreiheit | Solaris CET',
+      accessibilityDescription: 'Barrierefreiheitserklärung für die Solaris-CET-Website.',
+    },
+    notFound: {
+      heading: 'Seite nicht gefunden',
+      description: 'Die angeforderte Seite existiert nicht oder wurde verschoben.',
+      pathLabel: 'Pfad',
+      goHome: 'Zur Startseite',
+      openStatic: 'Statische Seite öffnen',
+    },
     social: {
       shareOnX: 'Auf X teilen',
       shareLink: 'Teilen',
