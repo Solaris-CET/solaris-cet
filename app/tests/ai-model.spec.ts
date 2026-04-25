@@ -23,8 +23,8 @@ test.describe('AI Model Execution — Intelligence Core', () => {
   });
 
   test('Intelligence Core section is present in the DOM', async ({ page }) => {
-    // The section is eagerly rendered (not lazy-loaded); cold preview can exceed 8s on slow runners.
-    const section = page.locator('section').filter({ has: page.locator('text=The Intelligence') }).first();
+    const section = page.locator('#intelligence');
+    await section.scrollIntoViewIfNeeded({ timeout: 15_000 });
     await expect(section).toBeAttached({ timeout: 15_000 });
   });
 

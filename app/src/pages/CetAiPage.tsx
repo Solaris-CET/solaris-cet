@@ -38,7 +38,7 @@ export default function CetAiPage() {
             <CetAiSearch />
           </div>
 
-          <aside className="min-w-0">
+          <div className="min-w-0">
             <div
               className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur md:p-6"
               onPointerMove={(e) => setGlowVars(e.currentTarget, e.clientX, e.clientY)}
@@ -80,7 +80,7 @@ export default function CetAiPage() {
                 ))}
               </ul>
             </div>
-          </aside>
+          </div>
         </div>
       </section>
     </main>

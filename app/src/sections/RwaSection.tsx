@@ -336,7 +336,7 @@ const RwaSection = () => {
                 onSelectProject={setSelectedProjectId}
               />
             </div>
-            <aside
+            <div
               className="lg:col-span-4 bento-card border border-white/10 p-6 shadow-depth"
               aria-label={tx.asideAria}
             >
@@ -419,7 +419,7 @@ const RwaSection = () => {
               ) : (
                 <div className="text-solaris-muted text-sm">{tx.asideNoSelection}</div>
               )}
-            </aside>
+            </div>
           </div>
         </ScrollFadeUp>
 

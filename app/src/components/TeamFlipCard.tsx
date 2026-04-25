@@ -28,16 +28,6 @@ export default function TeamFlipCard({
     <div
       className={cn('flip-card', className)}
       data-flipped={flipped ? 'true' : 'false'}
-      role="button"
-      tabIndex={0}
-      onClick={toggle}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          toggle();
-        }
-      }}
-      aria-label={`${name} — ${role}`}
     >
       <div className="flip-card-inner">
         <div className="flip-card-face flip-card-front bento-card p-6 border border-white/10">
@@ -54,9 +44,14 @@ export default function TeamFlipCard({
               </div>
               <div className="text-solaris-muted text-xs font-mono">↻</div>
             </div>
-            <div className="shrink-0 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-solaris-muted text-sm font-medium">
+            <button
+              type="button"
+              onClick={toggle}
+              aria-label={`Open bio for ${name}`}
+              className="shrink-0 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-solaris-muted text-sm font-medium hover:bg-white/10 transition-colors"
+            >
               ↻
-            </div>
+            </button>
           </div>
         </div>
 

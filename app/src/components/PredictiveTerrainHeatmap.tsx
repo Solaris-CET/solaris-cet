@@ -63,18 +63,20 @@ export function PredictiveTerrainHeatmap() {
         </div>
       </div>
 
-      <dl className="mb-4 flex flex-wrap gap-x-6 gap-y-2 text-[11px] font-mono text-slate-400">
-        <dt className="sr-only">{a.predictiveTerrainLegendTitle}</dt>
+      <ul
+        className="mb-4 flex flex-wrap gap-x-6 gap-y-2 text-[11px] font-mono text-slate-400"
+        aria-label={a.predictiveTerrainLegendTitle}
+      >
         {legendItems.map(({ level, label }) => (
-          <div key={level} className="flex items-center gap-2">
+          <li key={level} className="flex items-center gap-2">
             <span
               className={`inline-block h-3 w-3 shrink-0 rounded-sm ${swatchClass[level]}`}
               aria-hidden
             />
-            <dd className="m-0">{label}</dd>
-          </div>
+            <span>{label}</span>
+          </li>
         ))}
-      </dl>
+      </ul>
 
       <div
         className="grid w-full max-w-3xl mx-auto gap-px aspect-[12/8] bg-slate-950/80 p-px rounded-lg border border-white/10"

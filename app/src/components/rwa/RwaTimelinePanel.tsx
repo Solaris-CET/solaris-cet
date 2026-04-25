@@ -70,12 +70,9 @@ export function RwaTimelinePanel({
                 </div>
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <a
-                      href={`#milestone-${e.slug}`}
-                      className="font-display font-semibold text-solaris-text hover:underline underline-offset-4"
-                    >
+                    <span className="font-display font-semibold text-solaris-text">
                       {e.title}
-                    </a>
+                    </span>
                     <span
                       className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-mono ${timelineChipClass(
                         e.status,

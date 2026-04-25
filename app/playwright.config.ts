@@ -68,7 +68,6 @@ export default defineConfig({
        :4173 ERR_CONNECTION_REFUSED. */
     command: 'npm run preview:e2e',
     url: 'http://127.0.0.1:4173',
-    /* Local: reuse an existing preview on 127.0.0.1:4173 (e.g. `npm run preview:e2e`) after `npm run build`. */
     reuseExistingServer: !process.env.CI,
     timeout: process.env.CI ? 120_000 : 180_000,
   },

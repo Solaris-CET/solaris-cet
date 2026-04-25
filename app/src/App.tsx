@@ -73,12 +73,7 @@ function AppContent() {
 
     const qpLang = url.searchParams.get('lang');
     const qpLocale = qpLang ? qpLang.slice(0, 2).toLowerCase() : '';
-    if (qpLocale && (URL_LOCALES as readonly string[]).includes(qpLocale)) {
-      url.pathname = localizePathname(parsed.pathnameNoLocale, qpLocale as (typeof URL_LOCALES)[number]);
-      url.searchParams.delete('lang');
-      window.location.replace(url.toString());
-      return;
-    }
+    if (qpLocale && (URL_LOCALES as readonly string[]).includes(qpLocale)) return;
 
     if (parsed.locale === 'en') {
       const canonical = localizePathname(parsed.pathnameNoLocale, 'en');
