@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+import { useReducedMotion } from './useReducedMotion';
 
 gsap.registerPlugin(ScrollToPlugin);
 
@@ -9,6 +10,8 @@ gsap.registerPlugin(ScrollToPlugin);
  * ensuring high-performance smooth animations across all devices, overriding native snap behaviors.
  */
 export function useSmoothAnchors() {
+  const prefersReducedMotion = useReducedMotion();
+
   useEffect(() => {
     const handleAnchorClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -22,17 +25,24 @@ export function useSmoothAnchors() {
       const destElement = document.querySelector(href);
       if (destElement) {
         e.preventDefault();
-        
-        // Let's use GSAP scrollTo config
-        gsap.to(window, {
-          duration: 1,
-          scrollTo: {
-            y: destElement as HTMLElement,
-            offsetY: 80, // Accounts for header height
-            autoKill: true,
-          },
-          ease: "power3.inOut"
-        });
+
+        if (prefersReducedMotion) {
+          const y =
+            (destElement as HTMLElement).getBoundingClientRect().top +
+            window.scrollY -
+            80;
+          window.scrollTo({ top: Math.max(0, y), behavior: 'auto' });
+        } else {
+          gsap.to(window, {
+            duration: 1,
+            scrollTo: {
+              y: destElement as HTMLElement,
+              offsetY: 80,
+              autoKill: true,
+            },
+            ease: 'power3.inOut',
+          });
+        }
 
         // Update URL hash without jumping
         if (window.history.pushState) {
@@ -47,5 +57,5 @@ export function useSmoothAnchors() {
     return () => {
       document.removeEventListener('click', handleAnchorClick);
     };
-  }, []);
+  }, [prefersReducedMotion]);
 }

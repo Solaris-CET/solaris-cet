@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from '../hooks/useLanguage';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import type { CetAiKnowledge, Translations } from '../i18n/translations';
 import {
   buildCetAiObserveParse,
@@ -810,6 +811,7 @@ function ReActPanels({ phase }: { phase: ReActPhase }) {
 export default function CetAiSearch() {
   // --- LANGUAGE ---
   const { t } = useLanguage();
+  const prefersReducedMotion = useReducedMotion();
 
   // --- STATE MANAGEMENT ---
   const [query, setQuery] = useState('');
@@ -853,8 +855,8 @@ export default function CetAiSearch() {
 
   // Scroll chat to latest entry
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatHistory, submittedQuestion, finalResponse]);
+    chatEndRef.current?.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  }, [chatHistory, submittedQuestion, finalResponse, prefersReducedMotion]);
 
   // Cleanup timers on unmount
   useEffect(() => {
@@ -1206,7 +1208,11 @@ export default function CetAiSearch() {
           className="relative z-10 flex flex-col md:flex-row w-full gap-3 md:gap-4"
         >
           <div className="flex-grow relative">
+            <label htmlFor="cet-ai-hero-query" className="sr-only">
+              {t.cetAi.placeholder}
+            </label>
             <input
+              id="cet-ai-hero-query"
               type="text"
               data-testid="cet-ai-hero-query"
               value={query}
@@ -1220,6 +1226,7 @@ export default function CetAiSearch() {
               }
               disabled={isModalOpen}
               placeholder={t.cetAi.placeholder}
+              aria-label={t.cetAi.placeholder}
               aria-describedby={
                 query.length > 0 && !isModalOpen ? 'cet-ai-hero-char-count' : undefined
               }
@@ -1723,8 +1730,12 @@ export default function CetAiSearch() {
               className="flex gap-3 max-w-5xl mx-auto"
             >
               <div className="flex-grow relative">
+                <label htmlFor="cet-ai-modal-query" className="sr-only">
+                  {t.cetAi.placeholder}
+                </label>
                 <textarea
                   ref={modalInputRef}
+                  id="cet-ai-modal-query"
                   data-testid="cet-ai-modal-query"
                   value={query}
                   maxLength={CET_AI_MAX_QUERY_CHARS}
@@ -1738,6 +1749,7 @@ export default function CetAiSearch() {
                   disabled={isProcessing}
                   rows={2}
                   placeholder={phase === 'complete' ? t.cetAi.followUpPlaceholder : t.cetAi.placeholder}
+                  aria-label={t.cetAi.placeholder}
                   aria-describedby={query.length > 0 ? 'cet-ai-modal-char-count' : undefined}
                   className="w-full min-h-[3rem] max-h-40 resize-y px-5 py-3 bg-gray-950 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-all disabled:opacity-40 text-base leading-relaxed"
                 />

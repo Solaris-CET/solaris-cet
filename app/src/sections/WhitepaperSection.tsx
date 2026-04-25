@@ -18,6 +18,13 @@ import {
 } from 'lucide-react';
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 import { useLanguage } from '../hooks/useLanguage';
+{
+  "log-driver": "json-file",
+  "log-opts": { "max-size": "10m", "max-file": "3" }
+}{
+  "log-driver": "json-file",
+  "log-opts": { "max-size": "10m", "max-file": "3" }
+}import { useReducedMotion } from '../hooks/useReducedMotion';
 import { PUBLIC_WHITEPAPER_IPFS_CID, PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
 
 const WHITEPAPER_GATEWAY_URLS = [
@@ -473,6 +480,7 @@ const WPSectionCard = ({ section }: { section: WPSection }) => {
 
 const WhitepaperSection = () => {
   const { t, lang } = useLanguage();
+  const prefersReducedMotion = useReducedMotion();
   const tx = t.whitepaperUi;
   const sectionRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
@@ -495,6 +503,7 @@ const WhitepaperSection = () => {
   }, [sections]);
 
   useLayoutEffect(() => {
+    if (prefersReducedMotion) return;
     const section = sectionRef.current;
     if (!section) return;
 
@@ -549,7 +558,7 @@ const WhitepaperSection = () => {
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -655,7 +664,9 @@ const WhitepaperSection = () => {
               <button
                 key={section.id}
                 onClick={() => {
-                  document.getElementById(`wp-card-${section.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  document
+                    .getElementById(`wp-card-${section.id}`)
+                    ?.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'center' });
                 }}
                 className={`flex flex-col items-start gap-2 p-3 rounded-xl border ${c.border} bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-200 text-left group`}
                 type="button"

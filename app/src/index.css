@@ -202,10 +202,13 @@
     box-shadow: 0 0 0 4px rgba(242, 201, 76, 0.1);
   }
 
+  html {
+    scroll-padding-top: 100px;
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     html {
       scroll-behavior: smooth;
-      scroll-padding-top: 100px;
     }
   }
 }

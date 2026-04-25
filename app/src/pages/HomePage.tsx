@@ -35,6 +35,7 @@ export default function HomePage({ heroCinematic = false }: { heroCinematic?: bo
   return (
     <main
       id="main-content"
+      tabIndex={-1}
       className="relative w-full overflow-x-clip pb-[var(--mobile-conversion-dock-reserve)] xl:pb-0"
     >
       <section id="hero" aria-label={t.landmarks.hero} className="relative z-10">

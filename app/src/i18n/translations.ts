@@ -164,6 +164,7 @@ export interface Translations {
   footerNav: {
     privacy: string;
     terms: string;
+    accessibility: string;
     contact: string;
     /** In-page anchor `#authority-trust`. */
     authorityTrust: string;
@@ -1906,6 +1907,7 @@ const translations: Record<LangCode, Translations> = {
     footerNav: {
       privacy: 'Privacy',
       terms: 'Terms',
+      accessibility: 'Accessibility',
       contact: 'Contact',
       authorityTrust: 'Trust & proof',
       sovereignNoJs: 'Sovereign (no JS)',
@@ -2407,6 +2409,7 @@ const translations: Record<LangCode, Translations> = {
     footerNav: {
       privacy: 'Privacidad',
       terms: 'Términos',
+      accessibility: 'Accesibilidad',
       contact: 'Contacto',
       authorityTrust: 'Confianza y pruebas',
       sovereignNoJs: 'Soberano (sin JS)',
@@ -2876,6 +2879,7 @@ const translations: Record<LangCode, Translations> = {
     footerNav: {
       privacy: '隐私',
       terms: '条款',
+      accessibility: '无障碍',
       contact: '联系',
       authorityTrust: '信任与证明',
       sovereignNoJs: '主权（无 JS）',
@@ -3397,6 +3401,7 @@ const translations: Record<LangCode, Translations> = {
     footerNav: {
       privacy: 'Конфиденциальность',
       terms: 'Условия',
+      accessibility: 'Доступность',
       contact: 'Контакт',
       authorityTrust: 'Доверие и доказательства',
       sovereignNoJs: 'Суверенный (без JS)',
@@ -3895,6 +3900,7 @@ const translations: Record<LangCode, Translations> = {
     footerNav: {
       privacy: 'Confidențialitate',
       terms: 'Termeni',
+      accessibility: 'Accesibilitate',
       contact: 'Contact',
       authorityTrust: 'Încredere și dovezi',
       sovereignNoJs: 'Suveran (fără JS)',
@@ -4396,6 +4402,7 @@ const translations: Record<LangCode, Translations> = {
     footerNav: {
       privacy: 'Privacidade',
       terms: 'Termos',
+      accessibility: 'Acessibilidade',
       contact: 'Contato',
       authorityTrust: 'Confiança e provas',
       sovereignNoJs: 'Soberano (sem JS)',
@@ -4897,6 +4904,7 @@ const translations: Record<LangCode, Translations> = {
     footerNav: {
       privacy: 'Datenschutz',
       terms: 'AGB',
+      accessibility: 'Barrierefreiheit',
       contact: 'Kontakt',
       authorityTrust: 'Vertrauen & Nachweise',
       sovereignNoJs: 'Souverän (ohne JS)',

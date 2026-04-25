@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 import { SolarisLogoMark } from './SolarisLogoMark';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 /**
  * BackToTop — floating control after 600px scroll; uses Solaris mark on a dark inset for contrast on gold.
@@ -10,6 +11,7 @@ import { SolarisLogoMark } from './SolarisLogoMark';
  */
 const BackToTop = () => {
   const { t } = useLanguage();
+  const prefersReducedMotion = useReducedMotion();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -20,7 +22,9 @@ const BackToTop = () => {
 
   return (
     <button
-      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      onClick={() =>
+        window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' })
+      }
       aria-label={t.common.backToTop}
       title={shortSkillWhisper(skillSeedFromLabel('backToTop|scrollAnchor'))}
       aria-hidden={!visible}

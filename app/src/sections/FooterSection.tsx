@@ -37,6 +37,7 @@ const FooterSection = () => {
   const footerLinks = [
     { id: 'privacy', label: t.footerNav.privacy, href: WHITEPAPER_URL, icon: undefined },
     { id: 'terms', label: t.footerNav.terms, href: WHITEPAPER_URL, icon: undefined },
+    { id: 'accessibility', label: t.footerNav.accessibility, href: '/accessibility', icon: undefined },
     { id: 'contact', label: t.footerNav.contact, href: 'https://t.me/SolarisCET', icon: undefined },
     { id: 'authorityTrust', label: t.footerNav.authorityTrust, href: '#authority-trust', icon: undefined },
     /** Global comparison — primary discovery here + FAQ; not duplicated in header nav (5–7 target). */

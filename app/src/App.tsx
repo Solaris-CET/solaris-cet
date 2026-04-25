@@ -19,6 +19,7 @@ import { BuildSeal } from './components/BuildSeal';
 import { LanguageContext, useLanguageState } from './hooks/useLanguage';
 import { RegionContext, useRegionState } from './hooks/useRegion';
 import { useSmoothAnchors } from './hooks/useSmoothAnchors';
+import { useReducedMotion } from './hooks/useReducedMotion';
 import { applySpaSeo } from '@/lib/spaSeo';
 import './App.css';
 import { shortSkillWhisper, skillSeedFromLabel } from './lib/meshSkillFeed';
@@ -57,6 +58,7 @@ function AppContent() {
   const langState = useLanguageState();
   const regionState = useRegionState();
   const isLhci = import.meta.env.VITE_LHCI === '1';
+  const prefersReducedMotion = useReducedMotion();
 
   useSmoothAnchors();
   const pathnameRaw = typeof window === 'undefined' ? '/' : window.location.pathname || '/';
@@ -78,9 +80,12 @@ function AppContent() {
       return;
     }
 
-    if (parsed.locale === 'en' && url.pathname.startsWith('/en')) {
-      url.pathname = localizePathname(parsed.pathnameNoLocale, 'en');
-      window.location.replace(url.toString());
+    if (parsed.locale === 'en') {
+      const canonical = localizePathname(parsed.pathnameNoLocale, 'en');
+      if (url.pathname !== canonical) {
+        url.pathname = canonical;
+        window.location.replace(url.toString());
+      }
       return;
     }
     if (parsed.locale) return;
@@ -93,15 +98,12 @@ function AppContent() {
 
   useEffect(() => {
     const loadingEl = loadingRef.current;
-    const reducedMotion =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isSeen =
       typeof window !== 'undefined' &&
       typeof sessionStorage !== 'undefined' &&
       sessionStorage.getItem('solaris_intro_seen') === '1';
-    const delayMs = reducedMotion || isSeen ? LOADING_DURATION_REDUCED_MS : LOADING_DURATION_MS;
-    const fadeOutSec = reducedMotion ? 0.12 : 0.55;
+    const delayMs = prefersReducedMotion || isSeen ? LOADING_DURATION_REDUCED_MS : LOADING_DURATION_MS;
+    const fadeOutSec = prefersReducedMotion ? 0.12 : 0.55;
     let finished = false;
 
     const finish = () => {
@@ -121,7 +123,7 @@ function AppContent() {
       gsap.to(loadingEl, {
         opacity: 0,
         duration: fadeOutSec,
-        ease: reducedMotion ? 'none' : 'power3.out',
+        ease: prefersReducedMotion ? 'none' : 'power3.out',
         onComplete: () => {
           loadingEl.style.display = 'none';
         },
@@ -135,7 +137,7 @@ function AppContent() {
       window.clearTimeout(timer);
       window.clearTimeout(safety);
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
     // Ensure all ScrollTriggers are released if AppContent unmounts (HMR, route-level remounts).
@@ -171,7 +173,7 @@ function AppContent() {
     // Below 1024 px (tablets/small laptops), free scrolling is more natural
     const isBelowDesktop = typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches;
     if (isBelowDesktop) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (prefersReducedMotion) return;
 
     const setupSnap = () => {
       const pinned = ScrollTrigger.getAll()
@@ -215,13 +217,11 @@ function AppContent() {
       snapTriggerRef.current?.kill();
       snapTriggerRef.current = null;
     };
-  }, [isLoaded, buildSnapTo, routePath]);
+  }, [isLoaded, buildSnapTo, routePath, prefersReducedMotion]);
 
   /** When the server serves `index.html` for a route, scroll to the matching section after lazy sections mount. */
   useEffect(() => {
     if (!isLoaded) return;
-    const reducedMotion =
-      typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const path = routePath;
     const routeToSectionId: Record<string, string> = {
       '/mining': 'mining',
@@ -236,7 +236,7 @@ function AppContent() {
     const id = window.setInterval(() => {
       const el = document.getElementById(targetId);
       if (el) {
-        el.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+        el.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
         window.clearInterval(id);
         return;
       }
@@ -246,7 +246,7 @@ function AppContent() {
     }, 120);
 
     return () => window.clearInterval(id);
-  }, [isLoaded, routePath]);
+  }, [isLoaded, routePath, prefersReducedMotion]);
 
   useEffect(() => {
     const seo = (langState.t as unknown as { seo?: Record<string, string> }).seo ?? {};
@@ -391,7 +391,17 @@ function AppContent() {
         {/* Noise overlay */}
         {!isLhci ? <div className="noise-overlay" /> : null}
         
-        <a href="#main-content" className="skip-to-content">
+        <a
+          href="#main-content"
+          className="skip-to-content"
+          onClick={() => {
+            const el = document.getElementById('main-content');
+            if (!el) return;
+            requestAnimationFrame(() => {
+              (el as HTMLElement).focus?.();
+            });
+          }}
+        >
           {langState.t.common.skipToMain}
         </a>
         {/* Navigation */}
