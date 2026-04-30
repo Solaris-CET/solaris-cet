@@ -4,13 +4,17 @@ FROM node:${NODE_VERSION}-alpine AS builder
 
 WORKDIR /repo
 
+# Needed by build scripts that read git metadata (Coolify builder image doesn't include git by default).
+RUN apk add --no-cache git
+
 # Install dependencies first for better layer caching.
 COPY package*.json ./
 COPY app/package.json app/package.json
 COPY api/package.json api/package.json
+COPY cli/package.json cli/package.json
 COPY contracts/package.json contracts/package.json
 COPY scripts/package.json scripts/package.json
-RUN --mount=type=cache,target=/root/.npm npm ci --include=dev
+RUN --mount=type=cache,target=/root/.npm HUSKY=0 npm ci --include=dev
 
 # Build prerequisites used by app prebuild script.
 COPY scripts/ scripts/
