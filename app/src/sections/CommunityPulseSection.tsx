@@ -13,11 +13,12 @@ export default function CommunityPulseSection() {
     void (async () => {
       try {
         const res = await fetch('/api/community/feed?limit=12', { cache: 'no-store' });
-        const data = (await res.json().catch(() => null)) as { items?: unknown } | null;
+        const data = (await res.json().catch(() => null)) as { items?: unknown; degraded?: unknown } | null;
         const list = Array.isArray(data?.items) ? (data.items as FeedItem[]) : [];
+        const degraded = data?.degraded === true;
         if (cancelled) return;
         setItems(list.slice(0, 6));
-        setFailed(!res.ok);
+        setFailed(!res.ok || degraded);
         setLoaded(true);
       } catch {
         if (cancelled) return;

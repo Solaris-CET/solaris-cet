@@ -141,7 +141,7 @@ export default function HomePage({ heroCinematic = false }: { heroCinematic?: bo
         </ErrorBoundary>
       </section>
 
-      <section aria-label={t.landmarks.rwa} className="relative z-[55]">
+      <section id="rwa" aria-label={t.landmarks.rwa} className="relative z-[55] scroll-mt-24">
         <LazyLoadWrapper>
           <ScrollFadeUp>
             <ErrorBoundary>
@@ -151,7 +151,7 @@ export default function HomePage({ heroCinematic = false }: { heroCinematic?: bo
         </LazyLoadWrapper>
       </section>
 
-      <section aria-label={t.landmarks.roadmap} className="relative z-[70] scroll-mt-24">
+      <section id="roadmap" aria-label={t.landmarks.roadmap} className="relative z-[70] scroll-mt-24">
         <LazyLoadWrapper>
           <ScrollFadeUp>
             <ErrorBoundary>
@@ -269,7 +269,7 @@ export default function HomePage({ heroCinematic = false }: { heroCinematic?: bo
         </LazyLoadWrapper>
       </div>
 
-      <div className="relative z-[110]">
+      <div id="resources" className="relative z-[110] scroll-mt-24">
         <LazyLoadWrapper>
           <ScrollFadeUp>
             <ErrorBoundary>
@@ -279,7 +279,7 @@ export default function HomePage({ heroCinematic = false }: { heroCinematic?: bo
         </LazyLoadWrapper>
       </div>
 
-      <div className="relative z-[112]">
+      <div id="faq" className="relative z-[112] scroll-mt-24">
         <LazyLoadWrapper>
           <ScrollFadeUp>
             <ErrorBoundary>

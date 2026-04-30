@@ -13,7 +13,7 @@ const GLYPH_LINES = [
   'FRAME SHIFT · 視点変更 · تغيير زاوية · zmiana perspektywy · 測地線 · Δψ · ρ(x,t)',
 ];
 
-function useFirstAvailableAsset(candidates: string[]) {
+function useFirstAvailableAsset(candidates: string[], accept?: (res: Response) => boolean) {
   const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ function useFirstAvailableAsset(candidates: string[]) {
         try {
           const res = await fetch(candidate, { method: 'HEAD', cache: 'no-store', signal: controller.signal });
           if (!alive) return;
-          if (res.ok) {
+          if (res.ok && (!accept || accept(res))) {
             setUrl(candidate);
             return;
           }
@@ -43,7 +43,7 @@ function useFirstAvailableAsset(candidates: string[]) {
       alive = false;
       controller.abort();
     };
-  }, [candidates]);
+  }, [accept, candidates]);
 
   return url;
 }
@@ -81,8 +81,14 @@ export function CinematicBackground() {
   const reduceMotion = useReducedMotion();
   const canUseVideo = useCinematicEligibility(reduceMotion);
   const [videoReady, setVideoReady] = useState(false);
-  const posterUrl = useFirstAvailableAsset(POSTER_CANDIDATES);
-  const videoUrl = useFirstAvailableAsset(VIDEO_CANDIDATES);
+  const posterUrl = useFirstAvailableAsset(POSTER_CANDIDATES, (res) => {
+    const ct = (res.headers.get('content-type') || '').toLowerCase();
+    return ct.startsWith('image/');
+  });
+  const videoUrl = useFirstAvailableAsset(VIDEO_CANDIDATES, (res) => {
+    const ct = (res.headers.get('content-type') || '').toLowerCase();
+    return ct.startsWith('video/');
+  });
 
   const glyphText = useMemo(() => {
     const all = GLYPH_LINES.join('   ·   ');
