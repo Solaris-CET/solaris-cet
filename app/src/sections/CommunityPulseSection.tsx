@@ -5,15 +5,27 @@ type FeedItem = { kind: string; title: string; href: string; at: string };
 
 export default function CommunityPulseSection() {
   const [items, setItems] = useState<FeedItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      const res = await fetch('/api/community/feed?limit=12', { cache: 'no-store' });
-      const data = (await res.json().catch(() => null)) as { items?: unknown } | null;
-      const list = Array.isArray(data?.items) ? (data.items as FeedItem[]) : [];
+      try {
+        const res = await fetch('/api/community/feed?limit=12', { cache: 'no-store' });
+        const data = (await res.json().catch(() => null)) as { items?: unknown } | null;
+        const list = Array.isArray(data?.items) ? (data.items as FeedItem[]) : [];
+        if (cancelled) return;
+        setItems(list.slice(0, 6));
+        setFailed(!res.ok);
+        setLoaded(true);
+      } catch {
+        if (cancelled) return;
+        setItems([]);
+        setFailed(true);
+        setLoaded(true);
+      }
       if (cancelled) return;
-      setItems(list.slice(0, 6));
     })();
     return () => {
       cancelled = true;
@@ -52,8 +64,12 @@ export default function CommunityPulseSection() {
           </div>
 
           <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {items.length === 0 ? (
+            {!loaded ? (
               <div className="text-sm text-white/60">Încarc activitatea…</div>
+            ) : items.length === 0 ? (
+              <div className="text-sm text-white/60">
+                {failed ? 'Activitatea comunității e temporar indisponibilă.' : 'Momentan nu există activitate recentă.'}
+              </div>
             ) : (
               items.map((i) => (
                 <a
@@ -72,4 +88,3 @@ export default function CommunityPulseSection() {
     </section>
   );
 }
-

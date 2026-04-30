@@ -13,6 +13,17 @@ function parseLimit(req: Request, fallback: number): number {
   return Math.max(1, Math.min(60, Math.floor(n)));
 }
 
+function asDate(value: unknown): Date | null {
+  if (value instanceof Date && Number.isFinite(value.getTime())) return value;
+  if (typeof value === 'string' || typeof value === 'number') {
+    const d = new Date(value);
+    if (Number.isFinite(d.getTime())) return d;
+  }
+  return null;
+}
+
+type RawItem = { kind: 'forum_post' | 'event'; id: string; title: string; at: Date; href: string };
+
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') {
     return optionsResponse(req, 'GET, OPTIONS');
@@ -24,59 +35,93 @@ export default async function handler(req: Request): Promise<Response> {
     db = getDb();
   } catch {
     const now = new Date();
-    return jsonResponse(req, { now: now.toISOString(), items: [], leaderboard: [] });
+    return jsonResponse(req, { now: now.toISOString(), items: [], leaderboard: [], degraded: true });
   }
   const limit = parseLimit(req, 30);
   const now = new Date();
 
-  const forum = await db
-    .select({
-      id: schema.forumPosts.id,
-      title: schema.forumPosts.title,
-      at: schema.forumPosts.lastActivityAt,
-    })
-    .from(schema.forumPosts)
-    .where(eq(schema.forumPosts.status, 'visible'))
-    .orderBy(desc(schema.forumPosts.lastActivityAt))
-    .limit(Math.min(20, limit));
+  let degraded = false;
+  const forum = await (async () => {
+    try {
+      return await db
+        .select({
+          id: schema.forumPosts.id,
+          title: schema.forumPosts.title,
+          at: schema.forumPosts.lastActivityAt,
+        })
+        .from(schema.forumPosts)
+        .where(eq(schema.forumPosts.status, 'visible'))
+        .orderBy(desc(schema.forumPosts.lastActivityAt))
+        .limit(Math.min(20, limit));
+    } catch {
+      degraded = true;
+      return [];
+    }
+  })();
 
-  const events = await db
-    .select({
-      id: schema.events.id,
-      slug: schema.events.slug,
-      title: schema.events.title,
-      at: schema.events.startAt,
-    })
-    .from(schema.events)
-    .where(gte(schema.events.startAt, now))
-    .orderBy(asc(schema.events.startAt))
-    .limit(8);
+  const events = await (async () => {
+    try {
+      return await db
+        .select({
+          id: schema.events.id,
+          slug: schema.events.slug,
+          title: schema.events.title,
+          at: schema.events.startAt,
+        })
+        .from(schema.events)
+        .where(gte(schema.events.startAt, now))
+        .orderBy(asc(schema.events.startAt))
+        .limit(8);
+    } catch {
+      degraded = true;
+      return [];
+    }
+  })();
 
-  const leaderboard = await db
-    .select({
-      userId: schema.users.id,
-      walletAddress: schema.users.walletAddress,
-      points: schema.users.points,
-    })
-    .from(schema.users)
-    .orderBy(desc(schema.users.points))
-    .limit(8);
+  const leaderboard = await (async () => {
+    try {
+      return await db
+        .select({
+          userId: schema.users.id,
+          walletAddress: schema.users.walletAddress,
+          points: schema.users.points,
+        })
+        .from(schema.users)
+        .orderBy(desc(schema.users.points))
+        .limit(8);
+    } catch {
+      degraded = true;
+      return [];
+    }
+  })();
 
   const items = [
-    ...forum.map((p) => ({
-      kind: 'forum_post' as const,
-      id: p.id,
-      title: p.title,
-      at: p.at,
-      href: `/forum/${encodeURIComponent(p.id)}`,
-    })),
-    ...events.map((e) => ({
-      kind: 'event' as const,
-      id: e.id,
-      title: e.title,
-      at: e.at,
-      href: `/evenimente/${encodeURIComponent(e.slug)}`,
-    })),
+    ...forum
+      .map((p): RawItem | null => {
+        const at = asDate(p.at);
+        if (!at) return null;
+        return {
+          kind: 'forum_post' as const,
+          id: p.id,
+          title: p.title,
+          at,
+          href: `/forum/${encodeURIComponent(p.id)}`,
+        };
+      })
+      .filter((v): v is RawItem => v !== null),
+    ...events
+      .map((e): RawItem | null => {
+        const at = asDate(e.at);
+        if (!at) return null;
+        return {
+          kind: 'event' as const,
+          id: e.id,
+          title: e.title,
+          at,
+          href: `/evenimente/${encodeURIComponent(e.slug)}`,
+        };
+      })
+      .filter((v): v is RawItem => v !== null),
   ]
     .sort((a, b) => b.at.getTime() - a.at.getTime())
     .slice(0, limit)
@@ -86,5 +131,6 @@ export default async function handler(req: Request): Promise<Response> {
     now: now.toISOString(),
     items,
     leaderboard,
+    degraded,
   });
 }
