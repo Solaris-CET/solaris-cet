@@ -3,7 +3,7 @@
  * Timeout AbortSignal behaviour is covered in `timeout-signal.test.ts`.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
 
 describe("DeDust pool price calculations", () => {
   const CET_DECIMALS = 6;

@@ -1,7 +1,11 @@
-import { ExternalLink, Coins, BookOpen, MessageCircle, Scale } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useLanguage } from '../hooks/useLanguage';
+import { BookOpen, Coins, ExternalLink, MessageCircle, Scale } from 'lucide-react';
+
+import { trackBuyClick, trackSocialClick } from '@/lib/analytics';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
+import { mktEvent } from '@/lib/marketing';
+import { cn } from '@/lib/utils';
+
+import { useLanguage } from '../hooks/useLanguage';
 
 const TELEGRAM = 'https://t.me/+tKlfzx7IWopmNWQ0';
 
@@ -68,6 +72,16 @@ const MobileConversionDock = () => {
               key={href}
               href={href}
               {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              onClick={() => {
+                if (href === DEDUST_SWAP_URL) {
+                  trackBuyClick({ destination: href, source: 'mobile_dock' });
+                  mktEvent('buy_click', { destination: href, source: 'mobile_dock' });
+                }
+                if (href === TELEGRAM) {
+                  trackSocialClick({ platform: 'telegram', destination: href, source: 'mobile_dock' });
+                  mktEvent('social_click', { platform: 'telegram', destination: href, source: 'mobile_dock' });
+                }
+              }}
               className={cn(
                 'flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl py-2 px-1',
                 'text-[10px] sm:text-[11px] font-semibold tracking-tight text-center',

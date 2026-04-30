@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { expect,test } from '@playwright/test';
+
 import { waitForAppReady } from './e2e-helpers';
 
 test.describe('Mermaid decision map', () => {

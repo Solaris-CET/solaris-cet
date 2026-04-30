@@ -1,6 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { Download, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+import { trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
+
 import { useLanguage } from '../hooks/useLanguage';
 
 type BeforeInstallPromptEvent = Event & {
@@ -44,11 +47,13 @@ export default function PwaInstallPrompt() {
       setDeferred(e as BeforeInstallPromptEvent);
       if (showTimerRef.current !== null) window.clearTimeout(showTimerRef.current);
       showTimerRef.current = window.setTimeout(() => {
+        trackEvent('pwa_install_prompt_shown', { source: 'auto' });
         setVisible(true);
       }, 30_000);
     };
 
     const handleAppInstalled = () => {
+      trackEvent('pwa_installed', { source: 'browser' });
       dismiss();
     };
 
@@ -73,6 +78,7 @@ export default function PwaInstallPrompt() {
   const install = useCallback(async () => {
     if (!deferred) return;
     try {
+      trackEvent('pwa_install_prompt_click', { source: 'banner' });
       await deferred.prompt();
       await deferred.userChoice;
     } finally {

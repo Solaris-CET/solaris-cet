@@ -1,25 +1,28 @@
-import { useRef, useLayoutEffect, useState, useEffect, useMemo } from 'react';
 import { gsap } from 'gsap';
 import {
+  Atom,
   Brain,
-  Code2,
-  RefreshCw,
-  Coins,
-  ShieldCheck,
-  Download,
-  Cpu,
-  Zap,
-  Lock,
-  FileText,
   ChevronDown,
   ChevronUp,
+  Code2,
+  Coins,
+  Cpu,
+  Download,
+  FileText,
+  Lock,
   Network,
-  Atom,
+  RefreshCw,
+  ShieldCheck,
+  Zap,
 } from 'lucide-react';
+import { useEffect, useLayoutEffect, useMemo,useRef, useState } from 'react';
+
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
+import SocialShare from '@/components/SocialShare';
+import { PUBLIC_WHITEPAPER_IPFS_CID, PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
+
 import { useLanguage } from '../hooks/useLanguage';
 import { useReducedMotion } from '../hooks/useReducedMotion';
-import { PUBLIC_WHITEPAPER_IPFS_CID, PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
 
 const WHITEPAPER_GATEWAY_URLS = [
   PUBLIC_WHITEPAPER_IPFS_URL,
@@ -481,11 +484,25 @@ const WhitepaperSection = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
-  const [progress, setProgress] = useState(0);
   const sections = useMemo(
     () => (({ ro: wpSectionsRo } as Partial<Record<string, typeof wpSections>>)[lang] ?? wpSections),
     [lang],
   );
+  const [progress, setProgress] = useState(0);
+  const [activeSectionId, setActiveSectionId] = useState(() => sections[0]?.id ?? 'abstract');
+
+  const shareUrl = useMemo(() => {
+    if (typeof window === 'undefined') return undefined;
+    const url = new URL(window.location.href);
+    url.hash = '#whitepaper';
+    return url.toString();
+  }, []);
+
+  useEffect(() => {
+    if (sections.length === 0) return;
+    if (sections.some((s) => s.id === activeSectionId)) return;
+    setActiveSectionId(sections[0]?.id ?? 'abstract');
+  }, [activeSectionId, sections]);
 
   const readMinutes = useMemo(() => {
     const words = sections
@@ -586,6 +603,38 @@ const WhitepaperSection = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const cards = sections
+      .map((s) => document.getElementById(`wp-card-${s.id}`))
+      .filter((x): x is HTMLElement => Boolean(x));
+    if (cards.length === 0) return;
+
+    const ratios = new Map<string, number>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const id = (entry.target as HTMLElement).id.replace('wp-card-', '');
+          ratios.set(id, entry.isIntersecting ? entry.intersectionRatio : 0);
+        }
+        let bestId = activeSectionId;
+        let bestRatio = ratios.get(bestId) ?? 0;
+        for (const s of sections) {
+          const r = ratios.get(s.id) ?? 0;
+          if (r > bestRatio + 0.02) {
+            bestRatio = r;
+            bestId = s.id;
+          }
+        }
+        if (bestId !== activeSectionId) setActiveSectionId(bestId);
+      },
+      { threshold: [0.18, 0.28, 0.42, 0.6], rootMargin: '-30% 0px -55% 0px' },
+    );
+
+    for (const el of cards) observer.observe(el);
+    return () => observer.disconnect();
+  }, [activeSectionId, sections]);
+
   return (
     <section
       ref={sectionRef}
@@ -608,7 +657,7 @@ const WhitepaperSection = () => {
         <div className="absolute bottom-1/4 -right-32 w-96 h-96 rounded-full bg-solaris-cyan/5 blur-[120px]" />
       </div>
 
-      <div className="relative z-10 section-padding-x max-w-5xl mx-auto w-full">
+      <div className="relative z-10 section-padding-x max-w-6xl mx-auto w-full">
         {/* Section heading */}
         <div ref={headingRef} className="max-w-3xl mb-12">
           <div className="flex items-center gap-3 mb-4">
@@ -649,45 +698,65 @@ const WhitepaperSection = () => {
           </div>
         </div>
 
-        {/* Table of Contents */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
-          {sections.map(section => {
-            const Icon = section.icon;
-            const c = colorMap[section.color];
-            return (
-              <button
-                key={section.id}
-                onClick={() => {
-                  document
-                    .getElementById(`wp-card-${section.id}`)
-                    ?.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'center' });
-                }}
-                className={`flex flex-col items-start gap-2 p-3 rounded-xl border ${c.border} bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-200 text-left group`}
-                type="button"
-              >
-                <div className={`w-8 h-8 rounded-lg ${c.bg} flex items-center justify-center shrink-0`}>
-                  <Icon className={`w-4 h-4 ${c.text}`} />
-                </div>
-                <div>
-                  <div className={`font-mono text-[9px] font-bold ${c.text} opacity-60 mb-0.5`}>{section.number}</div>
-                  <div className="text-solaris-text text-xs font-semibold leading-tight group-hover:text-white transition-colors">
-                    {section.title}
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_280px]">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-solaris-text px-4 text-sm font-semibold hover:bg-white/10 transition-colors btn-quantum"
+                >
+                  Print
+                </button>
+              </div>
+              <SocialShare
+                url={shareUrl}
+                title="Solaris CET Whitepaper"
+                text="Solaris CET — Whitepaper"
+                variant="compact"
+              />
+            </div>
 
-        {/* Inline whitepaper sections */}
-        <div ref={contentRef} className="space-y-3 mb-16">
-          {sections.map(section => (
-            <WPSectionCard key={section.id} section={section} />
-          ))}
-        </div>
+            {/* Table of Contents */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
+              {sections.map(section => {
+                const Icon = section.icon;
+                const c = colorMap[section.color];
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => {
+                      document
+                        .getElementById(`wp-card-${section.id}`)
+                        ?.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'center' });
+                    }}
+                    className={`flex flex-col items-start gap-2 p-3 rounded-xl border ${c.border} bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-200 text-left group`}
+                    type="button"
+                  >
+                    <div className={`w-8 h-8 rounded-lg ${c.bg} flex items-center justify-center shrink-0`}>
+                      <Icon className={`w-4 h-4 ${c.text}`} />
+                    </div>
+                    <div>
+                      <div className={`font-mono text-[9px] font-bold ${c.text} opacity-60 mb-0.5`}>{section.number}</div>
+                      <div className="text-solaris-text text-xs font-semibold leading-tight group-hover:text-white transition-colors">
+                        {section.title}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
 
-        {/* CTA — IPFS archive */}
-        <div ref={ctaRef} className="bento-card p-6 lg:p-8 border border-solaris-gold/20">
+            {/* Inline whitepaper sections */}
+            <div ref={contentRef} className="space-y-3 mb-16">
+              {sections.map(section => (
+                <WPSectionCard key={section.id} section={section} />
+              ))}
+            </div>
+
+            {/* CTA — IPFS archive */}
+            <div ref={ctaRef} className="bento-card p-6 lg:p-8 border border-solaris-gold/20">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -729,6 +798,42 @@ const WhitepaperSection = () => {
               </a>
             ))}
           </div>
+        </div>
+          </div>
+
+          <aside className="hidden lg:block">
+            <div className="sticky top-28 rounded-2xl border border-white/10 bg-black/25 backdrop-blur p-4">
+              <div className="font-mono text-[10px] uppercase tracking-widest text-solaris-muted mb-3">
+                Table of contents
+              </div>
+              <div className="space-y-1">
+                {sections.map((s) => {
+                  const active = s.id === activeSectionId;
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => {
+                        document
+                          .getElementById(`wp-card-${s.id}`)
+                          ?.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
+                      }}
+                      className={`w-full rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+                        active
+                          ? 'bg-solaris-gold/10 border border-solaris-gold/20 text-solaris-text'
+                          : 'border border-transparent text-solaris-muted hover:bg-white/5 hover:text-solaris-text'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="truncate">{s.title}</span>
+                        <span className="font-mono text-[10px] text-white/35 shrink-0">{s.number}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </aside>
         </div>
 
         <div className="mt-10 max-w-3xl">

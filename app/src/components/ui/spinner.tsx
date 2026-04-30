@@ -1,7 +1,7 @@
 import { Loader2Icon } from "lucide-react"
 
-import { cn } from "@/lib/utils"
 import { useLanguage } from "@/hooks/useLanguage"
+import { cn } from "@/lib/utils"
 
 function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
   const { t } = useLanguage()

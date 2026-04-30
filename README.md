@@ -1,11 +1,17 @@
 # Solaris CET
 
+<p align="center">
+  <a href="https://solaris-cet.com" rel="nofollow">
+    <img src="./app/public/logo.png" alt="Solaris CET" width="140" />
+  </a>
+</p>
+
 [![CI](https://github.com/Solaris-CET/solaris-cet/actions/workflows/ci.yml/badge.svg)](https://github.com/Solaris-CET/solaris-cet/actions/workflows/ci.yml)
 [![Deploy to GitHub Pages](https://github.com/Solaris-CET/solaris-cet/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/Solaris-CET/solaris-cet/actions/workflows/deploy-pages.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Patents](https://img.shields.io/badge/Patents-None%20Reserved-blue.svg)](./PATENTS)
 
-**Solaris CET** is a Real-World Asset (RWA) token on **TON** with a fixed supply of **9,000 CET**, anchored in **Cetățuia, Romania**. This repository contains the official landing — a **Vite** + **React 19** + **TypeScript** app styled with **Tailwind CSS** and **GSAP**.
+**Solaris CET** is a Real-World Asset (RWA) token on **TON** with a fixed supply of **9,000 CET**, anchored in **Cetățuia, Romania**. This repository contains the official web app (landing + CET AI) — a **Vite** + **React 19** + **TypeScript** SPA styled with **Tailwind CSS** and **GSAP**.
 
 ### Production (single source of truth)
 
@@ -146,11 +152,10 @@ git clone https://github.com/Solaris-CET/solaris-cet.git
 cd solaris-cet
 
 # 2. Install dependencies
-npm install
+npm ci
 
 # 3. Start the development server
-cd app
-npm run dev
+npm run app:dev
 # → Available at http://localhost:5173
 ```
 
@@ -179,7 +184,7 @@ npm run preview
 |---------------|-------------------------------------------------|
 | UI Framework  | [React 19](https://react.dev/)                  |
 | Language      | [TypeScript 5](https://www.typescriptlang.org/) |
-| Bundler       | [Vite 7](https://vite.dev/)                     |
+| Bundler       | [Vite 8](https://vite.dev/)                     |
 | Styling       | [Tailwind CSS 4](https://tailwindcss.com/)      |
 | Components    | [shadcn/ui](https://ui.shadcn.com/) (Radix)     |
 | Animations    | [GSAP 3](https://gsap.com/)                     |
@@ -195,6 +200,13 @@ npm run preview
 
 Contributions, bug reports, and feature requests are welcome!
 Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before submitting a pull request.
+Community guidelines: [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
+
+### Docs (high-level)
+
+- [ARCHITECTURE.md](./docs/ARCHITECTURE.md) — architecture overview (frontend, API, DB, TON, AI)
+- [DATA_FLOW.md](./docs/DATA_FLOW.md) — data-flow diagram (Mermaid)
+- [RESOURCES.md](./docs/RESOURCES.md) — useful links for contributors
 
 ---
 

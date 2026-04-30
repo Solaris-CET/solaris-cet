@@ -16,9 +16,8 @@ This repository is designed to deploy on **Coolify + VPS** (production). Keep `/
 
 ## This folder
 
-`api/chat/route.ts` is a **smaller OpenAI-only** handler for setups where the project root is the **repository root** (not `app/`). It uses the same CORS allowlist as `app/api/*` via `api/lib/cors.ts`.
+`api/chat/route.ts` is a thin re-export of the canonical handler in `app/api/chat/route.ts` for setups where the project root is the **repository root** (not `app/`).
 
-- **Env:** `OPENAI_API_KEY`
 - **Do not** rely on both trees at once: pick one deploy layout to avoid duplicate or stale behaviour.
 
 ## Security notes

@@ -1,10 +1,12 @@
-import { useMemo, useState, useEffect } from 'react';
-import { Activity, Layers, Cpu, Globe, Lock, TrendingUp } from 'lucide-react';
-import GlowOrbs from '../components/GlowOrbs';
-import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
-import { useLanguage } from '../hooks/useLanguage';
+import { Activity, Cpu, Globe, Layers, Lock, TrendingUp } from 'lucide-react';
+import { useEffect,useMemo, useState } from 'react';
+
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
+import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+
+import GlowOrbs from '../components/GlowOrbs';
+import { useLanguage } from '../hooks/useLanguage';
 
 // ─── Live network stats that increment over time ──────────────────────────
 

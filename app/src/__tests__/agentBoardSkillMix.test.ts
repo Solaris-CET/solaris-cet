@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
 import {
   AGENT_BOARD_DEPT_TO_MESH_ID,
   buildSkillLatticeLine,

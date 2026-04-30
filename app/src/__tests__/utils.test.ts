@@ -1,16 +1,18 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
 import { DEDUST_POOL_ADDRESS } from "@/lib/dedustUrls";
+
 import {
-  cn,
-  formatUsd,
-  formatPrice,
   clamp,
+  cn,
   debounce,
-  formatNumber,
   formatCurrency,
+  formatNumber,
   formatPercentage,
-  truncateAddress,
+  formatPrice,
   formatTokenAmount,
+  formatUsd,
+  truncateAddress,
 } from "../lib/utils";
 
 describe("lib/utils", () => {

@@ -1,12 +1,15 @@
 // Entry: Vite + React SPA (production: Coolify → solaris-cet.com).
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { ThemeProvider } from 'next-themes'
-import * as Sentry from '@sentry/react'
+import './polyfills'
 import '@fontsource/syne/400.css'
 import '@fontsource/syne/600.css'
 import '@fontsource/syne/700.css'
 import './index.css'
+
+import * as Sentry from '@sentry/react'
+import { ThemeProvider } from 'next-themes'
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+
 import App from './App.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary.tsx'
 
@@ -27,6 +30,7 @@ if (sentryDsn) {
   Sentry.init({
     dsn: sentryDsn,
     environment: import.meta.env.MODE,
+    release: String(import.meta.env.VITE_GIT_COMMIT_HASH ?? '').trim() || undefined,
     tracesSampleRate: Number.isFinite(tracesSampleRate) ? tracesSampleRate : 0,
     sendDefaultPii: false,
   })

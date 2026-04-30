@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { Activity } from 'lucide-react';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { useLanguage } from '@/hooks/useLanguage';
-import { expressSkillForFeed } from '@/lib/skillGenome';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { expressMeshSkillForFeed, meshStandardBurstFromKey, meshWhisperFromKey } from '@/lib/meshSkillFeed';
+import { expressSkillForFeed } from '@/lib/skillGenome';
 
 const DEPTS = [
   'customer-ops',

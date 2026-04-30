@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
 import { calculateRewards as rewardsCalc } from "../lib/mining-calc";
 import {
   calculateRewards as rewardsLegacy,

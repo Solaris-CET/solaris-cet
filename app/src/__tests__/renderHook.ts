@@ -4,7 +4,7 @@
  *
  * Use these only in `// @vitest-environment jsdom` test files.
  */
-import { createElement, act as reactAct, type MutableRefObject, type ReactElement } from 'react';
+import { act as reactAct, createElement, type MutableRefObject, type ReactElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 
 interface RenderHookResult<T> {

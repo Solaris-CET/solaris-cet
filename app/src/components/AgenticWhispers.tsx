@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
 import { Sparkles } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { shortSkillWhisper } from '@/lib/meshSkillFeed';
 

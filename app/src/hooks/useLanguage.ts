@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useCallback, useContext, useEffect,useState } from 'react';
+
 import translations, { type LangCode, type Translations } from '../i18n/translations';
 import { getTextDirForLang } from '../lib/textDirection';
 
@@ -10,27 +11,19 @@ interface LanguageContextValue {
   t: Translations;
 }
 
-export const SUPPORTED_LANGS: LangCode[] = ['en', 'es', 'zh', 'ru', 'ro', 'pt', 'de'];
+export const SUPPORTED_LANGS: LangCode[] = ['en', 'ro', 'de', 'es', 'pt', 'ru', 'zh'];
 
 /**
  * Maps ISO 3166-1 alpha-2 country codes to a supported LangCode.
  * Only countries whose primary official language is a supported locale are listed.
  */
 const COUNTRY_LANG_MAP: Partial<Record<string, LangCode>> = {
-  // German-speaking countries
-  DE: 'de', AT: 'de', CH: 'de', LI: 'de',
   // Spanish-speaking countries
   ES: 'es', MX: 'es', AR: 'es', CO: 'es', PE: 'es', VE: 'es', CL: 'es',
   UY: 'es', BO: 'es', PY: 'es', EC: 'es', CR: 'es', PA: 'es', DO: 'es',
   CU: 'es', GT: 'es', HN: 'es', SV: 'es', NI: 'es',
-  // Chinese-speaking regions
-  CN: 'zh', TW: 'zh', HK: 'zh', MO: 'zh',
-  // Russian-speaking countries
-  RU: 'ru', BY: 'ru', KZ: 'ru', KG: 'ru',
   // Romanian-speaking countries
   RO: 'ro', MD: 'ro',
-  // Portuguese-speaking countries
-  PT: 'pt', BR: 'pt', AO: 'pt', MZ: 'pt', CV: 'pt', GW: 'pt', ST: 'pt', TL: 'pt',
 };
 
 /**
@@ -59,6 +52,8 @@ const detectLanguage = (): LangCode => {
     if (stored && (SUPPORTED_LANGS as string[]).includes(stored)) {
       return stored as LangCode;
     }
+    const cookieLang = readLangCookie();
+    if (cookieLang) return cookieLang;
     const nav = detectNavigatorLanguage();
     if (nav) return nav;
     return 'en';
@@ -66,6 +61,18 @@ const detectLanguage = (): LangCode => {
     return 'en';
   }
 };
+
+function readLangCookie(): LangCode | null {
+  try {
+    const m = /(?:^|;\s*)solaris_lang=([^;]+)/.exec(document.cookie);
+    const raw = m?.[1] ? decodeURIComponent(m[1]) : '';
+    const code = raw.slice(0, 2).toLowerCase();
+    if ((SUPPORTED_LANGS as string[]).includes(code)) return code as LangCode;
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 function detectNavigatorLanguage(): LangCode | null {
   try {

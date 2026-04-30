@@ -1,12 +1,14 @@
+import { Brain, CheckCircle, Coins,Minus, Shield, Trophy, XCircle, Zap } from 'lucide-react';
 import { lazy, Suspense, useMemo } from 'react';
-import { CheckCircle, XCircle, Minus, Trophy, Zap, Shield, Brain, Coins } from 'lucide-react';
-import GlowOrbs from '../components/GlowOrbs';
+
 import { ChartLazyFallback } from '@/components/ChartLazyFallback';
-import { useNearScreen } from '@/hooks/useNearScreen';
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
-import { useLanguage } from '../hooks/useLanguage';
+import { useNearScreen } from '@/hooks/useNearScreen';
 import { CET_FIXED_SUPPLY_CAP, TASK_AGENT_MESH_TOTAL } from '@/lib/domainPillars';
+
+import GlowOrbs from '../components/GlowOrbs';
+import { useLanguage } from '../hooks/useLanguage';
 
 const CompetitionCharts = lazy(() => import('@/components/CompetitionCharts'));
 

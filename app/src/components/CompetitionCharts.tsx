@@ -1,12 +1,13 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Coins, Zap } from 'lucide-react';
-import { skillSeedFromLabel, standardSkillBurst } from '@/lib/meshSkillFeed';
+import { Bar, BarChart, Cell,ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+
+import { useLanguage } from '@/hooks/useLanguage';
 import {
   COMPETITION_SCARCITY_CHART_ROWS,
   COMPETITION_TPS_CHART_ROWS,
 } from '@/lib/competitionChartData';
-import { useLanguage } from '@/hooks/useLanguage';
 import { localeForLang } from '@/lib/localeForLang';
+import { skillSeedFromLabel, standardSkillBurst } from '@/lib/meshSkillFeed';
 
 interface CompetitionBarTooltipPayload {
   value?: number;

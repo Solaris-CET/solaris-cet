@@ -1,11 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
 import {
-  CET_AI_TASK_MESH_LINE,
   buildCetAiObserveParse,
   buildDeepLatticeMeshLogMessage,
   buildDeepLatticeMeshLogMessageRawQuery,
   buildSkillLocusLogMessage,
   CET_AI_LATTICE_PHASE,
+  CET_AI_TASK_MESH_LINE,
 } from '@/lib/cetAiTelemetry';
 
 describe('cetAiTelemetry barrel', () => {

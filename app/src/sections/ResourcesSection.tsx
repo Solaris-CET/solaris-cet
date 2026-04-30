@@ -1,17 +1,18 @@
+import { BarChart2, BookOpen, Brain, ExternalLink,Globe } from 'lucide-react';
 import { useMemo } from 'react';
+
+import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
-import { BarChart2, BookOpen, Brain, Globe, ExternalLink } from 'lucide-react';
-import MeshSkillRibbon from '@/components/MeshSkillRibbon';
+import { useLanguage } from '@/hooks/useLanguage';
 import {
   COINGECKO_SEARCH_CET_URL,
   COINMARKETCAP_SEARCH_CET_URL,
-  TONVIEWER_CET_URL,
   DEXSCREENER_CET_SEARCH_URL,
   TONSCAN_CET_CONTRACT_URL,
+  TONVIEWER_CET_URL,
 } from '@/lib/cetContract';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
-import { useLanguage } from '@/hooks/useLanguage';
 import { PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
 
 interface Resource {

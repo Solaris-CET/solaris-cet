@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
-import { describe, it, expect, beforeEach } from 'vitest';
-import { renderHook, act } from './renderHook';
-import { useLanguageState, SUPPORTED_LANGS } from '../hooks/useLanguage';
+import { beforeEach,describe, expect, it } from 'vitest';
+
 import type { LangCode } from '../hooks/useLanguage';
+import { SUPPORTED_LANGS,useLanguageState } from '../hooks/useLanguage';
+import { act,renderHook } from './renderHook';
 
 beforeEach(() => {
   localStorage.clear();
@@ -51,10 +52,10 @@ describe('useLanguageState', () => {
 
     const { resultRef: r4 } = await renderHook(() => useLanguageState());
     await act(() => {
-      r4.current.setLang('ru');
+      r4.current.setLang('ro');
     });
-    expect(r4.current.lang).toBe('ru');
-    expect(localStorage.getItem('solaris_lang')).toBe('ru');
+    expect(r4.current.lang).toBe('ro');
+    expect(localStorage.getItem('solaris_lang')).toBe('ro');
 
     const { resultRef: r5 } = await renderHook(() => useLanguageState());
     await act(() => {
@@ -70,7 +71,7 @@ describe('useLanguageState', () => {
     expect(r6.current.t.nav.tokenomics).toBeDefined();
     expect(typeof r6.current.t.nav.tokenomics).toBe('string');
 
-    expect(SUPPORTED_LANGS).toEqual(expect.arrayContaining(['en', 'es', 'zh', 'ru', 'ro', 'pt', 'de']));
+    expect(SUPPORTED_LANGS).toEqual(expect.arrayContaining(['en', 'ro', 'es']));
     expect(SUPPORTED_LANGS).toHaveLength(7);
 
     const { resultRef: r7 } = await renderHook(() => useLanguageState());

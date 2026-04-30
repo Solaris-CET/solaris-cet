@@ -1,11 +1,13 @@
-import { useRef, useLayoutEffect, useState, useEffect, useCallback } from 'react';
-import type { ComponentType } from 'react';
 import { gsap } from 'gsap';
-import { Calculator, Smartphone, Laptop, Monitor, Server, TrendingUp } from 'lucide-react';
-import type { MiningInput, MiningResult } from '../lib/mining-math';
-import MeshSkillRibbon from '../components/MeshSkillRibbon';
+import { Calculator, Laptop, Monitor, Server, Smartphone, TrendingUp } from 'lucide-react';
+import type { ComponentType } from 'react';
+import { useCallback,useEffect, useLayoutEffect, useRef, useState } from 'react';
+
 import { meshStandardBurstFromKey, meshWhisperFromKey } from '@/lib/meshSkillFeed';
+
+import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useLanguage } from '../hooks/useLanguage';
+import type { MiningInput, MiningResult } from '../lib/mining-math';
 
 const BTC_S_SYMBOL = 'BTC-S';
 

@@ -5,6 +5,10 @@ services:
       dockerfile: Dockerfile
     environment:
       NODE_ENV: production
+      OTEL_ENABLED: "1"
+      OTEL_SERVICE_NAME: "solaris-cet"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
+      LOG_LEVEL: "info"
     ports:
       - "3000:3000"
 
@@ -39,3 +43,46 @@ services:
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+
+  tempo:
+    image: grafana/tempo:2.6.1
+    command: ["-config.file=/etc/tempo.yml"]
+    ports:
+      - "3200:3200"
+    volumes:
+      - ./tempo/tempo.yml:/etc/tempo.yml:ro
+      - tempo-data:/var/tempo
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.110.0
+    command: ["--config=/etc/otel/config.yml"]
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - ./otel-collector/config.yml:/etc/otel/config.yml:ro
+    depends_on:
+      - tempo
+
+  loki:
+    image: grafana/loki:3.2.1
+    command: ["-config.file=/etc/loki.yml"]
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki/loki.yml:/etc/loki.yml:ro
+      - loki-data:/var/loki
+
+  promtail:
+    image: grafana/promtail:3.2.1
+    command: ["-config.file=/etc/promtail.yml"]
+    volumes:
+      - ./promtail/promtail.yml:/etc/promtail.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - loki
+
+volumes:
+  tempo-data: {}
+  loki-data: {}

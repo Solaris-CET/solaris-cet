@@ -1,8 +1,9 @@
-import { useRef, useLayoutEffect, useState, useEffect, useCallback } from 'react';
 import { gsap } from 'gsap';
-import { Brain, Atom, ChevronRight, RotateCcw, Zap, Eye, Cpu } from 'lucide-react';
-import { observeLocusClip, type ObserveLocusBranch } from '@/lib/meshSkillFeed';
+import { Atom, Brain, ChevronRight, Cpu,Eye, RotateCcw, Zap } from 'lucide-react';
+import { useCallback,useEffect, useLayoutEffect, useRef, useState } from 'react';
+
 import { useLanguage } from '@/hooks/useLanguage';
+import { type ObserveLocusBranch,observeLocusClip } from '@/lib/meshSkillFeed';
 
 // Realistic TON mainnet block height range (as of 2025)
 const TON_MAINNET_BLOCK_MIN = 40_000_000;
@@ -131,12 +132,12 @@ const NeuralReasoningEngine = () => {
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const clearTimer = () => {
+  const clearTimer = useCallback(() => {
     if (intervalRef.current !== null) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-  };
+  }, []);
 
   const runReasoning = useCallback((q: string) => {
     clearTimer();
@@ -155,9 +156,9 @@ const NeuralReasoningEngine = () => {
         setVisibleIndex(idx);
       }
     }, REASONING_STEP_DELAY_MS);
-  }, [tx]);
+  }, [tx, clearTimer]);
 
-  useEffect(() => () => clearTimer(), []);
+  useEffect(() => () => clearTimer(), [clearTimer]);
 
   const handleReset = () => {
     clearTimer();

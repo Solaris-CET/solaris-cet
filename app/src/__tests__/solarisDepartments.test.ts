@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
 import { solarisDepartments } from '@/data/solarisDepartments';
 import { MESH_ID_TO_AGENT_BOARD_LABEL } from '@/lib/agentBoardSkillMix';
 

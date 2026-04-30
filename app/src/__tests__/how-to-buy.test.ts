@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { CET_CONTRACT_ADDRESS as CET_CONTRACT } from '@/lib/cetContract';
+import { describe, expect,it } from 'vitest';
+
 import { PRODUCTION_SITE_ORIGIN } from '@/lib/brandAssetFilenames';
+import { CET_CONTRACT_ADDRESS as CET_CONTRACT } from '@/lib/cetContract';
 import { DEDUST_POOL_ADDRESS, DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 
 const SITE_ROOT = `${PRODUCTION_SITE_ORIGIN}/`;

@@ -1,9 +1,10 @@
-import { useState, useEffect, useSyncExternalStore } from 'react';
-import { Brain, CheckCircle, MessageCircle, Lightbulb, AlertTriangle, Dna } from 'lucide-react';
+import { AlertTriangle, Brain, CheckCircle, Dna,Lightbulb, MessageCircle } from 'lucide-react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
+
 import {
+  meshStandardBurstFromKey,
   shortSkillWhisper,
   skillSeedFromLabel,
-  meshStandardBurstFromKey,
 } from '@/lib/meshSkillFeed';
 
 // ─── Live counters that increment naturally over time ─────────────────────

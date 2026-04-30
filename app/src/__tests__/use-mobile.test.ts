@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { renderHook } from './renderHook';
+import { afterEach,beforeEach, describe, expect, it } from 'vitest';
+
 import { useIsMobile } from '../hooks/use-mobile';
+import { renderHook } from './renderHook';
 
 const MOBILE_BREAKPOINT = 768;
 

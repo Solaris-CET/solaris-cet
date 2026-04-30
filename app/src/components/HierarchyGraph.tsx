@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
 import { Copy, ExternalLink } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
+
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
-import MermaidDiagram from './MermaidDiagram';
 import { useLanguage } from '@/hooks/useLanguage';
+import { cn } from '@/lib/utils';
+
+import MermaidDiagram from './MermaidDiagram';
 
 type MermaidAgentResponse = {
   format: 'mermaid';

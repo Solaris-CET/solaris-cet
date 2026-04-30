@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
 import { calculateRewards, type MiningInput } from '../lib/mining-math';
 
 describe('calculateRewards', () => {

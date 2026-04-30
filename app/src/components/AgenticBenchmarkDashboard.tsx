@@ -1,3 +1,5 @@
+import { Gauge, Sparkles } from 'lucide-react';
+import type { TooltipContentProps, TooltipPayloadEntry } from 'recharts';
 import {
   Bar,
   BarChart,
@@ -8,9 +10,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import type { TooltipContentProps, TooltipPayloadEntry } from 'recharts';
-import { Gauge, Sparkles } from 'lucide-react';
-import { standardSkillBurst, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+
+import { skillSeedFromLabel,standardSkillBurst } from '@/lib/meshSkillFeed';
 
 const SERIES_PRETTY: Record<string, string> = {
   solaris: 'Solaris (200k + RAV)',

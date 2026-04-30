@@ -1,7 +1,8 @@
-import { useEffect, useCallback, useReducer, useMemo } from 'react';
-import { Brain, Zap, Eye, CheckCircle2, XCircle, ExternalLink } from 'lucide-react';
-import { shortSkillWhisper, skillSaltFromQuery } from '@/lib/meshSkillFeed';
+import { Brain, CheckCircle2, ExternalLink,Eye, XCircle, Zap } from 'lucide-react';
+import { useCallback, useEffect, useMemo,useReducer } from 'react';
+
 import { DEDUST_POOL_DEPOSIT_URL } from '@/lib/dedustUrls';
+import { shortSkillWhisper, skillSaltFromQuery } from '@/lib/meshSkillFeed';
 
 /** Delay between each ReAct step reveal (ms). */
 const STEP_REVEAL_DELAY_MS = 700;

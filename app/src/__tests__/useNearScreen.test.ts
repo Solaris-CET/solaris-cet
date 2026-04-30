@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
-import { createElement } from 'react';
 import type { RefObject } from 'react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act } from './renderHook';
+import { createElement } from 'react';
+import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { useNearScreen } from '../hooks/useNearScreen';
+import { act,renderHook } from './renderHook';
 
 type ObserverCallback = (entries: IntersectionObserverEntry[]) => void;
 

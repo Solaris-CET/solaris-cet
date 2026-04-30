@@ -1,12 +1,13 @@
-import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
-import { TrendingUp, Droplets, Clock, Battery } from 'lucide-react';
+import { Battery,Clock, Droplets, TrendingUp } from 'lucide-react';
+import { useLayoutEffect,useRef } from 'react';
+
+import AppImage from '../components/AppImage';
 import GlowOrbs from '../components/GlowOrbs';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { SolarisLogoMark } from '../components/SolarisLogoMark';
-import AppImage from '../components/AppImage';
-import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useLanguage } from '../hooks/useLanguage';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 
 type TickerItem = { label: string; value: string; icon: typeof TrendingUp };

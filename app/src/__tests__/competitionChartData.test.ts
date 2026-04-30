@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
 import {
   COMPETITION_SCARCITY_CHART_ROWS,
   COMPETITION_TPS_CHART_ROWS,

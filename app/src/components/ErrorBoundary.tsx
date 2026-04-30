@@ -1,8 +1,10 @@
-import { Component, type ReactNode, type ErrorInfo } from 'react';
 import * as Sentry from '@sentry/react';
-import translations from '../i18n/translations';
-import { getActiveLangSync } from '../hooks/useLanguage';
+import { Component, type ErrorInfo,type ReactNode } from 'react';
+
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+
+import { getActiveLangSync } from '../hooks/useLanguage';
+import translations from '../i18n/translations';
 
 interface Props {
   children: ReactNode;

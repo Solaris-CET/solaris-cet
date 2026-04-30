@@ -1,7 +1,8 @@
-import { useId } from 'react';
 import { Globe } from 'lucide-react';
+import { useId } from 'react';
+
 import { useLanguage } from '../hooks/useLanguage';
-import { useRegion, type RegionCode } from '../hooks/useRegion';
+import { type RegionCode,useRegion } from '../hooks/useRegion';
 
 export default function RegionSelector({ className = '' }: { className?: string }) {
   const { t } = useLanguage();

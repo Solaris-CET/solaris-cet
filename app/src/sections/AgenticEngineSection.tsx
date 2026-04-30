@@ -1,16 +1,17 @@
-import { lazy, Suspense, useRef, useLayoutEffect, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { Cpu, Network } from 'lucide-react';
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
+
+import { ChartLazyFallback } from '@/components/ChartLazyFallback';
+import DepartmentIntelligenceScores from '@/components/DepartmentIntelligenceScores';
 import GlowOrbs from '@/components/GlowOrbs';
 import LiveNeuralFeed from '@/components/LiveNeuralFeed';
-import DepartmentIntelligenceScores from '@/components/DepartmentIntelligenceScores';
 import RavInternetMesh from '@/components/RavInternetMesh';
-import { ChartLazyFallback } from '@/components/ChartLazyFallback';
 
 const AgenticBenchmarkDashboard = lazy(() => import('@/components/AgenticBenchmarkDashboard'));
 import AgenticNeuralCanvas from '@/components/AgenticNeuralCanvas';
-import AgenticWhispers from '@/components/AgenticWhispers';
 import AgenticSignalUnlock from '@/components/AgenticSignalUnlock';
+import AgenticWhispers from '@/components/AgenticWhispers';
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 import { useLanguage } from '@/hooks/useLanguage';
 

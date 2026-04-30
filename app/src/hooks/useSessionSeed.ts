@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+
 import { hashStringToUint32, mulberry32 } from '@/lib/seed';
 
 function getSessionSeed(): number {

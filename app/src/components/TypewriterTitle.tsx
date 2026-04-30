@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect,useState } from 'react';
 
 export const TypewriterTitle: React.FC<{ phrases: string[] }> = ({ phrases }) => {
   const [text, setText] = useState('');

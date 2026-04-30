@@ -29,6 +29,32 @@
 /** Public salt — not secret, prevents cross-project key reuse. */
 const PBKDF2_SALT = 'solaris-cet-api-key-v1';
 
+function uniq(list: string[]): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const v of list) {
+    const k = v.trim();
+    if (!k) continue;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push(k);
+  }
+  return out;
+}
+
+export function encryptionSecretsFromEnv(): string[] {
+  const rawList = String(process.env.ENCRYPTION_SECRETS ?? '').trim();
+  const list = rawList
+    ? rawList
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : [];
+  const single = String(process.env.ENCRYPTION_SECRET ?? '').trim();
+  if (single) list.unshift(single);
+  return uniq(list);
+}
+
 /**
  * Derive a 256-bit AES-GCM key from `secret` using PBKDF2-SHA-256.
  */
@@ -93,6 +119,20 @@ export async function decryptApiKey(secret: string, encrypted: string): Promise<
   return new TextDecoder().decode(plainBuffer);
 }
 
+export async function decryptApiKeyWithEnvSecrets(encrypted: string): Promise<string> {
+  const secrets = encryptionSecretsFromEnv();
+  if (secrets.length === 0) throw new Error('ENCRYPTION_SECRET not configured');
+  let lastErr: unknown = null;
+  for (const s of secrets) {
+    try {
+      return await decryptApiKey(s, encrypted);
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error('Decrypt failed');
+}
+
 /**
  * Encrypt a plaintext API key into a base64url AES-256-GCM blob.
  * Intended for use in `scripts/encrypt-key.mjs`; not called in the
@@ -114,6 +154,13 @@ export async function encryptApiKey(secret: string, plaintext: string): Promise<
   combined.set(iv, 0);
   combined.set(new Uint8Array(ciphertext), iv.byteLength);
   return toBase64Url(combined);
+}
+
+export async function encryptApiKeyWithEnvPrimary(plaintext: string): Promise<string | null> {
+  const secrets = encryptionSecretsFromEnv();
+  const primary = secrets[0];
+  if (!primary) return null;
+  return encryptApiKey(primary, plaintext);
 }
 
 /**

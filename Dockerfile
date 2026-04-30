@@ -10,7 +10,7 @@ COPY app/package.json app/package.json
 COPY api/package.json api/package.json
 COPY contracts/package.json contracts/package.json
 COPY scripts/package.json scripts/package.json
-RUN --mount=type=cache,target=/root/.npm npm ci
+RUN --mount=type=cache,target=/root/.npm npm ci --include=dev
 
 # Build prerequisites used by app prebuild script.
 COPY scripts/ scripts/

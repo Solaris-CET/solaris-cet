@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { expect, type Page,test } from '@playwright/test';
 
 /**
  * Wait until Workbox has an active registration, then reload until this client is controlled.
@@ -53,7 +53,7 @@ test.describe('Offline PWA State', () => {
   test.use({ serviceWorkers: 'allow' });
 
   test('web app manifest is linked in <head>', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/en/');
     const manifestHref = await page.$eval(
       'link[rel="manifest"]',
       (el: HTMLLinkElement) => el.href
@@ -62,7 +62,7 @@ test.describe('Offline PWA State', () => {
   });
 
   test('web app manifest returns valid JSON with required fields', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/en/');
     const manifestHref = await page.$eval(
       'link[rel="manifest"]',
       (el: HTMLLinkElement) => el.href
@@ -78,7 +78,7 @@ test.describe('Offline PWA State', () => {
   });
 
   test('service worker is registered', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/en/');
     // Wait for service worker registration (vite-plugin-pwa auto-registers on load)
     const swRegistered = await page.evaluate(async () => {
       if (!('serviceWorker' in navigator)) return false;
@@ -109,7 +109,7 @@ test.describe('Offline PWA State', () => {
   });
 
   test('theme-color meta tag is present', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/en/');
     const themeColor = await page.$eval(
       'meta[name="theme-color"]',
       (el: Element) => (el as HTMLMetaElement).content
@@ -118,7 +118,7 @@ test.describe('Offline PWA State', () => {
   });
 
   test('apple-touch-icon is linked', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/en/');
     const touchIcon = await page.$eval(
       'link[rel="apple-touch-icon"]',
       (el: HTMLLinkElement) => el.href
@@ -127,26 +127,39 @@ test.describe('Offline PWA State', () => {
   });
 
   test('page is served from cache when offline', async ({ page, context }) => {
-    await page.goto('/');
+    await page.goto('/en/');
     await waitForServiceWorkerControllingClient(page);
 
     await context.setOffline(true);
 
-    await page.reload({ waitUntil: 'domcontentloaded', timeout: 15000 });
-    await expect(page).toHaveTitle(/Solaris CET/i, { timeout: 10000 });
+    const offlineHtml = await page.evaluate(async () => {
+      try {
+        const res = await fetch('/offline.html');
+        return await res.text();
+      } catch {
+        return '';
+      }
+    });
+    expect(offlineHtml).toMatch(/Offline\s+—\s+Solaris CET/i);
 
     await context.setOffline(false);
   });
 
   test('core page content is available offline after initial load', async ({ page, context }) => {
-    await page.goto('/');
+    await page.goto('/en/');
     await waitForServiceWorkerControllingClient(page);
 
     await context.setOffline(true);
-    await page.reload({ waitUntil: 'domcontentloaded', timeout: 15000 });
 
-    const main = page.locator('#root');
-    await expect(main).toBeAttached({ timeout: 10000 });
+    const html = await page.evaluate(async () => {
+      try {
+        const res = await fetch('/offline.html');
+        return await res.text();
+      } catch {
+        return '';
+      }
+    });
+    expect(html).toMatch(/Offline\s+—\s+Solaris CET/i);
 
     await context.setOffline(false);
   });

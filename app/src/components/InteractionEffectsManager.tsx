@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 const RIPPLE_SELECTOR = '.btn-gold, .btn-filled-gold, .ton-connect-btn button';

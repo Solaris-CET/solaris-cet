@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+
 import { useLanguage } from '@/hooks/useLanguage';
 
 const RwaSection = lazy(() => import('@/sections/RwaSection'));

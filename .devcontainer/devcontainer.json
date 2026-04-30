@@ -7,7 +7,7 @@
   },
   "remoteUser": "node",
   "workspaceFolder": "/workspaces/solaris-cet",
-  "postCreateCommand": "bash -lc 'cd app && npm ci && npx playwright install --with-deps chromium'",
+  "postCreateCommand": "bash -lc 'npm ci && cd app && npx playwright install --with-deps chromium'",
   "customizations": {
     "vscode": {
       "extensions": [

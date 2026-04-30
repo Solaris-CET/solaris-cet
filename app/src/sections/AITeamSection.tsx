@@ -1,22 +1,25 @@
+import { Brain, ChevronDown,TrendingUp } from 'lucide-react';
 import { lazy, Suspense } from 'react';
-import { Brain, TrendingUp, ChevronDown } from 'lucide-react';
-import GlowOrbs from '../components/GlowOrbs';
-import AnimatedCounter from '../components/AnimatedCounter';
-import AgentBoard from '../components/AgentBoard';
-import LiveAgentStats from '../components/LiveAgentStats';
-import { ChartLazyFallback } from '../components/ChartLazyFallback';
+
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
 
+import AgentBoard from '../components/AgentBoard';
+import AnimatedCounter from '../components/AnimatedCounter';
+import { ChartLazyFallback } from '../components/ChartLazyFallback';
+import GlowOrbs from '../components/GlowOrbs';
+import LiveAgentStats from '../components/LiveAgentStats';
+
 const AgentDepartmentChart = lazy(() => import('../components/AgentDepartmentChart'));
-import { solarisDepartments } from '@/data/solarisDepartments';
-import RoleSynthesizedSkills from '@/components/RoleSynthesizedSkills';
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
+import RoleSynthesizedSkills from '@/components/RoleSynthesizedSkills';
+import { solarisDepartments } from '@/data/solarisDepartments';
 import {
-  meshWhisperFromKey,
   meshStandardBurstForAiTeamRoleAgent,
   meshWhisperForAiTeamRoleGene,
+  meshWhisperFromKey,
 } from '@/lib/meshSkillFeed';
+
 import { useLanguage } from '../hooks/useLanguage';
 
 const departments = solarisDepartments;

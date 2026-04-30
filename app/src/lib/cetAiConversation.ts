@@ -1,9 +1,21 @@
 import type { Translations } from '../i18n/translations';
 
 export interface CetAiChatEntry {
+  id?: string;
   question: string;
   answer: string;
   confidence: number;
+  createdAt?: number;
+  modelUsed?: string;
+  sources?: Array<{ id: string; title: string; url: string; snippet: string }>;
+  alternates?: Array<{
+    answer: string;
+    confidence: number;
+    createdAt: number;
+    modelUsed?: string;
+    sources?: Array<{ id: string; title: string; url: string; snippet: string }>;
+  }>;
+  pinned?: boolean;
 }
 
 export function buildCopyForAiText(q: string, a: string, o: Translations['cetAi']): string {

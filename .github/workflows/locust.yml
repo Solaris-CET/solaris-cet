@@ -1,0 +1,69 @@
+name: Performance (Locust)
+
+on:
+  workflow_dispatch:
+    inputs:
+      host:
+        description: "Target host (e.g. https://staging.solaris-cet.com)"
+        required: true
+        type: string
+      users:
+        description: "Concurrent users"
+        required: false
+        default: "25"
+        type: string
+      spawn_rate:
+        description: "Users spawned per second"
+        required: false
+        default: "5"
+        type: string
+      run_time:
+        description: "Run time (e.g. 2m, 30s)"
+        required: false
+        default: "2m"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  locust:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install Locust
+        run: python -m pip install --upgrade pip && pip install locust
+
+      - name: Run load test
+        env:
+          HOST: ${{ inputs.host }}
+          USERS: ${{ inputs.users }}
+          SPAWN_RATE: ${{ inputs.spawn_rate }}
+          RUN_TIME: ${{ inputs.run_time }}
+        run: |
+          set -euo pipefail
+          locust -f perf/locustfile.py \
+            --headless \
+            -u "${USERS}" \
+            -r "${SPAWN_RATE}" \
+            -t "${RUN_TIME}" \
+            --host "${HOST}" \
+            --only-summary \
+            --csv perf/locust
+
+      - name: Upload Locust results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: locust-results
+          path: perf/locust*
+          retention-days: 14
+          if-no-files-found: warn
+

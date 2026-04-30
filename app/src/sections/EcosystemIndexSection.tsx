@@ -1,10 +1,11 @@
+import { BarChart2,ExternalLink, TrendingUp } from 'lucide-react';
 import { useMemo } from 'react';
+
+import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
-import { TrendingUp, ExternalLink, BarChart2 } from 'lucide-react';
-import MeshSkillRibbon from '@/components/MeshSkillRibbon';
-import { productionSiteUrl } from '@/lib/brandAssets';
 import { useLanguage } from '@/hooks/useLanguage';
+import { productionSiteUrl } from '@/lib/brandAssets';
 
 interface CryptoProject {
   name: string;

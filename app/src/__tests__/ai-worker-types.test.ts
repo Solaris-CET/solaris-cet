@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
 import type { AnalyticsInput, AnalyticsOutput, MemoryStats } from '../workers/aiWorker';
 
 describe('aiWorker — AnalyticsInput / AnalyticsOutput / MemoryStats', () => {

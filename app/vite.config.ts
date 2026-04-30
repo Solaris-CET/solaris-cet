@@ -1,14 +1,16 @@
 import { execSync } from "node:child_process"
 import fs from "node:fs"
-import path from "path"
-import { OG_IMAGE_FILENAME, SOLARIS_CET_LOGO_FILENAME } from "./src/lib/brandAssetFilenames"
-import { DEDUST_POOL_DEPOSIT_URL } from "./src/lib/dedustUrls"
-import react from "@vitejs/plugin-react"
+
 import { sentryVitePlugin } from "@sentry/vite-plugin"
-import { defineConfig } from "vite"
+import react from "@vitejs/plugin-react"
+import path from "path"
 import type { PluginOption } from "vite"
+import { defineConfig } from "vite"
 import { compression } from "vite-plugin-compression2"
 import { VitePWA } from 'vite-plugin-pwa'
+
+import { OG_IMAGE_FILENAME, SOLARIS_CET_LOGO_FILENAME } from "./src/lib/brandAssetFilenames"
+import { DEDUST_POOL_DEPOSIT_URL } from "./src/lib/dedustUrls"
 
 /**
  * Coolify/Nixpacks often run `vite preview` instead of nginx. Vite's preview
@@ -126,6 +128,9 @@ export default defineConfig({
             project: sentryProject,
             url: sentryUrl,
             release: gitShort(),
+            sourcemaps: {
+              filesToDeleteAfterUpload: ['dist/**/*.map'],
+            },
           } as unknown as Record<string, unknown>),
         ]
       : []),
@@ -140,7 +145,10 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: 'autoUpdate',
-      filename: `sw-${gitShort()}.js`,
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.js',
+      manifestFilename: 'manifest.json',
       includeAssets: [
         'favicon.svg',
         'icon-192.png',
@@ -156,18 +164,25 @@ export default defineConfig({
         theme_color: '#05060B',
         background_color: '#05060B',
         display: 'standalone',
+        display_override: ['standalone', 'minimal-ui', 'browser'],
+        orientation: 'portrait-primary',
         start_url: '/',
         scope: '/',
+        categories: ['finance', 'business', 'utilities'],
+        lang: 'en',
+        id: '/',
         icons: [
           {
             src: 'icon-192.png',
             sizes: '192x192',
             type: 'image/png',
+            purpose: 'any maskable',
           },
           {
             src: 'icon-512.png',
             sizes: '512x512',
             type: 'image/png',
+            purpose: 'any maskable',
           },
           {
             src: 'favicon.svg',
@@ -198,9 +213,19 @@ export default defineConfig({
             url: '/#competition',
           },
         ],
+        share_target: {
+          action: '/share',
+          method: 'GET',
+          enctype: 'application/x-www-form-urlencoded',
+          params: {
+            title: 'title',
+            text: 'text',
+            url: 'url',
+          },
+        },
       },
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+      injectManifest: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json,webmanifest}'],
         globIgnores: [
           '**/vendor/onnxruntime/**',
           '**/assets/mermaid-*.js*',
@@ -213,95 +238,7 @@ export default defineConfig({
           '**/assets/postprocessing-*.js*',
           '**/assets/@react-three/postprocessing-*.js*',
         ],
-        /**
-         * SPA shell for client routes (must stay index.html — not offline.html, or SPA breaks).
-         * Offline navigations use NetworkFirst below + handlerDidError → offline.html.
-         */
-        navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/sovereign\//, /^\/apocalypse\//],
-        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3 MiB to cover phone-mockup.png
-        runtimeCaching: [
-          {
-            urlPattern: ({ url }: { url: URL }) =>
-              url.pathname.startsWith('/assets/') &&
-              (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')),
-            handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'asset-chunks',
-              expiration: {
-                maxEntries: 80,
-                maxAgeSeconds: 60 * 60 * 24 * 14, // 14 days
-              },
-            },
-          },
-          {
-            urlPattern: ({ request, url }: { request: Request; url: URL }) =>
-              request.mode === 'navigate' &&
-              !url.pathname.startsWith('/sovereign/') &&
-              !url.pathname.startsWith('/apocalypse/'),
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'pages-offline-fallback',
-              networkTimeoutSeconds: 5,
-              plugins: [
-                {
-                  /** Runs in the generated service worker; `caches` is a SW global. */
-                  handlerDidError: async () => {
-                    const g = globalThis as unknown as {
-                      caches: { match: (req: string) => Promise<Response | undefined> }
-                    }
-                    return (await g.caches.match('/offline.html')) ?? undefined
-                  },
-                },
-              ],
-            },
-          },
-          {
-            urlPattern: /\/api\/state\.json$/,
-            handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'state-json-cache',
-              expiration: {
-                maxEntries: 1,
-                maxAgeSeconds: 60 * 5, // 5 minutes
-              },
-            },
-          },
-          {
-            urlPattern: /^https:\/\/api\.dedust\.io\//i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'dedust-api-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 5, // 5 minutes
-              },
-            },
-          },
-          {
-            urlPattern: /^https:\/\/api\.coingecko\.com\//i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'coingecko-api-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 5, // 5 minutes
-              },
-            },
-          },
-          {
-            // Cache same-origin ONNX Runtime WASM binaries for offline use.
-            urlPattern: /^\/vendor\/onnxruntime\//i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'onnx-wasm-cache',
-              expiration: {
-                maxEntries: 20,
-                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
-              },
-            },
-          },
-        ],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
       },
     }),
   ] satisfies PluginOption[],
@@ -327,7 +264,7 @@ export default defineConfig({
       },
     },
     cssCodeSplit: true,
-    sourcemap: true,
+    sourcemap: sentryEnabled,
     chunkSizeWarningLimit: 1600,
   },
   resolve: {

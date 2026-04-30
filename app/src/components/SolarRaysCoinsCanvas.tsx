@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
+
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 type Particle = {
   x: number;

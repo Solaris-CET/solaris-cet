@@ -1,18 +1,20 @@
-import { lazy, Suspense, useRef, useLayoutEffect, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
-import { Coins, Pickaxe, Users, TrendingDown, Lock, Cpu } from 'lucide-react';
-import GlowOrbs from '../components/GlowOrbs';
-import LivePoolStats from '../components/LivePoolStats';
+import { Coins, Cpu,Lock, Pickaxe, TrendingDown, Users } from 'lucide-react';
+import { lazy, Suspense, useEffect,useLayoutEffect, useRef, useState } from 'react';
+
 import ChainStateWidget from '../components/ChainStateWidget';
 import { ChartLazyFallback } from '../components/ChartLazyFallback';
+import GlowOrbs from '../components/GlowOrbs';
+import LivePoolStats from '../components/LivePoolStats';
 
 const TokenomicsChart = lazy(() => import('../components/TokenomicsChart'));
-import MeshSkillRibbon from '../components/MeshSkillRibbon';
-import { useLanguage } from '../hooks/useLanguage';
-import { useReducedMotion } from '../hooks/useReducedMotion';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 import { CET_FIXED_SUPPLY_CAP } from '@/lib/domainPillars';
+
+import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { TOKEN_DECIMALS } from '../constants/token';
+import { useLanguage } from '../hooks/useLanguage';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 const BENTO_TILE_INTERACTION =
   'transition-all duration-300 hover:!-translate-y-1 hover:!scale-100 hover:!shadow-[0_0_15px_rgba(234,179,8,0.2)]';

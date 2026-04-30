@@ -1,12 +1,14 @@
-import { useState, useRef, useMemo } from 'react';
 import { ChevronDown, HelpCircle } from 'lucide-react';
-import GlowOrbs from '../components/GlowOrbs';
-import MeshSkillRibbon from '../components/MeshSkillRibbon';
+import { useMemo,useRef, useState } from 'react';
+
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
+import { PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
+
+import GlowOrbs from '../components/GlowOrbs';
+import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useLanguage } from '../hooks/useLanguage';
 import type { FaqContent } from '../i18n/faqContent.types';
-import { PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
 
 interface FAQLink {
   label: string;

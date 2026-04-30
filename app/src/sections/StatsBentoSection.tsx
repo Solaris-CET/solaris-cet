@@ -1,13 +1,15 @@
+import { ArrowRight,Clock, Coins, Globe, Shield, TrendingUp, Users, Zap } from 'lucide-react';
+
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
-import { Users, Coins, Zap, Clock, Shield, TrendingUp, Globe, ArrowRight } from 'lucide-react';
+import { CET_FIXED_SUPPLY_CAP, TASK_AGENT_MESH_TOTAL } from '@/lib/domainPillars';
+import { meshStandardBurstFromKey, meshWhisperFromKey } from '@/lib/meshSkillFeed';
+
 import AnimatedCounter from '../components/AnimatedCounter';
 import GlowOrbs from '../components/GlowOrbs';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
-import { meshStandardBurstFromKey, meshWhisperFromKey } from '@/lib/meshSkillFeed';
-import { useLanguage } from '../hooks/useLanguage';
-import { CET_FIXED_SUPPLY_CAP, TASK_AGENT_MESH_TOTAL } from '@/lib/domainPillars';
 import { TOKEN_DECIMALS } from '../constants/token';
+import { useLanguage } from '../hooks/useLanguage';
 
 /** Overrides global `.bento-card:hover` (translate/scale/shadow) with the bento gold glow spec. */
 const BENTO_TILE_INTERACTION =

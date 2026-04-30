@@ -1,8 +1,9 @@
 import { memo, useEffect, useMemo, useRef } from 'react';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
+
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { mulberry32, hashStringToUint32, clamp01 } from '@/lib/seed';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useSessionSeed } from '@/hooks/useSessionSeed';
+import { clamp01,hashStringToUint32, mulberry32 } from '@/lib/seed';
 
 function routeVariant(pathname: string) {
   if (pathname === '/rwa') return 'rwa';

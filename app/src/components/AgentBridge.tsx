@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { Brain, Zap } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 import { SolarisLogoMark } from '@/components/SolarisLogoMark';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';

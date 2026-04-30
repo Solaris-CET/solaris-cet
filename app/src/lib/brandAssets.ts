@@ -1,23 +1,23 @@
 import {
   OG_IMAGE_FILENAME,
   PRODUCTION_SITE_ORIGIN,
-  SOLARIS_CET_LOGO_FILENAME,
-  TONCONNECT_ICON_FILENAME,
   productionBrandLogoUrl,
   productionOgImageUrl,
   productionSiteUrl,
   productionTonConnectIconUrl,
+  SOLARIS_CET_LOGO_FILENAME,
+  TONCONNECT_ICON_FILENAME,
 } from './brandAssetFilenames';
 
 export {
   OG_IMAGE_FILENAME,
   PRODUCTION_SITE_ORIGIN,
-  SOLARIS_CET_LOGO_FILENAME,
-  TONCONNECT_ICON_FILENAME,
   productionBrandLogoUrl,
   productionOgImageUrl,
   productionSiteUrl,
   productionTonConnectIconUrl,
+  SOLARIS_CET_LOGO_FILENAME,
+  TONCONNECT_ICON_FILENAME,
 };
 
 /**

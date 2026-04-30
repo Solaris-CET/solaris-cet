@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm';
+
 import { getDb, schema } from '../../db/client';
-import { decryptApiKey, encryptApiKey } from './crypto';
+import { decryptApiKeyWithEnvSecrets, encryptApiKeyWithEnvPrimary } from './crypto';
 import { getJwtSecretsFromEnv, verifyJwtWithSecrets } from './jwt';
 import { verifyTotpCode } from './totp';
 
@@ -34,6 +35,17 @@ export async function requireAuth(req: Request): Promise<AuthContext | { error: 
   if (sid) {
     const [s] = await db.select().from(schema.sessions).where(eq(schema.sessions.id, sid));
     if (!s || s.revokedAt || s.expiresAt.getTime() <= Date.now()) return { error: 'Unauthorized', status: 401 };
+
+    const idleSecondsRaw = String(process.env.SESSION_IDLE_SECONDS ?? '').trim();
+    const idleSeconds = idleSecondsRaw ? Number.parseInt(idleSecondsRaw, 10) : 0;
+    if (Number.isFinite(idleSeconds) && idleSeconds > 0) {
+      const base = (s.lastUsedAt ?? s.createdAt).getTime();
+      if (Date.now() - base > idleSeconds * 1000) {
+        await db.update(schema.sessions).set({ revokedAt: new Date() }).where(eq(schema.sessions.id, sid));
+        return { error: 'Unauthorized', status: 401 };
+      }
+    }
+
     await db.update(schema.sessions).set({ lastUsedAt: new Date() }).where(eq(schema.sessions.id, sid));
   }
 
@@ -70,13 +82,11 @@ export async function requireAdminMfa(
   if (!/^\d{6}$/.test(code)) return { ok: false, error: 'MFA required', status: 401 };
 
   const secretEnc = (mfa.secretEncrypted ?? '').trim();
-  const encSecret = String(process.env.ENCRYPTION_SECRET ?? '').trim();
-  if (!encSecret) return { ok: false, error: 'Not configured', status: 501 };
   if (!secretEnc) return { ok: false, error: 'MFA required', status: 412 };
 
   let secret: string;
   try {
-    secret = await decryptApiKey(encSecret, secretEnc);
+    secret = await decryptApiKeyWithEnvSecrets(secretEnc);
   } catch {
     return { ok: false, error: 'MFA invalid', status: 401 };
   }
@@ -87,8 +97,5 @@ export async function requireAdminMfa(
 }
 
 export async function encryptForDb(plaintext: string): Promise<string | null> {
-  const encSecret = String(process.env.ENCRYPTION_SECRET ?? '').trim();
-  if (!encSecret) return null;
-  return encryptApiKey(encSecret, plaintext);
+  return encryptApiKeyWithEnvPrimary(plaintext);
 }
-

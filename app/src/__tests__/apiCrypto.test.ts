@@ -1,6 +1,8 @@
-import { describe, it, expect, beforeAll } from "vitest";
 import { webcrypto } from "node:crypto";
-import { encryptApiKey, decryptApiKey, resolveApiKey } from "../../api/lib/crypto";
+
+import { beforeAll,describe, expect, it } from "vitest";
+
+import { decryptApiKey, encryptApiKey, resolveApiKey } from "../../api/lib/crypto";
 
 describe("api/lib/crypto", () => {
   beforeAll(() => {

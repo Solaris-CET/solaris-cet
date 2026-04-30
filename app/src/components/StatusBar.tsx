@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
 import { CheckCircle2, CloudOff, X } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -35,6 +36,7 @@ export default function StatusBar({ className }: { className?: string }) {
   const { dismissed, dismiss } = useDismissed('solaris_status_bar_dismissed');
   const [health, setHealth] = useState<HealthPayload | null>(null);
   const [failed, setFailed] = useState(false);
+  const [online, setOnline] = useState(() => (typeof navigator !== 'undefined' ? navigator.onLine : true));
 
   useEffect(() => {
     let alive = true;
@@ -61,7 +63,17 @@ export default function StatusBar({ className }: { className?: string }) {
     };
   }, []);
 
-  const online = typeof navigator !== 'undefined' ? navigator.onLine : true;
+  useEffect(() => {
+    const onOnline = () => setOnline(true);
+    const onOffline = () => setOnline(false);
+    window.addEventListener('online', onOnline);
+    window.addEventListener('offline', onOffline);
+    return () => {
+      window.removeEventListener('online', onOnline);
+      window.removeEventListener('offline', onOffline);
+    };
+  }, []);
+
   const ok = useMemo(() => {
     if (!online) return false;
     if (failed) return false;
@@ -90,7 +102,12 @@ export default function StatusBar({ className }: { className?: string }) {
             <CloudOff className="w-4 h-4 text-solaris-muted shrink-0" aria-hidden />
           )}
           <div className="min-w-0 font-mono text-[11px] text-solaris-muted truncate">
-            {health?.service ?? 'solaris-cet'} · {health?.environment ?? 'env'} · v{health?.version ?? '—'}
+            {!online ? (
+              <span className="text-solaris-gold/80">OFFLINE</span>
+            ) : (
+              <span className="text-emerald-300/80">ONLINE</span>
+            )}{' '}
+            · {health?.service ?? 'solaris-cet'} · {health?.environment ?? 'env'} · v{health?.version ?? '—'}
           </div>
         </div>
 

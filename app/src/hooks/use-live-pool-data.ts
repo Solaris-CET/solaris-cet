@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { chainStatePromise } from '@/lib/chain-state';
+import { useCallback,useEffect, useState } from 'react';
 
 import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';
+import { chainStatePromise } from '@/lib/chain-state';
 import { USDT_JETTON_MASTER_ADDRESS } from '@/lib/usdtContract';
 const REFRESH_INTERVAL_MS = 60_000;
 

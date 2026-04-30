@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
 
 // ─── BackToTop pure-logic tests ──────────────────────────────────────────
 // The component itself requires a DOM with scroll events. These tests cover

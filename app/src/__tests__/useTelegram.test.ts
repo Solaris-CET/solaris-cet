@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
-import { describe, it, expect, afterEach } from 'vitest';
-import { renderHook } from './renderHook';
+import { afterEach,describe, expect, it } from 'vitest';
+
 import { useTelegram } from '../hooks/useTelegram';
+import { renderHook } from './renderHook';
 
 function installTelegramWebApp(overrides?: Partial<{ initData: string }>) {
   const mock = {

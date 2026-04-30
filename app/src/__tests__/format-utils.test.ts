@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { formatNumber, formatCurrency, formatPercentage } from "../lib/utils";
+import { describe, expect,it } from "vitest";
+
+import { formatCurrency, formatNumber, formatPercentage } from "../lib/utils";
 
 describe("formatNumber, formatCurrency, formatPercentage", () => {
   it("separators, $, %", () => {

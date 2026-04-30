@@ -1,29 +1,10 @@
+import { Cookie,X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { X, Cookie } from 'lucide-react';
 
-type CookieConsentState = {
-  essential: true;
-  analytics: boolean;
-  marketing: boolean;
-};
-
-function readStoredConsent(): CookieConsentState | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = localStorage.getItem('solaris_cookie_consent');
-    if (!raw) return null;
-    const parsed: unknown = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object') return null;
-    const obj = parsed as Record<string, unknown>;
-    return {
-      essential: true,
-      analytics: Boolean(obj.analytics),
-      marketing: Boolean(obj.marketing),
-    };
-  } catch {
-    return null;
-  }
-}
+import { useLanguage } from '@/hooks/useLanguage';
+import { localizePathname, parseUrlLocaleFromPathname, urlLocaleFromLang } from '@/i18n/urlRouting';
+import { type CookieConsentState,readStoredConsent, writeStoredConsent } from '@/lib/consent';
+import { recordConsentProof } from '@/lib/consentProof';
 
 function injectAnalyticsScript(src: string) {
   if (!src) return;
@@ -33,6 +14,8 @@ function injectAnalyticsScript(src: string) {
   s.id = id;
   s.async = true;
   s.src = src;
+  const nonce = (document.querySelector('script[nonce]') as HTMLScriptElement | null)?.nonce;
+  if (nonce) s.setAttribute('nonce', nonce);
   document.head.appendChild(s);
 }
 
@@ -40,53 +23,59 @@ const CookieConsentBanner: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
   const [preferences, setPreferences] = useState<CookieConsentState>(() => {
-    return readStoredConsent() ?? { essential: true, analytics: false, marketing: false };
+    return readStoredConsent();
   });
+  const { lang, t } = useLanguage();
+  const ui = t.cookieUi;
 
   const analyticsSrc = (import.meta.env.VITE_UX_TEST_SRC ?? '').trim();
 
   useEffect(() => {
     const consent = readStoredConsent();
-    let timer: NodeJS.Timeout;
-    if (!consent) {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const hadDecision = Boolean(localStorage.getItem('solaris_cookie_consent'));
+    if (!hadDecision) {
       // Animate in after page load to not block LCP
       timer = setTimeout(() => setIsVisible(true), 2500);
     } else {
       if (analyticsSrc && consent.analytics) injectAnalyticsScript(analyticsSrc);
     }
-    return () => clearTimeout(timer);
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, [analyticsSrc]);
 
   if (!isVisible) return null;
 
+  const urlLocale =
+    typeof window === 'undefined'
+      ? urlLocaleFromLang(lang)
+      : parseUrlLocaleFromPathname(window.location.pathname).locale ?? urlLocaleFromLang(lang);
+  const cookiesHref = localizePathname('/cookies', urlLocale);
+  const settingsHref = localizePathname('/privacy-settings', urlLocale);
+
   const handleAcceptAll = () => {
-    localStorage.setItem(
-      'solaris_cookie_consent',
-      JSON.stringify({ essential: true, analytics: true, marketing: true })
-    );
+    const consent = writeStoredConsent({ analytics: true, marketing: true });
+    void recordConsentProof({ consent, source: 'banner_accept_all', locale: lang });
     if (analyticsSrc) injectAnalyticsScript(analyticsSrc);
     setIsVisible(false);
   };
 
   const handleSavePreferences = () => {
-    localStorage.setItem(
-      'solaris_cookie_consent',
-      JSON.stringify(preferences)
-    );
+    const consent = writeStoredConsent({ analytics: preferences.analytics, marketing: preferences.marketing });
+    void recordConsentProof({ consent, source: 'banner_save', locale: lang });
     if (preferences.analytics && analyticsSrc) injectAnalyticsScript(analyticsSrc);
     setIsVisible(false);
   };
 
   const handleDecline = () => {
-    localStorage.setItem(
-      'solaris_cookie_consent',
-      JSON.stringify({ essential: true, analytics: false, marketing: false })
-    );
+    const consent = writeStoredConsent({ analytics: false, marketing: false });
+    void recordConsentProof({ consent, source: 'banner_essential_only', locale: lang });
     setIsVisible(false);
   };
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-[380px] max-h-[70vh] overflow-auto bg-slate-950/95 backdrop-blur-2xl border border-white/10 p-4 sm:p-5 rounded-2xl shadow-[0_0_80px_rgba(0,0,0,0.8)] z-[9999] animate-in slide-in-from-bottom-10 fade-in duration-500 will-change-transform">
+    <div className="fixed left-4 right-4 bottom-[max(1rem,calc(env(safe-area-inset-bottom)+1rem+var(--mobile-conversion-dock-reserve,0px)))] sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-[380px] max-h-[55vh] sm:max-h-[70vh] overflow-y-auto overscroll-contain bg-slate-950/95 backdrop-blur-2xl border border-white/10 p-4 sm:p-5 rounded-2xl shadow-[0_0_80px_rgba(0,0,0,0.8)] z-[9999] animate-in slide-in-from-bottom-10 fade-in duration-500 will-change-transform">
       {!showPreferences ? (
         <>
           <div className="flex items-start gap-4 mb-4">
@@ -95,16 +84,23 @@ const CookieConsentBanner: React.FC = () => {
             </div>
             <div className="pt-1">
               <h3 className="font-display font-semibold text-white text-lg leading-none mb-2">
-                GDPR &amp; Cookies
+                {ui.bannerTitle}
               </h3>
               <p className="text-sm text-solaris-muted leading-relaxed">
-                Utilizăm module cookie pentru funcționarea platformei, analizarea traficului și îmbunătățirea experienței. Alegerea îți aparține.
+                {ui.bannerBody}{' '}
+                <a href={cookiesHref} className="text-solaris-cyan hover:text-solaris-text underline underline-offset-4">
+                  {ui.cookiePolicy}
+                </a>
+                {' · '}
+                <a href={settingsHref} className="text-solaris-cyan hover:text-solaris-text underline underline-offset-4">
+                  {ui.cookieSettings}
+                </a>
               </p>
             </div>
             <button
               onClick={() => setIsVisible(false)}
               className="ml-auto p-1.5 text-solaris-muted hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
-              aria-label="Închide"
+              aria-label="Close"
               type="button"
             >
               <X className="w-4 h-4" aria-hidden />
@@ -116,7 +112,7 @@ const CookieConsentBanner: React.FC = () => {
               className="w-full btn-filled-gold text-sm font-semibold py-3 rounded-xl transition-transform hover:-translate-y-0.5 shadow-[0_0_15px_rgba(242,201,76,0.15)]"
               type="button"
             >
-              Acceptă Toate Cookies
+              {ui.acceptAll}
             </button>
             <div className="flex justify-between gap-3">
               <button
@@ -124,14 +120,14 @@ const CookieConsentBanner: React.FC = () => {
                 className="flex-1 text-xs font-semibold py-2.5 px-4 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 rounded-xl transition-all"
                 type="button"
               >
-                Setări Personalizate
+                {ui.customize}
               </button>
               <button
                 onClick={handleDecline}
                 className="flex-1 text-xs font-semibold py-2.5 px-4 bg-transparent hover:bg-white/5 text-solaris-muted hover:text-white rounded-xl transition-colors"
                 type="button"
               >
-                Doar Esențiale
+                {ui.essentialOnly}
               </button>
             </div>
           </div>
@@ -140,7 +136,7 @@ const CookieConsentBanner: React.FC = () => {
         <>
           <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-3">
             <h3 className="font-display font-semibold text-solaris-text">
-              Configurează Preferințele
+              {ui.preferencesTitle}
             </h3>
             <button 
               onClick={() => setShowPreferences(false)} 
@@ -154,16 +150,16 @@ const CookieConsentBanner: React.FC = () => {
           <div className="space-y-4 mb-6">
             <div className="flex items-start justify-between gap-4 p-3 rounded-xl bg-white/5 border border-white/[0.05]">
               <div>
-                <div className="text-sm font-semibold text-white mb-1">Strict Necesare (Esențiale)</div>
-                <div className="text-xs text-solaris-muted leading-relaxed">Necesare funcționării normale (sesiuni, gateway-ul web3, securitate). Nu le poți dezactiva.</div>
+                <div className="text-sm font-semibold text-white mb-1">{ui.essentialTitle}</div>
+                <div className="text-xs text-solaris-muted leading-relaxed">{ui.essentialBody}</div>
               </div>
               <input type="checkbox" checked disabled className="mt-1 accent-solaris-gold opacity-50 cursor-not-allowed" />
             </div>
             
             <label className="flex items-start justify-between gap-4 p-3 rounded-xl border transition-colors cursor-pointer hover:bg-white/5 border-transparent">
               <div>
-                <div className="text-sm font-semibold text-white mb-1">Analitice & Performanță</div>
-                <div className="text-xs text-solaris-muted leading-relaxed">Ne ajută anonim să îmbunătățim experiența utilizatorilor colectând date despre interacțiuni.</div>
+                <div className="text-sm font-semibold text-white mb-1">{ui.analyticsTitle}</div>
+                <div className="text-xs text-solaris-muted leading-relaxed">{ui.analyticsBody}</div>
               </div>
               <input
                 type="checkbox"
@@ -175,8 +171,8 @@ const CookieConsentBanner: React.FC = () => {
             
             <label className="flex items-start justify-between gap-4 p-3 rounded-xl border transition-colors cursor-pointer hover:bg-white/5 border-transparent">
               <div>
-                <div className="text-sm font-semibold text-white mb-1">Marketing și Retargeting</div>
-                <div className="text-xs text-solaris-muted leading-relaxed">Folosite pentru a eficientiza bugetele de achiziție de investitori (Facebook/X Pixel).</div>
+                <div className="text-sm font-semibold text-white mb-1">{ui.marketingTitle}</div>
+                <div className="text-xs text-solaris-muted leading-relaxed">{ui.marketingBody}</div>
               </div>
               <input
                 type="checkbox"
@@ -192,7 +188,7 @@ const CookieConsentBanner: React.FC = () => {
             className="w-full btn-filled-gold text-sm font-semibold py-3 rounded-xl transition-transform hover:-translate-y-0.5"
             type="button"
           >
-            Salvează și Închide
+            {ui.saveClose}
           </button>
         </>
       )}

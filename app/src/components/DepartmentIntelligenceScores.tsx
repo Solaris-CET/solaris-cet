@@ -1,14 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
 import {
-  Crown, Code2, Palette, Brain, Shield, Globe,
-  Users, TrendingUp, Coins, FileCheck,
-} from 'lucide-react';
+Brain, Code2, Coins,   Crown, FileCheck,
+Globe,
+Palette, Shield, TrendingUp,   Users, } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+
 import { useNearScreen } from '@/hooks/useNearScreen';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import {
-  skillCaptionForDept,
   meshStandardBurstFromKey,
   meshWhisperFromKey,
+  skillCaptionForDept,
 } from '@/lib/meshSkillFeed';
 
 interface DeptIntel {

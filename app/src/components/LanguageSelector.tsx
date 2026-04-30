@@ -1,13 +1,5 @@
 import { ChevronDown, Globe } from 'lucide-react';
-import { useLanguage, type LangCode } from '../hooks/useLanguage';
-import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
-import {
-  URL_LOCALES,
-  type UrlLocale,
-  localizePathname,
-  parseUrlLocaleFromPathname,
-  urlLocaleFromLang,
-} from '@/i18n/urlRouting';
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,13 +7,23 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  localizePathname,
+  parseUrlLocaleFromPathname,
+  URL_LOCALES,
+  type UrlLocale,
+  urlLocaleFromLang,
+} from '@/i18n/urlRouting';
+import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 import { cn } from '@/lib/utils';
+
+import { type LangCode,useLanguage } from '../hooks/useLanguage';
 
 const LOCALE_LABELS: Record<UrlLocale, { code: string; flag: string; native: string }> = {
   en: { code: 'EN', flag: '🇬🇧', native: 'English' },
   ro: { code: 'RO', flag: '🇷🇴', native: 'Română' },
-  de: { code: 'DE', flag: '🇩🇪', native: 'Deutsch' },
   es: { code: 'ES', flag: '🇪🇸', native: 'Español' },
+  de: { code: 'DE', flag: '🇩🇪', native: 'Deutsch' },
   pt: { code: 'PT', flag: '🇵🇹', native: 'Português' },
   ru: { code: 'RU', flag: '🇷🇺', native: 'Русский' },
   zh: { code: 'ZH', flag: '🇨🇳', native: '中文' },

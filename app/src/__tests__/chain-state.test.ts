@@ -1,11 +1,13 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach,beforeEach, describe, expect, it, vi } from "vitest";
+
+import { TOKEN_DECIMALS } from "@/constants/token";
 import { CET_CONTRACT_ADDRESS } from "@/lib/cetContract";
 import { DEDUST_POOL_ADDRESS } from "@/lib/dedustUrls";
-import { TOKEN_DECIMALS } from "@/constants/token";
+
 import type {
+  ChainPoolState,
   ChainState,
   ChainTokenState,
-  ChainPoolState,
 } from "../lib/chain-state";
 
 function makeToken(overrides: Partial<ChainTokenState> = {}): ChainTokenState {

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+
 import { SafeHtml } from './SafeHtml';
 
 export default function MermaidDiagram({ graph }: { graph: string }) {

@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { expect,test } from '@playwright/test';
+
 import { waitForAppReady } from './e2e-helpers';
 import {
   E2E_I18N_START,
@@ -14,6 +15,19 @@ test.describe('Primary navigation (desktop)', () => {
   test.setTimeout(60_000);
 
   test.beforeEach(async ({ page }) => {
+    await page.route('**/api/cetuia/tokens?all=1', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: true,
+          tokens: [
+            { id: 1, status: 'reserved' },
+            { id: 2, status: 'sold' },
+          ],
+        }),
+      });
+    });
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto(E2E_I18N_START);
     await waitForAppReady(page);

@@ -9,12 +9,14 @@
  * cache on subsequent visits — zero RPC calls on initial page load.
  */
 
-import { use, Suspense } from 'react';
 import { Database, ExternalLink } from 'lucide-react';
+import { Suspense,use } from 'react';
+
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
-import { chainStatePromise } from '../lib/chain-state';
-import type { ChainState } from '../lib/chain-state';
+
 import { TOKEN_DECIMALS } from '../constants/token';
+import type { ChainState } from '../lib/chain-state';
+import { chainStatePromise } from '../lib/chain-state';
 
 // ── Inner component (suspends until chainStatePromise resolves) ──────────────
 

@@ -1,10 +1,11 @@
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import type { MutableRefObject } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, Float, PerformanceMonitor } from '@react-three/drei';
-import { Bloom, ChromaticAberration, EffectComposer, Noise, Vignette, DepthOfField } from '@react-three/postprocessing';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Bloom, ChromaticAberration, DepthOfField,EffectComposer, Noise, Vignette } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
+import type { MutableRefObject } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+
 import { EntanglementLines, HologramToken } from '@/experience/HologramToken';
 
 type HologramQuality = 'low' | 'high';

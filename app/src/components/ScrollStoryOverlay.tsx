@@ -1,11 +1,12 @@
-import { memo, useEffect, useMemo, useRef } from 'react';
-import type { CSSProperties } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import type { CSSProperties } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
+
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
-import { mulberry32 } from '@/lib/seed';
 import { useSessionSeed } from '@/hooks/useSessionSeed';
+import { mulberry32 } from '@/lib/seed';
 
 type Variant = 'home' | 'rwa' | 'cet-ai' | 'demo';
 

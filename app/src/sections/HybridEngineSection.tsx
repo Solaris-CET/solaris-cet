@@ -1,11 +1,12 @@
-import { useRef, useLayoutEffect, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
-import { Shield, Zap, Cpu, ArrowLeftRight } from 'lucide-react';
-import GlowOrbs from '../components/GlowOrbs';
+import { ArrowLeftRight,Cpu, Shield, Zap } from 'lucide-react';
+import { useEffect,useLayoutEffect, useRef, useState } from 'react';
+
 import AppImage from '../components/AppImage';
+import GlowOrbs from '../components/GlowOrbs';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
-import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useLanguage } from '../hooks/useLanguage';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 
 const HybridEngineSection = () => {

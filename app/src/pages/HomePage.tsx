@@ -1,16 +1,19 @@
 import { lazy } from 'react';
-import LazyLoadWrapper from '@/components/LazyLoadWrapper';
+
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import LazyLoadWrapper from '@/components/LazyLoadWrapper';
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { useLanguage } from '@/hooks/useLanguage';
+import AuthorityTrustSection from '@/sections/AuthorityTrustSection';
+import CommsSection from '@/sections/CommsSection';
+import CommunityPulseSection from '@/sections/CommunityPulseSection';
+import ComplianceSection from '@/sections/ComplianceSection';
 import HeroSection from '@/sections/HeroSection';
 import HybridEngineSection from '@/sections/HybridEngineSection';
-import StatsBentoSection from '@/sections/StatsBentoSection';
-import AuthorityTrustSection from '@/sections/AuthorityTrustSection';
 import IntelligenceCoreSection from '@/sections/IntelligenceCoreSection';
 import NovaAppSection from '@/sections/NovaAppSection';
+import StatsBentoSection from '@/sections/StatsBentoSection';
 import TokenomicsSection from '@/sections/TokenomicsSection';
-import ComplianceSection from '@/sections/ComplianceSection';
 
 const AgenticEngineSection = lazy(() => import('@/sections/AgenticEngineSection'));
 const RoadmapSection = lazy(() => import('@/sections/RoadmapSection'));
@@ -28,6 +31,7 @@ const RwaSection = lazy(() => import('@/sections/RwaSection'));
 const ResourcesSection = lazy(() => import('@/sections/ResourcesSection'));
 const FAQSection = lazy(() => import('@/sections/FAQSection'));
 const FooterSection = lazy(() => import('@/sections/FooterSection'));
+const SocialProofSection = lazy(() => import('@/sections/SocialProofSection'));
 
 export default function HomePage({ heroCinematic = false }: { heroCinematic?: boolean }) {
   const { t } = useLanguage();
@@ -43,6 +47,10 @@ export default function HomePage({ heroCinematic = false }: { heroCinematic?: bo
           <HeroSection cinematic={heroCinematic} />
         </ErrorBoundary>
       </section>
+
+      <CommsSection />
+
+      <CommunityPulseSection />
 
       <section
         id="problem-agriculture"
@@ -70,6 +78,15 @@ export default function HomePage({ heroCinematic = false }: { heroCinematic?: bo
           <LazyLoadWrapper>
             <ScrollFadeUp>
               <AuthorityTrustSection />
+            </ScrollFadeUp>
+          </LazyLoadWrapper>
+        </div>
+        <div className="relative z-[17]">
+          <LazyLoadWrapper>
+            <ScrollFadeUp>
+              <ErrorBoundary>
+                <SocialProofSection />
+              </ErrorBoundary>
             </ScrollFadeUp>
           </LazyLoadWrapper>
         </div>

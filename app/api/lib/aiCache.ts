@@ -1,20 +1,7 @@
 export type AiChatCachePayload = {
   response: string;
   sources: unknown[];
-  usage?: {
-    promptTokens?: number;
-    completionTokens?: number;
-    totalTokens?: number;
-    costUsd?: number;
-    providers?: Array<{
-      provider: string;
-      model: string;
-      promptTokens?: number;
-      completionTokens?: number;
-      totalTokens?: number;
-      costUsd?: number;
-    }>;
-  };
+  usage?: unknown;
 };
 
 type CacheEntry = { payload: AiChatCachePayload; expiresAt: number };
@@ -115,4 +102,3 @@ export async function sha256Hex(input: string): Promise<string> {
   const digest = await subtle.digest('SHA-256', data);
   return bytesToHex(new Uint8Array(digest));
 }
-

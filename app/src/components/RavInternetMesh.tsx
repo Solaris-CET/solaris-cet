@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
-import { useLanguage } from '@/hooks/useLanguage';
-import { shortSkillWhisper } from '@/lib/meshSkillFeed';
 import { Globe2, Radio } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+import { useLanguage } from '@/hooks/useLanguage';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { shortSkillWhisper } from '@/lib/meshSkillFeed';
 
 const NODES = [
   { id: 'web', label: 'Open Web', angle: -90 },

@@ -1,22 +1,31 @@
+import { ArrowRight, CalendarClock, CheckCircle, Copy, Download, FileText, Globe, MessageSquareWarning,Send, Shield, Users, X, Zap } from "lucide-react";
 import { useState } from 'react';
-import { Download, FileText, ArrowRight, Globe, X, Send, Copy, CheckCircle, Zap, Shield, Users, CalendarClock } from "lucide-react";
-import { SolarisLogoMark } from '../components/SolarisLogoMark';
-import SocialShare from '../components/SocialShare';
-import MeshSkillRibbon from '../components/MeshSkillRibbon';
-import { useLanguage } from '../hooks/useLanguage';
-import AnimatedCounter from '../components/AnimatedCounter';
-import TeamFlipCard from '../components/TeamFlipCard';
-import { useCommunityProof } from '../hooks/use-community-proof';
-import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';
 import { toast } from "sonner";
-import { ScrollFadeUp } from '@/components/ScrollFadeUp';
+
+import AppImage from '@/components/AppImage';
 import { HeaderTrustStrip } from '@/components/HeaderTrustStrip';
+import { ScrollFadeUp } from '@/components/ScrollFadeUp';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { localizePathname, parseUrlLocaleFromPathname, type UrlLocale, urlLocaleFromLang } from '@/i18n/urlRouting';
+import { trackBuyClick, trackSocialClick, trackWhitepaperClick } from '@/lib/analytics';
+import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';
 import {
   DEDUST_POOL_ADDRESS,
   DEDUST_POOL_DEPOSIT_URL,
   DEDUST_SWAP_URL,
 } from '@/lib/dedustUrls';
+import { mktConversion, mktEvent } from '@/lib/marketing';
 import { PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
+
+import AnimatedCounter from '../components/AnimatedCounter';
+import MeshSkillRibbon from '../components/MeshSkillRibbon';
+import SocialShare from '../components/SocialShare';
+import { SolarisLogoMark } from '../components/SolarisLogoMark';
+import TeamFlipCard from '../components/TeamFlipCard';
+import { useCommunityProof } from '../hooks/use-community-proof';
+import { useLanguage } from '../hooks/useLanguage';
 
 // Constants defined once to avoid duplication and maintain a single source of truth
 const GITHUB_URL = 'https://github.com/Solaris-CET/solaris-cet';
@@ -30,18 +39,39 @@ const socialLinks = [
 ];
 
 const FooterSection = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const tx = t.footerUi;
+  const issueTx = t.issueReporter;
   const proof = useCommunityProof();
+  const urlLocale: UrlLocale =
+    typeof window === 'undefined'
+      ? urlLocaleFromLang(lang)
+      : parseUrlLocaleFromPathname(window.location.pathname).locale ?? urlLocaleFromLang(lang);
+  const blogLocale: UrlLocale = urlLocale === 'ro' || urlLocale === 'es' ? urlLocale : 'en';
   /** Stable `key`s for React (not translated labels). Privacy + Terms share `href` so we cannot key by URL alone. */
   const footerLinks = [
-    { id: 'privacy', label: t.footerNav.privacy, href: WHITEPAPER_URL, icon: undefined },
-    { id: 'terms', label: t.footerNav.terms, href: WHITEPAPER_URL, icon: undefined },
-    { id: 'accessibility', label: t.footerNav.accessibility, href: '/accessibility', icon: undefined },
+    { id: 'privacy', label: t.footerNav.privacy, href: localizePathname('/privacy', urlLocale), icon: undefined },
+    { id: 'terms', label: t.footerNav.terms, href: localizePathname('/terms', urlLocale), icon: undefined },
+    { id: 'cookies', label: t.cookieUi.cookiePolicy, href: localizePathname('/cookies', urlLocale), icon: undefined },
+    { id: 'cookieSettings', label: t.cookieUi.cookieSettings, href: localizePathname('/privacy-settings', urlLocale), icon: undefined },
+    { id: 'transparency', label: 'Transparency', href: localizePathname('/transparency', urlLocale), icon: undefined },
+    { id: 'audits', label: 'Audits', href: localizePathname('/audits', urlLocale), icon: undefined },
+    { id: 'blog', label: t.blog.title, href: localizePathname('/blog', blogLocale), icon: undefined },
+    { id: 'accessibility', label: t.footerNav.accessibility, href: localizePathname('/accessibility', urlLocale), icon: undefined },
+    {
+      id: 'responsibleDisclosure',
+      label: t.footerNav.responsibleDisclosure,
+      href: localizePathname('/responsible-disclosure', urlLocale),
+      icon: undefined,
+    },
+    { id: 'bugBounty', label: t.footerNav.bugBounty, href: localizePathname('/bug-bounty', urlLocale), icon: undefined },
+    { id: 'releaseNotes', label: t.footerNav.releaseNotes, href: localizePathname('/release-notes', urlLocale), icon: CalendarClock },
     { id: 'contact', label: t.footerNav.contact, href: 'https://t.me/SolarisCET', icon: undefined },
     { id: 'authorityTrust', label: t.footerNav.authorityTrust, href: '#authority-trust', icon: undefined },
     /** Global comparison — primary discovery here + FAQ; not duplicated in header nav (5–7 target). */
     { id: 'competition', label: t.nav.competition, href: '#competition', icon: undefined },
+    { id: 'faqPage', label: t.nav.faq, href: localizePathname('/faq', urlLocale), icon: undefined },
+    { id: 'about', label: 'About', href: localizePathname('/about', urlLocale), icon: undefined },
     { id: 'sovereign', label: t.footerNav.sovereignNoJs, href: '/sovereign/', icon: Shield },
     { id: 'github', label: t.footerNav.github, href: GITHUB_URL, icon: Globe },
   ];
@@ -49,6 +79,53 @@ const FooterSection = () => {
   const [copiedContract, setCopiedContract] = useState(false);
   const [waitlistEmail, setWaitlistEmail] = useState('');
   const [waitlistBusy, setWaitlistBusy] = useState(false);
+  const [reportType, setReportType] = useState<'bug' | 'feature'>('bug');
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportTitle, setReportTitle] = useState('');
+  const [reportDetails, setReportDetails] = useState('');
+  const [reportSteps, setReportSteps] = useState('');
+  const [reportEnvironment, setReportEnvironment] = useState('');
+
+  const buildReportDraft = () => {
+    const title = reportTitle.trim();
+    const details = reportDetails.trim();
+    const steps = reportSteps.trim();
+    const env = reportEnvironment.trim();
+
+    return [
+      '### Summary',
+      title ? title : '(add a short summary)',
+      '',
+      '### Details',
+      details ? details : '(what happened / what you expected)',
+      '',
+      '### Steps to reproduce',
+      steps ? steps : '(1. …\n2. …)',
+      '',
+      '### Environment',
+      env ? env : '(OS, browser, Node/npm, commit)',
+      '',
+      '— drafted from https://solaris-cet.com',
+    ].join('\n');
+  };
+
+  const openGitHubIssue = async () => {
+    const title = reportTitle.trim() || (reportType === 'bug' ? '[BUG] ' : '[FEATURE] ');
+    const template = reportType === 'bug' ? 'bug_report.yml' : 'feature_request.yml';
+    const url = new URL('https://github.com/Solaris-CET/solaris-cet/issues/new');
+    url.searchParams.set('template', template);
+    url.searchParams.set('title', title);
+
+    const draft = buildReportDraft();
+    try {
+      await navigator.clipboard.writeText(draft);
+      toast.success(issueTx.toastCopied);
+    } catch {
+      toast.error(issueTx.toastCopyFailed);
+    }
+
+    window.open(url.toString(), '_blank', 'noopener,noreferrer');
+  };
 
   const handleCopyPool = () => {
     navigator.clipboard.writeText(DEDUST_POOL_ADDRESS).then(() => {
@@ -66,33 +143,31 @@ const FooterSection = () => {
     }).catch(() => {/* clipboard access denied – fail silently */});
   };
 
-  const submitWaitlist = async () => {
+  const submitNewsletter = async () => {
     const email = waitlistEmail.trim();
     if (!email) return;
     setWaitlistBusy(true);
     try {
-      const res = await fetch(`${import.meta.env.BASE_URL}api/waitlist`, {
+      const locale: UrlLocale =
+        typeof window === 'undefined'
+          ? urlLocaleFromLang('en')
+          : parseUrlLocaleFromPathname(window.location.pathname).locale ?? urlLocaleFromLang('en');
+      const res = await fetch(`${import.meta.env.BASE_URL}api/newsletter/subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, locale }),
         cache: 'no-store',
       });
       if (res.ok) {
-        toast.success(tx.waitlistAdded);
+        toast.success(tx.newsletterCheckInbox);
         setWaitlistEmail('');
         return;
       }
       const payload = (await res.json().catch(() => null)) as { error?: unknown } | null;
-      const error = typeof payload?.error === 'string' ? payload.error : tx.waitlistUnavailable;
-      if (res.status === 503) {
-        window.location.href = `mailto:?subject=${encodeURIComponent(tx.mailtoSubject)}&body=${encodeURIComponent(
-          tx.mailtoBody.replace('{email}', email),
-        )}`;
-        return;
-      }
+      const error = typeof payload?.error === 'string' ? payload.error : tx.newsletterUnavailable;
       toast.error(error);
     } catch {
-      toast.error(tx.waitlistUnavailable);
+      toast.error(tx.newsletterUnavailable);
     } finally {
       setWaitlistBusy(false);
     }
@@ -100,7 +175,7 @@ const FooterSection = () => {
 
   return (
     // Landmark `landmarks.footer` + `data-testid="footer-landmark-section"` live on App.tsx wrapper; avoid nested <section>.
-    <div className="relative section-glass pt-16 pb-8">
+    <div id="footer" className="relative section-glass pt-16 pb-8">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute bottom-0 left-0 right-0 h-[30vh] grid-floor opacity-10" />
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-solaris-gold/20 to-transparent" />
@@ -130,6 +205,10 @@ const FooterSection = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-filled-gold flex items-center gap-2 group btn-quantum"
+                  onClick={() => {
+                    trackSocialClick({ platform: 'telegram', destination: 'https://t.me/+tKlfzx7IWopmNWQ0', source: 'footer_cta' });
+                    mktEvent('social_click', { platform: 'telegram', destination: 'https://t.me/+tKlfzx7IWopmNWQ0', source: 'footer_cta' });
+                  }}
                 >
                   <Download className="w-4 h-4" />
                   {tx.ctaTelegramMining}
@@ -140,6 +219,10 @@ const FooterSection = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-gold flex items-center gap-2 btn-quantum"
+                  onClick={() => {
+                    trackWhitepaperClick({ destination: WHITEPAPER_URL, source: 'footer_cta' });
+                    mktConversion('Lead', { destination: WHITEPAPER_URL, source: 'footer_cta' });
+                  }}
                 >
                   <FileText className="w-4 h-4" />
                   {tx.ctaWhitepaper}
@@ -308,7 +391,7 @@ const FooterSection = () => {
                 className="flex flex-col sm:flex-row gap-3 shrink-0 w-full lg:w-auto"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  void submitWaitlist();
+                  void submitNewsletter();
                 }}
               >
                 <input
@@ -353,29 +436,171 @@ const FooterSection = () => {
                 <HeaderTrustStrip align="center" className="mt-1 max-w-none justify-start" />
               </div>
             </div>
-            <nav className="flex flex-wrap items-center gap-6">
-            {footerLinks.map((link) => (
-              <a
-                key={link.id}
-                href={link.href}
-                data-testid={
-                  link.href === '/sovereign/'
-                    ? 'footer-sovereign-link'
-                    : link.href === '#authority-trust'
-                      ? 'footer-authority-trust-link'
-                      : link.href === '#competition'
-                        ? 'footer-competition-link'
-                        : undefined
-                }
-                  target={link.href.startsWith('http') ? '_blank' : undefined}
-                  rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                  className="text-sm text-solaris-muted hover:text-solaris-text transition-colors duration-300 flex items-center gap-1"
-                >
-                  {link.icon && <link.icon className="w-4 h-4" />}
-                  {link.label}
-                </a>
-              ))}
-            </nav>
+            <div className="grid w-full gap-6 sm:grid-cols-2 lg:w-auto lg:grid-cols-3">
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-white/35 mb-3">Product</div>
+                <div className="flex flex-col gap-2">
+                  {footerLinks
+                    .filter((l) => ['authorityTrust', 'competition', 'faqPage', 'about'].includes(l.id))
+                    .map((link) => (
+                      <a
+                        key={link.id}
+                        href={link.href}
+                        data-testid={
+                          link.href === '#authority-trust'
+                            ? 'footer-authority-trust-link'
+                            : link.href === '#competition'
+                              ? 'footer-competition-link'
+                              : undefined
+                        }
+                        target={link.href.startsWith('http') ? '_blank' : undefined}
+                        rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        className="text-sm text-solaris-muted hover:text-solaris-text transition-colors duration-300 flex items-center gap-1"
+                      >
+                        {link.icon && <link.icon className="w-4 h-4" />}
+                        {link.label}
+                      </a>
+                    ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-white/35 mb-3">Legal</div>
+                <div className="flex flex-col gap-2">
+                  {footerLinks
+                    .filter((l) => ['privacy', 'terms', 'accessibility', 'responsibleDisclosure', 'bugBounty'].includes(l.id))
+                    .map((link) => (
+                      <a
+                        key={link.id}
+                        href={link.href}
+                        target={link.href.startsWith('http') ? '_blank' : undefined}
+                        rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        className="text-sm text-solaris-muted hover:text-solaris-text transition-colors duration-300 flex items-center gap-1"
+                      >
+                        {link.icon && <link.icon className="w-4 h-4" />}
+                        {link.label}
+                      </a>
+                    ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-white/35 mb-3">More</div>
+                <div className="flex flex-col gap-2">
+                  {footerLinks
+                    .filter((l) => ['releaseNotes', 'contact', 'sovereign', 'github'].includes(l.id))
+                    .map((link) => (
+                      <a
+                        key={link.id}
+                        href={link.href}
+                        data-testid={link.href === '/sovereign/' ? 'footer-sovereign-link' : undefined}
+                        target={link.href.startsWith('http') ? '_blank' : undefined}
+                        rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        className="text-sm text-solaris-muted hover:text-solaris-text transition-colors duration-300 flex items-center gap-1"
+                      >
+                        {link.icon && <link.icon className="w-4 h-4" />}
+                        {link.label}
+                      </a>
+                    ))}
+                </div>
+
+                <div className="mt-3">
+                  <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+                    <button
+                      type="button"
+                      onClick={() => setReportOpen(true)}
+                      className="text-sm text-solaris-muted hover:text-solaris-text transition-colors duration-300 flex items-center gap-1"
+                    >
+                      <MessageSquareWarning className="w-4 h-4" aria-hidden />
+                      {t.footerNav.reportIssue}
+                    </button>
+                    <DialogContent className="border border-white/10 bg-slate-950/95 text-white">
+                  <DialogHeader>
+                    <DialogTitle>{issueTx.title}</DialogTitle>
+                    <p className="text-slate-200/70 text-sm">
+                      {issueTx.description}
+                    </p>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="hud-label text-[10px]">{issueTx.typeLabel}</div>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setReportType('bug')}
+                          className={`rounded-lg px-3 py-2 text-sm border transition-colors ${
+                            reportType === 'bug'
+                              ? 'border-solaris-gold/40 bg-solaris-gold/10 text-solaris-text'
+                              : 'border-white/10 bg-white/5 text-solaris-muted hover:text-solaris-text'
+                          }`}
+                        >
+                          {issueTx.bug}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setReportType('feature')}
+                          className={`rounded-lg px-3 py-2 text-sm border transition-colors ${
+                            reportType === 'feature'
+                              ? 'border-solaris-gold/40 bg-solaris-gold/10 text-solaris-text'
+                              : 'border-white/10 bg-white/5 text-solaris-muted hover:text-solaris-text'
+                          }`}
+                        >
+                          {issueTx.feature}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="hud-label text-[10px]">{issueTx.titleLabel}</div>
+                      <Input
+                        value={reportTitle}
+                        onChange={(e) => setReportTitle(e.target.value)}
+                        placeholder={reportType === 'bug' ? issueTx.placeholderTitleBug : issueTx.placeholderTitleFeature}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="hud-label text-[10px]">{issueTx.detailsLabel}</div>
+                      <Textarea
+                        value={reportDetails}
+                        onChange={(e) => setReportDetails(e.target.value)}
+                        placeholder={issueTx.placeholderDetails}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="hud-label text-[10px]">{issueTx.stepsLabel}</div>
+                      <Textarea
+                        value={reportSteps}
+                        onChange={(e) => setReportSteps(e.target.value)}
+                        placeholder={issueTx.placeholderSteps}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="hud-label text-[10px]">{issueTx.environmentLabel}</div>
+                      <Textarea
+                        value={reportEnvironment}
+                        onChange={(e) => setReportEnvironment(e.target.value)}
+                        placeholder={issueTx.placeholderEnvironment}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <button
+                      type="button"
+                      onClick={openGitHubIssue}
+                      className="btn-filled-gold flex items-center justify-center gap-2"
+                    >
+                      {issueTx.openOnGithub}
+                      <ArrowRight className="w-4 h-4" aria-hidden />
+                    </button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+                </div>
+              </div>
+            </div>
             <div className="flex items-center gap-3">
               {socialLinks.map((social) => (
                 <a
@@ -385,6 +610,20 @@ const FooterSection = () => {
                   rel="noopener noreferrer"
                   className={`w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-solaris-muted transition-all duration-300 ${social.color}`}
                   aria-label={social.label}
+                  onClick={() => {
+                    if (social.label === 'DeDust') {
+                      trackBuyClick({ destination: social.href, source: 'footer_social' });
+                      mktEvent('buy_click', { destination: social.href, source: 'footer_social' });
+                    }
+                    if (social.label === 'Telegram') {
+                      trackSocialClick({ platform: 'telegram', destination: social.href, source: 'footer_social' });
+                      mktEvent('social_click', { platform: 'telegram', destination: social.href, source: 'footer_social' });
+                    }
+                    if (social.label === 'X') {
+                      trackSocialClick({ platform: 'x', destination: social.href, source: 'footer_social' });
+                      mktEvent('social_click', { platform: 'x', destination: social.href, source: 'footer_social' });
+                    }
+                  }}
                 >
                   <social.icon className="w-5 h-5" />
                 </a>
@@ -397,12 +636,28 @@ const FooterSection = () => {
               <p className="text-solaris-muted text-sm">
                 © {new Date().getFullYear()} Solaris CET. {tx.copyrightBridge} {tx.copyrightRights}
               </p>
+              <p className="mt-2 text-xs text-solaris-muted/80">
+                {tx.legalNotice}
+              </p>
               <p className="mt-2 font-mono text-[10px] uppercase tracking-widest text-solaris-muted/90">
                 {t.footerMeta.genesisCertification}
               </p>
             </div>
           <div className="flex flex-col md:flex-row items-center gap-3">
               <SocialShare />
+              <a
+                href="/lighthouse"
+                className="inline-flex items-center rounded-lg border border-white/10 bg-white/5 px-2 py-1 hover:bg-white/10 transition-colors"
+                aria-label="Lighthouse scores"
+              >
+                <AppImage
+                  src="/lighthouse-badge.svg"
+                  alt="Lighthouse badge"
+                  className="h-5 w-auto"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </a>
               <div className="hidden md:block w-px h-4 bg-white/10" />
               <div className="flex items-center gap-2">
                 <span className="font-mono text-[11px] text-solaris-gold font-semibold">₿</span>

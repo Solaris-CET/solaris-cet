@@ -1,7 +1,8 @@
-import { useRef, useLayoutEffect, useMemo } from 'react';
 import { gsap } from 'gsap';
-import { CheckCircle, Loader, Circle, ChevronDown } from 'lucide-react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { CheckCircle, ChevronDown,Circle, Loader } from 'lucide-react';
+import { useLayoutEffect, useMemo,useRef } from 'react';
+
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 import { useLanguage } from '@/hooks/useLanguage';
 

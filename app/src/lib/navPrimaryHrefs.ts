@@ -5,11 +5,11 @@
  */
 export const NAV_PRIMARY_IN_PAGE = [
   { navKey: 'tokenomics', href: '#staking' },
+  { navKey: 'cetuia', href: '/cetuia' },
   { navKey: 'rwa', href: '/rwa' },
   { navKey: 'cetAi', href: '/cet-ai' },
-  { navKey: 'whitepaper', href: '#whitepaper' },
+  { navKey: 'whitepaper', href: '/whitepaper' },
   { navKey: 'howToBuy', href: '#how-to-buy' },
-  { navKey: 'resources', href: '#resources' },
   { navKey: 'faq', href: '#faq' },
 ] as const;
 

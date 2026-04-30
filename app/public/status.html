@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Solaris — Status</title>
+    <style>
+      :root { color-scheme: dark; }
+      body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial; background: #05060B; color: #E8EEF6; }
+      .wrap { max-width: 920px; margin: 0 auto; padding: 32px 16px 64px; }
+      h1 { margin: 0 0 8px; font-size: 22px; letter-spacing: 0.2px; }
+      .meta { color: #9DB0C6; font-size: 13px; display: flex; gap: 12px; flex-wrap: wrap; }
+      .grid { margin-top: 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .card { border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); border-radius: 12px; padding: 14px; }
+      .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .name { font-size: 14px; }
+      .badge { font-size: 12px; padding: 3px 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.14); }
+      .ok { color: #7CFFB2; border-color: rgba(124,255,178,0.35); background: rgba(124,255,178,0.08); }
+      .warn { color: #FFD27C; border-color: rgba(255,210,124,0.35); background: rgba(255,210,124,0.08); }
+      .bad { color: #FF7C7C; border-color: rgba(255,124,124,0.35); background: rgba(255,124,124,0.08); }
+      pre { margin: 10px 0 0; white-space: pre-wrap; word-break: break-word; color: #BBD0E8; font-size: 12px; }
+      .full { grid-column: 1 / -1; }
+      @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+      a { color: #8BD3FF; text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>System status</h1>
+      <div class="meta">
+        <div id="updated">Updated: —</div>
+        <div id="overall">Overall: —</div>
+        <div><a href="/metrics" rel="noreferrer">/metrics</a></div>
+        <div><a href="/api/health?deep=1" rel="noreferrer">/api/health</a></div>
+        <div><a href="/api/status" rel="noreferrer">/api/status</a></div>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <div class="row">
+            <div class="name">API</div>
+            <div class="badge" id="apiBadge">—</div>
+          </div>
+          <pre id="apiDetails">—</pre>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div class="name">Dependencies</div>
+            <div class="badge" id="depsBadge">—</div>
+          </div>
+          <pre id="depsDetails">—</pre>
+        </div>
+        <div class="card full">
+          <div class="row">
+            <div class="name">Raw</div>
+            <div class="badge" id="rawBadge">—</div>
+          </div>
+          <pre id="raw">—</pre>
+        </div>
+      </div>
+    </div>
+    <script>
+      const el = (id) => document.getElementById(id)
+      const setBadge = (node, kind, text) => {
+        node.classList.remove('ok', 'warn', 'bad')
+        if (kind) node.classList.add(kind)
+        node.textContent = text
+      }
+      const fmt = (obj) => JSON.stringify(obj, null, 2)
+      const safe = async (url) => {
+        try {
+          const res = await fetch(url, { headers: { 'cache-control': 'no-store' } })
+          const text = await res.text()
+          const json = (() => { try { return JSON.parse(text) } catch { return null } })()
+          return { ok: res.ok, status: res.status, json, text }
+        } catch (e) {
+          return { ok: false, status: 0, json: null, text: String(e?.message || e) }
+        }
+      }
+      const compute = (health, status) => {
+        const apiOk = Boolean(status?.ok ?? health?.ok ?? false)
+        const deps = health?.checks && typeof health.checks === 'object' ? health.checks : null
+        const depsOk = deps ? Object.values(deps).every((v) => v && v.ok !== false) : true
+        const overallOk = apiOk && depsOk
+        return { apiOk, depsOk, overallOk, deps }
+      }
+      const refresh = async () => {
+        const [h, s] = await Promise.all([safe('/api/health?deep=1'), safe('/api/status')])
+        const health = h.json || null
+        const status = s.json || null
+        const { apiOk, depsOk, overallOk, deps } = compute(health, status)
+        el('updated').textContent = `Updated: ${new Date().toISOString()}`
+        setBadge(el('overall'), overallOk ? 'ok' : 'bad', overallOk ? 'OK' : 'DEGRADED')
+        setBadge(el('apiBadge'), apiOk ? 'ok' : 'bad', apiOk ? 'OK' : 'DEGRADED')
+        el('apiDetails').textContent = fmt({ status: s.status, body: status })
+        setBadge(el('depsBadge'), depsOk ? 'ok' : 'warn', depsOk ? 'OK' : 'CHECK')
+        el('depsDetails').textContent = fmt({ status: h.status, checks: deps })
+        setBadge(el('rawBadge'), overallOk ? 'ok' : 'warn', overallOk ? 'OK' : 'CHECK')
+        el('raw').textContent = fmt({ health: { status: h.status, body: health }, status: { status: s.status, body: status } })
+      }
+      refresh()
+      setInterval(refresh, 30000)
+    </script>
+  </body>
+</html>
+

@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { afterEach,describe, expect, it, vi } from 'vitest';
+
 import { AGENT_BOARD_DEPARTMENTS } from '@/lib/agentBoardDepartments';
 import { TASK_AGENT_MESH_TOTAL } from '@/lib/domainPillars';
 

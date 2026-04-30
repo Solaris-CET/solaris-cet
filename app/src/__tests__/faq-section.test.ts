@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
 import translations from '../i18n/translations';
 
 const en = translations.en.faqContent;

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useLanguage } from '../hooks/useLanguage';
-import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
-import { SolarisLogoMark } from './SolarisLogoMark';
+
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+
+import { useLanguage } from '../hooks/useLanguage';
+import { SolarisLogoMark } from './SolarisLogoMark';
 
 /**
  * BackToTop — floating control after 600px scroll; uses Solaris mark on a dark inset for contrast on gold.

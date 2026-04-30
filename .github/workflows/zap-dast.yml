@@ -1,0 +1,43 @@
+name: Security — OWASP ZAP DAST (staging)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zap-dast-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  zap-baseline:
+    name: ZAP baseline scan
+    runs-on: ubuntu-latest
+    if: ${{ secrets.ZAP_TARGET_URL != '' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: ZAP baseline scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: ${{ secrets.ZAP_TARGET_URL }}
+          cmd_options: >-
+            -a
+            -I
+            -T 10
+            -r zap-report.html
+            -J zap-report.json
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: zap-dast
+          path: |
+            zap-report.html
+            zap-report.json
+

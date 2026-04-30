@@ -1,7 +1,8 @@
-import type { FaqContent } from './faqContent.types';
-import { faqContentByLang } from './faqContent.data';
 import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';
 import { DEDUST_POOL_ADDRESS } from '@/lib/dedustUrls';
+
+import { faqContentByLang } from './faqContent.data';
+import type { FaqContent } from './faqContent.types';
 
 export type LangCode = 'en' | 'es' | 'zh' | 'ru' | 'ro' | 'pt' | 'de';
 
@@ -37,6 +38,7 @@ export interface Translations {
     home: string;
     cetApp: string;
     tokenomics: string;
+    cetuia: string;
     rwa: string;
     cetAi: string;
     roadmap: string;
@@ -94,6 +96,49 @@ export interface Translations {
     miningDescription: string;
     accessibilityTitle: string;
     accessibilityDescription: string;
+    responsibleDisclosureTitle: string;
+    responsibleDisclosureDescription: string;
+    bugBountyTitle: string;
+    bugBountyDescription: string;
+    blogTitle: string;
+    blogDescription: string;
+    blogCrumb: string;
+    newsletterConfirmTitle: string;
+    newsletterConfirmDescription: string;
+  };
+  blog: {
+    title: string;
+    subtitle: string;
+    filtersTitle: string;
+    filterCategory: string;
+    filterTags: string;
+    all: string;
+    openBlog: string;
+    emptyTitle: string;
+    emptyBody: string;
+    resetFilters: string;
+    notFoundTitle: string;
+    notFoundBody: string;
+    backToBlog: string;
+    tagsLabel: string;
+    newsletterCtaTitle: string;
+    newsletterCtaBody: string;
+    newsletterCtaButton: string;
+  };
+  newsletterConfirm: {
+    loadingTitle: string;
+    loadingBody: string;
+    successTitle: string;
+    successBody: string;
+    alreadyTitle: string;
+    alreadyBody: string;
+    expiredTitle: string;
+    expiredBody: string;
+    invalidTitle: string;
+    invalidBody: string;
+    ctaHome: string;
+    ctaBlog: string;
+    ctaRetry: string;
   };
   notFound: {
     heading: string;
@@ -166,11 +211,34 @@ export interface Translations {
     terms: string;
     accessibility: string;
     contact: string;
+    responsibleDisclosure: string;
+    bugBounty: string;
     /** In-page anchor `#authority-trust`. */
     authorityTrust: string;
     /** `/sovereign/` — OMEGA zero-JS surface. */
     sovereignNoJs: string;
     github: string;
+    releaseNotes: string;
+    reportIssue: string;
+  };
+  issueReporter: {
+    title: string;
+    description: string;
+    typeLabel: string;
+    bug: string;
+    feature: string;
+    titleLabel: string;
+    detailsLabel: string;
+    stepsLabel: string;
+    environmentLabel: string;
+    openOnGithub: string;
+    toastCopied: string;
+    toastCopyFailed: string;
+    placeholderTitleBug: string;
+    placeholderTitleFeature: string;
+    placeholderDetails: string;
+    placeholderSteps: string;
+    placeholderEnvironment: string;
   };
   /** Product anchor line (genesis timestamp, supply cap, surface label). */
   footerMeta: {
@@ -350,6 +418,16 @@ export interface Translations {
     howToBuy: string;
     community: string;
   };
+  mobileAppNav: {
+    home: string;
+    wallet: string;
+    chat: string;
+    transactions: string;
+    settings: string;
+    online: string;
+    offline: string;
+    dataSaver: string;
+  };
   tokenomics: {
     title: string;
     supply: string;
@@ -516,6 +594,7 @@ export interface Translations {
   howToBuyUi: HowToBuyUi;
   tokenomicsUi: TokenomicsUi;
   footerUi: FooterUi;
+  cookieUi: CookieUi;
   novaAppUi: NovaAppUi;
   competitionUi: CompetitionUi;
   highIntelligenceUi: HighIntelligenceUi;
@@ -540,6 +619,7 @@ export interface Translations {
 export type HowToBuyUi = typeof howToBuyUiEn;
 export type TokenomicsUi = typeof tokenomicsUiEn;
 export type FooterUi = typeof footerUiEn;
+export type CookieUi = typeof cookieUiEn;
 export type NovaAppUi = typeof novaAppUiEn;
 export type CompetitionUi = typeof competitionUiEn;
 export type HighIntelligenceUi = typeof highIntelligenceUiEn;
@@ -690,6 +770,8 @@ const tokenomicsUiRo = {
 const footerUiEn = {
   waitlistAdded: 'Added to waitlist',
   waitlistUnavailable: 'Waitlist unavailable',
+  newsletterCheckInbox: 'Check your inbox to confirm',
+  newsletterUnavailable: 'Newsletter unavailable',
   mailtoSubject: 'Solaris CET Waitlist',
   mailtoBody: 'Please add this email to the Solaris CET waitlist: {email}',
   kicker: 'AI BRIDGE TO HIGH INTELLIGENCE',
@@ -718,6 +800,7 @@ const footerUiEn = {
   emailNotify: 'Notify me',
   copyrightBridge: 'AI Bridge to High Intelligence.',
   copyrightRights: 'All rights reserved.',
+  legalNotice: 'Not financial advice. Crypto-assets are high risk and can result in total loss.',
   liveOnTon: 'LIVE ON TON MAINNET',
   architectedBy: 'Architected by Claudiu',
 };
@@ -725,6 +808,8 @@ const footerUiEn = {
 const footerUiRo = {
   waitlistAdded: 'Adăugat în lista de așteptare',
   waitlistUnavailable: 'Lista de așteptare indisponibilă',
+  newsletterCheckInbox: 'Verifică inbox-ul pentru confirmare',
+  newsletterUnavailable: 'Newsletter indisponibil',
   mailtoSubject: 'Solaris CET — Lista de așteptare',
   mailtoBody: 'Te rog adaugă acest email în lista de așteptare Solaris CET: {email}',
   kicker: 'PUNTE AI CĂTRE HIGH INTELLIGENCE',
@@ -753,8 +838,245 @@ const footerUiRo = {
   emailNotify: 'Anunță-mă',
   copyrightBridge: 'Punte AI către High Intelligence.',
   copyrightRights: 'Toate drepturile rezervate.',
+  legalNotice: 'Nu reprezintă sfat financiar. Crypto-assets au risc ridicat și pot duce la pierdere totală.',
   liveOnTon: 'LIVE PE TON MAINNET',
   architectedBy: 'Arhitectură: Claudiu',
+};
+
+const footerUiEs = {
+  ...footerUiEn,
+  waitlistAdded: 'Añadido a la lista',
+  waitlistUnavailable: 'Lista no disponible',
+  newsletterCheckInbox: 'Revisa tu bandeja de entrada para confirmar',
+  newsletterUnavailable: 'Newsletter no disponible',
+  mailtoSubject: 'Solaris CET — Lista',
+  mailtoBody: 'Por favor añade este email a la lista de Solaris CET: {email}',
+  kicker: 'PUENTE AI HACIA HIGH INTELLIGENCE',
+  headlineLead: 'Empieza a minar en ',
+  headlineAccent: 'minutos',
+  subtitle:
+    'Descarga la app Solaris CET. Conecta una wallet. Empieza a ganar en el puente entre la IA actual y High Intelligence.',
+  ctaTelegramMining: 'Empezar a minar en Telegram',
+  ctaWhitepaper: 'Leer el whitepaper',
+  founderRole: 'FUNDADOR & CREADOR',
+  contractLabel: 'Dirección del contrato CET (TON)',
+  communityKicker: 'Únete a la comunidad',
+  communityBody: 'Recibe actualizaciones, habla con el equipo y sigue la construcción en tiempo real.',
+  ctaTelegramChannel: 'Unirse al canal Telegram',
+  ctaMiningBot: 'Iniciar bot de minería',
+  emailWaitlistKicker: 'Newsletter (email)',
+  emailWaitlistBody: 'Recibe anuncios importantes por email.',
+  emailWaitlistFallback: 'Si el endpoint no está configurado, mostramos un error.',
+  emailPlaceholder: 'tu@ejemplo.com',
+  emailAria: 'Dirección de email',
+  emailSending: 'Enviando…',
+  emailNotify: 'Avísame',
+  copyrightBridge: 'Puente AI hacia High Intelligence.',
+  copyrightRights: 'Todos los derechos reservados.',
+  legalNotice: 'No es asesoramiento financiero. Los criptoactivos son de alto riesgo y pueden implicar pérdida total.',
+  liveOnTon: 'LIVE EN TON MAINNET',
+  architectedBy: 'Arquitectura: Claudiu',
+};
+
+const cookieUiEn = {
+  bannerTitle: 'GDPR & Cookies',
+  bannerBody: 'We use cookies for core functionality, traffic analytics, and to improve the experience. Your choice matters.',
+  acceptAll: 'Accept all cookies',
+  essentialOnly: 'Essential only',
+  customize: 'Customize',
+  preferencesTitle: 'Cookie preferences',
+  essentialTitle: 'Strictly necessary (Essential)',
+  essentialBody: 'Required for core functionality (sessions, security). Cannot be disabled.',
+  analyticsTitle: 'Analytics & performance',
+  analyticsBody: 'Helps us improve the product by collecting aggregated usage signals.',
+  marketingTitle: 'Marketing & retargeting',
+  marketingBody: 'Used to measure campaigns and optimize acquisition spend.',
+  saveClose: 'Save and close',
+  cookiePolicy: 'Cookie Policy',
+  cookieSettings: 'Cookie settings',
+  resetConsent: 'Reset consent',
+  updatedAtLabel: 'Updated',
+};
+
+const cookieUiRo = {
+  bannerTitle: 'GDPR & Cookies',
+  bannerBody: 'Utilizăm cookie-uri pentru funcționare, analizarea traficului și îmbunătățirea experienței. Alegerea îți aparține.',
+  acceptAll: 'Acceptă toate cookie-urile',
+  essentialOnly: 'Doar esențiale',
+  customize: 'Setări personalizate',
+  preferencesTitle: 'Preferințe cookie',
+  essentialTitle: 'Strict necesare (Esențiale)',
+  essentialBody: 'Necesare funcționării normale (sesiuni, securitate). Nu le poți dezactiva.',
+  analyticsTitle: 'Analitice & performanță',
+  analyticsBody: 'Ne ajută să îmbunătățim produsul prin semnale agregate despre utilizare.',
+  marketingTitle: 'Marketing & retargeting',
+  marketingBody: 'Folosite pentru măsurarea campaniilor și optimizarea bugetelor de achiziție.',
+  saveClose: 'Salvează și închide',
+  cookiePolicy: 'Politică de cookie-uri',
+  cookieSettings: 'Setări cookie',
+  resetConsent: 'Resetează consimțământul',
+  updatedAtLabel: 'Actualizat',
+};
+
+const cookieUiEs = {
+  ...cookieUiEn,
+  bannerBody: 'Usamos cookies para funciones esenciales, analítica y mejorar la experiencia. Tú decides.',
+  acceptAll: 'Aceptar todas',
+  essentialOnly: 'Solo esenciales',
+  customize: 'Personalizar',
+  preferencesTitle: 'Preferencias de cookies',
+  essentialTitle: 'Estrictamente necesarias',
+  essentialBody: 'Necesarias para el funcionamiento y la seguridad. No se pueden desactivar.',
+  analyticsTitle: 'Analítica y rendimiento',
+  analyticsBody: 'Nos ayuda a mejorar el producto con señales agregadas de uso.',
+  marketingTitle: 'Marketing y retargeting',
+  marketingBody: 'Para medir campañas y optimizar adquisición.',
+  saveClose: 'Guardar y cerrar',
+  cookiePolicy: 'Política de cookies',
+  cookieSettings: 'Ajustes de cookies',
+  resetConsent: 'Restablecer consentimiento',
+  updatedAtLabel: 'Actualizado',
+};
+
+const mobileAppNavEn = {
+  home: 'Home',
+  wallet: 'Wallet',
+  chat: 'Chat',
+  transactions: 'Transactions',
+  settings: 'Settings',
+  online: 'Online',
+  offline: 'Offline',
+  dataSaver: 'Data saver',
+};
+
+const mobileAppNavRo = {
+  home: 'Acasă',
+  wallet: 'Wallet',
+  chat: 'Chat',
+  transactions: 'Tranzacții',
+  settings: 'Setări',
+  online: 'Online',
+  offline: 'Offline',
+  dataSaver: 'Economisire date',
+};
+
+const mobileAppNavEs = {
+  home: 'Inicio',
+  wallet: 'Wallet',
+  chat: 'Chat',
+  transactions: 'Transacciones',
+  settings: 'Ajustes',
+  online: 'Online',
+  offline: 'Offline',
+  dataSaver: 'Ahorro de datos',
+};
+
+const blogEn = {
+  title: 'Articles',
+  subtitle: 'Updates, security notes, and deep dives — in your language.',
+  filtersTitle: 'Filters',
+  filterCategory: 'Category',
+  filterTags: 'Tags',
+  all: 'All',
+  openBlog: 'Open blog',
+  emptyTitle: 'No matching articles',
+  emptyBody: 'Try clearing filters or choose a different tag/category.',
+  resetFilters: 'Reset filters',
+  notFoundTitle: 'Article not found',
+  notFoundBody: 'The requested article does not exist or is not available in this language.',
+  backToBlog: 'Back to articles',
+  tagsLabel: 'Tags',
+  newsletterCtaTitle: 'Get new articles by email',
+  newsletterCtaBody: 'Subscribe to the newsletter (double opt-in).',
+  newsletterCtaButton: 'Subscribe',
+};
+
+const blogRo = {
+  title: 'Articole',
+  subtitle: 'Update-uri, note de securitate și articole detaliate — în limba ta.',
+  filtersTitle: 'Filtre',
+  filterCategory: 'Categorie',
+  filterTags: 'Tag-uri',
+  all: 'Toate',
+  openBlog: 'Deschide articolele',
+  emptyTitle: 'Nu există articole pentru filtrul ales',
+  emptyBody: 'Resetează filtrele sau alege un alt tag / categorie.',
+  resetFilters: 'Resetează filtrele',
+  notFoundTitle: 'Articol inexistent',
+  notFoundBody: 'Articolul nu există sau nu este disponibil în această limbă.',
+  backToBlog: 'Înapoi la articole',
+  tagsLabel: 'Tag-uri',
+  newsletterCtaTitle: 'Primește articole noi pe email',
+  newsletterCtaBody: 'Abonează-te la newsletter (double opt-in).',
+  newsletterCtaButton: 'Abonează-te',
+};
+
+const blogEs = {
+  title: 'Artículos',
+  subtitle: 'Actualizaciones, notas de seguridad y artículos técnicos — en tu idioma.',
+  filtersTitle: 'Filtros',
+  filterCategory: 'Categoría',
+  filterTags: 'Etiquetas',
+  all: 'Todo',
+  openBlog: 'Abrir blog',
+  emptyTitle: 'No hay artículos para este filtro',
+  emptyBody: 'Borra filtros o elige otra etiqueta/categoría.',
+  resetFilters: 'Restablecer filtros',
+  notFoundTitle: 'Artículo no encontrado',
+  notFoundBody: 'El artículo no existe o no está disponible en este idioma.',
+  backToBlog: 'Volver a artículos',
+  tagsLabel: 'Etiquetas',
+  newsletterCtaTitle: 'Recibe nuevos artículos por email',
+  newsletterCtaBody: 'Suscríbete al newsletter (double opt-in).',
+  newsletterCtaButton: 'Suscribirme',
+};
+
+const newsletterConfirmEn = {
+  loadingTitle: 'Confirming subscription',
+  loadingBody: 'Please wait…',
+  successTitle: 'Subscription confirmed',
+  successBody: 'Thanks! Your subscription is now active.',
+  alreadyTitle: 'Already confirmed',
+  alreadyBody: 'Your subscription is already active.',
+  expiredTitle: 'Link expired',
+  expiredBody: 'This confirmation link has expired. Please subscribe again.',
+  invalidTitle: 'Invalid link',
+  invalidBody: 'This confirmation link is invalid.',
+  ctaHome: 'Go home',
+  ctaBlog: 'Read articles',
+  ctaRetry: 'Subscribe again',
+};
+
+const newsletterConfirmRo = {
+  loadingTitle: 'Se confirmă abonarea',
+  loadingBody: 'Te rog așteaptă…',
+  successTitle: 'Abonare confirmată',
+  successBody: 'Mulțumim! Abonarea ta este activă.',
+  alreadyTitle: 'Deja confirmată',
+  alreadyBody: 'Abonarea ta este deja activă.',
+  expiredTitle: 'Link expirat',
+  expiredBody: 'Linkul de confirmare a expirat. Te rugăm să te abonezi din nou.',
+  invalidTitle: 'Link invalid',
+  invalidBody: 'Linkul de confirmare nu este valid.',
+  ctaHome: 'Acasă',
+  ctaBlog: 'Vezi articolele',
+  ctaRetry: 'Reîncearcă abonarea',
+};
+
+const newsletterConfirmEs = {
+  loadingTitle: 'Confirmando suscripción',
+  loadingBody: 'Espera un momento…',
+  successTitle: 'Suscripción confirmada',
+  successBody: '¡Gracias! Tu suscripción está activa.',
+  alreadyTitle: 'Ya confirmada',
+  alreadyBody: 'Tu suscripción ya está activa.',
+  expiredTitle: 'Enlace caducado',
+  expiredBody: 'Este enlace ha caducado. Suscríbete de nuevo.',
+  invalidTitle: 'Enlace inválido',
+  invalidBody: 'Este enlace de confirmación no es válido.',
+  ctaHome: 'Inicio',
+  ctaBlog: 'Leer artículos',
+  ctaRetry: 'Suscribirme de nuevo',
 };
 
 const novaAppUiEn = {
@@ -1793,6 +2115,7 @@ const translations: Record<LangCode, Translations> = {
       home: 'Home',
       cetApp: 'CET App',
       tokenomics: 'Tokenomics',
+      cetuia: 'Cetățuia Map',
       rwa: 'RWA',
       cetAi: 'CET AI',
       roadmap: 'Roadmap',
@@ -1844,7 +2167,18 @@ const translations: Record<LangCode, Translations> = {
       miningDescription: 'Mining overview and calculator for Solaris CET (landing section).',
       accessibilityTitle: 'Accessibility | Solaris CET',
       accessibilityDescription: 'Accessibility statement for the Solaris CET website.',
+      responsibleDisclosureTitle: 'Responsible Disclosure | Solaris CET',
+      responsibleDisclosureDescription: 'How to report security issues safely and responsibly.',
+      bugBountyTitle: 'Bug Bounty | Solaris CET',
+      bugBountyDescription: 'Bug bounty scope, rules, and reward guidelines for security researchers.',
+      blogTitle: 'Blog | Solaris CET',
+      blogDescription: 'Articles, updates, and security notes for Solaris CET.',
+      blogCrumb: 'Blog',
+      newsletterConfirmTitle: 'Newsletter confirmation | Solaris CET',
+      newsletterConfirmDescription: 'Confirm your Solaris CET newsletter subscription.',
     },
+    blog: blogEn,
+    newsletterConfirm: newsletterConfirmEn,
     notFound: {
       heading: 'Page not found',
       description: 'The requested page does not exist or has moved.',
@@ -1909,9 +2243,33 @@ const translations: Record<LangCode, Translations> = {
       terms: 'Terms',
       accessibility: 'Accessibility',
       contact: 'Contact',
+      responsibleDisclosure: 'Responsible disclosure',
+      bugBounty: 'Bug bounty',
       authorityTrust: 'Trust & proof',
       sovereignNoJs: 'Sovereign (no JS)',
       github: 'GitHub',
+      releaseNotes: 'Release notes',
+      reportIssue: 'Report an issue',
+    },
+    issueReporter: {
+      title: 'Report an issue',
+      description:
+        'Write a short draft. On submit we open the GitHub Issue Form and copy the draft to your clipboard.',
+      typeLabel: 'Type',
+      bug: 'Bug',
+      feature: 'Feature',
+      titleLabel: 'Title',
+      detailsLabel: 'Details',
+      stepsLabel: 'Steps',
+      environmentLabel: 'Environment',
+      openOnGithub: 'Open on GitHub',
+      toastCopied: 'Draft copied — paste it into the GitHub form',
+      toastCopyFailed: 'Could not copy the draft to clipboard',
+      placeholderTitleBug: '[BUG] …',
+      placeholderTitleFeature: '[FEATURE] …',
+      placeholderDetails: 'What happened and what did you expect?',
+      placeholderSteps: '1. …\n2. …\n3. …',
+      placeholderEnvironment: 'OS, browser, Node/npm, commit',
     },
     footerMeta: {
       genesisCertification:
@@ -2087,6 +2445,7 @@ const translations: Record<LangCode, Translations> = {
       howToBuy: 'How to buy',
       community: 'Community',
     },
+    mobileAppNav: mobileAppNavEn,
     tokenomics: {
       title: 'Tokenomics',
       supply: 'Total Supply',
@@ -2266,6 +2625,7 @@ const translations: Record<LangCode, Translations> = {
     howToBuyUi: howToBuyUiEn,
     tokenomicsUi: tokenomicsUiEn,
     footerUi: footerUiEn,
+    cookieUi: cookieUiEn,
     novaAppUi: novaAppUiEn,
     competitionUi: competitionUiEn,
     highIntelligenceUi: highIntelligenceUiEn,
@@ -2295,6 +2655,7 @@ const translations: Record<LangCode, Translations> = {
       home: 'Inicio',
       cetApp: 'App CET',
       tokenomics: 'Tokenómica',
+      cetuia: 'Mapa Cetățuia',
       rwa: 'RWA',
       cetAi: 'CET AI',
       roadmap: 'Hoja de Ruta',
@@ -2346,7 +2707,18 @@ const translations: Record<LangCode, Translations> = {
       miningDescription: 'Resumen de minería y calculadora para Solaris CET (sección de landing).',
       accessibilityTitle: 'Accesibilidad | Solaris CET',
       accessibilityDescription: 'Declaración de accesibilidad para el sitio Solaris CET.',
+      responsibleDisclosureTitle: 'Divulgación responsable | Solaris CET',
+      responsibleDisclosureDescription: 'Cómo reportar problemas de seguridad de forma segura y responsable.',
+      bugBountyTitle: 'Bug Bounty | Solaris CET',
+      bugBountyDescription: 'Alcance, reglas y guía de recompensas para investigadores de seguridad.',
+      blogTitle: 'Blog | Solaris CET',
+      blogDescription: 'Artículos, actualizaciones y notas de seguridad de Solaris CET.',
+      blogCrumb: 'Blog',
+      newsletterConfirmTitle: 'Confirmación de newsletter | Solaris CET',
+      newsletterConfirmDescription: 'Confirma tu suscripción al newsletter de Solaris CET.',
     },
+    blog: blogEs,
+    newsletterConfirm: newsletterConfirmEs,
     notFound: {
       heading: 'Página no encontrada',
       description: 'La página solicitada no existe o fue movida.',
@@ -2411,9 +2783,33 @@ const translations: Record<LangCode, Translations> = {
       terms: 'Términos',
       accessibility: 'Accesibilidad',
       contact: 'Contacto',
+      responsibleDisclosure: 'Divulgación responsable',
+      bugBounty: 'Bug bounty',
       authorityTrust: 'Confianza y pruebas',
       sovereignNoJs: 'Soberano (sin JS)',
       github: 'GitHub',
+      releaseNotes: 'Notas de versión',
+      reportIssue: 'Reportar un problema',
+    },
+    issueReporter: {
+      title: 'Reportar un problema',
+      description:
+        'Escribe un borrador corto. Al enviar, abrimos el formulario de GitHub y copiamos el borrador al portapapeles.',
+      typeLabel: 'Tipo',
+      bug: 'Bug',
+      feature: 'Funcionalidad',
+      titleLabel: 'Título',
+      detailsLabel: 'Detalles',
+      stepsLabel: 'Pasos',
+      environmentLabel: 'Entorno',
+      openOnGithub: 'Abrir en GitHub',
+      toastCopied: 'Borrador copiado — pégalo en el formulario de GitHub',
+      toastCopyFailed: 'No se pudo copiar el borrador al portapapeles',
+      placeholderTitleBug: '[BUG] …',
+      placeholderTitleFeature: '[FEATURE] …',
+      placeholderDetails: '¿Qué pasó y qué esperabas?',
+      placeholderSteps: '1. …\n2. …\n3. …',
+      placeholderEnvironment: 'SO, navegador, Node/npm, commit',
     },
     footerMeta: {
       genesisCertification:
@@ -2589,6 +2985,7 @@ const translations: Record<LangCode, Translations> = {
       howToBuy: 'Cómo comprar',
       community: 'Comunidad',
     },
+    mobileAppNav: mobileAppNavEs,
     tokenomics: {
       title: 'Tokenómica',
       supply: 'Suministro Total',
@@ -2767,7 +3164,8 @@ const translations: Record<LangCode, Translations> = {
     },
     howToBuyUi: howToBuyUiEn,
     tokenomicsUi: tokenomicsUiEn,
-    footerUi: footerUiEn,
+    footerUi: footerUiEs,
+    cookieUi: cookieUiEs,
     novaAppUi: novaAppUiEn,
     competitionUi: competitionUiEn,
     highIntelligenceUi: highIntelligenceUiEn,
@@ -2797,6 +3195,7 @@ const translations: Record<LangCode, Translations> = {
       home: '首页',
       cetApp: 'CET 应用',
       tokenomics: '代币经济学',
+      cetuia: 'Cetățuia 地图',
       rwa: 'RWA',
       cetAi: 'CET AI',
       roadmap: '路线图',
@@ -2881,9 +3280,32 @@ const translations: Record<LangCode, Translations> = {
       terms: '条款',
       accessibility: '无障碍',
       contact: '联系',
+      responsibleDisclosure: '负责任披露',
+      bugBounty: '漏洞赏金',
       authorityTrust: '信任与证明',
       sovereignNoJs: '主权（无 JS）',
       github: 'GitHub',
+      releaseNotes: '发行说明',
+      reportIssue: '报告问题',
+    },
+    issueReporter: {
+      title: '报告问题',
+      description: '填写简短草稿。提交时打开 GitHub Issue 表单，并将草稿复制到剪贴板。',
+      typeLabel: '类型',
+      bug: 'Bug',
+      feature: '功能',
+      titleLabel: '标题',
+      detailsLabel: '详情',
+      stepsLabel: '步骤',
+      environmentLabel: '环境',
+      openOnGithub: '在 GitHub 打开',
+      toastCopied: '草稿已复制 — 请粘贴到 GitHub 表单',
+      toastCopyFailed: '无法复制草稿到剪贴板',
+      placeholderTitleBug: '[BUG] …',
+      placeholderTitleFeature: '[FEATURE] …',
+      placeholderDetails: '发生了什么？你期望什么？',
+      placeholderSteps: '1. …\n2. …\n3. …',
+      placeholderEnvironment: '系统、浏览器、Node/npm、commit',
     },
     region: {
       ariaLabel: '地区',
@@ -2909,7 +3331,18 @@ const translations: Record<LangCode, Translations> = {
       miningDescription: 'Mining overview and calculator for Solaris CET (landing section).',
       accessibilityTitle: 'Accessibility | Solaris CET',
       accessibilityDescription: 'Accessibility statement for the Solaris CET website.',
+      responsibleDisclosureTitle: '负责任披露 | Solaris CET',
+      responsibleDisclosureDescription: '如何安全且负责任地报告安全问题。',
+      bugBountyTitle: '漏洞赏金 | Solaris CET',
+      bugBountyDescription: '漏洞赏金范围、规则与奖励指引。',
+      blogTitle: 'Blog | Solaris CET',
+      blogDescription: 'Articles, updates, and security notes for Solaris CET.',
+      blogCrumb: 'Blog',
+      newsletterConfirmTitle: 'Newsletter confirmation | Solaris CET',
+      newsletterConfirmDescription: 'Confirm your Solaris CET newsletter subscription.',
     },
+    blog: blogEn,
+    newsletterConfirm: newsletterConfirmEn,
     notFound: {
       heading: '页面未找到',
       description: '你请求的页面不存在或已移动。',
@@ -3082,6 +3515,16 @@ const translations: Record<LangCode, Translations> = {
       tokenomics: '经济模型',
       howToBuy: '如何购买',
       community: '社区',
+    },
+    mobileAppNav: {
+      home: '主页',
+      wallet: '钱包',
+      chat: '聊天',
+      transactions: '交易',
+      settings: '设置',
+      online: '在线',
+      offline: '离线',
+      dataSaver: '省流量',
     },
     tokenomics: {
       title: '代币经济学',
@@ -3258,6 +3701,7 @@ const translations: Record<LangCode, Translations> = {
     howToBuyUi: howToBuyUiEn,
     tokenomicsUi: tokenomicsUiEn,
     footerUi: footerUiEn,
+    cookieUi: cookieUiEn,
     novaAppUi: novaAppUiEn,
     competitionUi: competitionUiEn,
     highIntelligenceUi: highIntelligenceUiEn,
@@ -3287,6 +3731,7 @@ const translations: Record<LangCode, Translations> = {
       home: 'Главная',
       cetApp: 'Приложение CET',
       tokenomics: 'Токеномика',
+      cetuia: 'Карта Cetățuia',
       rwa: 'RWA',
       cetAi: 'CET AI',
       roadmap: 'Дорожная карта',
@@ -3338,7 +3783,18 @@ const translations: Record<LangCode, Translations> = {
       miningDescription: 'Mining overview and calculator for Solaris CET (landing section).',
       accessibilityTitle: 'Accessibility | Solaris CET',
       accessibilityDescription: 'Accessibility statement for the Solaris CET website.',
+      responsibleDisclosureTitle: 'Ответственное раскрытие | Solaris CET',
+      responsibleDisclosureDescription: 'Как безопасно и ответственно сообщать о проблемах безопасности.',
+      bugBountyTitle: 'Bug Bounty | Solaris CET',
+      bugBountyDescription: 'Область, правила и принципы вознаграждения для исследователей безопасности.',
+      blogTitle: 'Blog | Solaris CET',
+      blogDescription: 'Articles, updates, and security notes for Solaris CET.',
+      blogCrumb: 'Blog',
+      newsletterConfirmTitle: 'Newsletter confirmation | Solaris CET',
+      newsletterConfirmDescription: 'Confirm your Solaris CET newsletter subscription.',
     },
+    blog: blogEn,
+    newsletterConfirm: newsletterConfirmEn,
     notFound: {
       heading: 'Страница не найдена',
       description: 'Запрошенная страница не существует или была перемещена.',
@@ -3403,9 +3859,33 @@ const translations: Record<LangCode, Translations> = {
       terms: 'Условия',
       accessibility: 'Доступность',
       contact: 'Контакт',
+      responsibleDisclosure: 'Ответственное раскрытие',
+      bugBounty: 'Bug bounty',
       authorityTrust: 'Доверие и доказательства',
       sovereignNoJs: 'Суверенный (без JS)',
       github: 'GitHub',
+      releaseNotes: 'Заметки о выпуске',
+      reportIssue: 'Сообщить о проблеме',
+    },
+    issueReporter: {
+      title: 'Сообщить о проблеме',
+      description:
+        'Заполните короткий черновик. При отправке мы откроем форму GitHub и скопируем черновик в буфер обмена.',
+      typeLabel: 'Тип',
+      bug: 'Bug',
+      feature: 'Feature',
+      titleLabel: 'Заголовок',
+      detailsLabel: 'Детали',
+      stepsLabel: 'Шаги',
+      environmentLabel: 'Среда',
+      openOnGithub: 'Открыть на GitHub',
+      toastCopied: 'Черновик скопирован — вставьте его в форму GitHub',
+      toastCopyFailed: 'Не удалось скопировать черновик в буфер обмена',
+      placeholderTitleBug: '[BUG] …',
+      placeholderTitleFeature: '[FEATURE] …',
+      placeholderDetails: 'Что произошло и что вы ожидали?',
+      placeholderSteps: '1. …\n2. …\n3. …',
+      placeholderEnvironment: 'ОС, браузер, Node/npm, commit',
     },
     footerMeta: {
       genesisCertification:
@@ -3580,6 +4060,16 @@ const translations: Record<LangCode, Translations> = {
       tokenomics: 'Токеномика',
       howToBuy: 'Как купить',
       community: 'Сообщество',
+    },
+    mobileAppNav: {
+      home: 'Главная',
+      wallet: 'Кошелёк',
+      chat: 'Чат',
+      transactions: 'Транзакции',
+      settings: 'Настройки',
+      online: 'Онлайн',
+      offline: 'Оффлайн',
+      dataSaver: 'Экономия данных',
     },
     tokenomics: {
       title: 'Токеномика',
@@ -3757,6 +4247,7 @@ const translations: Record<LangCode, Translations> = {
     howToBuyUi: howToBuyUiEn,
     tokenomicsUi: tokenomicsUiEn,
     footerUi: footerUiEn,
+    cookieUi: cookieUiEn,
     novaAppUi: novaAppUiEn,
     competitionUi: competitionUiEn,
     highIntelligenceUi: highIntelligenceUiEn,
@@ -3786,6 +4277,7 @@ const translations: Record<LangCode, Translations> = {
       home: 'Acasă',
       cetApp: 'Aplicație CET',
       tokenomics: 'Tokenomică',
+      cetuia: 'Harta Cetățuia',
       rwa: 'RWA',
       cetAi: 'CET AI',
       roadmap: 'Foaie de Parcurs',
@@ -3837,7 +4329,18 @@ const translations: Record<LangCode, Translations> = {
       miningDescription: 'Prezentare mining și calculator pentru Solaris CET (secțiune landing).',
       accessibilityTitle: 'Accesibilitate | Solaris CET',
       accessibilityDescription: 'Declarație de accesibilitate pentru site-ul Solaris CET.',
+      responsibleDisclosureTitle: 'Dezvăluire responsabilă | Solaris CET',
+      responsibleDisclosureDescription: 'Cum raportezi probleme de securitate în mod sigur și responsabil.',
+      bugBountyTitle: 'Bug Bounty | Solaris CET',
+      bugBountyDescription: 'Scope, reguli și ghid de recompense pentru cercetători de securitate.',
+      blogTitle: 'Articole | Solaris CET',
+      blogDescription: 'Articole, update-uri și note de securitate pentru Solaris CET.',
+      blogCrumb: 'Articole',
+      newsletterConfirmTitle: 'Confirmare newsletter | Solaris CET',
+      newsletterConfirmDescription: 'Confirmă abonarea la newsletter-ul Solaris CET.',
     },
+    blog: blogRo,
+    newsletterConfirm: newsletterConfirmRo,
     notFound: {
       heading: 'Pagină negăsită',
       description: 'Pagina solicitată nu există sau a fost mutată.',
@@ -3902,9 +4405,33 @@ const translations: Record<LangCode, Translations> = {
       terms: 'Termeni',
       accessibility: 'Accesibilitate',
       contact: 'Contact',
+      responsibleDisclosure: 'Dezvăluire responsabilă',
+      bugBounty: 'Bug bounty',
       authorityTrust: 'Încredere și dovezi',
       sovereignNoJs: 'Suveran (fără JS)',
       github: 'GitHub',
+      releaseNotes: 'Note de lansare',
+      reportIssue: 'Raportează o problemă',
+    },
+    issueReporter: {
+      title: 'Raportează o problemă',
+      description:
+        'Completează un draft scurt. La trimitere deschidem GitHub Issue Form și copiem draftul în clipboard.',
+      typeLabel: 'Tip',
+      bug: 'Bug',
+      feature: 'Funcționalitate',
+      titleLabel: 'Titlu',
+      detailsLabel: 'Detalii',
+      stepsLabel: 'Pași',
+      environmentLabel: 'Mediu',
+      openOnGithub: 'Deschide pe GitHub',
+      toastCopied: 'Draft copiat — lipește-l în formularul GitHub',
+      toastCopyFailed: 'Nu s-a putut copia draftul în clipboard',
+      placeholderTitleBug: '[BUG] …',
+      placeholderTitleFeature: '[FEATURE] …',
+      placeholderDetails: 'Ce s-a întâmplat și ce te așteptai să se întâmple?',
+      placeholderSteps: '1. …\n2. …\n3. …',
+      placeholderEnvironment: 'OS, browser, Node/npm, commit',
     },
     footerMeta: {
       genesisCertification:
@@ -4080,6 +4607,7 @@ const translations: Record<LangCode, Translations> = {
       howToBuy: 'Cum cumperi',
       community: 'Comunitate',
     },
+    mobileAppNav: mobileAppNavRo,
     tokenomics: {
       title: 'Tokenomică',
       supply: 'Ofertă Totală',
@@ -4259,6 +4787,7 @@ const translations: Record<LangCode, Translations> = {
     howToBuyUi: howToBuyUiRo,
     tokenomicsUi: tokenomicsUiRo,
     footerUi: footerUiRo,
+    cookieUi: cookieUiRo,
     novaAppUi: novaAppUiRo,
     competitionUi: competitionUiRo,
     highIntelligenceUi: highIntelligenceUiRo,
@@ -4288,6 +4817,7 @@ const translations: Record<LangCode, Translations> = {
       home: 'Início',
       cetApp: 'App CET',
       tokenomics: 'Tokenomia',
+      cetuia: 'Mapa Cetățuia',
       rwa: 'RWA',
       cetAi: 'CET AI',
       roadmap: 'Roteiro',
@@ -4339,7 +4869,18 @@ const translations: Record<LangCode, Translations> = {
       miningDescription: 'Mining overview and calculator for Solaris CET (landing section).',
       accessibilityTitle: 'Accessibility | Solaris CET',
       accessibilityDescription: 'Accessibility statement for the Solaris CET website.',
+      responsibleDisclosureTitle: 'Divulgação responsável | Solaris CET',
+      responsibleDisclosureDescription: 'Como reportar problemas de segurança de forma segura e responsável.',
+      bugBountyTitle: 'Bug Bounty | Solaris CET',
+      bugBountyDescription: 'Âmbito, regras e diretrizes de recompensa para investigadores de segurança.',
+      blogTitle: 'Blog | Solaris CET',
+      blogDescription: 'Articles, updates, and security notes for Solaris CET.',
+      blogCrumb: 'Blog',
+      newsletterConfirmTitle: 'Newsletter confirmation | Solaris CET',
+      newsletterConfirmDescription: 'Confirm your Solaris CET newsletter subscription.',
     },
+    blog: blogEn,
+    newsletterConfirm: newsletterConfirmEn,
     notFound: {
       heading: 'Página não encontrada',
       description: 'A página solicitada não existe ou foi movida.',
@@ -4404,9 +4945,33 @@ const translations: Record<LangCode, Translations> = {
       terms: 'Termos',
       accessibility: 'Acessibilidade',
       contact: 'Contato',
+      responsibleDisclosure: 'Divulgação responsável',
+      bugBounty: 'Bug bounty',
       authorityTrust: 'Confiança e provas',
       sovereignNoJs: 'Soberano (sem JS)',
       github: 'GitHub',
+      releaseNotes: 'Notas de lançamento',
+      reportIssue: 'Reportar um problema',
+    },
+    issueReporter: {
+      title: 'Reportar um problema',
+      description:
+        'Escreva um rascunho curto. Ao enviar, abrimos o formulário do GitHub e copiamos o rascunho para a área de transferência.',
+      typeLabel: 'Tipo',
+      bug: 'Bug',
+      feature: 'Funcionalidade',
+      titleLabel: 'Título',
+      detailsLabel: 'Detalhes',
+      stepsLabel: 'Passos',
+      environmentLabel: 'Ambiente',
+      openOnGithub: 'Abrir no GitHub',
+      toastCopied: 'Rascunho copiado — cole-o no formulário do GitHub',
+      toastCopyFailed: 'Não foi possível copiar o rascunho para a área de transferência',
+      placeholderTitleBug: '[BUG] …',
+      placeholderTitleFeature: '[FEATURE] …',
+      placeholderDetails: 'O que aconteceu e o que você esperava?',
+      placeholderSteps: '1. …\n2. …\n3. …',
+      placeholderEnvironment: 'SO, navegador, Node/npm, commit',
     },
     footerMeta: {
       genesisCertification:
@@ -4581,6 +5146,16 @@ const translations: Record<LangCode, Translations> = {
       tokenomics: 'Tokenomia',
       howToBuy: 'Como comprar',
       community: 'Comunidade',
+    },
+    mobileAppNav: {
+      home: 'Início',
+      wallet: 'Wallet',
+      chat: 'Chat',
+      transactions: 'Transações',
+      settings: 'Configurações',
+      online: 'Online',
+      offline: 'Offline',
+      dataSaver: 'Economia de dados',
     },
     tokenomics: {
       title: 'Tokenomia',
@@ -4761,6 +5336,7 @@ const translations: Record<LangCode, Translations> = {
     howToBuyUi: howToBuyUiEn,
     tokenomicsUi: tokenomicsUiEn,
     footerUi: footerUiEn,
+    cookieUi: cookieUiEn,
     novaAppUi: novaAppUiEn,
     competitionUi: competitionUiEn,
     highIntelligenceUi: highIntelligenceUiEn,
@@ -4790,6 +5366,7 @@ const translations: Record<LangCode, Translations> = {
       home: 'Startseite',
       cetApp: 'CET App',
       tokenomics: 'Tokenomik',
+      cetuia: 'Cetățuia Karte',
       rwa: 'RWA',
       cetAi: 'CET AI',
       roadmap: 'Fahrplan',
@@ -4841,7 +5418,18 @@ const translations: Record<LangCode, Translations> = {
       miningDescription: 'Mining-Übersicht und Rechner für Solaris CET (Landing-Sektion).',
       accessibilityTitle: 'Barrierefreiheit | Solaris CET',
       accessibilityDescription: 'Barrierefreiheitserklärung für die Solaris-CET-Website.',
+      responsibleDisclosureTitle: 'Verantwortungsvolle Offenlegung | Solaris CET',
+      responsibleDisclosureDescription: 'Wie Sicherheitsprobleme sicher und verantwortungsvoll gemeldet werden.',
+      bugBountyTitle: 'Bug Bounty | Solaris CET',
+      bugBountyDescription: 'Scope, Regeln und Reward-Richtlinien für Security-Researcher.',
+      blogTitle: 'Blog | Solaris CET',
+      blogDescription: 'Articles, updates, and security notes for Solaris CET.',
+      blogCrumb: 'Blog',
+      newsletterConfirmTitle: 'Newsletter confirmation | Solaris CET',
+      newsletterConfirmDescription: 'Confirm your Solaris CET newsletter subscription.',
     },
+    blog: blogEn,
+    newsletterConfirm: newsletterConfirmEn,
     notFound: {
       heading: 'Seite nicht gefunden',
       description: 'Die angeforderte Seite existiert nicht oder wurde verschoben.',
@@ -4906,9 +5494,33 @@ const translations: Record<LangCode, Translations> = {
       terms: 'AGB',
       accessibility: 'Barrierefreiheit',
       contact: 'Kontakt',
+      responsibleDisclosure: 'Verantwortungsvolle Offenlegung',
+      bugBounty: 'Bug bounty',
       authorityTrust: 'Vertrauen & Nachweise',
       sovereignNoJs: 'Souverän (ohne JS)',
       github: 'GitHub',
+      releaseNotes: 'Versionshinweise',
+      reportIssue: 'Problem melden',
+    },
+    issueReporter: {
+      title: 'Problem melden',
+      description:
+        'Schreibe einen kurzen Entwurf. Beim Absenden öffnen wir das GitHub-Formular und kopieren den Entwurf in die Zwischenablage.',
+      typeLabel: 'Typ',
+      bug: 'Bug',
+      feature: 'Feature',
+      titleLabel: 'Titel',
+      detailsLabel: 'Details',
+      stepsLabel: 'Schritte',
+      environmentLabel: 'Umgebung',
+      openOnGithub: 'Auf GitHub öffnen',
+      toastCopied: 'Entwurf kopiert — bitte in das GitHub-Formular einfügen',
+      toastCopyFailed: 'Entwurf konnte nicht in die Zwischenablage kopiert werden',
+      placeholderTitleBug: '[BUG] …',
+      placeholderTitleFeature: '[FEATURE] …',
+      placeholderDetails: 'Was ist passiert und was hast du erwartet?',
+      placeholderSteps: '1. …\n2. …\n3. …',
+      placeholderEnvironment: 'OS, Browser, Node/npm, Commit',
     },
     footerMeta: {
       genesisCertification:
@@ -5083,6 +5695,16 @@ const translations: Record<LangCode, Translations> = {
       tokenomics: 'Tokenomik',
       howToBuy: 'So kaufen',
       community: 'Community',
+    },
+    mobileAppNav: {
+      home: 'Start',
+      wallet: 'Wallet',
+      chat: 'Chat',
+      transactions: 'Transaktionen',
+      settings: 'Einstellungen',
+      online: 'Online',
+      offline: 'Offline',
+      dataSaver: 'Datensparen',
     },
     tokenomics: {
       title: 'Tokenomik',
@@ -5263,6 +5885,7 @@ const translations: Record<LangCode, Translations> = {
     howToBuyUi: howToBuyUiEn,
     tokenomicsUi: tokenomicsUiEn,
     footerUi: footerUiEn,
+    cookieUi: cookieUiEn,
     novaAppUi: novaAppUiEn,
     competitionUi: competitionUiEn,
     highIntelligenceUi: highIntelligenceUiEn,

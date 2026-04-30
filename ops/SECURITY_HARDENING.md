@@ -12,10 +12,6 @@ Aceste fișiere sunt șabloane de configurare pentru hardening la nivel de host 
 - Configuri exemplu în `ops/fail2ban/`.
 - Ținte tipice: `sshd` și (opțional) endpoint-uri sensibile de tip `/api/auth`.
 
-### ModSecurity + OWASP CRS
-
-- Pentru o activare rapidă în Docker, folosește `docker/compose.security.yml` cu imaginea oficială OWASP CRS (reverse-proxy mode).
-
 ### AIDE (integritate fișiere)
 
 - Config exemplu în `ops/aide/aide.conf`.
@@ -25,3 +21,6 @@ Aceste fișiere sunt șabloane de configurare pentru hardening la nivel de host 
 
 - Configuri logrotate exemplu în `ops/logrotate/`.
 
+### Host hardening (Ubuntu)
+
+- Checklist complet: `ops/HOST_HARDENING_UBUNTU.md`.

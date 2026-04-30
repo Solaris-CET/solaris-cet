@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { cn } from '../lib/utils';
+import { type ReactNode,useEffect, useRef, useState } from 'react';
+
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { cn } from '../lib/utils';
 
 export type ScrollFadeUpProps = {
   children: ReactNode;
@@ -24,14 +25,23 @@ export function ScrollFadeUp({
   const prefersReducedMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const prevRmRef = useRef(prefersReducedMotion);
+  const [disableMotion, setDisableMotion] = useState(false);
   /** Intersection-driven visibility; ignored when `prefersReducedMotion` (always shown). */
   const [scrollVisible, setScrollVisible] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const apply = () => setDisableMotion(mq.matches);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, []);
 
   useEffect(() => {
     const wasReducedMotion = prevRmRef.current;
     prevRmRef.current = prefersReducedMotion;
 
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion || disableMotion) return;
 
     const el = ref.current;
     if (!el) return;
@@ -57,16 +67,18 @@ export function ScrollFadeUp({
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [prefersReducedMotion, threshold, rootMargin]);
+  }, [prefersReducedMotion, disableMotion, threshold, rootMargin]);
 
-  const visible = prefersReducedMotion || scrollVisible;
+  const visible = prefersReducedMotion || disableMotion || scrollVisible;
 
   return (
     <div
       ref={ref}
       className={cn(
         !prefersReducedMotion &&
+          !disableMotion &&
           'transition-[opacity,transform] duration-600 ease-out',
+        visible && !prefersReducedMotion && !disableMotion ? 'solaris-fog-reveal' : '',
         visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[30px]',
         className
       )}

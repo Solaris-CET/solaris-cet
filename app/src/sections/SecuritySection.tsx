@@ -1,19 +1,20 @@
+import {
+  Anchor,
+  BadgeCheck,
+  CheckCircle,
+  Code,
+  FileSearch,
+  Lock,
+  Shield,
+  Sparkles,
+  UserCheck,
+} from 'lucide-react';
+import { useMemo } from 'react';
+
+import { ByzantineConsensusVisualization } from '@/components/ByzantineConsensusVisualization';
+import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
-import {
-  Shield,
-  CheckCircle,
-  FileSearch,
-  UserCheck,
-  Code,
-  Lock,
-  Sparkles,
-  BadgeCheck,
-  Anchor,
-} from 'lucide-react';
-import MeshSkillRibbon from '@/components/MeshSkillRibbon';
-import { ByzantineConsensusVisualization } from '@/components/ByzantineConsensusVisualization';
-import { useMemo } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import {
   PUBLIC_CYBERSCOPE_URL,

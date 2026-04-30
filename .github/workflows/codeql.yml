@@ -58,7 +58,7 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --include=optional --legacy-peer-deps
 
       - name: Build application (for CodeQL analysis)
         run: npm run build --workspace=app

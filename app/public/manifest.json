@@ -1,49 +1,21 @@
 {
-  "name": "Solaris CET — RWA on TON",
+  "name": "Solaris CET",
   "short_name": "Solaris CET",
-  "description": "The world's first AI-native corporate token on TON. 9,000 CET supply. 200,000 autonomous agents. Powered by BRAID Framework and RAV Protocol.",
-  "start_url": "/",
+  "description": "Solaris CET on TON: fixed 9,000 supply, AI-native experience.",
+  "start_url": "/en/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#09090b",
-  "theme_color": "#F2C94C",
-  "orientation": "portrait-primary",
-  "categories": ["finance", "business", "utilities"],
-  "lang": "en",
+  "background_color": "#000000",
+  "theme_color": "#0b0b0b",
   "icons": [
-    {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
   ],
   "shortcuts": [
     {
-      "name": "Buy CET",
-      "short_name": "Buy",
-      "description": "Trade CET on DeDust DEX",
-      "url": "/#how-to-buy",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
-    },
-    {
-      "name": "CET AI",
-      "short_name": "CET AI",
-      "description": "Ask Solaris CET AI (Grok × Gemini RAV)",
-      "url": "/#cet-ai",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
-    },
-    {
-      "name": "Compare vs AI tokens",
-      "short_name": "Compare",
-      "description": "Global competitive matrix (CET vs FET, TAO, AGIX, …)",
-      "url": "/#competition",
+      "name": "CET App",
+      "short_name": "App",
+      "url": "/en/app",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]

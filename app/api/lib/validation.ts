@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { parseTonAddress } from './tonAddress';
 
 export const tonAddressSchema = z

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 
 interface Particle {

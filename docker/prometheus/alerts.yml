@@ -1,6 +1,14 @@
 groups:
   - name: solaris.rules
     rules:
+      - record: solaris_slo_error_ratio_30d
+        expr: >-
+          (sum(increase(solaris_http_requests_total{status=~"5.."}[30d])) / clamp_min(sum(increase(solaris_http_requests_total[30d])), 1e-6))
+
+      - record: solaris_slo_error_budget_remaining_ratio_30d
+        expr: >-
+          clamp_max(clamp_min((0.001 - solaris_slo_error_ratio_30d) / 0.001, 1), 0)
+
       - alert: SolarisInstanceDown
         expr: up{job="solaris"} == 0
         for: 2m
@@ -26,3 +34,51 @@ groups:
           severity: warning
         annotations:
           summary: High average latency (>800ms)
+
+      - alert: SolarisHighLatencyP95
+        expr: >-
+          histogram_quantile(0.95, sum(rate(solaris_http_request_latency_ms_bucket[5m])) by (le)) > 1500
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency p95 (>1500ms)
+
+      - alert: SolarisErrorBudgetBurnFast
+        expr: >-
+          (
+            (sum(rate(solaris_http_requests_total{status=~"5.."}[5m])) / clamp_min(sum(rate(solaris_http_requests_total[5m])), 1e-6)) > 0.001 * 14.4
+          )
+          and
+          (
+            (sum(rate(solaris_http_requests_total{status=~"5.."}[1h])) / clamp_min(sum(rate(solaris_http_requests_total[1h])), 1e-6)) > 0.001 * 14.4
+          )
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Error budget burn (fast)
+
+      - alert: SolarisErrorBudgetBurnSlow
+        expr: >-
+          (
+            (sum(rate(solaris_http_requests_total{status=~"5.."}[30m])) / clamp_min(sum(rate(solaris_http_requests_total[30m])), 1e-6)) > 0.001 * 6
+          )
+          and
+          (
+            (sum(rate(solaris_http_requests_total{status=~"5.."}[6h])) / clamp_min(sum(rate(solaris_http_requests_total[6h])), 1e-6)) > 0.001 * 6
+          )
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: Error budget burn (slow)
+
+      - alert: SolarisCriticalLogEvents
+        expr: >-
+          increase(solaris_log_events_total{kind="server_error"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Critical server errors in logs

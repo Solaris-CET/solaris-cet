@@ -16,7 +16,14 @@
       ],
       "lucide-react": ["../node_modules/lucide-react/dist/lucide-react.d.ts"],
       "sonner": ["../node_modules/sonner/dist/index.d.ts"],
-      "@radix-ui/react-dialog": ["../node_modules/@radix-ui/react-dialog/dist/index.d.ts"]
+      "@radix-ui/react-dialog": ["../node_modules/@radix-ui/react-dialog/dist/index.d.ts"],
+      "jszip": ["../node_modules/jszip/index.d.ts"],
+      "@tonconnect/ui-react": ["../node_modules/@tonconnect/ui-react/lib/index.d.ts"],
+      "@sentry/react": ["../node_modules/@sentry/react/build/types/index.d.ts"],
+      "next-themes": ["../node_modules/next-themes/dist/index.d.ts"],
+      "web-vitals": ["../node_modules/web-vitals/dist/modules/index.d.ts"],
+      "vitest": ["../node_modules/vitest/dist/index.d.ts"],
+      "@testing-library/react": ["../node_modules/@testing-library/react/types/index.d.ts"]
     },
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -37,5 +44,5 @@
     "noUncheckedSideEffectImports": true
   },
   "include": ["src"],
-  "exclude": ["src/__tests__/**", "src/**/*.test.*", "src/**/*.spec.*"]
+  "exclude": ["src/__tests__/**", "src/contract-tests/**", "src/**/*.test.*", "src/**/*.spec.*"]
 }

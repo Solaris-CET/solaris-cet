@@ -25,11 +25,13 @@ const MQ = '(prefers-reduced-motion: reduce)';
 export function useReducedMotion(): boolean {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
+    if (typeof window.matchMedia !== 'function') return false;
     return window.matchMedia(MQ).matches;
   });
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (typeof window.matchMedia !== 'function') return;
 
     const mql = window.matchMedia(MQ);
 

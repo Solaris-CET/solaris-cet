@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef,useState } from 'react';
 
 interface UseIntersectionObserverOptions {
   /** Fraction of the element that must be visible to trigger (default: `0.1`). */
@@ -25,13 +25,13 @@ interface UseIntersectionObserverOptions {
  * return <div ref={elementRef}>{isVisible && <HeavyComponent />}</div>;
  * ```
  */
-export function useIntersectionObserver({
+export function useIntersectionObserver<T extends Element = Element>({
   threshold = 0.1,
   rootMargin = '0px',
   freezeOnceVisible = true,
 }: UseIntersectionObserverOptions = {}) {
   const [isVisible, setIsVisible] = useState(false);
-  const elementRef = useRef<Element>(null);
+  const elementRef = useRef<T>(null);
 
   useEffect(() => {
     const element = elementRef.current;

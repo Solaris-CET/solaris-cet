@@ -1,23 +1,26 @@
-import React, { lazy, Suspense, useRef, useLayoutEffect, useMemo, useEffect, useState } from 'react';
+import { TonConnectButton } from '@tonconnect/ui-react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ShieldCheck, TrendingUp, CheckCircle, ChevronDown, FileText } from 'lucide-react';
-import { useReducedMotion } from '../hooks/useReducedMotion';
-import { useLanguage } from '../hooks/useLanguage';
+import { CheckCircle, ChevronDown, FileText,ShieldCheck, TrendingUp } from 'lucide-react';
+import React, { lazy, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+
+import AppImage from '@/components/AppImage';
+import { CetSymbol } from '@/components/CetSymbol';
+import { useCommunityProof } from '@/hooks/use-community-proof';
+import { useLivePoolData } from '@/hooks/use-live-pool-data';
+import { useDemoBeatAudio } from '@/hooks/useDemoBeatAudio';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useSessionSeed } from '@/hooks/useSessionSeed';
-import { useDemoBeatAudio } from '@/hooks/useDemoBeatAudio';
-import { formatCetSupplyWithSuffix, formatTaskAgentMeshHeadline } from '@/lib/numerals';
-import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '../components/ui/tooltip';
-import { TonConnectButton } from '@tonconnect/ui-react';
-import SolarRaysCoinsCanvas from '../components/SolarRaysCoinsCanvas';
-import QuantumFieldCanvas from '../components/QuantumFieldCanvas';
-import AnimatedCounter from '../components/AnimatedCounter';
-import { useLivePoolData } from '@/hooks/use-live-pool-data';
-import { useCommunityProof } from '@/hooks/use-community-proof';
-import CetAiSearch from '../components/CetAiSearch';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
-import { CetSymbol } from '@/components/CetSymbol';
+import { formatCetSupplyWithSuffix, formatTaskAgentMeshHeadline } from '@/lib/numerals';
+
+import AnimatedCounter from '../components/AnimatedCounter';
+import CetAiSearch from '../components/CetAiSearch';
+import QuantumFieldCanvas from '../components/QuantumFieldCanvas';
+import SolarRaysCoinsCanvas from '../components/SolarRaysCoinsCanvas';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
+import { useLanguage } from '../hooks/useLanguage';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 const HeroTokenHologram = lazy(() => import('@/experience/HeroTokenHologram'));
 
@@ -277,7 +280,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
     const update = () => {
       raf = 0;
       const y = Math.max(-160, -window.scrollY * 0.3);
-      bg.style.transform = `translate3d(0, ${y}px, 0)`;
+      bg.style.setProperty('--hero-scroll-y-px', `${y}px`);
     };
 
     const onScroll = () => {
@@ -290,7 +293,72 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
     return () => {
       window.removeEventListener('scroll', onScroll);
       if (raf) window.cancelAnimationFrame(raf);
-      bg.style.transform = '';
+      bg.style.removeProperty('--hero-scroll-y-px');
+    };
+  }, [prefersReducedMotion, superCinematic]);
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    if (superCinematic) return;
+    if (typeof window === 'undefined') return;
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+    const el = containerRef.current;
+    const bg = backgroundRef.current;
+    if (!el || !bg) return;
+    const isBelowDesktop = window.matchMedia('(max-width: 1023px)').matches;
+    if (isBelowDesktop) return;
+
+    const maxX = 10;
+    const maxY = 8;
+    const pos = { x: 0, y: 0 };
+    const target = { x: 0, y: 0 };
+    let raf = 0;
+
+    const commit = () => {
+      raf = 0;
+      pos.x += (target.x - pos.x) * 0.14;
+      pos.y += (target.y - pos.y) * 0.14;
+      bg.style.setProperty('--hero-parallax-x-px', `${pos.x.toFixed(2)}px`);
+      bg.style.setProperty('--hero-parallax-y-px', `${pos.y.toFixed(2)}px`);
+      if (Math.abs(pos.x - target.x) > 0.2 || Math.abs(pos.y - target.y) > 0.2) {
+        raf = window.requestAnimationFrame(commit);
+      }
+    };
+
+    const schedule = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(commit);
+    };
+
+    const onMove = (e: PointerEvent) => {
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const nx = r.width > 0 ? (e.clientX - cx) / (r.width / 2) : 0;
+      const ny = r.height > 0 ? (e.clientY - cy) / (r.height / 2) : 0;
+      target.x = Math.max(-1, Math.min(1, nx)) * maxX;
+      target.y = Math.max(-1, Math.min(1, ny)) * maxY;
+      schedule();
+    };
+
+    const onLeave = () => {
+      target.x = 0;
+      target.y = 0;
+      schedule();
+    };
+
+    el.addEventListener('pointermove', onMove, { passive: true });
+    el.addEventListener('pointerleave', onLeave, { passive: true });
+
+    bg.style.setProperty('--hero-parallax-x-px', '0px');
+    bg.style.setProperty('--hero-parallax-y-px', '0px');
+
+    return () => {
+      el.removeEventListener('pointermove', onMove);
+      el.removeEventListener('pointerleave', onLeave);
+      if (raf) window.cancelAnimationFrame(raf);
+      bg.style.removeProperty('--hero-parallax-x-px');
+      bg.style.removeProperty('--hero-parallax-y-px');
     };
   }, [prefersReducedMotion, superCinematic]);
 
@@ -298,7 +366,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
     <TooltipProvider>
       <section
         ref={containerRef}
-        className="relative min-h-dvh bg-[color:var(--solaris-void)] overflow-x-hidden lg:overflow-hidden flex flex-col justify-center items-center pt-20 pb-16 lg:pb-24 lg:pt-16"
+        className="relative min-h-[100svh] min-h-dvh bg-[color:var(--solaris-void)] overflow-x-hidden lg:overflow-hidden flex flex-col justify-center items-center pt-20 pb-16 lg:pb-24 lg:pt-16"
       >
         {isDemoRoute ? (
           <div
@@ -335,7 +403,15 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
             SOUND {demoSound ? 'ON' : 'OFF'}
           </button>
         ) : null}
-        <div ref={backgroundRef} className="absolute inset-0 z-0 overflow-hidden pointer-events-none will-change-transform" aria-hidden>
+        <div
+          ref={backgroundRef}
+          className="absolute inset-0 z-0 overflow-hidden pointer-events-none will-change-transform"
+          aria-hidden
+          style={{
+            transform:
+              'translate3d(var(--hero-parallax-x-px, 0px), calc(var(--hero-scroll-y-px, 0px) + var(--hero-parallax-y-px, 0px)), 0)',
+          }}
+        >
           {/* Layer 1 — fond de bază */}
           <div className="absolute inset-0 bg-[#020510]" />
 
@@ -354,7 +430,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
           {/* Layer 2+3 mobile — gradient static optimizat */}
           <div className="absolute inset-0 sm:hidden">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_22%,rgba(242,201,76,0.16)_0%,transparent_55%),radial-gradient(circle_at_80%_70%,rgba(46,231,255,0.08)_0%,transparent_50%)]" />
-            <img
+            <AppImage
               src="/hero-coin.png"
               alt=""
               className="absolute right-[-20%] bottom-[-10%] w-[520px] max-w-none opacity-35 blur-[0.2px]"

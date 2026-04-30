@@ -2,11 +2,18 @@
  * POST /api/auth — sync TON wallet → PostgreSQL (users).
  * Node.js runtime (Postgres TCP). Do not set runtime to 'edge'.
  */
-import { eq } from 'drizzle-orm';
+import crypto from 'node:crypto';
+
+import { and, eq, isNull, or, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
-import { getAllowedOrigin } from '../lib/cors';
+
 import { getDb, schema } from '../../db/client';
+import { findReferrerByCode, todayKeyUtc } from '../gamification/lib/gamification';
+import { clientIp } from '../lib/clientIp';
+import { getAllowedOrigin } from '../lib/cors';
 import { getJwtSecretsFromEnv, signJwt, verifyJwtWithSecrets } from '../lib/jwt';
+import { awardPoints } from '../lib/points';
+import { withRateLimit } from '../lib/rateLimit';
 import { tonAddressSchema } from '../lib/validation';
 
 export const config = { runtime: 'nodejs' };
@@ -22,32 +29,54 @@ function isUniqueViolation(err: unknown): boolean {
 
 const JWT_TTL_SECONDS = 60 * 60;
 
-function clientIp(req: Request): string | null {
-  const xf = req.headers.get('x-forwarded-for');
-  if (xf) {
-    const first = xf.split(',')[0]?.trim();
-    if (first) return first.slice(0, 200);
-  }
-  return null;
+function normalizeReferralCode(input: unknown): string | null {
+  if (typeof input !== 'string') return null;
+  const code = input.trim().toUpperCase();
+  if (!code) return null;
+  if (!/^[A-Z0-9_-]{4,20}$/.test(code)) return null;
+  return code;
+}
+
+function sha256Hex(input: string): string {
+  return crypto.createHash('sha256').update(input).digest('hex');
 }
 
 export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
   const allowedOrigin = getAllowedOrigin(origin);
 
+  if (origin && allowedOrigin !== origin) {
+    return new Response(JSON.stringify({ error: 'Forbidden' }), {
+      status: 403,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': allowedOrigin,
+        Vary: 'Origin',
+        'Cache-Control': 'no-store',
+      },
+    });
+  }
+
   if (req.method === 'OPTIONS') {
     return new Response(null, {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowedOrigin,
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         Vary: 'Origin',
       },
     });
   }
 
   if (req.method === 'GET' || req.method === 'DELETE') {
+    const limited = await withRateLimit(req, allowedOrigin, {
+      keyPrefix: 'auth-read',
+      limit: req.method === 'DELETE' ? 10 : 120,
+      windowSeconds: 60,
+    });
+    if (limited) return limited;
+
     const auth = req.headers.get('Authorization') ?? '';
     const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
     const secrets = getJwtSecretsFromEnv();
@@ -118,6 +147,13 @@ export default async function handler(req: Request): Promise<Response> {
     });
   }
 
+  const limited = await withRateLimit(req, allowedOrigin, {
+    keyPrefix: 'auth-write',
+    limit: 5,
+    windowSeconds: 60,
+  });
+  if (limited) return limited;
+
   try {
     let body: unknown;
     try {
@@ -152,6 +188,14 @@ export default async function handler(req: Request): Promise<Response> {
       });
     }
     const walletAddress = parsedWallet.data.toString();
+    const referralCode =
+      typeof body === 'object' && body !== null && 'referralCode' in body
+        ? normalizeReferralCode((body as { referralCode?: unknown }).referralCode)
+        : null;
+    const inviteToken =
+      typeof body === 'object' && body !== null && 'inviteToken' in body && typeof (body as { inviteToken?: unknown }).inviteToken === 'string'
+        ? (body as { inviteToken: string }).inviteToken.trim().slice(0, 200)
+        : '';
 
     const db = getDb();
 
@@ -161,7 +205,13 @@ export default async function handler(req: Request): Promise<Response> {
       .where(eq(schema.users.walletAddress, walletAddress));
 
     if (existing) {
-    const secret = getJwtSecretsFromEnv()[0];
+      const day = todayKeyUtc();
+      try {
+        await awardPoints(db, existing.id, 5, 'wallet', { dedupeKey: 'wallet_connect', meta: { activity: 'wallet_connect', day } });
+      } catch {
+        void 0;
+      }
+      const secret = getJwtSecretsFromEnv()[0];
       let token: string | undefined;
       if (secret) {
         try {
@@ -201,6 +251,82 @@ export default async function handler(req: Request): Promise<Response> {
             points: 0,
           })
           .returning();
+
+        if (referralCode) {
+          try {
+            const ref = await findReferrerByCode(db, referralCode);
+            if (ref && ref.userId !== newUser.id) {
+              const day = todayKeyUtc();
+              await db
+                .insert(schema.referrals)
+                .values({ referrerUserId: ref.userId, referredUserId: newUser.id, codeUsed: referralCode });
+              await awardPoints(db, ref.userId, 10, 'referral', {
+                dedupeKey: `referral:referrer:${newUser.id}`,
+                meta: { referredUserId: newUser.id, activity: 'referral', day, codeUsed: referralCode },
+              });
+              await awardPoints(db, newUser.id, 10, 'referral', {
+                dedupeKey: `referral:referred:${ref.userId}`,
+                meta: { referrerUserId: ref.userId, activity: 'referral', day, codeUsed: referralCode },
+              });
+            }
+          } catch {
+            void 0;
+          }
+        }
+
+        if (inviteToken) {
+          try {
+            const tokenHash = sha256Hex(inviteToken);
+            const now = new Date();
+            const [invite] = await db
+              .select({
+                id: schema.userInvites.id,
+                createdByUserId: schema.userInvites.createdByUserId,
+                usedCount: schema.userInvites.usedCount,
+                maxUses: schema.userInvites.maxUses,
+              })
+              .from(schema.userInvites)
+              .where(
+                and(
+                  eq(schema.userInvites.tokenHash, tokenHash),
+                  isNull(schema.userInvites.revokedAt),
+                  or(isNull(schema.userInvites.expiresAt), sql`${schema.userInvites.expiresAt} >= ${now}`),
+                  sql`${schema.userInvites.usedCount} < ${schema.userInvites.maxUses}`,
+                ),
+              )
+              .limit(1);
+
+            if (invite && invite.createdByUserId !== newUser.id) {
+              await db
+                .insert(schema.userInviteUses)
+                .values({ inviteId: invite.id, usedByUserId: newUser.id })
+                .onConflictDoNothing();
+              await db
+                .update(schema.userInvites)
+                .set({ usedCount: sql`${schema.userInvites.usedCount} + 1` })
+                .where(and(eq(schema.userInvites.id, invite.id), sql`${schema.userInvites.usedCount} < ${schema.userInvites.maxUses}`));
+
+              const day = todayKeyUtc();
+              await awardPoints(db, invite.createdByUserId, 5, 'invite', {
+                dedupeKey: `invite:inviter:${newUser.id}`,
+                meta: { invitedUserId: newUser.id, inviteId: invite.id, activity: 'invite', day },
+              });
+              await awardPoints(db, newUser.id, 5, 'invite', {
+                dedupeKey: `invite:joined:${invite.id}`,
+                meta: { inviterUserId: invite.createdByUserId, inviteId: invite.id, activity: 'invite', day },
+              });
+            }
+          } catch {
+            void 0;
+          }
+        }
+
+        const day = todayKeyUtc();
+        try {
+          await awardPoints(db, newUser.id, 5, 'wallet', { dedupeKey: 'wallet_connect', meta: { activity: 'wallet_connect', day } });
+        } catch {
+          void 0;
+        }
 
         const secret = getJwtSecretsFromEnv()[0];
         let token: string | undefined;

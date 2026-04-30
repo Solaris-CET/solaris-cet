@@ -1,9 +1,9 @@
 import {
   deepLatticeLineForQuery,
-  observeLocusBranchFromTopic,
-  observeLocusClip,
   meshStandardBurstFromKey,
   meshWhisperFromKey,
+  observeLocusBranchFromTopic,
+  observeLocusClip,
   skillSeedFromLabel,
 } from '@/lib/meshSkillFeed';
 

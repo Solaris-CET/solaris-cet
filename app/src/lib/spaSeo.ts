@@ -1,4 +1,4 @@
-import { URL_LOCALES, type UrlLocale, localizePathname, shouldLocalePrefixPathname } from '@/i18n/urlRouting'
+import { localizePathname, shouldLocalePrefixPathname,URL_LOCALES, type UrlLocale } from '@/i18n/urlRouting'
 
 export type SpaSeoConfig = {
   origin: string
@@ -6,6 +6,7 @@ export type SpaSeoConfig = {
   locale: UrlLocale
   title: string
   description: string
+  keywords?: string
   ogType?: 'website' | 'article'
   noindex?: boolean
   jsonLd?: unknown
@@ -44,6 +45,8 @@ function upsertJsonLd(id: string, payload: unknown) {
   const script = existing ?? document.createElement('script')
   script.id = id
   script.setAttribute('type', 'application/ld+json')
+  const nonce = document.querySelector('script[nonce]')?.getAttribute('nonce')
+  if (nonce) script.setAttribute('nonce', nonce)
   script.textContent = JSON.stringify(payload)
   if (!existing) document.head.appendChild(script)
 }
@@ -56,7 +59,11 @@ export function applySpaSeo(config: SpaSeoConfig) {
   const ogType = config.ogType ?? 'website'
 
   document.title = config.title
+  setMeta('meta[name="title"]', config.title)
   setMeta('meta[name="description"]', config.description)
+  if (typeof config.keywords === 'string' && config.keywords.trim()) {
+    setMeta('meta[name="keywords"]', config.keywords.trim())
+  }
   setMeta('meta[property="og:url"]', absoluteUrl)
   setMeta('meta[property="og:type"]', ogType)
   setMeta('meta[property="og:title"]', config.title)
@@ -64,17 +71,9 @@ export function applySpaSeo(config: SpaSeoConfig) {
   const ogLocale =
     config.locale === 'ro'
       ? 'ro_RO'
-      : config.locale === 'de'
-        ? 'de_DE'
-        : config.locale === 'es'
-          ? 'es_ES'
-          : config.locale === 'pt'
-            ? 'pt_PT'
-            : config.locale === 'ru'
-              ? 'ru_RU'
-              : config.locale === 'zh'
-                ? 'zh_CN'
-                : 'en_US'
+      : config.locale === 'es'
+        ? 'es_ES'
+        : 'en_US'
   setMeta('meta[property="og:locale"]', ogLocale)
   setMeta('meta[name="twitter:url"]', absoluteUrl)
   setMeta('meta[name="twitter:title"]', config.title)
@@ -86,7 +85,8 @@ export function applySpaSeo(config: SpaSeoConfig) {
     const localized = prefix ? localizePathname(pathnameNoLocale, l) : pathnameNoLocale
     setLink(`#hreflang-${l}`, `${config.origin}${localized === '/' ? '' : localized}`)
   }
-  setLink('#hreflang-x-default', `${config.origin}${pathnameNoLocale === '/' ? '' : pathnameNoLocale}`)
+  const xDefault = prefix ? localizePathname(pathnameNoLocale, 'en') : pathnameNoLocale
+  setLink('#hreflang-x-default', `${config.origin}${xDefault === '/' ? '' : xDefault}`)
 
   upsertJsonLd('spa-jsonld', config.jsonLd ?? null)
 }

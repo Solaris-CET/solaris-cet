@@ -15,7 +15,9 @@ function normalizePathname(raw: string) {
 }
 
 export function isLikelyFileRequest(pathname: string) {
-  return /\.[a-z0-9]{1,8}$/i.test(pathname);
+  const p = normalizePathname(pathname);
+  const last = p.split('/').pop() ?? '';
+  return last.includes('.') && !p.startsWith('/.well-known/');
 }
 
 export function shouldLocalePrefixPathname(pathnameRaw: string) {

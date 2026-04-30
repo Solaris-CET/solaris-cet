@@ -1,0 +1,29 @@
+name: Load Test — K6 Smoke
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Base URL to test"
+        required: false
+        default: "https://solaris-cet.com"
+
+permissions:
+  contents: read
+
+jobs:
+  k6:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run k6 smoke
+        uses: grafana/k6-action@v0.3.1
+        env:
+          BASE_URL: ${{ inputs.base_url || 'https://solaris-cet.com' }}
+        with:
+          filename: loadtest/k6-smoke.js
+

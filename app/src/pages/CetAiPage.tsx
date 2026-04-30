@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
-import { useLanguage } from '@/hooks/useLanguage';
+
 import CetAiSearch from '@/components/CetAiSearch';
+import { useLanguage } from '@/hooks/useLanguage';
 import { cn } from '@/lib/utils';
 
 function setGlowVars(el: HTMLElement, clientX: number, clientY: number) {
@@ -19,6 +20,15 @@ function clearGlowVars(el: HTMLElement) {
 export default function CetAiPage() {
   const { t } = useLanguage();
   const suggested = useMemo(() => t.cetAi.suggestedQuestions.slice(0, 6), [t]);
+  const sharePrompt = useMemo(() => {
+    try {
+      const url = new URL(window.location.href);
+      const v = url.searchParams.get('share');
+      return v ? v.slice(0, 1400) : undefined;
+    } catch {
+      return undefined;
+    }
+  }, []);
 
   return (
     <main
@@ -35,7 +45,7 @@ export default function CetAiPage() {
       >
         <div className="section-padding-x mx-auto grid max-w-[1200px] gap-10 lg:grid-cols-2 lg:gap-12">
           <div className="min-w-0">
-            <CetAiSearch />
+            <CetAiSearch initialPrompt={sharePrompt} />
           </div>
 
           <div className="min-w-0">

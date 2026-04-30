@@ -1,5 +1,5 @@
 import { getAllowedOrigin } from '../lib/cors';
-import { withUpstashRateLimit } from '../lib/rateLimit';
+import { withRateLimit } from '../lib/rateLimit';
 
 export const config = { runtime: 'edge' };
 
@@ -13,6 +13,18 @@ export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
   const allowedOrigin = getAllowedOrigin(origin);
 
+  if (origin && allowedOrigin !== origin) {
+    return new Response(JSON.stringify({ error: 'Forbidden' }), {
+      status: 403,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': allowedOrigin,
+        Vary: 'Origin',
+        'Cache-Control': 'no-store',
+      },
+    });
+  }
+
   if (req.method === 'OPTIONS') {
     return new Response(null, {
       status: 204,
@@ -20,7 +32,7 @@ export default async function handler(req: Request): Promise<Response> {
         'Access-Control-Allow-Origin': allowedOrigin,
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
-        'Vary': 'Origin',
+        Vary: 'Origin',
       },
     });
   }
@@ -32,7 +44,7 @@ export default async function handler(req: Request): Promise<Response> {
     });
   }
 
-  const limited = await withUpstashRateLimit(req, allowedOrigin, {
+  const limited = await withRateLimit(req, allowedOrigin, {
     keyPrefix: 'waitlist',
     limit: 6,
     windowSeconds: 60,

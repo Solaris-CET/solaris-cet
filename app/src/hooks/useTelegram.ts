@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 
 interface TelegramWebApp {
   expand: () => void;
@@ -46,6 +46,7 @@ declare global {
     Telegram?: {
       WebApp: TelegramWebApp;
     };
+    __SOLARIS_TG_THEME_PARAMS__?: TelegramWebApp['themeParams'];
   }
 }
 
@@ -61,34 +62,45 @@ const getTelegramWebApp = (): TelegramWebApp | null => {
 };
 
 export const useTelegram = (): UseTelegramResult => {
-  // Lazily detect Telegram WebApp at initialization time (not inside an effect)
-  const [tg] = useState<TelegramWebApp | null>(getTelegramWebApp);
+  const [tg, setTg] = useState<TelegramWebApp | null>(null);
   const isTelegram = tg !== null;
 
-  useEffect(() => {
-    if (!tg) return;
-
-    tg.expand();
-    tg.ready();
-    tg.enableClosingConfirmation();
-
-    // Apply Telegram theme colours as CSS variables
-    if (tg.themeParams.bg_color) {
-      document.documentElement.style.setProperty(
-        '--tg-theme-bg-color',
-        tg.themeParams.bg_color
-      );
+  useLayoutEffect(() => {
+    const forcedTheme = window.__SOLARIS_TG_THEME_PARAMS__;
+    if (forcedTheme?.bg_color) {
+      document.documentElement.style.setProperty('--tg-theme-bg-color', forcedTheme.bg_color);
     }
-    if (tg.themeParams.text_color) {
-      document.documentElement.style.setProperty(
-        '--tg-theme-text-color',
-        tg.themeParams.text_color
-      );
+    if (forcedTheme?.text_color) {
+      document.documentElement.style.setProperty('--tg-theme-text-color', forcedTheme.text_color);
     }
-  }, [tg]);
+
+    const webApp = getTelegramWebApp();
+    if (!webApp) return;
+
+    setTg(webApp);
+
+    webApp.expand();
+    webApp.ready();
+    webApp.enableClosingConfirmation();
+
+    if (webApp.themeParams.bg_color) {
+      document.documentElement.style.setProperty('--tg-theme-bg-color', webApp.themeParams.bg_color);
+    }
+    if (webApp.themeParams.text_color) {
+      document.documentElement.style.setProperty('--tg-theme-text-color', webApp.themeParams.text_color);
+    }
+  }, []);
 
   const haptic = (style: 'light' | 'medium' | 'heavy' = 'light') => {
     tg?.HapticFeedback?.impactOccurred(style);
+    try {
+      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+        const ms = style === 'heavy' ? 26 : style === 'medium' ? 18 : 12;
+        navigator.vibrate?.(ms);
+      }
+    } catch {
+      void 0;
+    }
   };
 
   return { isTelegram, tg, haptic };

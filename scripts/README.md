@@ -10,6 +10,8 @@ Small Node utilities used from the **repository root** (not the Vite app in `app
 | [encrypt-key.mjs](./encrypt-key.mjs) | Encrypt API keys for production env (`*_ENC` + `ENCRYPTION_SECRET`); see header comment for usage |
 | [sync-sovereign-to-public.mjs](./sync-sovereign-to-public.mjs) | Copies `static/sovereign/` → `app/public/sovereign/` (runs `prebuild` / `predev` in `app/` for OMEGA zero-JS surface at `/sovereign/`) |
 | [ton-indexer.ts](./ton-indexer.ts) | DeDust / TON indexer (used by `.github/workflows/ton-indexer.yml`) |
+| [load-test.yml](./load-test.yml) | Artillery scenario (homepage + sovereign + one API POST) for quick load checks |
+| [k6/smoke.js](./k6/smoke.js) | k6 smoke test (homepage + health + optional `/api/chat`) |
 
 ## Commands
 

@@ -1,5 +1,6 @@
-import { test, expect } from '@playwright/test';
-import { waitForAppReady, scrollUntilSelectorAttached } from './e2e-helpers';
+import { expect,test } from '@playwright/test';
+
+import { scrollUntilSelectorAttached,waitForAppReady } from './e2e-helpers';
 
 /**
  * Conversion UX — hero next-step row + mobile dock (PR 378/379 follow-up).

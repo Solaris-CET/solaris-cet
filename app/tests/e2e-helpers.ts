@@ -1,8 +1,16 @@
 import { expect, type Page } from '@playwright/test';
 
 export async function waitForAppReady(page: Page, options?: { timeout?: number }) {
-  const timeout = options?.timeout ?? 4000;
-  await page.locator('.loading-overlay').waitFor({ state: 'hidden', timeout }).catch(() => {});
+  const timeout = options?.timeout ?? 15_000;
+  await page.waitForFunction(() => {
+    const root = document.getElementById('root');
+    return Boolean(root && root.childElementCount > 0);
+  }, { timeout });
+
+  const overlay = page.locator('.loading-overlay');
+  if ((await overlay.count()) > 0) {
+    await overlay.waitFor({ state: 'hidden', timeout });
+  }
 }
 
 /**
@@ -16,7 +24,7 @@ export async function scrollUntilSelectorAttached(
   options?: { timeout?: number; stepPx?: number; intervals?: number[] },
 ) {
   const timeout = options?.timeout ?? 45_000;
-  const stepPx = options?.stepPx ?? 900;
+  const stepPx = options?.stepPx ?? 600;
   const intervals = options?.intervals ?? [100, 200, 300, 400, 500];
 
   await expect

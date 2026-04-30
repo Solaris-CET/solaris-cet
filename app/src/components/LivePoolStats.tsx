@@ -1,10 +1,12 @@
-import { Activity, RefreshCw, ExternalLink } from 'lucide-react';
-import { useLivePoolData } from '../hooks/use-live-pool-data';
-import { useLanguage } from '../hooks/useLanguage';
-import { formatUsd, formatPrice } from '../lib/utils';
-import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+import { Activity, ExternalLink,RefreshCw } from 'lucide-react';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import { DEDUST_POOL_PAGE_URL } from '@/lib/dedustUrls';
+import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+
+import { useLivePoolData } from '../hooks/use-live-pool-data';
+import { useLanguage } from '../hooks/useLanguage';
+import { formatPrice,formatUsd } from '../lib/utils';
 
 const LivePoolStats = () => {
   const { t } = useLanguage();
@@ -88,8 +90,10 @@ const LivePoolStats = () => {
         <div
           className="grid grid-cols-2 lg:grid-cols-4 gap-3"
           aria-busy={loading}
-          aria-label={loading ? t.livePool.loadingAria : undefined}
+          aria-live={loading ? 'polite' : undefined}
+          aria-atomic={loading ? true : undefined}
         >
+          {loading ? <span className="sr-only">{t.livePool.loadingAria}</span> : null}
           {loading
             ? Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="p-3 rounded-lg bg-white/5 space-y-2">

@@ -1,7 +1,8 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
+import { TOKEN_DECIMALS } from '@/constants/token';
 import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';
 import { DEDUST_POOL_ADDRESS } from '@/lib/dedustUrls';
-import { TOKEN_DECIMALS } from '@/constants/token';
 
 /**
  * Pure helpers aligned with `use-live-pool-data` reserve / volume parsing.

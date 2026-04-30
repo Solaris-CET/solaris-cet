@@ -12,10 +12,11 @@
  * Usage
  * ──────────────────────────────────────────────────────────────────────────
  *   const { runInference, queryMemory, isReady, backend, memoryStats } =
- *     useAiWorker({ onResult: (out) => console.log(out.scores) });
+ *     useAiWorker({ onResult: (out) => setScores(out.scores) });
  */
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+
 import type {
   AnalyticsInput,
   AnalyticsOutput,

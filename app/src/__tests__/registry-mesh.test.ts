@@ -1,11 +1,5 @@
-import { describe, it, expect } from "vitest";
-import {
-  SKILL_ALLELE_SPACE,
-  NOMINAL_SKILL_UNIVERSE,
-  synthesizeMeshSkills,
-  formatBigSpace,
-  expressSkillForFeed,
-} from "@/lib/skillGenome";
+import { describe, expect,it } from "vitest";
+
 import { solarisDepartments } from "@/data/solarisDepartments";
 import {
   AGENT_BOARD_DEPT_TO_MESH_ID,
@@ -13,6 +7,13 @@ import {
   buildSkillLatticePayload,
   truncateBoardSkillMessage,
 } from "@/lib/agentBoardSkillMix";
+import {
+  expressSkillForFeed,
+  formatBigSpace,
+  NOMINAL_SKILL_UNIVERSE,
+  SKILL_ALLELE_SPACE,
+  synthesizeMeshSkills,
+} from "@/lib/skillGenome";
 
 describe("skillGenome", () => {
   it("allele space, nominal universe, formatting, synthesis tiers, uniqueness, feed line", () => {

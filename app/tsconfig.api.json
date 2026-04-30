@@ -20,6 +20,7 @@
     "src/lib/brandAssetFilenames.ts",
     "src/lib/cetAiConstants.ts",
     "src/lib/cetContract.ts",
-    "src/lib/dedustUrls.ts"
+    "src/lib/dedustUrls.ts",
+    "src/lib/bridgeMath.ts"
   ]
 }

@@ -5,12 +5,20 @@
  */
 import { drizzle, type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
+
 import * as schema from './schema';
 
 export type Database = PostgresJsDatabase<typeof schema>;
 
 let sql: ReturnType<typeof postgres> | undefined;
 let db: Database | undefined;
+
+function parseIntEnv(name: string, fallback: number): number {
+  const raw = (process.env[name] ?? '').trim();
+  if (!raw) return fallback;
+  const n = Number.parseInt(raw, 10);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
 
 function connectionString(): string {
   const url = process.env.DATABASE_URL;
@@ -25,7 +33,11 @@ function connectionString(): string {
  */
 export function getDb(): Database {
   if (!db) {
-    sql = postgres(connectionString(), { max: 10 });
+    sql = postgres(connectionString(), {
+      max: parseIntEnv('DATABASE_POOL_MAX', 10),
+      idle_timeout: parseIntEnv('DATABASE_POOL_IDLE_TIMEOUT_SECONDS', 30),
+      connect_timeout: parseIntEnv('DATABASE_POOL_CONNECT_TIMEOUT_SECONDS', 10),
+    });
     db = drizzle(sql, { schema });
   }
   return db;

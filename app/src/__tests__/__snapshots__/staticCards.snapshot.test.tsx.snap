@@ -1,0 +1,196 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Static cards snapshots > BuildSeal snapshot 1`] = `
+<DocumentFragment>
+  <div
+    aria-label="Deployment artifact: short commit unknown, build date . Compare with the repository to verify this deployment."
+    class="pointer-events-none fixed bottom-4 right-4 z-[200] opacity-30 transition-opacity motion-reduce:transition-none hover:pointer-events-auto hover:opacity-100"
+    role="status"
+    title="Deployment artifact: short commit unknown, build date . Compare with the repository to verify this deployment."
+  >
+    <div
+      class="rounded border border-white/10 bg-slate-950/90 px-3 py-1 font-mono text-[9px] tracking-widest text-slate-500 shadow-lg backdrop-blur-sm"
+    >
+      <span
+        aria-hidden="true"
+      >
+        BUILD:
+      </span>
+      <span
+        aria-hidden="true"
+        class="ml-1 text-solaris-gold/80"
+      >
+        unknown
+      </span>
+      <span
+        aria-hidden="true"
+        class="mx-1 text-slate-600"
+      >
+        |
+      </span>
+      <span
+        aria-hidden="true"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Static cards snapshots > HeaderTrustStrip snapshot 1`] = `
+<DocumentFragment>
+  <nav
+    aria-label="Third-party audit and verification shortcuts"
+    class="flex flex-wrap items-center gap-x-2 gap-y-0.5 max-w-[min(100%,14rem)] justify-end"
+  >
+    <a
+      aria-label="Cyberscope (opens in new window)"
+      class="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-solaris-muted hover:text-solaris-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solaris-gold/70 rounded-sm transition-colors whitespace-nowrap py-1.5 px-2"
+      href="https://www.cyberscope.io/"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      Cyberscope
+    </a>
+    <span
+      aria-hidden="true"
+      class="text-solaris-muted/40 text-[10px] select-none"
+    >
+      ·
+    </span>
+    <a
+      aria-label="Freshcoins (opens in new window)"
+      class="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-solaris-muted hover:text-solaris-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solaris-gold/70 rounded-sm transition-colors whitespace-nowrap py-1.5 px-2"
+      href="https://www.freshcoins.io/"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      Freshcoins
+    </a>
+    <span
+      aria-hidden="true"
+      class="text-solaris-muted/40 text-[10px] select-none"
+    >
+      ·
+    </span>
+    <a
+      aria-label="KYC · Whitepaper (opens in new window)"
+      class="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-solaris-muted hover:text-solaris-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solaris-gold/70 rounded-sm transition-colors whitespace-nowrap py-1.5 px-2"
+      href="https://dweb.link/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      KYC · Whitepaper
+    </a>
+  </nav>
+</DocumentFragment>
+`;
+
+exports[`Static cards snapshots > TeamFlipCard snapshot 1`] = `
+<DocumentFragment>
+  <div
+    class="flip-card"
+    data-flipped="false"
+  >
+    <div
+      class="flip-card-inner"
+    >
+      <div
+        class="flip-card-face flip-card-front bento-card p-6 border border-white/10"
+      >
+        <div
+          class="flex flex-col md:flex-row items-center gap-5"
+        >
+          <div
+            class="shrink-0 w-16 h-16 rounded-2xl overflow-hidden border-2 border-solaris-gold/30 bg-solaris-gold/10 flex items-center justify-center"
+          >
+            <span
+              class="font-display font-bold text-2xl text-solaris-gold"
+            >
+              SC
+            </span>
+          </div>
+          <div
+            class="flex-1 text-center md:text-left min-w-0"
+          >
+            <div
+              class="hud-label text-solaris-gold text-[10px] mb-1"
+            >
+              Security
+            </div>
+            <div
+              class="font-display font-semibold text-solaris-text text-lg leading-tight mb-0.5 truncate"
+            >
+              Solaris CET
+            </div>
+            <div
+              class="text-solaris-muted text-xs font-mono"
+            >
+              ↻
+            </div>
+          </div>
+          <button
+            aria-label="Open bio for Solaris CET"
+            class="shrink-0 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-solaris-muted text-sm font-medium hover:bg-white/10 transition-colors"
+            type="button"
+          >
+            ↻
+          </button>
+        </div>
+      </div>
+      <div
+        class="flip-card-face flip-card-back bento-card p-6 border border-white/10"
+      >
+        <div
+          class="flex flex-col gap-4"
+        >
+          <div
+            class="min-w-0"
+          >
+            <div
+              class="hud-label text-solaris-gold text-[10px] mb-1"
+            >
+              Security
+            </div>
+            <div
+              class="font-display font-semibold text-solaris-text text-lg leading-tight truncate"
+            >
+              Solaris CET
+            </div>
+          </div>
+          <div
+            class="text-solaris-muted text-sm leading-relaxed"
+          >
+            Short bio.
+          </div>
+          <div
+            class="flex flex-wrap gap-2"
+          >
+            <a
+              class="px-4 py-2 rounded-xl bg-[#0A66C2]/20 border border-[#0A66C2]/40 text-[#4FC3F7] text-sm font-medium hover:bg-[#0A66C2]/30 transition-colors"
+              href="https://example.com/linkedin"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              LinkedIn
+            </a>
+            <a
+              class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-solaris-text text-sm font-medium hover:bg-white/10 transition-colors"
+              href="https://example.com/x"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              X
+            </a>
+            <button
+              class="px-4 py-2 rounded-xl bg-solaris-gold/10 border border-solaris-gold/25 text-solaris-gold text-sm font-medium hover:bg-solaris-gold/15 transition-colors"
+              type="button"
+            >
+              ↩
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

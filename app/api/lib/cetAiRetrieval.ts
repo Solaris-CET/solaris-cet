@@ -128,6 +128,7 @@ async function tavilySearch(
 
 export async function buildCetAiRetrievalBlock(
   query: string,
+  opts?: { enableWeb?: boolean },
 ): Promise<{ block: string; sources: CetAiRetrievalSource[] }> {
   const queryTokens = new Set(tokenize(query));
   const curated = CURATED_DOCS
@@ -143,7 +144,7 @@ export async function buildCetAiRetrievalBlock(
     }));
 
   const allowlist = parseAllowlist(process.env.CET_AI_WEB_ALLOWLIST);
-  const enabled = process.env.CET_AI_ENABLE_WEB === '1';
+  const enabled = opts?.enableWeb ?? process.env.CET_AI_ENABLE_WEB === '1';
   const tavilyKey = await resolveApiKey(
     process.env.TAVILY_API_KEY_ENC,
     process.env.TAVILY_API_KEY,

@@ -1,5 +1,6 @@
 node_modules/
 app/node_modules/
+cli/node_modules/
 .vercel/
 app/dist/
 app/.api-dist/*
@@ -12,8 +13,12 @@ app/test-results/
 app/playwright-report/
 app/coverage/
 contracts/build/
+cli/dist/
 *.log
 npm-debug.log*
+
+__pycache__/
+*.pyc
 
 # Agent coordination files (created by the GitHub Copilot agent system)
 pulls/
@@ -29,6 +34,18 @@ pulls/
 
 # npm / yarn scoped-package directories dropped at root
 @*/
+
+# Accidental root notes (keep local, never commit)
+/for comms, alerts, chat CRM, web3 modules"
+/for multilingual SEO, markdown blog, newsletter double opt-in"
+/for versioned public api developer portal"
+/hort summary>"
+/ocial community + telegram bot PRD and architecture"
+/ops automation + docs"
+/sets + whitepaper PWA"
+/task05-10 scope routes components ac"
+/tics + tsconfig refs"
+/h
 
 # JavaScript build helpers (Babel runtime, regenerator, etc.)
 *.js.map
@@ -148,3 +165,13 @@ app/coverage/
 
 # Claude Code — personal project overrides (team shares .claude/settings.json)
 .claude/settings.local.json
+
+# Trae IDE generated documents (keep rules/skills under .trae/, ignore generated docs)
+.trae/documents/
+
+# Local scratch markers (keep local, never commit)
+**/_applypatch_ping.txt
+
+# Accidental root files from pasted text
+/h
+/*"

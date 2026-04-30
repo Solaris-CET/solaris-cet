@@ -1,0 +1,42 @@
+name: Contract Tests (Pact)
+
+on:
+  pull_request:
+    branches: ["main"]
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pact:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --include=optional --legacy-peer-deps
+
+      - name: Run Pact contract tests
+        env:
+          PACT_ENABLED: "1"
+        run: npm run test:contract --workspace=app
+
+      - name: Upload Pact contracts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pacts
+          path: app/pacts
+          retention-days: 14
+          if-no-files-found: warn

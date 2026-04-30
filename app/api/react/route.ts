@@ -1,5 +1,5 @@
-import { getAllowedOrigin } from '../lib/cors';
 import { CET_CONTRACT_ADDRESS } from '../../src/lib/cetContract';
+import { getAllowedOrigin } from '../lib/cors';
 
 export const config = { runtime: 'edge' };
 

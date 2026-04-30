@@ -1,7 +1,8 @@
 import { Calendar, ChevronDown } from 'lucide-react';
+
+import { useLanguage } from '@/hooks/useLanguage';
 import type { RwaTimelineEvent } from '@/lib/rwaPortfolio';
 import { timelineChipClass } from '@/lib/rwaPortfolio';
-import { useLanguage } from '@/hooks/useLanguage';
 
 function setGlowVars(el: HTMLElement, clientX: number, clientY: number) {
   const r = el.getBoundingClientRect();

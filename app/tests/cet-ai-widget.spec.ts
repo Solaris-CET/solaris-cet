@@ -1,7 +1,8 @@
-import { test, expect, type Page, type BrowserContext, type Locator } from '@playwright/test';
-import { waitForAppReady } from './e2e-helpers';
-import { CET_AI_MAX_QUERY_CHARS } from '../src/lib/cetAiConstants';
+import { type BrowserContext, expect, type Locator,type Page, test } from '@playwright/test';
+
 import type { LangCode } from '../src/i18n/translations';
+import { CET_AI_MAX_QUERY_CHARS } from '../src/lib/cetAiConstants';
+import { waitForAppReady } from './e2e-helpers';
 
 /** All `LangCode` values except default English — each must have a row in `CET_AI_LOCALE_FIXTURES`. */
 type NonEnLang = Exclude<LangCode, 'en'>;
@@ -19,6 +20,7 @@ async function scrollCetAiHeroIntoView(page: Page): Promise<Locator> {
  */
 async function assertCopyTranscriptMultiTurnOffline(page: Page, context: BrowserContext): Promise<void> {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.route('**/api/ai/ask', (route) => route.abort('failed'));
   await page.route('**/api/chat', (route) => route.abort('failed'));
   await page.evaluate(() => {
     localStorage.removeItem('cet-ai-chat-history');
@@ -64,6 +66,80 @@ test.describe('Solaris CET AI widget — desktop', () => {
     await waitForAppReady(page, { timeout: 5000 });
   });
 
+  test('live multi-turn conversation: initial question + follow-up + sources', async ({ page }) => {
+    test.setTimeout(75_000);
+
+    let call = 0;
+    await page.route('**/api/ai/ask', async (route) => {
+      call += 1;
+      const payload =
+        call === 1
+          ? {
+              response:
+                '[DIAGNOSTIC INTERN]\nFirst reason.\n\n[DECODARE ORACOL]\nFirst act.\n\n[DIRECTIVĂ DE ACȚIUNE]\nFirst observe.\nSOURCES: https://docs.ton.org/',
+              sources: [
+                {
+                  id: 'SRC_001',
+                  title: 'TON Docs',
+                  url: 'https://docs.ton.org/',
+                  snippet: 'TON documentation entry point.',
+                },
+              ],
+            }
+          : {
+              response:
+                '[DIAGNOSTIC INTERN]\nSecond reason.\n\n[DECODARE ORACOL]\nSecond act.\n\n[DIRECTIVĂ DE ACȚIUNE]\nSecond observe.\nSOURCES: https://dedust.io/',
+              sources: [
+                {
+                  id: 'SRC_002',
+                  title: 'DeDust',
+                  url: 'https://dedust.io/',
+                  snippet: 'DeDust DEX.',
+                },
+              ],
+            };
+
+      await route.fulfill({
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Cet-Ai-Source': 'live',
+        },
+        body: JSON.stringify(payload),
+      });
+    });
+
+    await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
+    await page.getByTestId('cet-ai-hero-query').fill('Explain RAV protocol briefly');
+    await page.getByTestId('cet-ai-hero').getByRole('button', { name: /initiate|send/i }).click();
+    await expect(page.getByTestId('cet-ai-modal-dialog')).toBeVisible({ timeout: 8000 });
+
+    await expect(page.getByText(/First act\./)).toBeVisible({ timeout: 25_000 });
+    await expect(page.getByTestId('cet-ai-sources')).toBeVisible({ timeout: 25_000 });
+    await expect(
+      page.getByTestId('cet-ai-sources').getByTestId('cet-ai-source-link').first(),
+    ).toHaveAttribute('href', 'https://docs.ton.org/');
+
+    await page.getByTestId('cet-ai-modal-query').fill('Ok, now give a follow-up action');
+    await page
+      .getByTestId('cet-ai-modal-dialog')
+      .getByRole('button', { name: /Send question/i })
+      .click();
+
+    await expect(page.getByText('Ok, now give a follow-up action', { exact: true })).toBeVisible({
+      timeout: 5000,
+    });
+    await expect(page.getByText(/Second act\./)).toBeVisible({ timeout: 25_000 });
+    await expect(page.getByTestId('cet-ai-sources')).toBeVisible({ timeout: 25_000 });
+    await expect(
+      page.getByTestId('cet-ai-sources').getByTestId('cet-ai-source-link').first(),
+    ).toHaveAttribute('href', 'https://dedust.io/');
+
+    await expect(page.getByText('Explain RAV protocol briefly', { exact: true })).toBeVisible({
+      timeout: 5000,
+    });
+  });
+
   test('CET AI title and initiate control are visible', async ({ page }) => {
     const hero = page.getByTestId('cet-ai-hero');
     await hero.scrollIntoViewIfNeeded();
@@ -87,6 +163,7 @@ test.describe('Solaris CET AI widget — desktop', () => {
   });
 
   test('modal follow-up shows character count when typing (offline)', async ({ page }) => {
+    await page.route('**/api/ai/ask', (route) => route.abort('failed'));
     await page.route('**/api/chat', (route) => route.abort('failed'));
     const heroWidget = await scrollCetAiHeroIntoView(page);
     const chip = heroWidget.getByRole('button', { name: /What is the RAV Protocol/i });
@@ -147,7 +224,8 @@ test.describe('Solaris CET AI widget — desktop', () => {
     await assertCopyTranscriptMultiTurnOffline(page, context);
   });
 
-  test('static mode shows offline hint when /api/chat fails', async ({ page }) => {
+  test('static mode shows offline hint when live API fails', async ({ page }) => {
+    await page.route('**/api/ai/ask', (route) => route.abort('failed'));
     await page.route('**/api/chat', (route) => route.abort('failed'));
     const heroWidget = await scrollCetAiHeroIntoView(page);
     const chip = heroWidget.getByRole('button', { name: /What is the RAV Protocol/i });
@@ -161,8 +239,8 @@ test.describe('Solaris CET AI widget — desktop', () => {
     await expect(offlineHint).toContainText(/built-in|No live API/i);
   });
 
-  test('renders sources list when live /api/chat returns sources', async ({ page }) => {
-    await page.route('**/api/chat', async (route) => {
+  test('renders sources list when live API returns sources', async ({ page }) => {
+    await page.route('**/api/ai/ask', async (route) => {
       await route.fulfill({
         status: 200,
         headers: {
@@ -236,6 +314,7 @@ test.describe('Solaris CET AI widget — mobile viewport', () => {
   });
 
   test('modal follow-up shows character count when typing (offline)', async ({ page }) => {
+    await page.route('**/api/ai/ask', (route) => route.abort('failed'));
     await page.route('**/api/chat', (route) => route.abort('failed'));
     await page.getByTestId('cet-ai-hero').scrollIntoViewIfNeeded();
     const chip = page.getByRole('button', { name: /What is the RAV Protocol/i });

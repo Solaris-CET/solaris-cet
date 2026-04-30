@@ -1,10 +1,11 @@
-import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
-import { ShieldCheck, FileCheck, Globe, Server } from 'lucide-react';
+import { FileCheck, Globe, Server,ShieldCheck } from 'lucide-react';
+import { useLayoutEffect,useRef } from 'react';
+
 import GlowOrbs from '../components/GlowOrbs';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
-import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useLanguage } from '../hooks/useLanguage';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useRegion } from '../hooks/useRegion';
 
 

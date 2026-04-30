@@ -1,17 +1,17 @@
 /**
  * CET AI RAV terminal: mesh lattice lines, agent pool / team whispers, QUANTUM burst lines.
  */
+import { buildRavBurstLogMessage } from './cetAiBurstLines';
 import {
-  CET_AI_LATTICE_PHASE,
   buildAgentPoolMeshLogMessage,
   buildDeepLatticeMeshLogMessage,
   buildSkillLocusLogMessage,
   buildTeamAgentMeshLogMessage,
+  CET_AI_LATTICE_PHASE,
 } from './cetAiMeshLines';
-import { buildRavBurstLogMessage } from './cetAiBurstLines';
 
-export * from './cetAiMeshLines';
 export * from './cetAiBurstLines';
+export * from './cetAiMeshLines';
 
 export const CET_AI_TASK_MESH_LINE =
   'TASK_MESH: ~200k task agents · delegated sub-queries · CET AI consolidation';

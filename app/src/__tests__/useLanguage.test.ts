@@ -2,10 +2,11 @@
  * Pure language-detection + translation smoke (no React hook mount).
  */
 
-import { describe, it, expect } from "vitest";
-import translations from "../i18n/translations";
+import { describe, expect,it } from "vitest";
+
 import { SUPPORTED_LANGS } from "../hooks/useLanguage";
 import type { LangCode } from "../i18n/translations";
+import translations from "../i18n/translations";
 
 function detectLanguage(
   storedValue: string | null,
@@ -22,7 +23,7 @@ function detectLanguage(
 
 describe("useLanguage (pure)", () => {
   it("SUPPORTED_LANGS, detectLanguage matrix, translations parity, storage sim", () => {
-    expect(SUPPORTED_LANGS).toEqual(["en", "es", "zh", "ru", "ro", "pt", "de"]);
+    expect(SUPPORTED_LANGS).toEqual(["en", "ro", "de", "es", "pt", "ru", "zh"]);
     expect(detectLanguage("es", "en-US")).toBe("es");
     expect(detectLanguage("fr", "zh-CN")).toBe("zh");
     expect(detectLanguage(null, "fr-FR")).toBe("en");

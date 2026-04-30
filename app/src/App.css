@@ -1,5 +1,9 @@
 /* Solaris CET - App Styles */
 
+:root {
+  --solaris-announcement-offset: 0px;
+}
+
 /* Skip to main content (accessibility) */
 .skip-to-content {
   position: absolute;
@@ -149,6 +153,116 @@ button, .btn-gold, .btn-filled-gold {
 @media (pointer: coarse) {
   .cursor-glow {
     display: none;
+  }
+}
+
+html.solaris-custom-cursor a,
+html.solaris-custom-cursor button,
+html.solaris-custom-cursor input,
+html.solaris-custom-cursor textarea,
+html.solaris-custom-cursor select,
+html.solaris-custom-cursor label {
+  cursor: none !important;
+}
+
+.solaris-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  border: 1px solid rgba(242, 201, 76, 0.38);
+  box-shadow: 0 0 18px rgba(242, 201, 76, 0.18), 0 0 40px rgba(46, 231, 255, 0.08);
+  background: radial-gradient(circle at 50% 50%, rgba(242, 201, 76, 0.12), transparent 65%);
+  pointer-events: none;
+  z-index: 1200;
+  transform: translate3d(-200px, -200px, 0);
+  transition: width 160ms ease, height 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  mix-blend-mode: screen;
+}
+
+.solaris-cursor-ring[data-down="1"] {
+  width: 26px;
+  height: 26px;
+  border-color: rgba(242, 201, 76, 0.7);
+  box-shadow: 0 0 22px rgba(242, 201, 76, 0.28), 0 0 46px rgba(46, 231, 255, 0.12);
+}
+
+.solaris-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.9), rgba(242, 201, 76, 0.85));
+  pointer-events: none;
+  z-index: 1201;
+  transform: translate3d(-200px, -200px, 0);
+  box-shadow: 0 0 12px rgba(242, 201, 76, 0.5);
+  mix-blend-mode: screen;
+}
+
+.solaris-cursor-dot[data-down="1"] {
+  box-shadow: 0 0 16px rgba(242, 201, 76, 0.7);
+}
+
+.app-image[data-loaded="1"] {
+  animation: none;
+}
+
+.app-image[data-error="1"] {
+  background-image: radial-gradient(circle at 20% 20%, rgba(239, 68, 68, 0.12) 0%, transparent 55%),
+    radial-gradient(circle at 80% 70%, rgba(244, 114, 182, 0.1) 0%, transparent 50%);
+}
+
+@media (max-width: 640px), (pointer: coarse) {
+  .solaris-cursor-ring,
+  .solaris-cursor-dot {
+    display: none;
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  #whitepaper,
+  #whitepaper * {
+    visibility: visible !important;
+  }
+
+  #whitepaper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  #whitepaper .mesh-bg,
+  #whitepaper .grid-floor,
+  #whitepaper .tech-grid,
+  #whitepaper .quantum-ambient-glow,
+  #whitepaper .hero-film-grain,
+  #whitepaper .hero-holo-grid,
+  #whitepaper .hero-holo-scanline {
+    display: none !important;
+  }
+
+  #whitepaper .bento-card,
+  #whitepaper [class*="border-"] {
+    box-shadow: none !important;
+    background: #ffffff !important;
+    border-color: #d1d5db !important;
+  }
+
+  #whitepaper a {
+    color: #000000 !important;
+    text-decoration: underline;
   }
 }
 

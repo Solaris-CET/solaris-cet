@@ -1,6 +1,7 @@
-import type { FaqContent } from './faqContent.types';
+import { TOKEN_DECIMALS,TOKEN_TOTAL_SUPPLY } from '@/constants/token';
 import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';
-import { TOKEN_TOTAL_SUPPLY, TOKEN_DECIMALS } from '@/constants/token';
+
+import type { FaqContent } from './faqContent.types';
 
 type FaqLang = 'en' | 'es' | 'zh' | 'ru' | 'ro' | 'pt' | 'de';
 

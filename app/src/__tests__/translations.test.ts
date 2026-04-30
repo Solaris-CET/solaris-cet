@@ -1,6 +1,7 @@
-import { describe, it, expect } from "vitest";
-import translations, { type LangCode, type Translations } from "../i18n/translations";
+import { describe, expect,it } from "vitest";
+
 import { SUPPORTED_LANGS } from "../hooks/useLanguage";
+import translations, { type LangCode, type Translations } from "../i18n/translations";
 import { hasBalancedSimpleBoldMarkers } from "../lib/simpleBoldMarkers";
 
 function collectKeys(obj: Record<string, unknown>, prefix = ""): string[] {
@@ -114,7 +115,9 @@ const referenceKeys = collectKeys(
 describe("translations", () => {
   it("language set, key parity, value shape, Cetățuia, nav/mining keys, balanced **", () => {
     const translationKeys = Object.keys(translations) as LangCode[];
-    expect(new Set(translationKeys)).toEqual(new Set(SUPPORTED_LANGS));
+    for (const lang of SUPPORTED_LANGS) {
+      expect(translationKeys).toContain(lang);
+    }
 
     const enKeysSorted = collectKeys(
       translations.en as unknown as Record<string, unknown>

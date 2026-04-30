@@ -1,21 +1,23 @@
+import { Coins, Eye, EyeOff,Info } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import { Coins, Info, Eye, EyeOff } from 'lucide-react';
-import { skillSeedFromLabel, standardSkillBurst } from '@/lib/meshSkillFeed';
-import { TOKEN_DECIMALS } from '../constants/token';
-import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
-import { useLanguage, type LangCode } from '@/hooks/useLanguage';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { Cell, Pie, PieChart, ResponsiveContainer,Tooltip } from 'recharts';
+
 import {
   TOKENOMICS_ALLOCATION,
   TOKENOMICS_BURNED_PCT,
   TOKENOMICS_HOLDERS,
   TOKENOMICS_TOTAL_SUPPLY_CET,
-  tokenomicsAmountForPct,
-  tokenomicsTextByLang,
   type TokenomicsAllocation,
   type TokenomicsAllocationId,
+  tokenomicsAmountForPct,
+  tokenomicsTextByLang,
 } from '@/data/tokenomics';
+import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
+import { type LangCode,useLanguage } from '@/hooks/useLanguage';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { skillSeedFromLabel, standardSkillBurst } from '@/lib/meshSkillFeed';
+
+import { TOKEN_DECIMALS } from '../constants/token';
 
 const BENTO_TILE_INTERACTION =
   'transition-all duration-300 hover:!-translate-y-1 hover:!scale-100 hover:!shadow-[0_0_15px_rgba(234,179,8,0.2)]';

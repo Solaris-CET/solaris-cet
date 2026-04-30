@@ -1,10 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
 import {
-  SKILL_ALLELE_SPACE,
-  NOMINAL_SKILL_UNIVERSE,
-  synthesizeMeshSkills,
-  formatBigSpace,
   expressSkillForFeed,
+  formatBigSpace,
+  NOMINAL_SKILL_UNIVERSE,
+  SKILL_ALLELE_SPACE,
+  synthesizeMeshSkills,
 } from '@/lib/skillGenome';
 
 describe('skillGenome', () => {

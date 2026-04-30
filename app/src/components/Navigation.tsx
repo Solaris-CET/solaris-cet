@@ -1,14 +1,6 @@
-import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { ExternalLink } from 'lucide-react';
-import { SolarisLogoMark } from './SolarisLogoMark';
-import LanguageSelector from './LanguageSelector';
-import RegionSelector from './RegionSelector';
-import WalletConnect from './WalletConnect';
-import WalletBalance from './WalletBalance';
-import { HeaderTrustStrip } from './HeaderTrustStrip';
-import HeaderPriceTicker from './HeaderPriceTicker';
-import ThemeToggle from './ThemeToggle';
-import { useLanguage } from '../hooks/useLanguage';
+import { useCallback, useEffect, useMemo, useRef,useState } from 'react';
+
 import {
   Sheet,
   SheetContent,
@@ -16,10 +8,23 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { cn } from '@/lib/utils';
-import { standardSkillBurst, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+import { useSpecialNftBadge } from '@/hooks/useSpecialNftBadge';
+import { useTonNetwork } from '@/hooks/useTonNetwork';
+import { localizePathname, parseUrlLocaleFromPathname, urlLocaleFromLang } from '@/i18n/urlRouting';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
+import { skillSeedFromLabel,standardSkillBurst } from '@/lib/meshSkillFeed';
 import { NAV_PRIMARY_IN_PAGE } from '@/lib/navPrimaryHrefs';
+import { cn } from '@/lib/utils';
+
+import { useLanguage } from '../hooks/useLanguage';
+import HeaderPriceTicker from './HeaderPriceTicker';
+import { HeaderTrustStrip } from './HeaderTrustStrip';
+import LanguageSelector from './LanguageSelector';
+import RegionSelector from './RegionSelector';
+import { SolarisLogoMark } from './SolarisLogoMark';
+import ThemeToggle from './ThemeToggle';
+import WalletBalance from './WalletBalance';
+import WalletConnect from './WalletConnect';
 
 const MOBILE_MENU_FOCUSABLE_SELECTOR =
   'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -64,27 +69,30 @@ const Navigation = () => {
   const mobileMenuContentRef = useRef<HTMLDivElement>(null);
   /** True after the sheet has been opened at least once — avoids focusing the menu button on first mount. */
   const wasMobileMenuOpenRef = useRef(false);
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const { network, setNetwork } = useTonNetwork();
+  const { hasSpecial } = useSpecialNftBadge();
 
   const navLinks = useMemo(
     () =>
       NAV_PRIMARY_IN_PAGE.map(({ navKey, href }) => {
-        const withLang =
-          typeof window !== 'undefined' && href.startsWith('/') ? `${href}${window.location.search}` : href;
+        const locale = urlLocaleFromLang(lang);
+        const baseHref = href.startsWith('/') ? localizePathname(href, locale) : href;
+        const withLang = typeof window !== 'undefined' && baseHref.startsWith('/') ? `${baseHref}${window.location.search}` : baseHref;
         return {
           navKey,
           label: t.nav[navKey],
           href: withLang,
         };
       }),
-    [t],
+    [t, lang],
   );
 
-  const currentPath = useMemo(() => {
+  const currentPathNoLocale = useMemo(() => {
     if (typeof window === 'undefined') return '/';
-    return window.location.pathname.replace(/\/$/, '') || '/';
+    return parseUrlLocaleFromPathname(window.location.pathname).pathnameNoLocale;
   }, []);
-  const isRouteMode = currentPath === '/rwa' || currentPath === '/cet-ai';
+  const isRouteMode = currentPathNoLocale !== '/';
 
   const primaryDesktopHrefs = useMemo(() => new Set(navLinks.slice(0, 4).map((l) => l.href)), [navLinks]);
   const [activeHref, setActiveHref] = useState<string>(() => {
@@ -198,6 +206,62 @@ const Navigation = () => {
     return () => document.removeEventListener('keydown', handleMobileMenuKeyDown);
   }, [isMobileMenuOpen, handleMobileMenuKeyDown]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (typeof window.matchMedia !== 'function') return;
+    const mm = window.matchMedia('(max-width: 1023px)');
+    if (!mm.matches) return;
+
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+    let edgeStart = false;
+
+    const onStart = (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (!t) return;
+      startX = t.clientX;
+      startY = t.clientY;
+      edgeStart = startX <= 24;
+      tracking = isMobileMenuOpen || edgeStart;
+    };
+
+    const onMove = (e: TouchEvent) => {
+      if (!tracking) return;
+      const t = e.touches[0];
+      if (!t) return;
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+      if (Math.abs(dy) > Math.abs(dx) * 1.25) return;
+
+      if (!isMobileMenuOpen && edgeStart && dx > 70) {
+        setIsMobileMenuOpen(true);
+        tracking = false;
+        return;
+      }
+      if (isMobileMenuOpen && dx < -70) {
+        setIsMobileMenuOpen(false);
+        tracking = false;
+      }
+    };
+
+    const onEnd = () => {
+      tracking = false;
+      edgeStart = false;
+    };
+
+    document.addEventListener('touchstart', onStart, { passive: true });
+    document.addEventListener('touchmove', onMove, { passive: true });
+    document.addEventListener('touchend', onEnd, { passive: true });
+    document.addEventListener('touchcancel', onEnd, { passive: true });
+    return () => {
+      document.removeEventListener('touchstart', onStart);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', onEnd);
+      document.removeEventListener('touchcancel', onEnd);
+    };
+  }, [isMobileMenuOpen]);
+
   return (
     <header
       className={cn(
@@ -207,6 +271,7 @@ const Navigation = () => {
           ? 'bg-[rgba(10,10,30,0.85)] backdrop-blur-[20px] border-white/10 shadow-[0_1px_0_rgba(242,201,76,0.08),0_12px_36px_rgba(0,0,0,0.45)]'
           : 'bg-[rgba(10,10,30,0.55)] backdrop-blur-[20px] border-white/6',
       )}
+      style={{ top: 'var(--solaris-announcement-offset, 0px)' }}
     >
       {/* Scroll progress bar — animated shimmer */}
       <div
@@ -246,7 +311,7 @@ const Navigation = () => {
 
           {/* Desktop Navigation — middle column only; cannot paint under the logo column */}
           <nav
-            className="hidden min-w-0 overflow-x-auto overflow-y-visible [-ms-overflow-style:none] [scrollbar-width:none] lg:flex lg:flex-nowrap lg:items-center lg:justify-center lg:gap-4 2xl:gap-6 [&::-webkit-scrollbar]:hidden"
+            className="hidden relative z-30 min-w-0 overflow-x-auto overflow-y-visible [-ms-overflow-style:none] [scrollbar-width:none] lg:flex lg:flex-nowrap lg:items-center lg:justify-center lg:gap-4 2xl:gap-6 [&::-webkit-scrollbar]:hidden"
             aria-label={t.nav.primaryNavigation}
           >
             {navLinks.map((link) => (
@@ -274,7 +339,7 @@ const Navigation = () => {
           </nav>
 
           {/* CTAs: persistent Buy on DeDust (< lg) + full desktop rail */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="relative z-20 flex items-center gap-2 sm:gap-3 shrink-0">
             <a
               href={DEDUST_SWAP_URL}
               target="_blank"
@@ -300,13 +365,54 @@ const Navigation = () => {
                 <WalletBalance />
                 <HeaderTrustStrip />
               </div>
+              {hasSpecial ? (
+                <div className="hidden xl:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-400/10 border border-emerald-400/20">
+                  <span className="text-[10px] font-mono text-emerald-200">SPECIAL NFT</span>
+                </div>
+              ) : null}
               <HeaderPriceTicker />
+              <div className="flex items-center gap-1 rounded-full border border-white/10 bg-white/5 p-1">
+                <button
+                  type="button"
+                  className={cn(
+                    'px-2 py-1 rounded-full text-[10px] font-mono transition-colors',
+                    network === 'mainnet' ? 'bg-solaris-gold/20 text-solaris-gold' : 'text-solaris-muted hover:text-solaris-text',
+                  )}
+                  onClick={() => setNetwork('mainnet')}
+                  aria-pressed={network === 'mainnet'}
+                >
+                  MAIN
+                </button>
+                <button
+                  type="button"
+                  className={cn(
+                    'px-2 py-1 rounded-full text-[10px] font-mono transition-colors',
+                    network === 'testnet' ? 'bg-cyan-400/15 text-cyan-200' : 'text-solaris-muted hover:text-solaris-text',
+                  )}
+                  onClick={() => setNetwork('testnet')}
+                  aria-pressed={network === 'testnet'}
+                >
+                  TEST
+                </button>
+              </div>
               <div
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-400/10 border border-emerald-400/20"
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1 rounded-full border',
+                  network === 'mainnet'
+                    ? 'bg-emerald-400/10 border-emerald-400/20'
+                    : 'bg-cyan-400/10 border-cyan-400/20',
+                )}
                 title={standardSkillBurst(skillSeedFromLabel('navHeader|liveMesh'))}
               >
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-mono text-[11px] text-emerald-400">LIVE</span>
+                <div
+                  className={cn(
+                    'w-1.5 h-1.5 rounded-full animate-pulse',
+                    network === 'mainnet' ? 'bg-emerald-400' : 'bg-cyan-300',
+                  )}
+                />
+                <span className={cn('font-mono text-[11px]', network === 'mainnet' ? 'text-emerald-400' : 'text-cyan-200')}>
+                  {network === 'mainnet' ? 'LIVE' : 'TESTNET'}
+                </span>
               </div>
             </div>
 
@@ -356,7 +462,7 @@ const Navigation = () => {
           className={cn(
             'border-l border-white/10 bg-slate-950/92 backdrop-blur-2xl p-0 gap-0 shadow-[0_0_80px_rgba(0,0,0,0.65)]',
             'flex flex-col overflow-y-auto overscroll-contain',
-            'w-screen max-w-none h-dvh sm:max-w-none',
+            'w-[100dvw] max-w-[100dvw] h-[100svh] h-dvh sm:max-w-none',
             '[&>button]:top-5 [&>button]:right-5 [&>button]:size-10 [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center',
           )}
         >
@@ -410,11 +516,23 @@ const Navigation = () => {
                 </div>
               </div>
               <div
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-400/10 border border-emerald-400/20"
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-full border',
+                  network === 'mainnet'
+                    ? 'bg-emerald-400/10 border-emerald-400/20'
+                    : 'bg-cyan-400/10 border-cyan-400/20',
+                )}
                 title={standardSkillBurst(skillSeedFromLabel('navSheet|liveMesh'))}
               >
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-mono text-[11px] text-emerald-400">LIVE</span>
+                <div
+                  className={cn(
+                    'w-1.5 h-1.5 rounded-full animate-pulse',
+                    network === 'mainnet' ? 'bg-emerald-400' : 'bg-cyan-300',
+                  )}
+                />
+                <span className={cn('font-mono text-[11px]', network === 'mainnet' ? 'text-emerald-400' : 'text-cyan-200')}>
+                  {network === 'mainnet' ? 'LIVE' : 'TESTNET'}
+                </span>
               </div>
               <button
                 type="button"

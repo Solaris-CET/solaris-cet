@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
 import { TrendingDown, TrendingUp } from 'lucide-react';
-import { useLivePoolData } from '../hooks/use-live-pool-data';
-import { formatPrice } from '../lib/utils';
-import { useLanguage } from '../hooks/useLanguage';
+import { useEffect, useMemo, useState } from 'react';
+
 import { cn } from '@/lib/utils';
+
+import { useLivePoolData } from '../hooks/use-live-pool-data';
+import { useLanguage } from '../hooks/useLanguage';
+import { formatPrice } from '../lib/utils';
 
 const STORAGE_KEY = 'solaris_price_sparkline_v1';
 const MAX_POINTS = 32;

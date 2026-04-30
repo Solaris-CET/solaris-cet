@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
+
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { cn } from '@/lib/utils';
 
 export default function ThemeToggle({ className }: { className?: string }) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     const id = window.setTimeout(() => setMounted(true), 0);
@@ -23,7 +26,13 @@ export default function ThemeToggle({ className }: { className?: string }) {
         'hover:bg-solaris-gold/10 hover:border-solaris-gold/25',
         className,
       )}
-      onClick={() => setTheme(next)}
+      onClick={() => {
+        if (!prefersReducedMotion) {
+          document.documentElement.classList.add('solaris-theme-transition');
+          window.setTimeout(() => document.documentElement.classList.remove('solaris-theme-transition'), 260);
+        }
+        setTheme(next);
+      }}
       aria-label="Toggle theme"
     >
       {mounted && active === 'light' ? (

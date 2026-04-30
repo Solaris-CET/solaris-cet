@@ -1,13 +1,15 @@
-import { useMemo, useRef, useLayoutEffect, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
-import { Brain, Lightbulb, Play, Eye, Zap } from 'lucide-react';
+import { Brain, Eye, Lightbulb, Play, Zap } from 'lucide-react';
+import { useEffect,useLayoutEffect, useMemo, useRef, useState } from 'react';
+
+import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+
 import AgentBridge from '../components/AgentBridge';
 import DualAiFusionGraphic from '../components/DualAiFusionGraphic';
 import GlowOrbs from '../components/GlowOrbs';
 import HierarchyGraph from '../components/HierarchyGraph';
-import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
-import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useLanguage } from '../hooks/useLanguage';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 
 type ReactStep = { phase: string; icon: string; text: string; color: string };

@@ -1,5 +1,5 @@
-import { getAllowedOrigin } from '../lib/cors';
 import { getDb, schema } from '../../db/client';
+import { getAllowedOrigin } from '../lib/cors';
 import { getJwtSecretsFromEnv, verifyJwtWithSecrets } from '../lib/jwt';
 
 export const config = { runtime: 'nodejs' };
@@ -50,7 +50,10 @@ export default async function handler(req: Request): Promise<Response> {
       });
       mode = 'db';
     } catch {
-      console.log('[AUDIT]', { wallet: walletFromToken, action, details });
+      const wallet = walletFromToken
+        ? `${walletFromToken.slice(0, 6)}…${walletFromToken.slice(-6)}`
+        : null;
+      console.warn('[AUDIT_FALLBACK]', { wallet, action, hasDetails: Boolean(details) });
     }
 
     return new Response(JSON.stringify({ success: true, mode }), {

@@ -12,6 +12,15 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
 const target = join(root, "app/public/sovereign/index.html");
 
+function hasGit() {
+  try {
+    execSync("command -v git", { stdio: "ignore" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 if (!existsSync(target)) {
   console.error("[inject-sovereign-build-seal] missing:", target);
   process.exit(1);
@@ -19,9 +28,13 @@ if (!existsSync(target)) {
 
 let hash = process.env.VITE_GIT_COMMIT_HASH?.trim() ?? "";
 if (!hash) {
-  try {
-    hash = execSync("git rev-parse --short HEAD", { encoding: "utf8" }).trim();
-  } catch {
+  if (hasGit()) {
+    try {
+      hash = execSync("git rev-parse --short HEAD", { encoding: "utf8" }).trim();
+    } catch {
+      hash = "unknown";
+    }
+  } else {
     hash = "unknown";
   }
 }

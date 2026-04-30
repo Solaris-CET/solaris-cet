@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { buildSkillLatticePayload } from '@/lib/agentBoardSkillMix';
+import { useCallback,useEffect, useRef, useState } from 'react';
+
 import { AGENT_BOARD_DEPARTMENTS } from '@/lib/agentBoardDepartments';
+import { buildSkillLatticePayload } from '@/lib/agentBoardSkillMix';
 
 // ─── Types (shared with AgentBoard component) ─────────────────────────────
 

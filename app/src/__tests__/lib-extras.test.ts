@@ -1,6 +1,8 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
 import { DEDUST_POOL_ADDRESS } from "@/lib/dedustUrls";
-import { truncateAddress, formatTokenAmount } from "../lib/utils";
+
+import { formatTokenAmount,truncateAddress } from "../lib/utils";
 
 describe("truncateAddress + formatTokenAmount", () => {
   it("address truncation and CET amount formatting", () => {

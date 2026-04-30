@@ -1,42 +1,57 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { SafeHtml } from './SafeHtml';
-import { Dialog, DialogTitle, FullscreenDialogContent } from "@/components/ui/dialog";
 import {
-  X,
-  Send,
-  Copy,
-  Check,
-  ExternalLink,
-  ChevronRight,
-  Sparkles,
-  Trash2,
   Bot,
-  StopCircle,
-  RefreshCw,
+  Check,
+  ChevronRight,
   ClipboardList,
+  Copy,
+  Download,
+  ExternalLink,
+  Flag,
+  Mic,
+  Paperclip,
+  Pin,
+  RefreshCw,
+  Send,
+  SlidersHorizontal,
+  Sparkles,
+  StopCircle,
+  ThumbsDown,
+  ThumbsUp,
+  Trash2,
+  Volume2,
+  VolumeX,
+  X,
 } from "lucide-react";
-import { useLanguage } from '../hooks/useLanguage';
-import { useLocalStorage } from '../hooks/useLocalStorage';
-import { useReducedMotion } from '../hooks/useReducedMotion';
-import type { CetAiKnowledge, Translations } from '../i18n/translations';
-import {
-  buildCetAiObserveParse,
-  buildDeepLatticeMeshLogMessage,
-  buildDeepLatticeMeshLogMessageRawQuery,
-  CET_AI_LATTICE_PHASE,
-  buildFlashGlintLogMessage,
-  buildExpressomeBurstLogMessage,
-  buildConsensusBurstLogMessage,
-  buildLoopCompleteBurstLogMessage,
-} from '@/lib/cetAiTelemetry';
-import { TONSCAN_CET_CONTRACT_URL } from '@/lib/cetContract';
+import React, { useCallback,useEffect, useRef, useState } from "react";
+
+import { Dialog, DialogTitle, FullscreenDialogContent } from "@/components/ui/dialog";
+import { trackAiQuery, trackEvent } from '@/lib/analytics';
+import { getAuthToken } from '@/lib/authToken';
 import { CET_AI_MAX_QUERY_CHARS } from '@/lib/cetAiConstants';
-import { cetAiQueryCharCountToneClass, formatCetAiQueryCharCountAria } from '@/lib/cetAiQueryUi';
 import {
   buildCopyForAiText,
   buildFullConversationHandoff,
   type CetAiChatEntry,
 } from '@/lib/cetAiConversation';
+import { cetAiQueryCharCountToneClass, formatCetAiQueryCharCountAria } from '@/lib/cetAiQueryUi';
+import {
+  buildCetAiObserveParse,
+  buildConsensusBurstLogMessage,
+  buildDeepLatticeMeshLogMessage,
+  buildDeepLatticeMeshLogMessageRawQuery,
+  buildExpressomeBurstLogMessage,
+  buildFlashGlintLogMessage,
+  buildLoopCompleteBurstLogMessage,
+  CET_AI_LATTICE_PHASE,
+} from '@/lib/cetAiTelemetry';
+import { TONSCAN_CET_CONTRACT_URL } from '@/lib/cetContract';
+
+import { useLanguage } from '../hooks/useLanguage';
+import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useReducedMotion } from '../hooks/useReducedMotion';
+import { useSessionStorage } from '../hooks/useSessionStorage';
+import type { CetAiKnowledge, Translations } from '../i18n/translations';
+import { SafeHtml } from './SafeHtml';
 
 // --- TYPE DEFINITIONS ---
 type ReActPhase =
@@ -51,6 +66,17 @@ type ReActPhase =
   | 'verify_anchor'
   | 'complete';
 
+type SpeechRecognitionLike = {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  onresult: ((ev: unknown) => void) | null;
+  onend: (() => void) | null;
+  onerror: (() => void) | null;
+  start: () => void;
+  stop?: () => void;
+};
+
 type AiState = 'idle' | 'loading' | 'success' | 'error';
 
 interface TelemetryLog {
@@ -64,6 +90,14 @@ interface MetricsData {
   confidence: number;
   latency: number;
   cetCost: number;
+}
+
+interface AiAttachmentMeta {
+  id: string;
+  filename: string;
+  mimeType: string;
+  bytes: number;
+  url: string | null;
 }
 
 // --- CONFIDENCE SCORES per topic ---
@@ -120,6 +154,11 @@ interface CetAiFetchResult {
   text: string | null;
   sourceHeader: string | null;
   sources: Array<{ id: string; title: string; url: string; snippet: string }>;
+  modelUsed: string | null;
+  conversationId: string | null;
+  assistantMessageId: string | null;
+  queryLogId: string | null;
+  usedCache: boolean;
   /** True if /api/chat responded with a non-success or empty body (helps explain fallback). */
   liveEndpointError: boolean;
   /** Parsed `message` or `error` from JSON body when the call did not yield a response. */
@@ -132,6 +171,16 @@ async function fetchCetAiChat(
   query: string,
   signal: AbortSignal,
   priorHistory: CetAiChatEntry[],
+  opts?: {
+    model?: string;
+    tone?: string;
+    mode?: string;
+    instructions?: string;
+    conversationId?: string | null;
+    revisionOfMessageId?: string | null;
+    forceFresh?: boolean;
+    attachmentIds?: string[];
+  },
 ): Promise<CetAiFetchResult> {
   const conversation = chatHistoryToConversation(priorHistory);
   const maxAttempts = 2;
@@ -139,6 +188,7 @@ async function fetchCetAiChat(
   let lastErrorDetail: string | null = null;
   let lastHttpStatus: number | null = null;
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const endpoint = attempt === 0 ? '/api/ai/ask' : '/api/chat';
     if (attempt > 0) {
       await new Promise<void>(resolve => {
         const delay = 300 + Math.random() * 400;
@@ -159,26 +209,68 @@ async function fetchCetAiChat(
         signal.addEventListener('abort', onAbort);
       });
       if (signal.aborted)
-        return { text: null, sourceHeader: null, sources: [], liveEndpointError: false, errorDetail: null, httpStatus: null };
+        return {
+          text: null,
+          sourceHeader: null,
+          sources: [],
+          modelUsed: null,
+          conversationId: null,
+          assistantMessageId: null,
+          queryLogId: null,
+          usedCache: false,
+          liveEndpointError: false,
+          errorDetail: null,
+          httpStatus: null,
+        };
     }
     try {
-      const res = await fetch('/api/chat', {
+      const token = getAuthToken();
+      const res = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ query, conversation }),
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          query,
+          conversation,
+          model: opts?.model,
+          tone: opts?.tone,
+          mode: opts?.mode,
+          instructions: opts?.instructions,
+          conversationId: opts?.conversationId ?? null,
+          revisionOfMessageId: opts?.revisionOfMessageId ?? null,
+          forceFresh: Boolean(opts?.forceFresh),
+          attachmentIds: Array.isArray(opts?.attachmentIds) ? opts?.attachmentIds : [],
+        }),
         signal,
       });
       const sourceHeader = res.headers.get('X-Cet-Ai-Source');
+      const usedCache = res.headers.get('X-Cet-Ai-Used-Cache') === '1';
       const raw = await res.text();
-      let data: { response?: string; message?: string; error?: string; sources?: unknown } = {};
+      let data: {
+        response?: string;
+        message?: string;
+        error?: string;
+        sources?: unknown;
+        modelUsed?: unknown;
+        conversationId?: unknown;
+        assistantMessageId?: unknown;
+        queryLogId?: unknown;
+      } = {};
       try {
-        data = JSON.parse(raw) as { response?: string; message?: string; error?: string; sources?: unknown };
+        data = JSON.parse(raw) as typeof data;
       } catch {
         /* non-JSON error body */
       }
       const responseText = typeof data.response === 'string' ? data.response.trim() : '';
       const msg = typeof data.message === 'string' ? data.message.trim() : '';
       const err = typeof data.error === 'string' ? data.error.trim() : '';
+      const modelUsed = typeof data.modelUsed === 'string' ? data.modelUsed.trim() : null;
+      const conversationId = typeof data.conversationId === 'string' ? data.conversationId.trim() : null;
+      const assistantMessageId = typeof data.assistantMessageId === 'string' ? data.assistantMessageId.trim() : null;
+      const queryLogId = typeof data.queryLogId === 'string' ? data.queryLogId.trim() : null;
       const sources = Array.isArray(data.sources)
         ? data.sources
             .map((s): { id: string; title: string; url: string; snippet: string } | null => {
@@ -204,6 +296,11 @@ async function fetchCetAiChat(
           text: responseText,
           sourceHeader,
           sources,
+          modelUsed,
+          conversationId,
+          assistantMessageId,
+          queryLogId,
+          usedCache,
           liveEndpointError: false,
           errorDetail: null,
           httpStatus: null,
@@ -219,13 +316,30 @@ async function fetchCetAiChat(
       }
     } catch {
       if (signal.aborted)
-        return { text: null, sourceHeader: null, sources: [], liveEndpointError: false, errorDetail: null, httpStatus: null };
+        return {
+          text: null,
+          sourceHeader: null,
+          sources: [],
+          modelUsed: null,
+          conversationId: null,
+          assistantMessageId: null,
+          queryLogId: null,
+          usedCache: false,
+          liveEndpointError: false,
+          errorDetail: null,
+          httpStatus: null,
+        };
     }
   }
   return {
     text: null,
     sourceHeader: null,
     sources: [],
+    modelUsed: null,
+    conversationId: null,
+    assistantMessageId: null,
+    queryLogId: null,
+    usedCache: false,
     liveEndpointError: sawHttpOrEmptyError,
     errorDetail: lastErrorDetail,
     httpStatus: lastHttpStatus,
@@ -808,22 +922,37 @@ function ReActPanels({ phase }: { phase: ReActPhase }) {
 }
 
 
-export default function CetAiSearch() {
+export default function CetAiSearch(props: { initialPrompt?: string } = {}) {
   // --- LANGUAGE ---
   const { t } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
 
   // --- STATE MANAGEMENT ---
-  const [query, setQuery] = useState('');
+  const initialPrompt = props.initialPrompt;
+  const [query, setQuery] = useState(() => (initialPrompt?.trim() ? initialPrompt.trim() : ''));
   const [submittedQuestion, setSubmittedQuestion] = useState('');
   const [phase, setPhase] = useState<ReActPhase>('idle');
   const [aiState, setAiState] = useState<AiState>('idle');
   const [logs, setLogs] = useState<TelemetryLog[]>([]);
   const [metrics, setMetrics] = useState<MetricsData>({ confidence: 0, latency: 0, cetCost: 0 });
   const [finalResponse, setFinalResponse] = useState('');
+  const [typedResponse, setTypedResponse] = useState('');
+  const [typingDone, setTypingDone] = useState(true);
   const [cetAiConfidence, setCetAiConfidence] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [chatHistory, setChatHistory] = useLocalStorage<CetAiChatEntry[]>('cet-ai-chat-history', []);
+  const [chatHistory, setChatHistory] = useSessionStorage<CetAiChatEntry[]>('cet-ai-chat-history', []);
+  const [pinnedEntries, setPinnedEntries] = useLocalStorage<CetAiChatEntry[]>('cet-ai-pinned', []);
+  const [recentSearches, setRecentSearches] = useLocalStorage<string[]>('cet-ai-recent-searches', []);
+  const [aiModel, setAiModel] = useLocalStorage<string>('cet-ai-model', 'auto');
+  const [aiTone, setAiTone] = useLocalStorage<string>('cet-ai-tone', 'brand');
+  const [aiMode, setAiMode] = useLocalStorage<string>('cet-ai-mode', 'default');
+  const [customInstructions, setCustomInstructions] = useLocalStorage<string>('cet-ai-custom-instructions', '');
+  const [readingMode, setReadingMode] = useLocalStorage<boolean>('cet-ai-reading-mode', false);
+  const [serverConversationId, setServerConversationId] = useLocalStorage<string | null>(
+    'cet-ai-server-conversation-id',
+    null,
+  );
+  const [attachments, setAttachments] = useLocalStorage<AiAttachmentMeta[]>('cet-ai-attachments', []);
   const [copiedResponse, setCopiedResponse] = useState(false);
   const [copiedForAi, setCopiedForAi] = useState(false);
   const [copiedTranscript, setCopiedTranscript] = useState(false);
@@ -838,13 +967,29 @@ export default function CetAiSearch() {
   /** Last HTTP status from a failed /api/chat response (429, 5xx, etc.). */
   const [liveApiHttpStatus, setLiveApiHttpStatus] = useState<number | null>(null);
 
+  const [currentModelUsed, setCurrentModelUsed] = useState<string | null>(null);
+  const [currentAssistantMessageId, setCurrentAssistantMessageId] = useState<string | null>(null);
+  const [currentQueryLogId, setCurrentQueryLogId] = useState<string | null>(null);
+  const [currentFeedback, setCurrentFeedback] = useState<-1 | 0 | 1 | null>(null);
+  const [sendingFeedback, setSendingFeedback] = useState(false);
+  const [currentAlternates, setCurrentAlternates] = useState<NonNullable<CetAiChatEntry['alternates']>>([]);
+  const [currentUsedCache, setCurrentUsedCache] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showPinned, setShowPinned] = useState(false);
+
+  const shareConsumedRef = useRef(false);
   const terminalRef = useRef<HTMLDivElement>(null);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const modalInputRef = useRef<HTMLTextAreaElement>(null);
+  const attachmentInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const cetAiAbortRef = useRef<AbortController | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   /** Incremented to invalidate in-flight schedules (stop / new question). */
   const generationEpochRef = useRef(0);
+  const typewriterRafRef = useRef<number>(0);
 
   // Auto-scroll telemetry terminal
   useEffect(() => {
@@ -860,8 +1005,93 @@ export default function CetAiSearch() {
 
   // Cleanup timers on unmount
   useEffect(() => {
-    return () => { timersRef.current.forEach(clearTimeout); };
+    return () => {
+      timersRef.current.forEach(clearTimeout);
+      window.cancelAnimationFrame(typewriterRafRef.current);
+    };
   }, []);
+
+  useEffect(() => {
+    setChatHistory((prev) => {
+      const list = Array.isArray(prev) ? prev : [];
+      return list
+        .map((e, i) => ({
+          ...e,
+          id: e.id ?? `${Date.now().toString(36)}-${i}`,
+          createdAt: e.createdAt ?? Date.now(),
+          alternates: Array.isArray(e.alternates) ? e.alternates : undefined,
+        }))
+        .slice(-80);
+    });
+    setPinnedEntries((prev) => (Array.isArray(prev) ? prev : []).slice(-200));
+    setRecentSearches((prev) => (Array.isArray(prev) ? prev : []).slice(0, 20));
+    setAttachments((prev) => (Array.isArray(prev) ? prev : []).slice(0, 6));
+  }, [setChatHistory, setPinnedEntries, setRecentSearches, setAttachments]);
+
+  useEffect(() => {
+    window.cancelAnimationFrame(typewriterRafRef.current);
+    let initTimer: number | null = null;
+    const scheduleInit = (fn: () => void) => {
+      initTimer = window.setTimeout(fn, 0);
+    };
+
+    if (!finalResponse) {
+      scheduleInit(() => {
+        setTypedResponse('');
+        setTypingDone(true);
+      });
+      return () => {
+        if (initTimer) window.clearTimeout(initTimer);
+      };
+    }
+    if (prefersReducedMotion) {
+      scheduleInit(() => {
+        setTypedResponse(finalResponse);
+        setTypingDone(true);
+      });
+      return () => {
+        if (initTimer) window.clearTimeout(initTimer);
+      };
+    }
+
+    const isHtml = /<\/?[^>]+>/.test(finalResponse);
+    const plain = isHtml
+      ? finalResponse
+          .replace(/<br\s*\/?\s*>/gi, '\n')
+          .replace(/<[^>]*>/g, '')
+      : finalResponse;
+
+    const myEpoch = generationEpochRef.current;
+    const total = plain.length;
+    const stepMs = total > 2200 ? 6 : total > 900 ? 10 : 14;
+
+    let last = performance.now();
+    let i = 0;
+    scheduleInit(() => {
+      setTypedResponse('');
+      setTypingDone(false);
+    });
+
+    const tick = (now: number) => {
+      if (generationEpochRef.current !== myEpoch) return;
+      const dt = Math.max(0, now - last);
+      last = now;
+      const chars = Math.max(1, Math.floor(dt / stepMs));
+      i = Math.min(total, i + chars);
+      setTypedResponse(plain.slice(0, i));
+      if (i >= total) {
+        setTypingDone(true);
+        return;
+      }
+      typewriterRafRef.current = window.requestAnimationFrame(tick);
+    };
+
+    typewriterRafRef.current = window.requestAnimationFrame(tick);
+    return () => {
+      if (initTimer) window.clearTimeout(initTimer);
+      window.cancelAnimationFrame(typewriterRafRef.current);
+    };
+  }, [finalResponse, prefersReducedMotion]);
 
   // --- CLOSE HANDLER ---
   const handleClose = useCallback(() => {
@@ -876,9 +1106,17 @@ export default function CetAiSearch() {
     setQuery('');
     setLogs([]);
     setFinalResponse('');
+    setTypedResponse('');
+    setTypingDone(true);
     setCetAiConfidence(0);
     setMetrics({ confidence: 0, latency: 0, cetCost: 0 });
-    setChatHistory([]);
+    try {
+      window.speechSynthesis?.cancel();
+    } catch {
+      void 0;
+    }
+    setIsListening(false);
+    setIsSpeaking(false);
     setSubmittedQuestion('');
     setResponseUsedLiveApi(false);
     setLiveApiReturnedError(false);
@@ -887,6 +1125,12 @@ export default function CetAiSearch() {
     setCopiedResponse(false);
     setCopiedForAi(false);
     setCopiedTranscript(false);
+    setCurrentAssistantMessageId(null);
+    setCurrentQueryLogId(null);
+    setCurrentModelUsed(null);
+    setCurrentFeedback(null);
+    setCurrentAlternates([]);
+    setCurrentUsedCache(false);
   }, [
     setIsModalOpen,
     setPhase,
@@ -895,8 +1139,9 @@ export default function CetAiSearch() {
     setFinalResponse,
     setCetAiConfidence,
     setMetrics,
-    setChatHistory,
     setSubmittedQuestion,
+    setIsListening,
+    setIsSpeaking,
   ]);
 
   // Focus follow-up input when a response is ready
@@ -925,8 +1170,265 @@ export default function CetAiSearch() {
     timersRef.current.push(id);
   };
 
+  const estimateReadMinutes = (text: string): number => {
+    const words = text.trim().split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.round(words / 200));
+  };
+
+  const sha256Lite = (s: string): string => {
+    let h1 = 0x811c9dc5;
+    for (let i = 0; i < s.length; i++) {
+      h1 ^= s.charCodeAt(i);
+      h1 = Math.imul(h1, 0x01000193);
+    }
+    return (h1 >>> 0).toString(16).padStart(8, '0');
+  };
+
+  const downloadText = (filename: string, text: string, type: string) => {
+    try {
+      const blob = new Blob([text], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 250);
+    } catch {
+      void 0;
+    }
+  };
+
+  const exportHistoryJson = () => {
+    const current: CetAiChatEntry | null =
+      submittedQuestion && finalResponse
+        ? {
+            id: `${Date.now().toString(36)}-current`,
+            question: submittedQuestion,
+            answer: finalResponse,
+            confidence: cetAiConfidence,
+            createdAt: Date.now(),
+            modelUsed: currentModelUsed ?? undefined,
+            sources: responseSources,
+          }
+        : null;
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      history: [...chatHistory, ...(current ? [current] : [])],
+      pinned: pinnedEntries,
+      settings: { model: aiModel, tone: aiTone, mode: aiMode },
+    };
+    downloadText(`cet-ai-history-${Date.now()}.json`, JSON.stringify(payload, null, 2), 'application/json');
+  };
+
+  const exportHistoryMarkdown = () => {
+    const blocks: string[] = [];
+    const all: CetAiChatEntry[] = [...chatHistory];
+    if (submittedQuestion && finalResponse) {
+      all.push({
+        question: submittedQuestion,
+        answer: finalResponse,
+        confidence: cetAiConfidence,
+        modelUsed: currentModelUsed ?? undefined,
+        sources: responseSources,
+      });
+    }
+    blocks.push(`# CET AI Transcript\n\nExported: ${new Date().toISOString()}`);
+    for (const e of all) {
+      blocks.push(`\n## Q\n${e.question}\n\n## A\n${e.answer}`);
+      if (Array.isArray(e.alternates) && e.alternates.length > 0) {
+        const alt = e.alternates
+          .map((a, i) => `\n### Regenerate #${i + 1}\n${a.answer}`)
+          .join('\n');
+        blocks.push(alt);
+      }
+      blocks.push('\n---');
+    }
+    downloadText(`cet-ai-history-${Date.now()}.md`, blocks.join('\n'), 'text/markdown');
+  };
+
+  const uploadAttachment = async (file: File) => {
+    const token = getAuthToken();
+    if (!token) {
+      window.alert('Login required for attachments.');
+      return;
+    }
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch('/api/ai/attachments', {
+        method: 'POST',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: form,
+      });
+      const raw = await res.text();
+      let data: unknown = null;
+      try {
+        data = JSON.parse(raw) as unknown;
+      } catch {
+        data = null;
+      }
+      const rec = data && typeof data === 'object' ? (data as Record<string, unknown>) : null;
+      const attachmentRec = rec && rec.attachment && typeof rec.attachment === 'object' ? (rec.attachment as Record<string, unknown>) : null;
+      const id = attachmentRec && typeof attachmentRec.id === 'string' ? attachmentRec.id : '';
+      const filename = attachmentRec && typeof attachmentRec.filename === 'string' ? attachmentRec.filename : '';
+      const mimeType = attachmentRec && typeof attachmentRec.mimeType === 'string' ? attachmentRec.mimeType : '';
+      const bytes = attachmentRec && typeof attachmentRec.bytes === 'number' ? attachmentRec.bytes : 0;
+      const url = rec && typeof rec.url === 'string' ? rec.url : null;
+      if (!res.ok || !id) {
+        window.alert('Upload failed.');
+        return;
+      }
+      setAttachments((prev) => {
+        const list = Array.isArray(prev) ? prev : [];
+        const next = [{ id, filename, mimeType, bytes, url }, ...list.filter((x) => x.id !== id)];
+        return next.slice(0, 6);
+      });
+    } catch {
+      window.alert('Upload failed.');
+    }
+  };
+
+  const handleAttachmentInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    e.target.value = '';
+    if (files.length === 0) return;
+    void (async () => {
+      for (const file of files.slice(0, 3)) {
+        await uploadAttachment(file);
+      }
+    })();
+  };
+
+  const togglePinEntry = (entry: CetAiChatEntry) => {
+    const id = entry.id ?? `${sha256Lite(entry.question)}-${sha256Lite(entry.answer)}`;
+    setPinnedEntries((prev) => {
+      const list = Array.isArray(prev) ? prev : [];
+      const exists = list.some((p) => (p.id ?? '') === id);
+      if (exists) return list.filter((p) => (p.id ?? '') !== id);
+      const next = [{ ...entry, id, pinned: true }, ...list];
+      return next.slice(0, 200);
+    });
+  };
+
+  const reportCurrentAnswer = async () => {
+    if (!submittedQuestion || !finalResponse) return;
+    const reason = window.prompt('Raportează răspuns: motiv scurt (ex: conținut inadecvat, halucinație, spam)')?.trim() ?? '';
+    if (!reason) return;
+    try {
+      const token = getAuthToken();
+      await fetch('/api/ai/report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          reason,
+          query: submittedQuestion,
+          response: finalResponse,
+          messageId: currentAssistantMessageId,
+        }),
+      });
+    } catch {
+      void 0;
+    }
+  };
+
+  const rateCurrentAnswer = async (rating: -1 | 0 | 1) => {
+    if (!finalResponse) return;
+    if (sendingFeedback) return;
+    setSendingFeedback(true);
+    try {
+      const token = getAuthToken();
+      await fetch('/api/ai/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          rating,
+          messageId: currentAssistantMessageId,
+          queryLogId: currentQueryLogId,
+        }),
+      });
+      setCurrentFeedback(rating);
+      trackEvent('ai_feedback', { rating });
+    } catch {
+      void 0;
+    } finally {
+      setSendingFeedback(false);
+    }
+  };
+
+  const stopSpeaking = () => {
+    try {
+      window.speechSynthesis?.cancel();
+    } catch {
+      void 0;
+    }
+    setIsSpeaking(false);
+  };
+
+  const speakAnswer = (text: string) => {
+    if (!text.trim()) return;
+    try {
+      if (!('speechSynthesis' in window)) return;
+      stopSpeaking();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = navigator.language;
+      u.onend = () => setIsSpeaking(false);
+      u.onerror = () => setIsSpeaking(false);
+      setIsSpeaking(true);
+      window.speechSynthesis.speak(u);
+    } catch {
+      setIsSpeaking(false);
+    }
+  };
+
+  const toggleListening = () => {
+    try {
+      const AnyWin = window as unknown as {
+        SpeechRecognition?: new () => SpeechRecognitionLike;
+        webkitSpeechRecognition?: new () => SpeechRecognitionLike;
+      };
+      const Rec = AnyWin.SpeechRecognition ?? AnyWin.webkitSpeechRecognition;
+      if (!Rec) return;
+      if (isListening) {
+        recognitionRef.current?.stop?.();
+        setIsListening(false);
+        return;
+      }
+      const rec = new Rec();
+      recognitionRef.current = rec;
+      rec.lang = navigator.language;
+      rec.interimResults = true;
+      rec.continuous = false;
+      rec.onresult = (ev: unknown) => {
+        const transcript =
+          typeof ev === 'object' &&
+          ev !== null &&
+          'results' in ev &&
+          Array.isArray((ev as { results?: unknown }).results) &&
+          Array.isArray((ev as { results: unknown[] }).results[0])
+            ? (ev as { results: Array<Array<{ transcript?: unknown }>> }).results[0]?.[0]?.transcript
+            : undefined;
+        if (typeof transcript === 'string') setQuery(transcript.slice(0, CET_AI_MAX_QUERY_CHARS));
+      };
+      rec.onend = () => setIsListening(false);
+      rec.onerror = () => setIsListening(false);
+      setIsListening(true);
+      rec.start();
+    } catch {
+      setIsListening(false);
+    }
+  };
+
   const handleStopGeneration = useCallback(() => {
     generationEpochRef.current += 1;
+    window.cancelAnimationFrame(typewriterRafRef.current);
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
     cetAiAbortRef.current?.abort();
@@ -934,6 +1436,8 @@ export default function CetAiSearch() {
     setPhase('complete');
     setAiState('error');
     setFinalResponse(t.cetAi.generationStopped);
+    setTypedResponse(t.cetAi.generationStopped);
+    setTypingDone(true);
     setResponseUsedLiveApi(false);
     setResponseSources([]);
     setLiveApiReturnedError(false);
@@ -944,7 +1448,11 @@ export default function CetAiSearch() {
   }, [t.cetAi.generationStopped]);
 
   // --- CORE LOGIC: RAV + optional live /api/chat (Coolify/VPS) with local knowledge fallback ---
-  const processQuestion = useCallback((q: string, priorHistory: CetAiChatEntry[] = []) => {
+  const processQuestion = useCallback((
+    q: string,
+    priorHistory: CetAiChatEntry[] = [],
+    runOpts?: { forceFresh?: boolean; revisionOfMessageId?: string | null },
+  ) => {
     const question = q.trim().slice(0, CET_AI_MAX_QUERY_CHARS);
     if (!question) return;
 
@@ -956,7 +1464,16 @@ export default function CetAiSearch() {
     const ac = new AbortController();
     cetAiAbortRef.current = ac;
 
-    const cetAiFetchPromise = fetchCetAiChat(question, ac.signal, priorHistory);
+    const cetAiFetchPromise = fetchCetAiChat(question, ac.signal, priorHistory, {
+      model: aiModel,
+      tone: aiTone,
+      mode: aiMode,
+      instructions: customInstructions,
+      conversationId: serverConversationId,
+      revisionOfMessageId: runOpts?.revisionOfMessageId ?? null,
+      forceFresh: Boolean(runOpts?.forceFresh),
+      attachmentIds: attachments.map((a) => a.id),
+    });
 
     const { answer: localAnswer, confidence } = buildContextualResponse(question, t.cetAi.knowledge);
     const lowerQ = question.toLowerCase();
@@ -968,11 +1485,36 @@ export default function CetAiSearch() {
       }
     }
     setDetectedTopic(detected);
+    try {
+      try {
+        const k = 'solaris_ai_activated';
+        const seen = typeof window !== 'undefined' ? localStorage.getItem(k) : null;
+        if (!seen) {
+          localStorage.setItem(k, String(Date.now()));
+          trackEvent('ai_activation', { topic: detected });
+        }
+      } catch {
+        void 0;
+      }
+      trackAiQuery({
+        topic: detected,
+        queryLength: question.length,
+        route: typeof window !== 'undefined' ? window.location.pathname : undefined,
+        source: 'cet_ai',
+      });
+    } catch {
+      void 0;
+    }
     const hash = generateHash();
     const tokenCount = question.split(/\s+/).length;
     const startMs = performance.now();
 
     setSubmittedQuestion(question);
+    if (!runOpts?.revisionOfMessageId) {
+      setCurrentAssistantMessageId(null);
+    }
+    setCurrentModelUsed(null);
+    setCurrentUsedCache(false);
     setAiState('loading');
     setLogs([]);
     setFinalResponse('');
@@ -986,6 +1528,15 @@ export default function CetAiSearch() {
     setCopiedResponse(false);
     setCopiedForAi(false);
     setCopiedTranscript(false);
+    setCurrentFeedback(null);
+
+    if (!runOpts?.revisionOfMessageId) {
+      setRecentSearches((prev) => {
+        const base = Array.isArray(prev) ? prev : [];
+        const next = [question, ...base.filter((x) => x !== question)];
+        return next.slice(0, 12);
+      });
+    }
 
     setPhase('observe_parse');
     addLog('INFO', `RAV_INIT: Grok × Gemini CET AI v3.1 · Session [${hash}]`);
@@ -1056,6 +1607,11 @@ export default function CetAiSearch() {
                   text: null,
                   sourceHeader: null,
                   sources: [],
+                  modelUsed: null,
+                  conversationId: null,
+                  assistantMessageId: null,
+                  queryLogId: null,
+                  usedCache: false,
                   liveEndpointError: false,
                   errorDetail: null,
                   httpStatus: null,
@@ -1067,10 +1623,16 @@ export default function CetAiSearch() {
           text: null,
           sourceHeader: null,
           sources: [],
+          modelUsed: null,
+          conversationId: null,
+          assistantMessageId: null,
+          queryLogId: null,
+          usedCache: false,
           liveEndpointError: false,
           errorDetail: null,
           httpStatus: null,
         }));
+
         if (generationEpochRef.current !== myEpoch || ac.signal.aborted) return;
         const remote = raced.text;
         const hasRemoteText = Boolean(remote?.trim());
@@ -1079,6 +1641,11 @@ export default function CetAiSearch() {
         const text = hasRemoteText ? remote!.trim() : localAnswer;
         const conf = hasRemoteText ? Math.min(99.2, confidence + 1.5) : confidence;
         setResponseSources(hasRemoteText ? raced.sources : []);
+        setCurrentModelUsed(hasRemoteText ? (raced.modelUsed ?? null) : null);
+        setCurrentUsedCache(Boolean(hasRemoteText && raced.usedCache));
+        if (hasRemoteText && raced.conversationId) setServerConversationId(raced.conversationId);
+        if (hasRemoteText && raced.assistantMessageId) setCurrentAssistantMessageId(raced.assistantMessageId);
+        setCurrentQueryLogId(hasRemoteText ? (raced.queryLogId ?? null) : null);
         setLiveApiReturnedError(!hasRemoteText && raced.liveEndpointError);
         setLiveApiErrorDetail(
           !hasRemoteText && raced.liveEndpointError ? (raced.errorDetail ?? null) : null,
@@ -1134,7 +1701,19 @@ export default function CetAiSearch() {
       addLog('INFO', buildDeepLatticeMeshLogMessage('SESSION_MESH', question, CET_AI_LATTICE_PHASE.sessionClose));
       addLog('QUANTUM', buildLoopCompleteBurstLogMessage(question));
     }, CET_AI_PHASE_MS[7]);
-  }, [generateHash, addLog, t.cetAi.knowledge]);
+  }, [
+    generateHash,
+    addLog,
+    t.cetAi.knowledge,
+    aiModel,
+    aiTone,
+    aiMode,
+    customInstructions,
+    serverConversationId,
+    setServerConversationId,
+    attachments,
+    setRecentSearches,
+  ]);
 
   // Hero widget submit → open modal + start processing
   const handleHeroSubmit = (e: React.FormEvent) => {
@@ -1152,7 +1731,19 @@ export default function CetAiSearch() {
     if (!query.trim() || isProcessing) return;
     const nextHistory: CetAiChatEntry[] =
       finalResponse && submittedQuestion
-        ? [...chatHistory, { question: submittedQuestion, answer: finalResponse, confidence: cetAiConfidence }]
+        ? [
+            ...chatHistory,
+            {
+              id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
+              question: submittedQuestion,
+              answer: finalResponse,
+              confidence: cetAiConfidence,
+              createdAt: Date.now(),
+              modelUsed: currentModelUsed ?? undefined,
+              sources: responseSources,
+              alternates: currentAlternates.length > 0 ? currentAlternates : undefined,
+            },
+          ]
         : chatHistory;
     setChatHistory(nextHistory);
     const q = query.trim();
@@ -1165,10 +1756,55 @@ export default function CetAiSearch() {
     ? liveApiHttpHintForStatus(t.cetAi, liveApiHttpStatus)
     : null;
 
+  useEffect(() => {
+    if (!initialPrompt) return;
+    if (shareConsumedRef.current) return;
+    shareConsumedRef.current = true;
+    const q = initialPrompt.trim().slice(0, CET_AI_MAX_QUERY_CHARS);
+    if (!q) return;
+    setQuery(q);
+    setIsModalOpen(true);
+    window.setTimeout(() => processQuestion(q, chatHistory), 50);
+    setQuery('');
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('share');
+      window.history.replaceState(null, '', url.toString());
+    } catch {
+      void 0;
+    }
+  }, [chatHistory, initialPrompt, processQuestion]);
+
   const handleRegenerate = useCallback(() => {
     if (!submittedQuestion.trim() || isProcessing) return;
-    processQuestion(submittedQuestion.trim(), chatHistory);
-  }, [submittedQuestion, chatHistory, isProcessing, processQuestion]);
+    if (finalResponse.trim()) {
+      setCurrentAlternates((prev) => [
+        ...prev,
+        {
+          answer: finalResponse,
+          confidence: cetAiConfidence,
+          createdAt: Date.now(),
+          modelUsed: currentModelUsed ?? undefined,
+          sources: responseSources,
+        },
+      ]);
+    }
+    processQuestion(submittedQuestion.trim(), chatHistory, {
+      forceFresh: true,
+      revisionOfMessageId: currentAssistantMessageId,
+    });
+  }, [
+    submittedQuestion,
+    chatHistory,
+    isProcessing,
+    processQuestion,
+    finalResponse,
+    cetAiConfidence,
+    currentModelUsed,
+    responseSources,
+    currentAssistantMessageId,
+    setCurrentAlternates,
+  ]);
 
   // ── RENDER ────────────────────────────────────────────────────────────────────
   return (
@@ -1290,7 +1926,9 @@ export default function CetAiSearch() {
             overlayClassName="bg-black/95 backdrop-blur-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
             className="fixed inset-0 z-[9999] flex flex-col font-sans pt-[env(safe-area-inset-top,0px)] outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
           >
-          <DialogTitle className="sr-only">{t.cetAi.title}</DialogTitle>
+          <div className="sr-only">
+            <DialogTitle>{t.cetAi.title}</DialogTitle>
+          </div>
           <p id="cet-ai-dialog-desc" className="sr-only">
             {t.cetAi.modalDescription}
           </p>
@@ -1348,6 +1986,49 @@ export default function CetAiSearch() {
                 </button>
               )}
               <button
+                type="button"
+                onClick={() => setShowPinned((v) => !v)}
+                aria-label="Pins"
+                title="Pins"
+                className="p-2 rounded-lg text-gray-600 hover:text-yellow-300 hover:bg-gray-800 transition-all duration-200"
+              >
+                <Pin className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowSettings((v) => !v)}
+                aria-label="Settings"
+                title="Settings"
+                className="p-2 rounded-lg text-gray-600 hover:text-cyan-300 hover:bg-gray-800 transition-all duration-200"
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => attachmentInputRef.current?.click()}
+                aria-label="Attach"
+                title="Attach"
+                className="p-2 rounded-lg text-gray-600 hover:text-blue-300 hover:bg-gray-800 transition-all duration-200"
+              >
+                <Paperclip className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={exportHistoryJson}
+                aria-label="Export"
+                title="Export"
+                className="p-2 rounded-lg text-gray-600 hover:text-green-300 hover:bg-gray-800 transition-all duration-200"
+              >
+                <Download className="w-4 h-4" />
+              </button>
+              <input
+                ref={attachmentInputRef}
+                type="file"
+                multiple
+                onChange={handleAttachmentInputChange}
+                className="hidden"
+              />
+              <button
                 onClick={handleClose}
                 aria-label={t.cetAi.closeCetAiAria}
                 className="ml-1 min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all duration-200 touch-manipulation"
@@ -1361,9 +2042,184 @@ export default function CetAiSearch() {
           <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
             <div className="max-w-5xl mx-auto space-y-10">
 
+              {showSettings && (
+                <div className="rounded-2xl border border-gray-800/90 bg-black/30 px-4 py-4 space-y-3">
+                  <div className="flex flex-wrap gap-3 items-end">
+                    <label className="text-[11px] font-mono text-gray-500 uppercase tracking-widest">
+                      Model
+                      <select
+                        value={aiModel}
+                        onChange={(e) => setAiModel(e.target.value)}
+                        className="mt-1 block bg-gray-950 border border-gray-700 rounded-lg px-2 py-1 text-xs text-gray-200"
+                      >
+                        <option value="auto">Auto</option>
+                        <option value="grok">Grok</option>
+                        <option value="gemini">Gemini</option>
+                        <option value="claude">Claude</option>
+                      </select>
+                    </label>
+                    <label className="text-[11px] font-mono text-gray-500 uppercase tracking-widest">
+                      Tone
+                      <select
+                        value={aiTone}
+                        onChange={(e) => setAiTone(e.target.value)}
+                        className="mt-1 block bg-gray-950 border border-gray-700 rounded-lg px-2 py-1 text-xs text-gray-200"
+                      >
+                        <option value="brand">Brand</option>
+                        <option value="neutral">Neutral</option>
+                        <option value="fun">Fun</option>
+                      </select>
+                    </label>
+                    <label className="text-[11px] font-mono text-gray-500 uppercase tracking-widest">
+                      Mode
+                      <select
+                        value={aiMode}
+                        onChange={(e) => setAiMode(e.target.value)}
+                        className="mt-1 block bg-gray-950 border border-gray-700 rounded-lg px-2 py-1 text-xs text-gray-200"
+                      >
+                        <option value="default">Default</option>
+                        <option value="read">Read</option>
+                        <option value="eli5">ELI5</option>
+                      </select>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setReadingMode((v) => !v)}
+                      className={`min-h-9 px-3 rounded-lg border text-xs font-semibold transition-colors ${
+                        readingMode
+                          ? 'border-yellow-500/40 text-yellow-200 bg-yellow-500/10'
+                          : 'border-gray-700 text-gray-300 bg-gray-950'
+                      }`}
+                    >
+                      Reading mode
+                    </button>
+                    <button
+                      type="button"
+                      onClick={exportHistoryMarkdown}
+                      className="min-h-9 px-3 rounded-lg border border-gray-700 bg-gray-950 text-gray-300 text-xs font-semibold hover:border-green-500/40 hover:text-green-300 transition-colors"
+                    >
+                      Export MD
+                    </button>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-mono text-gray-500 uppercase tracking-widest mb-1">
+                      Custom instructions
+                    </label>
+                    <textarea
+                      value={customInstructions}
+                      onChange={(e) => setCustomInstructions(e.target.value.slice(0, 1200))}
+                      rows={3}
+                      className="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-yellow-500"
+                      placeholder="Ex: răspunde scurt, cu pași numerotați; evită marketingul."
+                    />
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-mono text-gray-500 uppercase tracking-widest mb-2">Attachments</p>
+                    {attachments.length === 0 ? (
+                      <p className="text-xs text-gray-500">No attachments.</p>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {attachments.map((a) => (
+                          <div
+                            key={a.id}
+                            className="inline-flex items-center gap-2 min-h-9 px-3 rounded-full bg-gray-950 border border-gray-700 text-gray-300 text-xs"
+                          >
+                            {a.url ? (
+                              <a
+                                href={a.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="hover:text-yellow-300"
+                                title={`${a.filename} (${a.mimeType})`}
+                              >
+                                {a.filename}
+                              </a>
+                            ) : (
+                              <span title={`${a.filename} (${a.mimeType})`}>{a.filename}</span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setAttachments((prev) =>
+                                  (Array.isArray(prev) ? prev : []).filter((x) => x.id !== a.id),
+                                )
+                              }
+                              className="p-1 rounded hover:bg-gray-800 text-gray-500 hover:text-gray-200"
+                              aria-label="Remove"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {recentSearches.length > 0 ? (
+                    <div>
+                      <p className="text-[11px] font-mono text-gray-500 uppercase tracking-widest mb-2">Recent</p>
+                      <div className="flex flex-wrap gap-2">
+                        {recentSearches.slice(0, 8).map((q) => (
+                          <button
+                            key={q}
+                            type="button"
+                            onClick={() => {
+                              setQuery(q);
+                              setShowSettings(false);
+                              setTimeout(() => processQuestion(q, chatHistory), 50);
+                            }}
+                            className="inline-flex items-center gap-1 min-h-9 px-3 rounded-full bg-gray-950 border border-gray-700 text-gray-300 text-xs hover:border-yellow-500/50 hover:text-yellow-300 transition-all"
+                          >
+                            {q}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              )}
+
+              {showPinned && (
+                <div className="rounded-2xl border border-gray-800/90 bg-black/30 px-4 py-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-mono text-gray-500 uppercase tracking-widest">Pins</p>
+                    <button
+                      type="button"
+                      onClick={() => setShowPinned(false)}
+                      className="text-xs text-gray-500 hover:text-gray-300"
+                    >
+                      Close
+                    </button>
+                  </div>
+                  {pinnedEntries.length === 0 ? (
+                    <p className="text-sm text-gray-500">No pinned answers yet.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {pinnedEntries.slice(0, 50).map((p) => (
+                        <div key={p.id ?? p.question} className="rounded-xl border border-gray-800 bg-black/20 p-3">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <p className="text-xs text-gray-400">{p.question}</p>
+                              <p className="mt-2 text-sm text-gray-200 whitespace-pre-wrap">{p.answer.slice(0, 260)}{p.answer.length > 260 ? '…' : ''}</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => togglePinEntry(p)}
+                              className="p-2 rounded-lg text-gray-500 hover:text-yellow-300 hover:bg-gray-800"
+                              aria-label="Unpin"
+                            >
+                              <Pin className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* ── Chat history (previous Q&As) ── */}
               {chatHistory.map((entry, i) => (
-                <div key={i} className="space-y-4 opacity-50">
+                <div key={entry.id ?? i} className="space-y-4 opacity-50">
                   {/* User bubble */}
                   <div className="flex justify-end">
                     <div className="bg-gray-900 border border-gray-700 rounded-2xl rounded-tr-sm px-5 py-3 max-w-2xl">
@@ -1412,16 +2268,13 @@ export default function CetAiSearch() {
                         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                           <div className="flex items-center gap-2">
                             <div className="w-7 h-7 rounded-lg bg-yellow-500/20 border border-yellow-500/40 flex items-center justify-center shrink-0">
-                              <svg viewBox="0 0 16 16" className="w-4 h-4 text-yellow-400" fill="currentColor">
-                                <circle cx="8" cy="8" r="3" />
-                                <path d="M8 1 L8.6 4.5 L8 4 L7.4 4.5 Z" />
-                                <path d="M8 15 L8.6 11.5 L8 12 L7.4 11.5 Z" />
-                                <path d="M1 8 L4.5 8.6 L4 8 L4.5 7.4 Z" />
-                                <path d="M15 8 L11.5 8.6 L12 8 L11.5 7.4 Z" />
-                              </svg>
+                              <Sparkles className="w-4 h-4 text-yellow-400" aria-hidden />
                             </div>
                             <p className="text-green-400 text-xs font-mono font-bold uppercase tracking-widest">
                               {t.cetAi.cetAiResponse} · {t.cetAi.confidence} {cetAiConfidence.toFixed(1)}%
+                              {currentModelUsed ? ` · ${currentModelUsed}` : ''}
+                              {currentUsedCache ? ' · cache' : ''}
+                              {finalResponse ? ` · ~${estimateReadMinutes(finalResponse)} min` : ''}
                             </p>
                           </div>
                           <div className="flex items-center gap-2 flex-wrap justify-end">
@@ -1438,6 +2291,7 @@ export default function CetAiSearch() {
                                 navigator.clipboard.writeText(finalResponse).then(() => {
                                   setCopiedResponse(true);
                                   setTimeout(() => setCopiedResponse(false), 2000);
+                                  trackEvent('ai_copy', { kind: 'response' });
                                 }).catch(() => {});
                               }}
                               className="p-1.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:text-yellow-400 hover:border-yellow-500/40 transition-all"
@@ -1453,6 +2307,7 @@ export default function CetAiSearch() {
                                 navigator.clipboard.writeText(payload).then(() => {
                                   setCopiedForAi(true);
                                   setTimeout(() => setCopiedForAi(false), 2000);
+                                  trackEvent('ai_copy', { kind: 'for_ai' });
                                 }).catch(() => {});
                               }}
                               className="p-1.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:text-cyan-300 hover:border-cyan-500/40 transition-all"
@@ -1477,6 +2332,7 @@ export default function CetAiSearch() {
                                     .then(() => {
                                       setCopiedTranscript(true);
                                       setTimeout(() => setCopiedTranscript(false), 2000);
+                                      trackEvent('ai_copy', { kind: 'transcript' });
                                     })
                                     .catch(() => {});
                                 }}
@@ -1498,6 +2354,70 @@ export default function CetAiSearch() {
                               className="p-1.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:text-amber-300 hover:border-amber-500/40 transition-all disabled:opacity-40 disabled:pointer-events-none"
                             >
                               <RefreshCw className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              aria-label="Pin"
+                              title="Pin"
+                              onClick={() => {
+                                if (!submittedQuestion || !finalResponse) return;
+                                togglePinEntry({
+                                  id: `${Date.now().toString(36)}-pin`,
+                                  question: submittedQuestion,
+                                  answer: finalResponse,
+                                  confidence: cetAiConfidence,
+                                  createdAt: Date.now(),
+                                  modelUsed: currentModelUsed ?? undefined,
+                                  sources: responseSources,
+                                  alternates: currentAlternates.length > 0 ? currentAlternates : undefined,
+                                  pinned: true,
+                                });
+                              }}
+                              className="p-1.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:text-yellow-300 hover:border-yellow-500/40 transition-all"
+                            >
+                              <Pin className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              aria-label="Text to speech"
+                              title="Text to speech"
+                              onClick={() => (isSpeaking ? stopSpeaking() : speakAnswer(finalResponse))}
+                              className="p-1.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:text-cyan-300 hover:border-cyan-500/40 transition-all"
+                            >
+                              {isSpeaking ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                            </button>
+                            <button
+                              type="button"
+                              aria-label="Thumbs up"
+                              title="Thumbs up"
+                              onClick={() => void rateCurrentAnswer(1)}
+                              disabled={sendingFeedback || currentFeedback === 1}
+                              className={`p-1.5 rounded-lg bg-gray-900 border text-gray-400 transition-all disabled:opacity-40 disabled:pointer-events-none ${
+                                currentFeedback === 1 ? 'border-green-500/40 text-green-300' : 'border-gray-700 hover:text-green-300 hover:border-green-500/40'
+                              }`}
+                            >
+                              <ThumbsUp className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              aria-label="Thumbs down"
+                              title="Thumbs down"
+                              onClick={() => void rateCurrentAnswer(-1)}
+                              disabled={sendingFeedback || currentFeedback === -1}
+                              className={`p-1.5 rounded-lg bg-gray-900 border text-gray-400 transition-all disabled:opacity-40 disabled:pointer-events-none ${
+                                currentFeedback === -1 ? 'border-red-500/40 text-red-300' : 'border-gray-700 hover:text-red-300 hover:border-red-500/40'
+                              }`}
+                            >
+                              <ThumbsDown className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              aria-label="Report"
+                              title="Report"
+                              onClick={reportCurrentAnswer}
+                              className="p-1.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-400 hover:text-red-300 hover:border-red-500/40 transition-all"
+                            >
+                              <Flag className="w-3.5 h-3.5" />
                             </button>
                             <a
                               href={TONSCAN_CET_CONTRACT_URL}
@@ -1531,8 +2451,33 @@ export default function CetAiSearch() {
                             ) : null}
                           </div>
                         )}
-                        <div className="text-white" role="status" aria-live="polite" aria-atomic="true">
-                          {/<\/?.+?>/.test(finalResponse) ? (
+                        <div
+                          className={
+                            readingMode
+                              ? 'text-white text-[15px] leading-7 tracking-[0.01em]'
+                              : 'text-white'
+                          }
+                          role="status"
+                          aria-live="polite"
+                          aria-atomic="true"
+                          onClick={() => {
+                            if (typingDone) return;
+                            const isHtml = /<\/?[^>]+>/.test(finalResponse);
+                            const plain = isHtml
+                              ? finalResponse
+                                  .replace(/<br\s*\/?\s*>/gi, '\n')
+                                  .replace(/<[^>]*>/g, '')
+                              : finalResponse;
+                            setTypedResponse(plain);
+                            setTypingDone(true);
+                          }}
+                        >
+                          {!typingDone ? (
+                            <pre className="whitespace-pre-wrap text-sm leading-relaxed font-sans">
+                              {typedResponse}
+                              <span className="ml-0.5 inline-block w-[0.6ch] text-yellow-300 motion-safe:animate-pulse">▍</span>
+                            </pre>
+                          ) : /<\/?[^>]+>/.test(finalResponse) ? (
                             <SafeHtml
                               html={finalResponse.replace(/\n/g, '<br/>')}
                               config={CET_AI_SAFE_HTML_CONFIG}
@@ -1582,7 +2527,16 @@ export default function CetAiSearch() {
                                 onClick={() => {
                                   const nextHistory = [
                                     ...chatHistory,
-                                    { question: submittedQuestion, answer: finalResponse, confidence: cetAiConfidence },
+                                    {
+                                      id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
+                                      question: submittedQuestion,
+                                      answer: finalResponse,
+                                      confidence: cetAiConfidence,
+                                      createdAt: Date.now(),
+                                      modelUsed: currentModelUsed ?? undefined,
+                                      sources: responseSources,
+                                      alternates: currentAlternates.length > 0 ? currentAlternates : undefined,
+                                    },
                                   ];
                                   setChatHistory(nextHistory);
                                   processQuestion(suggestion, nextHistory);
@@ -1773,6 +2727,19 @@ export default function CetAiSearch() {
               >
                 <Send className="w-4 h-4" />
                 <span className="hidden sm:inline">{t.cetAi.sendCompact}</span>
+              </button>
+              <button
+                type="button"
+                onClick={toggleListening}
+                disabled={isProcessing}
+                aria-label="Voice input"
+                className={`min-h-11 min-w-11 px-4 py-3 rounded-xl border transition-all flex items-center justify-center touch-manipulation ${
+                  isListening
+                    ? 'border-cyan-500/50 text-cyan-300 bg-cyan-500/10 motion-safe:animate-pulse'
+                    : 'border-gray-700 text-gray-400 bg-gray-950 hover:border-cyan-500/40 hover:text-cyan-300'
+                } disabled:opacity-40 disabled:pointer-events-none`}
+              >
+                <Mic className="w-4 h-4" />
               </button>
             </form>
             <p className="text-center text-gray-600 text-[11px] mt-2 font-mono max-w-lg mx-auto leading-snug">

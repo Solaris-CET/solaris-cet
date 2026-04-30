@@ -18,6 +18,15 @@ export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
   const allowedOrigin = getAllowedOrigin(origin);
 
+  const url = (() => {
+    try {
+      return new URL(req.url);
+    } catch {
+      return null;
+    }
+  })();
+  const deep = url?.searchParams.get('deep') === '1';
+
   if (req.method === 'OPTIONS') {
     return new Response(null, {
       status: 204,
@@ -61,6 +70,48 @@ export default async function handler(req: Request): Promise<Response> {
   );
   const tonConfigured = hasTonRpcUrl;
 
+  const deepChecks = deep
+    ? await (async () => {
+        const out: Record<string, unknown> = {};
+        if (hasTonRpcUrl) {
+          try {
+            const ac = new AbortController();
+            const id = setTimeout(() => ac.abort(), 2500);
+            const res = await fetch(process.env.TONCENTER_RPC_URL as string, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(hasTonApiKey ? { 'X-API-Key': String(process.env.TONCENTER_API_KEY) } : {}),
+              },
+              body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'getMasterchainInfo', params: {} }),
+              signal: ac.signal,
+            });
+            clearTimeout(id);
+            out.tonRpc = res.ok ? 'ok' : `http_${res.status}`;
+          } catch {
+            out.tonRpc = 'error';
+          }
+        }
+        if (hasUpstashUrl && hasUpstashToken) {
+          try {
+            const u = String(process.env.UPSTASH_REDIS_REST_URL).replace(/\/+$/, '');
+            const ac = new AbortController();
+            const id = setTimeout(() => ac.abort(), 2500);
+            const res = await fetch(`${u}/ping`, {
+              method: 'GET',
+              headers: { Authorization: `Bearer ${String(process.env.UPSTASH_REDIS_REST_TOKEN)}` },
+              signal: ac.signal,
+            });
+            clearTimeout(id);
+            out.upstash = res.ok ? 'ok' : `http_${res.status}`;
+          } catch {
+            out.upstash = 'error';
+          }
+        }
+        return out;
+      })()
+    : null;
+
   return jsonResponse(
     {
       status: 'ok',
@@ -71,6 +122,7 @@ export default async function handler(req: Request): Promise<Response> {
         rateLimit: hasUpstashUrl && hasUpstashToken ? 'configured' : 'missing',
         jwt: hasJwtSecrets || hasJwtSecret ? 'configured' : 'missing',
       },
+      ...(deepChecks ? { deepChecks } : {}),
       env: {
         db: { databaseUrl: hasDbUrl },
         ai: {

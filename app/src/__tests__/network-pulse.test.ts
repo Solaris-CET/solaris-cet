@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
 
 function formatLive(n: number, unit: string): string {
   if (unit === '%') return `${n.toFixed(2)}%`;

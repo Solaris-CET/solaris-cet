@@ -1,6 +1,8 @@
-import { describe, it, expect } from 'vitest';
-import { readFileSync, existsSync } from 'node:fs';
+import { existsSync,readFileSync } from 'node:fs';
 import path from 'node:path';
+
+import { describe, expect,it } from 'vitest';
+
 import { PRODUCTION_SITE_ORIGIN } from '@/lib/brandAssetFilenames';
 
 const publicDir = path.resolve(__dirname, '../../public');

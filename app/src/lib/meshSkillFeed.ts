@@ -1,6 +1,6 @@
 import { solarisDepartments } from '@/data/solarisDepartments';
 import { AGENT_BOARD_DEPT_TO_MESH_ID } from '@/lib/agentBoardSkillMix';
-import { synthesizeMeshSkills, type SynthesisTier } from '@/lib/skillGenome';
+import { type SynthesisTier,synthesizeMeshSkills } from '@/lib/skillGenome';
 
 const FEED_TIERS: SynthesisTier[] = ['flash', 'deep', 'standard'];
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
+
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 // Sursa: animație quantum field adaptată din design extern
 // Adaptări: reducedMotion gate, ResizeObserver, DPR scaling, cleanup complet, culori aliniate brandului

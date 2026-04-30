@@ -1,7 +1,7 @@
 /**
  * Pure read/write mirrors of `useLocalStorage` (no React render).
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 function readFromStorage<T>(key: string, initial: T): T {
   try {

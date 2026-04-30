@@ -1,16 +1,17 @@
 import type { LucideIcon } from 'lucide-react';
 import {
-  Users,
-  Code2,
-  TrendingUp,
   Brain,
+  Code2,
   Coins,
+  Crown,
+  FileCheck,
   Globe,
   Palette,
   Shield,
-  FileCheck,
-  Crown,
+  TrendingUp,
+  Users,
 } from 'lucide-react';
+
 import { AGENT_BOARD_DEPT_TO_MESH_ID } from '@/lib/agentBoardSkillMix';
 
 type BoardDeptLabel = keyof typeof AGENT_BOARD_DEPT_TO_MESH_ID;

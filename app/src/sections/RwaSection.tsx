@@ -1,20 +1,22 @@
-import { ScrollFadeUp } from '@/components/ScrollFadeUp';
-import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
-import { MapPin, Leaf, Shield, TrendingUp, Layers, Sun, Landmark, ExternalLink, Fingerprint, Wallet } from 'lucide-react';
-import GlowOrbs from '../components/GlowOrbs';
-import MeshSkillRibbon from '../components/MeshSkillRibbon';
-import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
-import { useLanguage } from '../hooks/useLanguage';
-import { PredictiveTerrainHeatmap } from '@/components/PredictiveTerrainHeatmap';
+import { ExternalLink, Fingerprint, Landmark, Layers, Leaf, MapPin, Shield, Sun, TrendingUp, Wallet } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+
+import { PredictiveTerrainHeatmap } from '@/components/PredictiveTerrainHeatmap';
+import { RwaDocumentsPanel } from '@/components/rwa/RwaDocumentsPanel';
 import { RwaPortfolioMap } from '@/components/rwa/RwaPortfolioMap';
 import { RwaTimelinePanel } from '@/components/rwa/RwaTimelinePanel';
-import { RwaDocumentsPanel } from '@/components/rwa/RwaDocumentsPanel';
-import { RWA_DOCUMENTS, RWA_PROJECTS, RWA_TIMELINE, statusChipClass } from '@/lib/rwaPortfolio';
+import { ScrollFadeUp } from '@/components/ScrollFadeUp';
+import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { TONSCAN_CET_CONTRACT_URL } from '@/lib/cetContract';
 import { DEDUST_POOL_PAGE_URL } from '@/lib/dedustUrls';
+import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 import { PUBLIC_WHITEPAPER_IPFS_CID, PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
+import { RWA_DOCUMENTS, RWA_PROJECTS, RWA_TIMELINE, statusChipClass } from '@/lib/rwaPortfolio';
+
+import GlowOrbs from '../components/GlowOrbs';
+import MeshSkillRibbon from '../components/MeshSkillRibbon';
+import { useLanguage } from '../hooks/useLanguage';
 
 /** Inline SVG placeholder — replace with on-site photography of Cetățuia land when available */
 const PHYSICAL_ASSET_PLACEHOLDER_BG =

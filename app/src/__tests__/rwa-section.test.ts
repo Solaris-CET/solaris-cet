@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
 
 const RWA_STATS = [
   { label: 'Location',       value: 'Cetățuia, Romania'   },

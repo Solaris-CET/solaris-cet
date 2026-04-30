@@ -1,6 +1,11 @@
-import { useEffect, useRef } from 'react';
 import { TonConnectButton, useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
-import { standardSkillBurst, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+import { useJwtSession } from '@/hooks/useJwtSession';
+import { useTonNetwork } from '@/hooks/useTonNetwork';
+import { trackWalletConnect } from '@/lib/analytics';
+import { mktConversion } from '@/lib/marketing';
+import { skillSeedFromLabel,standardSkillBurst } from '@/lib/meshSkillFeed';
 
 /**
  * WalletConnect — thin wrapper around the TonConnect UI button.
@@ -12,33 +17,136 @@ import { standardSkillBurst, skillSeedFromLabel } from '@/lib/meshSkillFeed';
  * In development, when a wallet is connected, also renders a "Send Test TON"
  * button for a small test transaction.
  */
-const WalletConnect = () => {
+type WalletConnectMode = 'auth' | 'link';
+
+type Props = {
+  mode?: WalletConnectMode;
+  onProof?: (args: {
+    walletAddress: string;
+    tonProof: Record<string, unknown> | null;
+    publicKey: unknown;
+    network: string;
+  }) => void;
+};
+
+const WalletConnect = (props: Props) => {
+  const mode: WalletConnectMode = props.mode ?? 'auth';
+  const onProof = props.onProof;
   const [tonConnectUI] = useTonConnectUI();
   const wallet = useTonWallet();
   const lastSyncedAddress = useRef<string | null>(null);
+  const { token, setToken } = useJwtSession();
+  const { network } = useTonNetwork();
+  const [challenge, setChallenge] = useState<{ payload: string; expiresAt: string } | null>(null);
+
+  const walletAddress = useMemo(() => wallet?.account?.address?.trim() ?? null, [wallet?.account?.address]);
 
   useEffect(() => {
-    const address = wallet?.account?.address?.trim();
-    if (!address || lastSyncedAddress.current === address) return;
-    lastSyncedAddress.current = address;
+    let alive = true;
+    const controller = new AbortController();
+    const run = async () => {
+      try {
+        const res = await fetch(`/api/auth/challenge?network=${encodeURIComponent(network)}`, {
+          method: 'GET',
+          cache: 'no-store',
+          signal: controller.signal,
+        });
+        if (!res.ok) return;
+        const json = (await res.json()) as { payload?: unknown; expiresAt?: unknown };
+        const payload = typeof json.payload === 'string' ? json.payload : '';
+        const expiresAt = typeof json.expiresAt === 'string' ? json.expiresAt : '';
+        if (!payload || !expiresAt) return;
+        if (!alive) return;
+        setChallenge({ payload, expiresAt });
+      } catch {
+        void 0;
+      }
+    };
+    void run();
+    return () => {
+      alive = false;
+      controller.abort();
+    };
+  }, [network]);
+
+  useEffect(() => {
+    if (!challenge?.payload) return;
+    try {
+      tonConnectUI.setConnectRequestParameters({ state: 'ready', value: { tonProof: challenge.payload } });
+    } catch {
+      void 0;
+    }
+  }, [challenge?.payload, tonConnectUI]);
+
+  useEffect(() => {
+    if (mode !== 'auth') return;
+    if (walletAddress) return;
+    if (!token) return;
+    setToken(null);
+    lastSyncedAddress.current = null;
+  }, [mode, setToken, token, walletAddress]);
+
+  useEffect(() => {
+    if (!walletAddress) return;
+    if (lastSyncedAddress.current === walletAddress) return;
+
+    if (mode === 'auth') {
+      try {
+        trackWalletConnect({ network, source: 'tonconnect' });
+        mktConversion('CompleteRegistration', { network, source: 'tonconnect' });
+      } catch {
+        void 0;
+      }
+    }
+    lastSyncedAddress.current = walletAddress;
+
+    const tonProof = (() => {
+      const w = wallet as unknown as Record<string, unknown>;
+      const items = w.connectItems;
+      if (!items || typeof items !== 'object') return null;
+      const tp = (items as Record<string, unknown>).tonProof;
+      if (!tp || typeof tp !== 'object') return null;
+      return tp as Record<string, unknown>;
+    })();
+
+    const pub = (wallet as unknown as { account?: { publicKey?: unknown } })?.account?.publicKey;
+    if (mode === 'link') {
+      onProof?.({ walletAddress, tonProof, publicKey: pub, network });
+      return;
+    }
 
     void (async () => {
       try {
-        const res = await fetch('/api/auth', {
+        const url = new URL(window.location.href);
+        const referralCode = url.searchParams.get('ref') || (() => {
+          try {
+            return localStorage.getItem('solaris_ref');
+          } catch {
+            return null;
+          }
+        })();
+        const inviteToken = url.searchParams.get('invite') || (() => {
+          try {
+            return localStorage.getItem('solaris_invite');
+          } catch {
+            return null;
+          }
+        })();
+        const res = await fetch('/api/auth/verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ walletAddress: address }),
+          body: JSON.stringify({ walletAddress: walletAddress, tonProof, publicKey: pub, network, referralCode, inviteToken }),
         });
-        if (!res.ok && import.meta.env.DEV) {
-          console.warn('[WalletConnect] /api/auth failed:', res.status, await res.text());
-        }
-      } catch (e) {
-        if (import.meta.env.DEV) {
-          console.warn('[WalletConnect] /api/auth:', e);
-        }
+        if (!res.ok) return;
+        const json = (await res.json()) as { token?: unknown };
+        const nextToken = typeof json.token === 'string' ? json.token : '';
+        if (!nextToken) return;
+        setToken(nextToken);
+      } catch {
+        void 0;
       }
     })();
-  }, [wallet?.account?.address]);
+  }, [mode, network, onProof, setToken, wallet, walletAddress]);
 
   const handleTestTransaction = async () => {
     if (!tonConnectUI.connected) return;

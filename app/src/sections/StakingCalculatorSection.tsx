@@ -1,8 +1,9 @@
+import { Calculator, Calendar, LineChart, Percent, Sparkles } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { Calendar, Calculator, LineChart, Percent, Sparkles } from 'lucide-react';
+
 import GlowOrbs from '../components/GlowOrbs';
-import { useLanguage } from '../hooks/useLanguage';
 import { useLivePoolData } from '../hooks/use-live-pool-data';
+import { useLanguage } from '../hooks/useLanguage';
 import { formatPrice } from '../lib/utils';
 
 type PeriodDays = 30 | 90 | 180 | 365;

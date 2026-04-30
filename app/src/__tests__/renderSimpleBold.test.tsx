@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
-import { describe, it, expect, afterEach } from 'vitest';
-import { render, cleanup } from '@testing-library/react';
-import { hasBalancedSimpleBoldMarkers } from '@/lib/simpleBoldMarkers';
+import { cleanup,render } from '@testing-library/react';
+import { afterEach,describe, expect, it } from 'vitest';
+
 import { renderSimpleBold } from '@/lib/renderSimpleBold';
+import { hasBalancedSimpleBoldMarkers } from '@/lib/simpleBoldMarkers';
 
 afterEach(() => {
   cleanup();

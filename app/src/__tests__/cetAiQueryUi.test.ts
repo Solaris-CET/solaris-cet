@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest';
-import { cetAiQueryCharCountToneClass, formatCetAiQueryCharCountAria } from '@/lib/cetAiQueryUi';
+import { describe, expect,it } from 'vitest';
+
 import {
   CET_AI_MAX_QUERY_CHARS,
   CET_AI_QUERY_NEAR_LIMIT_REMAINING_CHARS,
 } from '@/lib/cetAiConstants';
+import { cetAiQueryCharCountToneClass, formatCetAiQueryCharCountAria } from '@/lib/cetAiQueryUi';
 
 describe('formatCetAiQueryCharCountAria', () => {
   it('replaces placeholders', () => {

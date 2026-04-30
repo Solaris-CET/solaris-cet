@@ -1,15 +1,15 @@
 import type { LucideIcon } from 'lucide-react';
 import {
-  Crown,
-  Code2,
-  Palette,
   Brain,
-  Shield,
-  Globe,
-  Users,
-  TrendingUp,
+  Code2,
   Coins,
+  Crown,
   FileCheck,
+  Globe,
+  Palette,
+  Shield,
+  TrendingUp,
+  Users,
 } from 'lucide-react';
 
 /**

@@ -1,23 +1,43 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
+
+import { URL_LOCALES } from '../src/i18n/urlRouting';
 import { NAV_PRIMARY_IN_PAGE } from '../src/lib/navPrimaryHrefs';
 import { scrollUntilSelectorAttached } from './e2e-helpers';
 
 /** Match `sovereign-static.spec.ts`: fixed language for stable nav + section copy. */
-export const E2E_I18N_START = '/?lang=en';
+export const E2E_I18N_START = '/en/';
 
 export type NavPrimaryInPageHref = (typeof NAV_PRIMARY_IN_PAGE)[number]['href'];
 
+async function clickNavLink(locator: Locator) {
+  try {
+    await locator.click({ timeout: 3_000 });
+  } catch {
+    await locator.evaluate((el) => (el as HTMLAnchorElement).click());
+  }
+}
+
 /** Hash links: pointer hit-test can fail in headless (logo / glass layers). */
 export async function clickHeaderNav(page: Page, href: NavPrimaryInPageHref): Promise<void> {
-  if (href.startsWith('#')) {
-    await page
-      .locator(`header nav a[href="${href}"]`)
-      .evaluate((el) => (el as HTMLAnchorElement).click());
-    return;
+  const locator = href.startsWith('#')
+    ? page.locator(`header nav a[href="${href}"]`)
+    : page.locator(`header nav a[href$="${href}"]`);
+  await clickNavLink(locator);
+}
+
+export async function clickMobileSheetNav(page: Page, href: NavPrimaryInPageHref): Promise<void> {
+  const locator = page.locator(`#mobile-menu nav a[href="${href}"]`);
+  await clickNavLink(locator);
+}
+
+function stripLocalePrefix(pathname: string) {
+  const parts = pathname.split('/').filter(Boolean);
+  const first = parts[0] ?? '';
+  if ((URL_LOCALES as readonly string[]).includes(first)) {
+    const rest = `/${parts.slice(1).join('/')}`;
+    return rest === '/' ? '/' : rest.replace(/\/$/, '') || '/';
   }
-  await page
-    .locator(`header nav a[href^="${href}"]`)
-    .evaluate((el) => (el as HTMLAnchorElement).click());
+  return pathname;
 }
 
 const desktopAssertByHref: {
@@ -39,21 +59,39 @@ const desktopAssertByHref: {
     await scrollUntilSelectorAttached(page, '#cet-ai');
     await expect(page.getByTestId('cet-ai-hero')).toBeVisible({ timeout: 15_000 });
   },
-  '#whitepaper': async (page) => {
-    await scrollUntilSelectorAttached(page, '#whitepaper');
-    await expect(page.locator('#whitepaper').getByText('WHITEPAPER · INLINE EDITION')).toBeVisible({
-      timeout: 15_000,
-    });
+  '/whitepaper': async (page) => {
+    await expect(page.getByRole('heading', { name: 'Whitepaper' })).toBeVisible({ timeout: 15_000 });
+  },
+  '/cetuia': async (page) => {
+    await expect(page.getByTestId('cetuia-map-section')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId('cetuia-hex-map')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId('cetuia-map-controls')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('button', { name: 'Zoom in' })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('button', { name: 'Zoom out' })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('button', { name: 'Reset view' })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId('cetuia-loading')).toBeHidden({ timeout: 15_000 });
+
+    const counts = page.getByTestId('cetuia-token-counts');
+    await expect(counts).toBeVisible({ timeout: 15_000 });
+    await expect(counts).toContainText(/8[\s\u00A0,.]?998\s*\/\s*1\s*\/\s*1/);
+
+    const interaction = page.getByTestId('cetuia-map-interaction');
+    await expect(interaction).toBeVisible({ timeout: 15_000 });
+    const box = await interaction.boundingBox();
+    if (!box) throw new Error('cetuia-map-interaction boundingBox is null');
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    const selectedToken = page.getByTestId('cetuia-selected-token');
+    await expect(selectedToken).toContainText(/#(1|2)/, { timeout: 15_000 });
+    const tokenText = (await selectedToken.textContent())?.trim() ?? '';
+    const match = tokenText.match(/^#(\d+)$/);
+    if (!match) throw new Error(`Unexpected cetuia-selected-token: ${tokenText}`);
+    const tokenId = Number(match[1]);
+    const status = page.getByTestId('cetuia-selected-status');
+    await expect(status).toContainText(tokenId === 1 ? 'REZERVAT' : 'VÂNDUT', { timeout: 15_000 });
   },
   '#how-to-buy': async (page) => {
     await scrollUntilSelectorAttached(page, '#how-to-buy');
     await expect(page.locator('#how-to-buy').getByText('HOW TO BUY')).toBeVisible({
-      timeout: 15_000,
-    });
-  },
-  '#resources': async (page) => {
-    await scrollUntilSelectorAttached(page, '#resources');
-    await expect(page.locator('#resources').getByText('ECOSYSTEM RESOURCES')).toBeVisible({
       timeout: 15_000,
     });
   },
@@ -70,7 +108,7 @@ export async function runDesktopNavPrimaryCase(page: Page, href: NavPrimaryInPag
   if (href.startsWith('#')) {
     await expect(page).toHaveURL((u) => u.hash === href);
   } else {
-    await expect(page).toHaveURL((u) => u.pathname.replace(/\/$/, '') === href);
+    await expect(page).toHaveURL((u) => stripLocalePrefix(u.pathname).replace(/\/$/, '') === href);
   }
   await desktopAssertByHref[href](page);
 }

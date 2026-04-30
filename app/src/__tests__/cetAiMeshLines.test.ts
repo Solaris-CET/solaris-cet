@@ -1,10 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
 import {
   buildAgentPoolMeshLogMessage,
-  buildTeamAgentMeshLogMessage,
   buildDeepLatticeMeshLogMessage,
   buildDeepLatticeMeshLogMessageRawQuery,
   buildSkillLocusLogMessage,
+  buildTeamAgentMeshLogMessage,
   CET_AI_LATTICE_PHASE,
 } from '@/lib/cetAiMeshLines';
 

@@ -1,18 +1,20 @@
+import { AlertTriangle, CheckCircle, Dna,Lightbulb, MessageCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
 import { useLanguage } from '@/hooks/useLanguage';
-import { MessageCircle, Lightbulb, CheckCircle, AlertTriangle, Dna } from 'lucide-react';
-import { useAgentBoard, type EventKind } from '../hooks/useAgentBoard';
+import { agentBoardDeptUiRow, isAgentBoardDeptLabel } from '@/lib/agentBoardDeptUi';
 import { AGENT_BOARD_DEPT_TO_MESH_ID } from '@/lib/agentBoardSkillMix';
 import {
-  meshWhisperFromKey,
+  meshStandardBurstForBoardCollab,
+  meshStandardBurstForBoardLiveAgent,
   meshStandardBurstFromKey,
   meshWhisperForAiTeamRoleAgent,
-  meshWhisperForBoardLiveAgent,
-  meshStandardBurstForBoardLiveAgent,
   meshWhisperForBoardCollab,
-  meshStandardBurstForBoardCollab,
+  meshWhisperForBoardLiveAgent,
+  meshWhisperFromKey,
 } from '@/lib/meshSkillFeed';
-import { agentBoardDeptUiRow, isAgentBoardDeptLabel } from '@/lib/agentBoardDeptUi';
+
+import { type EventKind,useAgentBoard } from '../hooks/useAgentBoard';
 
 const KIND_CONFIG: Record<EventKind, { icon: typeof MessageCircle; label: string; color: string; bg: string }> = {
   solved:  { icon: CheckCircle,   label: 'SOLVED',  color: 'text-emerald-400', bg: 'bg-emerald-400/10' },

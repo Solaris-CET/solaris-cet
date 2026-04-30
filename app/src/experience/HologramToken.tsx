@@ -1,6 +1,7 @@
-import { memo, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { memo, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+
 import { clamp01, mulberry32 } from '@/lib/seed';
 
 type Quality = 'low' | 'high';

@@ -1,11 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
 import {
-  CET_AI_BURST_SALT,
-  buildRavBurstLogMessage,
-  buildFlashGlintLogMessage,
-  buildExpressomeBurstLogMessage,
   buildConsensusBurstLogMessage,
+  buildExpressomeBurstLogMessage,
+  buildFlashGlintLogMessage,
   buildLoopCompleteBurstLogMessage,
+  buildRavBurstLogMessage,
+  CET_AI_BURST_SALT,
 } from '@/lib/cetAiBurstLines';
 
 describe('cetAiBurstLines', () => {

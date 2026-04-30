@@ -15,11 +15,12 @@
 
 import { TonClient, Address } from '@ton/ton';
 import { Factory, MAINNET_FACTORY_ADDR, PoolType, Asset, JettonRoot } from '@dedust/sdk';
-import { writeFileSync, mkdirSync } from 'fs';
+import { writeFileSync, mkdirSync, readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { CET_CONTRACT_ADDRESS } from '../app/src/lib/cetContract';
 import { USDT_JETTON_MASTER_ADDRESS } from '../app/src/lib/usdtContract';
+import { DEDUST_POOL_ADDRESS } from '../app/src/lib/dedustUrls';
 import { TOKEN_NAME, TOKEN_SYMBOL, TOKEN_DECIMALS } from '../app/src/constants/token';
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -59,6 +60,23 @@ interface IndexerOutput {
   updatedAt: string;
 }
 
+type YieldPoint = {
+  ts: string;
+  tvlUsd: number;
+  volume24hUsd: number;
+  cetPriceUsd: number;
+  tonPriceUsd: number;
+};
+
+type DeDustAsset = { type: 'native' | 'jetton'; address?: string };
+type DeDustPool = {
+  address: string;
+  assets: [DeDustAsset, DeDustAsset];
+  reserves: [string, string];
+  stats?: { volume_24h?: string };
+};
+type DeDustPrice = { address: string; price: string };
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function bigintToDecimalString(value: bigint, decimals: number): string {
@@ -90,6 +108,68 @@ async function retry<T>(fn: () => Promise<T>, label: string): Promise<T> {
     }
   }
   throw lastErr;
+}
+
+function readJsonFile<T>(filePath: string, fallback: T): T {
+  try {
+    const raw = readFileSync(filePath, 'utf8');
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+async function fetchYieldPoint(): Promise<YieldPoint | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
+  try {
+    const [poolsRes, pricesRes] = await Promise.all([
+      fetch('https://api.dedust.io/v2/pools', { signal: controller.signal }),
+      fetch('https://api.dedust.io/v2/prices', { signal: controller.signal }),
+    ]);
+    if (!poolsRes.ok || !pricesRes.ok) return null;
+    const pools = (await poolsRes.json()) as DeDustPool[];
+    const prices = (await pricesRes.json()) as DeDustPrice[];
+
+    const tonEntry = prices.find((p) => p.address === 'native');
+    const tonPriceUsd = tonEntry ? Number.parseFloat(tonEntry.price) : Number.NaN;
+    if (!Number.isFinite(tonPriceUsd) || tonPriceUsd <= 0) return null;
+
+    const cetAddressLower = CET_CONTRACT_ADDRESS.toLowerCase();
+    const cetEntry = prices.find((p) => p.address.toLowerCase() === cetAddressLower);
+    const cetPriceUsdRaw = cetEntry ? Number.parseFloat(cetEntry.price) : Number.NaN;
+
+    const pool = pools.find((p) => p.address === DEDUST_POOL_ADDRESS);
+    if (!pool) return null;
+
+    const tonIndex = pool.assets[0].type === 'native' ? 0 : 1;
+    const cetIndex = tonIndex === 0 ? 1 : 0;
+    const tonReserve = Number.parseFloat(pool.reserves[tonIndex]) / 1e9;
+    const cetReserve = Number.parseFloat(pool.reserves[cetIndex]) / Math.pow(10, TOKEN_DECIMALS);
+
+    const cetPriceUsd = Number.isFinite(cetPriceUsdRaw) && cetPriceUsdRaw > 0
+      ? cetPriceUsdRaw
+      : cetReserve > 0
+        ? (tonReserve / cetReserve) * tonPriceUsd
+        : Number.NaN;
+    if (!Number.isFinite(cetPriceUsd) || cetPriceUsd <= 0) return null;
+
+    const tvlUsd = tonReserve * tonPriceUsd * 2;
+    const volume24hTon = pool.stats?.volume_24h ? Number.parseFloat(pool.stats.volume_24h) / 1e9 : Number.NaN;
+    const volume24hUsd = Number.isFinite(volume24hTon) && volume24hTon > 0 ? volume24hTon * tonPriceUsd : 0;
+
+    return {
+      ts: new Date().toISOString(),
+      tvlUsd,
+      volume24hUsd,
+      cetPriceUsd,
+      tonPriceUsd,
+    };
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
@@ -229,6 +309,23 @@ async function main(): Promise<void> {
   writeFileSync(outputPath, JSON.stringify(output, null, 2) + '\n', 'utf8');
 
   console.log(`[ton-indexer] state.json written to ${outputPath}`);
+  
+  const yieldsPath = join(__dirname, '..', 'app', 'public', 'api', 'yields-history.json');
+  const point = await fetchYieldPoint();
+  if (point) {
+    const prev = readJsonFile<YieldPoint[]>(yieldsPath, []);
+    const normalized = Array.isArray(prev) ? prev : [];
+    const next = normalized
+      .filter((p) => p && typeof p.ts === 'string' && p.ts !== point.ts)
+      .concat(point)
+      .sort((a, b) => (a.ts < b.ts ? -1 : 1))
+      .slice(-720);
+    writeFileSync(yieldsPath, JSON.stringify(next, null, 2) + '\n', 'utf8');
+    console.log(`[ton-indexer] yields-history.json updated (${next.length} points)`);
+  } else {
+    console.log('[ton-indexer] yields-history skipped (upstream unavailable)');
+  }
+
   console.log('[ton-indexer] Done.');
 }
 

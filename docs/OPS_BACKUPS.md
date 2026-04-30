@@ -78,3 +78,25 @@ pg_restore --clean --if-exists --no-owner --no-privileges --dbname "$PGDATABASE"
 - Always encrypt backups at rest (bucket encryption) and preferably client-side (`openssl` step above).
 - Test restores; “a backup you never restored” is not a backup.
 
+---
+
+# Backups — Redis (/data)
+
+## Host cron (simplu)
+
+1) Alege containerul Redis (în Coolify îl vei vedea în lista de servicii/containers).
+
+2) Rulează backup-ul cu retenție + (opțional) criptare.
+
+Script: `scripts/redis-data-backup.sh`.
+
+Exemplu (03:25 UTC zilnic):
+
+```cron
+25 3 * * * BACKUP_DIR=/var/backups/solaris-cet REDIS_CONTAINER=redis BACKUP_PREFIX=solaris-redis BACKUP_KEEP_DAYS=14 BACKUP_PASSPHRASE='***' /root/solaris-cet/scripts/redis-data-backup.sh >/var/log/solaris-redis-backup.log 2>&1
+```
+
+## Observații
+
+- Scriptul face `redis-cli save` înainte de arhivare (dezactivează cu `REDIS_FORCE_SAVE=0`).
+- Dacă Redis rulează cu volume mapate, arhiva reflectă exact conținutul din `/data`.

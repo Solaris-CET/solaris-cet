@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+
 import AppImage from '@/components/AppImage';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 

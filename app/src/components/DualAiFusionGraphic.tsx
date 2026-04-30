@@ -1,5 +1,6 @@
-import { useReducedMotion } from '../hooks/useReducedMotion';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 /**
  * Visual diagram: Grok × Gemini converging on Solaris with RAV (Reason · Act · Verify)

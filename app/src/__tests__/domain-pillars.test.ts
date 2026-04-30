@@ -1,12 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
 import { solarisDepartments } from '@/data/solarisDepartments';
+import { AGENT_BOARD_DEPARTMENTS } from '@/lib/agentBoardDepartments';
+import { AGENT_BOARD_DEPT_TO_MESH_ID } from '@/lib/agentBoardSkillMix';
 import {
   CET_FIXED_SUPPLY_CAP,
   ENTERPRISE_DEPARTMENT_LANES,
   TASK_AGENT_MESH_TOTAL,
 } from '@/lib/domainPillars';
-import { AGENT_BOARD_DEPT_TO_MESH_ID } from '@/lib/agentBoardSkillMix';
-import { AGENT_BOARD_DEPARTMENTS } from '@/lib/agentBoardDepartments';
 
 describe('domain pillars ↔ registry alignment', () => {
   it('CET cap and department / mesh totals match solarisDepartments', () => {

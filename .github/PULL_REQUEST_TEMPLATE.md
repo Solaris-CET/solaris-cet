@@ -20,9 +20,9 @@
 
 Run these from the repo root. This repo uses npm workspaces and a single root `package-lock.json`.
 
-- [ ] `npm ci --legacy-peer-deps` succeeds
-- [ ] `npm run app:verify` succeeds
-- [ ] `PW_WORKERS=1 npm run app:test:e2e` succeeds (when UI/routes changed)
+- [ ] `npm ci --include=optional --legacy-peer-deps` succeeds
+- [ ] `npm run verify:fast` succeeds
+- [ ] `npm run verify:all` succeeds (when UI/routes/API contracts changed)
 - [ ] `npm run contracts:test` succeeds (when contracts changed)
 - [ ] `npm run contracts:typecheck` succeeds (when contracts changed)
 - [ ] Tested manually in a browser when UI behaviour changed

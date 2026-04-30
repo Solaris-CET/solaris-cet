@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { renderHook, act } from './renderHook';
-import { useAgentBoard, defaultGenerateEvent } from '../hooks/useAgentBoard';
+import { afterEach,describe, expect, it, vi } from 'vitest';
+
+import { defaultGenerateEvent,useAgentBoard } from '../hooks/useAgentBoard';
+import { act,renderHook } from './renderHook';
 
 describe('useAgentBoard + defaultGenerateEvent', () => {
   afterEach(() => {

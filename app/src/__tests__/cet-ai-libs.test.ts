@@ -1,53 +1,54 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
+import {
+  buildConsensusBurstLogMessage,
+  buildExpressomeBurstLogMessage,
+  buildFlashGlintLogMessage,
+  buildLoopCompleteBurstLogMessage,
+  buildRavBurstLogMessage,
+  CET_AI_BURST_SALT,
+} from "@/lib/cetAiBurstLines";
 import {
   buildAgentPoolMeshLogMessage,
-  buildTeamAgentMeshLogMessage,
   buildDeepLatticeMeshLogMessage,
   buildDeepLatticeMeshLogMessageRawQuery,
   buildSkillLocusLogMessage,
+  buildTeamAgentMeshLogMessage,
   CET_AI_LATTICE_PHASE,
 } from "@/lib/cetAiMeshLines";
 import {
-  CET_AI_TASK_MESH_LINE,
   buildCetAiObserveParse,
   buildDeepLatticeMeshLogMessage as buildDeepLatticeTelemetry,
   buildDeepLatticeMeshLogMessageRawQuery as buildDeepLatticeRawTelemetry,
   buildSkillLocusLogMessage as buildSkillLocusTelemetry,
   CET_AI_LATTICE_PHASE as CET_AI_LATTICE_PHASE_T,
+  CET_AI_TASK_MESH_LINE,
 } from "@/lib/cetAiTelemetry";
 import {
-  CET_AI_BURST_SALT,
-  buildRavBurstLogMessage,
-  buildFlashGlintLogMessage,
-  buildExpressomeBurstLogMessage,
-  buildConsensusBurstLogMessage,
-  buildLoopCompleteBurstLogMessage,
-} from "@/lib/cetAiBurstLines";
-import {
-  expressMeshSkillForFeed,
-  shortSkillWhisper,
-  skillCaptionForDept,
-  standardSkillBurst,
-  skillFlashForBoardDept,
-  skillSaltFromQuery,
-  skillSeedFromLabel,
-  deepLatticeLineForQuery,
-  observeLocusBranchFromTopic,
-  observeLocusClip,
-  meshWhisperFromKey,
-  meshStandardBurstFromKey,
+  agentBoardLiveAgentKey,
   aiTeamRoleAgentKey,
   aiTeamRoleGeneKey,
   aiTeamSynthKey,
-  meshWhisperForAiTeamRoleAgent,
+  deepLatticeLineForQuery,
+  expressMeshSkillForFeed,
   meshStandardBurstForAiTeamRoleAgent,
+  meshStandardBurstForBoardCollab,
+  meshStandardBurstForBoardLiveAgent,
+  meshStandardBurstFromKey,
+  meshWhisperForAiTeamRoleAgent,
   meshWhisperForAiTeamRoleGene,
   meshWhisperForAiTeamSynth,
-  agentBoardLiveAgentKey,
-  meshWhisperForBoardLiveAgent,
-  meshStandardBurstForBoardLiveAgent,
   meshWhisperForBoardCollab,
-  meshStandardBurstForBoardCollab,
+  meshWhisperForBoardLiveAgent,
+  meshWhisperFromKey,
+  observeLocusBranchFromTopic,
+  observeLocusClip,
+  shortSkillWhisper,
+  skillCaptionForDept,
+  skillFlashForBoardDept,
+  skillSaltFromQuery,
+  skillSeedFromLabel,
+  standardSkillBurst,
 } from "@/lib/meshSkillFeed";
 
 function stripFeedTimestamp(line: string): string {

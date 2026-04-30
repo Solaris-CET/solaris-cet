@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
+
 import { useLanguage } from '@/hooks/useLanguage';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { shortSkillWhisper } from '@/lib/meshSkillFeed';
 
 interface MeshSkillRibbonProps {

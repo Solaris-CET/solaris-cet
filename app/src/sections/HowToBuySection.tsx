@@ -1,13 +1,17 @@
-import { useMemo, useState, useCallback } from 'react';
-import { Wallet, ArrowRightLeft, Coins, Copy, Check, ExternalLink } from 'lucide-react';
+import { ArrowRightLeft, Check, Coins, Copy, ExternalLink,Wallet } from 'lucide-react';
+import { useCallback,useMemo, useState } from 'react';
+import { toast } from 'sonner';
+
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
+import { trackBuyClick } from '@/lib/analytics';
+import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';
+import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
+import { mktEvent } from '@/lib/marketing';
+
 import LivePoolStats from '../components/LivePoolStats';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useLanguage } from '../hooks/useLanguage';
-import { CET_CONTRACT_ADDRESS } from '@/lib/cetContract';
-import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
-import { toast } from 'sonner';
 
 const TONKEEPER_URL = 'https://tonkeeper.com';
 
@@ -153,6 +157,18 @@ const HowToBuySection = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`inline-flex items-center gap-2 text-sm font-semibold ${c.text} hover:opacity-90 transition-opacity btn-quantum`}
+                    onClick={() => {
+                      if (step.action?.href === DEDUST_SWAP_URL) {
+                        trackBuyClick({
+                          destination: step.action.href,
+                          source: `how_to_buy_step:${step.id}`,
+                        });
+                        mktEvent('buy_click', {
+                          destination: step.action.href,
+                          source: `how_to_buy_step:${step.id}`,
+                        });
+                      }
+                    }}
                   >
                     {step.action.label}
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -218,6 +234,10 @@ const HowToBuySection = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="shrink-0 btn-filled-gold text-sm btn-quantum"
+                onClick={() => {
+                  trackBuyClick({ destination: DEDUST_SWAP_URL, source: 'how_to_buy_cta' });
+                  mktEvent('buy_click', { destination: DEDUST_SWAP_URL, source: 'how_to_buy_cta' });
+                }}
               >
                 <ArrowRightLeft className="w-4 h-4" />
                 {tx.swapCta}

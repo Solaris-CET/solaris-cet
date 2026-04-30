@@ -1,19 +1,21 @@
-import { describe, it, expect } from "vitest";
-import { readFileSync, existsSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { describe, expect,it } from "vitest";
+
 import {
   OG_IMAGE_FILENAME,
   PRODUCTION_SITE_ORIGIN,
-  SOLARIS_CET_LOGO_FILENAME,
   productionBrandLogoUrl,
   productionOgImageUrl,
   productionSiteUrl,
   productionTonConnectIconUrl,
+  SOLARIS_CET_LOGO_FILENAME,
 } from "@/lib/brandAssets";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "../../..");
-const appPublic = join(dirname(fileURLToPath(import.meta.url)), "../../public");
+const appPublic = join(repoRoot, "app/public");
 
 const FORBIDDEN_CDN_PATTERNS = [
   /fonts\.googleapis\.com/i,
@@ -86,9 +88,10 @@ describe("index.html — canonical production site URL", () => {
   it("og:url, twitter:url, canonical link, and JSON-LD url fields use productionSiteUrl()", () => {
     const appIndexHtml = readFileSync(join(repoRoot, "app/index.html"), "utf8");
     const site = productionSiteUrl();
-    expect(appIndexHtml).toContain(`property="og:url" content="${site}"`);
-    expect(appIndexHtml).toContain(`name="twitter:url" content="${site}"`);
-    expect(appIndexHtml).toContain(`rel="canonical" href="${site}"`);
+    const canonical = `${site}/en/`;
+    expect(appIndexHtml).toContain(`property="og:url" content="${canonical}"`);
+    expect(appIndexHtml).toContain(`name="twitter:url" content="${canonical}"`);
+    expect(appIndexHtml).toContain(`rel="canonical" href="${canonical}"`);
     expect(appIndexHtml).toContain(`"url": "${site}"`);
   });
 });

@@ -1,10 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
+import type { Translations } from '@/i18n/translations';
 import {
   buildCopyForAiText,
   buildFullConversationHandoff,
   type CetAiChatEntry,
 } from '@/lib/cetAiConversation';
-import type { Translations } from '@/i18n/translations';
 
 const mockCetAi = {
   copyForAiQuestionLabel: '## Question',

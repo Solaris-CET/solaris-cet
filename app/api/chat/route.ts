@@ -18,20 +18,27 @@
  * `runtime: 'edge'` matches edge-style adapters and compatible hosts (e.g. Coolify).
  */
 import OpenAI from 'openai';
+
+import { TOKEN_DECIMALS } from '../../src/constants/token';
+import { CET_AI_MAX_QUERY_CHARS } from '../../src/lib/cetAiConstants';
+import { CET_CONTRACT_ADDRESS } from '../../src/lib/cetContract';
+import { DEDUST_POOL_ADDRESS } from '../../src/lib/dedustUrls';
+import { getAiChatCache, getCacheTtlSeconds, setAiChatCache, sha256Hex } from '../lib/aiCache';
+import { buildCetAiRetrievalBlock } from '../lib/cetAiRetrieval';
+import { circuitAllows, circuitReportFailure, circuitReportSuccess } from '../lib/circuitBreaker';
+import { clientIp } from '../lib/clientIp';
+import { acquireConcurrencySlot } from '../lib/concurrencyLimit';
 import { getAllowedOrigin } from '../lib/cors';
 import { resolveApiKey } from '../lib/crypto';
-import { buildCetAiRetrievalBlock } from '../lib/cetAiRetrieval';
-import { withUpstashRateLimit } from '../lib/rateLimit';
-import { CET_CONTRACT_ADDRESS } from '../../src/lib/cetContract';
-import { CET_AI_MAX_QUERY_CHARS } from '../../src/lib/cetAiConstants';
-import { DEDUST_POOL_ADDRESS } from '../../src/lib/dedustUrls';
-import { TOKEN_DECIMALS } from '../../src/constants/token';
+import { withRateLimit } from '../lib/rateLimit';
+import { decideCetAiRavPlan, deriveCetAiResourceBudget } from '../lib/reactBrain';
 
 export const config = { runtime: 'edge' };
 
 /** AI model identifiers — update here to change versions across all call sites. */
 const GEMINI_MODEL = 'gemini-2.0-flash';
 const GROK_MODEL = 'grok-3-mini-beta';
+const CLAUDE_MODEL = (process.env.CET_AI_CLAUDE_MODEL ?? 'claude-3-5-sonnet-20241022').trim() || 'claude-3-5-sonnet-20241022';
 
 interface DeDustAsset {
   type: 'native' | 'jetton';
@@ -97,6 +104,50 @@ function buildChatMessages(
   }
   msgs.push({ role: 'user', content: userQuery.trim() });
   return msgs;
+}
+
+async function claudeComplete(opts: {
+  apiKey: string;
+  model: string;
+  system: string;
+  conversation: ConversationTurn[];
+  userQuery: string;
+  temperature: number;
+}): Promise<string> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 12000);
+  try {
+    const messages: Array<{ role: 'user' | 'assistant'; content: string }> = [];
+    for (const t of opts.conversation) messages.push({ role: t.role, content: t.content });
+    messages.push({ role: 'user', content: opts.userQuery.trim() });
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': opts.apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: opts.model,
+        max_tokens: 1200,
+        temperature: Math.max(0, Math.min(1, opts.temperature)),
+        system: opts.system,
+        messages,
+      }),
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error(`Claude request failed (${res.status}).`);
+    const payload = (await res.json()) as { content?: Array<{ type?: unknown; text?: unknown }> };
+    return (
+      payload?.content
+        ?.map((c) => (c && c.type === 'text' && typeof c.text === 'string' ? c.text : ''))
+        .filter(Boolean)
+        .join('') ?? ''
+    );
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 /**
@@ -175,7 +226,7 @@ export default async function handler(req: Request): Promise<Response> {
       headers: {
         'Access-Control-Allow-Origin': allowedOrigin,
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Vary': 'Origin',
       },
     });
@@ -192,25 +243,48 @@ export default async function handler(req: Request): Promise<Response> {
     });
   }
 
-  const limited = await withUpstashRateLimit(req, allowedOrigin, {
+  const limited = await withRateLimit(req, allowedOrigin, {
     keyPrefix: 'cet-ai-chat',
     limit: 10,
     windowSeconds: 10,
   });
   if (limited) return limited;
 
+  const globalSlot = await acquireConcurrencySlot(req, {
+    keyPrefix: 'cet-ai-chat:global',
+    keyPart: 'global',
+    limit: process.env.CET_AI_CHAT_MAX_CONCURRENT_GLOBAL ?? 40,
+    ttlSeconds: 45,
+    allowedOrigin,
+    retryAfterSeconds: 2,
+  });
+  if (globalSlot instanceof Response) return globalSlot;
+
+  const ipSlot = await acquireConcurrencySlot(req, {
+    keyPrefix: 'cet-ai-chat:ip',
+    limit: process.env.CET_AI_CHAT_MAX_CONCURRENT_PER_IP ?? 2,
+    ttlSeconds: 45,
+    allowedOrigin,
+    retryAfterSeconds: 2,
+  });
+  if (ipSlot instanceof Response) {
+    await globalSlot.release();
+    return ipSlot;
+  }
+
   try {
   // 1. Resolve API keys — prefer AES-256-GCM encrypted variants (*_ENC) when
   //    ENCRYPTION_SECRET is set; fall back to plaintext variants for local dev.
   const encryptionSecret = process.env.ENCRYPTION_SECRET;
-  const [grokKey, geminiKey] = await Promise.all([
+  const [grokKey, geminiKey, claudeKey] = await Promise.all([
     resolveApiKey(process.env.GROK_API_KEY_ENC, process.env.GROK_API_KEY, encryptionSecret),
     resolveApiKey(process.env.GEMINI_API_KEY_ENC, process.env.GEMINI_API_KEY, encryptionSecret),
+    resolveApiKey(process.env.ANTHROPIC_API_KEY_ENC, process.env.ANTHROPIC_API_KEY, encryptionSecret),
   ]);
 
-  if (!grokKey && !geminiKey) {
+  if (!grokKey && !geminiKey && !claudeKey) {
     return new Response(
-      JSON.stringify({ message: 'No AI provider API key configured. Set GROK_API_KEY_ENC/GROK_API_KEY or GEMINI_API_KEY_ENC/GEMINI_API_KEY in the server environment.' }),
+      JSON.stringify({ message: 'No AI provider API key configured. Set GROK_API_KEY_ENC/GROK_API_KEY, GEMINI_API_KEY_ENC/GEMINI_API_KEY, or ANTHROPIC_API_KEY_ENC/ANTHROPIC_API_KEY in the server environment.' }),
       {
         status: 500,
         headers: {
@@ -256,8 +330,51 @@ export default async function handler(req: Request): Promise<Response> {
     );
   }
 
-  // 3. Fetch live on-chain data (OBSERVE step of the outer RAV loop)
-  const onChain = await fetchOnChainContext();
+  const cacheTtlSeconds = getCacheTtlSeconds();
+  const ip = clientIp(req);
+  const cacheKey =
+    cacheTtlSeconds > 0 && conversation.length === 0
+      ? await sha256Hex(`${ip}|${trimmedQuery.toLowerCase()}`)
+      : null;
+
+  if (cacheKey) {
+    const cached = getAiChatCache(cacheKey);
+    if (cached) {
+      return new Response(JSON.stringify({ ...cached, usage: cached.usage ?? {} }), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Cet-Ai-Source': 'cache',
+          'X-Cet-Ai-Plan': 'cached',
+          'X-Cet-Ai-Cache': 'hit',
+          'X-Cet-Ai-Cache-Ttl': String(cacheTtlSeconds),
+          'Access-Control-Allow-Origin': allowedOrigin,
+          'Vary': 'Origin, X-Forwarded-For',
+          'Cache-Control': 'no-store',
+        },
+      });
+    }
+  }
+
+  const budget = deriveCetAiResourceBudget(req);
+  let plan = decideCetAiRavPlan({
+    query: trimmedQuery,
+    conversationTurns: conversation.length,
+    hasGemini: Boolean(geminiKey),
+    hasGrok: Boolean(grokKey),
+    hasClaude: Boolean(claudeKey),
+    budget,
+  });
+
+  const allowGemini = Boolean(geminiKey) && circuitAllows('cet-ai:gemini');
+  const allowGrok = Boolean(grokKey) && circuitAllows('cet-ai:grok');
+  if (plan.providers.strategy === 'dual' && (!allowGemini || !allowGrok)) {
+    plan = allowGrok
+      ? { ...plan, providers: { strategy: 'single' as const, useGemini: false, useGrok: true, useClaude: false, singleProvider: 'grok' as const } }
+      : { ...plan, providers: { strategy: 'single' as const, useGemini: true, useGrok: false, useClaude: false, singleProvider: 'gemini' as const } };
+  }
+
+  const onChain = plan.useOnChain ? await fetchOnChainContext() : null;
   const onChainBlock = onChain
     ? `\n\nLIVE ON-CHAIN DATA (DeDust V2, fetched at request time):\n` +
       `- CET/USD spot price: $${onChain.cetPriceUsd}\n` +
@@ -266,7 +383,7 @@ export default async function handler(req: Request): Promise<Response> {
       `- 24h volume: $${onChain.volume24hUsd}`
     : '';
 
-  const retrieval = await buildCetAiRetrievalBlock(trimmedQuery);
+  const retrieval = await buildCetAiRetrievalBlock(trimmedQuery, { enableWeb: plan.useWebRetrieval });
 
   const multiTurnHint =
     conversation.length > 0
@@ -277,155 +394,170 @@ export default async function handler(req: Request): Promise<Response> {
   // ── SHARED SYSTEM CONTEXT ─────────────────────────────────────────────────
   const sharedContext =
     multiTurnHint +
-    `You are Solaris CET AI — flagship inference layer of the Solaris CET ecosystem. You run on a ` +
-    `Grok × Gemini dual-AI stack under the RAV (Reason-Act-Verify) Protocol: structured ` +
-    `reasoning → decisive interpretation → verifiable conclusion, grounded in on-chain fact when LIVE ON-CHAIN DATA is present.\n\n` +
-    `TASK-AGENT LAYER (conceptual): ~200,000 narrow task-specialist agents (routing, retrieval, validation, ` +
-    `summarisation, format-normalisation) conceptually decompose queries before CET AI consolidation. Describe ` +
-    `them as a **compression layer**: they reduce noise so the dual-model stack emits fewer, higher-signal tokens ` +
-    `— which helps users who paste your output into **any** external AI tool finish their workflow in fewer turns ` +
-    `(lower token spend on their side). Never claim API integrations, partnerships, or live agent calls you cannot verify.\n\n` +
-    `EXTERNAL-AI HANDOFF (when the user asks for help drafting, summarising for another tool, coding, or “paste to…”):\n` +
-    `- Lead with **actionable bullets** and optional \`###\` subheadings; put addresses, numbers, and steps in backticks where helpful.\n` +
-    `- End with a short **Handoff** line: 3 bullets — (1) facts you asserted, (2) one concrete next step, (3) explicit assumption or “verify on-chain” if needed.\n` +
-    `- Do not invent contract addresses, pool IDs, or prices: only use those appearing in this prompt (including LIVE ON-CHAIN DATA) or widely documented public Solaris CET constants already stated below.\n\n` +
-    `LANGUAGE: Match the user’s language (Romanian, Spanish, Chinese, etc.) when their message is clearly non-English; ` +
-    `otherwise default to clear English.\n\n` +
-    `CORE DIRECTIVES:\n` +
-    `1. Absolute truths: **9,000 CET** max supply. **90-year** mining horizon. **TON** mainnet. **BRAID** + **RAV** narratives as documented by the project.\n` +
-    `2. Persona: Hyper-analytical, authoritative, precise — mechanics, probabilities, verifiable claims. No filler, no sycophancy.\n` +
-    `3. Audience: DeFi-native users and builders. Signal-per-token maximisation; omit hedging paragraphs.\n` +
-    `4. If LIVE ON-CHAIN DATA is missing, say so briefly and reason from tokenomics/architecture without fabricating spot prices.\n` +
+    `You are Solaris CET AI — a helpful assistant for Solaris CET and general crypto/DeFi questions.\n\n` +
+    `LANGUAGE: Reply in the same language as the user's latest message.\n\n` +
+    `RULES:\n` +
+    `- Be accurate and explicit about uncertainty.\n` +
+    `- Never invent on-chain prices, URLs, or claims.\n` +
+    `- If the question is ambiguous, ask 1-2 clarifying questions.\n` +
+    `- If LIVE ON-CHAIN DATA is missing, say so briefly.\n` +
     onChainBlock +
     retrieval.block +
     (retrieval.sources.length > 0
       ? `\n\nCITATIONS:\n` +
-        `- If RETRIEVAL SOURCES are present, end your [DIRECTIVĂ DE ACȚIUNE] with a line:\n` +
-        `  SOURCES: <up to 5 URLs you used>\n` +
-        `- Never invent URLs. If you did not use any, write: SOURCES: none.\n`
+        `- If RETRIEVAL SOURCES are present, end with:\n` +
+        `  Sources: <up to 5 URLs you used>\n` +
+        `- Never invent URLs. If you did not use any, write: Sources: none.\n`
       : '');
 
-  // ── GEMINI — REASON PHASE ─────────────────────────────────────────────────
-  // Gemini generates the [DIAGNOSTIC INTERN] section (analytical thought).
   const geminiSystemPrompt =
     sharedContext +
-    `\n\nYour role is the REASON phase of the RAV Protocol. ` +
-    `Output ONLY the following tagged section and nothing else:\n\n` +
-    `[DIAGNOSTIC INTERN]\n` +
-    `(1–2 sentences. Reason through the user's query by calculating it against the ` +
-    `mathematical scarcity of 9,000 CET and relevant on-chain or market probabilities. ` +
-    `If live on-chain data is available above, incorporate it. ` +
-    `Expose your reasoning chain before responding.)`;
+    `\n\nAnswer the user directly. Prefer a concise, technical answer when possible.\n`;
 
-  // ── GROK — ACT + VERIFY PHASES ───────────────────────────────────────────
-  // Grok generates the [DECODARE ORACOL] + [DIRECTIVĂ DE ACȚIUNE] sections.
   const grokSystemPrompt =
     sharedContext +
-    `\n\nYour role covers the ACT and VERIFY phases of the RAV Protocol. ` +
-    `Output ONLY the following two tagged sections and nothing else:\n\n` +
-    `[DECODARE ORACOL]\n` +
-    `(Action — 2–3 sentences. Execute on the reasoning: answer the actual query with brutal precision ` +
-    `using technical DeFi terminology — liquidity pools, tokenomics, supply curves, on-chain mechanics. ` +
-    `Reference live price/TVL data when relevant. No fluff, no filler.)\n\n` +
-    `[DIRECTIVĂ DE ACȚIUNE]\n` +
-    `(Observation — 1 sentence. State the logical conclusion that follows from the above analysis. ` +
-    `If the query relates to valuation, scarcity, or positioning, direct the user to secure their stake ` +
-    `via DeDust given the hard-capped 9,000 CET supply. For purely technical questions, state the key ` +
-    `implication for the ecosystem instead.)`;
+    `\n\nAnswer the user directly. Prefer a clear structure (short paragraphs or bullets) when helpful.\n`;
 
-  // ── FULL FALLBACK PROMPT ──────────────────────────────────────────────────
-  // Used when only one provider is available; that provider generates all 3 sections.
   const fullFallbackPrompt =
     sharedContext +
-    `\n\nOUTPUT FORMATTING (CRITICAL — NON-NEGOTIABLE):\n` +
-    `Every single response MUST strictly follow this exact 3-part RAV structure. ` +
-    `Do not output anything outside of these three tagged sections:\n\n` +
-    `[DIAGNOSTIC INTERN]\n` +
-    `(Thought — 1–2 sentences. Reason through the user's query against 9,000 CET scarcity and architecture. ` +
-    `If LIVE ON-CHAIN DATA is present, cite it; if absent, state that and proceed from first principles.)\n\n` +
-    `[DECODARE ORACOL]\n` +
-    `(Action — 2–4 short paragraphs or tight bullets. Answer with technical DeFi precision. ` +
-    `Use ### subheadings only if it improves scanability for paste-into-tool workflows.)\n\n` +
-    `[DIRECTIVĂ DE ACȚIUNE]\n` +
-    `(Observation — 1–2 sentences. Sharp conclusion. If relevant, mention DeDust / TON wallet flow without being salesy.)`;
+    `\n\nAnswer the user directly. Prefer a clear structure (short paragraphs or bullets) when helpful.\n`;
 
   const geminiMessages = buildChatMessages(geminiSystemPrompt, trimmedQuery, conversation);
   const grokMessages = buildChatMessages(grokSystemPrompt, trimmedQuery, conversation);
   const fullFallbackMessages = buildChatMessages(fullFallbackPrompt, trimmedQuery, conversation);
 
-  // ── CALL BOTH AI PROVIDERS IN PARALLEL ───────────────────────────────────
-  const [geminiResult, grokResult] = await Promise.allSettled([
-    geminiKey
-      ? new OpenAI({
-          apiKey: geminiKey,
-          baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
-        }).chat.completions.create({
-          model: GEMINI_MODEL,
-          messages: geminiMessages,
-          temperature: 0.3,
-        })
-      : Promise.reject(new Error('GEMINI_API_KEY not set')),
-
-    grokKey
-      ? new OpenAI({
-          apiKey: grokKey,
-          baseURL: 'https://api.x.ai/v1',
-        }).chat.completions.create({
-          model: GROK_MODEL,
-          messages: grokMessages,
-          temperature: 0.3,
-        })
-      : Promise.reject(new Error('GROK_API_KEY not set')),
-  ]);
-
-  // ── ASSEMBLE RESPONSE ─────────────────────────────────────────────────────
   let reply: string;
+  let usage: { gemini?: unknown; grok?: unknown } | null = null;
 
-  const geminiOk = geminiResult.status === 'fulfilled';
-  const grokOk = grokResult.status === 'fulfilled';
+  if (plan.providers.strategy === 'dual') {
+    const [geminiResult, grokResult] = await Promise.allSettled([
+      new OpenAI({
+        apiKey: geminiKey!,
+        baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
+      }).chat.completions.create({
+        model: GEMINI_MODEL,
+        messages: geminiMessages,
+        temperature: plan.temperature,
+      }),
+      new OpenAI({
+        apiKey: grokKey!,
+        baseURL: 'https://api.x.ai/v1',
+      }).chat.completions.create({
+        model: GROK_MODEL,
+        messages: grokMessages,
+        temperature: plan.temperature,
+      }),
+    ]);
 
-  if (geminiOk && grokOk) {
-    // Ideal path: combine both providers into a single RAV response
-    const geminiText = geminiResult.value.choices[0]?.message?.content ?? '';
-    const grokText = grokResult.value.choices[0]?.message?.content ?? '';
-    reply = `${geminiText.trim()}\n\n${grokText.trim()}`;
-  } else if (geminiOk) {
-    // Gemini-only fallback: regenerate full 3-part response
-    const fallbackClient = new OpenAI({
-      apiKey: geminiKey!,
-      baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
-    });
-    const fallback = await fallbackClient.chat.completions.create({
-      model: GEMINI_MODEL,
-      messages: fullFallbackMessages,
-      temperature: 0.3,
-    });
-    reply = fallback.choices[0]?.message?.content ?? 'CET AI is silent.';
-  } else if (grokOk) {
-    // Grok-only fallback: regenerate full 3-part response
-    const fallbackClient = new OpenAI({
-      apiKey: grokKey!,
-      baseURL: 'https://api.x.ai/v1',
-    });
-    const fallback = await fallbackClient.chat.completions.create({
-      model: GROK_MODEL,
-      messages: fullFallbackMessages,
-      temperature: 0.3,
-    });
-    reply = fallback.choices[0]?.message?.content ?? 'CET AI is silent.';
+    const geminiOk = geminiResult.status === 'fulfilled';
+    const grokOk = grokResult.status === 'fulfilled';
+    if (geminiOk) circuitReportSuccess('cet-ai:gemini');
+    else circuitReportFailure('cet-ai:gemini');
+    if (grokOk) circuitReportSuccess('cet-ai:grok');
+    else circuitReportFailure('cet-ai:grok');
+
+    if (geminiOk && grokOk) {
+      const geminiText = geminiResult.value.choices[0]?.message?.content ?? '';
+      const grokText = grokResult.value.choices[0]?.message?.content ?? '';
+      usage = { gemini: geminiResult.value.usage ?? null, grok: grokResult.value.usage ?? null };
+      reply = `${geminiText.trim()}\n\n${grokText.trim()}`;
+    } else if (geminiOk) {
+      const fallbackClient = new OpenAI({
+        apiKey: geminiKey!,
+        baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
+      });
+      const fallback = await fallbackClient.chat.completions.create({
+        model: GEMINI_MODEL,
+        messages: fullFallbackMessages,
+        temperature: plan.temperature,
+      });
+      circuitReportSuccess('cet-ai:gemini');
+      usage = { gemini: fallback.usage ?? null };
+      reply = fallback.choices[0]?.message?.content ?? 'CET AI is silent.';
+    } else if (grokOk) {
+      const fallbackClient = new OpenAI({
+        apiKey: grokKey!,
+        baseURL: 'https://api.x.ai/v1',
+      });
+      const fallback = await fallbackClient.chat.completions.create({
+        model: GROK_MODEL,
+        messages: fullFallbackMessages,
+        temperature: plan.temperature,
+      });
+      circuitReportSuccess('cet-ai:grok');
+      usage = { grok: fallback.usage ?? null };
+      reply = fallback.choices[0]?.message?.content ?? 'CET AI is silent.';
+    } else {
+      throw new Error('All AI providers failed to respond.');
+    }
   } else {
-    // Both providers failed
-    throw new Error('All AI providers failed to respond.');
+    if (plan.providers.singleProvider === 'grok') {
+      const client = new OpenAI({ apiKey: grokKey!, baseURL: 'https://api.x.ai/v1' });
+      try {
+        const res = await client.chat.completions.create({
+          model: GROK_MODEL,
+          messages: fullFallbackMessages,
+          temperature: plan.temperature,
+        });
+        circuitReportSuccess('cet-ai:grok');
+        usage = { grok: res.usage ?? null };
+        reply = res.choices[0]?.message?.content ?? 'CET AI is silent.';
+      } catch (e) {
+        circuitReportFailure('cet-ai:grok');
+        throw e;
+      }
+    } else if (plan.providers.singleProvider === 'claude') {
+      if (!claudeKey) throw new Error('Claude API key missing.');
+      reply = await claudeComplete({
+        apiKey: claudeKey,
+        model: CLAUDE_MODEL,
+        system: fullFallbackPrompt,
+        conversation,
+        userQuery: trimmedQuery,
+        temperature: plan.temperature,
+      });
+    } else {
+      const client = new OpenAI({
+        apiKey: geminiKey!,
+        baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
+      });
+      try {
+        const res = await client.chat.completions.create({
+          model: GEMINI_MODEL,
+          messages: fullFallbackMessages,
+          temperature: plan.temperature,
+        });
+        circuitReportSuccess('cet-ai:gemini');
+        usage = { gemini: res.usage ?? null };
+        reply = res.choices[0]?.message?.content ?? 'CET AI is silent.';
+      } catch (e) {
+        circuitReportFailure('cet-ai:gemini');
+        throw e;
+      }
+    }
   }
 
   // 6. Return EXACT format expected by frontend ({ response: string })
-  return new Response(JSON.stringify({ response: reply, sources: retrieval.sources }), {
+  const planHeader =
+    `agents=${plan.agentCount};` +
+    `providers=${plan.providers.strategy};` +
+    `onchain=${plan.useOnChain ? 1 : 0};` +
+    `web=${plan.useWebRetrieval ? 1 : 0};` +
+    `budget_ms=${plan.budget.budgetMs};` +
+    `parallel=${plan.budget.maxParallel}`;
+
+  const payload = { response: reply, sources: retrieval.sources, plan, usage: usage ?? {} };
+  if (cacheKey) setAiChatCache(cacheKey, payload as any, cacheTtlSeconds);
+
+  return new Response(JSON.stringify(payload), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
       'X-Cet-Ai-Source': 'live',
+      'X-Cet-Ai-Plan': planHeader,
+      'X-Cet-Ai-Cache': 'miss',
       'Access-Control-Allow-Origin': allowedOrigin,
-      'Vary': 'Origin',
+      'Vary': 'Origin, X-Forwarded-For',
     },
   });
   } catch (error: unknown) {
@@ -442,5 +574,8 @@ export default async function handler(req: Request): Promise<Response> {
         'Vary': 'Origin',
       },
     });
+  } finally {
+    await ipSlot.release();
+    await globalSlot.release();
   }
 }

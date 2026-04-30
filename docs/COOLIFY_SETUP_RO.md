@@ -4,16 +4,23 @@
 
 - Aplicația nu este Next.js. Este Vite (frontend) + server Node (`app/server/index.cjs`) care servește `app/dist` și rute API din `app/.api-dist`.
 - `package.json` cere Node `>=22` (local + build). Dacă rulezi cu Node 20 pe host, e probabil să ai build-uri instabile.
-- În Coolify, varianta recomandată este build & run din `Dockerfile`, caz în care Node/pnpm instalate pe host devin irelevante (contează doar motorul Docker).
+- În Coolify, varianta recomandată este build & run din `Dockerfile`, caz în care Node/npm instalate pe host devin irelevante (contează doar motorul Docker).
 
 ## 1) Verificări rapide pe server (Holtzer)
 
 ```bash
 node -v
 corepack --version || true
-pnpm -v || true
+npm -v || true
 docker -v
 docker compose version || true
+```
+
+Alternativ (un singur script):
+
+```bash
+chmod +x scripts/host-preflight.sh
+./scripts/host-preflight.sh
 ```
 
 Recomandat: Node `22.x` (nu `20.x`) dacă faci build pe host.
@@ -64,6 +71,7 @@ Regulă:
 - AI web retrieval (opțional): `CET_AI_ENABLE_WEB=1`, `CET_AI_WEB_ALLOWLIST`, `TAVILY_API_KEY_ENC`/`TAVILY_API_KEY`
 - Observabilitate (opțional): `METRICS_TOKEN`, `SENTRY_DSN`, `SENTRY_ENVIRONMENT`, `SENTRY_TRACES_SAMPLE_RATE`
 - Waitlist (opțional): `WAITLIST_WEBHOOK_URL`
+- Cron/jobs (opțional): `CRON_SECRET` (header `x-cron-secret`) și/sau `CRON_TOKEN` (query `?token=` / `Authorization: Bearer`).
 
 După update, fă `Redeploy`.
 
@@ -102,6 +110,8 @@ server {
 
 Recomandat în Coolify: un “Scheduled job / service” separat cu `postgres:16-alpine` care rulează `pg_dump` (vezi `docs/OPS_BACKUPS.md`).
 
+Variantă rapidă (import ca Compose în Coolify): `docker/coolify.backup.yml`.
+
 Pentru cron pe host:
 
 ```bash
@@ -126,12 +136,14 @@ Exemplu (03:15 UTC zilnic):
 Și rulează ca “Post deploy command”:
 
 ```bash
-node scripts/telegram-notify.mjs "solaris-cet.com deployed: ${GIT_SHA:-unknown}"
+node scripts/post-deploy.mjs
 ```
 
-Script: `scripts/telegram-notify.mjs`.
+Script: `scripts/post-deploy.mjs` (trimite și statusul `health.json`).
 
 ## 9) Test end-to-end (deployment pipeline)
+
+Notă: poți rula și `node scripts/check-env.mjs --profile=admin,ai,metrics` pentru validare rapidă a env-urilor.
 
 1) Fă o modificare mică (ex: bump `app/public/health.json` `version`) și dă push.
 2) Confirmă în Coolify că deployment-ul pornește automat.
@@ -144,6 +156,28 @@ curl -fsS https://solaris-cet.com/api/metrics | egrep 'solaris_(ai|db|ton)_confi
 echo
 curl -fsS https://solaris-cet.com/metrics | head -n 40
 echo
+```
+
+## 10) Rollback rapid (re-deploy la ultima imagine stabilă)
+
+În UI (rapid): Application → Deployments → alege ultimul deployment bun → Rollback.
+
+Script (API, după tag):
+
+```bash
+COOLIFY_BASE_URL='https://coolify.example.com' \
+COOLIFY_API_TOKEN='***' \
+COOLIFY_RESOURCE_UUID='***' \
+COOLIFY_TAG='stable-2026-04-25' \
+node -v >/dev/null && bash scripts/coolify-deploy-by-tag.sh
+```
+
+Pentru “ultima stabilă” dintr-un fișier (host):
+
+```bash
+sudo install -d -m 0755 /var/lib/solaris-cet
+echo 'stable-2026-04-25' | sudo tee /var/lib/solaris-cet/last-stable-tag
+COOLIFY_BASE_URL='https://coolify.example.com' COOLIFY_API_TOKEN='***' COOLIFY_RESOURCE_UUID='***' sudo -E bash scripts/coolify-rollback.sh
 ```
 
 ## Referințe din repo

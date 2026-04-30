@@ -1,12 +1,13 @@
-import { RadialBarChart, RadialBar, Tooltip, ResponsiveContainer } from 'recharts';
 import { Brain } from 'lucide-react';
+import { RadialBar, RadialBarChart, ResponsiveContainer,Tooltip } from 'recharts';
+
 import { solarisDepartments } from '@/data/solarisDepartments';
 import { MESH_ID_TO_AGENT_BOARD_LABEL } from '@/lib/agentBoardSkillMix';
 import {
+  meshStandardBurstFromKey,
+  meshWhisperFromKey,
   skillFlashForBoardDept,
   skillSeedFromLabel,
-  meshWhisperFromKey,
-  meshStandardBurstFromKey,
 } from '@/lib/meshSkillFeed';
 
 // ─── Department data (headcount from registry; labels match AgentBoard / meshSkillFeed) ─

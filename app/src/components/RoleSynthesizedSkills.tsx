@@ -1,16 +1,17 @@
-import { useMemo } from 'react';
 import { Dna } from 'lucide-react';
+import { useMemo } from 'react';
+
 import {
-  synthesizeMeshSkills,
-  NOMINAL_SKILL_UNIVERSE,
-  formatBigSpace,
-  SKILL_ALLELE_SPACE,
-} from '@/lib/skillGenome';
-import {
+  meshWhisperForAiTeamSynth,
   skillCaptionForDept,
   skillSeedFromLabel,
-  meshWhisperForAiTeamSynth,
 } from '@/lib/meshSkillFeed';
+import {
+  formatBigSpace,
+  NOMINAL_SKILL_UNIVERSE,
+  SKILL_ALLELE_SPACE,
+  synthesizeMeshSkills,
+} from '@/lib/skillGenome';
 
 const SYNTH_STANDARD = 16;
 const SYNTH_DEEP = 12;

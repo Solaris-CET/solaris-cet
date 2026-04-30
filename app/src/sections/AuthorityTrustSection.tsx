@@ -1,9 +1,11 @@
+import { Eye,Link2, MapPin, ShieldCheck } from 'lucide-react';
+
 import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
-import { ShieldCheck, Link2, MapPin, Eye } from 'lucide-react';
-import { useLanguage } from '../hooks/useLanguage';
-import GlowOrbs from '../components/GlowOrbs';
-import { renderSimpleBold } from '@/lib/renderSimpleBold';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
+import { renderSimpleBold } from '@/lib/renderSimpleBold';
+
+import GlowOrbs from '../components/GlowOrbs';
+import { useLanguage } from '../hooks/useLanguage';
 
 /**
  * Four trust pillars (Vibe Founder playbook): technical proof, on-chain truth,

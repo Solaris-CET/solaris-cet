@@ -1,7 +1,8 @@
-import { describe, it, expect } from "vitest";
 import { existsSync, statSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { dirname,join } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { describe, expect,it } from "vitest";
 
 /**
  * Guardrail: static/sovereign/index.html references fonts/jetbrains-mono-400.woff2.

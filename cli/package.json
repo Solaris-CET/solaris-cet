@@ -1,0 +1,30 @@
+{
+  "name": "solaris-cli",
+  "version": "0.1.0",
+  "description": "Solaris CET admin & ops CLI (deploy, backup, stats, user-list).",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "solaris-cli": "dist/index.js",
+    "solaris": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "../node_modules/.bin/tsc -p tsconfig.json",
+    "typecheck": "../node_modules/.bin/tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "commander": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.17",
+    "tsx": "^4.19.2",
+    "typescript": "5.8.3"
+  }
+}

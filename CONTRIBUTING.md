@@ -10,17 +10,22 @@ Mulțumim că ești interesat să contribui la **Solaris CET**! Urmează pașii 
 - [Cum poți contribui](#cum-poți-contribui)
 - [Configurarea mediului de dezvoltare](#configurarea-mediului-de-dezvoltare)
 - [Verificare monorepo](#verificare-monorepo-înainte-de-pr-sau-release)
+- [Arhitectură (high-level)](#arhitectură-high-level)
+- [Onboarding video (Loom)](#onboarding-video-loom)
 - [Flux de lucru Git](#flux-de-lucru-git)
 - [Standarde de cod](#standarde-de-cod)
 - [Trimiterea unui Pull Request](#trimiterea-unui-pull-request)
 - [Raportarea problemelor](#raportarea-problemelor)
 - [Politica de securitate](#politica-de-securitate)
+- [Issue-uri pentru începători](#issue-uri-pentru-începători)
 
 ---
 
 ## Cod de conduită
 
 Acest proiect respectă principiile unui mediu deschis, prietenos și incluziv. Orice formă de hărțuire, discriminare sau comportament ostil nu este tolerată. Prin participarea la acest proiect, ești de acord să respecți aceste principii.
+
+Referință: [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
 
 ---
 
@@ -55,7 +60,7 @@ git clone https://github.com/Solaris-CET/solaris-cet.git
 cd solaris-cet
 
 # 2. Instalează dependențele
-npm ci
+npm ci --include=optional --legacy-peer-deps
 
 # 3. Pornește serverul de dezvoltare
 npm run app:dev
@@ -98,10 +103,32 @@ npm run verify:all
 
 | Zonă | Comandă |
 |------|---------|
-| **Monorepo (rapid)** | Din repo root: `npm ci && npm run verify:fast` |
-| **Monorepo (complet, include E2E stabil)** | Din repo root: `npm ci && npm run verify:all` (prima dată: `npx playwright install --with-deps chromium` din `app/`) |
+| **Monorepo (rapid)** | Din repo root: `npm ci --include=optional --legacy-peer-deps && npm run verify:fast` |
+| **Monorepo (complet, include E2E stabil)** | Din repo root: `npm ci --include=optional --legacy-peer-deps && npm run verify:all` (prima dată: `npx playwright install --with-deps chromium` din `app/`) |
 
 **CI GitHub:** job-ul Playwright rulează `npm run test:e2e` cu `PW_WORKERS` din variabila de repository **`E2E_WORKERS`** (opțional; necompletată → 1 worker). Local, `verify:all` folosește `test:e2e:stable` (un worker, predictibil).
+
+---
+
+## Arhitectură (high-level)
+
+- Overview: `docs/ARCHITECTURE.md`
+- Diagramă data flow: `docs/DATA_FLOW.md`
+- Starea arhitecturii curente (deployment/runtime): `ARCHITECTURE_STATE.md`
+
+---
+
+## Onboarding video (Loom)
+
+Nu putem include direct un video în repo, dar menținem un script scurt (2–4 minute) pe care orice maintainer îl poate înregistra:
+
+1. Clone + `npm ci --include=optional --legacy-peer-deps` (din root)
+2. Pornește local: `npm run app:dev`
+3. Rulează quality gate: `npm run verify:fast`
+4. (Opțional) E2E stabil: `npm run verify:all`
+5. Entry points: `app/src/App.tsx`, `app/api/*`, `contracts/`, `scripts/`
+
+În descrierea video-ului, include link către `README.md` + `CONTRIBUTING.md` + `docs/ARCHITECTURE.md`.
 
 ---
 
@@ -241,6 +268,12 @@ Include în mesaj:
 Vom răspunde în maxim **72 de ore** și vom coordona un disclosure responsabil.
 
 ---
+
+## Issue-uri pentru începători
+
+- Caută label-ul **`good first issue`** pentru task-uri cu scope mic și context clar.
+- Caută label-ul **`help wanted`** pentru task-uri deschise către contribuții externe.
+- Dacă nu există un issue potrivit, deschide un **Feature Request** și descrie soluția propusă + impactul.
 
 ## Recunoaștere
 

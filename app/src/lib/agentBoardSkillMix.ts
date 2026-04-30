@@ -1,5 +1,5 @@
 import { solarisDepartments } from '@/data/solarisDepartments';
-import { synthesizeMeshSkills, type SynthesisTier } from '@/lib/skillGenome';
+import { type SynthesisTier,synthesizeMeshSkills } from '@/lib/skillGenome';
 
 /** AgentBoard / charts: display `dept.name` → `solarisDepartments.id` */
 export const AGENT_BOARD_DEPT_TO_MESH_ID: Record<string, string> = {
