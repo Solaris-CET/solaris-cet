@@ -61,7 +61,6 @@ registerRoute(
     request.mode === 'navigate' && !url.pathname.startsWith('/sovereign/') && !url.pathname.startsWith('/apocalypse/'),
   new NetworkFirst({
     cacheName: 'pages-offline-fallback',
-    networkTimeoutSeconds: 5,
     plugins: [
       {
         handlerDidError: async () => {

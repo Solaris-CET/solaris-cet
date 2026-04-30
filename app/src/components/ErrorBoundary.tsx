@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/react';
 import { Component, type ErrorInfo,type ReactNode } from 'react';
 
+import { isChunkLoadFailure, recoverAppOnce } from '@/lib/appRecovery';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 
 import { getActiveLangSync } from '../hooks/useLanguage';
@@ -82,6 +83,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
       const canRetry = this.state.retryCount < MAX_RETRIES;
       const eb = translations[getActiveLangSync()].errorBoundary;
+      const canRecover = isChunkLoadFailure(this.state.error);
 
       return (
         <div
@@ -129,7 +131,13 @@ export class ErrorBoundary extends Component<Props, State> {
               )}
               <button
                 type="button"
-                onClick={() => window.location.reload()}
+                onClick={() => {
+                  if (canRecover) {
+                    void recoverAppOnce();
+                  } else {
+                    window.location.reload();
+                  }
+                }}
                 className={`px-6 py-2.5 rounded-xl font-semibold transition-colors ${
                   canRetry
                     ? 'bg-white/10 hover:bg-white/15 text-solaris-text'

@@ -10,6 +10,8 @@ import { ThemeProvider } from 'next-themes'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
+import { isChunkLoadFailure, recoverAppOnce } from '@/lib/appRecovery'
+
 import App from './App.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary.tsx'
 
@@ -17,12 +19,22 @@ import { ErrorBoundary } from './components/ErrorBoundary.tsx'
 // replaces the hashed file), reload the page once so the browser gets
 // fresh HTML and correct chunk URLs.
 window.addEventListener('vite:preloadError', () => {
-  const key = 'vite_chunk_reload';
-  if (!sessionStorage.getItem(key)) {
-    sessionStorage.setItem(key, '1');
-    window.location.reload();
-  }
+  void recoverAppOnce('vite_chunk_reload')
 });
+
+window.addEventListener('error', (event) => {
+  const message = (event as ErrorEvent | undefined)?.message ?? ''
+  if (isChunkLoadFailure(message) || isChunkLoadFailure((event as ErrorEvent | undefined)?.error)) {
+    void recoverAppOnce()
+  }
+})
+
+window.addEventListener('unhandledrejection', (event) => {
+  const reason = (event as PromiseRejectionEvent | undefined)?.reason
+  if (isChunkLoadFailure(reason)) {
+    void recoverAppOnce()
+  }
+})
 
 const sentryDsn = String(import.meta.env.VITE_SENTRY_DSN ?? '').trim()
 if (sentryDsn) {
