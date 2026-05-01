@@ -54,7 +54,7 @@ export function createTimeoutSignal(ms: number): AbortSignal {
 export function useLivePoolData(): PoolData {
   const [data, setData] = useState<PoolData>(INITIAL_STATE);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async ({ allowGql = true }: { allowGql?: boolean } = {}) => {
     try {
       const lhci = import.meta.env.VITE_LHCI === '1';
       if (lhci) {
@@ -149,7 +149,7 @@ export function useLivePoolData(): PoolData {
         tvlUsd = reserveUsdtReadable + reserveCetReadable * priceUsd;
       }
 
-      if (priceUsd === null) {
+      if (priceUsd === null && allowGql) {
         const gqlSignal = createTimeoutSignal(4500);
         const gqlRes = await fetch('https://mainnet.api.dedust.io/v3/graphql', {
           method: 'POST',
@@ -228,9 +228,37 @@ export function useLivePoolData(): PoolData {
   }, []);
 
   useEffect(() => {
-    fetchData();
-    const id = setInterval(fetchData, REFRESH_INTERVAL_MS);
-    return () => clearInterval(id);
+    let cancelled = false;
+
+    const run = () => {
+      if (cancelled) return;
+      void fetchData({ allowGql: false });
+    };
+
+    if (typeof window === 'undefined') {
+      run();
+    } else if (document.readyState === 'complete') {
+      const w = window as unknown as {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+        cancelIdleCallback?: (id: number) => void;
+      };
+      if (typeof w.requestIdleCallback === 'function') {
+        w.requestIdleCallback(run, { timeout: 2500 });
+      } else {
+        window.setTimeout(run, 1200);
+      }
+    } else {
+      window.addEventListener('load', run, { once: true });
+    }
+
+    const id = setInterval(() => {
+      void fetchData();
+    }, REFRESH_INTERVAL_MS);
+
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
   }, [fetchData]);
 
   return data;

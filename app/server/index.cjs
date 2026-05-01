@@ -664,12 +664,13 @@ async function tryServeStatic(req, reqUrl, res) {
           const brPath = `${absPath}.br`;
           const brStat = await stat(brPath);
           if (brStat.isFile()) {
-            if (absPath === path.join(distDir, 'index.html')) continue;
-            setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
-            res.setHeader('Content-Encoding', 'br');
-            res.setHeader('Vary', 'Accept-Encoding');
-            await serveFile(res, brPath);
-            return true;
+            if (absPath !== path.join(distDir, 'index.html')) {
+              setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+              res.setHeader('Content-Encoding', 'br');
+              res.setHeader('Vary', 'Accept-Encoding');
+              await serveFile(res, brPath);
+              return true;
+            }
           }
         } catch {
           void 0;
@@ -1116,6 +1117,7 @@ async function main() {
     ) {
       res.statusCode = 404;
       setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+      res.setHeader('Cache-Control', 'no-store');
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
       res.end(JSON.stringify({ error: 'Not found' }));
       return;
@@ -1125,6 +1127,7 @@ async function main() {
       if (await serveApi(req, res, reqUrl)) return;
       res.statusCode = 404;
       setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:' });
+      res.setHeader('Cache-Control', 'no-store');
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
       res.end(JSON.stringify({ error: 'Not found' }));
       return;
@@ -1139,6 +1142,7 @@ async function main() {
     if (isStaticPrefix || isLikelyFileRequest(pathname)) {
       res.statusCode = 404;
       setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+      res.setHeader('Cache-Control', 'no-store');
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
       res.end(JSON.stringify({ error: 'Not found' }));
       return;

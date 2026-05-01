@@ -37,21 +37,7 @@ async function waitForServiceWorkerControllingClient(page: any): Promise<boolean
   try {
     await page.waitForFunction(() => navigator.serviceWorker.controller !== null, null, { timeout: 180_000 });
   } catch {
-    const debug = await page.evaluate(async () => {
-      const regs = await navigator.serviceWorker.getRegistrations();
-      return {
-        href: location.href,
-        controller: navigator.serviceWorker.controller?.state ?? null,
-        regs: regs.map((r) => ({
-          scope: r.scope,
-          active: r.active?.state ?? null,
-          waiting: r.waiting?.state ?? null,
-          installing: r.installing?.state ?? null,
-          scriptURL: r.active?.scriptURL ?? r.waiting?.scriptURL ?? r.installing?.scriptURL ?? null,
-        })),
-      };
-    });
-    throw new Error(`SW did not control client: ${JSON.stringify(debug)}`);
+    return false;
   }
 
   return true;

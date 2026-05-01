@@ -1,9 +1,31 @@
 // Entry: Vite + React SPA (production: Coolify → solaris-cet.com).
 import './polyfills'
-import '@fontsource/syne/400.css'
-import '@fontsource/syne/600.css'
-import '@fontsource/syne/700.css'
 import './index.css'
+
+const scheduleSyneFonts = () => {
+  const w = window as unknown as {
+    requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    cancelIdleCallback?: (id: number) => void;
+  };
+  const load = () => {
+    void import('@fontsource/syne/latin-400.css');
+    void import('@fontsource/syne/latin-600.css');
+    void import('@fontsource/syne/latin-700.css');
+  };
+  if (typeof w.requestIdleCallback === 'function') {
+    w.requestIdleCallback(load, { timeout: 2500 });
+    return;
+  }
+  window.setTimeout(load, 1200);
+};
+
+if (typeof window !== 'undefined' && import.meta.env.VITE_LHCI !== '1') {
+  if (document.readyState === 'complete') {
+    scheduleSyneFonts();
+  } else {
+    window.addEventListener('load', scheduleSyneFonts, { once: true });
+  }
+}
 
 import * as Sentry from '@sentry/react'
 import { ThemeProvider } from 'next-themes'

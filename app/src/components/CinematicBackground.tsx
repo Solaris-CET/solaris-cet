@@ -13,10 +13,14 @@ const GLYPH_LINES = [
   'FRAME SHIFT · 視点変更 · تغيير زاوية · zmiana perspektywy · 測地線 · Δψ · ρ(x,t)',
 ];
 
-function useFirstAvailableAsset(candidates: string[], accept?: (res: Response) => boolean) {
-  const [url, setUrl] = useState<string | null>(null);
+function useFirstAvailableAsset(enabled: boolean, candidates: string[], accept?: (res: Response) => boolean) {
+  const [url, setUrl] = useState<string | null>(() => (enabled ? candidates[0] ?? null : null));
 
   useEffect(() => {
+    if (!enabled) {
+      setUrl(null);
+      return;
+    }
     if (typeof window === 'undefined') return;
 
     let alive = true;
@@ -43,7 +47,7 @@ function useFirstAvailableAsset(candidates: string[], accept?: (res: Response) =
       alive = false;
       controller.abort();
     };
-  }, [accept, candidates]);
+  }, [accept, candidates, enabled]);
 
   return url;
 }
@@ -81,7 +85,7 @@ export function CinematicBackground() {
   const reduceMotion = useReducedMotion();
   const canUseVideo = useCinematicEligibility(reduceMotion);
   const [videoReady, setVideoReady] = useState(false);
-  const videoUrl = useFirstAvailableAsset(VIDEO_CANDIDATES, (res) => {
+  const videoUrl = useFirstAvailableAsset(canUseVideo, VIDEO_CANDIDATES, (res) => {
     const ct = (res.headers.get('content-type') || '').toLowerCase();
     return ct.startsWith('video/');
   });
