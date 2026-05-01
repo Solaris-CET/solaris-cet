@@ -4,7 +4,9 @@ import { useLayoutEffect,useRef } from 'react';
 
 import GlowOrbs from '../components/GlowOrbs';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
+import { useAsyncCssReady } from '../hooks/useAsyncCssReady';
 import { useLanguage } from '../hooks/useLanguage';
+import { useNearScreen } from '../hooks/useNearScreen';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useRegion } from '../hooks/useRegion';
 
@@ -18,8 +20,11 @@ const ComplianceSection = () => {
   const rightCardRef = useRef<HTMLDivElement>(null);
   const badgesRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
+  const cssReady = useAsyncCssReady();
+  const { isNearScreen, fromRef } = useNearScreen({ distance: '900px' });
 
   useLayoutEffect(() => {
+    if (!cssReady || !isNearScreen) return;
     const section = sectionRef.current;
     if (!section) return;
 
@@ -73,7 +78,7 @@ const ComplianceSection = () => {
     }, section);
 
     return () => ctx.revert();
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, cssReady, isNearScreen]);
 
   return (
     <section
@@ -81,6 +86,7 @@ const ComplianceSection = () => {
       aria-label={t.sectionAria.compliance}
       className="section-pinned section-glass flex flex-col items-start justify-start gap-10 py-16 xl:flex-row xl:items-center xl:justify-center xl:py-0 section-padding-x"
     >
+      <div ref={fromRef} aria-hidden className="absolute inset-x-0 top-0 h-px" />
       {/* Background grid */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute bottom-0 left-0 right-0 h-[50vh] grid-floor opacity-20" />

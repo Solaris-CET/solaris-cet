@@ -6,7 +6,9 @@ import AppImage from '../components/AppImage';
 import GlowOrbs from '../components/GlowOrbs';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { SolarisLogoMark } from '../components/SolarisLogoMark';
+import { useAsyncCssReady } from '../hooks/useAsyncCssReady';
 import { useLanguage } from '../hooks/useLanguage';
+import { useNearScreen } from '../hooks/useNearScreen';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 
@@ -18,6 +20,8 @@ const NovaAppSection = () => {
   const textPanelRef = useRef<HTMLDivElement>(null);
   const tickerRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
+  const cssReady = useAsyncCssReady();
+  const { isNearScreen, fromRef } = useNearScreen({ distance: '900px' });
   const { t } = useLanguage();
   const tx = t.novaAppUi;
 
@@ -33,6 +37,7 @@ const NovaAppSection = () => {
   const doubledTickerItems = [...tickerItems, ...tickerItems];
 
   useLayoutEffect(() => {
+    if (!cssReady || !isNearScreen) return;
     const section = sectionRef.current;
     if (!section) return;
 
@@ -83,13 +88,14 @@ const NovaAppSection = () => {
     }, section);
 
     return () => ctx.revert();
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, cssReady, isNearScreen]);
 
   return (
     <div
       ref={sectionRef}
       className="section-pinned section-glass flex flex-col items-start justify-start gap-10 py-16 xl:flex-row xl:items-center xl:justify-center xl:py-0 xl:overflow-hidden mesh-bg section-padding-x"
     >
+      <div ref={fromRef} aria-hidden className="absolute inset-x-0 top-0 h-px" />
       {/* Background grid */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute bottom-0 left-0 right-0 h-[50vh] grid-floor opacity-20" />

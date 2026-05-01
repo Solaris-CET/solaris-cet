@@ -13,7 +13,9 @@ import { CET_FIXED_SUPPLY_CAP } from '@/lib/domainPillars';
 
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { TOKEN_DECIMALS } from '../constants/token';
+import { useAsyncCssReady } from '../hooks/useAsyncCssReady';
 import { useLanguage } from '../hooks/useLanguage';
+import { useNearScreen } from '../hooks/useNearScreen';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 const BENTO_TILE_INTERACTION =
@@ -35,6 +37,8 @@ const TokenomicsSection = () => {
   const { t } = useLanguage();
   const tx = t.tokenomicsUi;
   const prefersReducedMotion = useReducedMotion();
+  const cssReady = useAsyncCssReady();
+  const { isNearScreen, fromRef } = useNearScreen({ distance: '900px' });
 
   useEffect(() => {
     const timer = setTimeout(() => setRingVisible(true), 300);
@@ -69,6 +73,7 @@ const TokenomicsSection = () => {
   }, [ringVisible]);
 
   useLayoutEffect(() => {
+    if (!cssReady || !isNearScreen) return;
     const section = sectionRef.current;
     if (!section) return;
 
@@ -115,13 +120,14 @@ const TokenomicsSection = () => {
     }, section);
 
     return () => ctx.revert();
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, cssReady, isNearScreen]);
 
   return (
     <div
       ref={sectionRef}
       className="section-pinned section-glass flex items-center justify-center xl:overflow-hidden mesh-bg section-padding-x"
     >
+      <div ref={fromRef} aria-hidden className="absolute inset-x-0 top-0 h-px" />
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute bottom-0 left-0 right-0 h-[50vh] grid-floor opacity-20" />
         <div className="absolute inset-0 tech-grid opacity-30" />

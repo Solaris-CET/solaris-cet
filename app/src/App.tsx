@@ -39,6 +39,7 @@ import RouteSignatureLayer from './components/RouteSignatureLayer';
 import ScrollStoryOverlay from './components/ScrollStoryOverlay';
 import { SolarisLogoMark } from './components/SolarisLogoMark';
 import StatusBar from './components/StatusBar';
+import { useAsyncCssReady } from './hooks/useAsyncCssReady';
 import { JwtSessionContext, useJwtSessionState } from './hooks/useJwtSession';
 import { LanguageContext, useLanguageState } from './hooks/useLanguage';
 import { useReducedMotion } from './hooks/useReducedMotion';
@@ -128,6 +129,7 @@ function AppContent() {
   const setJwtToken = jwtState.setToken;
   const isLhci = import.meta.env.VITE_LHCI === '1';
   const prefersReducedMotion = useReducedMotion();
+  const cssReady = useAsyncCssReady();
 
   useSmoothAnchors();
   const pathnameRaw = typeof window === 'undefined' ? '/' : window.location.pathname || '/';
@@ -473,24 +475,37 @@ function AppContent() {
       });
     };
 
-    const maxWaitMs = 12_000;
-    const started = performance.now();
-    const id = window.setInterval(() => {
-      setupSnap();
-      if (snapTriggerRef.current) {
-        window.clearInterval(id);
-        return;
-      }
-      if (performance.now() - started > maxWaitMs) {
-        window.clearInterval(id);
-      }
-    }, 300);
+    if (!cssReady) return;
+
+    let raf = 0;
+    const schedule = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        setupSnap();
+      });
+    };
+
+    const onRefresh = () => schedule();
+    (ScrollTrigger as unknown as { addEventListener: (e: string, cb: () => void) => void }).addEventListener(
+      'refresh',
+      onRefresh,
+    );
+    window.addEventListener('load', schedule, { once: true });
+
+    schedule();
+    const timer = window.setTimeout(schedule, 900);
     return () => {
-      window.clearInterval(id);
+      (ScrollTrigger as unknown as { removeEventListener: (e: string, cb: () => void) => void }).removeEventListener(
+        'refresh',
+        onRefresh,
+      );
+      window.clearTimeout(timer);
+      if (raf) window.cancelAnimationFrame(raf);
       snapTriggerRef.current?.kill();
       snapTriggerRef.current = null;
     };
-  }, [isLoaded, buildSnapTo, routePath, prefersReducedMotion]);
+  }, [isLoaded, buildSnapTo, routePath, prefersReducedMotion, cssReady]);
 
   /** When the server serves `index.html` for a route, scroll to the matching section after lazy sections mount. */
   useEffect(() => {

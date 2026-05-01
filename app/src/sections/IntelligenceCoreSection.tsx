@@ -8,7 +8,9 @@ import AgentBridge from '../components/AgentBridge';
 import DualAiFusionGraphic from '../components/DualAiFusionGraphic';
 import GlowOrbs from '../components/GlowOrbs';
 import HierarchyGraph from '../components/HierarchyGraph';
+import { useAsyncCssReady } from '../hooks/useAsyncCssReady';
 import { useLanguage } from '../hooks/useLanguage';
+import { useNearScreen } from '../hooks/useNearScreen';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 
@@ -28,6 +30,8 @@ const IntelligenceCoreSection = () => {
   const chipsRef = useRef<HTMLDivElement>(null);
   const [reactStep, setReactStep] = useState(0);
   const prefersReducedMotion = useReducedMotion();
+  const cssReady = useAsyncCssReady();
+  const { isNearScreen, fromRef } = useNearScreen({ distance: '900px' });
 
   const steps: ReactStep[] = useMemo(() => tx.reactSteps.map(parseReactStep), [tx.reactSteps]);
 
@@ -40,6 +44,7 @@ const IntelligenceCoreSection = () => {
   }, [prefersReducedMotion, steps.length]);
 
   useLayoutEffect(() => {
+    if (!cssReady || !isNearScreen) return;
     const section = sectionRef.current;
     if (!section) return;
 
@@ -93,7 +98,7 @@ const IntelligenceCoreSection = () => {
     }, section);
 
     return () => ctx.revert();
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, cssReady, isNearScreen]);
 
   return (
     <section
@@ -102,6 +107,7 @@ const IntelligenceCoreSection = () => {
       aria-label={t.sectionAria.intelligenceCore}
       className="section-pinned section-glass flex flex-col items-start justify-start gap-10 py-16 xl:flex-row xl:items-center xl:justify-center xl:py-0 section-padding-x"
     >
+      <div ref={fromRef} aria-hidden className="absolute inset-x-0 top-0 h-px" />
       {/* Background grid */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute bottom-0 left-0 right-0 h-[50vh] grid-floor opacity-20" />

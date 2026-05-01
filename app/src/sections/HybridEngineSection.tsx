@@ -5,7 +5,9 @@ import { useEffect,useLayoutEffect, useRef, useState } from 'react';
 import AppImage from '../components/AppImage';
 import GlowOrbs from '../components/GlowOrbs';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
+import { useAsyncCssReady } from '../hooks/useAsyncCssReady';
 import { useLanguage } from '../hooks/useLanguage';
+import { useNearScreen } from '../hooks/useNearScreen';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 
@@ -17,6 +19,8 @@ const HybridEngineSection = () => {
   const svgPathRef = useRef<SVGPathElement>(null);
   const [activeNode, setActiveNode] = useState<'pow' | 'dpos' | null>(null);
   const prefersReducedMotion = useReducedMotion();
+  const cssReady = useAsyncCssReady();
+  const { isNearScreen, fromRef } = useNearScreen({ distance: '900px' });
   const { t } = useLanguage();
   const tx = t.hybridEngineUi;
 
@@ -41,6 +45,7 @@ const HybridEngineSection = () => {
   }, [prefersReducedMotion]);
 
   useLayoutEffect(() => {
+    if (!cssReady || !isNearScreen) return;
     const section = sectionRef.current;
     if (!section) return;
 
@@ -94,7 +99,7 @@ const HybridEngineSection = () => {
     }, section);
 
     return () => ctx.revert();
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, cssReady, isNearScreen]);
 
   const badges = [
     {
@@ -128,6 +133,7 @@ const HybridEngineSection = () => {
       ref={sectionRef}
       className="section-pinned section-glass flex items-center justify-center section-padding-x"
     >
+      <div ref={fromRef} aria-hidden className="absolute inset-x-0 top-0 h-px" />
       {/* Background grid */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute bottom-0 left-0 right-0 h-[50vh] grid-floor opacity-20" />

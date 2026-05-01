@@ -19,6 +19,7 @@ import CetAiSearch from '../components/CetAiSearch';
 import QuantumFieldCanvas from '../components/QuantumFieldCanvas';
 import SolarRaysCoinsCanvas from '../components/SolarRaysCoinsCanvas';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
+import { useAsyncCssReady } from '../hooks/useAsyncCssReady';
 import { useLanguage } from '../hooks/useLanguage';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -82,6 +83,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
   const demoHardCutDoneRef = useRef(false);
 
   const prefersReducedMotion = useReducedMotion();
+  const cssReady = useAsyncCssReady();
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const isMobile = useMediaQuery('(max-width: 767px)');
   const isAutomated = useMemo(() => {
@@ -137,6 +139,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
   const superCinematic =
     cinematic && isDemoRoute && isDesktop && !isMobile && !prefersReducedMotion && !isAutomated;
 
+  const [hologramReady, setHologramReady] = useState(false);
+
   const [demoSound, setDemoSound] = useState(() => {
     if (typeof window === 'undefined') return false;
     try {
@@ -174,6 +178,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
 
   useLayoutEffect(() => {
     if (!superCinematic) return;
+    if (!cssReady) return;
     const el = containerRef.current;
     const bg = backgroundRef.current;
     const title = titleContainerRef.current;
@@ -239,7 +244,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
       window.dispatchEvent(new CustomEvent('solaris:demoScrub', { detail: { progress: 0 } }));
       ctx.revert();
     };
-  }, [superCinematic]);
+  }, [superCinematic, cssReady]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -298,6 +303,43 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
   }, [prefersReducedMotion, superCinematic]);
 
   useEffect(() => {
+    if (!enableHologram) {
+      setHologramReady(false);
+      return;
+    }
+    if (!cssReady) return;
+    if (superCinematic) {
+      setHologramReady(true);
+      return;
+    }
+
+    let cancelled = false;
+    const show = () => {
+      if (cancelled) return;
+      setHologramReady(true);
+    };
+
+    const w = window as unknown as {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+
+    if (typeof w.requestIdleCallback === 'function') {
+      const id = w.requestIdleCallback(show, { timeout: 1200 });
+      return () => {
+        cancelled = true;
+        w.cancelIdleCallback?.(id);
+      };
+    }
+
+    const t = window.setTimeout(show, 900);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(t);
+    };
+  }, [enableHologram, cssReady, superCinematic]);
+
+  useEffect(() => {
     if (prefersReducedMotion) return;
     if (superCinematic) return;
     if (typeof window === 'undefined') return;
@@ -330,8 +372,23 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
       raf = window.requestAnimationFrame(commit);
     };
 
+    let rect = el.getBoundingClientRect();
+    let rectRaf = 0;
+    const refreshRect = () => {
+      rectRaf = 0;
+      rect = el.getBoundingClientRect();
+    };
+    const scheduleRect = () => {
+      if (rectRaf) return;
+      rectRaf = window.requestAnimationFrame(refreshRect);
+    };
+
+    const ro = new ResizeObserver(scheduleRect);
+    ro.observe(el);
+    window.addEventListener('scroll', scheduleRect, { passive: true });
+
     const onMove = (e: PointerEvent) => {
-      const r = el.getBoundingClientRect();
+      const r = rect;
       const cx = r.left + r.width / 2;
       const cy = r.top + r.height / 2;
       const nx = r.width > 0 ? (e.clientX - cx) / (r.width / 2) : 0;
@@ -356,7 +413,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
     return () => {
       el.removeEventListener('pointermove', onMove);
       el.removeEventListener('pointerleave', onLeave);
+      window.removeEventListener('scroll', scheduleRect);
+      ro.disconnect();
       if (raf) window.cancelAnimationFrame(raf);
+      if (rectRaf) window.cancelAnimationFrame(rectRaf);
       bg.style.removeProperty('--hero-parallax-x-px');
       bg.style.removeProperty('--hero-parallax-y-px');
     };
@@ -457,7 +517,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
 
         <Suspense fallback={null}>
           {enableHologram ? (
-            <HeroTokenHologram quality={holoQuality ?? undefined} seed={signatureSeed} />
+            hologramReady ? <HeroTokenHologram quality={holoQuality ?? undefined} seed={signatureSeed} /> : null
           ) : null}
         </Suspense>
 

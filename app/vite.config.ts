@@ -46,7 +46,7 @@ function inlineCriticalCssAndAsyncStyles(): Plugin {
           .map(({ href }) => `<noscript><link rel="stylesheet" href="${esc(href)}"></noscript>`)
           .join('')
 
-        const loader = `<script nonce="__CSP_NONCE__">(function(){var links=[].slice.call(document.querySelectorAll('link[data-async-css="1"]'));if(!links.length)return;var next=0;function applyInOrder(){while(next<links.length){var l=links[next];if(l.dataset.loaded!=='1')return;l.rel='stylesheet';l.removeAttribute('as');l.removeAttribute('data-async-css');next++;}}links.forEach(function(l){l.addEventListener('load',function(){l.dataset.loaded='1';applyInOrder();},{once:true});l.addEventListener('error',function(){l.dataset.loaded='1';applyInOrder();},{once:true});});})();</script>`
+        const loader = `<script nonce="__CSP_NONCE__">(function(){var links=[].slice.call(document.querySelectorAll('link[data-async-css="1"]'));if(!links.length)return;try{window.__solarisAsyncCssReady=false;}catch(e){}var next=0;function markReady(){try{window.__solarisAsyncCssReady=true;window.dispatchEvent(new Event('solaris:cssReady'));}catch(e){}}function applyInOrder(){while(next<links.length){var l=links[next];if(l.dataset.loaded!=='1')return;l.rel='stylesheet';l.removeAttribute('as');l.removeAttribute('data-async-css');next++;}if(next>=links.length)markReady();}links.forEach(function(l){l.addEventListener('load',function(){l.dataset.loaded='1';applyInOrder();},{once:true});l.addEventListener('error',function(){l.dataset.loaded='1';applyInOrder();},{once:true});});})();</script>`
 
         nextHtml = nextHtml.replace(/<\/head>/i, `${noscript}${loader}</head>`)
       }
