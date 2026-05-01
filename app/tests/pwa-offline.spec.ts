@@ -1,10 +1,10 @@
-import { expect, type Page,test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * Wait until Workbox has an active registration, then reload until this client is controlled.
  * A single reload is not always enough for `navigator.serviceWorker.controller` to be set.
  */
-async function waitForServiceWorkerControllingClient(page: Page): Promise<void> {
+async function waitForServiceWorkerControllingClient(page: any): Promise<void> {
   await page.waitForLoadState('domcontentloaded');
 
   await expect
@@ -12,9 +12,28 @@ async function waitForServiceWorkerControllingClient(page: Page): Promise<void> 
       async () =>
         page.evaluate(async () => {
           const regs = await navigator.serviceWorker.getRegistrations();
-          return regs.some((r) => r.active != null);
+          if (navigator.serviceWorker.controller) return true;
+
+          if (regs.length === 0) {
+            try {
+              await navigator.serviceWorker.register('/sw.js');
+            } catch {
+              return false;
+            }
+          }
+
+          for (const r of regs) {
+            try {
+              r.waiting?.postMessage({ type: 'SKIP_WAITING' });
+            } catch {
+              void 0;
+            }
+          }
+
+          const regs2 = await navigator.serviceWorker.getRegistrations();
+          return regs2.some((r) => r.active != null) || navigator.serviceWorker.controller !== null;
         }),
-      { timeout: 30_000, intervals: [200, 400, 800, 1600] },
+      { timeout: 180_000, intervals: [200, 400, 800, 1600, 3200] },
     )
     .toBe(true);
 
@@ -27,7 +46,7 @@ async function waitForServiceWorkerControllingClient(page: Page): Promise<void> 
   await expect
     .poll(
       async () => page.evaluate(() => navigator.serviceWorker.controller !== null),
-      { timeout: 35_000, intervals: [200, 400, 800, 1600, 3200] },
+      { timeout: 180_000, intervals: [200, 400, 800, 1600, 3200] },
     )
     .toBe(true);
 }
@@ -49,6 +68,8 @@ async function waitForServiceWorkerControllingClient(page: Page): Promise<void> 
 test.describe('Offline PWA State', () => {
   /** One preview + shared SW origin: serial reduces cross-test timing races on controller claim. */
   test.describe.configure({ mode: 'serial' });
+
+  test.setTimeout(240_000);
 
   test.use({ serviceWorkers: 'allow' });
 

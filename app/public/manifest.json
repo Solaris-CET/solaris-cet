@@ -1,0 +1,31 @@
+{
+  "name": "Solaris CET",
+  "short_name": "Solaris",
+  "description": "Solaris CET — hyper-scarce RWA on TON: 9,000 CET, 90-year mining, Grok×Gemini Oracle, ~200k task agents, BRAID + RAV.",
+  "theme_color": "#05060B",
+  "background_color": "#05060B",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "portrait-primary",
+  "start_url": "/en/",
+  "scope": "/",
+  "categories": ["finance", "business", "utilities"],
+  "lang": "en",
+  "id": "/",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Buy CET on DeDust", "short_name": "Buy CET", "url": "https://dedust.io/coins/EQBbUfeIo6yrNRButZGdf4WRJZZ3IDkN8kHJbsKlu3xxypWX" },
+    { "name": "Start Mining on Telegram", "short_name": "Mine CET", "url": "https://t.me/+tKlfzx7IWopmNWQ0" },
+    { "name": "How to buy CET", "short_name": "Buy guide", "url": "/#how-to-buy" },
+    { "name": "Compare vs AI tokens", "short_name": "Compare", "url": "/#competition" }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": { "title": "title", "text": "text", "url": "url" }
+  }
+}
