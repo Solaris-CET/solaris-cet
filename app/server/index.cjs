@@ -1129,6 +1129,20 @@ async function main() {
       res.end(JSON.stringify({ error: 'Not found' }));
       return;
     }
+    const pathname = reqUrl.pathname || '/';
+    const isStaticPrefix =
+      pathname.startsWith('/assets/') ||
+      pathname.startsWith('/images/') ||
+      pathname.startsWith('/fonts/') ||
+      pathname.startsWith('/vendor/') ||
+      pathname.startsWith('/cinematic/');
+    if (isStaticPrefix || isLikelyFileRequest(pathname)) {
+      res.statusCode = 404;
+      setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.end(JSON.stringify({ error: 'Not found' }));
+      return;
+    }
     await serveIndex(res, reqUrl);
     } catch (err) {
       try {

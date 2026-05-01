@@ -54,7 +54,7 @@ export default function AccountNotificationsTab(props: Props) {
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="text-white font-semibold">Push notifications</div>
-              <div className="mt-1 text-xs text-white/60">Service worker separat: `/push/sw.js`.</div>
+              <div className="mt-1 text-xs text-white/60">Service worker: `/sw.js` (legacy: `/push/sw.js`).</div>
             </div>
             <Switch checked={props.pushEnabled} onCheckedChange={props.setPushEnabled} />
           </div>
@@ -90,4 +90,3 @@ export default function AccountNotificationsTab(props: Props) {
     </div>
   );
 }
-
