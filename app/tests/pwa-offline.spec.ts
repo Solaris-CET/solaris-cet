@@ -173,4 +173,18 @@ test.describe('Offline PWA State', () => {
 
     await context.setOffline(false);
   });
+
+  test('app shell loads offline for /en/ after first visit', async ({ page, context }) => {
+    await page.goto('/en/');
+    await waitForServiceWorkerControllingClient(page);
+
+    await context.setOffline(true);
+    await page.reload({ waitUntil: 'domcontentloaded' });
+
+    await expect(page.locator('#root')).toHaveCount(1);
+    await expect(page.locator('link[rel="manifest"]')).toHaveCount(1);
+    expect(await page.title()).not.toMatch(/Offline\s+—\s+Solaris CET/i);
+
+    await context.setOffline(false);
+  });
 });

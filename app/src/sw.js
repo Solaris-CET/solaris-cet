@@ -1,5 +1,5 @@
-import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching'
-import { registerRoute } from 'workbox-routing'
+import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
+import { NavigationRoute, registerRoute, setCatchHandler } from 'workbox-routing'
 import { CacheFirst, NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies'
 import { ExpirationPlugin } from 'workbox-expiration'
 import { CacheableResponsePlugin } from 'workbox-cacheable-response'
@@ -20,6 +20,15 @@ sw.addEventListener('message', (event) => {
   const data = event?.data
   if (data && typeof data === 'object' && data.type === 'SKIP_WAITING') {
     sw.skipWaiting?.()
+  }
+
+  if (data && typeof data === 'object' && data.type === 'CLEAR_CACHES' && data.confirm === true) {
+    event.waitUntil(
+      (async () => {
+        const keys = await sw.caches.keys()
+        await Promise.all(keys.map((k) => sw.caches.delete(k)))
+      })(),
+    )
   }
 })
 
@@ -56,18 +65,67 @@ registerRoute(
   }),
 )
 
+const appShellHandler = createHandlerBoundToURL('/index.html')
+registerRoute(
+  new NavigationRoute(
+    async (options) => {
+      try {
+        return await appShellHandler(options)
+      } catch {
+        const offline = await sw.caches.match('/offline.html')
+        return offline ?? Response.error()
+      }
+    },
+    {
+      denylist: [/^\/sovereign\//, /^\/apocalypse\//, /\/[^/?]+\.[^/]+$/],
+    },
+  ),
+)
+
 registerRoute(
   ({ request, url }) =>
-    request.mode === 'navigate' && !url.pathname.startsWith('/sovereign/') && !url.pathname.startsWith('/apocalypse/'),
-  new NetworkFirst({
-    cacheName: 'pages-offline-fallback',
+    request.mode === 'navigate' && (url.pathname.startsWith('/sovereign/') || url.pathname.startsWith('/apocalypse/')),
+  new StaleWhileRevalidate({
+    cacheName: 'static-sites-pages',
     plugins: [
-      {
-        handlerDidError: async () => {
-          const match = await sw.caches.match('/offline.html')
-          return match ?? undefined
-        },
-      },
+      new CacheableResponsePlugin({ statuses: [200] }),
+      new ExpirationPlugin({ maxEntries: 40, maxAgeSeconds: 60 * 60 * 24 * 30 }),
+    ],
+  }),
+)
+
+registerRoute(
+  ({ request, url }) =>
+    request.method === 'GET' &&
+    url.origin === sw.location.origin &&
+    (url.pathname === '/robots.txt' || url.pathname === '/sitemap.xml'),
+  new StaleWhileRevalidate({
+    cacheName: 'meta-files-cache',
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [200] }),
+      new ExpirationPlugin({ maxEntries: 4, maxAgeSeconds: 60 * 60 * 24 * 7 }),
+    ],
+  }),
+)
+
+registerRoute(
+  ({ request }) => request.destination === 'image' && request.method === 'GET',
+  new StaleWhileRevalidate({
+    cacheName: 'images-cache',
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
+      new ExpirationPlugin({ maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 30 }),
+    ],
+  }),
+)
+
+registerRoute(
+  ({ request }) => request.destination === 'font' && request.method === 'GET',
+  new CacheFirst({
+    cacheName: 'fonts-cache',
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
+      new ExpirationPlugin({ maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 }),
     ],
   }),
 )
@@ -76,7 +134,10 @@ registerRoute(
   ({ url }) => /\/api\/state\.json$/.test(url.pathname),
   new StaleWhileRevalidate({
     cacheName: 'state-json-cache',
-    plugins: [new ExpirationPlugin({ maxEntries: 1, maxAgeSeconds: 60 * 5 })],
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [200] }),
+      new ExpirationPlugin({ maxEntries: 1, maxAgeSeconds: 60 * 5 }),
+    ],
   }),
 )
 
@@ -84,7 +145,11 @@ registerRoute(
   ({ url }) => /^https:\/\/api\.dedust\.io\//i.test(url.href),
   new NetworkFirst({
     cacheName: 'dedust-api-cache',
-    plugins: [new ExpirationPlugin({ maxEntries: 10, maxAgeSeconds: 60 * 5 })],
+    networkTimeoutSeconds: 4,
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
+      new ExpirationPlugin({ maxEntries: 10, maxAgeSeconds: 60 * 5 }),
+    ],
   }),
 )
 
@@ -92,7 +157,11 @@ registerRoute(
   ({ url }) => /^https:\/\/api\.coingecko\.com\//i.test(url.href),
   new NetworkFirst({
     cacheName: 'coingecko-api-cache',
-    plugins: [new ExpirationPlugin({ maxEntries: 10, maxAgeSeconds: 60 * 5 })],
+    networkTimeoutSeconds: 4,
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
+      new ExpirationPlugin({ maxEntries: 10, maxAgeSeconds: 60 * 5 }),
+    ],
   }),
 )
 
@@ -100,9 +169,26 @@ registerRoute(
   ({ url }) => /^\/vendor\/onnxruntime\//i.test(url.pathname),
   new CacheFirst({
     cacheName: 'onnx-wasm-cache',
-    plugins: [new ExpirationPlugin({ maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 })],
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
+      new ExpirationPlugin({ maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 }),
+    ],
   }),
 )
+
+setCatchHandler(async ({ event }) => {
+  if (event?.request?.destination === 'document') {
+    const offline = await sw.caches.match('/offline.html')
+    if (offline) return offline
+  }
+
+  if (event?.request?.destination === 'image') {
+    const img = await sw.caches.match('/offline-image.svg')
+    if (img) return img
+  }
+
+  return Response.error()
+})
 
 function getPushPayload(event) {
   const data = event?.data
