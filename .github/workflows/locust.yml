@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -60,10 +60,9 @@ jobs:
 
       - name: Upload Locust results
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: locust-results
           path: perf/locust*
           retention-days: 14
           if-no-files-found: warn
-

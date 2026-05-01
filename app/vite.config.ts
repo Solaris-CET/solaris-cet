@@ -62,6 +62,7 @@ function inlineCriticalCssAndAsyncStyles(): Plugin {
 function fixReownPhosphorImports(): Plugin {
   const prefix = '../node_modules/@phosphor-icons/webcomponents/dist/icons/'
   const barePrefix = '@phosphor-icons/webcomponents/'
+  const virtualPrefix = '\0phosphor-missing:'
   return {
     name: 'fix-reown-phosphor-imports',
     enforce: 'pre',
@@ -72,9 +73,13 @@ function fixReownPhosphorImports(): Plugin {
       }
       if (source.startsWith(barePrefix)) {
         const icon = source.slice(barePrefix.length)
-        return path.resolve(__dirname, '..', 'node_modules', '@phosphor-icons', 'webcomponents', 'dist', 'icons', `${icon}.mjs`)
+        return `${virtualPrefix}${icon}`
       }
       return null
+    },
+    load(id) {
+      if (!id.startsWith(virtualPrefix)) return null
+      return 'export default undefined;'
     },
   }
 }
