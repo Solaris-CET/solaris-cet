@@ -142,6 +142,16 @@ test.describe('Offline PWA State', () => {
     });
     expect(offlineHtml).toMatch(/Offline\s+—\s+Solaris CET/i);
 
+    const offlineImageSvg = await page.evaluate(async () => {
+      try {
+        const res = await fetch('/offline-image.svg');
+        return await res.text();
+      } catch {
+        return '';
+      }
+    });
+    expect(offlineImageSvg).toMatch(/<svg[\s\S]*>\s*/i);
+
     await context.setOffline(false);
   });
 

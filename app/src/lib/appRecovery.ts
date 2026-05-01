@@ -19,6 +19,7 @@ export function isChunkLoadFailure(value: unknown): boolean {
   return (
     /Failed to fetch dynamically imported module/i.test(msg) ||
     /Importing a module script failed/i.test(msg) ||
+    /Expected a JavaScript module script but the server responded with a MIME type/i.test(msg) ||
     /Loading chunk \d+ failed/i.test(msg) ||
     /ChunkLoadError/i.test(msg)
   )
