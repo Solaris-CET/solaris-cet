@@ -1,11 +1,10 @@
 import { eq } from 'drizzle-orm';
-
-import { getDb, schema } from '../../../db/client';
 import { corsJson, optionsResponse, readJson } from '../../lib/http';
 import { ensureAllowedOrigin } from '../../lib/originGuard';
-import { awardPoints } from '../../lib/points';
 import { withRateLimit } from '../../lib/rateLimit';
+import { awardPoints } from '../../lib/points';
 import { verifyTelegramInitData } from '../../telegram/initData';
+import { getDb, schema } from '../../../db/client';
 
 export const config = { runtime: 'nodejs' };
 

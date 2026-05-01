@@ -1,10 +1,9 @@
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CheckCircle, ChevronDown,Circle, Loader } from 'lucide-react';
 import { useLayoutEffect, useMemo,useRef } from 'react';
 
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 import { useLanguage } from '@/hooks/useLanguage';
+import { loadGsapWithScrollTrigger } from '@/lib/gsapLazy';
 
 type PhaseStatus = 'done' | 'active' | 'upcoming';
 
@@ -231,8 +230,6 @@ const statusConfig: Record<PhaseStatus, PhaseStatusConfig> = {
   },
 };
 
-gsap.registerPlugin(ScrollTrigger);
-
 const RoadmapSection = () => {
   const { t, lang } = useLanguage();
   const tx = t.roadmapUi;
@@ -250,63 +247,71 @@ const RoadmapSection = () => {
     const section = sectionRef.current;
     if (!section) return;
 
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headingRef.current,
-        { y: 32, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: headingRef.current,
-            start: 'top 82%',
-            end: 'top 55%',
-            scrub: true,
-          },
-        }
-      );
-
-      const cards = cardsRef.current?.querySelectorAll('.roadmap-card');
-      if (cards?.length) {
+    let cancelled = false;
+    let ctx: { revert: () => void } | null = null;
+    void loadGsapWithScrollTrigger().then(({ gsap }) => {
+      if (cancelled) return;
+      ctx = gsap.context(() => {
         gsap.fromTo(
-          cards,
-          { y: 40, opacity: 0 },
+          headingRef.current,
+          { y: 32, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            stagger: 0.12,
-            duration: 0.7,
+            duration: 0.8,
             scrollTrigger: {
-              trigger: cardsRef.current,
-              start: 'top 80%',
-              end: 'top 35%',
+              trigger: headingRef.current,
+              start: 'top 82%',
+              end: 'top 55%',
               scrub: true,
             },
-          }
-        );
-      }
-
-      if (lineRef.current) {
-        const path = lineRef.current;
-        const length = path.getTotalLength();
-        path.style.strokeDasharray = `${length}`;
-        path.style.strokeDashoffset = `${length}`;
-
-        gsap.to(path, {
-          strokeDashoffset: 0,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: cardsRef.current,
-            start: 'top 85%',
-            end: 'bottom 20%',
-            scrub: true,
           },
-        });
-      }
-    }, section);
+        );
 
-    return () => ctx.revert();
+        const cards = cardsRef.current?.querySelectorAll('.roadmap-card');
+        if (cards?.length) {
+          gsap.fromTo(
+            cards,
+            { y: 40, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              stagger: 0.12,
+              duration: 0.7,
+              scrollTrigger: {
+                trigger: cardsRef.current,
+                start: 'top 80%',
+                end: 'top 35%',
+                scrub: true,
+              },
+            },
+          );
+        }
+
+        if (lineRef.current) {
+          const path = lineRef.current;
+          const length = path.getTotalLength();
+          path.style.strokeDasharray = `${length}`;
+          path.style.strokeDashoffset = `${length}`;
+
+          gsap.to(path, {
+            strokeDashoffset: 0,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: cardsRef.current,
+              start: 'top 85%',
+              end: 'bottom 20%',
+              scrub: true,
+            },
+          });
+        }
+      }, section);
+    });
+
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
   }, []);
 
   return (

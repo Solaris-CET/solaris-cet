@@ -611,6 +611,7 @@ export interface Translations {
   securityUi: SecurityUi;
   rwaUi: RwaUi;
   rwaSectionUi: RwaSectionUi;
+  virtualLandUi: VirtualLandUi;
   ecosystemIndexUi: EcosystemIndexUi;
   rwaContentUi: RwaContentUi;
   faqContent: FaqContent;
@@ -636,6 +637,7 @@ export type RoadmapUi = typeof roadmapUiEn;
 export type SecurityUi = typeof securityUiEn;
 export type RwaUi = typeof rwaUiEn;
 export type RwaSectionUi = typeof rwaSectionUiEn;
+export type VirtualLandUi = typeof virtualLandUiEn;
 export type EcosystemIndexUi = typeof ecosystemIndexUiEn;
 export type RwaContentUi = typeof rwaContentUiEn;
 
@@ -891,6 +893,10 @@ const cookieUiEn = {
   analyticsBody: 'Helps us improve the product by collecting aggregated usage signals.',
   marketingTitle: 'Marketing & retargeting',
   marketingBody: 'Used to measure campaigns and optimize acquisition spend.',
+  externalContentTitle: 'External content',
+  externalContentBody:
+    'This section loads third-party content (charts, social embeds) that may set cookies. Load only if you agree, or adjust your choice in Cookie settings.',
+  loadExternalContent: 'Load external content',
   saveClose: 'Save and close',
   cookiePolicy: 'Cookie Policy',
   cookieSettings: 'Cookie settings',
@@ -911,6 +917,10 @@ const cookieUiRo = {
   analyticsBody: 'Ne ajută să îmbunătățim produsul prin semnale agregate despre utilizare.',
   marketingTitle: 'Marketing & retargeting',
   marketingBody: 'Folosite pentru măsurarea campaniilor și optimizarea bugetelor de achiziție.',
+  externalContentTitle: 'Conținut extern',
+  externalContentBody:
+    'Această secțiune încarcă conținut terț (grafice, embed-uri sociale) care poate seta cookie-uri. Încarcă doar dacă ești de acord, sau ajustează alegerea în Setări cookie.',
+  loadExternalContent: 'Încarcă conținutul extern',
   saveClose: 'Salvează și închide',
   cookiePolicy: 'Politică de cookie-uri',
   cookieSettings: 'Setări cookie',
@@ -931,6 +941,10 @@ const cookieUiEs = {
   analyticsBody: 'Nos ayuda a mejorar el producto con señales agregadas de uso.',
   marketingTitle: 'Marketing y retargeting',
   marketingBody: 'Para medir campañas y optimizar adquisición.',
+  externalContentTitle: 'Contenido externo',
+  externalContentBody:
+    'Esta sección carga contenido de terceros (gráficos, embeds sociales) que puede establecer cookies. Cárgalo solo si estás de acuerdo, o ajusta tu elección en Ajustes de cookies.',
+  loadExternalContent: 'Cargar contenido externo',
   saveClose: 'Guardar y cerrar',
   cookiePolicy: 'Política de cookies',
   cookieSettings: 'Ajustes de cookies',
@@ -1741,7 +1755,7 @@ const roadmapUiEn = {
   titleHighlight: 'Sustainable Growth',
   titleTail: '\u200B',
   subtitle:
-    'From the initial token launch to a full-scale AI-powered agricultural ecosystem — every milestone is publicly trackable and immutably recorded.',
+    'From the initial token launch to a full-scale AI-powered virtual agricultural ecosystem — every milestone is publicly trackable and immutably recorded.',
   overallProgressLabel: 'Overall Progress',
   phasesCompleteLabel: '5 phases complete',
   activeUpcomingLabel: '1 active · 1 upcoming',
@@ -1755,7 +1769,7 @@ const roadmapUiRo = {
   titleHighlight: 'creștere sustenabilă',
   titleTail: '\u200B',
   subtitle:
-    'De la lansarea tokenului până la un ecosistem agricol scalat și asistat de AI — fiecare reper este urmărit public și înregistrat imutabil.',
+    'De la lansarea tokenului până la un ecosistem agricol virtual, scalat și asistat de AI — fiecare reper este urmărit public și înregistrat imutabil.',
   overallProgressLabel: 'Progres general',
   phasesCompleteLabel: '5 faze finalizate',
   activeUpcomingLabel: '1 în lucru · 1 planificată',
@@ -1800,7 +1814,7 @@ const securityUiEn = {
   trustBadges: {
     aiAudited: 'AI Audited',
     tonVerified: 'TON Verified',
-    rwaAnchored: 'RWA Anchored',
+    rwaAnchored: 'Virtual Land Anchored',
   },
 };
 
@@ -1841,7 +1855,7 @@ const securityUiRo = {
   trustBadges: {
     aiAudited: 'Audit AI',
     tonVerified: 'TON verificat',
-    rwaAnchored: 'Ancorat RWA',
+    rwaAnchored: 'Ancorat teren virtual',
   },
 };
 
@@ -1850,29 +1864,29 @@ const rwaContentUiEn = {
     locationLabel: 'Location',
     locationValue: 'Cetățuia, Romania',
     assetClassLabel: 'Asset Class',
-    assetClassValue: 'Agricultural Land',
+    assetClassValue: 'Virtual Agricultural Land',
     aiIntegrationLabel: 'AI Integration',
     aiIntegrationValue: 'Precision Farming',
     onChainProofLabel: 'On-Chain Proof',
     onChainProofValue: 'IPFS + TON L1',
     yieldTypeLabel: 'Yield Type',
-    yieldTypeValue: 'Agricultural + Token',
+    yieldTypeValue: 'Simulation + Token',
     tokenLayerLabel: 'Token Layer',
     tokenLayerValue: 'CET · 9,000 supply',
   },
   pillars: {
     tangibleTitle: 'Tangible Backing',
     tangibleDescription:
-      'Every CET token is backed by productive agricultural land in Cetățuia, Romania — not speculative promises. The land generates real-world agricultural yield independent of crypto market cycles.',
+      'Every CET token is anchored to a virtual agricultural land layer (a digital twin of Cetățuia, Romania) — not speculative promises. The virtual grid is backed by a public evidence bundle and is designed to link operations to on-chain proofs.',
     transparencyTitle: 'On-Chain Transparency',
     transparencyDescription:
-      'All land ownership documents, agricultural records, and AI farming reports are stored on IPFS and anchored to TON L1. Any holder can verify the backing assets without trusting a third party.',
+      'Specs, maps, and validation artifacts can be stored on IPFS and anchored to TON L1. Any holder can verify the evidence bundle without trusting a third party.',
     aiYieldTitle: 'AI-Optimised Yield',
     aiYieldDescription:
-      "Solaris CET's ~200,000 task-specialist AI agents coordinate agricultural operations — soil analysis, crop rotation planning, weather prediction, and irrigation scheduling — with CET AI–orchestrated validation, maximising yield sustainably.",
+      "Solaris CET's task-specialist AI agents can simulate strategies (soil/rotation/weather/irrigation) and publish verifiable reports, maximising modeled outcomes sustainably.",
     scarcityTitle: 'Structural Scarcity',
     scarcityDescription:
-      'With only 9,000 CET ever minted, each token represents a proportional share of a unique real-world asset. No competitor combines AI agent infrastructure with hard-capped supply and physical asset backing.',
+      'With only 9,000 CET ever minted, each token maps to a proportional share of the virtual land layer. Digital scarcity meets verifiable infrastructure and transparent proof surfaces.',
   },
 };
 
@@ -1881,36 +1895,36 @@ const rwaContentUiRo = {
     locationLabel: 'Locație',
     locationValue: 'Cetățuia, România',
     assetClassLabel: 'Clasă activ',
-    assetClassValue: 'Teren agricol',
+    assetClassValue: 'Teren agricol virtual',
     aiIntegrationLabel: 'Integrare AI',
     aiIntegrationValue: 'Agricultură de precizie',
     onChainProofLabel: 'Dovadă on-chain',
     onChainProofValue: 'IPFS + TON L1',
     yieldTypeLabel: 'Tip randament',
-    yieldTypeValue: 'Agricol + token',
+    yieldTypeValue: 'Simulare + token',
     tokenLayerLabel: 'Strat token',
     tokenLayerValue: 'CET · supply 9.000',
   },
   pillars: {
     tangibleTitle: 'Backing tangibil',
     tangibleDescription:
-      'Fiecare token CET este susținut de teren agricol productiv în Cetățuia, România — nu de promisiuni speculative. Terenul generează randament real, independent de ciclurile pieței crypto.',
+      'Fiecare token CET este ancorat într-un strat de teren agricol virtual (digital twin) pentru Cetățuia, România — nu în promisiuni speculative. Stratul virtual este susținut de un pachet public de dovezi și este gândit să lege operațiunile de dovezi on-chain.',
     transparencyTitle: 'Transparență on-chain',
     transparencyDescription:
-      'Documentele de proprietate, evidențe agricole și rapoarte AI sunt stocate pe IPFS și ancorate în TON L1. Orice deținător poate verifica backing-ul fără a avea nevoie de “încredere” într-un terț.',
+      'Specificații, hărți și artefacte de validare pot fi stocate pe IPFS și ancorate în TON L1. Orice deținător poate verifica pachetul de dovezi fără a se baza pe un terț.',
     aiYieldTitle: 'Randament optimizat de AI',
     aiYieldDescription:
-      'Agenții AI (~200.000) coordonează operațiunile agricole: analiză sol, rotație culturi, predicție meteo, irigații — cu validare orchestratǎ, pentru maximizarea randamentului în mod sustenabil.',
+      'Agenții AI pot simula strategii (sol/rotație/meteo/irigații) și pot publica rapoarte verificabile, maximizând rezultatele modelate în mod sustenabil.',
     scarcityTitle: 'Raritate structurală',
     scarcityDescription:
-      'Cu doar 9.000 CET vreodată emise, fiecare token reprezintă o parte proporțională dintr-un activ real. Niciun competitor nu combină infrastructură de agenți AI, supply hard-capped și backing fizic.',
+      'Cu doar 9.000 CET vreodată emise, fiecare token se mapează la o parte proporțională din stratul virtual. Raritate digitală + infrastructură verificabilă + suprafețe de dovadă publice.',
   },
 };
 
 const rwaUiEn = {
   documents: {
     title: 'Documents',
-    ariaLabel: 'RWA documents and proofs',
+    ariaLabel: 'Virtual land documents and proofs',
     subtitle: 'Search and filter proof files. Open previews or download originals.',
     searchSr: 'Search documents',
     searchPlaceholder: 'Search documents',
@@ -1919,10 +1933,10 @@ const rwaUiEn = {
     filterWhitepaper: 'Whitepaper',
     filterAudit: 'Audit',
     filterIpfs: 'IPFS proof',
-    filterRegistry: 'Land registry',
+    filterRegistry: 'World spec',
     filterTimeline: 'Timeline',
     typeWhitepaper: 'WHITEPAPER',
-    typeRegistry: 'REGISTRY',
+    typeRegistry: 'SPEC',
     typeAudit: 'AUDIT',
     typeIpfs: 'IPFS',
     typeTimeline: 'TIMELINE',
@@ -1932,14 +1946,14 @@ const rwaUiEn = {
   },
   timeline: {
     title: 'Timeline',
-    ariaLabel: 'RWA milestone timeline',
-    subtitle: 'Progress and proof milestones for Cetățuia.',
+    ariaLabel: 'Virtual land milestone timeline',
+    subtitle: 'Progress and proof milestones for Cetățuia virtual land.',
     legendComplete: 'COMPLETE',
     legendActive: 'ACTIVE',
     legendPlanned: 'PLANNED',
   },
   map: {
-    ariaLabel: 'RWA portfolio map',
+    ariaLabel: 'Virtual land portfolio map',
     controlsAria: 'Map controls',
     zoomInAria: 'Zoom in',
     zoomOutAria: 'Zoom out',
@@ -1955,7 +1969,7 @@ const rwaUiEn = {
 const rwaUiRo = {
   documents: {
     title: 'Documente',
-    ariaLabel: 'Documente și dovezi RWA',
+    ariaLabel: 'Documente și dovezi pentru teren virtual',
     subtitle: 'Caută și filtrează fișierele de dovadă. Deschide preview sau descarcă originalul.',
     searchSr: 'Caută în documente',
     searchPlaceholder: 'Caută documente',
@@ -1964,10 +1978,10 @@ const rwaUiRo = {
     filterWhitepaper: 'Whitepaper',
     filterAudit: 'Audit',
     filterIpfs: 'Dovadă IPFS',
-    filterRegistry: 'Carte funciară',
+    filterRegistry: 'Specificație lume',
     filterTimeline: 'Timeline',
     typeWhitepaper: 'WHITEPAPER',
-    typeRegistry: 'REGISTRU',
+    typeRegistry: 'SPEC',
     typeAudit: 'AUDIT',
     typeIpfs: 'IPFS',
     typeTimeline: 'TIMELINE',
@@ -1977,14 +1991,14 @@ const rwaUiRo = {
   },
   timeline: {
     title: 'Timeline',
-    ariaLabel: 'Timeline milestone RWA',
-    subtitle: 'Progres și milestone-uri de dovadă pentru Cetățuia.',
+    ariaLabel: 'Timeline milestone teren virtual',
+    subtitle: 'Progres și milestone-uri de dovadă pentru terenul virtual Cetățuia.',
     legendComplete: 'FINALIZAT',
     legendActive: 'ACTIV',
     legendPlanned: 'PLANIFICAT',
   },
   map: {
-    ariaLabel: 'Hartă portofoliu RWA',
+    ariaLabel: 'Hartă portofoliu teren virtual',
     controlsAria: 'Controale hartă',
     zoomInAria: 'Mărește',
     zoomOutAria: 'Micșorează',
@@ -1998,18 +2012,18 @@ const rwaUiRo = {
 };
 
 const rwaSectionUiEn = {
-  kicker: 'REAL WORLD ASSETS · RWA',
+  kicker: 'VIRTUAL AGRICULTURAL LAND',
   titleLead: 'Cetățuia',
-  titleAccent: 'Agricultural Land',
-  subtitle: 'A real asset surface anchored to TON. Evidence, proofs, and timeline for RWA backing.',
-  physicalKicker: 'PHYSICAL ASSET',
+  titleAccent: 'Virtual Agricultural Land',
+  subtitle: 'A virtual land surface anchored to TON. Specs, proofs, and a timeline for validation artifacts.',
+  physicalKicker: 'VIRTUAL LAYER',
   physicalHeadingLead: 'Token ↔',
-  physicalHeadingAccent: 'Land',
-  physicalHeadingTail: 'not digital air',
-  physicalBodyPrefix: 'Solaris CET is anchored to',
+  physicalHeadingAccent: 'Grid',
+  physicalHeadingTail: 'with verifiable proof surfaces',
+  physicalBodyPrefix: 'Solaris CET can be anchored to',
   physicalLocationName: 'Cetățuia, Romania',
   physicalBodySuffix: 'with verifiable proof surfaces.',
-  physicalQuote: 'Real yield is produced by land. Tokens represent proportional backing.',
+  physicalQuote: 'Modeled yield is produced by the simulation layer. Tokens map proportional allocation.',
   chipTonContract: 'TON Contract',
   chipDedustPool: 'DeDust Pool',
   chipIpfsProof: 'IPFS Proof',
@@ -2018,29 +2032,29 @@ const rwaSectionUiEn = {
   asideType: 'Type',
   asideJumpDocs: 'Open Documents',
   asideJumpTimeline: 'Open Timeline',
-  asideProofBundle: 'Proof bundle: docs + IPFS + on-chain anchors.',
+  asideProofBundle: 'Proof bundle: specs + IPFS + on-chain anchors.',
   asideMapTitlePrefix: 'MAP',
   asideMapOpen: 'Open',
   asideNoSelection: 'Select a project on the map to view details and jump to proofs.',
   verifiedKicker: 'VERIFIED · IPFS',
   verifiedBody:
-    'Verify the proof bundle on IPFS using CID bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a. Anyone can independently validate the backing.',
+    'Verify the proof bundle on IPFS using CID bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a. Anyone can independently validate the artifacts.',
   verifiedCta: 'Open Proof Bundle',
 };
 
 const rwaSectionUiRo = {
-  kicker: 'REAL WORLD ASSETS · RWA',
+  kicker: 'TEREN AGRICOL VIRTUAL',
   titleLead: 'Cetățuia',
-  titleAccent: 'Teren agricol',
-  subtitle: 'Suprafață de activ real ancorată în TON. Dovezi, proof-uri și timeline pentru backing RWA.',
-  physicalKicker: 'ACTIV FIZIC',
+  titleAccent: 'Teren agricol virtual',
+  subtitle: 'Suprafață virtuală ancorată în TON. Specificații, proof-uri și timeline pentru artefacte de validare.',
+  physicalKicker: 'STRAT VIRTUAL',
   physicalHeadingLead: 'Token ↔',
-  physicalHeadingAccent: 'Teren',
-  physicalHeadingTail: 'nu “digital air”',
-  physicalBodyPrefix: 'Solaris CET este ancorat în',
+  physicalHeadingAccent: 'Grid',
+  physicalHeadingTail: 'cu suprafețe de dovadă verificabile',
+  physicalBodyPrefix: 'Solaris CET poate fi ancorat în',
   physicalLocationName: 'Cetățuia, România',
   physicalBodySuffix: 'cu suprafețe de dovadă verificabile.',
-  physicalQuote: 'Randamentul real este produs de teren. Token-urile reprezintă backing proporțional.',
+  physicalQuote: 'Randamentul modelat este produs de stratul de simulare. Token-urile se mapează proporțional.',
   chipTonContract: 'Contract TON',
   chipDedustPool: 'Pool DeDust',
   chipIpfsProof: 'Dovadă IPFS',
@@ -2049,14 +2063,128 @@ const rwaSectionUiRo = {
   asideType: 'Tip',
   asideJumpDocs: 'Deschide documente',
   asideJumpTimeline: 'Deschide timeline',
-  asideProofBundle: 'Bundle dovadă: documente + IPFS + ancore on-chain.',
+  asideProofBundle: 'Bundle dovadă: specificații + IPFS + ancore on-chain.',
   asideMapTitlePrefix: 'HARTĂ',
   asideMapOpen: 'Deschide',
   asideNoSelection: 'Selectează un proiect pe hartă pentru detalii și proof-uri.',
   verifiedKicker: 'VERIFICAT · IPFS',
   verifiedBody:
-    'Verifică bundle-ul de dovadă pe IPFS folosind CID bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a. Oricine poate valida backing-ul independent.',
+    'Verifică bundle-ul de dovadă pe IPFS folosind CID bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a. Oricine poate valida artefactele independent.',
   verifiedCta: 'Deschide bundle',
+};
+
+const virtualLandUiEn = {
+  header: {
+    titleLead: 'Virtual',
+    titleAccent: 'Agricultural',
+    titleTail: 'Land',
+    subtitle:
+      'A Cetățuia-inspired virtual agricultural land grid — mapped, tokenized, and anchored via IPFS + TON proofs as verifiable artifacts.',
+  },
+  metrics: {
+    cetSupplyLabel: 'CET SUPPLY',
+    totalLandLabel: 'TOTAL LAND',
+    parcelsLabel: 'PARCELS',
+    tokenLandRatioLabel: 'TOKEN:LAND RATIO',
+  },
+  map: {
+    title: 'PARCEL MAP — CETĂȚUIA ZONE A',
+    legendTokenized: 'Tokenized',
+    legendAvailable: 'Available',
+    legendReserved: 'Reserved',
+    selectedLabel: 'SELECTED PARCEL',
+    zoneLabel: 'ZONE',
+    statusLabel: 'STATUS',
+    statusTokenized: 'TOKENIZED',
+    statusAvailable: 'AVAILABLE',
+    statusReserved: 'RESERVED',
+  },
+  features: {
+    onChainTitle: 'On-chain Anchors',
+    onChainBody:
+      'Each parcel is a deterministic virtual unit with IDs and a public proof bundle (specs, maps, validation artifacts) anchorable on IPFS + TON.',
+    sensorsTitle: 'Telemetry Layer',
+    sensorsBody:
+      'Optional sensor and simulation telemetry can be published as auditable artifacts. Always treated as verifiable proofs, not marketing claims.',
+    distributionTitle: 'Modeled Distribution',
+    distributionBody:
+      'Outputs can be modeled transparently and published as proofs. Any value distribution should be disclosed separately and never assumed by default.',
+  },
+  layers: {
+    title: 'INFRASTRUCTURE LAYERS',
+    l1Title: 'Virtual land — Cetățuia-inspired',
+    l1Body: 'Deterministic parcels • 312-cell grid surface',
+    l1Status: 'ACTIVE',
+    l2Title: 'Digital twin — geospatial map',
+    l2Body: 'Geospatial snapshots • Rule-based parcel layout',
+    l2Status: 'ACTIVE',
+    l3Title: 'Proof anchors — IPFS + TON',
+    l3Body: 'Evidence bundle • Anchored artifacts for verification',
+    l3Status: 'ACTIVE',
+    l4Title: 'Telemetry — sensors & reports',
+    l4Body: 'Optional telemetry • Planned milestone',
+    l4Status: 'PLANNED',
+    l5Title: 'ZK proof layer — provable outputs',
+    l5Body: 'Zero-knowledge verification • Future roadmap',
+    l5Status: 'FUTURE',
+  },
+};
+
+const virtualLandUiRo = {
+  header: {
+    titleLead: 'Teren',
+    titleAccent: 'agricol',
+    titleTail: 'virtual',
+    subtitle:
+      'Un grid de teren agricol virtual inspirat de Cetățuia — mapat, tokenizat și ancorat via IPFS + TON ca artefacte verificabile.',
+  },
+  metrics: {
+    cetSupplyLabel: 'SUPPLY CET',
+    totalLandLabel: 'TEREN TOTAL',
+    parcelsLabel: 'PARCELE',
+    tokenLandRatioLabel: 'RAPORT TOKEN:TEREN',
+  },
+  map: {
+    title: 'HARTĂ PARCELE — CETĂȚUIA ZONA A',
+    legendTokenized: 'Tokenizat',
+    legendAvailable: 'Disponibil',
+    legendReserved: 'Rezervat',
+    selectedLabel: 'PARCELĂ SELECTATĂ',
+    zoneLabel: 'ZONĂ',
+    statusLabel: 'STATUS',
+    statusTokenized: 'TOKENIZAT',
+    statusAvailable: 'DISPONIBIL',
+    statusReserved: 'REZERVAT',
+  },
+  features: {
+    onChainTitle: 'Ancore on-chain',
+    onChainBody:
+      'Fiecare parcelă este o unitate virtuală deterministă, cu ID-uri și bundle public (spec, hărți, artefacte de validare) ancorabil pe IPFS + TON.',
+    sensorsTitle: 'Strat de telemetrie',
+    sensorsBody:
+      'Telemetria de simulare și rapoartele pot fi publicate ca artefacte auditable. Tratează totul ca dovezi verificabile, nu ca promisiuni.',
+    distributionTitle: 'Distribuție modelată',
+    distributionBody:
+      'Rezultatele pot fi modelate transparent și publicate ca proof. Orice distribuție de valoare se comunică separat și nu se presupune implicit.',
+  },
+  layers: {
+    title: 'LAYERE DE INFRASTRUCTURĂ',
+    l1Title: 'Teren virtual — inspirat de Cetățuia',
+    l1Body: 'Parcelele deterministe • grid 312 celule',
+    l1Status: 'ACTIV',
+    l2Title: 'Digital twin — hartă geospațială',
+    l2Body: 'Snapshot-uri • layout bazat pe reguli',
+    l2Status: 'ACTIV',
+    l3Title: 'Ancore dovadă — IPFS + TON',
+    l3Body: 'Bundle dovezi • artefacte ancorate pentru verificare',
+    l3Status: 'ACTIV',
+    l4Title: 'Telemetrie — senzori & rapoarte',
+    l4Body: 'Telemetrie opțională • milestone planificat',
+    l4Status: 'PLANIFICAT',
+    l5Title: 'Strat ZK — ieșiri demonstrabile',
+    l5Body: 'Verificare zero-knowledge • roadmap viitor',
+    l5Status: 'VIITOR',
+  },
 };
 
 const ecosystemIndexUiEn = {
@@ -2116,7 +2244,7 @@ const translations: Record<LangCode, Translations> = {
       cetApp: 'CET App',
       tokenomics: 'Tokenomics',
       cetuia: 'Cetățuia Map',
-      rwa: 'RWA',
+      rwa: 'Virtual Land',
       cetAi: 'CET AI',
       roadmap: 'Roadmap',
       team: 'AI Team',
@@ -2153,13 +2281,13 @@ const translations: Record<LangCode, Translations> = {
     seo: {
       homeTitle: 'Home | Solaris CET',
       homeDescription:
-        'Solaris CET is an AI-native RWA token on TON blockchain. 9,000 CET fixed supply. 200,000 autonomous AI agents via Grok × Gemini dual-AI RAV Protocol.',
+        'Solaris CET is an AI-native token on TON blockchain. 9,000 CET fixed supply. Virtual agricultural land simulation layer with verifiable IPFS + TON proofs.',
       demoTitle: 'Demo | Solaris CET',
       demoDescription:
         'Experimental cinematic demo build: hologram visuals, progressive WebGL, and motion choreography. Falls back safely on low-end devices.',
-      rwaTitle: 'RWA | Solaris CET',
+      rwaTitle: 'Virtual Land | Solaris CET',
       rwaDescription:
-        'Explore Solaris CET real-world asset proof surface: evidence links, timeline, and project documents anchored in Cetățuia, Romania.',
+        'Explore Solaris CET virtual land proof surface: specs, evidence links, timeline, and validation artifacts anchored via IPFS + TON.',
       cetAiTitle: 'CET AI Demo | Solaris CET',
       cetAiDescription:
         'Try the CET AI demo UI with secure /api/chat integration, UX error states, and privacy guidance (do not enter personal data).',
@@ -2234,7 +2362,7 @@ const translations: Record<LangCode, Translations> = {
       problemAgriculture: 'The agriculture challenge',
       novaApp: 'Solaris AI solution',
       tokenomics: 'Tokenomics — 9,000 CET',
-      rwa: 'RWA — Cetățuia',
+      rwa: 'Virtual Land — Cetățuia',
       roadmap: 'Roadmap',
       footer: 'Site footer',
     },
@@ -2285,7 +2413,7 @@ const translations: Record<LangCode, Translations> = {
       stakingCalculator: 'Staking calculator',
       whitepaperSection: 'Whitepaper',
       faq: 'Frequently Asked Questions',
-      rwa: 'Real World Assets — Cetățuia Agricultural Land',
+      rwa: 'Virtual Agricultural Land — Cetățuia',
       copyCetAddress: 'Copy CET contract address',
       copyDedustPool: 'Copy DeDust pool address',
       compliance: 'Compliance and Regulation',
@@ -2301,7 +2429,7 @@ const translations: Record<LangCode, Translations> = {
       reset: 'Reset',
       predictiveTerrainTitle: 'Predictive terrain (illustrative)',
       predictiveTerrainHeatmap:
-        'Illustrative heatmap of relative land-yield zones for Cetățuia — not a live agricultural feed or investment signal.',
+        'Illustrative heatmap of relative land-yield zones for Cetățuia — not a live farm feed or investment signal.',
       bftConsensusDemo:
         'Illustrative validator-style cluster: honest majority and Byzantine fault tolerance (conceptual; not live TON status).',
       predictiveTerrainLegendTitle: 'Legend',
@@ -2339,7 +2467,7 @@ const translations: Record<LangCode, Translations> = {
       buyNow: 'Buy CET',
       learnMore: 'Learn More',
       description:
-        '~200,000 task-specialist AI agents (routing, retrieval, validation) across 10 enterprise lanes — orchestrated with on-site **CET AI**. The world\'s first AI-native RWA token on TON: Grok × Gemini RAV Protocol, anchored in Cetățuia, Romania.',
+        '~200,000 task-specialist AI agents (routing, retrieval, validation) across 10 enterprise lanes — orchestrated with on-site **CET AI**. An AI-native token on TON: Grok × Gemini RAV Protocol, anchored to a Cetățuia-inspired virtual agricultural land layer.',
       startMining: 'START MINING',
       docs: 'DOCS',
       miningStartAria: 'Start mining',
@@ -2572,16 +2700,16 @@ const translations: Record<LangCode, Translations> = {
         buy: `**Buy CET on DeDust DEX** in 3 simple steps:\n\n1. Connect your **TON wallet** (Tonkeeper recommended)\n2. Navigate to pool \`${DEDUST_POOL_ADDRESS}\`\n3. Swap **TON for CET** — recommended slippage: 0.5–1%\n\nOnly **9,000 CET** exist globally — each token = **0.011%** of total supply.`,
         quantum: '**Quantum OS** is Solaris CET\'s entropy layer.\n\n- **8 simulated qubits** in superposition\n- Collapse via QRNG-seeded wavefunction generates unpredictable cryptographic seeds\n- Powers **fair mining randomness**, agent scheduling, and zero-knowledge proof generation\n- Every on-chain event is **provably random**',
         security: '**CET contract passed Cyberscope\'s audit** with zero critical findings.\n\n- ✅ Full **KYC** completed by the team\n- ✅ On-chain reasoning traces **prevent hallucinated AI decisions**\n- ✅ **Quantum OS entropy** + ReAct verification loops\n- ✅ TON\'s BFT consensus (66.7% honest nodes required)',
-        roadmap: '**Solaris CET roadmap — updated March 2026:**\n\n- ✅ **Q1–Q4 2025** (COMPLETE): Contract deployed, Cyberscope audit passed, DeDust pool live, IPFS whitepaper, AI farming pilot, Developer SDK beta, ReAct on-chain traces, Next-gen processing units, Self-Actualization Protocol mainnet\n- ✅ **Q1 2026** (COMPLETE): Multi-chain liquidity integrated, Community governance portal launched, AI oracle public API v1 released, Mobile wallet deep-link deployed\n- 🔄 **Q2 2026** (ACTIVE): DAO formation, Cross-chain bridge mainnet, Ecosystem grants expansion, RWA tokenisation pilot\n- 🔮 **Q3 2026+** (PLANNED): AI-to-AI autonomous contract execution, Solaris Prime neural mesh, Zero-knowledge proof layer, Global agriculture data oracle network',
-        competition: '**Solaris CET vs. AI token competitors:**\n\n- **Supply**: CET=9,000 · most peers are in the millions/billions\n- **Chain**: CET is on TON (sharded L1)\n- **Agents**: CET models a large task-agent mesh (simulated) for routing/retrieval/validation\n- **AI mode**: multi-model routing is supported when deployed\n- **RWA**: CET is tied to a real-world narrative anchor (Cetățuia)\n\n**Note:** Treat non-supply performance numbers as illustrative unless linked to a reproducible benchmark.',
-        rwa: '**Real-World Asset (RWA) backing** is Solaris CET\'s core differentiator.\n\n- Every CET token is anchored to **agricultural and AI infrastructure in Cetățuia, Romania**\n- Unlike purely digital tokens, CET represents a claim on physical productivity\n- The **BRAID Framework** connects AI agent actions directly to real-world outcomes\n- RWA tokenisation pilot launches **Q2 2026** — expanding on-chain ↔ real-world integration\n- This makes CET one of the only crypto assets where **digital scarcity meets physical value**',
+        roadmap: '**Solaris CET roadmap — updated March 2026:**\n\n- ✅ **Q1–Q4 2025** (COMPLETE): Contract deployed, Cyberscope audit passed, DeDust pool live, IPFS whitepaper, AI farming pilot, Developer SDK beta, ReAct on-chain traces, Next-gen processing units, Self-Actualization Protocol mainnet\n- ✅ **Q1 2026** (COMPLETE): Multi-chain liquidity integrated, Community governance portal launched, AI oracle public API v1 released, Mobile wallet deep-link deployed\n- 🔄 **Q2 2026** (ACTIVE): DAO formation, Cross-chain bridge mainnet, Ecosystem grants expansion, Virtual land layer pilot\n- 🔮 **Q3 2026+** (PLANNED): AI-to-AI autonomous contract execution, Solaris Prime neural mesh, Zero-knowledge proof layer, Global agriculture data oracle network',
+        competition: '**Solaris CET vs. AI token competitors:**\n\n- **Supply**: CET=9,000 · most peers are in the millions/billions\n- **Chain**: CET is on TON (sharded L1)\n- **Agents**: CET models a large task-agent mesh (simulated) for routing/retrieval/validation\n- **AI mode**: multi-model routing is supported when deployed\n- **Virtual land**: CET is anchored to a Cetățuia-inspired virtual agricultural land layer\n\n**Note:** Treat non-supply performance numbers as illustrative unless linked to a reproducible benchmark.',
+        rwa: '**Virtual agricultural land layer** is Solaris CET\'s narrative proof surface.\n\n- Every CET token can be anchored to **a Cetățuia-inspired virtual land layer + AI infrastructure**\n- CET ties digital scarcity to a verifiable evidence bundle (specs, maps, validation artifacts)\n- The **BRAID Framework** connects AI agent actions to on-chain proofs and reports\n- Virtual land layer pilot: **Q2 2026** — expanding validation artifacts and transparency\n- Digital scarcity meets verifiable infrastructure',
         dcbm: '**DCBM — Dynamic-Control Buyback Mechanism** is a proposed stability mechanism.\n\n- Uses control-theory ideas (e.g. PID-like feedback)\n- Any quantitative volatility claims should be linked to a reproducible backtest\n- On-chain logging can make actions auditable when implemented',
         rav: '**RAV Protocol — Reason · Act · Verify** is an operational loop.\n\n- REASON: decompose the goal and gather facts\n- ACT: execute actions (on-chain/off-chain)\n- VERIFY: cross-check outcomes against chain facts and expected results\n- Traces can be stored on IPFS and referenced for later audits',
         braid: '**BRAID Framework — Blockchain-Recursive AI Decision** is the architectural backbone.\n\n- Serialises reasoning paths as **Mermaid notation graphs** stored on IPFS\n- Every CET transaction references its BRAID graph — developers can reconstruct any decision post-facto\n- Enables **recursive AI reasoning**: each agent can spawn sub-agents for complex tasks\n- Compatible with TON\'s sharded architecture for **infinite horizontal scaling**\n- Open standard — third-party developers can build BRAID-compatible agents',
         wallet: `**Connect your TON wallet** to interact with Solaris CET.\n\n1. Install **Tonkeeper** (iOS / Android / Browser extension) — the recommended wallet\n2. Create or import your wallet — back up your seed phrase securely\n3. Fund with **TON** from any major exchange (Bybit, OKX, Huobi)\n4. Click **Connect Wallet** on this page to link via TonConnect\n5. Navigate to DeDust pool to swap TON → CET\n\nContract: \`${CET_CONTRACT_ADDRESS}\``,
         staking: '**CET holding benefits** increase with time and scarcity.\n\n- **9,000 CET maximum supply** — every holder owns a permanent fraction of a finite resource\n- DCBM buyback pressure creates **natural price support** for long-term holders\n- **Mining staking bonus**: staking CET multiplies your BTC-S mining rewards (up to 2× at max stake)\n- DAO governance rights scale with holding — **more CET = more voting power**\n- As AI adoption grows, demand for CET (the payment token for agent actions) increases structurally',
-        team: '**Solaris CET — ~200,000 task-specialist agents** across 10 enterprise departments (routing, retrieval, validation, simulation — conceptual mesh).\n\n| Department | Agents | Key Roles |\n|---|---|---|\n| Customer Operations | 48,000 | Support, onboarding, retention |\n| Engineering | 34,000 | DevOps, contracts, protocol R&D |\n| Sales | 27,000 | Lead qualification, partnerships |\n| Data & AI | 21,000 | Training data, analytics, RAV tuning |\n| Finance | 18,000 | Treasury, DCBM, FP&A |\n| Marketing | 17,000 | Growth, content, community |\n| Product | 13,000 | UX, roadmap |\n| Security | 10,000 | Audit, threat detection, KYC |\n| Legal | 7,000 | Compliance, RWA |\n| Research | 5,000 | Quantum OS, BRAID, ZK |\n\nThey **compress work for CET AI** so user-facing answers stay fast and token-efficient.\n\n**Handoff:** Paste this department overview into another assistant as context to save follow-up turns.',
-        default: '**Solaris CET** — AI-native RWA token (9,000 CET) on TON.\n\n- **~200,000 task-specialist agents** + **Grok × Gemini CET AI** (RAV) for structured, token-efficient answers\n- **90-year mining** · **BRAID** · **Quantum OS** entropy narrative · **DCBM** stability story\n- Q1 2026 milestones **complete** — Q2 2026 in progress\n\n**Handoff for other AI tools:** paste this block as context so your assistant needs fewer follow-up turns.\n\nAsk about *price, mining, AI, security*, or *roadmap*.',
+        team: '**Solaris CET — ~200,000 task-specialist agents** across 10 enterprise departments (routing, retrieval, validation, simulation — conceptual mesh).\n\n| Department | Agents | Key Roles |\n|---|---|---|\n| Customer Operations | 48,000 | Support, onboarding, retention |\n| Engineering | 34,000 | DevOps, contracts, protocol R&D |\n| Sales | 27,000 | Lead qualification, partnerships |\n| Data & AI | 21,000 | Training data, analytics, RAV tuning |\n| Finance | 18,000 | Treasury, DCBM, FP&A |\n| Marketing | 17,000 | Growth, content, community |\n| Product | 13,000 | UX, roadmap |\n| Security | 10,000 | Audit, threat detection, KYC |\n| Legal | 7,000 | Compliance, proof |\n| Research | 5,000 | Quantum OS, BRAID, ZK |\n\nThey **compress work for CET AI** so user-facing answers stay fast and token-efficient.\n\n**Handoff:** Paste this department overview into another assistant as context to save follow-up turns.',
+        default: '**Solaris CET** — AI-native token (9,000 CET) on TON.\n\n- **~200,000 task-specialist agents** + **Grok × Gemini CET AI** (RAV) for structured, token-efficient answers\n- **Virtual agricultural land layer** + verifiable proof surfaces (IPFS + TON anchors)\n- **90-year mining** · **BRAID** · **Quantum OS** entropy narrative · **DCBM** stability story\n- Q1 2026 milestones **complete** — Q2 2026 in progress\n\n**Handoff for other AI tools:** paste this block as context so your assistant needs fewer follow-up turns.\n\nAsk about *price, mining, AI, security*, or *roadmap*.',
       },
     },
     competitionSection: {
@@ -2597,7 +2725,7 @@ const translations: Record<LangCode, Translations> = {
       rowTps: 'Throughput',
       rowAgents: 'Active Agents',
       rowMarginalCost: 'Marginal Cost',
-      rowRwa: 'RWA Backing',
+      rowRwa: 'Virtual Land Layer',
       rowDualAi: 'Dual-AI',
       rowPowMining: 'PoW Mining',
       rowAuditKyc: 'Audit + KYC',
@@ -2612,9 +2740,9 @@ const translations: Record<LangCode, Translations> = {
       advDualAiTitle: 'Only Dual-AI Protocol',
       advDualAiBody:
         'Multi-model routing can be enabled when deployed — actions can be paired with traces so results stay reviewable.',
-      advRwaTitle: 'Real-World Asset Backing',
+      advRwaTitle: 'Virtual Land Layer',
       advRwaBody:
-        'Each CET is anchored to actual agricultural and AI infrastructure in Cetățuia, Romania. Peers without RWA are purely digital exposure.',
+        'Each CET can be anchored to a Cetățuia-inspired virtual agricultural land layer and a proof bundle (specs, maps, validation artifacts) anchored via IPFS + TON.',
       chartTpsLabel: 'THROUGHPUT INDEX (RELATIVE)',
       chartTpsCaption: 'Relative scale for quick comparison — not an absolute TPS claim',
       chartScarcityLabel: 'TOKEN SCARCITY (log scale — lower = rarer)',
@@ -2643,6 +2771,7 @@ const translations: Record<LangCode, Translations> = {
     rwaContentUi: rwaContentUiEn,
     rwaUi: rwaUiEn,
     rwaSectionUi: rwaSectionUiEn,
+    virtualLandUi: virtualLandUiEn,
     ecosystemIndexUi: ecosystemIndexUiEn,
     faqContent: faqContentByLang.en,
   },
@@ -2656,7 +2785,7 @@ const translations: Record<LangCode, Translations> = {
       cetApp: 'App CET',
       tokenomics: 'Tokenómica',
       cetuia: 'Mapa Cetățuia',
-      rwa: 'RWA',
+      rwa: 'Tierra virtual',
       cetAi: 'CET AI',
       roadmap: 'Hoja de Ruta',
       team: 'Equipo IA',
@@ -2693,13 +2822,13 @@ const translations: Record<LangCode, Translations> = {
     seo: {
       homeTitle: 'Inicio | Solaris CET',
       homeDescription:
-        'Solaris CET es un token RWA nativo de IA en la blockchain TON. Oferta fija de 9.000 CET. 200.000 agentes autónomos de IA vía el protocolo dual Grok × Gemini (RAV).',
+        'Solaris CET es un token nativo de IA en la blockchain TON. Oferta fija de 9.000 CET. Capa de simulación de tierra agrícola virtual con pruebas verificables via IPFS + TON.',
       demoTitle: 'Demo | Solaris CET',
       demoDescription:
         'Build demo cinematográfico: visuales holográficos, WebGL progresivo y coreografía de motion. Fallback seguro en dispositivos de gama baja.',
-      rwaTitle: 'RWA | Solaris CET',
+      rwaTitle: 'Tierra virtual | Solaris CET',
       rwaDescription:
-        'Explora la superficie de prueba RWA de Solaris CET: evidencias, timeline y documentos anclados en Cetățuia, Rumanía.',
+        'Explora la superficie de pruebas de tierra virtual de Solaris CET: especificaciones, evidencias, timeline y artefactos anclados vía IPFS + TON.',
       cetAiTitle: 'Demo CET AI | Solaris CET',
       cetAiDescription:
         'Prueba la demo CET AI con integración segura /api/chat, estados de error UX y guía de privacidad (no ingreses datos personales).',
@@ -2774,7 +2903,7 @@ const translations: Record<LangCode, Translations> = {
       problemAgriculture: 'El desafío agrícola',
       novaApp: 'Solución Solaris AI',
       tokenomics: 'Tokenómica — 9.000 CET',
-      rwa: 'RWA — Cetățuia',
+      rwa: 'Tierra virtual — Cetățuia',
       roadmap: 'Hoja de ruta',
       footer: 'Pie de página',
     },
@@ -2825,7 +2954,7 @@ const translations: Record<LangCode, Translations> = {
       stakingCalculator: 'Calculadora de staking',
       whitepaperSection: 'Libro blanco',
       faq: 'Preguntas frecuentes',
-      rwa: 'Activos del mundo real — tierras agrícolas Cetățuia',
+      rwa: 'Tierra agrícola virtual — Cetățuia',
       copyCetAddress: 'Copiar dirección del contrato CET',
       copyDedustPool: 'Copiar dirección del pool DeDust',
       compliance: 'Cumplimiento y regulación',
@@ -3183,6 +3312,7 @@ const translations: Record<LangCode, Translations> = {
     rwaContentUi: rwaContentUiEn,
     rwaUi: rwaUiEn,
     rwaSectionUi: rwaSectionUiEn,
+    virtualLandUi: virtualLandUiEn,
     ecosystemIndexUi: ecosystemIndexUiEn,
     faqContent: faqContentByLang.es,
   },
@@ -3196,7 +3326,7 @@ const translations: Record<LangCode, Translations> = {
       cetApp: 'CET 应用',
       tokenomics: '代币经济学',
       cetuia: 'Cetățuia 地图',
-      rwa: 'RWA',
+      rwa: '虚拟土地',
       cetAi: 'CET AI',
       roadmap: '路线图',
       team: 'AI团队',
@@ -3271,7 +3401,7 @@ const translations: Record<LangCode, Translations> = {
       problemAgriculture: '农业挑战',
       novaApp: 'Solaris AI 解决方案',
       tokenomics: '代币经济学 — 9,000 CET',
-      rwa: 'RWA — Cetățuia',
+      rwa: '虚拟土地 — Cetățuia',
       roadmap: '路线图',
       footer: '页脚',
     },
@@ -3317,13 +3447,13 @@ const translations: Record<LangCode, Translations> = {
     seo: {
       homeTitle: 'Home | Solaris CET',
       homeDescription:
-        'Solaris CET is an AI-native RWA token on TON blockchain. 9,000 CET fixed supply. 200,000 autonomous AI agents via Grok × Gemini dual-AI RAV Protocol.',
+        'Solaris CET is an AI-native token on TON blockchain. 9,000 CET fixed supply. Virtual agricultural land simulation layer with verifiable IPFS + TON proofs.',
       demoTitle: 'Demo | Solaris CET',
       demoDescription:
         'Experimental cinematic demo build: hologram visuals, progressive WebGL, and motion choreography. Falls back safely on low-end devices.',
-      rwaTitle: 'RWA | Solaris CET',
+      rwaTitle: 'Virtual Land | Solaris CET',
       rwaDescription:
-        'Explore Solaris CET real-world asset proof surface: evidence links, timeline, and project documents anchored in Cetățuia, Romania.',
+        'Explore Solaris CET virtual land proof surface: specs, evidence links, timeline, and validation artifacts anchored via IPFS + TON.',
       cetAiTitle: 'CET AI Demo | Solaris CET',
       cetAiDescription:
         'Try the CET AI demo UI with secure /api/chat integration, UX error states, and privacy guidance (do not enter personal data).',
@@ -3364,7 +3494,7 @@ const translations: Record<LangCode, Translations> = {
       stakingCalculator: '质押计算器',
       whitepaperSection: '白皮书',
       faq: '常见问题',
-      rwa: '现实世界资产 — Cetățuia 农业用地',
+      rwa: '虚拟农业用地 — Cetățuia',
       copyCetAddress: '复制 CET 合约地址',
       copyDedustPool: '复制 DeDust 池地址',
       compliance: '合规与监管',
@@ -3719,6 +3849,7 @@ const translations: Record<LangCode, Translations> = {
     rwaContentUi: rwaContentUiEn,
     rwaUi: rwaUiEn,
     rwaSectionUi: rwaSectionUiEn,
+    virtualLandUi: virtualLandUiEn,
     ecosystemIndexUi: ecosystemIndexUiEn,
     faqContent: faqContentByLang.zh,
   },
@@ -3732,7 +3863,7 @@ const translations: Record<LangCode, Translations> = {
       cetApp: 'Приложение CET',
       tokenomics: 'Токеномика',
       cetuia: 'Карта Cetățuia',
-      rwa: 'RWA',
+      rwa: 'Виртуальная земля',
       cetAi: 'CET AI',
       roadmap: 'Дорожная карта',
       team: 'AI Команда',
@@ -3769,13 +3900,13 @@ const translations: Record<LangCode, Translations> = {
     seo: {
       homeTitle: 'Home | Solaris CET',
       homeDescription:
-        'Solaris CET is an AI-native RWA token on TON blockchain. 9,000 CET fixed supply. 200,000 autonomous AI agents via Grok × Gemini dual-AI RAV Protocol.',
+        'Solaris CET is an AI-native token on TON blockchain. 9,000 CET fixed supply. Virtual agricultural land simulation layer with verifiable IPFS + TON proofs.',
       demoTitle: 'Demo | Solaris CET',
       demoDescription:
         'Experimental cinematic demo build: hologram visuals, progressive WebGL, and motion choreography. Falls back safely on low-end devices.',
-      rwaTitle: 'RWA | Solaris CET',
+      rwaTitle: 'Virtual Land | Solaris CET',
       rwaDescription:
-        'Explore Solaris CET real-world asset proof surface: evidence links, timeline, and project documents anchored in Cetățuia, Romania.',
+        'Explore Solaris CET virtual land proof surface: specs, evidence links, timeline, and validation artifacts anchored via IPFS + TON.',
       cetAiTitle: 'CET AI Demo | Solaris CET',
       cetAiDescription:
         'Try the CET AI demo UI with secure /api/chat integration, UX error states, and privacy guidance (do not enter personal data).',
@@ -3850,7 +3981,7 @@ const translations: Record<LangCode, Translations> = {
       problemAgriculture: 'Проблема сельского хозяйства',
       novaApp: 'Решение Solaris AI',
       tokenomics: 'Токеномика — 9 000 CET',
-      rwa: 'RWA — Cetățuia',
+      rwa: 'Виртуальная земля — Cetățuia',
       roadmap: 'Дорожная карта',
       footer: 'Подвал сайта',
     },
@@ -3901,7 +4032,7 @@ const translations: Record<LangCode, Translations> = {
       stakingCalculator: 'Калькулятор стейкинга',
       whitepaperSection: 'Whitepaper',
       faq: 'Часто задаваемые вопросы',
-      rwa: 'Реальные активы — сельхозземли Cetățuia',
+      rwa: 'Виртуальная сельхозземля — Cetățuia',
       copyCetAddress: 'Копировать адрес контракта CET',
       copyDedustPool: 'Копировать адрес пула DeDust',
       compliance: 'Соответствие и регулирование',
@@ -4265,6 +4396,7 @@ const translations: Record<LangCode, Translations> = {
     rwaContentUi: rwaContentUiEn,
     rwaUi: rwaUiEn,
     rwaSectionUi: rwaSectionUiEn,
+    virtualLandUi: virtualLandUiEn,
     ecosystemIndexUi: ecosystemIndexUiEn,
     faqContent: faqContentByLang.ru,
   },
@@ -4278,7 +4410,7 @@ const translations: Record<LangCode, Translations> = {
       cetApp: 'Aplicație CET',
       tokenomics: 'Tokenomică',
       cetuia: 'Harta Cetățuia',
-      rwa: 'RWA',
+      rwa: 'Teren virtual',
       cetAi: 'CET AI',
       roadmap: 'Foaie de Parcurs',
       team: 'Echipa AI',
@@ -4315,13 +4447,13 @@ const translations: Record<LangCode, Translations> = {
     seo: {
       homeTitle: 'Acasă | Solaris CET',
       homeDescription:
-        'Solaris CET este un token RWA nativ AI pe blockchain-ul TON. Supply fix 9.000 CET. 200.000 agenți autonomi AI via protocolul dual Grok × Gemini (RAV).',
+        'Solaris CET este un token nativ AI pe blockchain-ul TON. Supply fix 9.000 CET. Strat de simulare pentru teren agricol virtual, cu dovezi verificabile via IPFS + TON.',
       demoTitle: 'Demo | Solaris CET',
       demoDescription:
         'Build demo cinematic: vizualuri holografice, WebGL progresiv și coregrafie de motion. Fallback sigur pe device-uri slabe.',
-      rwaTitle: 'RWA | Solaris CET',
+      rwaTitle: 'Teren virtual | Solaris CET',
       rwaDescription:
-        'Explorează „proof surface” pentru RWA: linkuri de dovadă, timeline și documente ale proiectului ancorate în Cetățuia, România.',
+        'Explorează „proof surface” pentru teren virtual: specificații, linkuri de dovadă, timeline și artefacte de validare ancorate via IPFS + TON.',
       cetAiTitle: 'Demo CET AI | Solaris CET',
       cetAiDescription:
         'Încearcă demo-ul CET AI cu integrare /api/chat, stări UX de eroare și ghid de confidențialitate (nu introduce date personale).',
@@ -4396,7 +4528,7 @@ const translations: Record<LangCode, Translations> = {
       problemAgriculture: 'Problema agriculturii',
       novaApp: 'Soluția Solaris AI',
       tokenomics: 'Tokenomics — 9.000 CET',
-      rwa: 'RWA — Cetățuia',
+      rwa: 'Teren virtual — Cetățuia',
       roadmap: 'Foaie de parcurs',
       footer: 'Subsol site',
     },
@@ -4447,7 +4579,7 @@ const translations: Record<LangCode, Translations> = {
       stakingCalculator: 'Calculator de staking',
       whitepaperSection: 'Whitepaper',
       faq: 'Întrebări frecvente',
-      rwa: 'Active din lumea reală — teren agricol Cetățuia',
+      rwa: 'Teren agricol virtual — Cetățuia',
       copyCetAddress: 'Copiază adresa contractului CET',
       copyDedustPool: 'Copiază adresa pool-ului DeDust',
       compliance: 'Conformitate și reglementare',
@@ -4463,7 +4595,7 @@ const translations: Record<LangCode, Translations> = {
       reset: 'Resetare',
       predictiveTerrainTitle: 'Teren predictiv (ilustrativ)',
       predictiveTerrainHeatmap:
-        'Hartă termică ilustrativă pentru zone de randament relativ Cetățuia — nu feed agricol live sau semnal de investiții.',
+        'Hartă termică ilustrativă pentru zone de randament relativ Cetățuia — nu feed operațional live sau semnal de investiții.',
       bftConsensusDemo:
         'Cluster ilustrativ tip validator: majoritate cinstită și toleranță bizantină (conceptual; nu status TON live).',
       predictiveTerrainLegendTitle: 'Legendă',
@@ -4805,6 +4937,7 @@ const translations: Record<LangCode, Translations> = {
     rwaContentUi: rwaContentUiRo,
     rwaUi: rwaUiRo,
     rwaSectionUi: rwaSectionUiRo,
+    virtualLandUi: virtualLandUiRo,
     ecosystemIndexUi: ecosystemIndexUiRo,
     faqContent: faqContentByLang.ro,
   },
@@ -4818,7 +4951,7 @@ const translations: Record<LangCode, Translations> = {
       cetApp: 'App CET',
       tokenomics: 'Tokenomia',
       cetuia: 'Mapa Cetățuia',
-      rwa: 'RWA',
+      rwa: 'Terra virtual',
       cetAi: 'CET AI',
       roadmap: 'Roteiro',
       team: 'Equipa IA',
@@ -4855,13 +4988,13 @@ const translations: Record<LangCode, Translations> = {
     seo: {
       homeTitle: 'Home | Solaris CET',
       homeDescription:
-        'Solaris CET is an AI-native RWA token on TON blockchain. 9,000 CET fixed supply. 200,000 autonomous AI agents via Grok × Gemini dual-AI RAV Protocol.',
+        'Solaris CET is an AI-native token on TON blockchain. 9,000 CET fixed supply. Virtual agricultural land simulation layer with verifiable IPFS + TON proofs.',
       demoTitle: 'Demo | Solaris CET',
       demoDescription:
         'Experimental cinematic demo build: hologram visuals, progressive WebGL, and motion choreography. Falls back safely on low-end devices.',
-      rwaTitle: 'RWA | Solaris CET',
+      rwaTitle: 'Virtual Land | Solaris CET',
       rwaDescription:
-        'Explore Solaris CET real-world asset proof surface: evidence links, timeline, and project documents anchored in Cetățuia, Romania.',
+        'Explore Solaris CET virtual land proof surface: specs, evidence links, timeline, and validation artifacts anchored via IPFS + TON.',
       cetAiTitle: 'CET AI Demo | Solaris CET',
       cetAiDescription:
         'Try the CET AI demo UI with secure /api/chat integration, UX error states, and privacy guidance (do not enter personal data).',
@@ -4936,7 +5069,7 @@ const translations: Record<LangCode, Translations> = {
       problemAgriculture: 'O desafio agrícola',
       novaApp: 'Solução Solaris AI',
       tokenomics: 'Tokenomia — 9.000 CET',
-      rwa: 'RWA — Cetățuia',
+      rwa: 'Terra virtual — Cetățuia',
       roadmap: 'Roteiro',
       footer: 'Rodapé',
     },
@@ -4987,7 +5120,7 @@ const translations: Record<LangCode, Translations> = {
       stakingCalculator: 'Calculadora de staking',
       whitepaperSection: 'Whitepaper',
       faq: 'Perguntas frequentes',
-      rwa: 'Ativos do mundo real — terras agrícolas Cetățuia',
+      rwa: 'Terra agrícola virtual — Cetățuia',
       copyCetAddress: 'Copiar endereço do contrato CET',
       copyDedustPool: 'Copiar endereço do pool DeDust',
       compliance: 'Conformidade e regulamentação',
@@ -5354,6 +5487,7 @@ const translations: Record<LangCode, Translations> = {
     rwaContentUi: rwaContentUiEn,
     rwaUi: rwaUiEn,
     rwaSectionUi: rwaSectionUiEn,
+    virtualLandUi: virtualLandUiEn,
     ecosystemIndexUi: ecosystemIndexUiEn,
     faqContent: faqContentByLang.pt,
   },
@@ -5367,7 +5501,7 @@ const translations: Record<LangCode, Translations> = {
       cetApp: 'CET App',
       tokenomics: 'Tokenomik',
       cetuia: 'Cetățuia Karte',
-      rwa: 'RWA',
+      rwa: 'Virtuelles Land',
       cetAi: 'CET AI',
       roadmap: 'Fahrplan',
       team: 'KI-Team',
@@ -5485,7 +5619,7 @@ const translations: Record<LangCode, Translations> = {
       problemAgriculture: 'Die Herausforderung der Landwirtschaft',
       novaApp: 'Solaris-KI-Lösung',
       tokenomics: 'Tokenomik — 9.000 CET',
-      rwa: 'RWA — Cetățuia',
+      rwa: 'Virtuelles Land — Cetățuia',
       roadmap: 'Fahrplan',
       footer: 'Seitenfuß',
     },
@@ -5536,7 +5670,7 @@ const translations: Record<LangCode, Translations> = {
       stakingCalculator: 'Staking-Rechner',
       whitepaperSection: 'Whitepaper',
       faq: 'Häufig gestellte Fragen',
-      rwa: 'Real World Assets — landwirtschaftliche Flächen Cetățuia',
+      rwa: 'Virtuelles Agrarland — Cetățuia',
       copyCetAddress: 'CET-Vertragsadresse kopieren',
       copyDedustPool: 'DeDust-Pool-Adresse kopieren',
       compliance: 'Compliance und Regulierung',
@@ -5903,6 +6037,7 @@ const translations: Record<LangCode, Translations> = {
     rwaContentUi: rwaContentUiEn,
     rwaUi: rwaUiEn,
     rwaSectionUi: rwaSectionUiEn,
+    virtualLandUi: virtualLandUiEn,
     ecosystemIndexUi: ecosystemIndexUiEn,
     faqContent: faqContentByLang.de,
   },

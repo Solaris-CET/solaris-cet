@@ -1,6 +1,6 @@
-import { expect, type Page } from '@playwright/test';
+import { expect } from '@playwright/test';
 
-export async function waitForAppReady(page: Page, options?: { timeout?: number }) {
+export async function waitForAppReady(page: any, options?: { timeout?: number }) {
   const timeout = options?.timeout ?? 15_000;
   await page.waitForFunction(() => {
     const root = document.getElementById('root');
@@ -19,7 +19,7 @@ export async function waitForAppReady(page: Page, options?: { timeout?: number }
  * repeated `scrollBy` sometimes does (e.g. deep link `/#authority-trust` while the id is not mounted yet).
  */
 export async function scrollUntilSelectorAttached(
-  page: Page,
+  page: any,
   selector: string,
   options?: { timeout?: number; stepPx?: number; intervals?: number[] },
 ) {
@@ -31,7 +31,7 @@ export async function scrollUntilSelectorAttached(
     .poll(
       async () => {
         return page.evaluate(
-          ({ sel, step }) => {
+          ({ sel, step }: { sel: string; step: number }) => {
             if (document.querySelector(sel)) return true;
             const el = document.documentElement;
             const maxY = Math.max(0, el.scrollHeight - window.innerHeight);

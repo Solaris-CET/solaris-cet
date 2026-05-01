@@ -1,4 +1,4 @@
-import { expect, type Locator, type Page } from '@playwright/test';
+import { expect } from '@playwright/test';
 
 import { URL_LOCALES } from '../src/i18n/urlRouting';
 import { NAV_PRIMARY_IN_PAGE } from '../src/lib/navPrimaryHrefs';
@@ -9,23 +9,22 @@ export const E2E_I18N_START = '/en/';
 
 export type NavPrimaryInPageHref = (typeof NAV_PRIMARY_IN_PAGE)[number]['href'];
 
-async function clickNavLink(locator: Locator) {
+async function clickNavLink(locator: any) {
   try {
     await locator.click({ timeout: 3_000 });
   } catch {
-    await locator.evaluate((el) => (el as HTMLAnchorElement).click());
+    await locator.evaluate((el: Element) => (el as HTMLAnchorElement).click());
   }
 }
 
-/** Hash links: pointer hit-test can fail in headless (logo / glass layers). */
-export async function clickHeaderNav(page: Page, href: NavPrimaryInPageHref): Promise<void> {
+export async function clickHeaderNav(page: any, href: NavPrimaryInPageHref): Promise<void> {
   const locator = href.startsWith('#')
     ? page.locator(`header nav a[href="${href}"]`)
     : page.locator(`header nav a[href$="${href}"]`);
   await clickNavLink(locator);
 }
 
-export async function clickMobileSheetNav(page: Page, href: NavPrimaryInPageHref): Promise<void> {
+export async function clickMobileSheetNav(page: any, href: NavPrimaryInPageHref): Promise<void> {
   const locator = page.locator(`#mobile-menu nav a[href="${href}"]`);
   await clickNavLink(locator);
 }
@@ -40,9 +39,7 @@ function stripLocalePrefix(pathname: string) {
   return pathname;
 }
 
-const desktopAssertByHref: {
-  [K in NavPrimaryInPageHref]: (page: Page) => Promise<void>;
-} = {
+const desktopAssertByHref: Record<NavPrimaryInPageHref, (page: any) => Promise<void>> = {
   '#staking': async (page) => {
     const staking = page.locator('#staking');
     await expect(staking).toBeAttached({ timeout: 15_000 });
@@ -51,7 +48,7 @@ const desktopAssertByHref: {
   },
   '/rwa': async (page) => {
     await scrollUntilSelectorAttached(page, '#rwa');
-    await expect(page.locator('#rwa').getByText('REAL WORLD ASSETS · RWA')).toBeVisible({
+    await expect(page.locator('#rwa').getByText('VIRTUAL AGRICULTURAL LAND')).toBeVisible({
       timeout: 15_000,
     });
   },
@@ -96,19 +93,19 @@ const desktopAssertByHref: {
     });
   },
   '#faq': async (page) => {
-    await scrollUntilSelectorAttached(page, '#faq');
-    await expect(page.locator('#faq').locator('.faq-trigger').first()).toBeVisible({
+    await scrollUntilSelectorAttached(page, '#faq .faq-trigger');
+    await expect(page.locator('#faq .faq-trigger').first()).toBeVisible({
       timeout: 15_000,
     });
   },
 };
 
-export async function runDesktopNavPrimaryCase(page: Page, href: NavPrimaryInPageHref): Promise<void> {
+export async function runDesktopNavPrimaryCase(page: any, href: NavPrimaryInPageHref): Promise<void> {
   await clickHeaderNav(page, href);
   if (href.startsWith('#')) {
-    await expect(page).toHaveURL((u) => u.hash === href);
+    await expect(page).toHaveURL((u: any) => u.hash === href);
   } else {
-    await expect(page).toHaveURL((u) => stripLocalePrefix(u.pathname).replace(/\/$/, '') === href);
+    await expect(page).toHaveURL((u: any) => stripLocalePrefix(u.pathname).replace(/\/$/, '') === href);
   }
   await desktopAssertByHref[href](page);
 }

@@ -1,5 +1,5 @@
 import { Copy, ExternalLink } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ComponentType } from 'react';
 import { toast } from 'sonner';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -49,15 +49,9 @@ export default function HierarchyGraph({
   const [data, setData] = useState<MermaidAgentResponse | null>(null);
   const [failed, setFailed] = useState(false);
   const [isActive, setIsActive] = useState(false);
-  const [renderDiagram, setRenderDiagram] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    try {
-      return localStorage.getItem('solaris_mermaid_render') === '1';
-    } catch {
-      return false;
-    }
-  });
+  const [renderDiagram] = useState(false);
   const [isSourceOpen, setIsSourceOpen] = useState(false);
+  const Diagram = MermaidDiagram as unknown as ComponentType<{ graph: string }>;
 
   useEffect(() => {
     const el = rootRef.current;
@@ -68,11 +62,9 @@ export default function HierarchyGraph({
         window.clearTimeout(id);
       };
     }
-    const fallback = window.setTimeout(() => setIsActive(true), 2000);
     const obs = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
-          window.clearTimeout(fallback);
           setIsActive(true);
         }
       },
@@ -80,7 +72,6 @@ export default function HierarchyGraph({
     );
     obs.observe(el);
     return () => {
-      window.clearTimeout(fallback);
       obs.disconnect();
     };
   }, []);
@@ -136,18 +127,10 @@ export default function HierarchyGraph({
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => {
-              setRenderDiagram(true);
-              try {
-                localStorage.setItem('solaris_mermaid_render', '1');
-              } catch {
-                void 0;
-              }
-            }}
             className="px-2.5 h-8 rounded-lg border border-white/10 bg-white/5 text-[11px] text-solaris-muted hover:text-solaris-text hover:bg-white/10 transition-colors disabled:opacity-40"
-            disabled={renderDiagram}
+            disabled
           >
-            {renderDiagram ? tx.rendered : tx.render}
+            {tx.render}
           </button>
           <button
             type="button"
@@ -194,7 +177,7 @@ export default function HierarchyGraph({
       ) : (
         <div className="space-y-3">
           {graph && renderDiagram ? (
-            <MermaidDiagram graph={graph} />
+            <Diagram graph={graph} />
           ) : (
             <div className="rounded-xl bg-black/20 border border-white/10 p-3 text-xs text-solaris-muted">
               {tx.renderOptional}

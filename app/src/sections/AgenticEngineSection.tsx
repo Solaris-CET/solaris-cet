@@ -1,4 +1,3 @@
-import { gsap } from 'gsap';
 import { Cpu, Network } from 'lucide-react';
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
@@ -14,6 +13,7 @@ import AgenticSignalUnlock from '@/components/AgenticSignalUnlock';
 import AgenticWhispers from '@/components/AgenticWhispers';
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 import { useLanguage } from '@/hooks/useLanguage';
+import { loadGsapWithScrollTrigger } from '@/lib/gsapLazy';
 
 /**
  * Agentic engine narrative: live neural simulation, department IQ, RAV internet mesh, benchmark dashboard.
@@ -40,24 +40,32 @@ const AgenticEngineSection = () => {
   useLayoutEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headRef.current,
-        { y: 28, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.75,
-          scrollTrigger: {
-            trigger: headRef.current,
-            start: 'top 85%',
-            end: 'top 55%',
-            scrub: true,
+    let cancelled = false;
+    let ctx: { revert: () => void } | null = null;
+    void loadGsapWithScrollTrigger().then(({ gsap }) => {
+      if (cancelled) return;
+      ctx = gsap.context(() => {
+        gsap.fromTo(
+          headRef.current,
+          { y: 28, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.75,
+            scrollTrigger: {
+              trigger: headRef.current,
+              start: 'top 85%',
+              end: 'top 55%',
+              scrub: true,
+            },
           },
-        }
-      );
-    }, section);
-    return () => ctx.revert();
+        );
+      }, section);
+    });
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
   }, []);
 
   return (

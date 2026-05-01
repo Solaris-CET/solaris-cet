@@ -1,10 +1,6 @@
-import { gsap } from 'gsap';
-import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import { useEffect } from 'react';
 
 import { useReducedMotion } from './useReducedMotion';
-
-gsap.registerPlugin(ScrollToPlugin);
 
 /**
  * Intercepts any click on links staring with `#` and animates the scroll using GSAP,
@@ -27,23 +23,8 @@ export function useSmoothAnchors() {
       if (destElement) {
         e.preventDefault();
 
-        if (prefersReducedMotion) {
-          const y =
-            (destElement as HTMLElement).getBoundingClientRect().top +
-            window.scrollY -
-            80;
-          window.scrollTo({ top: Math.max(0, y), behavior: 'auto' });
-        } else {
-          gsap.to(window, {
-            duration: 1,
-            scrollTo: {
-              y: destElement as HTMLElement,
-              offsetY: 80,
-              autoKill: true,
-            },
-            ease: 'power3.inOut',
-          });
-        }
+        const y = (destElement as HTMLElement).getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top: Math.max(0, y), behavior: prefersReducedMotion ? 'auto' : 'smooth' });
 
         // Update URL hash without jumping
         if (window.history.pushState) {

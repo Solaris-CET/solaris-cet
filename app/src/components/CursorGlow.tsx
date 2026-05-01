@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 
+import { useDocumentHidden } from '@/hooks/useDocumentHidden';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 /**
@@ -13,6 +14,7 @@ import { useReducedMotion } from '../hooks/useReducedMotion';
  */
 const CursorGlow = () => {
   const prefersReducedMotion = useReducedMotion();
+  const hidden = useDocumentHidden();
   const glowRef = useRef<HTMLDivElement>(null);
   const posRef = useRef({ x: -300, y: -300 });
   const targetRef = useRef({ x: -300, y: -300 });
@@ -20,6 +22,7 @@ const CursorGlow = () => {
 
   useEffect(() => {
     if (prefersReducedMotion) return;
+    if (hidden) return;
     // Skip runtime work when device has no fine pointer (touch-first/coarse).
     if (!window.matchMedia('(pointer: fine)').matches) return;
 
@@ -49,9 +52,10 @@ const CursorGlow = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(rafRef.current);
     };
-  }, [prefersReducedMotion]);
+  }, [hidden, prefersReducedMotion]);
 
   if (prefersReducedMotion) return null;
+  if (hidden) return null;
 
   return (
     <div

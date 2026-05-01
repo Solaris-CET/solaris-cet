@@ -37,13 +37,18 @@ const AgenticSignalUnlock = ({ active }: AgenticSignalUnlockProps) => {
         {Array.from({ length: 24 }).map((_, i) => (
           <span
             key={i}
-            className="absolute left-1/2 top-1/2 h-[2px] w-[min(42vw,220px)] origin-left opacity-0 rounded-full"
-            style={{
-              transform: `rotate(${i * 15}deg)`,
-              background: `linear-gradient(90deg, rgba(46,231,255,0.95), transparent)`,
-              animation: `signal-ray 0.85s ease-out ${i * 0.025}s forwards`,
-            }}
-          />
+            className="absolute left-1/2 top-1/2 h-[2px] w-[min(42vw,220px)] rounded-full"
+            style={{ transform: `rotate(${i * 15}deg)` }}
+          >
+            <span
+              className="block h-full w-full origin-left opacity-0 rounded-full"
+              style={{
+                background: `linear-gradient(90deg, rgba(46,231,255,0.95), transparent)`,
+                animation: `signal-ray 0.85s ease-out ${i * 0.025}s forwards`,
+                willChange: 'transform, opacity',
+              }}
+            />
+          </span>
         ))}
       </div>
       <div className="relative text-center max-w-md border border-solaris-gold/40 rounded-2xl bg-slate-950/92 backdrop-blur-xl px-6 py-8 shadow-[0_0_60px_rgba(242,201,76,0.18)]">
@@ -66,9 +71,9 @@ const AgenticSignalUnlock = ({ active }: AgenticSignalUnlockProps) => {
       </div>
       <style>{`
         @keyframes signal-ray {
-          from { opacity: 0; filter: blur(4px); }
-          40% { opacity: 0.9; filter: blur(0); }
-          to { opacity: 0.2; filter: blur(1px); }
+          from { opacity: 0; transform: scaleX(0); }
+          40% { opacity: 0.9; transform: scaleX(1); }
+          to { opacity: 0.2; transform: scaleX(0.7); }
         }
         @keyframes signal-fade {
           0% { opacity: 0; }

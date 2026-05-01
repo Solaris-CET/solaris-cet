@@ -19,6 +19,7 @@ export default function LoginPage() {
   const [info, setInfo] = useState<string | null>(null);
   const [oauthBusy, setOauthBusy] = useState(false);
   const [oauthError, setOauthError] = useState<string | null>(null);
+  const [telegramWidgetEnabled, setTelegramWidgetEnabled] = useState(false);
 
   const address = useMemo(() => wallet?.account?.address?.trim() ?? '', [wallet?.account?.address]);
   const telegramBotUsername = useMemo(() => String(import.meta.env.VITE_TELEGRAM_BOT_USERNAME ?? '').trim(), []);
@@ -48,6 +49,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!telegramBotUsername) return;
+    if (!telegramWidgetEnabled) return;
     (window as unknown as { onTelegramAuth?: (u: Record<string, unknown>) => void }).onTelegramAuth = async (u) => {
       setOauthError(null);
       try {
@@ -78,7 +80,7 @@ export default function LoginPage() {
     s.setAttribute('data-onauth', 'onTelegramAuth(user)');
     s.setAttribute('data-request-access', 'write');
     container.appendChild(s);
-  }, [setToken, telegramBotUsername]);
+  }, [setToken, telegramBotUsername, telegramWidgetEnabled]);
 
   const startGithub = async () => {
     setOauthBusy(true);
@@ -167,7 +169,17 @@ export default function LoginPage() {
           <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
             <div className="text-xs text-white/60 font-mono">Telegram</div>
             <div className="mt-2 text-white/70 text-sm">Funcționează după ce faci link în Security settings.</div>
-            <div id="telegram-login" className="mt-3" />
+            {telegramWidgetEnabled ? (
+              <div id="telegram-login" className="mt-3" />
+            ) : (
+              <button
+                type="button"
+                className="btn-gold text-sm disabled:opacity-60 mt-3"
+                onClick={() => setTelegramWidgetEnabled(true)}
+              >
+                Load Telegram
+              </button>
+            )}
           </div>
         ) : null}
 

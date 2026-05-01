@@ -1,6 +1,3 @@
-import { TonConnectButton } from '@tonconnect/ui-react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CheckCircle, ChevronDown, FileText,ShieldCheck, TrendingUp } from 'lucide-react';
 import React, { lazy, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
@@ -13,19 +10,20 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useSessionSeed } from '@/hooks/useSessionSeed';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 import { formatCetSupplyWithSuffix, formatTaskAgentMeshHeadline } from '@/lib/numerals';
+import { loadGsapWithScrollTrigger } from '@/lib/gsapLazy';
 
 import AnimatedCounter from '../components/AnimatedCounter';
-import CetAiSearch from '../components/CetAiSearch';
 import QuantumFieldCanvas from '../components/QuantumFieldCanvas';
 import SolarRaysCoinsCanvas from '../components/SolarRaysCoinsCanvas';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import { useAsyncCssReady } from '../hooks/useAsyncCssReady';
 import { useLanguage } from '../hooks/useLanguage';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { useTonConnectFeature } from '@/tonconnect/TonConnectFeatureContext';
 
 const HeroTokenHologram = lazy(() => import('@/experience/HeroTokenHologram'));
-
-gsap.registerPlugin(ScrollTrigger);
+const WalletConnect = lazy(() => import('@/components/WalletConnect'));
+const CetAiSearch = lazy(() => import('@/components/CetAiSearch'));
 
 function clamp01(v: number) {
   return Math.min(1, Math.max(0, v));
@@ -84,6 +82,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
 
   const prefersReducedMotion = useReducedMotion();
   const cssReady = useAsyncCssReady();
+  const { ready: tonConnectReady, enable: enableTonConnect } = useTonConnectFeature();
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const isMobile = useMediaQuery('(max-width: 767px)');
   const isAutomated = useMemo(() => {
@@ -93,7 +92,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
   }, []);
   const signatureSeed = useSessionSeed('heroHologram');
   const { t, lang } = useLanguage();
-  const pool = useLivePoolData();
+  const [poolEnabled, setPoolEnabled] = useState(false);
+  const pool = useLivePoolData({ enabled: poolEnabled });
   const community = useCommunityProof();
   const [stats, setStats] = useState<HeroStatState>({
     totalSupply: 9000,
@@ -140,6 +140,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
     cinematic && isDemoRoute && isDesktop && !isMobile && !prefersReducedMotion && !isAutomated;
 
   const [hologramReady, setHologramReady] = useState(false);
+  const [hasUserIntent, setHasUserIntent] = useState(false);
+  const [tickerExpanded, setTickerExpanded] = useState(false);
+  const [cetAiReady, setCetAiReady] = useState(false);
 
   const [demoSound, setDemoSound] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -165,15 +168,23 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
       return;
     }
 
-    const ctx = gsap.context(() => {
-      const mainTl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 1.1 } });
+    let cancelled = false;
+    let ctx: { revert: () => void } | null = null;
+    void loadGsapWithScrollTrigger().then(({ gsap }) => {
+      if (cancelled) return;
+      ctx = gsap.context(() => {
+        const mainTl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 1.1 } });
 
-      mainTl
-        .fromTo(titleContainerRef.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1 }, 0.2)
-        .fromTo(tickerContainerRef.current, { y: 24, opacity: 0 }, { y: 0, opacity: 1 }, '-=0.6');
-    }, containerRef);
+        mainTl
+          .fromTo(titleContainerRef.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1 }, 0.2)
+          .fromTo(tickerContainerRef.current, { y: 24, opacity: 0 }, { y: 0, opacity: 1 }, '-=0.6');
+      }, containerRef);
+    });
 
-    return () => ctx.revert();
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
   }, [prefersReducedMotion, isMobile]);
 
   useLayoutEffect(() => {
@@ -186,63 +197,70 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
     const cut = demoCutRef.current;
     if (!el || !bg || !title || !ticker || !cut) return;
 
-    const ctx = gsap.context(() => {
-      gsap.set(bg, { transformOrigin: '50% 50%', willChange: 'transform' });
-      gsap.set(title, { willChange: 'transform, opacity' });
-      gsap.set(ticker, { willChange: 'transform, opacity' });
-      gsap.set(cut, { willChange: 'transform, opacity', opacity: 0, yPercent: 110 });
+    let cancelled = false;
+    let ctx: { revert: () => void } | null = null;
+    void loadGsapWithScrollTrigger().then(({ gsap }) => {
+      if (cancelled) return;
 
-      const setScrub = (p: number) => {
-        const v = clamp01(p);
-        document.documentElement.style.setProperty('--demo-scrub', v.toFixed(3));
-        window.dispatchEvent(new CustomEvent('solaris:demoScrub', { detail: { progress: v } }));
-      };
-      setScrub(0);
+      ctx = gsap.context(() => {
+        gsap.set(bg, { transformOrigin: '50% 50%', willChange: 'transform' });
+        gsap.set(title, { willChange: 'transform, opacity' });
+        gsap.set(ticker, { willChange: 'transform, opacity' });
+        gsap.set(cut, { willChange: 'transform, opacity', opacity: 0, yPercent: 110 });
 
-      const hardCut = () => {
-        if (demoHardCutDoneRef.current) return;
-        const target = document.querySelector<HTMLElement>('#problem-agriculture');
-        if (!target) return;
-        demoHardCutDoneRef.current = true;
-        window.dispatchEvent(new CustomEvent('solaris:demoBeat', { detail: { intensity: 1 } }));
-        const y = target.getBoundingClientRect().top + window.scrollY;
-        window.scrollTo(0, y);
-        gsap.killTweensOf(cut);
-        gsap.set(cut, { opacity: 0, yPercent: 0 });
-        gsap.to(cut, { opacity: 1, duration: 0.08, ease: 'power2.out', overwrite: true });
-        gsap.to(cut, { opacity: 0, duration: 0.22, ease: 'power2.in', delay: 0.08, overwrite: true });
-      };
+        const setScrub = (p: number) => {
+          const v = clamp01(p);
+          document.documentElement.style.setProperty('--demo-scrub', v.toFixed(3));
+          window.dispatchEvent(new CustomEvent('solaris:demoScrub', { detail: { progress: v } }));
+        };
+        setScrub(0);
 
-      const tl = gsap.timeline({
-        defaults: { ease: 'none' },
-        scrollTrigger: {
-          trigger: el,
-          start: 'top top',
-          end: '+=180%',
-          scrub: 1,
-          pin: true,
-          anticipatePin: 1,
-          pinSpacing: true,
-          onUpdate: (self: { progress: number }) => setScrub(self.progress),
-          onLeave: () => hardCut(),
-          onEnterBack: () => {
-            demoHardCutDoneRef.current = false;
+        const hardCut = () => {
+          if (demoHardCutDoneRef.current) return;
+          const target = document.querySelector<HTMLElement>('#problem-agriculture');
+          if (!target) return;
+          demoHardCutDoneRef.current = true;
+          window.dispatchEvent(new CustomEvent('solaris:demoBeat', { detail: { intensity: 1 } }));
+          const y = target.getBoundingClientRect().top + window.scrollY;
+          window.scrollTo(0, y);
+          gsap.killTweensOf(cut);
+          gsap.set(cut, { opacity: 0, yPercent: 0 });
+          gsap.to(cut, { opacity: 1, duration: 0.08, ease: 'power2.out', overwrite: true });
+          gsap.to(cut, { opacity: 0, duration: 0.22, ease: 'power2.in', delay: 0.08, overwrite: true });
+        };
+
+        const tl = gsap.timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: {
+            trigger: el,
+            start: 'top top',
+            end: '+=180%',
+            scrub: 1,
+            pin: true,
+            anticipatePin: 1,
+            pinSpacing: true,
+            onUpdate: (self: { progress: number }) => setScrub(self.progress),
+            onLeave: () => hardCut(),
+            onEnterBack: () => {
+              demoHardCutDoneRef.current = false;
+            },
           },
-        },
-      });
+        });
 
-      tl.to(bg, { y: -96, scale: 1.12 }, 0);
-      tl.to(title, { y: -62, scale: 0.955, opacity: 0.86 }, 0);
-      tl.to(ticker, { y: 38, scale: 0.975, opacity: 0.9 }, 0);
+        tl.to(bg, { y: -96, scale: 1.12 }, 0);
+        tl.to(title, { y: -62, scale: 0.955, opacity: 0.86 }, 0);
+        tl.to(ticker, { y: 38, scale: 0.975, opacity: 0.9 }, 0);
 
-      tl.to(cut, { opacity: 0.86, yPercent: 0 }, 0.74);
-      tl.to(cut, { opacity: 0, yPercent: -110 }, 0.9);
-    }, el);
+        tl.to(cut, { opacity: 0.86, yPercent: 0 }, 0.74);
+        tl.to(cut, { opacity: 0, yPercent: -110 }, 0.9);
+      }, el);
+    });
 
     return () => {
+      cancelled = true;
       document.documentElement.style.removeProperty('--demo-scrub');
       window.dispatchEvent(new CustomEvent('solaris:demoScrub', { detail: { progress: 0 } }));
-      ctx.revert();
+      ctx?.revert();
     };
   }, [superCinematic, cssReady]);
 
@@ -270,6 +288,33 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
     return () => {
       alive = false;
       controller.abort();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    let cancelled = false;
+    let armed = true;
+    const enable = () => {
+      if (!armed || cancelled) return;
+      armed = false;
+      setPoolEnabled(true);
+      cleanup();
+    };
+    const cleanup = () => {
+      window.removeEventListener('pointerdown', enable);
+      window.removeEventListener('keydown', enable);
+      window.removeEventListener('scroll', enable);
+    };
+
+    window.addEventListener('pointerdown', enable, { once: true, passive: true });
+    window.addEventListener('keydown', enable, { once: true });
+    window.addEventListener('scroll', enable, { once: true, passive: true });
+    const t = window.setTimeout(enable, 9000);
+    return () => {
+      cancelled = true;
+      cleanup();
+      window.clearTimeout(t);
     };
   }, []);
 
@@ -303,7 +348,70 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
   }, [prefersReducedMotion, superCinematic]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (superCinematic) {
+      setHasUserIntent(true);
+      return;
+    }
+
+    let fired = false;
+    let timeoutId = 0;
+    const fire = () => {
+      if (fired) return;
+      fired = true;
+      cleanup();
+      setHasUserIntent(true);
+    };
+    const cleanup = () => {
+      window.removeEventListener('pointerdown', fire);
+      window.removeEventListener('keydown', fire);
+      window.removeEventListener('scroll', fire);
+      window.removeEventListener('touchstart', fire);
+      window.clearTimeout(timeoutId);
+    };
+    window.addEventListener('pointerdown', fire, { passive: true });
+    window.addEventListener('keydown', fire);
+    window.addEventListener('scroll', fire, { passive: true });
+    window.addEventListener('touchstart', fire, { passive: true });
+    timeoutId = window.setTimeout(fire, 15_000);
+    return cleanup;
+  }, [superCinematic]);
+
+  useEffect(() => {
+    if (hasUserIntent) {
+      setCetAiReady(true);
+      return;
+    }
+    if (typeof window === 'undefined') return;
+    let cancelled = false;
+    const enable = () => {
+      if (cancelled) return;
+      setCetAiReady(true);
+    };
+    const w = window as unknown as {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    if (typeof w.requestIdleCallback === 'function') {
+      const id = w.requestIdleCallback(enable, { timeout: 9000 });
+      return () => {
+        cancelled = true;
+        w.cancelIdleCallback?.(id);
+      };
+    }
+    const t = window.setTimeout(enable, 9000);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(t);
+    };
+  }, [hasUserIntent]);
+
+  useEffect(() => {
     if (!enableHologram) {
+      setHologramReady(false);
+      return;
+    }
+    if (!hasUserIntent) {
       setHologramReady(false);
       return;
     }
@@ -314,30 +422,78 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
     }
 
     let cancelled = false;
-    const show = () => {
-      if (cancelled) return;
-      setHologramReady(true);
-    };
+    let idleTimeoutId: number | null = null;
+    let idleCallbackId: number | null = null;
+    let activated = false;
 
     const w = window as unknown as {
       requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
       cancelIdleCallback?: (id: number) => void;
     };
 
+    const show = () => {
+      if (cancelled) return;
+      setHologramReady(true);
+    };
+
+    const scheduleShow = () => {
+      if (typeof w.requestIdleCallback === 'function') {
+        idleCallbackId = w.requestIdleCallback(show, { timeout: 1200 });
+        return;
+      }
+      idleTimeoutId = window.setTimeout(show, 900);
+    };
+
+    function cleanup() {
+      window.removeEventListener('pointerdown', onActivate);
+      window.removeEventListener('keydown', onActivate);
+      window.removeEventListener('touchstart', onActivate);
+    }
+
+    function onActivate() {
+      if (cancelled) return;
+      if (activated) return;
+      activated = true;
+      cleanup();
+      scheduleShow();
+    }
+
+    window.addEventListener('pointerdown', onActivate, { once: true, passive: true });
+    window.addEventListener('keydown', onActivate, { once: true });
+    window.addEventListener('touchstart', onActivate, { once: true, passive: true });
+
+    return () => {
+      cancelled = true;
+      cleanup();
+      if (idleCallbackId !== null && typeof w.cancelIdleCallback === 'function') w.cancelIdleCallback(idleCallbackId);
+      if (idleTimeoutId !== null) window.clearTimeout(idleTimeoutId);
+    };
+  }, [enableHologram, hasUserIntent, cssReady, superCinematic]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const enable = () => {
+      if (cancelled) return;
+      setTickerExpanded(true);
+    };
+    const w = window as unknown as {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    if (typeof window === 'undefined') return;
     if (typeof w.requestIdleCallback === 'function') {
-      const id = w.requestIdleCallback(show, { timeout: 1200 });
+      const id = w.requestIdleCallback(enable, { timeout: 2000 });
       return () => {
         cancelled = true;
         w.cancelIdleCallback?.(id);
       };
     }
-
-    const t = window.setTimeout(show, 900);
+    const t = window.setTimeout(enable, 1200);
     return () => {
       cancelled = true;
       window.clearTimeout(t);
     };
-  }, [enableHologram, cssReady, superCinematic]);
+  }, []);
 
   useEffect(() => {
     if (prefersReducedMotion) return;
@@ -491,11 +647,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
           <div className="absolute inset-0 sm:hidden">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_22%,rgba(242,201,76,0.16)_0%,transparent_55%),radial-gradient(circle_at_80%_70%,rgba(46,231,255,0.08)_0%,transparent_50%)]" />
             <AppImage
-              src="/hero-coin.png"
+              src="/solaris-cet-logo-emblem-190.webp"
               alt=""
+              width="190"
+              height="190"
               className="absolute right-[-20%] bottom-[-10%] w-[520px] max-w-none opacity-35 blur-[0.2px]"
-              loading="eager"
+              loading="lazy"
               decoding="async"
+              fetchPriority="low"
             />
           </div>
 
@@ -535,26 +694,39 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
             
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-solaris-gold/25 bg-solaris-gold/10 quantum-badge text-solaris-gold text-[10px] sm:text-xs font-semibold tracking-widest uppercase mb-8 shadow-[0_0_18px_rgba(242,201,76,0.15)]">
                <span className="w-1.5 h-1.5 rounded-full bg-solaris-gold animate-pulse" />
-               RWA · CETĂȚUIA ROMÂNIEI · TON
+               VIRTUAL AGRICULTURAL LAND · CETĂȚUIA · TON
             </div>
 
             <h1 className="font-display text-white leading-[1.02] tracking-[-0.04em] mb-5 drop-shadow-2xl type-h1">
-              Primul token RWA ancorat în{' '}
-              <span className="text-gradient-aurora">Cetățuia, România</span>
+              Un token ancorat într-un strat de{' '}
+              <span className="text-gradient-aurora">teren agricol virtual</span>
               <span className="text-solaris-gold">
                 {' '}
                 — 9,000 <CetSymbol className="text-solaris-gold" />.
               </span>
-              <span className="block text-white">Imutabil.</span>
+              <span className="block text-white">Verificabil.</span>
             </h1>
             
             <p className="type-body text-slate-100/90 max-w-2xl font-medium mb-10 text-balance px-4">
-              Activ real. Supply fix. Lichiditate on-chain. Un token care nu se confundă cu mii de imitații.
+              Strat virtual verificabil. Supply fix. Lichiditate on-chain. Dovezi publice pentru spec, map și rapoarte.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-10 sm:mb-12 w-full sm:w-auto px-4">
               <div className="w-full sm:w-auto hero-cta-pulse">
-                <TonConnectButton className="ton-connect-btn" />
+                {tonConnectReady ? (
+                  <Suspense fallback={null}>
+                    <WalletConnect />
+                  </Suspense>
+                ) : (
+                  <button
+                    type="button"
+                    className="ton-connect-btn w-full"
+                    data-testid="wallet-connect-button"
+                    onClick={() => enableTonConnect({ openModal: true })}
+                  >
+                    Connect Wallet
+                  </button>
+                )}
               </div>
 
               <a
@@ -654,7 +826,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
             </div>
 
             <div id="cet-ai" className="w-full mt-6 px-4">
-              <CetAiSearch />
+              {cetAiReady ? (
+                <Suspense fallback={null}>
+                  <CetAiSearch />
+                </Suspense>
+              ) : null}
             </div>
 
             
@@ -710,8 +886,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({ cinematic = false }) => {
         >
           <div className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-10 sm:w-16 bg-gradient-to-r from-[color:var(--solaris-void)] to-transparent" aria-hidden />
           <div className="pointer-events-none absolute inset-y-0 right-0 z-[2] w-10 sm:w-16 bg-gradient-to-l from-[color:var(--solaris-void)] to-transparent" aria-hidden />
-          <div className="flex min-w-max animate-ticker whitespace-nowrap group/ticker">
-            {[...tickerRows, ...tickerRows].map((item, i) => (
+          <div
+            className={
+              tickerExpanded
+                ? 'flex min-w-max animate-ticker whitespace-nowrap group/ticker'
+                : 'flex min-w-max whitespace-nowrap'
+            }
+          >
+            {(tickerExpanded ? [...tickerRows, ...tickerRows] : tickerRows.slice(0, 10)).map((item, i) => (
               <div
                 key={`${lang}-ticker-${item.label}-${i}`}
                 className="inline-flex items-center px-6 sm:px-8 md:px-10 gap-3 md:gap-4 group/item transition-opacity duration-300 hover:!opacity-100 group-hover/ticker:opacity-50"

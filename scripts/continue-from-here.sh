@@ -62,6 +62,25 @@ echo "  cd /root/solaris-cet && npm run verify:fast"
 echo "  cd /root/solaris-cet && npm run verify:all   # includes Playwright E2E stable"
 echo
 
+echo ">>> Quick coordination snippets (copy/paste)"
+cat <<'SNIPS'
+Ofer ajutor
+Status: AVAILABLE
+Pot ajuta cu:
+- <micro-task 1>
+- <micro-task 2>
+- <micro-task 3>
+Nu ating: <folder/fișier> fără acord
+
+Cer ajutor
+Blocaj: <1 propoziție>
+Unde: <fișier/rută>
+Încercat: <1-3 pași>
+Eroare: <1-3 linii>
+Cer: <debug/decizie/review>
+SNIPS
+echo
+
 echo ">>> Paste this into the next chat (edit priority line):"
 cat <<'PROMPT'
 Continuă de unde s-a oprit sesiunea anterioară. Starea repo e în output-ul comenzii continue-from-here.

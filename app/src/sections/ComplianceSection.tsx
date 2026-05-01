@@ -1,4 +1,3 @@
-import { gsap } from 'gsap';
 import { FileCheck, Globe, Server,ShieldCheck } from 'lucide-react';
 import { useLayoutEffect,useRef } from 'react';
 
@@ -9,6 +8,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import { useNearScreen } from '../hooks/useNearScreen';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useRegion } from '../hooks/useRegion';
+import { loadGsapWithScrollTrigger } from '../lib/gsapLazy';
 
 
 const ComplianceSection = () => {
@@ -36,48 +36,53 @@ const ComplianceSection = () => {
       return;
     }
 
-    const ctx = gsap.context(() => {
-      const scrollTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: '+=70%',
-          pin: true,
-          scrub: 0.5,
-        },
-      });
+    let cancelled = false;
+    let ctx: { revert: () => void } | null = null;
+    void loadGsapWithScrollTrigger().then(({ gsap }) => {
+      if (cancelled) return;
+      ctx = gsap.context(() => {
+        const scrollTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: '+=70%',
+            pin: true,
+            scrub: 0.5,
+          },
+        });
 
-      // ENTRANCE (0% - 30%)
-      scrollTl.fromTo(
-        leftCardRef.current,
-        { x: '-55vw', opacity: 0 },
-        { x: 0, opacity: 1, ease: 'none' },
-        0
-      );
-
-      scrollTl.fromTo(
-        rightCardRef.current,
-        { x: '55vw', rotateY: 35, opacity: 0 },
-        { x: 0, rotateY: 0, opacity: 1, ease: 'none' },
-        0
-      );
-
-      const badges = badgesRef.current?.querySelectorAll('.badge-chip');
-      if (badges) {
         scrollTl.fromTo(
-          badges,
-          { scale: 0.7, opacity: 0 },
-          { scale: 1, opacity: 1, stagger: 0.03, ease: 'none' },
-          0.12
+          leftCardRef.current,
+          { x: '-55vw', opacity: 0 },
+          { x: 0, opacity: 1, ease: 'none' },
+          0,
         );
-      }
 
-      // SETTLE (30% - 70%): Hold
+        scrollTl.fromTo(
+          rightCardRef.current,
+          { x: '55vw', rotateY: 35, opacity: 0 },
+          { x: 0, rotateY: 0, opacity: 1, ease: 'none' },
+          0,
+        );
 
-      scrollTl.to([leftCardRef.current, rightCardRef.current], { scale: 0.99, ease: 'none' }, 0.72);
-    }, section);
+        const badges = badgesRef.current?.querySelectorAll('.badge-chip');
+        if (badges) {
+          scrollTl.fromTo(
+            badges,
+            { scale: 0.7, opacity: 0 },
+            { scale: 1, opacity: 1, stagger: 0.03, ease: 'none' },
+            0.12,
+          );
+        }
 
-    return () => ctx.revert();
+        scrollTl.to([leftCardRef.current, rightCardRef.current], { scale: 0.99, ease: 'none' }, 0.72);
+      }, section);
+    });
+
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
   }, [prefersReducedMotion, cssReady, isNearScreen]);
 
   return (

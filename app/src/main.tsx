@@ -1,5 +1,4 @@
 // Entry: Vite + React SPA (production: Coolify → solaris-cet.com).
-import './polyfills'
 import './index.css'
 
 const scheduleSyneFonts = () => {
@@ -27,12 +26,18 @@ if (typeof window !== 'undefined' && import.meta.env.VITE_LHCI !== '1') {
   }
 }
 
-import * as Sentry from '@sentry/react'
 import { ThemeProvider } from 'next-themes'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { isChunkLoadFailure, recoverAppOnce } from '@/lib/appRecovery'
+import { scheduleSentryInit } from '@/lib/sentryClient'
+
+if (import.meta.env.DEV && typeof window !== 'undefined') {
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    void recoverAppOnce('dev_sw_reset')
+  }
+}
 
 import App from './App.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary.tsx'
@@ -61,12 +66,11 @@ window.addEventListener('unhandledrejection', (event) => {
 const sentryDsn = String(import.meta.env.VITE_SENTRY_DSN ?? '').trim()
 if (sentryDsn) {
   const tracesSampleRate = Number.parseFloat(String(import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE ?? '0'))
-  Sentry.init({
+  scheduleSentryInit({
     dsn: sentryDsn,
     environment: import.meta.env.MODE,
     release: String(import.meta.env.VITE_GIT_COMMIT_HASH ?? '').trim() || undefined,
     tracesSampleRate: Number.isFinite(tracesSampleRate) ? tracesSampleRate : 0,
-    sendDefaultPii: false,
   })
 }
 

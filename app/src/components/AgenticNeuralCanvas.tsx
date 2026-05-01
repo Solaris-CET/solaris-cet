@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 
+import { useDocumentHidden } from '@/hooks/useDocumentHidden';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 
@@ -17,10 +18,12 @@ interface Node {
 const AgenticNeuralCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reduce = useReducedMotion();
+  const hidden = useDocumentHidden();
   const mouse = useRef({ x: 0.5, y: 0.5 });
 
   useEffect(() => {
     if (reduce) return;
+    if (hidden) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -30,10 +33,18 @@ const AgenticNeuralCanvas = () => {
     let raf = 0;
     let w = 0;
     let h = 0;
+    let rectLeft = 0;
+    let rectTop = 0;
+    let rectW = 0;
+    let rectH = 0;
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      rectLeft = rect.left;
+      rectTop = rect.top;
+      rectW = rect.width;
+      rectH = rect.height;
       w = rect.width;
       h = rect.height;
       canvas.width = Math.floor(w * dpr);
@@ -55,10 +66,9 @@ const AgenticNeuralCanvas = () => {
     ro.observe(canvas);
 
     const onMove = (e: PointerEvent) => {
-      const rect = canvas.getBoundingClientRect();
       mouse.current = {
-        x: (e.clientX - rect.left) / Math.max(rect.width, 1),
-        y: (e.clientY - rect.top) / Math.max(rect.height, 1),
+        x: (e.clientX - rectLeft) / Math.max(rectW, 1),
+        y: (e.clientY - rectTop) / Math.max(rectH, 1),
       };
     };
     window.addEventListener('pointermove', onMove, { passive: true });
@@ -122,7 +132,7 @@ const AgenticNeuralCanvas = () => {
       ro.disconnect();
       window.removeEventListener('pointermove', onMove);
     };
-  }, [reduce]);
+  }, [hidden, reduce]);
 
   const meshCaption = (
     <p
@@ -141,6 +151,7 @@ const AgenticNeuralCanvas = () => {
       </div>
     );
   }
+  if (hidden) return null;
 
   return (
     <div className="absolute inset-0 pointer-events-none">

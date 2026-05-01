@@ -22,20 +22,13 @@ test.describe('Wallet Connection', () => {
 
   test('connect wallet button is visible in desktop nav', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
-    // TonConnectButton renders a <button> or <div role="button">
-    const walletBtn = page.locator('[class*="ton-connect-btn"], tc-root button, button').filter({
-      hasText: /connect wallet|connect|wallet/i,
-    }).first();
+    const walletBtn = page.locator('[data-testid="wallet-connect-button"]').first();
     await expect(walletBtn).toBeVisible({ timeout: 6000 });
   });
 
   test('connect wallet button has accessible label', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
-    // Any button whose text or aria-label contains "connect"
-    const walletBtn = page
-      .locator('button, [role="button"]')
-      .filter({ hasText: /connect/i })
-      .first();
+    const walletBtn = page.locator('[data-testid="wallet-connect-button"]').first();
     await expect(walletBtn).toBeVisible({ timeout: 6000 });
     // Must have some accessible text (either inner text or aria-label)
     const label = await walletBtn.getAttribute('aria-label').catch(() => null);
@@ -45,10 +38,7 @@ test.describe('Wallet Connection', () => {
 
   test('clicking connect wallet button opens modal or selector', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
-    const walletBtn = page
-      .locator('button, [role="button"]')
-      .filter({ hasText: /connect/i })
-      .first();
+    const walletBtn = page.locator('[data-testid="wallet-connect-button"]').first();
     await walletBtn.waitFor({ state: 'visible', timeout: 6000 });
     await walletBtn.click();
     // The TonConnect modal is injected into the DOM as a web-component (<tc-modal> / <div role="dialog">)
@@ -61,10 +51,7 @@ test.describe('Wallet Connection', () => {
 
   test('wallet modal can be dismissed', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
-    const walletBtn = page
-      .locator('button, [role="button"]')
-      .filter({ hasText: /connect/i })
-      .first();
+    const walletBtn = page.locator('[data-testid="wallet-connect-button"]').first();
     await walletBtn.waitFor({ state: 'visible', timeout: 6000 });
     await walletBtn.click();
 
@@ -89,10 +76,7 @@ test.describe('Wallet Connection', () => {
     const mobileMenu = page.locator('#mobile-menu');
     await expect(mobileMenu).toBeVisible({ timeout: 3000 });
 
-    // TonConnectButton renders as a web component (tc-root / tc-connect-button) with
-    // shadow DOM — text-based filtering does not work across shadow boundaries.
-    // Instead verify the host element is present inside the mobile menu.
-    const walletRoot = mobileMenu.locator('tc-root, [class*="ton-connect"]').first();
-    await expect(walletRoot).toBeAttached({ timeout: 5000 });
+    const walletBtn = mobileMenu.locator('[data-testid="wallet-connect-button"]').first();
+    await expect(walletBtn).toBeVisible({ timeout: 5000 });
   });
 });

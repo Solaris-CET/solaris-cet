@@ -1,4 +1,5 @@
 import { getAllowedOrigin } from '../lib/cors';
+import { BUILD_DATE, BUILD_GIT_SHA } from '../lib/buildInfo';
 
 export const config = { runtime: 'edge' };
 
@@ -55,6 +56,8 @@ export default async function handler(req: Request): Promise<Response> {
   const hasUpstashToken = Boolean(process.env.UPSTASH_REDIS_REST_TOKEN?.trim());
   const hasJwtSecret = Boolean(process.env.JWT_SECRET?.trim());
   const hasJwtSecrets = Boolean(process.env.JWT_SECRETS?.trim());
+  const buildGitSha: string = BUILD_GIT_SHA;
+  const buildDate: string = BUILD_DATE;
   const gitSha =
     process.env.GIT_SHA?.trim() ||
     process.env.GIT_COMMIT?.trim() ||
@@ -62,7 +65,7 @@ export default async function handler(req: Request): Promise<Response> {
     process.env.VERCEL_GIT_COMMIT_SHA?.trim() ||
     process.env.CF_PAGES_COMMIT_SHA?.trim() ||
     process.env.GITHUB_SHA?.trim() ||
-    null;
+    (buildGitSha === 'unknown' ? null : buildGitSha);
 
   const dbConfigured = hasDbUrl;
   const aiConfigured = Boolean(
@@ -147,6 +150,7 @@ export default async function handler(req: Request): Promise<Response> {
       },
       build: {
         gitSha,
+        date: buildDate === 'unknown' ? null : buildDate,
         node: typeof process !== 'undefined' ? process.version : null,
       },
       time: new Date().toISOString(),

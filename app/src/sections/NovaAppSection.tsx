@@ -1,4 +1,3 @@
-import { gsap } from 'gsap';
 import { Battery,Clock, Droplets, TrendingUp } from 'lucide-react';
 import { useLayoutEffect,useRef } from 'react';
 
@@ -6,6 +5,7 @@ import AppImage from '../components/AppImage';
 import GlowOrbs from '../components/GlowOrbs';
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { SolarisLogoMark } from '../components/SolarisLogoMark';
+import { loadGsapWithScrollTrigger } from '../lib/gsapLazy';
 import { useAsyncCssReady } from '../hooks/useAsyncCssReady';
 import { useLanguage } from '../hooks/useLanguage';
 import { useNearScreen } from '../hooks/useNearScreen';
@@ -49,45 +49,50 @@ const NovaAppSection = () => {
       return;
     }
 
-    const ctx = gsap.context(() => {
-      const scrollTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: '+=70%',
-          pin: true,
-          scrub: 0.5,
-        },
-      });
+    let cancelled = false;
+    let ctx: { revert: () => void } | null = null;
+    void loadGsapWithScrollTrigger().then(({ gsap }) => {
+      if (cancelled) return;
+      ctx = gsap.context(() => {
+        const scrollTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: '+=70%',
+            pin: true,
+            scrub: 0.5,
+          },
+        });
 
-      // ENTRANCE (0% - 30%)
-      scrollTl.fromTo(
-        phoneRef.current,
-        { y: '70vh', rotateZ: -6, opacity: 0 },
-        { y: 0, rotateZ: 0, opacity: 1, ease: 'none' },
-        0
-      );
+        scrollTl.fromTo(
+          phoneRef.current,
+          { y: '70vh', rotateZ: -6, opacity: 0 },
+          { y: 0, rotateZ: 0, opacity: 1, ease: 'none' },
+          0,
+        );
 
-      scrollTl.fromTo(
-        textPanelRef.current,
-        { x: '40vw', opacity: 0 },
-        { x: 0, opacity: 1, ease: 'none' },
-        0.05
-      );
+        scrollTl.fromTo(
+          textPanelRef.current,
+          { x: '40vw', opacity: 0 },
+          { x: 0, opacity: 1, ease: 'none' },
+          0.05,
+        );
 
-      scrollTl.fromTo(
-        tickerRef.current,
-        { y: '20vh', opacity: 0 },
-        { y: 0, opacity: 1, ease: 'none' },
-        0.15
-      );
+        scrollTl.fromTo(
+          tickerRef.current,
+          { y: '20vh', opacity: 0 },
+          { y: 0, opacity: 1, ease: 'none' },
+          0.15,
+        );
 
-      // SETTLE (30% - 70%): Hold
+        scrollTl.to([phoneRef.current, textPanelRef.current], { scale: 0.99, ease: 'none' }, 0.72);
+      }, section);
+    });
 
-      scrollTl.to([phoneRef.current, textPanelRef.current], { scale: 0.99, ease: 'none' }, 0.72);
-    }, section);
-
-    return () => ctx.revert();
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
   }, [prefersReducedMotion, cssReady, isNearScreen]);
 
   return (

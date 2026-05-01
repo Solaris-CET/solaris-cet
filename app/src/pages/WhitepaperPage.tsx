@@ -50,6 +50,8 @@ export default function WhitepaperPage() {
   const [selected, setSelected] = useState<LangCode>(lang);
   const [offlineReady, setOfflineReady] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [savingAll, setSavingAll] = useState(false);
+  const [saveAllInfo, setSaveAllInfo] = useState<string | null>(null);
 
   useEffect(() => {
     setSelected(lang);
@@ -62,12 +64,14 @@ export default function WhitepaperPage() {
       language: 'Limbă',
       download: 'Descarcă PDF',
       saveOffline: 'Salvează pentru offline',
+      saveAllOffline: 'Salvează toate PDF-urile',
       saved: 'Disponibil offline',
       notSaved: 'Nu este salvat offline',
       offlineHint: 'Ești offline — conținutul funcționează dacă a fost deschis anterior.',
       noDoc: 'Nu există încă un PDF pentru această limbă.',
       openNewTab: 'Deschide în tab nou',
       saving: 'Se salvează…',
+      savingAll: 'Se salvează toate…',
     };
     if (lang === 'es') {
       return {
@@ -76,12 +80,14 @@ export default function WhitepaperPage() {
         language: 'Idioma',
         download: 'Descargar PDF',
         saveOffline: 'Guardar para offline',
+        saveAllOffline: 'Guardar todos los PDF',
         saved: 'Disponible offline',
         notSaved: 'No guardado offline',
         offlineHint: 'Estás offline — funciona si lo abriste antes.',
         noDoc: 'Todavía no hay PDF para este idioma.',
         openNewTab: 'Abrir en nueva pestaña',
         saving: 'Guardando…',
+        savingAll: 'Guardando todo…',
       };
     }
     if (lang === 'en') {
@@ -91,12 +97,14 @@ export default function WhitepaperPage() {
         language: 'Language',
         download: 'Download PDF',
         saveOffline: 'Save for offline',
+        saveAllOffline: 'Save all PDFs',
         saved: 'Available offline',
         notSaved: 'Not saved offline',
         offlineHint: 'You are offline — works if previously opened.',
         noDoc: 'No PDF is available for this language yet.',
         openNewTab: 'Open in new tab',
         saving: 'Saving…',
+        savingAll: 'Saving all…',
       };
     }
     return base;
@@ -113,13 +121,13 @@ export default function WhitepaperPage() {
       {
         lang: 'ro',
         label: 'RO',
-        url: '/whitepaper/solaris-cet-whitepaper-ro.pdf',
+        url: PUBLIC_WHITEPAPER_IPFS_URL,
         filename: 'solaris-cet-whitepaper-ro.pdf',
       },
       {
         lang: 'es',
         label: 'ES',
-        url: '/whitepaper/solaris-cet-whitepaper-es.pdf',
+        url: PUBLIC_WHITEPAPER_IPFS_URL,
         filename: 'solaris-cet-whitepaper-es.pdf',
       },
     ],
@@ -155,6 +163,63 @@ export default function WhitepaperPage() {
       setOfflineReady(ok);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const saveAllForOffline = async () => {
+    setSavingAll(true);
+    setSaveAllInfo(null);
+    try {
+      const sameOrigin = docs.filter((d) => isLikelySameOrigin(d.url)).map((d) => d.url);
+      const crossOrigin = docs.filter((d) => !isLikelySameOrigin(d.url)).map((d) => d.url);
+
+      let okCount = 0;
+      let failCount = 0;
+
+      if (sameOrigin.length && 'serviceWorker' in navigator) {
+        const controller = navigator.serviceWorker.controller;
+        if (controller) {
+          const payload = await new Promise<any>((resolve) => {
+            const timeout = window.setTimeout(() => resolve({ okCount: 0, failCount: sameOrigin.length, error: 'timeout' }), 15_000);
+            const onMessage = (event: MessageEvent) => {
+              const data = (event as any)?.data;
+              if (data && typeof data === 'object' && data.type === 'PREFETCH_DONE') {
+                window.clearTimeout(timeout);
+                navigator.serviceWorker.removeEventListener('message', onMessage as any);
+                resolve(data);
+              }
+            };
+            navigator.serviceWorker.addEventListener('message', onMessage as any);
+            controller.postMessage({ type: 'PREFETCH_URLS', urls: sameOrigin });
+          });
+          okCount += Number(payload?.okCount ?? 0);
+          failCount += Number(payload?.failCount ?? 0);
+        } else {
+          for (const u of sameOrigin) {
+            try {
+              await warmCache(u);
+              okCount += 1;
+            } catch {
+              failCount += 1;
+            }
+          }
+        }
+      }
+
+      for (const u of crossOrigin) {
+        try {
+          await warmCache(u);
+          okCount += 1;
+        } catch {
+          failCount += 1;
+        }
+      }
+
+      setSaveAllInfo(`${okCount} ok · ${failCount} failed`);
+      const ok = await isCached(activeDoc.url);
+      setOfflineReady(ok);
+    } finally {
+      setSavingAll(false);
     }
   };
 
@@ -260,7 +325,24 @@ export default function WhitepaperPage() {
                   <HardDriveDownload className="w-4 h-4" aria-hidden />
                   {saving ? tx.saving : tx.saveOffline}
                 </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={saveAllForOffline}
+                  disabled={savingAll}
+                >
+                  <HardDriveDownload className="w-4 h-4" aria-hidden />
+                  {savingAll ? tx.savingAll : tx.saveAllOffline}
+                </Button>
               </div>
+
+              {saveAllInfo ? (
+                <div className="mt-3 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-[12px] text-solaris-muted">
+                  {saveAllInfo}
+                </div>
+              ) : null}
 
               <div
                 className={cn(

@@ -3,7 +3,10 @@ import { createPortal } from 'react-dom';
 
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
-const VIDEO_CANDIDATES = ['/cinematic/cosmic-loop.webm', '/cinematic/cosmic-loop.mp4'];
+const VIDEO_CANDIDATES = [
+  String(import.meta.env.VITE_CINEMATIC_VIDEO_WEBM_URL ?? '').trim(),
+  String(import.meta.env.VITE_CINEMATIC_VIDEO_MP4_URL ?? '').trim(),
+].filter(Boolean);
 
 const POSTER_FALLBACK = '/cinematic/cosmic-poster-768.jpg';
 

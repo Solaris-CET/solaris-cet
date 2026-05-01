@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 
+import { useDocumentHidden } from '@/hooks/useDocumentHidden';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
@@ -30,9 +31,10 @@ export default function QuantumFieldCanvas() {
   const reducedMotion = useReducedMotion();
   const isMobile = useIsMobile();
   const isWebDriver = typeof navigator !== 'undefined' && navigator.webdriver;
+  const hidden = useDocumentHidden();
 
   useEffect(() => {
-    if (reducedMotion || isMobile || isWebDriver) return;
+    if (reducedMotion || isMobile || isWebDriver || hidden) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -48,10 +50,14 @@ export default function QuantumFieldCanvas() {
     const stars: Star[] = [];
     const particles: QParticle[] = [];
     const mouse = { x: -9999, y: -9999 };
+    let rectLeft = 0;
+    let rectTop = 0;
 
     // ── Resize ─────────────────────────────────────────────────────
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
+      rectLeft = rect.left;
+      rectTop = rect.top;
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       w = Math.max(1, Math.floor(rect.width));
       h = Math.max(1, Math.floor(rect.height));
@@ -204,9 +210,8 @@ export default function QuantumFieldCanvas() {
 
     // ── Mouse ───────────────────────────────────────────────────────
     const onMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
+      mouse.x = e.clientX - rectLeft;
+      mouse.y = e.clientY - rectTop;
     };
     const onMouseLeave = () => {
       mouse.x = -9999;
@@ -227,9 +232,9 @@ export default function QuantumFieldCanvas() {
       canvas.removeEventListener('mousemove', onMouseMove);
       canvas.removeEventListener('mouseleave', onMouseLeave);
     };
-  }, [reducedMotion, isMobile, isWebDriver]);
+  }, [reducedMotion, isMobile, isWebDriver, hidden]);
 
-  if (reducedMotion || isMobile || isWebDriver) return null;
+  if (reducedMotion || isMobile || isWebDriver || hidden) return null;
 
   return (
     <canvas

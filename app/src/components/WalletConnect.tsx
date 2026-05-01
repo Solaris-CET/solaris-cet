@@ -1,4 +1,4 @@
-import { TonConnectButton, useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
+import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useJwtSession } from '@/hooks/useJwtSession';
@@ -167,13 +167,28 @@ const WalletConnect = (props: Props) => {
     }
   };
 
+  const handleOpenModal = async () => {
+    try {
+      await tonConnectUI.openModal();
+    } catch {
+      void 0;
+    }
+  };
+
   return (
     <div
       className="flex items-center gap-2 min-h-[44px]"
       title={standardSkillBurst(skillSeedFromLabel('walletConnect|tonMesh'))}
     >
       <div className="touch-manipulation">
-        <TonConnectButton className="ton-connect-btn" />
+        <button
+          type="button"
+          className="ton-connect-btn"
+          data-testid="wallet-connect-button"
+          onClick={handleOpenModal}
+        >
+          {walletAddress ? 'Wallet' : 'Connect Wallet'}
+        </button>
       </div>
       {wallet && import.meta.env.DEV ? (
         <button type="button" className="btn-gold text-sm" onClick={handleTestTransaction}>

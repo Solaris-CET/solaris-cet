@@ -8,8 +8,8 @@
     <link rel="preload" as="font" href="/fonts/jetbrains-mono-400.woff2" type="font/woff2" crossorigin />
     <title>Solaris CET — RWA Token on TON Blockchain</title>
     <meta name="title" content="Solaris CET — RWA Token on TON Blockchain" />
-    <meta name="description" content="SOLARIS (CET) — 200,000 autonomous AI agents across 10 enterprise departments on TON blockchain. 9,000 CET fixed supply. RAV Protocol: Grok × Gemini dual-AI. Real-World Asset anchored in Cetățuia, Romania." />
-    <meta name="keywords" content="Solaris CET, TON blockchain, RWA token, real world asset, DeDust, RAV protocol, Grok, Gemini, dual AI, agricultural AI, Cetățuia, 2026 Agentic Era, AI corporate structure, AI team, AI agents, autonomous agents" />
+    <meta name="description" content="SOLARIS (CET) — AI-native token on TON blockchain. 9,000 CET fixed supply. RAV Protocol: Grok × Gemini dual-AI. Cetățuia-inspired virtual agricultural land layer with verifiable IPFS + TON proofs." />
+    <meta name="keywords" content="Solaris CET, TON blockchain, virtual agricultural land, virtual land, DeDust, RAV protocol, Grok, Gemini, dual AI, Cetățuia, proof bundle, IPFS, on-chain proofs, AI agents, autonomous agents" />
     <meta name="robots" content="index, follow" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     
@@ -22,8 +22,8 @@
     <!-- Open Graph / Social -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://solaris-cet.com/en/" />
-    <meta property="og:title" content="Solaris CET — RWA Token on TON Blockchain" />
-    <meta property="og:description" content="200,000 autonomous AI agents. 9,000 CET fixed supply on TON blockchain. The world's first AI-native RWA token — powered by Grok × Gemini dual-AI RAV Protocol." />
+    <meta property="og:title" content="Solaris CET — Virtual Land Layer on TON" />
+    <meta property="og:description" content="AI-native token on TON. 9,000 CET fixed supply. Cetățuia-inspired virtual agricultural land layer with verifiable IPFS + TON proofs." />
     <meta property="og:site_name" content="Solaris CET" />
     <meta property="og:image" content="https://solaris-cet.com/og-image.png" />
     <meta property="og:image:width" content="1200" />
@@ -31,19 +31,17 @@
     <meta property="og:locale" content="en_US" />
     <meta property="og:locale:alternate" content="ro_RO" />
     <meta property="og:locale:alternate" content="es_ES" />
-    <meta property="og:image:alt" content="Solaris CET — 9,000 CET fixed supply on TON, RWA anchored in Cetățuia" />
+    <meta property="og:image:alt" content="Solaris CET — 9,000 CET fixed supply on TON, virtual agricultural land layer" />
 
     <!-- Resource hints for critical third-party endpoints used at runtime -->
-    <link rel="preconnect" href="https://telegram.org" crossorigin />
-    <link rel="preconnect" href="https://config.ton.org" crossorigin />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@SolarisCET" />
     <meta name="twitter:creator" content="@SolarisCET" />
     <meta name="twitter:url" content="https://solaris-cet.com/en/" />
-    <meta name="twitter:title" content="Solaris CET — RWA Token on TON Blockchain" />
-    <meta name="twitter:description" content="200,000 autonomous AI agents on TON. 9,000 CET fixed supply. The world's first AI-native RWA token — Grok × Gemini dual-AI RAV Protocol." />
+    <meta name="twitter:title" content="Solaris CET — Virtual Land Layer on TON" />
+    <meta name="twitter:description" content="AI-native token on TON. 9,000 CET fixed supply. Cetățuia-inspired virtual agricultural land layer with verifiable IPFS + TON proofs." />
     <meta name="twitter:image" content="https://solaris-cet.com/og-image.png" />
 
     <!-- Canonical -->
@@ -70,6 +68,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#F2C94C" />
+    <link rel="manifest" href="/manifest.json" />
 
     <!-- Structured Data -->
     <script nonce="__CSP_NONCE__" type="application/ld+json">
@@ -95,7 +94,7 @@
         "name": "Solaris CET Team"
       },
       "copyrightYear": "2025",
-      "keywords": "Solaris CET, TON blockchain, RWA token, real world asset, DeDust, RAV protocol, Grok, Gemini, dual AI",
+      "keywords": "Solaris CET, TON blockchain, virtual land, virtual agricultural land, DeDust, RAV protocol, Grok, Gemini, dual AI",
       "codeRepository": "https://github.com/Solaris-CET/solaris-cet"
     }
     </script>
@@ -207,45 +206,56 @@
 
     <!-- OMEGA policy: no external font/style CDNs in shipped runtime HTML -->
 
-    <!-- Preload critical raster brand + hero coin (loader/nav mark + hero 3D coin) for LCP -->
-    <link rel="preload" as="image" href="./solaris-cet-logo-emblem-190.jpg" fetchpriority="high" />
-    <link rel="preload" as="image" href="./hero-coin.png" fetchpriority="high" />
-
     <!-- Preload cinematic poster (LCP candidate) so it is discoverable from initial HTML -->
-    <link rel="preload" as="image" href="./cinematic/cosmic-poster-768.jpg" fetchpriority="high" />
+    <link
+      rel="preload"
+      as="image"
+      href="/cinematic/cosmic-poster-768.webp"
+      type="image/webp"
+      imagesrcset="/cinematic/cosmic-poster-768.webp 768w, /cinematic/cosmic-poster-1024.webp 1024w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
 
-    <!-- Telegram Mini App SDK — enables window.Telegram.WebApp when the app
-         runs inside Telegram. The SDK is served from telegram.org's CDN and
-         updated by Telegram; SRI is intentionally omitted because pinning a
-         hash would break every time Telegram pushes an update.
-         defer ensures the script does not block HTML parsing or first paint. -->
-    <script
-      defer
-      src="https://telegram.org/js/telegram-web-app.js"
-      integrity="sha384-1XuC9S4cgk6RH1oCsL2diDRwLiiivu/oZHNfxYUitEFuiKpP5ceNbzu220KKrcK+"
-      crossorigin="anonymous"
-    ></script>
+    <script nonce="__CSP_NONCE__">
+      (function () {
+        try {
+          var p = new URLSearchParams(location.search);
+          var isTg =
+            p.has('tgWebAppPlatform') ||
+            p.has('tgWebAppStartParam') ||
+            p.has('tgWebAppVersion') ||
+            /Telegram/i.test(navigator.userAgent || '');
+          if (!isTg) return;
+
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://telegram.org/js/telegram-web-app.js';
+          s.crossOrigin = 'anonymous';
+          document.head.appendChild(s);
+        } catch (e) {}
+      })();
+    </script>
 
   </head>
   <body>
     <div id="solaris-cinematic-bg" class="cinematic-bg" aria-hidden="true">
       <picture>
         <source
-          srcset="./cinematic/cosmic-poster-768.webp 768w, ./cinematic/cosmic-poster-1024.webp 1024w"
+          srcset="/cinematic/cosmic-poster-768.webp 768w, /cinematic/cosmic-poster-1024.webp 1024w"
           sizes="100vw"
           type="image/webp"
         />
         <img
           id="solaris-cinematic-poster"
-          src="./cinematic/cosmic-poster-768.jpg"
-          srcset="./cinematic/cosmic-poster-768.jpg 768w, ./cinematic/cosmic-poster-1024.jpg 1024w"
+          src="/cinematic/cosmic-poster-768.jpg"
+          srcset="/cinematic/cosmic-poster-768.jpg 768w, /cinematic/cosmic-poster-1024.jpg 1024w"
           sizes="100vw"
           width="768"
           height="403"
           alt=""
           loading="eager"
           decoding="async"
-          fetchpriority="high"
           class="cinematic-poster"
         />
       </picture>
@@ -353,7 +363,7 @@
         <ul>
           <li>2025-12-31 — Contract deployed · Audit complete · DeDust pool live</li>
           <li>2026-03-31 — IPFS proof published · RAV protocol surface shipped</li>
-          <li>2026-06-30 — RWA tokenisation pilot (Cetățuia) — active phase</li>
+          <li>2026-06-30 — Virtual land layer pilot (Cetățuia) — active phase</li>
           <li>2026-09-30 — Zero-knowledge proof layer — planned</li>
         </ul>
       </div>

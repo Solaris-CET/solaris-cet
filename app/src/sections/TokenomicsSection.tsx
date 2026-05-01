@@ -1,4 +1,3 @@
-import { gsap } from 'gsap';
 import { Coins, Cpu,Lock, Pickaxe, TrendingDown, Users } from 'lucide-react';
 import { lazy, Suspense, useEffect,useLayoutEffect, useRef, useState } from 'react';
 
@@ -10,6 +9,7 @@ import LivePoolStats from '../components/LivePoolStats';
 const TokenomicsChart = lazy(() => import('../components/TokenomicsChart'));
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 import { CET_FIXED_SUPPLY_CAP } from '@/lib/domainPillars';
+import { loadGsapWithScrollTrigger } from '@/lib/gsapLazy';
 
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { TOKEN_DECIMALS } from '../constants/token';
@@ -59,16 +59,22 @@ const TokenomicsSection = () => {
 
     const progress = CET_MINED_SUPPLY / CET_TOTAL_SUPPLY;
 
-    gsap.set(circle, { strokeDasharray: RING_CIRCUMFERENCE, strokeDashoffset: RING_CIRCUMFERENCE });
-    const tween = gsap.to(circle, {
-      strokeDashoffset: RING_CIRCUMFERENCE * (1 - progress),
-      duration: 2,
-      ease: 'power3.out',
-      delay: 0.3,
+    let cancelled = false;
+    let tween: { kill: () => void } | null = null;
+    void loadGsapWithScrollTrigger().then(({ gsap }) => {
+      if (cancelled) return;
+      gsap.set(circle, { strokeDasharray: RING_CIRCUMFERENCE, strokeDashoffset: RING_CIRCUMFERENCE });
+      tween = gsap.to(circle, {
+        strokeDashoffset: RING_CIRCUMFERENCE * (1 - progress),
+        duration: 2,
+        ease: 'power3.out',
+        delay: 0.3,
+      });
     });
 
     return () => {
-      tween.kill();
+      cancelled = true;
+      tween?.kill();
     };
   }, [ringVisible]);
 
@@ -88,38 +94,46 @@ const TokenomicsSection = () => {
       return;
     }
 
-    const ctx = gsap.context(() => {
-      const scrollTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: '+=70%',
-          pin: true,
-          scrub: 0.5,
-        },
-      });
+    let cancelled = false;
+    let ctx: { revert: () => void } | null = null;
+    void loadGsapWithScrollTrigger().then(({ gsap }) => {
+      if (cancelled) return;
+      ctx = gsap.context(() => {
+        const scrollTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: '+=70%',
+            pin: true,
+            scrub: 0.5,
+          },
+        });
 
-      scrollTl.fromTo(
-        cardRef.current,
-        { scale: 0.78, y: '40vh', opacity: 0 },
-        { scale: 1, y: 0, opacity: 1, ease: 'none' },
-        0
-      );
-
-      const pills = pillsRef.current?.querySelectorAll('.metric-pill');
-      if (pills) {
         scrollTl.fromTo(
-          pills,
-          { y: '10vh', opacity: 0 },
-          { y: 0, opacity: 1, stagger: 0.03, ease: 'none' },
-          0.1
+          cardRef.current,
+          { scale: 0.78, y: '40vh', opacity: 0 },
+          { scale: 1, y: 0, opacity: 1, ease: 'none' },
+          0,
         );
-      }
 
-      scrollTl.to(cardRef.current, { scale: 0.985, ease: 'none' }, 0.72);
-    }, section);
+        const pills = pillsRef.current?.querySelectorAll('.metric-pill');
+        if (pills) {
+          scrollTl.fromTo(
+            pills,
+            { y: '10vh', opacity: 0 },
+            { y: 0, opacity: 1, stagger: 0.03, ease: 'none' },
+            0.1,
+          );
+        }
 
-    return () => ctx.revert();
+        scrollTl.to(cardRef.current, { scale: 0.985, ease: 'none' }, 0.72);
+      }, section);
+    });
+
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
   }, [prefersReducedMotion, cssReady, isNearScreen]);
 
   return (

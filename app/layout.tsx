@@ -3,7 +3,7 @@
  * in Coolify/CI; `vite build` injects it into `index.html` or removes the meta if unset.
  */
 export const metadata = {
-  title: 'Solaris CET — RWA Token on TON Blockchain',
+  title: 'Solaris CET — Virtual Agricultural Land Layer on TON',
   description:
-    'SOLARIS (CET) — 200,000 autonomous AI agents on TON. 9,000 CET fixed supply. RAV Protocol: Grok × Gemini dual-AI. Real-World Asset anchored in Cetățuia, Romania.',
+    'SOLARIS (CET) — AI-native token on TON. 9,000 CET fixed supply. RAV Protocol: Grok × Gemini dual-AI. Cetățuia-inspired virtual agricultural land layer with verifiable IPFS + TON proofs.',
 } as const;

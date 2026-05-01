@@ -6,12 +6,7 @@ import WalletConnect from './WalletConnect';
 const sendTransactionMock = vi.fn(async () => undefined);
 
 vi.mock('@tonconnect/ui-react', () => ({
-  TonConnectButton: (props: Record<string, unknown>) => (
-    <button type="button" data-testid="tonconnect-btn" {...props}>
-      Connect
-    </button>
-  ),
-  useTonConnectUI: () => [{ connected: true, sendTransaction: sendTransactionMock }],
+  useTonConnectUI: () => [{ connected: true, sendTransaction: sendTransactionMock, openModal: vi.fn(async () => undefined) }],
   useTonWallet: () => ({ account: { address: 'EQ_TEST_ADDRESS' } }),
 }));
 

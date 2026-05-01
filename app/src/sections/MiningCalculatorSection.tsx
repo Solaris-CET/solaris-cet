@@ -1,7 +1,6 @@
-import { gsap } from 'gsap';
 import { Calculator, Laptop, Monitor, Server, Smartphone, TrendingUp } from 'lucide-react';
 import type { ComponentType } from 'react';
-import { useCallback,useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback,useEffect, useRef, useState } from 'react';
 
 import { meshStandardBurstFromKey, meshWhisperFromKey } from '@/lib/meshSkillFeed';
 
@@ -50,10 +49,6 @@ const MiningCalculatorSection = () => {
   const [stake, setStake] = useState(100);
   const [results, setResults] = useState({ daily: 0, monthly: 0, apy: 0 });
 
-  // Use a stable ref to hold the animated proxy object so GSAP tweens don't
-  // target a stale closure value across renders.
-  const animProxy = useRef({ daily: 0, monthly: 0, apy: 0 });
-
   // Web Worker instance — created once, persisted across renders
   const workerRef = useRef<Worker | null>(null);
 
@@ -68,21 +63,10 @@ const MiningCalculatorSection = () => {
     ) => {
       if (event.data.type === 'REWARDS_RESULT') {
         const { daily, monthly, apy } = event.data.payload;
-        const proxy = animProxy.current;
-
-        gsap.to(proxy, {
-          daily,
-          monthly,
-          apy,
-          duration: 0.5,
-          ease: 'power2.out',
-          onUpdate: () => {
-            setResults({
-              daily: Number(proxy.daily.toFixed(4)),
-              monthly: Number(proxy.monthly.toFixed(2)),
-              apy: Number(proxy.apy.toFixed(1)),
-            });
-          },
+        setResults({
+          daily: Number(daily.toFixed(4)),
+          monthly: Number(monthly.toFixed(2)),
+          apy: Number(apy.toFixed(1)),
         });
       }
     };
@@ -102,83 +86,6 @@ const MiningCalculatorSection = () => {
     };
     workerRef.current?.postMessage({ type: 'CALCULATE_REWARDS', payload: input });
   }, [device, hashrate, stake]);
-
-  useLayoutEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    const ctx = gsap.context(() => {
-      // Heading animation
-      gsap.fromTo(
-        headingRef.current,
-        { y: 24, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: headingRef.current,
-            start: 'top 80%',
-            end: 'top 55%',
-            scrub: true,
-          },
-        }
-      );
-
-      // Calculator card animation
-      gsap.fromTo(
-        calculatorRef.current,
-        { x: '-10vw', opacity: 0 },
-        {
-          x: 0,
-          opacity: 1,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: calculatorRef.current,
-            start: 'top 80%',
-            end: 'top 55%',
-            scrub: true,
-          },
-        }
-      );
-
-      // Result card animation
-      gsap.fromTo(
-        resultRef.current,
-        { x: '10vw', opacity: 0 },
-        {
-          x: 0,
-          opacity: 1,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: resultRef.current,
-            start: 'top 80%',
-            end: 'top 55%',
-            scrub: true,
-          },
-        }
-      );
-
-      // Stats row animation
-      gsap.fromTo(
-        statsRef.current,
-        { y: '6vh', opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: statsRef.current,
-            start: 'top 85%',
-            end: 'top 65%',
-            scrub: true,
-          },
-        }
-      );
-    }, section);
-
-    return () => ctx.revert();
-  }, []);
 
   const handleDeviceChange = useCallback((newDevice: DeviceType) => {
     setDevice(newDevice);

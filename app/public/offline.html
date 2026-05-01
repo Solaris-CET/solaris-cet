@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#020617" />
+    <meta name="theme-color" content="#05060B" />
     <meta
       name="description"
       content="Solaris CET offline surface. When the app is unavailable, access the sovereign static node for CET supply facts and project anchors."
@@ -64,6 +64,40 @@
         font-size: 0.8rem;
         color: #f8fafc;
       }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0.7rem 1rem;
+        border-radius: 0.9rem;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        color: #f8fafc;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        letter-spacing: 0.01em;
+      }
+      .btn:hover {
+        background: rgba(255, 255, 255, 0.09);
+      }
+      .btn.primary {
+        border-color: rgba(242, 201, 76, 0.28);
+        background: rgba(242, 201, 76, 0.12);
+        color: #f2c94c;
+      }
+      .btn.primary:hover {
+        background: rgba(242, 201, 76, 0.16);
+      }
     </style>
   </head>
   <body>
@@ -75,9 +109,11 @@
         doesn’t, you can still open the static <strong>OMEGA</strong> surface (no
         JavaScript) for CET supply facts.
       </p>
-      <p>
-        <a href="/sovereign/">/sovereign/</a>
-      </p>
+      <div class="actions" role="group" aria-label="Offline actions">
+        <a class="btn primary" href="/en/?retry=1">Retry</a>
+        <a class="btn" href="/en/">Go home</a>
+        <a class="btn" href="/sovereign/">Open OMEGA</a>
+      </div>
     </div>
   </body>
 </html>

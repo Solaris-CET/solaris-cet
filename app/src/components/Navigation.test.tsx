@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { TonConnectFeatureProvider } from '@/tonconnect/TonConnectFeatureProvider';
+
 import Navigation from './Navigation';
 
 vi.mock('../hooks/useLanguage', () => ({
@@ -65,7 +67,11 @@ vi.mock('./ThemeToggle', () => ({
 
 describe('Navigation', () => {
   it('renders primary navigation labels', () => {
-    render(<Navigation />);
+    render(
+      <TonConnectFeatureProvider>
+        <Navigation />
+      </TonConnectFeatureProvider>,
+    );
 
     expect(screen.getAllByRole('navigation', { name: 'Primary navigation' }).length).toBeGreaterThan(0);
     expect(screen.getAllByText('Tokenomics').length).toBeGreaterThan(0);
@@ -75,7 +81,11 @@ describe('Navigation', () => {
   });
 
   it('opens the mobile menu', async () => {
-    render(<Navigation />);
+    render(
+      <TonConnectFeatureProvider>
+        <Navigation />
+      </TonConnectFeatureProvider>,
+    );
 
     screen.getByTestId('mobile-menu-toggle').click();
     expect(await screen.findByText(/Solaris/i)).toBeInTheDocument();

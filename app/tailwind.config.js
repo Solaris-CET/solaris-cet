@@ -121,8 +121,11 @@ module.exports = {
           "50%": { opacity: "1" },
         },
         "shimmer": {
-          "0%": { backgroundPosition: "-200% 0" },
-          "100%": { backgroundPosition: "200% 0" },
+          "0%": { transform: "translate3d(-140%, 0, 0)", opacity: "0" },
+          "18%": { opacity: "0.35" },
+          "50%": { opacity: "0.55" },
+          "88%": { opacity: "0.35" },
+          "100%": { transform: "translate3d(140%, 0, 0)", opacity: "0" },
         },
         "ticker": {
           "0%": { transform: "translateX(0)" },
@@ -133,8 +136,8 @@ module.exports = {
           "50%": { opacity: "1", transform: "translate(-50%, -50%) scale(1.1)" },
         },
         "gold-pulse": {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(242, 201, 76, 0.15)" },
-          "50%": { boxShadow: "0 0 50px rgba(242, 201, 76, 0.4), 0 0 100px rgba(242, 201, 76, 0.2)" },
+          "0%, 100%": { opacity: "0.86" },
+          "50%": { opacity: "1" },
         },
         /** Slow ambient drift for hero gradient orbs (keeps transform origin stable). */
         "hero-aurora": {
@@ -157,8 +160,8 @@ module.exports = {
           "50%": { transform: "translate(-1.2%, -0.8%) scale(1.02)" },
         },
         "bft-honest": {
-          "0%, 100%": { opacity: "0.85", boxShadow: "0 0 0 0 rgba(34, 197, 94, 0.2)" },
-          "50%": { opacity: "1", boxShadow: "0 0 12px 0 rgba(34, 197, 94, 0.35)" },
+          "0%, 100%": { opacity: "0.85", transform: "translateZ(0) scale(1)" },
+          "50%": { opacity: "1", transform: "translateZ(0) scale(1.05)" },
         },
         "bft-glitch": {
           "0%, 100%": { transform: "translate(0, 0)", opacity: "1" },

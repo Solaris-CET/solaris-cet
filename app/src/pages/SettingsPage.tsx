@@ -56,6 +56,7 @@ export default function SettingsPage() {
   const telegramBotUsername = useMemo(() => String(import.meta.env.VITE_TELEGRAM_BOT_USERNAME ?? '').trim(), []);
   const [linkBusy, setLinkBusy] = useState(false);
   const [linkInfo, setLinkInfo] = useState<string | null>(null);
+  const [telegramWidgetEnabled, setTelegramWidgetEnabled] = useState(false);
 
   const [wallets, setWallets] = useState<UserWallet[]>([]);
   const [walletLabel, setWalletLabel] = useState('');
@@ -63,9 +64,11 @@ export default function SettingsPage() {
 
   const [offlineBusy, setOfflineBusy] = useState(false);
   const [offlineInfo, setOfflineInfo] = useState<string | null>(null);
+  const [offlineCacheStatus, setOfflineCacheStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (!telegramBotUsername) return;
+    if (!telegramWidgetEnabled) return;
     const container = document.getElementById('telegram-link');
     if (!container) return;
     container.replaceChildren();
@@ -77,7 +80,7 @@ export default function SettingsPage() {
     s.setAttribute('data-onauth', 'onTelegramLinkAuth(user)');
     s.setAttribute('data-request-access', 'write');
     container.appendChild(s);
-  }, [telegramBotUsername]);
+  }, [telegramBotUsername, telegramWidgetEnabled]);
 
   useEffect(() => {
     if (!token) return;
@@ -238,6 +241,58 @@ export default function SettingsPage() {
       target.postMessage({ type: 'CLEAR_CACHES', confirm: true });
       setOfflineInfo('Offline cache cleared. Reloading…');
       window.location.reload();
+    } catch (e) {
+      setOfflineInfo(String(e instanceof Error ? e.message : e).slice(0, 160));
+    } finally {
+      setOfflineBusy(false);
+    }
+  };
+
+  const refreshOfflineCacheStatus = async () => {
+    setOfflineBusy(true);
+    setOfflineInfo(null);
+    setOfflineCacheStatus(null);
+    try {
+      if (!('serviceWorker' in navigator)) {
+        setOfflineInfo('Service worker not supported in this browser.');
+        return;
+      }
+
+      const controller = navigator.serviceWorker.controller;
+      const reg = await navigator.serviceWorker.getRegistration('/');
+      const target = controller || reg?.active || reg?.waiting || null;
+      if (!target) {
+        setOfflineInfo('Service worker is not active yet.');
+        return;
+      }
+
+      const payload = await new Promise<any>((resolve) => {
+        const timeout = window.setTimeout(() => resolve({ error: 'timeout' }), 5_000);
+        const onMessage = (event: MessageEvent) => {
+          const data = (event as any)?.data;
+          if (data && typeof data === 'object' && data.type === 'CACHE_STATUS') {
+            window.clearTimeout(timeout);
+            navigator.serviceWorker.removeEventListener('message', onMessage as any);
+            resolve(data);
+          }
+        };
+        navigator.serviceWorker.addEventListener('message', onMessage as any);
+        target.postMessage({ type: 'GET_CACHE_STATUS' });
+      });
+
+      if (payload?.error) {
+        setOfflineInfo(`Cache status error: ${String(payload.error).slice(0, 140)}`);
+        return;
+      }
+      const entries = Array.isArray(payload?.entries) ? payload.entries : [];
+      const top = entries
+        .slice()
+        .sort((a: any, b: any) => (b?.entries ?? 0) - (a?.entries ?? 0))
+        .slice(0, 10)
+        .map((x: any) => `${String(x?.name ?? 'cache')}: ${String(x?.entries ?? '?')}`)
+        .join('\n');
+      const header = `Caches: ${payload?.cacheCount ?? entries.length}`;
+      setOfflineCacheStatus(top ? `${header}\n${top}` : header);
     } catch (e) {
       setOfflineInfo(String(e instanceof Error ? e.message : e).slice(0, 160));
     } finally {
@@ -497,6 +552,18 @@ export default function SettingsPage() {
                   >
                     Clear offline cache
                   </button>
+                  <button
+                    type="button"
+                    className={
+                      offlineBusy
+                        ? 'px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-mono opacity-60 cursor-not-allowed'
+                        : 'px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-mono'
+                    }
+                    onClick={refreshOfflineCacheStatus}
+                    disabled={offlineBusy}
+                  >
+                    Cache status
+                  </button>
                 </div>
               </div>
 
@@ -504,6 +571,12 @@ export default function SettingsPage() {
                 <div className="mt-4 rounded-xl border border-white/10 bg-black/30 p-3 text-white/80 text-sm">
                   {offlineInfo}
                 </div>
+              ) : null}
+
+              {offlineCacheStatus ? (
+                <pre className="mt-4 whitespace-pre-wrap rounded-xl border border-white/10 bg-black/30 p-3 text-white/80 text-xs font-mono">
+                  {offlineCacheStatus}
+                </pre>
               ) : null}
             </section>
 
@@ -524,7 +597,17 @@ export default function SettingsPage() {
                   <div className="rounded-xl border border-white/10 bg-black/30 p-4">
                     <div className="text-white/90 font-medium">Telegram Login</div>
                     <div className="mt-1 text-white/70 text-sm">Authenticate once to bind your Telegram account.</div>
-                    <div id="telegram-link" className="mt-3" />
+                    {telegramWidgetEnabled ? (
+                      <div id="telegram-link" className="mt-3" />
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn-gold text-sm disabled:opacity-60 mt-3"
+                        onClick={() => setTelegramWidgetEnabled(true)}
+                      >
+                        Load Telegram
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div className="rounded-xl border border-white/10 bg-black/30 p-4">

@@ -1,5 +1,5 @@
 import { ExternalLink } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef,useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef,useState } from 'react';
 
 import {
   Sheet,
@@ -8,8 +8,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { useSpecialNftBadge } from '@/hooks/useSpecialNftBadge';
 import { useTonNetwork } from '@/hooks/useTonNetwork';
+import { useTonConnectFeature } from '@/tonconnect/TonConnectFeatureContext';
 import { localizePathname, parseUrlLocaleFromPathname, urlLocaleFromLang } from '@/i18n/urlRouting';
 import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 import { skillSeedFromLabel,standardSkillBurst } from '@/lib/meshSkillFeed';
@@ -23,8 +23,8 @@ import LanguageSelector from './LanguageSelector';
 import RegionSelector from './RegionSelector';
 import { SolarisLogoMark } from './SolarisLogoMark';
 import ThemeToggle from './ThemeToggle';
-import WalletBalance from './WalletBalance';
-import WalletConnect from './WalletConnect';
+
+const TonConnectNavCluster = lazy(() => import('./TonConnectNavCluster').then((m) => ({ default: m.TonConnectNavCluster })));
 
 const MOBILE_MENU_FOCUSABLE_SELECTOR =
   'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -63,15 +63,16 @@ function tryFocusFirstFocusable(nodes: NodeListOf<HTMLElement>): void {
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const progressBarRef = useRef<HTMLDivElement>(null);
+  const scrollRafRef = useRef<number>(0);
+  const isScrolledRef = useRef<boolean | null>(null);
   const mobileMenuToggleRef = useRef<HTMLButtonElement>(null);
   const mobileMenuContentRef = useRef<HTMLDivElement>(null);
   /** True after the sheet has been opened at least once — avoids focusing the menu button on first mount. */
   const wasMobileMenuOpenRef = useRef(false);
   const { t, lang } = useLanguage();
   const { network, setNetwork } = useTonNetwork();
-  const { hasSpecial } = useSpecialNftBadge();
+  const { ready: tonConnectReady, enable: enableTonConnect } = useTonConnectFeature();
 
   const navLinks = useMemo(
     () =>
@@ -105,16 +106,34 @@ const Navigation = () => {
   });
 
   useEffect(() => {
-    const handleScroll = () => {
+    const apply = () => {
+      scrollRafRef.current = 0;
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      setIsScrolled(scrollTop > 80);
-      setScrollProgress(docHeight > 0 ? (scrollTop / docHeight) * 100 : 0);
+      const nextIsScrolled = scrollTop > 80;
+      const prevIsScrolled = isScrolledRef.current;
+      if (prevIsScrolled === null || prevIsScrolled !== nextIsScrolled) {
+        isScrolledRef.current = nextIsScrolled;
+        setIsScrolled(nextIsScrolled);
+      }
+      const nextProgress = docHeight > 0 ? Math.max(0, Math.min(100, (scrollTop / docHeight) * 100)) : 0;
+      const bar = progressBarRef.current;
+      if (bar) bar.style.width = `${nextProgress}%`;
     };
 
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => {
+      if (scrollRafRef.current) return;
+      scrollRafRef.current = window.requestAnimationFrame(apply);
+    };
+
+    apply();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (scrollRafRef.current) window.cancelAnimationFrame(scrollRafRef.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -278,7 +297,7 @@ const Navigation = () => {
         ref={progressBarRef}
         className="absolute bottom-0 left-0 h-[1px] transition-none"
         style={{
-          width: `${scrollProgress}%`,
+          width: '0%',
           background:
             'linear-gradient(90deg, var(--solaris-gold), var(--solaris-cyan), rgb(167 139 250), var(--solaris-gold))',
           backgroundSize: '200% 100%',
@@ -360,16 +379,23 @@ const Navigation = () => {
                 <RegionSelector />
                 <ThemeToggle />
               </div>
-              <div className="flex flex-col items-end gap-1 shrink-0">
-                <WalletConnect />
-                <WalletBalance />
-                <HeaderTrustStrip />
-              </div>
-              {hasSpecial ? (
-                <div className="hidden xl:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-400/10 border border-emerald-400/20">
-                  <span className="text-[10px] font-mono text-emerald-200">SPECIAL NFT</span>
+              {tonConnectReady ? (
+                <Suspense fallback={null}>
+                  <TonConnectNavCluster />
+                </Suspense>
+              ) : (
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  <button
+                    type="button"
+                    className="ton-connect-btn"
+                    data-testid="wallet-connect-button"
+                    onClick={() => enableTonConnect({ openModal: true })}
+                  >
+                    Connect Wallet
+                  </button>
+                  <HeaderTrustStrip />
                 </div>
-              ) : null}
+              )}
               <HeaderPriceTicker />
               <div className="flex items-center gap-1 rounded-full border border-white/10 bg-white/5 p-1">
                 <button
@@ -509,11 +535,23 @@ const Navigation = () => {
                 <LanguageSelector />
                 <RegionSelector />
                 <ThemeToggle />
-                <div className="w-full flex flex-col items-center gap-2">
-                  <WalletConnect />
-                  <WalletBalance className="justify-center" />
-                  <HeaderTrustStrip align="center" />
-                </div>
+                {tonConnectReady ? (
+                  <Suspense fallback={null}>
+                    <TonConnectNavCluster align="center" />
+                  </Suspense>
+                ) : (
+                  <div className="w-full flex flex-col items-center gap-2">
+                    <button
+                      type="button"
+                      className="ton-connect-btn"
+                      data-testid="wallet-connect-button"
+                      onClick={() => enableTonConnect({ openModal: true })}
+                    >
+                      Connect Wallet
+                    </button>
+                    <HeaderTrustStrip align="center" />
+                  </div>
+                )}
               </div>
               <div
                 className={cn(

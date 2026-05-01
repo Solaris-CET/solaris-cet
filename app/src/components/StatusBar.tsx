@@ -80,12 +80,13 @@ export default function StatusBar({ className }: { className?: string }) {
     return (health?.status ?? '').toLowerCase() === 'healthy';
   }, [failed, health?.status, online]);
 
-  if (dismissed) return null;
+  if (dismissed && online) return null;
 
   return (
     <div
       className={cn(
-        'fixed bottom-0 left-0 right-0 z-[120] hidden sm:block',
+        'fixed bottom-0 left-0 right-0 z-[120]',
+        online ? 'hidden sm:block' : 'block',
         'backdrop-blur-md bg-slate-950/60 border-t border-white/10 pointer-events-none',
         className,
       )}
@@ -111,14 +112,16 @@ export default function StatusBar({ className }: { className?: string }) {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={dismiss}
-          className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-white/10 bg-white/5 text-solaris-muted hover:text-solaris-text hover:bg-white/10 transition-colors pointer-events-auto"
-          aria-label="Dismiss status bar"
-        >
-          <X className="w-4 h-4" aria-hidden />
-        </button>
+        {online ? (
+          <button
+            type="button"
+            onClick={dismiss}
+            className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-white/10 bg-white/5 text-solaris-muted hover:text-solaris-text hover:bg-white/10 transition-colors pointer-events-auto"
+            aria-label="Dismiss status bar"
+          >
+            <X className="w-4 h-4" aria-hidden />
+          </button>
+        ) : null}
       </div>
     </div>
   );

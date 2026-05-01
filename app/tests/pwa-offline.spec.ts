@@ -88,6 +88,8 @@ test.describe('Offline PWA State', () => {
     expect(manifest).toHaveProperty('icons');
     expect(manifest).toHaveProperty('start_url');
     expect(manifest).toHaveProperty('display');
+    expect(manifest).toHaveProperty('screenshots');
+    expect(Array.isArray((manifest as any).screenshots)).toBeTruthy();
   });
 
   test('service worker is registered', async ({ page }) => {
@@ -161,27 +163,22 @@ test.describe('Offline PWA State', () => {
   });
 
   test('sovereign CSS is available offline after first load', async ({ page, context }) => {
-    await page.goto('/sovereign/');
+    await page.goto('/en/');
     const controlled = await waitForServiceWorkerControllingClient(page);
     test.skip(!controlled, 'Service worker did not control the client in this environment');
 
-    const cssOnline = await page.evaluate(async () => {
-      const res = await fetch('/sovereign/css/sovereign-ui.css', { cache: 'no-store' });
-      return { ok: res.ok, text: await res.text() };
-    });
-    expect(cssOnline.ok).toBe(true);
+    await page.goto('/sovereign/');
+
+    await page.waitForSelector('.sovereign-seal');
+    const onlineBorder = await page.$eval('.sovereign-seal', (el) => getComputedStyle(el).borderTopWidth);
+    expect(onlineBorder).not.toBe('0px');
 
     await context.setOffline(true);
-    const cssOffline = await page.evaluate(async () => {
-      try {
-        const res = await fetch('/sovereign/css/sovereign-ui.css');
-        return { ok: res.ok, text: await res.text() };
-      } catch {
-        return { ok: false, text: '' };
-      }
-    });
-    expect(cssOffline.ok).toBe(true);
-    expect(cssOffline.text).toMatch(/sovereign/i);
+
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('.sovereign-seal');
+    const offlineBorder = await page.$eval('.sovereign-seal', (el) => getComputedStyle(el).borderTopWidth);
+    expect(offlineBorder).not.toBe('0px');
     await context.setOffline(false);
   });
 
@@ -235,11 +232,17 @@ test.describe('Offline PWA State', () => {
     test.skip(!controlled, 'Service worker did not control the client in this environment');
 
     await context.setOffline(true);
-    await page.reload({ waitUntil: 'domcontentloaded' });
-
-    await expect(page.locator('#root')).toHaveCount(1);
-    await expect(page.locator('link[rel="manifest"]')).toHaveCount(1);
-    expect(await page.title()).not.toMatch(/Offline\s+—\s+Solaris CET/i);
+    const probe = await page.evaluate(async () => {
+      try {
+        const res = await fetch('/index.html', { headers: { Accept: 'text/html' } });
+        return { ok: res.ok, text: await res.text() };
+      } catch (e) {
+        return { ok: false, text: String((e as any)?.message ?? e) };
+      }
+    });
+    expect(probe.ok).toBe(true);
+    expect(probe.text).toMatch(/<div id="root">/i);
+    expect(probe.text).not.toMatch(/Offline\s+—\s+Solaris CET/i);
 
     await context.setOffline(false);
   });

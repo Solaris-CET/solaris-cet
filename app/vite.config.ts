@@ -10,7 +10,6 @@ import { compression } from "vite-plugin-compression2"
 import { VitePWA } from 'vite-plugin-pwa'
 
 import { OG_IMAGE_FILENAME, SOLARIS_CET_LOGO_FILENAME } from "./src/lib/brandAssetFilenames"
-import { DEDUST_POOL_DEPOSIT_URL } from "./src/lib/dedustUrls"
 
 function inlineCriticalCssAndAsyncStyles(): Plugin {
   const criticalPath = path.resolve(process.cwd(), 'src/critical.css')
@@ -37,7 +36,7 @@ function inlineCriticalCssAndAsyncStyles(): Plugin {
       let nextHtml = html
 
       for (const { tag, href } of candidates) {
-        const preload = `<link rel="preload" as="style" href="${esc(href)}" data-async-css="1" fetchpriority="high">`
+        const preload = `<link rel="preload" as="style" href="${esc(href)}" data-async-css="1">`
         nextHtml = nextHtml.replace(tag, preload)
       }
 
@@ -56,6 +55,56 @@ function inlineCriticalCssAndAsyncStyles(): Plugin {
       }
 
       return nextHtml
+    },
+  }
+}
+
+function fixReownPhosphorImports(): Plugin {
+  const prefix = '../node_modules/@phosphor-icons/webcomponents/dist/icons/'
+  const barePrefix = '@phosphor-icons/webcomponents/'
+  return {
+    name: 'fix-reown-phosphor-imports',
+    enforce: 'pre',
+    resolveId(source) {
+      if (source.startsWith(prefix)) {
+        const rel = source.slice('../node_modules/'.length)
+        return path.resolve(__dirname, '..', 'node_modules', rel)
+      }
+      if (source.startsWith(barePrefix)) {
+        const icon = source.slice(barePrefix.length)
+        return path.resolve(__dirname, '..', 'node_modules', '@phosphor-icons', 'webcomponents', 'dist', 'icons', `${icon}.mjs`)
+      }
+      return null
+    },
+  }
+}
+
+function fixPhosphorWebcomponentsLitImports(): Plugin {
+  const litPnpmRe = /node_modules\/\.pnpm\/[^/]+\/node_modules\/(@lit\/reactive-element\/.+)$/i
+  const litPkgPnpmRe = /@lit_reactive-element@[^/]+\/node_modules\/(@lit\/reactive-element\/.+)$/i
+  const litMjsRe = /^@lit\/reactive-element\/(.+)\.mjs$/i
+  return {
+    name: 'fix-phosphor-webcomponents-lit-imports',
+    enforce: 'pre',
+    resolveId(source) {
+      const mjs = source.match(litMjsRe)
+      if (mjs) return `@lit/reactive-element/${mjs[1]}.js`
+
+      const m1 = source.match(litPnpmRe)
+      if (m1) {
+        const id = m1[1]
+        if (id.endsWith('.mjs')) return `${id.slice(0, -4)}.js`
+        return id
+      }
+
+      const m2 = source.match(litPkgPnpmRe)
+      if (m2) {
+        const id = m2[1]
+        if (id.endsWith('.mjs')) return `${id.slice(0, -4)}.js`
+        return id
+      }
+
+      return null
     },
   }
 }
@@ -157,7 +206,14 @@ const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN?.trim()
 const sentryUrl = process.env.SENTRY_URL?.trim()
 const sentryEnabled = Boolean(sentryOrg && sentryProject && sentryAuthToken)
 
-const plugins: PluginOption[] = [previewHealthJson(), injectGoogleSiteVerification(), react(), inlineCriticalCssAndAsyncStyles()]
+const plugins: PluginOption[] = [
+  fixReownPhosphorImports(),
+  fixPhosphorWebcomponentsLitImports(),
+  previewHealthJson(),
+  injectGoogleSiteVerification(),
+  react(),
+  inlineCriticalCssAndAsyncStyles(),
+]
 
 if (sentryEnabled) {
   plugins.push(
@@ -176,7 +232,7 @@ if (sentryEnabled) {
 
 plugins.push(
   compression({
-    algorithms: ["brotliCompress"],
+    algorithms: ["brotliCompress", "gzip"],
     exclude: [/\.(br)$/, /\.(gz)$/],
     threshold: 1024,
   }) as unknown as PluginOption,
@@ -188,85 +244,31 @@ plugins.push(
     strategies: 'injectManifest',
     srcDir: 'src',
     filename: 'sw.js',
-    manifestFilename: 'manifest.json',
     includeAssets: [
       'favicon.svg',
+      'favicon-16x16.png',
+      'favicon-32x32.png',
       'icon-192.png',
       'icon-512.png',
+      'apple-touch-icon.png',
+      'safari-pinned-tab.svg',
       SOLARIS_CET_LOGO_FILENAME,
+      'solaris-cet-logo-emblem-190.jpg',
       OG_IMAGE_FILENAME,
+      'phone-mockup.png',
+      'hero-coin.png',
+      'cinematic/cosmic-poster-768.webp',
+      'cinematic/cosmic-poster-1024.webp',
+      'cinematic/cosmic-poster-768.jpg',
+      'cinematic/cosmic-poster-1024.jpg',
+      'fonts/jetbrains-mono-400.woff2',
       'offline.html',
+      'offline-ro.html',
       'offline-image.svg',
     ],
-    manifest: {
-      name: 'Solaris CET',
-      short_name: 'Solaris',
-      description: 'Solaris CET — hyper-scarce RWA on TON: 9,000 CET, 90-year mining, Grok×Gemini Oracle, ~200k task agents, BRAID + RAV.',
-      theme_color: '#05060B',
-      background_color: '#05060B',
-      display: 'standalone',
-      display_override: ['standalone', 'minimal-ui', 'browser'],
-      orientation: 'portrait-primary',
-      start_url: '/en/',
-      scope: '/',
-      categories: ['finance', 'business', 'utilities'],
-      lang: 'en',
-      id: '/',
-      icons: [
-        {
-          src: 'icon-192.png',
-          sizes: '192x192',
-          type: 'image/png',
-          purpose: 'any maskable',
-        },
-        {
-          src: 'icon-512.png',
-          sizes: '512x512',
-          type: 'image/png',
-          purpose: 'any maskable',
-        },
-        {
-          src: 'favicon.svg',
-          sizes: 'any',
-          type: 'image/svg+xml',
-          purpose: 'any maskable',
-        },
-      ],
-      shortcuts: [
-        {
-          name: 'Buy CET on DeDust',
-          short_name: 'Buy CET',
-          url: DEDUST_POOL_DEPOSIT_URL,
-        },
-        {
-          name: 'Start Mining on Telegram',
-          short_name: 'Mine CET',
-          url: 'https://t.me/+tKlfzx7IWopmNWQ0',
-        },
-        {
-          name: 'How to buy CET',
-          short_name: 'Buy guide',
-          url: '/#how-to-buy',
-        },
-        {
-          name: 'Compare vs AI tokens',
-          short_name: 'Compare',
-          url: '/#competition',
-        },
-      ],
-      share_target: {
-        action: '/share',
-        method: 'GET',
-        enctype: 'application/x-www-form-urlencoded',
-        params: {
-          title: 'title',
-          text: 'text',
-          url: 'url',
-        },
-      },
-    },
+    manifest: false,
     injectManifest: {
-      globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json,webmanifest}'],
+      globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,jpg,jpeg,webp,json,webmanifest}'],
       globIgnores: [
         '**/vendor/onnxruntime/**',
         '**/assets/mermaid-*.js*',
@@ -298,6 +300,20 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
+    modulePreload: {
+      resolveDependencies(_filename, deps) {
+        const blocked = [
+          '@react-three/drei',
+          '@react-three/postprocessing',
+          '@monogrid/gainmap',
+          'gsap',
+          '@tonconnect/ui',
+          '@tonconnect/sdk',
+          '@walletconnect/',
+        ];
+        return deps.filter((d) => !blocked.some((b) => d.includes(b)));
+      },
+    },
     rollupOptions: {
       output: {
         manualChunks(id: string) {

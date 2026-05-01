@@ -1,5 +1,6 @@
-import matter from 'gray-matter'
 import { marked } from 'marked'
+
+import { extractFrontmatter } from './frontmatter'
 
 import launchEn from '../content/blog/en/launch.md?raw'
 import launchEs from '../content/blog/es/launch.md?raw'
@@ -81,7 +82,7 @@ const rawIndex: RawIndexItem[] = Object.entries(rawModules)
   .map(([path, markdown]) => {
     const meta = extractLocaleAndSlug(path)
     if (!meta) return null
-    const parsed = matter(markdown)
+    const parsed = extractFrontmatter(markdown)
     const frontmatter = parseFrontmatter(parsed.data)
     return {
       slug: meta.slug,

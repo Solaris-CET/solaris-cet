@@ -18,20 +18,19 @@
  * `runtime: 'edge'` matches edge-style adapters and compatible hosts (e.g. Coolify).
  */
 import OpenAI from 'openai';
-
-import { TOKEN_DECIMALS } from '../../src/constants/token';
-import { CET_AI_MAX_QUERY_CHARS } from '../../src/lib/cetAiConstants';
-import { CET_CONTRACT_ADDRESS } from '../../src/lib/cetContract';
-import { DEDUST_POOL_ADDRESS } from '../../src/lib/dedustUrls';
-import { getAiChatCache, getCacheTtlSeconds, setAiChatCache, sha256Hex } from '../lib/aiCache';
-import { buildCetAiRetrievalBlock } from '../lib/cetAiRetrieval';
-import { circuitAllows, circuitReportFailure, circuitReportSuccess } from '../lib/circuitBreaker';
-import { clientIp } from '../lib/clientIp';
-import { acquireConcurrencySlot } from '../lib/concurrencyLimit';
 import { getAllowedOrigin } from '../lib/cors';
+import { getAiChatCache, getCacheTtlSeconds, setAiChatCache, sha256Hex } from '../lib/aiCache';
+import { clientIp } from '../lib/clientIp';
 import { resolveApiKey } from '../lib/crypto';
-import { withRateLimit } from '../lib/rateLimit';
+import { buildCetAiRetrievalBlock } from '../lib/cetAiRetrieval';
 import { decideCetAiRavPlan, deriveCetAiResourceBudget } from '../lib/reactBrain';
+import { acquireConcurrencySlot } from '../lib/concurrencyLimit';
+import { circuitAllows, circuitReportFailure, circuitReportSuccess } from '../lib/circuitBreaker';
+import { withRateLimit } from '../lib/rateLimit';
+import { CET_CONTRACT_ADDRESS } from '../../src/lib/cetContract';
+import { CET_AI_MAX_QUERY_CHARS } from '../../src/lib/cetAiConstants';
+import { DEDUST_POOL_ADDRESS } from '../../src/lib/dedustUrls';
+import { TOKEN_DECIMALS } from '../../src/constants/token';
 
 export const config = { runtime: 'edge' };
 

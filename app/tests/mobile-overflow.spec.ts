@@ -1,6 +1,6 @@
-import { expect,test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-import { scrollUntilSelectorAttached,waitForAppReady } from './e2e-helpers';
+import { scrollUntilSelectorAttached, waitForAppReady } from './e2e-helpers';
 
 type OverflowItem = {
   tag: string;
@@ -11,7 +11,7 @@ type OverflowItem = {
   width: number;
 };
 
-async function getOverflowing(page: import('@playwright/test').Page) {
+async function getOverflowing(page: any) {
   return page.evaluate(() => {
     const vw = window.innerWidth;
     const scrollWidth = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);

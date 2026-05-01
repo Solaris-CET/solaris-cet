@@ -1,23 +1,18 @@
-import matter from 'gray-matter';
-
-import cookiesRo from '@/content/legal/ro/cookies.md?raw';
 import type { CookieConsentState } from '@/lib/consent';
+
+import { LEGAL_DIGESTS } from '@/generated/legalDigests';
 
 const CONSENT_KEY_STORAGE = 'solaris_consent_key';
 
-function safePolicyVersion(): string {
-  try {
-    const parsed = matter(cookiesRo);
-    const v = (parsed.data as Record<string, unknown>).lastUpdated;
-    if (typeof v === 'string' && v.trim()) return v.trim().slice(0, 40);
-    if (typeof v === 'number' && Number.isFinite(v)) return String(v).slice(0, 40);
-    return new Date().toISOString().slice(0, 10);
-  } catch {
-    return new Date().toISOString().slice(0, 10);
-  }
+function resolveCookiePolicyDigest(locale?: string): { version: string; sha256: string | null } {
+  const fallback = LEGAL_DIGESTS.cookies.en;
+  const raw = (locale ?? '').trim().slice(0, 2).toLowerCase();
+  const byLocale = (LEGAL_DIGESTS.cookies as Record<string, { version: string; sha256: string }>)[raw];
+  const entry = byLocale ?? fallback;
+  const version = entry?.version?.trim().slice(0, 40) || new Date().toISOString().slice(0, 10);
+  const sha256 = entry?.sha256?.trim() ? entry.sha256.trim().slice(0, 128) : null;
+  return { version, sha256 };
 }
-
-const COOKIE_POLICY_VERSION = safePolicyVersion();
 
 export function getConsentKey(): string {
   if (typeof window === 'undefined') return '';
@@ -44,6 +39,7 @@ export async function recordConsentProof(input: {
 
   const source = input.source.trim() ? input.source.trim().slice(0, 60) : 'unknown';
   const locale = (input.locale ?? '').trim().slice(0, 10) || undefined;
+  const digest = resolveCookiePolicyDigest(locale);
 
   try {
     await fetch('/api/consent', {
@@ -55,7 +51,8 @@ export async function recordConsentProof(input: {
       body: JSON.stringify({
         consentKey,
         consent: { analytics: input.consent.analytics, marketing: input.consent.marketing },
-        policyVersion: COOKIE_POLICY_VERSION,
+        policyVersion: digest.version,
+        policyHash: digest.sha256,
         source,
         meta: {
           updatedAt: input.consent.updatedAt,
@@ -68,4 +65,3 @@ export async function recordConsentProof(input: {
     void 0;
   }
 }
-

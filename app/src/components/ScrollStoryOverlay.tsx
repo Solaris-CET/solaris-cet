@@ -1,11 +1,10 @@
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { CSSProperties } from 'react';
 import { memo, useEffect, useMemo, useRef } from 'react';
 
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useSessionSeed } from '@/hooks/useSessionSeed';
+import { loadGsapWithScrollTrigger } from '@/lib/gsapLazy';
 import { mulberry32 } from '@/lib/seed';
 
 type Variant = 'home' | 'rwa' | 'cet-ai' | 'demo';
@@ -69,47 +68,52 @@ function ScrollStoryOverlay({ routePath }: { routePath: string }) {
     })();
     if (isAudit) return;
 
-    const ctx = gsap.context(() => {
-      gsap.set(el, {
-        opacity: variant === 'demo' ? 0.42 : 0.34,
-        '--story-x': 42,
-        '--story-y': 28,
-        '--story-hue': 0,
-        '--story-scale': 1,
-      } as gsap.TweenVars);
+    let cancelled = false;
+    let ctx: { revert: () => void } | null = null;
+    void loadGsapWithScrollTrigger().then(({ gsap, ScrollTrigger }) => {
+      if (cancelled) return;
 
-      const setDemoBeat = (intensity: number) => {
-        if (variant !== 'demo') return;
-        if (typeof window === 'undefined') return;
-        const i = Math.max(0, Math.min(1, intensity));
-        document.documentElement.style.setProperty('--demo-beat', i.toFixed(3));
-        window.dispatchEvent(new CustomEvent('solaris:demoBeat', { detail: { intensity: i } }));
-      };
+      ctx = gsap.context(() => {
+        gsap.set(el, {
+          opacity: variant === 'demo' ? 0.42 : 0.34,
+          '--story-x': 42,
+          '--story-y': 28,
+          '--story-hue': 0,
+          '--story-scale': 1,
+        } as unknown as Record<string, unknown>);
 
-      setDemoBeat(0);
+        const setDemoBeat = (intensity: number) => {
+          if (variant !== 'demo') return;
+          if (typeof window === 'undefined') return;
+          const i = Math.max(0, Math.min(1, intensity));
+          document.documentElement.style.setProperty('--demo-beat', i.toFixed(3));
+          window.dispatchEvent(new CustomEvent('solaris:demoBeat', { detail: { intensity: i } }));
+        };
 
-      const applyBeat = (
-        x: number,
-        y: number,
-        hue: number,
-        opacity: number,
-        scale: number,
-        intensity: number,
-      ) => {
-        gsap.to(el, {
-          duration: isMobile ? 0.5 : 0.9,
-          ease: 'power3.out',
-          opacity,
-          '--story-x': x,
-          '--story-y': y,
-          '--story-hue': hue,
-          '--story-scale': scale,
-          overwrite: true,
-        } as gsap.TweenVars);
-        setDemoBeat(intensity);
-      };
+        setDemoBeat(0);
 
-      const beats =
+        const applyBeat = (
+          x: number,
+          y: number,
+          hue: number,
+          opacity: number,
+          scale: number,
+          intensity: number,
+        ) => {
+          gsap.to(el, {
+            duration: isMobile ? 0.5 : 0.9,
+            ease: 'power3.out',
+            opacity,
+            '--story-x': x,
+            '--story-y': y,
+            '--story-hue': hue,
+            '--story-scale': scale,
+            overwrite: true,
+          } as unknown as Record<string, unknown>);
+          setDemoBeat(intensity);
+        };
+
+        const beats =
         routePath === '/demo'
           ? [
               { sel: '#hero', x: 42, y: 24, hue: 0, o: 0.46, s: 1.02, i: 0.55 },
@@ -138,23 +142,27 @@ function ScrollStoryOverlay({ routePath }: { routePath: string }) {
               ? [{ sel: '#cet-ai', x: 50, y: 28, hue: 26, o: 0.36, s: 1.05, i: 0 }]
               : [];
 
-      const triggers = beats.map((b) =>
-        ScrollTrigger.create({
-          trigger: b.sel,
-          start: 'top 70%',
-          end: 'bottom 30%',
-          onEnter: () => applyBeat(b.x, b.y, b.hue, b.o, b.s, b.i),
-          onEnterBack: () => applyBeat(b.x, b.y, b.hue, b.o, b.s, b.i),
-        }),
-      );
+        const triggers = beats.map((b) =>
+          ScrollTrigger.create({
+            trigger: b.sel,
+            start: 'top 70%',
+            end: 'bottom 30%',
+            onEnter: () => applyBeat(b.x, b.y, b.hue, b.o, b.s, b.i),
+            onEnterBack: () => applyBeat(b.x, b.y, b.hue, b.o, b.s, b.i),
+          }),
+        );
 
-      return () => {
-        triggers.forEach((t) => t.kill());
-        setDemoBeat(0);
-      };
-    }, el);
+        return () => {
+          triggers.forEach((t) => t.kill());
+          setDemoBeat(0);
+        };
+      }, el);
+    });
 
-    return () => ctx.revert();
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
   }, [isMobile, lhci, reduced, routePath, variant]);
 
   if (lhci) return null;

@@ -1,5 +1,7 @@
 import { memo, useEffect, useMemo, useRef } from 'react';
 
+import { useDataSaver } from '@/hooks/useDataSaver';
+import { useDocumentHidden } from '@/hooks/useDocumentHidden';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useSessionSeed } from '@/hooks/useSessionSeed';
@@ -99,6 +101,8 @@ function drawFrame(
 function RouteSignatureLayer({ routePath }: { routePath: string }) {
   const reduced = useReducedMotion();
   const isMobile = useMediaQuery('(max-width: 767px)');
+  const hidden = useDocumentHidden();
+  const { enabled: dataSaver } = useDataSaver();
   const seed = useSessionSeed('routeSignature');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const variant = useMemo(() => routeVariant(routePath), [routePath]);
@@ -109,10 +113,21 @@ function RouteSignatureLayer({ routePath }: { routePath: string }) {
     return navAny.webdriver === true || /HeadlessChrome/i.test(navigator.userAgent);
   }, []);
 
+  const qualityTier = useMemo(() => {
+    if (dataSaver) return 'low';
+    if (typeof navigator !== 'undefined') {
+      const hc = (navigator as Navigator & { hardwareConcurrency?: number }).hardwareConcurrency;
+      if (typeof hc === 'number' && Number.isFinite(hc) && hc > 0 && hc <= 4) return 'low';
+    }
+    if (isMobile) return 'mid';
+    return 'high';
+  }, [dataSaver, isMobile]);
+
   useEffect(() => {
     if (lhci) return;
     if (isAudit) return;
     if (reduced) return;
+    if (hidden) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -120,11 +135,19 @@ function RouteSignatureLayer({ routePath }: { routePath: string }) {
 
     let raf = 0;
     let last = 0;
-    const fps = isMobile ? 22 : 30;
+    const fps =
+      qualityTier === 'low'
+        ? 16
+        : qualityTier === 'mid'
+          ? 22
+          : 30;
     const step = 1000 / fps;
 
     const resize = () => {
-      const dpr = isMobile ? 1 : Math.min(1.5, window.devicePixelRatio || 1);
+      const dpr =
+        isMobile || qualityTier === 'low'
+          ? 1
+          : Math.min(1.4, window.devicePixelRatio || 1);
       const w = Math.max(1, Math.floor(window.innerWidth * dpr));
       const h = Math.max(1, Math.floor(window.innerHeight * dpr));
       canvas.width = w;
@@ -143,7 +166,7 @@ function RouteSignatureLayer({ routePath }: { routePath: string }) {
       last = ts;
       const w = canvas.width;
       const h = canvas.height;
-      const density =
+      const densityBase =
         variant === 'demo'
           ? (isMobile ? 220 : 420)
           : variant === 'cet-ai'
@@ -151,6 +174,12 @@ function RouteSignatureLayer({ routePath }: { routePath: string }) {
             : variant === 'rwa'
               ? (isMobile ? 140 : 280)
               : (isMobile ? 120 : 240);
+      const density =
+        qualityTier === 'low'
+          ? Math.max(80, Math.floor(densityBase * 0.55))
+          : qualityTier === 'mid'
+            ? Math.max(100, Math.floor(densityBase * 0.75))
+            : densityBase;
       drawFrame(ctx, w, h, ts, variant, seed, density);
     };
 
@@ -159,7 +188,7 @@ function RouteSignatureLayer({ routePath }: { routePath: string }) {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(raf);
     };
-  }, [isAudit, isMobile, lhci, reduced, seed, variant]);
+  }, [hidden, isAudit, isMobile, lhci, qualityTier, reduced, seed, variant]);
 
   if (lhci || isAudit) return null;
 

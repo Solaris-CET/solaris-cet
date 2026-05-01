@@ -9,6 +9,9 @@ declare module 'virtual:pwa-register/react' {
   };
 }
 
+declare module '@sentry/browser';
+declare module 'onnxruntime-web';
+
 interface ImportMetaEnv {
   readonly VITE_GIT_COMMIT_HASH: string
   readonly VITE_BUILD_TIMESTAMP: string

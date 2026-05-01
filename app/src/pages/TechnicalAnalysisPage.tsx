@@ -2,6 +2,9 @@ import { useEffect, useId, useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useLanguage } from '@/hooks/useLanguage';
+import { localizePathname, parseUrlLocaleFromPathname, urlLocaleFromLang } from '@/i18n/urlRouting';
+import { onConsentChange, readStoredConsent } from '@/lib/consent';
 
 declare global {
   interface Window {
@@ -16,13 +19,23 @@ function clampSymbol(v: string): string {
 }
 
 export default function TechnicalAnalysisPage() {
+  const { lang, t } = useLanguage();
+  const ui = t.cookieUi;
   const [symbol, setSymbol] = useState('BINANCE:TONUSDT');
   const [draft, setDraft] = useState('BINANCE:TONUSDT');
+  const [externalEnabled, setExternalEnabled] = useState(() => readStoredConsent().marketing);
 
   const reactId = useId();
   const containerId = useMemo(() => `tv_${reactId.replace(/[^a-zA-Z0-9_-]/g, '')}`, [reactId]);
 
   useEffect(() => {
+    return onConsentChange((next) => {
+      setExternalEnabled(next.marketing);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!externalEnabled) return;
     const id = containerId;
     const mount = () => {
       const tv = window.TradingView;
@@ -57,12 +70,20 @@ export default function TechnicalAnalysisPage() {
     script.async = true;
     script.dataset.tv = 'tvjs';
     script.onload = () => mount();
+    const nonce = (document.querySelector('script[nonce]') as HTMLScriptElement | null)?.nonce;
+    if (nonce) script.setAttribute('nonce', nonce);
     document.head.appendChild(script);
 
     return () => {
       script.onload = null;
     };
-  }, [symbol, containerId]);
+  }, [symbol, containerId, externalEnabled]);
+
+  const urlLocale =
+    typeof window === 'undefined'
+      ? urlLocaleFromLang(lang)
+      : parseUrlLocaleFromPathname(window.location.pathname).locale ?? urlLocaleFromLang(lang);
+  const settingsHref = localizePathname('/privacy-settings', urlLocale);
 
   return (
     <main id="main-content" tabIndex={-1} className="min-h-[70vh] px-6 py-20">
@@ -80,9 +101,35 @@ export default function TechnicalAnalysisPage() {
           </div>
         </div>
 
-        <div className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-3">
-          <div id={containerId} className="h-[520px] w-full" />
-        </div>
+        {!externalEnabled ? (
+          <div className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-5">
+            <div className="text-white text-sm font-semibold">{ui.externalContentTitle}</div>
+            <p className="mt-2 text-white/70 text-sm leading-relaxed">{ui.externalContentBody}</p>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <Button onClick={() => setExternalEnabled(true)} className="rounded-xl">
+                {ui.loadExternalContent}
+              </Button>
+              <a
+                href={settingsHref}
+                className="text-xs font-semibold text-solaris-cyan hover:text-solaris-text underline underline-offset-4"
+              >
+                {ui.cookieSettings}
+              </a>
+            </div>
+          </div>
+        ) : null}
+
+        {externalEnabled ? (
+          <div className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-3">
+            <div id={containerId} className="h-[520px] w-full" />
+          </div>
+        ) : (
+          <div className="mt-8 rounded-2xl border border-white/10 bg-black/20 p-3">
+            <div className="h-[520px] w-full flex items-center justify-center text-white/50 text-sm">
+              {ui.externalContentTitle}
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

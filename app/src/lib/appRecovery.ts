@@ -1,4 +1,5 @@
 const DEFAULT_KEY = 'solaris_recover_once_v1'
+const PENDING_ANALYTICS_KEY = 'solaris_pending_analytics_event_v1'
 
 function asString(value: unknown): string {
   if (typeof value === 'string') return value
@@ -46,5 +47,16 @@ export async function recoverAppOnce(key = DEFAULT_KEY): Promise<void> {
 
   const url = new URL(window.location.href)
   url.searchParams.set('v', String(Date.now()))
+  try {
+    const payload = {
+      name: 'pwa_recovery',
+      ts: Date.now(),
+      key,
+      pathname: url.pathname,
+    }
+    sessionStorage.setItem(PENDING_ANALYTICS_KEY, JSON.stringify(payload))
+  } catch {
+    void 0
+  }
   window.location.replace(url.toString())
 }

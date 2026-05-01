@@ -5,6 +5,7 @@ import { PredictiveTerrainHeatmap } from '@/components/PredictiveTerrainHeatmap'
 import { RwaDocumentsPanel } from '@/components/rwa/RwaDocumentsPanel';
 import { RwaPortfolioMap } from '@/components/rwa/RwaPortfolioMap';
 import { RwaTimelinePanel } from '@/components/rwa/RwaTimelinePanel';
+import { VirtualAgriculturalLandShowcase } from '@/components/rwa/VirtualAgriculturalLandShowcase';
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
@@ -36,12 +37,10 @@ const PHYSICAL_ASSET_PLACEHOLDER_BG =
       <rect fill="url(#pa)" width="1920" height="800"/>
       <rect fill="url(#grain)" width="1920" height="800"/>
       <ellipse cx="960" cy="620" rx="900" ry="120" fill="rgba(16,185,129,0.08)"/>
-      <text x="960" y="380" text-anchor="middle" fill="rgba(242,201,76,0.22)" font-family="ui-sans-serif,system-ui,sans-serif" font-size="22" font-weight="700">Cetățuia, Romania</text>
-      <text x="960" y="420" text-anchor="middle" fill="rgba(148,163,184,0.45)" font-family="ui-monospace,monospace" font-size="14">Cetățuia, România · teren agricol</text>
+      <text x="960" y="380" text-anchor="middle" fill="rgba(242,201,76,0.22)" font-family="ui-sans-serif,system-ui,sans-serif" font-size="22" font-weight="700">Cetățuia (virtual)</text>
+      <text x="960" y="420" text-anchor="middle" fill="rgba(148,163,184,0.45)" font-family="ui-monospace,monospace" font-size="14">Virtual agricultural land · simulation layer</text>
     </svg>`
   );
-
-const DEFAULT_PHYSICAL_ASSET_PHOTO_URL = '/rwa/cetatuia.jpg';
 
 function ipfsCidFromUrl(url: string): string | null {
   const m = url.match(/\/ipfs\/([^/?#]+)/i);
@@ -56,17 +55,18 @@ function clamp(n: number, min: number, max: number): number {
 
 const RWA_STATS = [
   { label: 'Location',       value: 'Cetățuia, Romania',   icon: MapPin,    color: 'text-emerald-400', border: 'border-emerald-400/20' },
-  { label: 'Asset Class',    value: 'Agricultural Land',   icon: Leaf,      color: 'text-solaris-gold', border: 'border-solaris-gold/20' },
+  { label: 'Asset Class',    value: 'Virtual Agricultural Land',   icon: Leaf,      color: 'text-solaris-gold', border: 'border-solaris-gold/20' },
   { label: 'AI Integration', value: 'Precision Farming',   icon: Sun,       color: 'text-solaris-cyan', border: 'border-solaris-cyan/20' },
   { label: 'On-Chain Proof', value: 'IPFS + TON L1',       icon: Shield,    color: 'text-purple-400',   border: 'border-purple-400/20'  },
-  { label: 'Yield Type',     value: 'Agricultural + Token', icon: TrendingUp,color: 'text-amber-400',    border: 'border-amber-400/20'  },
+  { label: 'Yield Type',     value: 'Simulation + Token', icon: TrendingUp,color: 'text-amber-400',    border: 'border-amber-400/20'  },
   { label: 'Token Layer',    value: 'CET · 9,000 supply',  icon: Layers,    color: 'text-pink-400',     border: 'border-pink-400/20'   },
 ];
 
 const RWA_PILLARS = [
   {
     title: 'Tangible Backing',
-    description: 'Every CET token is backed by productive agricultural land in Cetățuia, Romania — not speculative promises. The land generates real-world agricultural yield independent of crypto market cycles.',
+    description:
+      'Every CET token is anchored to a virtual agricultural land layer (a digital twin of Cetățuia, Romania) — not speculative promises. The virtual grid is backed by a public evidence bundle and is designed to link operations to on-chain proofs.',
     icon: Leaf,
     color: 'text-emerald-400',
     bg: 'bg-emerald-400/10',
@@ -74,7 +74,8 @@ const RWA_PILLARS = [
   },
   {
     title: 'On-Chain Transparency',
-    description: 'All land ownership documents, agricultural records, and AI farming reports are stored on IPFS and anchored to TON L1. Any holder can verify the backing assets without trusting a third party.',
+    description:
+      'Specs, maps, and validation artifacts can be stored on IPFS and anchored to TON L1. Any holder can verify the evidence bundle without trusting a third party.',
     icon: Shield,
     color: 'text-solaris-cyan',
     bg: 'bg-solaris-cyan/10',
@@ -82,7 +83,7 @@ const RWA_PILLARS = [
   },
   {
     title: 'AI-Optimised Yield',
-    description: 'Solaris CET\'s ~200,000 task-specialist AI agents coordinate agricultural operations — soil analysis, crop rotation planning, weather prediction, and irrigation scheduling — with CET AI–orchestrated validation, maximising yield sustainably.',
+    description: 'Solaris CET\'s task-specialist AI agents can simulate strategies (soil/rotation/weather/irrigation) and publish verifiable reports, maximising modeled outcomes sustainably.',
     icon: Sun,
     color: 'text-solaris-gold',
     bg: 'bg-solaris-gold/10',
@@ -90,7 +91,7 @@ const RWA_PILLARS = [
   },
   {
     title: 'Structural Scarcity',
-    description: 'With only 9,000 CET ever minted, each token represents a proportional share of a unique real-world asset. No competitor combines AI agent infrastructure with hard-capped supply and physical asset backing.',
+    description: 'With only 9,000 CET ever minted, each token maps to a proportional share of the virtual land layer. Digital scarcity meets verifiable infrastructure and transparent proof surfaces.',
     icon: TrendingUp,
     color: 'text-purple-400',
     bg: 'bg-purple-400/10',
@@ -150,8 +151,11 @@ const RwaSection = () => {
   }, [selectedProject]);
 
   useEffect(() => {
-    const configured = import.meta.env.VITE_RWA_PHOTO_URL;
-    const candidate = configured?.trim() ? configured.trim() : DEFAULT_PHYSICAL_ASSET_PHOTO_URL;
+    const candidate = String(import.meta.env.VITE_RWA_PHOTO_URL ?? '').trim();
+    if (!candidate) {
+      setPhysicalAssetPhotoUrl(null);
+      return;
+    }
     const img = new Image();
     img.decoding = 'async';
     img.onload = () => setPhysicalAssetPhotoUrl(candidate);
@@ -167,10 +171,15 @@ const RwaSection = () => {
     if (isBelowDesktop) return;
 
     let raf = 0;
+    let bgTop = 0;
+
+    const measure = () => {
+      bgTop = bg.getBoundingClientRect().top + window.scrollY;
+    };
     const update = () => {
       raf = 0;
-      const rect = bg.getBoundingClientRect();
-      const offset = clamp(rect.top, -900, 900);
+      const top = bgTop - window.scrollY;
+      const offset = clamp(top, -900, 900);
       const y = clamp(offset * -0.08, -48, 48);
       bg.style.transform = `translate3d(0, ${y}px, 0) scale(1.05)`;
     };
@@ -180,12 +189,18 @@ const RwaSection = () => {
       raf = window.requestAnimationFrame(update);
     };
 
+    const onResize = () => {
+      measure();
+      onScroll();
+    };
+
+    measure();
     update();
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
+    window.addEventListener('resize', onResize);
     return () => {
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
+      window.removeEventListener('resize', onResize);
       if (raf) window.cancelAnimationFrame(raf);
       bg.style.transform = '';
     };
@@ -326,6 +341,20 @@ const RwaSection = () => {
             );
           })}
         </ScrollStaggerFadeUp>
+
+        <ScrollFadeUp>
+          <div className="mb-12">
+            <VirtualAgriculturalLandShowcase
+              ui={t.virtualLandUi}
+              metrics={{
+                cetSupply: '9k',
+                totalLand: '47 ha (sim)',
+                parcels: 312,
+                tokenLandRatio: '1:1',
+              }}
+            />
+          </div>
+        </ScrollFadeUp>
 
         <PredictiveTerrainHeatmap />
 

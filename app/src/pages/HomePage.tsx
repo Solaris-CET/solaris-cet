@@ -93,7 +93,9 @@ export default function HomePage({ heroCinematic = false }: { heroCinematic?: bo
         <div className="relative z-20">
           <ErrorBoundary>
             <ScrollFadeUp>
-              <IntelligenceCoreSection />
+              <LazyLoadWrapper>
+                <IntelligenceCoreSection />
+              </LazyLoadWrapper>
             </ScrollFadeUp>
           </ErrorBoundary>
         </div>
@@ -136,7 +138,9 @@ export default function HomePage({ heroCinematic = false }: { heroCinematic?: bo
         </div>
         <ErrorBoundary>
           <ScrollFadeUp>
-            <TokenomicsSection />
+            <LazyLoadWrapper>
+              <TokenomicsSection />
+            </LazyLoadWrapper>
           </ScrollFadeUp>
         </ErrorBoundary>
       </section>

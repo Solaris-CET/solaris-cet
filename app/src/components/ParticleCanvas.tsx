@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 
+import { useDocumentHidden } from '@/hooks/useDocumentHidden';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
 
 interface Particle {
@@ -74,16 +76,33 @@ const ParticleCanvas = ({
   const particlesRef = useRef<Particle[]>([]);
   const mouseRef = useRef({ x: -9999, y: -9999 });
   const rafRef = useRef<number>(0);
+  const rectRef = useRef({ left: 0, top: 0 });
+  const prefersReducedMotion = useReducedMotion();
+  const hidden = useDocumentHidden();
 
   useEffect(() => {
+    if (prefersReducedMotion) return;
+    if (hidden) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    let measureRaf = 0;
+    const measure = () => {
+      measureRaf = 0;
+      const rect = canvas.getBoundingClientRect();
+      rectRef.current = { left: rect.left, top: rect.top };
+    };
+    const measureSoon = () => {
+      if (measureRaf) return;
+      measureRaf = window.requestAnimationFrame(measure);
+    };
+
     const resize = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
+      measureSoon();
     };
     resize();
 
@@ -104,10 +123,13 @@ const ParticleCanvas = ({
 
     const handleMouseMove = (e: MouseEvent) => {
       if (!mouseInteraction) return;
-      const rect = canvas.getBoundingClientRect();
+      const rect = rectRef.current;
       mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     };
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
+
+    window.addEventListener('scroll', measureSoon, { passive: true });
+    window.addEventListener('resize', measureSoon, { passive: true });
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -195,9 +217,12 @@ const ParticleCanvas = ({
     return () => {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', measureSoon);
+      window.removeEventListener('resize', measureSoon);
+      if (measureRaf) window.cancelAnimationFrame(measureRaf);
       ro.disconnect();
     };
-  }, [count, connectionRadius, mouseInteraction]);
+  }, [count, connectionRadius, mouseInteraction, hidden, prefersReducedMotion]);
 
   return (
     <div className={`relative h-full w-full ${className}`}>

@@ -1,5 +1,6 @@
 const http = require('node:http');
 const crypto = require('node:crypto');
+const zlib = require('node:zlib');
 const { readFile, stat } = require('node:fs/promises');
 const fs = require('node:fs');
 const { createReadStream } = fs;
@@ -465,6 +466,11 @@ function shouldServeBrotli(req) {
   return accept.includes('br');
 }
 
+function shouldServeGzip(req) {
+  const accept = String(req.headers['accept-encoding'] ?? '');
+  return accept.includes('gzip');
+}
+
 const contentTypes = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -628,7 +634,7 @@ async function readBodyLimited(req, maxBytes) {
 
 async function serveFile(res, absPath) {
   const ext = path.extname(absPath).toLowerCase();
-  const basePath = ext === '.br' ? absPath.slice(0, -3) : absPath;
+  const basePath = ext === '.br' || ext === '.gz' ? absPath.slice(0, -3) : absPath;
   const baseExt = path.extname(basePath).toLowerCase();
   const type = contentTypes[baseExt] ?? 'application/octet-stream';
   res.statusCode = 200;
@@ -676,13 +682,30 @@ async function tryServeStatic(req, reqUrl, res) {
           void 0;
         }
       }
+      if (shouldServeGzip(req)) {
+        try {
+          const gzPath = `${absPath}.gz`;
+          const gzStat = await stat(gzPath);
+          if (gzStat.isFile()) {
+            if (absPath !== path.join(distDir, 'index.html')) {
+              setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+              res.setHeader('Content-Encoding', 'gzip');
+              res.setHeader('Vary', 'Accept-Encoding');
+              await serveFile(res, gzPath);
+              return true;
+            }
+          }
+        } catch {
+          void 0;
+        }
+      }
 
       const st = await stat(absPath);
       if (!st.isFile()) continue;
       const nonce = absPath === path.join(distDir, 'index.html') ? generateNonce() : '';
       setSecurityHeaders(res, { nonce, isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
       if (nonce) {
-        await serveSpaIndex(res, nonce, reqUrl.protocol === 'https:', reqUrl.origin);
+        await serveSpaIndex(req, res, nonce, reqUrl.protocol === 'https:', reqUrl.origin);
       } else {
         await serveFile(res, absPath);
       }
@@ -694,7 +717,7 @@ async function tryServeStatic(req, reqUrl, res) {
   }
 }
 
-async function serveSpaIndex(res, nonce, isHttps, origin) {
+async function serveSpaIndex(req, res, nonce, isHttps, origin) {
   const indexPath = path.join(distDir, 'index.html');
   const html = String(await readFile(indexPath));
   const withNonce = nonce ? html.replaceAll('__CSP_NONCE__', nonce) : html;
@@ -702,10 +725,29 @@ async function serveSpaIndex(res, nonce, isHttps, origin) {
   setSecurityHeaders(res, { nonce, isHttps, origin });
   res.setHeader('Content-Type', contentTypes['.html']);
   res.setHeader('Cache-Control', 'no-store');
-  res.end(withNonce);
+  const raw = Buffer.from(withNonce, 'utf8');
+  if (raw.length >= 1024 && shouldServeBrotli(req)) {
+    const br = zlib.brotliCompressSync(raw, {
+      params: {
+        [zlib.constants.BROTLI_PARAM_QUALITY]: 4,
+      },
+    });
+    res.setHeader('Content-Encoding', 'br');
+    res.setHeader('Vary', 'Accept-Encoding');
+    res.end(br);
+    return;
+  }
+  if (raw.length >= 1024 && shouldServeGzip(req)) {
+    const gz = zlib.gzipSync(raw);
+    res.setHeader('Content-Encoding', 'gzip');
+    res.setHeader('Vary', 'Accept-Encoding');
+    res.end(gz);
+    return;
+  }
+  res.end(raw);
 }
 
-async function serveIndex(res, reqUrl) {
+async function serveIndex(req, res, reqUrl) {
   const nonce = generateNonce();
   res.statusCode = 200;
   setSecurityHeaders(res, { nonce, isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
@@ -713,7 +755,26 @@ async function serveIndex(res, reqUrl) {
   res.setHeader('Cache-Control', 'no-store');
   const indexPath = path.join(distDir, 'index.html');
   const html = String(await readFile(indexPath));
-  res.end(html.replaceAll('__CSP_NONCE__', nonce));
+  const raw = Buffer.from(html.replaceAll('__CSP_NONCE__', nonce), 'utf8');
+  if (raw.length >= 1024 && shouldServeBrotli(req)) {
+    const br = zlib.brotliCompressSync(raw, {
+      params: {
+        [zlib.constants.BROTLI_PARAM_QUALITY]: 4,
+      },
+    });
+    res.setHeader('Content-Encoding', 'br');
+    res.setHeader('Vary', 'Accept-Encoding');
+    res.end(br);
+    return;
+  }
+  if (raw.length >= 1024 && shouldServeGzip(req)) {
+    const gz = zlib.gzipSync(raw);
+    res.setHeader('Content-Encoding', 'gzip');
+    res.setHeader('Vary', 'Accept-Encoding');
+    res.end(gz);
+    return;
+  }
+  res.end(raw);
 }
 
 function loadApiHandler(relPath) {
@@ -834,6 +895,20 @@ async function main() {
       const reqUrl = getRequestUrl(req);
       const p = reqUrl.pathname;
 
+    if (p === '/favicon.ico') {
+      try {
+        const absPath = path.join(distDir, 'favicon-32x32.png');
+        const st = await stat(absPath);
+        if (st.isFile()) {
+          setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+          await serveFile(res, absPath);
+          return;
+        }
+      } catch {
+        void 0;
+      }
+    }
+
     if (forceHttps && reqUrl.protocol === 'http:' && reqUrl.hostname !== 'localhost' && reqUrl.hostname !== '127.0.0.1') {
       const location = new URL(reqUrl.toString());
       location.protocol = 'https:';
@@ -863,6 +938,7 @@ async function main() {
       if (p0.startsWith('/assets/') || p0.startsWith('/images/') || p0.startsWith('/fonts/')) return false;
       if (p0.startsWith('/api/')) return false;
       if (p0 === '/metrics' || p0 === '/sitemap.xml' || p0 === '/robots.txt') return false;
+      if (p0 === '/status' || p0 === '/status/' || p0 === '/status.html') return false;
       if (p0.startsWith('/.well-known/')) return false;
       if (p0 === '/audit' || p0.startsWith('/audit/')) return false;
       if (p0 === '/whitepaper' || p0 === '/whitepaper/') return false;
@@ -896,8 +972,15 @@ async function main() {
       const pathnameNoLocale = rest === '/' ? '/' : normalizePathname(rest).replace(/\/$/, '') || '/';
       return { locale: first, pathnameNoLocale };
     };
+    const rewriteLegacyPathnameNoLocale = (pathnameNoLocale) => {
+      const normalized = normalizePathname(pathnameNoLocale).replace(/\/$/, '') || '/';
+      if (normalized === '/privacy-policy') return '/privacy';
+      if (normalized === '/terms-and-conditions') return '/terms';
+      if (normalized === '/cookie-policy') return '/cookies';
+      return normalized;
+    };
     const localizePathname = (pathnameNoLocale, locale) => {
-      const base = normalizePathname(pathnameNoLocale).replace(/\/$/, '') || '/';
+      const base = rewriteLegacyPathnameNoLocale(pathnameNoLocale);
       if (!shouldLocalePrefixPathname(base)) return base;
       if (base === '/') return `/${locale}/`;
       return normalizePathname(`/${locale}${base}`);
@@ -937,37 +1020,104 @@ async function main() {
         if (localePrefix) {
           const canonical = localizePathname(pathnameNoLocale, localePrefix);
           if (p !== canonical) {
+            const allowNoSlashLocaleRoot =
+              pathnameNoLocale === '/' && p === `/${localePrefix}` && canonical === `/${localePrefix}/`;
+            if (!allowNoSlashLocaleRoot) {
+              const location = new URL(reqUrl.toString());
+              location.pathname = canonical;
+              res.statusCode = 301;
+              setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+              res.setHeader('Location', location.toString());
+              res.setHeader('Cache-Control', 'no-store');
+              res.end();
+              return;
+            }
+          }
+        } else {
+          const qp = reqUrl.searchParams.get('lang');
+          const candidate = qp ? String(qp).slice(0, 2).toLowerCase() : '';
+          if (!(p === '/' && !candidate)) {
+            const targetLocale = detectLocale();
+            const canonical = localizePathname(pathnameNoLocale, targetLocale);
             const location = new URL(reqUrl.toString());
             location.pathname = canonical;
-            res.statusCode = 301;
+            location.searchParams.delete('lang');
+            res.statusCode = 302;
             setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+            if (candidate && URL_LOCALES.includes(candidate)) {
+              res.setHeader(
+                'Set-Cookie',
+                `solaris_lang=${encodeURIComponent(candidate)}; Path=/; Max-Age=31536000; SameSite=Lax`,
+              );
+            }
             res.setHeader('Location', location.toString());
             res.setHeader('Cache-Control', 'no-store');
             res.end();
             return;
           }
-        } else {
-          const targetLocale = detectLocale();
-          const canonical = localizePathname(pathnameNoLocale, targetLocale);
-          const location = new URL(reqUrl.toString());
-          location.pathname = canonical;
-          location.searchParams.delete('lang');
-          res.statusCode = 302;
-          setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
-          try {
-            const qp = reqUrl.searchParams.get('lang');
-            const candidate = qp ? String(qp).slice(0, 2).toLowerCase() : '';
-            if (candidate && URL_LOCALES.includes(candidate)) {
-              res.setHeader('Set-Cookie', `solaris_lang=${encodeURIComponent(candidate)}; Path=/; Max-Age=31536000; SameSite=Lax`);
-            }
-          } catch {
-            void 0;
-          }
-          res.setHeader('Location', location.toString());
-          res.setHeader('Cache-Control', 'no-store');
-          res.end();
-          return;
         }
+      }
+    }
+
+    if (req.method === 'GET' || req.method === 'HEAD') {
+      const sendNoContent = () => {
+        res.statusCode = 204;
+        setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+        res.setHeader('Cache-Control', 'no-store');
+        res.end();
+      };
+
+      if (p === '/favicon.ico') {
+        sendNoContent();
+        return;
+      }
+
+      if (p === '/site.webmanifest' || p === '/manifest.webmanifest') {
+        const absPath = path.join(distDir, 'manifest.json');
+        try {
+          const st = await stat(absPath);
+          if (st.isFile()) {
+            setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/manifest+json; charset=utf-8');
+            res.setHeader('Cache-Control', 'no-store');
+            if (req.method === 'HEAD') {
+              res.end();
+              return;
+            }
+            createReadStream(absPath).pipe(res);
+            return;
+          }
+        } catch {
+          void 0;
+        }
+        res.statusCode = 404;
+        setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+        res.setHeader('Cache-Control', 'no-store');
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        res.end(JSON.stringify({ error: 'Not found' }));
+        return;
+      }
+
+      if (p === '/apple-touch-icon-precomposed.png') {
+        const absPath = path.join(distDir, 'apple-touch-icon.png');
+        try {
+          const st = await stat(absPath);
+          if (st.isFile()) {
+            setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+            await serveFile(res, absPath);
+            return;
+          }
+        } catch {
+          void 0;
+        }
+        sendNoContent();
+        return;
+      }
+
+      if (p === '/browserconfig.xml') {
+        sendNoContent();
+        return;
       }
     }
 
@@ -1061,13 +1211,24 @@ async function main() {
       res.end();
     };
 
-    if (p === '/audit') {
-      sendRedirect('/audit/');
-      return;
-    }
-
     if (p === '/status' || p === '/status/') {
-      sendRedirect('/status.html');
+      try {
+        const absPath = path.join(distDir, 'status.html');
+        const st = await stat(absPath);
+        if (st.isFile()) {
+          res.statusCode = 200;
+          setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+          await serveFile(res, absPath);
+          return;
+        }
+      } catch {
+        void 0;
+      }
+      res.statusCode = 404;
+      setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+      res.setHeader('Cache-Control', 'no-store');
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.end(JSON.stringify({ error: 'Not found' }));
       return;
     }
 
@@ -1090,10 +1251,6 @@ async function main() {
       const restRaw = localeMatch[2] ?? '/';
       const rest = (restRaw.replace(/\/$/, '') || '/').replace('/index.html', '/');
 
-      if (p === `/${locale}`) {
-        sendRedirect(`/${locale}/`);
-        return;
-      }
       if (rest === '/privacy-policy') {
         sendRedirect(`/${locale}/privacy`);
         return;
@@ -1147,7 +1304,7 @@ async function main() {
       res.end(JSON.stringify({ error: 'Not found' }));
       return;
     }
-    await serveIndex(res, reqUrl);
+    await serveIndex(req, res, reqUrl);
     } catch (err) {
       try {
         incMap(metrics.logCounters, 'server_error', 1);

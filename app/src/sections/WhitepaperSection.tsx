@@ -1,4 +1,4 @@
-import { gsap } from 'gsap';
+import { loadGsapWithScrollTrigger } from '@/lib/gsapLazy';
 import {
   Atom,
   Brain,
@@ -54,9 +54,9 @@ const wpSections: WPSection[] = [
     title: 'Executive Summary',
     subtitle: 'Sovereign Autonomous Infrastructure — 2026 Agentic Era',
     content: [
-      'SOLARIS (CET) is a high-stakes Real-World Asset (RWA) token anchored in the agricultural and AI infrastructure of Cetățuia. Each unit provides access to the Solaris Prime Tactical Ecosystem, a reasoning hierarchy powered by Gemini 3 Pro Preview.',
-      'With a hard-capped supply of 9,000 CET on the TON blockchain, each token represents fractional ownership in a scalable, cloud-agnostic industrial hub designed for the 2026 Agentic Era. The ecosystem automates precision agriculture, crop diagnostics, and market operations through on-chain verifiable intelligence.',
-      'The operational framework is governed by the proprietary RAV (Reason-Act-Verify) Protocol, ensuring military-grade precision across market automation and crop diagnostics. Every decision is traceable on-chain, providing full auditability for all ecosystem participants.',
+      'SOLARIS (CET) is an AI-native token on TON with a hard-capped supply of 9,000 CET. The narrative anchor is a Cetățuia-inspired virtual agricultural land layer designed for deterministic generation and verifiable proof surfaces.',
+      'Each token maps to a proportional share of the virtual land layer. Specs, maps, and validation artifacts can be anchored via IPFS + TON so external observers can independently verify what the system claims.',
+      'The operational framework uses RAV (Reason-Act-Verify) for structured outputs and traceable actions. When deployed, reports can be anchored as artifacts so changes remain auditable over time.',
     ],
     stats: [
       { label: 'Total Supply', value: '9,000 CET' },
@@ -518,57 +518,65 @@ const WhitepaperSection = () => {
     const section = sectionRef.current;
     if (!section) return;
 
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headingRef.current,
-        { y: 32, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: headingRef.current,
-            start: 'top 82%',
-            end: 'top 55%',
-            scrub: true,
+    let cancelled = false;
+    let ctx: { revert: () => void } | null = null;
+    void loadGsapWithScrollTrigger().then(({ gsap }) => {
+      if (cancelled) return;
+      ctx = gsap.context(() => {
+        gsap.fromTo(
+          headingRef.current,
+          { y: 32, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            scrollTrigger: {
+              trigger: headingRef.current,
+              start: 'top 82%',
+              end: 'top 55%',
+              scrub: true,
+            },
           },
-        }
-      );
+        );
 
-      gsap.fromTo(
-        contentRef.current,
-        { y: 40, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: contentRef.current,
-            start: 'top 80%',
-            end: 'top 50%',
-            scrub: true,
+        gsap.fromTo(
+          contentRef.current,
+          { y: 40, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            scrollTrigger: {
+              trigger: contentRef.current,
+              start: 'top 80%',
+              end: 'top 50%',
+              scrub: true,
+            },
           },
-        }
-      );
+        );
 
-      gsap.fromTo(
-        ctaRef.current,
-        { y: 24, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.7,
-          scrollTrigger: {
-            trigger: ctaRef.current,
-            start: 'top 88%',
-            end: 'top 65%',
-            scrub: true,
+        gsap.fromTo(
+          ctaRef.current,
+          { y: 24, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            scrollTrigger: {
+              trigger: ctaRef.current,
+              start: 'top 88%',
+              end: 'top 65%',
+              scrub: true,
+            },
           },
-        }
-      );
-    }, section);
+        );
+      }, section);
+    });
 
-    return () => ctx.revert();
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
   }, [prefersReducedMotion]);
 
   useEffect(() => {
@@ -577,15 +585,29 @@ const WhitepaperSection = () => {
     const cta = ctaRef.current;
     if (!section || !content || !cta) return;
 
+    let startY = 0;
+    let endY = 0;
+    let measureRaf = 0;
+
+    const measure = () => {
+      measureRaf = 0;
+      startY = content.getBoundingClientRect().top + window.scrollY;
+      endY = cta.getBoundingClientRect().bottom + window.scrollY;
+    };
+
+    const measureSoon = () => {
+      if (measureRaf) return;
+      measureRaf = window.requestAnimationFrame(measure);
+    };
+
     const update = () => {
       rafRef.current = null;
-      const start = content.getBoundingClientRect().top + window.scrollY;
-      const end = cta.getBoundingClientRect().bottom + window.scrollY;
-      const span = Math.max(1, end - start);
+      if (!startY || !endY) measure();
+      const span = Math.max(1, endY - startY);
       const y = window.scrollY + 120;
-      const raw = (y - start) / span;
+      const raw = (y - startY) / span;
       const next = Math.max(0, Math.min(1, raw));
-      setProgress(next);
+      setProgress((prev) => (Math.abs(prev - next) < 0.002 ? prev : next));
     };
 
     const onScroll = () => {
@@ -593,13 +615,25 @@ const WhitepaperSection = () => {
       rafRef.current = window.requestAnimationFrame(update);
     };
 
+    const onResize = () => {
+      measureSoon();
+      onScroll();
+    };
+
+    const ro = new ResizeObserver(() => measureSoon());
+    ro.observe(content);
+    ro.observe(cta);
+
+    measure();
     update();
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
+    window.addEventListener('resize', onResize);
     return () => {
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
+      window.removeEventListener('resize', onResize);
       if (rafRef.current !== null) window.cancelAnimationFrame(rafRef.current);
+      if (measureRaf) window.cancelAnimationFrame(measureRaf);
+      ro.disconnect();
     };
   }, []);
 

@@ -35,7 +35,10 @@ const AgenticWhispers = () => {
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-br from-solaris-cyan/[0.06] via-transparent to-solaris-gold/[0.05] px-4 py-3 sm:px-5 sm:py-4 mb-8">
-      <div className="absolute inset-0 opacity-[0.35] pointer-events-none bg-[linear-gradient(110deg,transparent_40%,rgba(242,201,76,0.08)_50%,transparent_60%)] bg-[length:200%_100%] animate-[whisper-shimmer_7s_ease-in-out_infinite]" />
+      <div
+        className="absolute inset-0 opacity-[0.35] pointer-events-none bg-[linear-gradient(110deg,transparent_40%,rgba(242,201,76,0.08)_50%,transparent_60%)] bg-[length:200%_100%] animate-[whisper-shimmer_7s_ease-in-out_infinite]"
+        style={reduce ? undefined : { willChange: 'transform, opacity' }}
+      />
       <div className="relative flex items-start gap-3">
         <Sparkles className="w-4 h-4 text-solaris-gold shrink-0 mt-0.5 opacity-90" aria-hidden />
         <div className="min-w-0">
@@ -59,8 +62,8 @@ const AgenticWhispers = () => {
           to { opacity: 1; transform: translateY(0); }
         }
         @keyframes whisper-shimmer {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
+          0%, 100% { transform: translate3d(-12%, 0, 0); opacity: 0.24; }
+          50% { transform: translate3d(12%, 0, 0); opacity: 0.38; }
         }
       `}</style>
     </div>

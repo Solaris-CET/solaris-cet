@@ -1,4 +1,3 @@
-import { gsap } from 'gsap';
 import { ArrowLeftRight,Cpu, Shield, Zap } from 'lucide-react';
 import { useEffect,useLayoutEffect, useRef, useState } from 'react';
 
@@ -9,6 +8,7 @@ import { useAsyncCssReady } from '../hooks/useAsyncCssReady';
 import { useLanguage } from '../hooks/useLanguage';
 import { useNearScreen } from '../hooks/useNearScreen';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { loadGsapWithScrollTrigger } from '../lib/gsapLazy';
 
 
 const HybridEngineSection = () => {
@@ -31,17 +31,23 @@ const HybridEngineSection = () => {
     if (prefersReducedMotion) return;
 
     const len = path.getTotalLength();
-    gsap.set(path, { strokeDasharray: len, strokeDashoffset: len });
-
-    const tween = gsap.to(path, {
-      strokeDashoffset: 0,
-      duration: 3,
-      ease: 'power2.inOut',
-      repeat: -1,
-      yoyo: true,
+    let cancelled = false;
+    let tween: { kill: () => void } | null = null;
+    void loadGsapWithScrollTrigger().then(({ gsap }) => {
+      if (cancelled) return;
+      gsap.set(path, { strokeDasharray: len, strokeDashoffset: len });
+      tween = gsap.to(path, {
+        strokeDashoffset: 0,
+        duration: 3,
+        ease: 'power2.inOut',
+        repeat: -1,
+        yoyo: true,
+      });
     });
-
-    return () => { tween.kill(); };
+    return () => {
+      cancelled = true;
+      tween?.kill();
+    };
   }, [prefersReducedMotion]);
 
   useLayoutEffect(() => {
@@ -57,48 +63,53 @@ const HybridEngineSection = () => {
       return;
     }
 
-    const ctx = gsap.context(() => {
-      const scrollTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: '+=70%',
-          pin: true,
-          scrub: 0.5,
-        },
-      });
+    let cancelled = false;
+    let ctx: { revert: () => void } | null = null;
+    void loadGsapWithScrollTrigger().then(({ gsap }) => {
+      if (cancelled) return;
+      ctx = gsap.context(() => {
+        const scrollTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: '+=70%',
+            pin: true,
+            scrub: 0.5,
+          },
+        });
 
-      // ENTRANCE (0% - 30%)
-      scrollTl.fromTo(
-        cardRef.current,
-        { y: '60vh', rotateX: 18, scale: 0.86, opacity: 0 },
-        { y: 0, rotateX: 0, scale: 1, opacity: 1, ease: 'none' },
-        0
-      );
-
-      if (titleRef.current) {
-        const words = titleRef.current.querySelectorAll('.word');
         scrollTl.fromTo(
-          words,
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, stagger: 0.02, ease: 'none' },
-          0.05
+          cardRef.current,
+          { y: '60vh', rotateX: 18, scale: 0.86, opacity: 0 },
+          { y: 0, rotateX: 0, scale: 1, opacity: 1, ease: 'none' },
+          0,
         );
-      }
 
-      scrollTl.fromTo(
-        coinRef.current,
-        { x: '30vw', scale: 0.6, opacity: 0 },
-        { x: 0, scale: 0.85, opacity: 0.35, ease: 'none' },
-        0
-      );
+        if (titleRef.current) {
+          const words = titleRef.current.querySelectorAll('.word');
+          scrollTl.fromTo(
+            words,
+            { y: 20, opacity: 0 },
+            { y: 0, opacity: 1, stagger: 0.02, ease: 'none' },
+            0.05,
+          );
+        }
 
-      // SETTLE (30% - 70%): Hold
+        scrollTl.fromTo(
+          coinRef.current,
+          { x: '30vw', scale: 0.6, opacity: 0 },
+          { x: 0, scale: 0.85, opacity: 0.35, ease: 'none' },
+          0,
+        );
 
-      scrollTl.to(cardRef.current, { scale: 0.985, ease: 'none' }, 0.72);
-    }, section);
+        scrollTl.to(cardRef.current, { scale: 0.985, ease: 'none' }, 0.72);
+      }, section);
+    });
 
-    return () => ctx.revert();
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
   }, [prefersReducedMotion, cssReady, isNearScreen]);
 
   const badges = [

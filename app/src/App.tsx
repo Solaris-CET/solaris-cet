@@ -1,8 +1,6 @@
 import './App.css';
 
-import { TonConnectUIProvider } from '@tonconnect/ui-react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import type { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 
 import { AnalyticsBootstrap } from '@/components/AnalyticsBootstrap';
@@ -19,10 +17,10 @@ import {
   URL_LOCALES,
   urlLocaleFromLang,
 } from '@/i18n/urlRouting';
-import { getBlogPost } from '@/lib/blog';
 import { PRODUCTION_SITE_ORIGIN } from '@/lib/brandAssets';
 import { subscribePush } from '@/lib/pushClient';
 import { applySpaSeo } from '@/lib/spaSeo';
+import { utMeasureToNextFrame } from '@/lib/userTiming';
 
 import AnnouncementBanner from './components/AnnouncementBanner';
 import BackToTop from './components/BackToTop';
@@ -49,6 +47,10 @@ import { useTelegram } from './hooks/useTelegram';
 import { TonNetworkContext, useTonNetworkState } from './hooks/useTonNetwork';
 import { shortSkillWhisper, skillSeedFromLabel } from './lib/meshSkillFeed';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { useTonConnectFeature } from './tonconnect/TonConnectFeatureContext';
+import { TonConnectFeatureProvider } from './tonconnect/TonConnectFeatureProvider';
+import { TonConnectLazyProvider } from './tonconnect/TonConnectLazyProvider';
+import { loadGsapWithScrollTrigger } from './lib/gsapLazy';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const CetuiaMapPage = lazy(() => import('./pages/CetuiaMapPage'));
@@ -101,8 +103,6 @@ const PrelaunchPage = lazy(() => import('./pages/PrelaunchPage'));
 const ThanksPage = lazy(() => import('./pages/ThanksPage'));
 const CountryLandingPage = lazy(() => import('./pages/CountryLandingPage'));
 
-gsap.registerPlugin(ScrollTrigger);
-
 /** Brief shell warm-up; shorter than earlier builds to avoid artificial wait (B2B credibility). */
 const LOADING_DURATION_MS = 450;
 /** Skip fixed delay when user requests reduced motion (WCAG 2.3.3). */
@@ -136,9 +136,25 @@ function AppContent() {
   const parsedPath = parseUrlLocaleFromPathname(pathnameRaw);
   const activeUrlLocale = parsedPath.locale ?? urlLocaleFromLang(langState.lang);
   const routePath = (parsedPath.pathnameNoLocale.replace(/\/$/, '') || '/').replace('/index.html', '/') || '/';
+  const { enable: enableTonConnect } = useTonConnectFeature();
 
   useEffect(() => {
-    const bump = () => setLocationKey((k) => k + 1);
+    const needsTonConnect =
+      routePath === '/wallet' ||
+      routePath === '/account' ||
+      routePath === '/login' ||
+      routePath === '/auth' ||
+      routePath === '/staking' ||
+      routePath === '/tx-history' ||
+      routePath === '/nfts' ||
+      routePath === '/profile' ||
+      routePath === '/airdrop' ||
+      routePath === '/settings';
+    if (needsTonConnect) enableTonConnect();
+  }, [routePath, enableTonConnect]);
+
+  useEffect(() => {
+    const bump = () => setLocationKey((k: number) => k + 1);
     window.addEventListener('popstate', bump);
     window.addEventListener('hashchange', bump);
     return () => {
@@ -214,9 +230,10 @@ function AppContent() {
       if (url.pathname === '/audit' || url.pathname.startsWith('/audit/')) return;
       if (url.pathname.startsWith('/sovereign/') || url.pathname.startsWith('/apocalypse/')) return;
 
+      utMeasureToNextFrame('ui:nav', { href: url.pathname + url.search + url.hash });
       e.preventDefault();
       window.history.pushState(null, '', url.toString());
-      setLocationKey((k) => k + 1);
+      setLocationKey((k: number) => k + 1);
 
       if (url.hash) {
         const el = document.querySelector(url.hash);
@@ -395,14 +412,21 @@ function AppContent() {
 
       loadingEl.style.pointerEvents = 'none';
       setIsLoaded(true);
-      gsap.to(loadingEl, {
-        opacity: 0,
-        duration: fadeOutSec,
-        ease: prefersReducedMotion ? 'none' : 'power3.out',
-        onComplete: () => {
+      void loadGsapWithScrollTrigger()
+        .then(({ gsap }) => {
+          gsap.to(loadingEl, {
+            opacity: 0,
+            duration: fadeOutSec,
+            ease: prefersReducedMotion ? 'none' : 'power3.out',
+            onComplete: () => {
+              loadingEl.style.display = 'none';
+            },
+          });
+        })
+        .catch(() => {
+          loadingEl.style.opacity = '0';
           loadingEl.style.display = 'none';
-        },
-      });
+        });
     };
 
     const timer = window.setTimeout(finish, delayMs);
@@ -417,7 +441,11 @@ function AppContent() {
   useEffect(() => {
     // Ensure all ScrollTriggers are released if AppContent unmounts (HMR, route-level remounts).
     return () => {
-      ScrollTrigger.getAll().forEach((st: ScrollTrigger) => st.kill());
+      void loadGsapWithScrollTrigger()
+        .then(({ ScrollTrigger }) => {
+          ScrollTrigger.getAll().forEach((st) => st.kill());
+        })
+        .catch(() => null);
     };
   }, []);
 
@@ -450,22 +478,25 @@ function AppContent() {
     if (isBelowDesktop) return;
     if (prefersReducedMotion) return;
 
-    const setupSnap = () => {
-      const pinned = ScrollTrigger.getAll()
-        .filter((st: ScrollTrigger) => st.vars.pin)
-        .sort((a: ScrollTrigger, b: ScrollTrigger) => a.start - b.start);
+    let ScrollTriggerRef: Awaited<ReturnType<typeof loadGsapWithScrollTrigger>>['ScrollTrigger'] | null = null;
+    const setupSnap = async () => {
+      const loaded = await loadGsapWithScrollTrigger();
+      ScrollTriggerRef = loaded.ScrollTrigger;
+      const pinned = loaded.ScrollTrigger.getAll()
+        .filter((st) => st.vars.pin)
+        .sort((a, b) => a.start - b.start);
 
-      const maxScroll = ScrollTrigger.maxScroll(window);
+      const maxScroll = loaded.ScrollTrigger.maxScroll(window);
       if (!maxScroll || pinned.length === 0) return;
 
-      const pinnedRanges = pinned.map((st: ScrollTrigger) => ({
+      const pinnedRanges = pinned.map((st) => ({
         start: st.start / maxScroll,
         end: (st.end ?? st.start) / maxScroll,
         center: (st.start + ((st.end ?? st.start) - st.start) * 0.5) / maxScroll,
       }));
 
       snapTriggerRef.current?.kill();
-      snapTriggerRef.current = ScrollTrigger.create({
+      snapTriggerRef.current = loaded.ScrollTrigger.create({
         snap: {
           snapTo: buildSnapTo(pinnedRanges),
           duration: { min: 0.15, max: 0.35 },
@@ -482,24 +513,28 @@ function AppContent() {
       if (raf) return;
       raf = window.requestAnimationFrame(() => {
         raf = 0;
-        setupSnap();
+        void setupSnap();
       });
     };
 
     const onRefresh = () => schedule();
-    (ScrollTrigger as unknown as { addEventListener: (e: string, cb: () => void) => void }).addEventListener(
-      'refresh',
-      onRefresh,
-    );
+    void loadGsapWithScrollTrigger().then(({ ScrollTrigger }) => {
+      (ScrollTrigger as unknown as { addEventListener: (e: string, cb: () => void) => void }).addEventListener(
+        'refresh',
+        onRefresh,
+      );
+    });
     window.addEventListener('load', schedule, { once: true });
 
     schedule();
     const timer = window.setTimeout(schedule, 900);
     return () => {
-      (ScrollTrigger as unknown as { removeEventListener: (e: string, cb: () => void) => void }).removeEventListener(
-        'refresh',
-        onRefresh,
-      );
+      if (ScrollTriggerRef) {
+        (ScrollTriggerRef as unknown as { removeEventListener: (e: string, cb: () => void) => void }).removeEventListener(
+          'refresh',
+          onRefresh,
+        );
+      }
       window.clearTimeout(timer);
       if (raf) window.cancelAnimationFrame(raf);
       snapTriggerRef.current?.kill();
@@ -537,15 +572,33 @@ function AppContent() {
   }, [isLoaded, routePath, prefersReducedMotion]);
 
   useEffect(() => {
-    const seo = (langState.t as unknown as { seo?: Record<string, string> }).seo ?? {};
-    const baseKeywords =
-      'Solaris CET, CET token, TON blockchain, RWA token, DeDust, RAV protocol, Grok, Gemini, dual AI, autonomous agents';
+    const seoRaw = (langState.t as unknown as { seo?: Record<string, unknown> }).seo ?? {};
+    const pick = (v: unknown, fallback: string) => (typeof v === 'string' && v.trim() ? v : fallback);
+    const seo = (key: string, fallback: string) => pick(seoRaw[key], fallback);
+    const keywordString = (...chunks: Array<string | undefined>) => {
+      const items = chunks
+        .flatMap((chunk) => (typeof chunk === 'string' ? chunk.split(',') : []))
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const seen = new Set<string>();
+      const out: string[] = [];
+      for (const item of items) {
+        const k = item.toLowerCase();
+        if (seen.has(k)) continue;
+        seen.add(k);
+        out.push(item);
+      }
+      return out.join(', ');
+    };
+    const baseKeywords = keywordString(
+      'Solaris CET, CET token, TON blockchain, virtual land, virtual agricultural land, DeDust, RAV protocol, Grok, Gemini, dual AI, autonomous agents',
+    );
     const routeMeta: Record<string, { title: string; description: string; keywords?: string; noindex?: boolean }> = {
-      '/': { title: seo.homeTitle, description: seo.homeDescription, keywords: baseKeywords },
+      '/': { title: seo('homeTitle', 'Solaris CET'), description: seo('homeDescription', 'Solaris CET on TON.'), keywords: baseKeywords },
       '/cetuia': {
         title: 'Cetățuia Map | Solaris CET',
         description: 'Interactive hex map for the 9,000 CET village tokens.',
-        keywords: `${baseKeywords}, Cetățuia, map, hex grid, token`,
+        keywords: keywordString(baseKeywords, 'Cetățuia, map, hex grid, token'),
       },
       '/privacy': {
         title: 'Privacy Policy | Solaris CET',
@@ -594,11 +647,31 @@ function AppContent() {
         description: 'Security posture and audit references for Solaris CET.',
         keywords: 'Solaris CET audit, security, disclosures',
       },
-      '/blog': { title: seo.blogTitle, description: seo.blogDescription, keywords: 'Solaris CET blog, announcements, updates' },
-      '/demo': { title: seo.demoTitle, description: seo.demoDescription, keywords: 'Solaris CET demo, cinematic, WebGL' },
-      '/rwa': { title: seo.rwaTitle, description: seo.rwaDescription, keywords: `${baseKeywords}, real world asset, proof surface` },
-      '/cet-ai': { title: seo.cetAiTitle, description: seo.cetAiDescription, keywords: `${baseKeywords}, CET AI, Q&A` },
-      '/mining': { title: seo.miningTitle, description: seo.miningDescription, keywords: `${baseKeywords}, mining, staking` },
+      '/blog': {
+        title: seo('blogTitle', 'Blog | Solaris CET'),
+        description: seo('blogDescription', 'News, updates, and research notes from Solaris CET.'),
+        keywords: 'Solaris CET blog, announcements, updates',
+      },
+      '/demo': {
+        title: seo('demoTitle', 'Demo | Solaris CET'),
+        description: seo('demoDescription', 'Solaris CET demo.'),
+        keywords: 'Solaris CET demo, cinematic, WebGL',
+      },
+      '/rwa': {
+        title: seo('rwaTitle', 'RWA | Solaris CET'),
+        description: seo('rwaDescription', 'Virtual land primitives and verifiable surface proofs.'),
+        keywords: keywordString(baseKeywords, 'virtual land, proof surface'),
+      },
+      '/cet-ai': {
+        title: seo('cetAiTitle', 'CET AI | Solaris CET'),
+        description: seo('cetAiDescription', 'Ask CET AI about Solaris CET, on-chain data, and docs.'),
+        keywords: keywordString(baseKeywords, 'CET AI, Q&A'),
+      },
+      '/mining': {
+        title: seo('miningTitle', 'Mining | Solaris CET'),
+        description: seo('miningDescription', 'Mining and staking for Solaris CET.'),
+        keywords: keywordString(baseKeywords, 'mining, staking'),
+      },
       '/brand-assets': {
         title: 'Brand Assets | Solaris CET',
         description: 'Download official Solaris CET brand kit, logos, and media assets.',
@@ -615,17 +688,17 @@ function AppContent() {
         keywords: 'Solaris CET release notes, changelog',
       },
       '/accessibility': {
-        title: seo.accessibilityTitle ?? seo.homeTitle,
-        description: seo.accessibilityDescription ?? seo.homeDescription,
+        title: seo('accessibilityTitle', seo('homeTitle', 'Solaris CET')),
+        description: seo('accessibilityDescription', seo('homeDescription', 'Solaris CET on TON.')),
         keywords: 'Solaris CET accessibility statement, WCAG',
       },
       '/responsible-disclosure': {
-        title: seo.responsibleDisclosureTitle,
-        description: seo.responsibleDisclosureDescription,
+        title: seo('responsibleDisclosureTitle', 'Responsible Disclosure | Solaris CET'),
+        description: seo('responsibleDisclosureDescription', 'How to report security issues responsibly.'),
       },
       '/bug-bounty': {
-        title: seo.bugBountyTitle,
-        description: seo.bugBountyDescription,
+        title: seo('bugBountyTitle', 'Bug Bounty | Solaris CET'),
+        description: seo('bugBountyDescription', 'Bug bounty scope and reporting process.'),
       },
       '/faq': {
         title: 'FAQ | Solaris CET',
@@ -689,8 +762,8 @@ function AppContent() {
         noindex: true,
       },
       '/newsletter/confirm': {
-        title: seo.newsletterConfirmTitle,
-        description: seo.newsletterConfirmDescription,
+        title: seo('newsletterConfirmTitle', 'Newsletter Confirmation | Solaris CET'),
+        description: seo('newsletterConfirmDescription', 'Confirm your email subscription.'),
         keywords: 'Solaris CET newsletter confirmation',
         noindex: true,
       },
@@ -714,54 +787,77 @@ function AppContent() {
     if (routePath.startsWith('/blog/') && routePath.length > '/blog/'.length) {
       const slug = routePath.slice('/blog/'.length).split('/')[0] ?? '';
       const blogLocale = activeUrlLocale === 'ro' || activeUrlLocale === 'es' ? activeUrlLocale : 'en';
-      const post = getBlogPost(blogLocale, slug);
-      if (!post) {
-        applySpaSeo({
-          origin: PRODUCTION_SITE_ORIGIN,
-          pathnameNoLocale: routePath,
-          locale: activeUrlLocale,
-          title: seo.blogTitle,
-          description: seo.blogDescription,
-          noindex: true,
-        });
-        return;
-      }
+      void import('@/lib/blog')
+        .then(({ getBlogPost }) => {
+          const post = getBlogPost(blogLocale, slug);
+          if (!post) {
+            applySpaSeo({
+              origin: PRODUCTION_SITE_ORIGIN,
+              pathnameNoLocale: routePath,
+              locale: activeUrlLocale,
+              title: seo('blogTitle', 'Blog | Solaris CET'),
+              description: seo('blogDescription', 'News, updates, and research notes from Solaris CET.'),
+              noindex: true,
+            });
+            return;
+          }
 
-      const absoluteUrl = `${PRODUCTION_SITE_ORIGIN}/${activeUrlLocale}/blog/${post.slug}`;
-      const jsonLd = {
-        '@context': 'https://schema.org',
-        '@graph': [
-          {
-            '@type': 'BreadcrumbList',
-            itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: `${PRODUCTION_SITE_ORIGIN}/${activeUrlLocale}/` },
-              { '@type': 'ListItem', position: 2, name: seo.blogCrumb ?? 'Blog', item: `${PRODUCTION_SITE_ORIGIN}/${activeUrlLocale}/blog` },
-              { '@type': 'ListItem', position: 3, name: post.frontmatter.title, item: absoluteUrl },
+          const absoluteUrl = `${PRODUCTION_SITE_ORIGIN}/${activeUrlLocale}/blog/${post.slug}`;
+          const jsonLd = {
+            '@context': 'https://schema.org',
+            '@graph': [
+              {
+                '@type': 'BreadcrumbList',
+                itemListElement: [
+                  {
+                    '@type': 'ListItem',
+                    position: 1,
+                    name: 'Home',
+                    item: `${PRODUCTION_SITE_ORIGIN}/${activeUrlLocale}/`,
+                  },
+                  {
+                    '@type': 'ListItem',
+                    position: 2,
+                    name: pick(seoRaw.blogCrumb, 'Blog'),
+                    item: `${PRODUCTION_SITE_ORIGIN}/${activeUrlLocale}/blog`,
+                  },
+                  { '@type': 'ListItem', position: 3, name: post.frontmatter.title, item: absoluteUrl },
+                ],
+              },
+              {
+                '@type': 'BlogPosting',
+                headline: post.frontmatter.title,
+                description: post.frontmatter.description,
+                datePublished: post.frontmatter.date,
+                inLanguage: activeUrlLocale,
+                mainEntityOfPage: { '@type': 'WebPage', '@id': absoluteUrl },
+                publisher: { '@id': `${PRODUCTION_SITE_ORIGIN}/#organization` },
+                author: { '@type': 'Organization', name: 'Solaris CET' },
+              },
             ],
-          },
-          {
-            '@type': 'BlogPosting',
-            headline: post.frontmatter.title,
-            description: post.frontmatter.description,
-            datePublished: post.frontmatter.date,
-            inLanguage: activeUrlLocale,
-            mainEntityOfPage: { '@type': 'WebPage', '@id': absoluteUrl },
-            publisher: { '@id': `${PRODUCTION_SITE_ORIGIN}/#organization` },
-            author: { '@type': 'Organization', name: 'Solaris CET' },
-          },
-        ],
-      };
+          };
 
-      applySpaSeo({
-        origin: PRODUCTION_SITE_ORIGIN,
-        pathnameNoLocale: `/blog/${post.slug}`,
-        locale: activeUrlLocale,
-        title: `${post.frontmatter.title} | Solaris CET`,
-        description: post.frontmatter.description,
-        keywords: `${baseKeywords}, blog`,
-        ogType: 'article',
-        jsonLd,
-      });
+          applySpaSeo({
+            origin: PRODUCTION_SITE_ORIGIN,
+            pathnameNoLocale: `/blog/${post.slug}`,
+            locale: activeUrlLocale,
+            title: `${post.frontmatter.title} | Solaris CET`,
+            description: post.frontmatter.description,
+            keywords: keywordString(baseKeywords, 'blog'),
+            ogType: 'article',
+            jsonLd,
+          });
+        })
+        .catch(() => {
+          applySpaSeo({
+            origin: PRODUCTION_SITE_ORIGIN,
+            pathnameNoLocale: routePath,
+            locale: activeUrlLocale,
+            title: seo('blogTitle', 'Blog | Solaris CET'),
+            description: seo('blogDescription', 'News, updates, and research notes from Solaris CET.'),
+            noindex: true,
+          });
+        });
       return;
     }
 
@@ -791,8 +887,8 @@ function AppContent() {
         origin: PRODUCTION_SITE_ORIGIN,
         pathnameNoLocale: routePath,
         locale: activeUrlLocale,
-        title: seo.homeTitle,
-        description: seo.homeDescription,
+        title: seo('homeTitle', 'Solaris CET'),
+        description: seo('homeDescription', 'Solaris CET on TON.'),
         noindex: true,
       });
       return;
@@ -807,7 +903,12 @@ function AppContent() {
                 '@type': 'BreadcrumbList',
                 itemListElement: [
                   { '@type': 'ListItem', position: 1, name: 'Home', item: `${PRODUCTION_SITE_ORIGIN}/${activeUrlLocale}/` },
-                  { '@type': 'ListItem', position: 2, name: seo.blogCrumb ?? 'Blog', item: `${PRODUCTION_SITE_ORIGIN}/${activeUrlLocale}/blog` },
+                  {
+                    '@type': 'ListItem',
+                    position: 2,
+                    name: pick(seoRaw.blogCrumb, 'Blog'),
+                    item: `${PRODUCTION_SITE_ORIGIN}/${activeUrlLocale}/blog`,
+                  },
                 ],
               },
               {
@@ -829,7 +930,16 @@ function AppContent() {
       title: meta.title,
       description: meta.description,
       keywords: meta.keywords,
-      noindex: meta.noindex,
+      noindex:
+        Boolean(meta.noindex) ||
+        (() => {
+          try {
+            const u = new URL(window.location.href);
+            return u.searchParams.has('v');
+          } catch {
+            return false;
+          }
+        })(),
       jsonLd,
     });
   }, [activeUrlLocale, langState.t, routePath]);
@@ -1132,7 +1242,7 @@ function AppContent() {
                 Solaris <CetSymbol className="text-white" />
               </h1>
               <p className="text-slate-200/90 max-w-2xl mx-auto leading-relaxed">
-                AI-native RWA token on TON with fixed 9,000 <CetSymbol className="text-slate-200/90" /> supply and a sovereign proof surface.
+                AI-native token on TON with fixed 9,000 <CetSymbol className="text-slate-200/90" /> supply and a sovereign proof surface.
               </p>
             </main>
           ) : (
@@ -1163,9 +1273,25 @@ function App() {
     : `${PRODUCTION_SITE_ORIGIN}/tonconnect-manifest.json`;
 
   return (
-    <TonConnectUIProvider manifestUrl={manifestUrl}>
-      <AppContent />
-    </TonConnectUIProvider>
+    <TonConnectFeatureProvider>
+      <TonConnectGate manifestUrl={manifestUrl}>
+        <AppContent />
+      </TonConnectGate>
+    </TonConnectFeatureProvider>
+  );
+}
+
+function TonConnectGate({ manifestUrl, children }: { manifestUrl: string; children: React.ReactNode }) {
+  const { requested } = useTonConnectFeature();
+  const blockWhileLoading =
+    typeof window !== 'undefined' &&
+    /^(?:\/(?:en|ro))?(?:\/(wallet|account|login|auth|staking|tx-history|nfts|profile|airdrop|settings))(?:\/|$)/.test(
+      window.location.pathname || '/',
+    );
+  return (
+    <TonConnectLazyProvider requested={requested} manifestUrl={manifestUrl} blockWhileLoading={blockWhileLoading}>
+      {children}
+    </TonConnectLazyProvider>
   );
 }
 

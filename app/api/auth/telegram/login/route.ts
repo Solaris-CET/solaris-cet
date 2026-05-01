@@ -1,12 +1,10 @@
 import crypto from 'node:crypto';
-
 import { eq } from 'drizzle-orm';
-
-import { getDb, schema } from '../../../../db/client';
-import { clientIp } from '../../../lib/clientIp';
 import { jsonResponse, optionsResponse } from '../../../lib/http';
-import { getJwtSecretsFromEnv, signJwt } from '../../../lib/jwt';
 import { ensureAllowedOrigin } from '../../../lib/originGuard';
+import { getDb, schema } from '../../../../db/client';
+import { getJwtSecretsFromEnv, signJwt } from '../../../lib/jwt';
+import { clientIp } from '../../../lib/clientIp';
 
 export const config = { runtime: 'nodejs' };
 

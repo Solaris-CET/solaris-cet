@@ -1,5 +1,6 @@
-import { gsap } from 'gsap';
 import React, { useEffect, useRef } from 'react';
+
+import { loadGsapWithScrollTrigger } from '@/lib/gsapLazy';
 
 type AnimatedCounterProps = {
   value?: number;
@@ -49,24 +50,31 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
       return;
     }
     const target = { val: 0 };
-    gsap.to(target, {
-      val: targetValue,
-      duration: duration,
-      ease: "power3.out",
-      onUpdate: () => {
-        if (node) {
+    let cancelled = false;
+    let tween: { kill: () => void } | null = null;
+    void loadGsapWithScrollTrigger().then(({ gsap }) => {
+      if (cancelled) return;
+      tween = gsap.to(target, {
+        val: targetValue,
+        duration: duration,
+        ease: 'power3.out',
+        onUpdate: () => {
           const formatted = target.val.toLocaleString(undefined, {
             minimumFractionDigits: decimals,
             maximumFractionDigits: decimals,
           });
           node.textContent = `${prefix}${formatted}${suffix}`;
-        }
-      },
-      scrollTrigger: {
-        trigger: node,
-        start: "top 95%",
-      }
+        },
+        scrollTrigger: {
+          trigger: node,
+          start: 'top 95%',
+        },
+      });
     });
+    return () => {
+      cancelled = true;
+      tween?.kill();
+    };
   }, [value, end, prefix, suffix, duration, decimals]);
 
   return (

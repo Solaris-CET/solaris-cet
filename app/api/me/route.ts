@@ -1,9 +1,8 @@
 import { eq, sql } from 'drizzle-orm';
-
-import { getDb, schema } from '../../db/client';
-import { requireAuth } from '../lib/auth';
 import { getAllowedOrigin } from '../lib/cors';
 import { jsonResponse, optionsResponse } from '../lib/http';
+import { requireAuth } from '../lib/auth';
+import { getDb, schema } from '../../db/client';
 
 export const config = { runtime: 'nodejs' };
 

@@ -1,5 +1,6 @@
-import matter from 'gray-matter'
 import { marked } from 'marked'
+
+import { extractFrontmatter } from './frontmatter'
 
 import auditsEn from '../content/legal/en/audits.md?raw'
 import cookiesEn from '../content/legal/en/cookies.md?raw'
@@ -85,7 +86,7 @@ const rawByLocaleKey: Record<`${LegalLocale}/${LegalDocKey}`, string> = {
 
 export function getLegalDoc(locale: LegalLocale, key: LegalDocKey): LegalDoc {
   const raw = rawByLocaleKey[`${locale}/${key}`] ?? rawByLocaleKey[`en/${key}`]
-  const parsed = matter(raw)
+  const parsed = extractFrontmatter(raw)
   const frontmatter = parseFrontmatter(parsed.data)
   return {
     key,

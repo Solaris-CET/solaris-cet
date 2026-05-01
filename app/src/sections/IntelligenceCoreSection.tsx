@@ -1,4 +1,3 @@
-import { gsap } from 'gsap';
 import { Brain, Eye, Lightbulb, Play, Zap } from 'lucide-react';
 import { useEffect,useLayoutEffect, useMemo, useRef, useState } from 'react';
 
@@ -12,6 +11,7 @@ import { useAsyncCssReady } from '../hooks/useAsyncCssReady';
 import { useLanguage } from '../hooks/useLanguage';
 import { useNearScreen } from '../hooks/useNearScreen';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { loadGsapWithScrollTrigger } from '../lib/gsapLazy';
 
 
 type ReactStep = { phase: string; icon: string; text: string; color: string };
@@ -56,48 +56,53 @@ const IntelligenceCoreSection = () => {
       return;
     }
 
-    const ctx = gsap.context(() => {
-      const scrollTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: '+=70%',
-          pin: true,
-          scrub: 0.5,
-        },
-      });
+    let cancelled = false;
+    let ctx: { revert: () => void } | null = null;
+    void loadGsapWithScrollTrigger().then(({ gsap }) => {
+      if (cancelled) return;
+      ctx = gsap.context(() => {
+        const scrollTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: '+=70%',
+            pin: true,
+            scrub: 0.5,
+          },
+        });
 
-      // ENTRANCE (0% - 30%)
-      scrollTl.fromTo(
-        leftCardRef.current,
-        { x: '-55vw', opacity: 0 },
-        { x: 0, opacity: 1, ease: 'none' },
-        0
-      );
-
-      scrollTl.fromTo(
-        rightCardRef.current,
-        { x: '55vw', rotateY: -35, opacity: 0 },
-        { x: 0, rotateY: 0, opacity: 1, ease: 'none' },
-        0
-      );
-
-      const chips = chipsRef.current?.querySelectorAll('.hud-chip');
-      if (chips) {
         scrollTl.fromTo(
-          chips,
-          { scale: 0.7, y: '4vh', opacity: 0 },
-          { scale: 1, y: 0, opacity: 1, stagger: 0.03, ease: 'none' },
-          0.1
+          leftCardRef.current,
+          { x: '-55vw', opacity: 0 },
+          { x: 0, opacity: 1, ease: 'none' },
+          0,
         );
-      }
 
-      // SETTLE (30% - 70%): Hold
+        scrollTl.fromTo(
+          rightCardRef.current,
+          { x: '55vw', rotateY: -35, opacity: 0 },
+          { x: 0, rotateY: 0, opacity: 1, ease: 'none' },
+          0,
+        );
 
-      scrollTl.to([leftCardRef.current, rightCardRef.current], { scale: 0.99, ease: 'none' }, 0.72);
-    }, section);
+        const chips = chipsRef.current?.querySelectorAll('.hud-chip');
+        if (chips) {
+          scrollTl.fromTo(
+            chips,
+            { scale: 0.7, y: '4vh', opacity: 0 },
+            { scale: 1, y: 0, opacity: 1, stagger: 0.03, ease: 'none' },
+            0.1,
+          );
+        }
 
-    return () => ctx.revert();
+        scrollTl.to([leftCardRef.current, rightCardRef.current], { scale: 0.99, ease: 'none' }, 0.72);
+      }, section);
+    });
+
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
   }, [prefersReducedMotion, cssReady, isNearScreen]);
 
   return (

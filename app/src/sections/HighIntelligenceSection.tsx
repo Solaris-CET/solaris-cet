@@ -1,9 +1,9 @@
-import { gsap } from 'gsap';
 import { Atom, Brain, ChevronRight, Cpu,Eye, RotateCcw, Zap } from 'lucide-react';
 import { useCallback,useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { useLanguage } from '@/hooks/useLanguage';
 import { type ObserveLocusBranch,observeLocusClip } from '@/lib/meshSkillFeed';
+import { loadGsapWithScrollTrigger } from '@/lib/gsapLazy';
 
 // Realistic TON mainnet block height range (as of 2025)
 const TON_MAINNET_BLOCK_MIN = 40_000_000;
@@ -546,45 +546,53 @@ const HighIntelligenceSection = () => {
     const section = sectionRef.current;
     if (!section) return;
 
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headingRef.current,
-        { y: 32, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: headingRef.current,
-            start: 'top 82%',
-            end: 'top 55%',
-            scrub: true,
-          },
-        }
-      );
-
-      const cards = cardsRef.current?.querySelectorAll('.hi-card');
-      if (cards) {
+    let cancelled = false;
+    let ctx: { revert: () => void } | null = null;
+    void loadGsapWithScrollTrigger().then(({ gsap }) => {
+      if (cancelled) return;
+      ctx = gsap.context(() => {
         gsap.fromTo(
-          cards,
-          { y: 48, opacity: 0 },
+          headingRef.current,
+          { y: 32, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            stagger: 0.18,
             duration: 0.8,
             scrollTrigger: {
-              trigger: cardsRef.current,
-              start: 'top 78%',
-              end: 'top 30%',
+              trigger: headingRef.current,
+              start: 'top 82%',
+              end: 'top 55%',
               scrub: true,
             },
-          }
+          },
         );
-      }
-    }, section);
 
-    return () => ctx.revert();
+        const cards = cardsRef.current?.querySelectorAll('.hi-card');
+        if (cards) {
+          gsap.fromTo(
+            cards,
+            { y: 48, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              stagger: 0.18,
+              duration: 0.8,
+              scrollTrigger: {
+                trigger: cardsRef.current,
+                start: 'top 78%',
+                end: 'top 30%',
+                scrub: true,
+              },
+            },
+          );
+        }
+      }, section);
+    });
+
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
   }, []);
 
   return (

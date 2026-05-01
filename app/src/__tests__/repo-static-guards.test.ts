@@ -97,11 +97,10 @@ describe("index.html — canonical production site URL", () => {
 });
 
 describe("index.html — critical image preloads for LCP", () => {
-  it("preloads Solaris brand raster and hero coin", () => {
+  it("preloads cinematic poster and avoids hero coin", () => {
     const appIndexHtml = readFileSync(join(repoRoot, "app/index.html"), "utf8");
-    const escapedLogo = 'solaris-cet-logo-emblem-190\\.jpg';
-    expect(appIndexHtml).toMatch(new RegExp(`rel="preload"[^>]+${escapedLogo}`, "s"));
-    expect(appIndexHtml).toMatch(/rel="preload"[^>]+hero-coin\.png/s);
+    expect(appIndexHtml).toMatch(/rel="preload"[^>]+cosmic-poster-768\.webp/s);
+    expect(appIndexHtml).not.toMatch(/rel="preload"[^>]+hero-coin\.png/s);
   });
 });
 

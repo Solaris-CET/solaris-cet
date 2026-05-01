@@ -2,7 +2,7 @@ import { PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
 
 export type RwaStatus = 'active' | 'planned' | 'risk';
 
-export type RwaProjectType = 'agricultural_land' | 'ai_infrastructure' | 'compliance_anchor';
+export type RwaProjectType = 'virtual_agricultural_land' | 'ai_infrastructure' | 'compliance_anchor';
 
 export type RwaDocType = 'whitepaper' | 'land_registry' | 'audit' | 'ipfs_proof' | 'timeline';
 
@@ -91,9 +91,9 @@ export const RWA_TIMELINE: readonly RwaTimelineEvent[] = [
   {
     id: 'tl-2026-q2',
     slug: 'rwa-tokenisation-pilot',
-    title: 'RWA tokenisation pilot (Cetățuia) — active phase',
+    title: 'Virtual land layer pilot (Cetățuia) — active phase',
     description:
-      'Pilot phase for mapping real-world documentation, operations attestations and on-chain references into a cohesive public RWA portfolio view.',
+      'Pilot phase for publishing world specs, deterministic generation proofs and on-chain references into a cohesive public virtual land portfolio view.',
     date: '2026-06-30',
     status: 'active',
   },
@@ -111,13 +111,13 @@ export const RWA_TIMELINE: readonly RwaTimelineEvent[] = [
 export const RWA_PROJECTS: readonly RwaProject[] = [
   {
     id: 'cetatuia-land',
-    slug: 'cetatuia-agricultural-land',
-    title: 'Cetățuia Agricultural Land',
+    slug: 'cetatuia-virtual-agricultural-land',
+    title: 'Cetățuia Virtual Agricultural Land',
     summary:
-      'Primary narrative anchor: productive agricultural land in Cetățuia, Romania with IPFS + TON attestations.',
+      'Primary narrative anchor: a Cetățuia-inspired virtual agricultural land layer with IPFS + TON attestations.',
     status: 'active',
     region: 'Cetățuia, Romania',
-    projectType: 'agricultural_land',
+    projectType: 'virtual_agricultural_land',
     marker: { xPct: 62, yPct: 48 },
     documentIds: ['whitepaper-ipfs', 'whitepaper-html', 'ipfs-proof'],
     timelineIds: ['tl-2025-q4', 'tl-2026-q1', 'tl-2026-q2', 'tl-2026-q3'],

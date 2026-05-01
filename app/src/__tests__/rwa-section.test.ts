@@ -2,10 +2,10 @@ import { describe, expect,it } from 'vitest';
 
 const RWA_STATS = [
   { label: 'Location',       value: 'Cetățuia, Romania'   },
-  { label: 'Asset Class',    value: 'Agricultural Land'   },
+  { label: 'Asset Class',    value: 'Virtual Agricultural Land'   },
   { label: 'AI Integration', value: 'Precision Farming'   },
   { label: 'On-Chain Proof', value: 'IPFS + TON L1'       },
-  { label: 'Yield Type',     value: 'Agricultural + Token' },
+  { label: 'Yield Type',     value: 'Simulation + Token' },
   { label: 'Token Layer',    value: 'CET · 9,000 supply'  },
 ];
 

@@ -1,6 +1,5 @@
-import { gsap } from 'gsap';
 import { Brain, Zap } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 import MeshSkillRibbon from '@/components/MeshSkillRibbon';
 import { SolarisLogoMark } from '@/components/SolarisLogoMark';
@@ -13,20 +12,6 @@ import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
  */
 const AgentBridge = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Animate the signal packets travelling left→right
-      gsap.to('.bridge-dot', {
-        x: '100%',
-        duration: 2.4,
-        stagger: { each: 0.4, repeat: -1 },
-        ease: 'power1.inOut',
-        opacity: 0,
-      });
-    }, containerRef);
-    return () => ctx.revert();
-  }, []);
 
   const NODE_STYLE = 'bento-card p-5 text-center min-w-[130px] lg:min-w-[160px] flex flex-col items-center gap-2';
 

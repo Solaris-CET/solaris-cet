@@ -3,7 +3,12 @@ const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 const { NodeSDK } = require('@opentelemetry/sdk-node');
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
-const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
+let getNodeAutoInstrumentations = null;
+try {
+  ({ getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node'));
+} catch {
+  getNodeAutoInstrumentations = null;
+}
 
 function boolFromEnv(name, fallback) {
   const v = String(process.env[name] ?? '').trim();
@@ -68,11 +73,13 @@ if (!otelEnabled || !otlpTracesEndpoint) {
         'production',
     }),
     traceExporter: new OTLPTraceExporter({ url: otlpTracesEndpoint, headers: {} }),
-    instrumentations: [
-      getNodeAutoInstrumentations({
-        '@opentelemetry/instrumentation-fs': { enabled: false },
-      }),
-    ],
+    instrumentations: getNodeAutoInstrumentations
+      ? [
+          getNodeAutoInstrumentations({
+            '@opentelemetry/instrumentation-fs': { enabled: false },
+          }),
+        ]
+      : [],
   });
 
   const startPromise = sdk
@@ -93,4 +100,3 @@ if (!otelEnabled || !otlpTracesEndpoint) {
 
   module.exports = startPromise;
 }
-

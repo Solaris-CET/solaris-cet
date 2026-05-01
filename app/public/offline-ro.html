@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ro">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#05060B" />
+    <meta
+      name="description"
+      content="Solaris CET offline surface. Când aplicația nu este disponibilă, poți accesa suprafața statică OMEGA pentru reperele proiectului."
+    />
+    <title>Offline — Solaris CET</title>
+    <style>
+      :root {
+        --void: #020617;
+        --gold: #f2c94c;
+        --muted: #94a3b8;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: var(--void);
+        color: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        text-align: center;
+      }
+      .panel {
+        max-width: 26rem;
+        padding: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        background: rgba(255, 255, 255, 0.04);
+      }
+      h1 {
+        font-family: ui-monospace, monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin: 0 0 0.75rem;
+      }
+      p {
+        margin: 0 0 1rem;
+        color: var(--muted);
+        line-height: 1.5;
+        font-size: 0.95rem;
+      }
+      a {
+        color: var(--gold);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(242, 201, 76, 0.35);
+      }
+      a:hover {
+        border-bottom-color: var(--gold);
+      }
+      .mono {
+        font-family: ui-monospace, monospace;
+        font-size: 0.8rem;
+        color: #f8fafc;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0.7rem 1rem;
+        border-radius: 0.9rem;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        color: #f8fafc;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        letter-spacing: 0.01em;
+      }
+      .btn:hover {
+        background: rgba(255, 255, 255, 0.09);
+      }
+      .btn.primary {
+        border-color: rgba(242, 201, 76, 0.28);
+        background: rgba(242, 201, 76, 0.12);
+        color: #f2c94c;
+      }
+      .btn.primary:hover {
+        background: rgba(242, 201, 76, 0.16);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="panel">
+      <h1>Rețea indisponibilă</h1>
+      <p class="mono">Solaris CET</p>
+      <p>
+        App-ul poate funcționa offline după prima vizită reușită. Dacă nu se
+        încarcă, poți deschide suprafața statică <strong>OMEGA</strong> (fără
+        JavaScript) pentru reperele proiectului.
+      </p>
+      <div class="actions" role="group" aria-label="Acțiuni offline">
+        <a class="btn primary" href="/ro/?retry=1">Reîncearcă</a>
+        <a class="btn" href="/ro/">Acasă</a>
+        <a class="btn" href="/sovereign/">Deschide OMEGA</a>
+      </div>
+    </div>
+  </body>
+</html>

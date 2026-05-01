@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+import { utMeasureToNextFrame } from '@/lib/userTiming';
 
 import { useLanguage } from '../hooks/useLanguage';
 import { SolarisLogoMark } from './SolarisLogoMark';
@@ -17,16 +18,34 @@ const BackToTop = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 600);
+    let raf = 0;
+    let last: boolean | null = null;
+    const apply = () => {
+      raf = 0;
+      const next = window.scrollY > 600;
+      if (last === null || last !== next) {
+        last = next;
+        setVisible(next);
+      }
+    };
+    const onScroll = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(apply);
+    };
+    apply();
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
   }, []);
 
   return (
     <button
-      onClick={() =>
-        window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' })
-      }
+      onClick={() => {
+        utMeasureToNextFrame('ui:back-to-top');
+        window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+      }}
       aria-label={t.common.backToTop}
       title={shortSkillWhisper(skillSeedFromLabel('backToTop|scrollAnchor'))}
       aria-hidden={!visible}

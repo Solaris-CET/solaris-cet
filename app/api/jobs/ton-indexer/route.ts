@@ -1,12 +1,11 @@
 import { desc } from 'drizzle-orm'
-
-import { getDb, schema } from '../../../db/client'
-import { CET_CONTRACT_ADDRESS } from '../../../src/lib/cetContract'
 import { getAllowedOrigin } from '../../lib/cors'
 import { requireCron } from '../../lib/cron'
 import { corsJson, corsOptions } from '../../lib/http'
 import { fetchTonapiJson, parseTonNetwork } from '../../lib/tonapi'
 import { tonAddressSchema } from '../../lib/validation'
+import { getDb, schema } from '../../../db/client'
+import { CET_CONTRACT_ADDRESS } from '../../../src/lib/cetContract'
 
 export const config = { runtime: 'nodejs' }
 

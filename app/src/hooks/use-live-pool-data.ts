@@ -51,7 +51,7 @@ export function createTimeoutSignal(ms: number): AbortSignal {
   return controller.signal;
 }
 
-export function useLivePoolData(): PoolData {
+export function useLivePoolData({ enabled = true }: { enabled?: boolean } = {}): PoolData {
   const [data, setData] = useState<PoolData>(INITIAL_STATE);
 
   const fetchData = useCallback(async ({ allowGql = true }: { allowGql?: boolean } = {}) => {
@@ -228,6 +228,7 @@ export function useLivePoolData(): PoolData {
   }, []);
 
   useEffect(() => {
+    if (!enabled) return;
     let cancelled = false;
 
     const run = () => {
@@ -259,7 +260,7 @@ export function useLivePoolData(): PoolData {
       cancelled = true;
       clearInterval(id);
     };
-  }, [fetchData]);
+  }, [fetchData, enabled]);
 
   return data;
 }

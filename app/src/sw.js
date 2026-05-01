@@ -6,6 +6,77 @@ import { CacheableResponsePlugin } from 'workbox-cacheable-response'
 
 const sw = globalThis
 
+const CACHE_SUFFIX = String(
+  (import.meta?.env?.VITE_GIT_COMMIT_HASH ?? import.meta?.env?.VITE_BUILD_TIMESTAMP ?? 'dev') || 'dev',
+).slice(0, 12)
+
+function cache(base) {
+  return `${base}-${CACHE_SUFFIX}`
+}
+
+const SENSITIVE_QUERY_KEYS = ['token', 'auth', 'apikey', 'api_key', 'key', 'signature', 'sig', 'session', 'jwt']
+
+function isSensitiveUrl(url) {
+  if (!url || typeof url.search !== 'string') return false
+  if (!url.search) return false
+  for (const k of SENSITIVE_QUERY_KEYS) {
+    try {
+      if (url.searchParams?.has?.(k)) return true
+    } catch {
+      void 0
+    }
+  }
+  return /\b(token|auth|apikey|api_key|signature|session|jwt)=/i.test(url.search)
+}
+
+function isRangeRequest(request) {
+  try {
+    const v = request?.headers?.get?.('range')
+    return typeof v === 'string' && v.length > 0
+  } catch {
+    return false
+  }
+}
+
+function cacheNameForUrl(url) {
+  const p = url?.pathname ?? ''
+  if (url?.origin === sw.location.origin) {
+    if (p.startsWith('/api/')) return null
+
+    if (p.startsWith('/whitepaper/') || p.endsWith('.pdf')) return cache('whitepaper-pdf-cache')
+    if (p.startsWith('/assets/') && (p.endsWith('.js') || p.endsWith('.css'))) return cache('asset-chunks')
+
+    if (
+      p === '/manifest.json' ||
+      p === '/offline.html' ||
+      /^\/offline-(en|ro|es|zh|ru|pt|de)\.html$/.test(p) ||
+      p === '/offline-image.svg' ||
+      p === '/favicon.svg' ||
+      p === '/favicon.ico' ||
+      /^\/favicon-(16x16|32x32)\.png$/.test(p) ||
+      p === '/apple-touch-icon.png' ||
+      p === '/safari-pinned-tab.svg'
+    ) {
+      return cache('meta-files-cache')
+    }
+
+    if (/\.(woff2?|ttf|otf)$/i.test(p)) return cache('fonts-cache')
+    if (/\.(png|jpe?g|webp|svg|ico)$/i.test(p)) return cache('images-cache')
+
+    if (p.startsWith('/sovereign/') || p.startsWith('/apocalypse/') || p.startsWith('/audit/')) {
+      if (/\.(css|js|png|jpe?g|webp|svg|ico|woff2?|ttf|otf)$/i.test(p)) return cache('static-surfaces-assets')
+      return cache('static-sites-pages')
+    }
+
+    if (p.endsWith('.html')) return cache('static-sites-pages')
+    return null
+  }
+
+  if (url?.origin === 'https://ipfs.io' && url.pathname.endsWith('.pdf')) return cache('ipfs-whitepaper-cache')
+
+  return null
+}
+
 sw.addEventListener('install', (event) => {
   const probe = async () => {
     try {
@@ -38,9 +109,65 @@ sw.addEventListener('install', (event) => {
 })
 
 sw.addEventListener('activate', (event) => {
-  if (sw.clients?.claim) {
-    event.waitUntil(sw.clients.claim())
+  const jobs = []
+  if (sw.clients?.claim) jobs.push(sw.clients.claim())
+  if (sw.registration?.navigationPreload?.enable) {
+    jobs.push(
+      sw.registration.navigationPreload.enable().catch(() => {
+        void 0
+      }),
+    )
   }
+
+  jobs.push(
+    (async () => {
+      const bases = [
+        'asset-chunks',
+        'whitepaper-pdf-cache',
+        'ipfs-whitepaper-cache',
+        'static-sites-pages',
+        'meta-files-cache',
+        'images-cache',
+        'static-surfaces-assets',
+        'fonts-cache',
+        'state-json-cache',
+        'dedust-api-cache',
+        'coingecko-api-cache',
+        'onnx-wasm-cache',
+      ]
+      const keep = new Set(bases.map((b) => cache(b)))
+      const keys = await sw.caches.keys()
+      await Promise.all(
+        keys
+          .filter((k) => bases.some((b) => k === b || k.startsWith(`${b}-`)))
+          .filter((k) => !keep.has(k))
+          .map((k) => sw.caches.delete(k)),
+      )
+    })(),
+  )
+
+  jobs.push(
+    (async () => {
+      try {
+        const cacheName = cache('static-surfaces-assets')
+        const c = await sw.caches.open(cacheName)
+        const urls = ['/sovereign/css/sovereign-ui.css', '/sovereign/css/print.css']
+        for (const u of urls) {
+          try {
+            const req = new Request(u, { cache: 'reload', credentials: 'omit' })
+            const res = await fetch(req)
+            if (!res.ok) continue
+            await c.put(req, res.clone())
+          } catch {
+            void 0
+          }
+        }
+      } catch {
+        void 0
+      }
+    })(),
+  )
+  if (jobs.length) event.waitUntil(Promise.all(jobs))
 })
 
 const wbManifest = self.__WB_MANIFEST || []
@@ -51,9 +178,16 @@ const filteredManifest = wbManifest.filter((entry) => {
 
   if (url === 'index.html') return true
   if (url === 'offline.html') return true
+  if (url === 'offline-ro.html') return true
+  if (/^offline-(en|ro|es|zh|ru|pt|de)\.html$/.test(url)) return true
   if (url === 'manifest.json') return true
   if (url === 'offline-image.svg') return true
+  if (url === 'hero-coin.png') return true
+  if (url === 'solaris-cet-logo-emblem-190.jpg') return true
+  if (/^cinematic\/cosmic-poster-(768|1024)\.(webp|jpg)$/.test(url)) return true
+  if (url === 'fonts/jetbrains-mono-400.woff2') return true
   if (/^icon-(192|512)\.png$/.test(url)) return true
+  if (/^icon-maskable-(192|512)\.png$/.test(url)) return true
   if (/^favicon\.(svg|ico)$/.test(url)) return true
   if (/^favicon-(16x16|32x32)\.png$/.test(url)) return true
   if (url === 'apple-touch-icon.png') return true
@@ -75,6 +209,87 @@ sw.addEventListener('message', (event) => {
       (async () => {
         const keys = await sw.caches.keys()
         await Promise.all(keys.map((k) => sw.caches.delete(k)))
+      })(),
+    )
+  }
+
+  if (data && typeof data === 'object' && data.type === 'PREFETCH_URLS' && Array.isArray(data.urls)) {
+    const urls = data.urls.slice(0, 60).filter((u) => typeof u === 'string')
+    event.waitUntil(
+      (async () => {
+        let okCount = 0
+        let failCount = 0
+        for (const raw of urls) {
+          try {
+            const u = new URL(raw, sw.location.origin)
+            if (isSensitiveUrl(u)) {
+              failCount += 1
+              continue
+            }
+
+            const cacheName = cacheNameForUrl(u)
+            if (!cacheName) {
+              failCount += 1
+              continue
+            }
+
+            const reqInit =
+              u.origin === sw.location.origin
+                ? { cache: 'reload', credentials: 'omit' }
+                : { cache: 'reload', credentials: 'omit', mode: 'no-cors' }
+            const req = new Request(u.href, reqInit)
+            const res = await fetch(req)
+            const ok = res.ok || res.type === 'opaque'
+            if (!ok) {
+              failCount += 1
+              continue
+            }
+
+            const c = await sw.caches.open(cacheName)
+            await c.put(req, res.clone())
+            okCount += 1
+          } catch {
+            failCount += 1
+          }
+        }
+        try {
+          const source = event.source
+          source?.postMessage?.({ type: 'PREFETCH_DONE', okCount, failCount })
+        } catch {
+          void 0
+        }
+      })(),
+    )
+  }
+
+  if (data && typeof data === 'object' && data.type === 'GET_CACHE_STATUS') {
+    event.waitUntil(
+      (async () => {
+        try {
+          const cacheNames = await sw.caches.keys()
+          const limited = cacheNames.slice(0, 30)
+          const entries = await Promise.all(
+            limited.map(async (name) => {
+              try {
+                const c = await sw.caches.open(name)
+                const keys = await c.keys()
+                return { name, entries: keys.length }
+              } catch {
+                return { name, entries: -1 }
+              }
+            }),
+          )
+          event.source?.postMessage?.({
+            type: 'CACHE_STATUS',
+            cacheCount: cacheNames.length,
+            entries,
+          })
+        } catch (e) {
+          event.source?.postMessage?.({
+            type: 'CACHE_STATUS',
+            error: String(e instanceof Error ? e.message : e),
+          })
+        }
       })(),
     )
   }
@@ -116,17 +331,18 @@ registerRoute(
   ({ url }) =>
     url.pathname.startsWith('/assets/') && (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')),
   new StaleWhileRevalidate({
-    cacheName: 'asset-chunks',
+    cacheName: cache('asset-chunks'),
     plugins: [new ExpirationPlugin({ maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 14 })],
   }),
 )
 
 registerRoute(
-  ({ url }) =>
+  ({ request, url }) =>
     url.origin === sw.location.origin &&
+    !isRangeRequest(request) &&
     (url.pathname.endsWith('.pdf') || url.pathname.startsWith('/whitepaper/')),
   new CacheFirst({
-    cacheName: 'whitepaper-pdf-cache',
+    cacheName: cache('whitepaper-pdf-cache'),
     plugins: [
       new CacheableResponsePlugin({ statuses: [0, 200] }),
       new ExpirationPlugin({ maxEntries: 8, maxAgeSeconds: 60 * 60 * 24 * 30 }),
@@ -137,7 +353,7 @@ registerRoute(
 registerRoute(
   ({ url }) => /^https:\/\/dweb\.link\/ipfs\//i.test(url.href),
   new CacheFirst({
-    cacheName: 'ipfs-whitepaper-cache',
+    cacheName: cache('ipfs-whitepaper-cache'),
     plugins: [
       new CacheableResponsePlugin({ statuses: [0, 200] }),
       new ExpirationPlugin({ maxEntries: 8, maxAgeSeconds: 60 * 60 * 24 * 30 }),
@@ -150,9 +366,16 @@ registerRoute(
   new NavigationRoute(
     async (options) => {
       try {
+        const preload = await options?.event?.preloadResponse
+        if (preload) return preload
         return await appShellHandler(options)
       } catch {
-        const offline = await sw.caches.match('/offline.html')
+        const u = options?.request?.url ? new URL(options.request.url) : null
+        const p = u?.pathname ?? '/'
+        const m = p.match(/^\/(en|ro|es|zh|ru|pt|de)(?:\/|$)/i)
+        const locale = m?.[1]?.toLowerCase() ?? ''
+        const localized = locale ? await sw.caches.match(`/offline-${locale}.html`) : undefined
+        const offline = localized ?? (await sw.caches.match('/offline.html'))
         return offline ?? Response.error()
       }
     },
@@ -166,7 +389,7 @@ registerRoute(
   ({ request, url }) =>
     request.mode === 'navigate' && (url.pathname.startsWith('/sovereign/') || url.pathname.startsWith('/apocalypse/')),
   new StaleWhileRevalidate({
-    cacheName: 'static-sites-pages',
+    cacheName: cache('static-sites-pages'),
     plugins: [
       new CacheableResponsePlugin({ statuses: [200] }),
       new ExpirationPlugin({ maxEntries: 40, maxAgeSeconds: 60 * 60 * 24 * 30 }),
@@ -180,7 +403,7 @@ registerRoute(
     url.origin === sw.location.origin &&
     (url.pathname === '/robots.txt' || url.pathname === '/sitemap.xml'),
   new StaleWhileRevalidate({
-    cacheName: 'meta-files-cache',
+    cacheName: cache('meta-files-cache'),
     plugins: [
       new CacheableResponsePlugin({ statuses: [200] }),
       new ExpirationPlugin({ maxEntries: 4, maxAgeSeconds: 60 * 60 * 24 * 7 }),
@@ -192,9 +415,11 @@ registerRoute(
   ({ request, url }) =>
     request.method === 'GET' &&
     url.origin === sw.location.origin &&
+    !isRangeRequest(request) &&
+    !isSensitiveUrl(url) &&
     (request.destination === 'image' || /\.(png|jpe?g|webp|svg|ico)$/i.test(url.pathname)),
   new StaleWhileRevalidate({
-    cacheName: 'images-cache',
+    cacheName: cache('images-cache'),
     plugins: [
       new CacheableResponsePlugin({ statuses: [0, 200] }),
       new ExpirationPlugin({ maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 30 }),
@@ -206,20 +431,23 @@ registerRoute(
   ({ request, url }) =>
     request.method === 'GET' &&
     url.origin === sw.location.origin &&
+    !isRangeRequest(request) &&
+    !isSensitiveUrl(url) &&
     (url.pathname.startsWith('/sovereign/') || url.pathname.startsWith('/apocalypse/')),
   new CacheFirst({
-    cacheName: 'static-surfaces-assets',
+    cacheName: cache('static-surfaces-assets'),
     plugins: [
-      new CacheableResponsePlugin({ statuses: [200] }),
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
       new ExpirationPlugin({ maxEntries: 120, maxAgeSeconds: 60 * 60 * 24 * 30 }),
     ],
   }),
 )
 
 registerRoute(
-  ({ request }) => request.destination === 'font' && request.method === 'GET',
+  ({ request, url }) =>
+    request.destination === 'font' && request.method === 'GET' && !isRangeRequest(request) && !isSensitiveUrl(url),
   new CacheFirst({
-    cacheName: 'fonts-cache',
+    cacheName: cache('fonts-cache'),
     plugins: [
       new CacheableResponsePlugin({ statuses: [0, 200] }),
       new ExpirationPlugin({ maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 }),
@@ -230,7 +458,7 @@ registerRoute(
 registerRoute(
   ({ url }) => /\/api\/state\.json$/.test(url.pathname),
   new NetworkFirst({
-    cacheName: 'state-json-cache',
+    cacheName: cache('state-json-cache'),
     networkTimeoutSeconds: 2,
     plugins: [
       new CacheableResponsePlugin({ statuses: [200] }),
@@ -242,7 +470,7 @@ registerRoute(
 registerRoute(
   ({ url }) => /^https:\/\/api\.dedust\.io\//i.test(url.href),
   new NetworkFirst({
-    cacheName: 'dedust-api-cache',
+    cacheName: cache('dedust-api-cache'),
     networkTimeoutSeconds: 4,
     plugins: [
       new CacheableResponsePlugin({ statuses: [0, 200] }),
@@ -254,7 +482,7 @@ registerRoute(
 registerRoute(
   ({ url }) => /^https:\/\/api\.coingecko\.com\//i.test(url.href),
   new NetworkFirst({
-    cacheName: 'coingecko-api-cache',
+    cacheName: cache('coingecko-api-cache'),
     networkTimeoutSeconds: 4,
     plugins: [
       new CacheableResponsePlugin({ statuses: [0, 200] }),
@@ -266,7 +494,7 @@ registerRoute(
 registerRoute(
   ({ url }) => /^\/vendor\/onnxruntime\//i.test(url.pathname),
   new CacheFirst({
-    cacheName: 'onnx-wasm-cache',
+    cacheName: cache('onnx-wasm-cache'),
     plugins: [
       new CacheableResponsePlugin({ statuses: [0, 200] }),
       new ExpirationPlugin({ maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 }),
@@ -290,7 +518,11 @@ setCatchHandler(async ({ event }) => {
   }
 
   if (event?.request?.destination === 'document') {
-    const offline = await sw.caches.match('/offline.html')
+    const p = url?.pathname ?? '/'
+    const m = p.match(/^\/(en|ro|es|zh|ru|pt|de)(?:\/|$)/i)
+    const locale = m?.[1]?.toLowerCase() ?? ''
+    const localized = locale ? await sw.caches.match(`/offline-${locale}.html`) : undefined
+    const offline = localized ?? (await sw.caches.match('/offline.html'))
     if (offline) return offline
   }
 

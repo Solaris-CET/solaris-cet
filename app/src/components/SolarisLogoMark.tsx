@@ -3,7 +3,7 @@ import { memo, useCallback, useId, useState } from 'react';
 import { solarisCetLogoSrc } from '@/lib/brandAssets';
 import { cn } from '@/lib/utils';
 
-const LOGO_SRC = solarisCetLogoSrc();
+const FULL_LOGO_SRC = solarisCetLogoSrc();
 
 export type SolarisLogoMarkProps = {
   className?: string;
@@ -110,18 +110,40 @@ function SolarisLogoMarkInner({
       {rasterFailed ? (
         <SolarisVectorFallback crop={crop} decorative={decorative} />
       ) : (
-        <img
-          src={LOGO_SRC}
-          alt={imgAlt}
-          width={687}
-          height={1024}
-          decoding="async"
-          fetchPriority={priority ? 'high' : 'auto'}
-          loading={priority ? 'eager' : 'lazy'}
-          draggable={false}
-          onError={handleRasterError}
-          className={cn('solaris-holo-img', crop === 'emblem' ? 'solaris-holo-img--emblem' : 'solaris-holo-img--full')}
-        />
+        crop === 'emblem' ? (
+          <picture>
+            <source
+              type="image/webp"
+              srcSet={`${import.meta.env.BASE_URL}solaris-cet-logo-emblem-95.webp 95w, ${import.meta.env.BASE_URL}solaris-cet-logo-emblem-190.webp 190w`}
+              sizes="64px"
+            />
+            <img
+              src={`${import.meta.env.BASE_URL}solaris-cet-logo-emblem-190.jpg`}
+              alt={imgAlt}
+              width={190}
+              height={190}
+              decoding="async"
+              fetchPriority={priority ? 'high' : 'auto'}
+              loading={priority ? 'eager' : 'lazy'}
+              draggable={false}
+              onError={handleRasterError}
+              className={cn('solaris-holo-img', 'solaris-holo-img--emblem')}
+            />
+          </picture>
+        ) : (
+          <img
+            src={FULL_LOGO_SRC}
+            alt={imgAlt}
+            width={687}
+            height={1024}
+            decoding="async"
+            fetchPriority={priority ? 'high' : 'auto'}
+            loading={priority ? 'eager' : 'lazy'}
+            draggable={false}
+            onError={handleRasterError}
+            className={cn('solaris-holo-img', 'solaris-holo-img--full')}
+          />
+        )
       )}
     </span>
   );

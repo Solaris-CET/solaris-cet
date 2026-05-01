@@ -63,12 +63,11 @@
     "esbuild": "0.27.7",
     "protobufjs": "7.5.5",
     "uuid": "14.0.0",
-    "gaxios": {
-      "uuid": "14.0.0"
-    },
-    "mermaid": {
-      "uuid": "14.0.0"
-    },
+    "d3-color": "3.1.0",
+    "dompurify": "3.4.1",
+    "gaxios": "7.1.2",
+    "gcp-metadata": "8.1.2",
+    "mermaid": "11.14.0",
     "typescript": "5.8.3",
     "@esbuild-kit/core-utils": {
       "esbuild": "0.27.7"

@@ -100,7 +100,7 @@ export default function CetuiaMapSection() {
             <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
               <div className="text-xs font-mono text-white/55">NOTE</div>
               <p className="mt-2 text-sm text-solaris-muted leading-relaxed">
-                Statusurile sunt generate dintr-un endpoint de demo și vor fi conectate la ownership on-chain + indexer în pasul următor.
+                Statusurile sunt generate dintr-un endpoint de demo și vor fi conectate la dovada deținerii on-chain + indexer în pasul următor.
               </p>
             </div>
           </div>

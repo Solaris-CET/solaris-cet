@@ -7,7 +7,7 @@
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
   "orientation": "portrait-primary",
-  "start_url": "/en/",
+  "start_url": "/",
   "scope": "/",
   "categories": ["finance", "business", "utilities"],
   "lang": "en",
@@ -27,5 +27,21 @@
     "method": "GET",
     "enctype": "application/x-www-form-urlencoded",
     "params": { "title": "title", "text": "text", "url": "url" }
-  }
+  },
+  "screenshots": [
+    {
+      "src": "phone-mockup.png",
+      "sizes": "1024x1536",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Solaris CET — mobile interface"
+    },
+    {
+      "src": "og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Solaris CET — overview"
+    }
+  ]
 }

@@ -38,6 +38,13 @@ export default async function handler(req: Request): Promise<Response> {
     .limit(1);
   const [tg] = await db.select().from(schema.telegramLinks).where(eq(schema.telegramLinks.userId, user.id)).limit(1);
 
+  const consentProofs = await db
+    .select()
+    .from(schema.consentProofs)
+    .where(eq(schema.consentProofs.userId, user.id))
+    .orderBy(desc(schema.consentProofs.createdAt))
+    .limit(2000);
+
   const contacts = await db
     .select()
     .from(schema.contacts)
@@ -101,6 +108,20 @@ export default async function handler(req: Request): Promise<Response> {
           linkedAt: iso(tg.linkedAt),
         }
       : null,
+    consentProofs: consentProofs.map((p) => ({
+      id: p.id,
+      consentKey: p.consentKey,
+      essential: p.essential,
+      analytics: p.analytics,
+      marketing: p.marketing,
+      policyVersion: p.policyVersion,
+      policyHash: p.policyHash ?? null,
+      source: p.source,
+      ipHash: p.ipHash ?? null,
+      userAgent: p.userAgent ?? null,
+      meta: p.meta ?? null,
+      createdAt: iso(p.createdAt),
+    })),
     contacts: contacts.map((c) => ({
       id: c.id,
       email: c.email ?? null,
@@ -132,6 +153,7 @@ export default async function handler(req: Request): Promise<Response> {
       })),
     },
     limits: {
+      consentProofs: 2000,
       contacts: 50,
       pointsLedger: 5000,
       referralsAsReferrer: 5000,
