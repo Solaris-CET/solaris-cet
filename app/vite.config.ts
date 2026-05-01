@@ -4,7 +4,7 @@ import fs from "node:fs"
 import { sentryVitePlugin } from "@sentry/vite-plugin"
 import react from "@vitejs/plugin-react"
 import path from "path"
-import type { PluginOption } from "vite"
+import type { Plugin, PluginOption } from "vite"
 import { defineConfig } from "vite"
 import { compression } from "vite-plugin-compression2"
 import { VitePWA } from 'vite-plugin-pwa'
@@ -58,7 +58,7 @@ function previewHealthJson(): PluginOption {
 function injectGoogleSiteVerification(): Plugin {
   return {
     name: "inject-google-site-verification",
-    transformIndexHtml(html) {
+    transformIndexHtml(html: string) {
       const raw = process.env.VITE_GOOGLE_SITE_VERIFICATION?.trim()
       const esc = (s: string) =>
         s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;")
@@ -109,6 +109,133 @@ const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN?.trim()
 const sentryUrl = process.env.SENTRY_URL?.trim()
 const sentryEnabled = Boolean(sentryOrg && sentryProject && sentryAuthToken)
 
+const plugins: PluginOption[] = [previewHealthJson(), injectGoogleSiteVerification(), react()]
+
+if (sentryEnabled) {
+  plugins.push(
+    sentryVitePlugin({
+      authToken: sentryAuthToken,
+      org: sentryOrg,
+      project: sentryProject,
+      url: sentryUrl,
+      release: gitShort(),
+      sourcemaps: {
+        filesToDeleteAfterUpload: ['dist/**/*.map'],
+      },
+    } as unknown as Record<string, unknown>) as unknown as PluginOption,
+  )
+}
+
+plugins.push(
+  compression({
+    algorithms: ["brotliCompress"],
+    exclude: [/\.(br)$/, /\.(gz)$/],
+    threshold: 1024,
+  }) as unknown as PluginOption,
+)
+
+plugins.push(
+  VitePWA({
+    registerType: 'autoUpdate',
+    strategies: 'injectManifest',
+    srcDir: 'src',
+    filename: 'sw.js',
+    manifestFilename: 'manifest.json',
+    includeAssets: [
+      'favicon.svg',
+      'icon-192.png',
+      'icon-512.png',
+      SOLARIS_CET_LOGO_FILENAME,
+      OG_IMAGE_FILENAME,
+      'offline.html',
+      'offline-image.svg',
+    ],
+    manifest: {
+      name: 'Solaris CET',
+      short_name: 'Solaris',
+      description: 'Solaris CET — hyper-scarce RWA on TON: 9,000 CET, 90-year mining, Grok×Gemini Oracle, ~200k task agents, BRAID + RAV.',
+      theme_color: '#05060B',
+      background_color: '#05060B',
+      display: 'standalone',
+      display_override: ['standalone', 'minimal-ui', 'browser'],
+      orientation: 'portrait-primary',
+      start_url: '/en/',
+      scope: '/',
+      categories: ['finance', 'business', 'utilities'],
+      lang: 'en',
+      id: '/',
+      icons: [
+        {
+          src: 'icon-192.png',
+          sizes: '192x192',
+          type: 'image/png',
+          purpose: 'any maskable',
+        },
+        {
+          src: 'icon-512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any maskable',
+        },
+        {
+          src: 'favicon.svg',
+          sizes: 'any',
+          type: 'image/svg+xml',
+          purpose: 'any maskable',
+        },
+      ],
+      shortcuts: [
+        {
+          name: 'Buy CET on DeDust',
+          short_name: 'Buy CET',
+          url: DEDUST_POOL_DEPOSIT_URL,
+        },
+        {
+          name: 'Start Mining on Telegram',
+          short_name: 'Mine CET',
+          url: 'https://t.me/+tKlfzx7IWopmNWQ0',
+        },
+        {
+          name: 'How to buy CET',
+          short_name: 'Buy guide',
+          url: '/#how-to-buy',
+        },
+        {
+          name: 'Compare vs AI tokens',
+          short_name: 'Compare',
+          url: '/#competition',
+        },
+      ],
+      share_target: {
+        action: '/share',
+        method: 'GET',
+        enctype: 'application/x-www-form-urlencoded',
+        params: {
+          title: 'title',
+          text: 'text',
+          url: 'url',
+        },
+      },
+    },
+    injectManifest: {
+      globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json,webmanifest}'],
+      globIgnores: [
+        '**/vendor/onnxruntime/**',
+        '**/assets/mermaid-*.js*',
+        '**/assets/@mermaid-js/**',
+        '**/assets/cytoscape-*.js*',
+        '**/assets/cytoscape-*/*.js*',
+        '**/assets/three-*.js*',
+        '**/assets/three-stdlib-*.js*',
+        '**/assets/@react-three/**',
+        '**/assets/postprocessing-*.js*',
+        '**/assets/@react-three/postprocessing-*.js*',
+      ],
+      maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+    },
+  }) as unknown as PluginOption,
+)
+
 // https://vite.dev/config/
 export default defineConfig({
   base: '/',
@@ -116,133 +243,7 @@ export default defineConfig({
     "import.meta.env.VITE_GIT_COMMIT_HASH": JSON.stringify(gitShort()),
     "import.meta.env.VITE_BUILD_TIMESTAMP": JSON.stringify(buildTimestamp()),
   },
-  plugins: [
-    previewHealthJson(),
-    injectGoogleSiteVerification(),
-    react(),
-    ...(sentryEnabled
-      ? [
-          sentryVitePlugin({
-            authToken: sentryAuthToken,
-            org: sentryOrg,
-            project: sentryProject,
-            url: sentryUrl,
-            release: gitShort(),
-            sourcemaps: {
-              filesToDeleteAfterUpload: ['dist/**/*.map'],
-            },
-          } as unknown as Record<string, unknown>),
-        ]
-      : []),
-    // Emit Brotli-compressed (.br) assets alongside regular files.
-    // Reduces transfer size by up to 75 % vs gzip — critical for rural
-    // low-bandwidth users. Servers that support pre-compressed assets
-    // serve the .br variant with Content-Encoding: br automatically.
-    compression({
-      algorithms: ["brotliCompress"],
-      exclude: [/\.(br)$/, /\.(gz)$/],
-      threshold: 1024,
-    }),
-    VitePWA({
-      registerType: 'autoUpdate',
-      strategies: 'injectManifest',
-      srcDir: 'src',
-      filename: 'sw.js',
-      manifestFilename: 'manifest.json',
-      includeAssets: [
-        'favicon.svg',
-        'icon-192.png',
-        'icon-512.png',
-        SOLARIS_CET_LOGO_FILENAME,
-        OG_IMAGE_FILENAME,
-        'offline.html',
-        'offline-image.svg',
-      ],
-      manifest: {
-        name: 'Solaris CET',
-        short_name: 'Solaris',
-        description: 'Solaris CET — hyper-scarce RWA on TON: 9,000 CET, 90-year mining, Grok×Gemini Oracle, ~200k task agents, BRAID + RAV.',
-        theme_color: '#05060B',
-        background_color: '#05060B',
-        display: 'standalone',
-        display_override: ['standalone', 'minimal-ui', 'browser'],
-        orientation: 'portrait-primary',
-        start_url: '/en/',
-        scope: '/',
-        categories: ['finance', 'business', 'utilities'],
-        lang: 'en',
-        id: '/',
-        icons: [
-          {
-            src: 'icon-192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any maskable',
-          },
-          {
-            src: 'icon-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable',
-          },
-          {
-            src: 'favicon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
-            purpose: 'any maskable',
-          },
-        ],
-        shortcuts: [
-          {
-            name: 'Buy CET on DeDust',
-            short_name: 'Buy CET',
-            url: DEDUST_POOL_DEPOSIT_URL,
-          },
-          {
-            name: 'Start Mining on Telegram',
-            short_name: 'Mine CET',
-            url: 'https://t.me/+tKlfzx7IWopmNWQ0',
-          },
-          {
-            name: 'How to buy CET',
-            short_name: 'Buy guide',
-            url: '/#how-to-buy',
-          },
-          {
-            name: 'Compare vs AI tokens',
-            short_name: 'Compare',
-            url: '/#competition',
-          },
-        ],
-        share_target: {
-          action: '/share',
-          method: 'GET',
-          enctype: 'application/x-www-form-urlencoded',
-          params: {
-            title: 'title',
-            text: 'text',
-            url: 'url',
-          },
-        },
-      },
-      injectManifest: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json,webmanifest}'],
-        globIgnores: [
-          '**/vendor/onnxruntime/**',
-          '**/assets/mermaid-*.js*',
-          '**/assets/@mermaid-js/**',
-          '**/assets/cytoscape-*.js*',
-          '**/assets/cytoscape-*/*.js*',
-          '**/assets/three-*.js*',
-          '**/assets/three-stdlib-*.js*',
-          '**/assets/@react-three/**',
-          '**/assets/postprocessing-*.js*',
-          '**/assets/@react-three/postprocessing-*.js*',
-        ],
-        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
-      },
-    }),
-  ] satisfies PluginOption[],
+  plugins,
   preview: {
     host: '0.0.0.0',
     port: resolvePreviewPort(),
