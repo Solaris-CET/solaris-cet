@@ -156,6 +156,7 @@ export default defineConfig({
         SOLARIS_CET_LOGO_FILENAME,
         OG_IMAGE_FILENAME,
         'offline.html',
+        'offline-image.svg',
       ],
       manifest: {
         name: 'Solaris CET',
@@ -166,7 +167,7 @@ export default defineConfig({
         display: 'standalone',
         display_override: ['standalone', 'minimal-ui', 'browser'],
         orientation: 'portrait-primary',
-        start_url: '/',
+        start_url: '/en/',
         scope: '/',
         categories: ['finance', 'business', 'utilities'],
         lang: 'en',
