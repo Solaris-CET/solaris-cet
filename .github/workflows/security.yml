@@ -94,7 +94,7 @@ jobs:
         run: npm ci --include=optional --legacy-peer-deps
 
       - name: Run Snyk
-        uses: snyk/actions/node@v1.0.0
+        uses: snyk/actions/node@v1
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
