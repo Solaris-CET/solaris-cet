@@ -7,35 +7,28 @@ import { expect, test } from '@playwright/test';
 async function waitForServiceWorkerControllingClient(page: any): Promise<void> {
   await page.waitForLoadState('domcontentloaded');
 
-  await expect
-    .poll(
-      async () =>
-        page.evaluate(async () => {
-          const regs = await navigator.serviceWorker.getRegistrations();
-          if (navigator.serviceWorker.controller) return true;
+  const reg = await page.evaluate(async () => {
+    if (!('serviceWorker' in navigator)) return { ok: false as const, reason: 'no_service_worker' };
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      registration.waiting?.postMessage({ type: 'SKIP_WAITING' });
+      return {
+        ok: true as const,
+        scope: registration.scope,
+        state: {
+          active: registration.active?.state ?? null,
+          waiting: registration.waiting?.state ?? null,
+          installing: registration.installing?.state ?? null,
+        },
+      };
+    } catch (e: any) {
+      return { ok: false as const, reason: 'register_failed', name: e?.name ?? 'Error', message: String(e?.message ?? e) };
+    }
+  });
 
-          if (regs.length === 0) {
-            try {
-              await navigator.serviceWorker.register('/sw.js');
-            } catch {
-              return false;
-            }
-          }
-
-          for (const r of regs) {
-            try {
-              r.waiting?.postMessage({ type: 'SKIP_WAITING' });
-            } catch {
-              void 0;
-            }
-          }
-
-          const regs2 = await navigator.serviceWorker.getRegistrations();
-          return regs2.some((r) => r.active != null) || navigator.serviceWorker.controller !== null;
-        }),
-      { timeout: 180_000, intervals: [200, 400, 800, 1600, 3200] },
-    )
-    .toBe(true);
+  if (!reg.ok) {
+    throw new Error(`SW registration failed: ${JSON.stringify(reg)}`);
+  }
 
   for (let i = 0; i < 6; i++) {
     const controlled = await page.evaluate(() => navigator.serviceWorker.controller !== null);
@@ -43,12 +36,25 @@ async function waitForServiceWorkerControllingClient(page: any): Promise<void> {
     await page.reload({ waitUntil: 'domcontentloaded' });
   }
 
-  await expect
-    .poll(
-      async () => page.evaluate(() => navigator.serviceWorker.controller !== null),
-      { timeout: 180_000, intervals: [200, 400, 800, 1600, 3200] },
-    )
-    .toBe(true);
+  try {
+    await page.waitForFunction(() => navigator.serviceWorker.controller !== null, null, { timeout: 180_000 });
+  } catch {
+    const debug = await page.evaluate(async () => {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      return {
+        href: location.href,
+        controller: navigator.serviceWorker.controller?.state ?? null,
+        regs: regs.map((r) => ({
+          scope: r.scope,
+          active: r.active?.state ?? null,
+          waiting: r.waiting?.state ?? null,
+          installing: r.installing?.state ?? null,
+          scriptURL: r.active?.scriptURL ?? r.waiting?.scriptURL ?? r.installing?.scriptURL ?? null,
+        })),
+      };
+    });
+    throw new Error(`SW did not control client: ${JSON.stringify(debug)}`);
+  }
 }
 
 /**

@@ -3,17 +3,40 @@ import { NavigationRoute, registerRoute, setCatchHandler } from 'workbox-routing
 import { CacheFirst, NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies'
 import { ExpirationPlugin } from 'workbox-expiration'
 import { CacheableResponsePlugin } from 'workbox-cacheable-response'
-import { clientsClaim } from 'workbox-core'
 
 const sw = globalThis
 
-sw.addEventListener('install', () => {
-  sw.skipWaiting?.()
+sw.addEventListener('install', (event) => {
+  if (sw.skipWaiting) {
+    event.waitUntil(sw.skipWaiting())
+  }
 })
 
-clientsClaim()
+sw.addEventListener('activate', (event) => {
+  if (sw.clients?.claim) {
+    event.waitUntil(sw.clients.claim())
+  }
+})
 
-precacheAndRoute(self.__WB_MANIFEST || [])
+const wbManifest = self.__WB_MANIFEST || []
+const filteredManifest = wbManifest.filter((entry) => {
+  const rawUrl = typeof entry === 'string' ? entry : entry?.url
+  if (typeof rawUrl !== 'string') return false
+  const url = rawUrl.replace(/^\//, '')
+
+  if (url === 'index.html') return true
+  if (url === 'offline.html') return true
+  if (url === 'manifest.json') return true
+  if (url === 'offline-image.svg') return true
+  if (/^icon-(192|512)\.png$/.test(url)) return true
+  if (/^favicon\.(svg|ico)$/.test(url)) return true
+  if (/^favicon-(16x16|32x32)\.png$/.test(url)) return true
+  if (url === 'apple-touch-icon.png') return true
+  if (url === 'safari-pinned-tab.svg') return true
+
+  return false
+})
+precacheAndRoute(filteredManifest)
 cleanupOutdatedCaches()
 
 sw.addEventListener('message', (event) => {
@@ -132,8 +155,9 @@ registerRoute(
 
 registerRoute(
   ({ url }) => /\/api\/state\.json$/.test(url.pathname),
-  new StaleWhileRevalidate({
+  new NetworkFirst({
     cacheName: 'state-json-cache',
+    networkTimeoutSeconds: 2,
     plugins: [
       new CacheableResponsePlugin({ statuses: [200] }),
       new ExpirationPlugin({ maxEntries: 1, maxAgeSeconds: 60 * 5 }),
@@ -177,6 +201,20 @@ registerRoute(
 )
 
 setCatchHandler(async ({ event }) => {
+  const url = event?.request?.url ? new URL(event.request.url) : null
+  if (url && url.origin === sw.location.origin && url.pathname === '/api/state.json') {
+    const cached = await sw.caches.match(event.request)
+    if (cached) return cached
+    return new Response(
+      JSON.stringify({
+        token: { symbol: 'CET', name: 'Solaris CET', contract: 'unknown', totalSupply: null, decimals: 9 },
+        pool: { address: 'unknown', reserveTon: null, reserveCet: null, lpSupply: null, priceTonPerCet: null },
+        updatedAt: new Date(0).toISOString(),
+      }),
+      { headers: { 'content-type': 'application/json; charset=utf-8' }, status: 200 },
+    )
+  }
+
   if (event?.request?.destination === 'document') {
     const offline = await sw.caches.match('/offline.html')
     if (offline) return offline

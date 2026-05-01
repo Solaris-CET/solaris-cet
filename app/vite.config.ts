@@ -12,6 +12,54 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { OG_IMAGE_FILENAME, SOLARIS_CET_LOGO_FILENAME } from "./src/lib/brandAssetFilenames"
 import { DEDUST_POOL_DEPOSIT_URL } from "./src/lib/dedustUrls"
 
+function inlineCriticalCssAndAsyncStyles(): Plugin {
+  const criticalPath = path.resolve(process.cwd(), 'src/critical.css')
+  const criticalCss = fs.existsSync(criticalPath) ? fs.readFileSync(criticalPath, 'utf8') : ''
+
+  const esc = (value: string) => value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')
+  const getAttr = (tag: string, attr: string) => {
+    const re = new RegExp(`${attr}=["']([^"']+)["']`, 'i')
+    return tag.match(re)?.[1]
+  }
+
+  return {
+    name: 'inline-critical-css-and-async-styles',
+    apply: 'build',
+    transformIndexHtml(html) {
+      const styleLinks = html.match(/<link\b[^>]*rel=["']stylesheet["'][^>]*>/gi) ?? []
+      const candidates = styleLinks
+        .map((tag) => ({ tag, href: getAttr(tag, 'href') }))
+        .filter((x): x is { tag: string; href: string } => !!x.href)
+        .filter((x) => /(^|\/)(assets)\/.+\.css($|\?)/i.test(x.href))
+
+      if (candidates.length === 0 && !criticalCss) return html
+
+      let nextHtml = html
+
+      for (const { tag, href } of candidates) {
+        const preload = `<link rel="preload" as="style" href="${esc(href)}" data-async-css="1" fetchpriority="high">`
+        nextHtml = nextHtml.replace(tag, preload)
+      }
+
+      if (candidates.length > 0) {
+        const noscript = candidates
+          .map(({ href }) => `<noscript><link rel="stylesheet" href="${esc(href)}"></noscript>`)
+          .join('')
+
+        const loader = `<script nonce="__CSP_NONCE__">(function(){var links=[].slice.call(document.querySelectorAll('link[data-async-css="1"]'));if(!links.length)return;var next=0;function applyInOrder(){while(next<links.length){var l=links[next];if(l.dataset.loaded!=='1')return;l.rel='stylesheet';l.removeAttribute('as');l.removeAttribute('data-async-css');next++;}}links.forEach(function(l){l.addEventListener('load',function(){l.dataset.loaded='1';applyInOrder();},{once:true});l.addEventListener('error',function(){l.dataset.loaded='1';applyInOrder();},{once:true});});})();</script>`
+
+        nextHtml = nextHtml.replace(/<\/head>/i, `${noscript}${loader}</head>`)
+      }
+
+      if (criticalCss) {
+        nextHtml = nextHtml.replace(/<\/head>/i, `<style nonce="__CSP_NONCE__">${criticalCss}</style></head>`)
+      }
+
+      return nextHtml
+    },
+  }
+}
+
 /**
  * Coolify/Nixpacks often run `vite preview` instead of nginx. Vite's preview
  * SPA `htmlFallback` treats paths containing a dot as client routes, so
@@ -109,7 +157,7 @@ const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN?.trim()
 const sentryUrl = process.env.SENTRY_URL?.trim()
 const sentryEnabled = Boolean(sentryOrg && sentryProject && sentryAuthToken)
 
-const plugins: PluginOption[] = [previewHealthJson(), injectGoogleSiteVerification(), react()]
+const plugins: PluginOption[] = [previewHealthJson(), injectGoogleSiteVerification(), react(), inlineCriticalCssAndAsyncStyles()]
 
 if (sentryEnabled) {
   plugins.push(
