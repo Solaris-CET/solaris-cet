@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 
-import AppImage from '@/components/AppImage';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 const VIDEO_CANDIDATES = ['/cinematic/cosmic-loop.webm', '/cinematic/cosmic-loop.mp4'];
 
-const POSTER_CANDIDATES = ['/cinematic/cosmic-poster.jpg', '/cinematic/cosmic-poster.webp', '/og-image.png'];
+const POSTER_FALLBACK = '/cinematic/cosmic-poster-768.jpg';
 
 const GLYPH_LINES = [
   '∑ ψ(x) e^{iθ} · 量子 · क्वांटम · квант · 量子纠缠 · ⟂ ⊗ ⟂ · ∫ dt · ϕ(t) → ∞',
@@ -81,30 +81,21 @@ export function CinematicBackground() {
   const reduceMotion = useReducedMotion();
   const canUseVideo = useCinematicEligibility(reduceMotion);
   const [videoReady, setVideoReady] = useState(false);
-  const posterUrl = useFirstAvailableAsset(POSTER_CANDIDATES, (res) => {
-    const ct = (res.headers.get('content-type') || '').toLowerCase();
-    return ct.startsWith('image/');
-  });
   const videoUrl = useFirstAvailableAsset(VIDEO_CANDIDATES, (res) => {
     const ct = (res.headers.get('content-type') || '').toLowerCase();
     return ct.startsWith('video/');
   });
+
+  const portalTarget =
+    typeof document !== 'undefined' ? document.getElementById('solaris-cinematic-bg') : null;
 
   const glyphText = useMemo(() => {
     const all = GLYPH_LINES.join('   ·   ');
     return `${all}   ·   ${all}`;
   }, []);
 
-  return (
-    <div className="cinematic-bg" aria-hidden>
-      <AppImage
-        src={posterUrl ?? '/og-image.png'}
-        alt=""
-        className="cinematic-poster"
-        loading="eager"
-        decoding="async"
-      />
-
+  const content = (
+    <>
       {canUseVideo && videoUrl ? (
         <video
           className={videoReady ? 'cinematic-video is-ready' : 'cinematic-video'}
@@ -113,14 +104,12 @@ export function CinematicBackground() {
           loop
           playsInline
           preload="metadata"
-          poster={posterUrl ?? '/og-image.png'}
+          poster={POSTER_FALLBACK}
           onCanPlay={() => setVideoReady(true)}
         >
           <source src={videoUrl} type={videoUrl.endsWith('.webm') ? 'video/webm' : 'video/mp4'} />
         </video>
       ) : null}
-
-      <div className="cinematic-grade" aria-hidden />
 
       <div className="planet-impact planet-impact--a" aria-hidden />
       <div className="planet-impact planet-impact--b" aria-hidden />
@@ -146,6 +135,12 @@ export function CinematicBackground() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
+
+  if (portalTarget) {
+    return createPortal(content, portalTarget);
+  }
+
+  return <div className="cinematic-bg" aria-hidden>{content}</div>;
 }

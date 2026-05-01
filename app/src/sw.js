@@ -7,9 +7,34 @@ import { CacheableResponsePlugin } from 'workbox-cacheable-response'
 const sw = globalThis
 
 sw.addEventListener('install', (event) => {
-  if (sw.skipWaiting) {
-    event.waitUntil(sw.skipWaiting())
+  const probe = async () => {
+    try {
+      const res = await fetch('/index.html', { cache: 'reload' })
+      const clients = await sw.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      for (const client of clients) {
+        try {
+          client.postMessage({ type: 'SW_INSTALL_PROBE', url: res.url, status: res.status })
+        } catch {
+          void 0
+        }
+      }
+    } catch (e) {
+      try {
+        const clients = await sw.clients.matchAll({ type: 'window', includeUncontrolled: true })
+        for (const client of clients) {
+          try {
+            client.postMessage({ type: 'SW_INSTALL_PROBE', error: String(e ?? '') })
+          } catch {
+            void 0
+          }
+        }
+      } catch {
+        void 0
+      }
+    }
   }
+
+  event.waitUntil(Promise.all([sw.skipWaiting?.(), probe()]))
 })
 
 sw.addEventListener('activate', (event) => {
@@ -53,6 +78,38 @@ sw.addEventListener('message', (event) => {
       })(),
     )
   }
+})
+
+async function broadcast(message) {
+  try {
+    const clients = await sw.clients.matchAll({ type: 'window', includeUncontrolled: true })
+    for (const client of clients) {
+      try {
+        client.postMessage(message)
+      } catch {
+        void 0
+      }
+    }
+  } catch {
+    void 0
+  }
+}
+
+sw.addEventListener('error', (event) => {
+  void broadcast({
+    type: 'SW_ERROR',
+    message: String(event?.message ?? ''),
+    filename: String(event?.filename ?? ''),
+    lineno: Number(event?.lineno ?? 0),
+    colno: Number(event?.colno ?? 0),
+  })
+})
+
+sw.addEventListener('unhandledrejection', (event) => {
+  void broadcast({
+    type: 'SW_UNHANDLED_REJECTION',
+    reason: String(event?.reason ?? ''),
+  })
 })
 
 registerRoute(
@@ -132,12 +189,29 @@ registerRoute(
 )
 
 registerRoute(
-  ({ request }) => request.destination === 'image' && request.method === 'GET',
+  ({ request, url }) =>
+    request.method === 'GET' &&
+    url.origin === sw.location.origin &&
+    (request.destination === 'image' || /\.(png|jpe?g|webp|svg|ico)$/i.test(url.pathname)),
   new StaleWhileRevalidate({
     cacheName: 'images-cache',
     plugins: [
       new CacheableResponsePlugin({ statuses: [0, 200] }),
       new ExpirationPlugin({ maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 30 }),
+    ],
+  }),
+)
+
+registerRoute(
+  ({ request, url }) =>
+    request.method === 'GET' &&
+    url.origin === sw.location.origin &&
+    (url.pathname.startsWith('/sovereign/') || url.pathname.startsWith('/apocalypse/')),
+  new CacheFirst({
+    cacheName: 'static-surfaces-assets',
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [200] }),
+      new ExpirationPlugin({ maxEntries: 120, maxAgeSeconds: 60 * 60 * 24 * 30 }),
     ],
   }),
 )

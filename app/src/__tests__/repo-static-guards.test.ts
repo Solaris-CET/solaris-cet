@@ -99,7 +99,7 @@ describe("index.html — canonical production site URL", () => {
 describe("index.html — critical image preloads for LCP", () => {
   it("preloads Solaris brand raster and hero coin", () => {
     const appIndexHtml = readFileSync(join(repoRoot, "app/index.html"), "utf8");
-    const escapedLogo = SOLARIS_CET_LOGO_FILENAME.replace(/\./g, "\\.");
+    const escapedLogo = 'solaris-cet-logo-emblem-190\\.jpg';
     expect(appIndexHtml).toMatch(new RegExp(`rel="preload"[^>]+${escapedLogo}`, "s"));
     expect(appIndexHtml).toMatch(/rel="preload"[^>]+hero-coin\.png/s);
   });

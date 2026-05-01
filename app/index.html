@@ -208,8 +208,11 @@
     <!-- OMEGA policy: no external font/style CDNs in shipped runtime HTML -->
 
     <!-- Preload critical raster brand + hero coin (loader/nav mark + hero 3D coin) for LCP -->
-    <link rel="preload" as="image" href="./solaris-cet-logo.jpg" fetchpriority="high" />
+    <link rel="preload" as="image" href="./solaris-cet-logo-emblem-190.jpg" fetchpriority="high" />
     <link rel="preload" as="image" href="./hero-coin.png" fetchpriority="high" />
+
+    <!-- Preload cinematic poster (LCP candidate) so it is discoverable from initial HTML -->
+    <link rel="preload" as="image" href="./cinematic/cosmic-poster-768.jpg" fetchpriority="high" />
 
     <!-- Telegram Mini App SDK — enables window.Telegram.WebApp when the app
          runs inside Telegram. The SDK is served from telegram.org's CDN and
@@ -225,6 +228,29 @@
 
   </head>
   <body>
+    <div id="solaris-cinematic-bg" class="cinematic-bg" aria-hidden="true">
+      <picture>
+        <source
+          srcset="./cinematic/cosmic-poster-768.webp 768w, ./cinematic/cosmic-poster-1024.webp 1024w"
+          sizes="100vw"
+          type="image/webp"
+        />
+        <img
+          id="solaris-cinematic-poster"
+          src="./cinematic/cosmic-poster-768.jpg"
+          srcset="./cinematic/cosmic-poster-768.jpg 768w, ./cinematic/cosmic-poster-1024.jpg 1024w"
+          sizes="100vw"
+          width="768"
+          height="403"
+          alt=""
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+          class="cinematic-poster"
+        />
+      </picture>
+      <div class="cinematic-grade" aria-hidden="true"></div>
+    </div>
     <!--
       Progressive enhancement / dual-state (OMEGA-aligned):
       Without JS, the Vite/React bundle never runs — #root stays empty.

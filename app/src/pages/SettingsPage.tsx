@@ -61,6 +61,9 @@ export default function SettingsPage() {
   const [walletLabel, setWalletLabel] = useState('');
   const [walletSetPrimary, setWalletSetPrimary] = useState(false);
 
+  const [offlineBusy, setOfflineBusy] = useState(false);
+  const [offlineInfo, setOfflineInfo] = useState<string | null>(null);
+
   useEffect(() => {
     if (!telegramBotUsername) return;
     const container = document.getElementById('telegram-link');
@@ -214,6 +217,31 @@ export default function SettingsPage() {
       await loadAll();
     } finally {
       setLoading(false);
+    }
+  };
+
+  const clearOfflineCache = async () => {
+    setOfflineBusy(true);
+    setOfflineInfo(null);
+    try {
+      if (!('serviceWorker' in navigator)) {
+        setOfflineInfo('Service worker not supported in this browser.');
+        return;
+      }
+      const reg = await navigator.serviceWorker.getRegistration('/');
+      const swc = navigator.serviceWorker.controller;
+      const target = swc || reg?.active || reg?.waiting || null;
+      if (!target) {
+        setOfflineInfo('Service worker is not active yet.');
+        return;
+      }
+      target.postMessage({ type: 'CLEAR_CACHES', confirm: true });
+      setOfflineInfo('Offline cache cleared. Reloading…');
+      window.location.reload();
+    } catch (e) {
+      setOfflineInfo(String(e instanceof Error ? e.message : e).slice(0, 160));
+    } finally {
+      setOfflineBusy(false);
     }
   };
 
@@ -445,18 +473,38 @@ export default function SettingsPage() {
                   <div className="text-white font-semibold">Mobile & PWA</div>
                   <div className="mt-1 text-white/70 text-sm">Reduce background refresh and network usage.</div>
                 </div>
-                <button
-                  type="button"
-                  className={
-                    dataSaver
-                      ? 'px-3 py-2 rounded-xl bg-solaris-gold/20 text-solaris-gold text-xs font-mono'
-                      : 'px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-mono'
-                  }
-                  onClick={() => setDataSaver(!dataSaver)}
-                >
-                  Data saver: {dataSaver ? 'On' : 'Off'}
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    className={
+                      dataSaver
+                        ? 'px-3 py-2 rounded-xl bg-solaris-gold/20 text-solaris-gold text-xs font-mono'
+                        : 'px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-mono'
+                    }
+                    onClick={() => setDataSaver(!dataSaver)}
+                  >
+                    Data saver: {dataSaver ? 'On' : 'Off'}
+                  </button>
+                  <button
+                    type="button"
+                    className={
+                      offlineBusy
+                        ? 'px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-mono opacity-60 cursor-not-allowed'
+                        : 'px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-mono'
+                    }
+                    onClick={clearOfflineCache}
+                    disabled={offlineBusy}
+                  >
+                    Clear offline cache
+                  </button>
+                </div>
               </div>
+
+              {offlineInfo ? (
+                <div className="mt-4 rounded-xl border border-white/10 bg-black/30 p-3 text-white/80 text-sm">
+                  {offlineInfo}
+                </div>
+              ) : null}
             </section>
 
             <section className="rounded-xl border border-white/10 bg-black/40 p-5">
