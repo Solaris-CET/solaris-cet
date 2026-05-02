@@ -19,6 +19,7 @@ RUN --mount=type=cache,target=/root/.npm HUSKY=0 npm ci --include=dev --legacy-p
 # Build prerequisites used by app prebuild script.
 COPY scripts/ scripts/
 COPY static/ static/
+COPY CHANGELOG.md CHANGELOG.md
 
 # Build the frontend app.
 COPY app/ app/

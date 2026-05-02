@@ -23,10 +23,10 @@ function isReferenceLink(line) {
   return /^\[[^\]]+\]:\s+https?:\/\//.test(line);
 }
 
-function finalize(releases, generatedAt) {
+function finalize(releases, generatedAt, source) {
   return {
     generatedAt,
-    source: 'CHANGELOG.md',
+    source,
     releases,
   };
 }
@@ -99,9 +99,30 @@ function parseChangelog(markdown) {
 }
 
 async function main() {
-  const markdown = await fs.readFile(CHANGELOG_PATH, 'utf8');
-  const releases = parseChangelog(markdown);
-  const payload = finalize(releases, detectGeneratedAt());
+  let markdown = '';
+  try {
+    markdown = await fs.readFile(CHANGELOG_PATH, 'utf8');
+  } catch {
+    markdown = '';
+  }
+
+  const generatedAt = detectGeneratedAt();
+  const releases = markdown ? parseChangelog(markdown) : [];
+  const source = markdown ? 'CHANGELOG.md' : 'generated';
+
+  if (!markdown) {
+    try {
+      const appPkg = JSON.parse(await fs.readFile(path.join(REPO_ROOT, 'app', 'package.json'), 'utf8'));
+      const version = typeof appPkg?.version === 'string' ? appPkg.version : null;
+      if (version) {
+        releases.unshift({ version, date: generatedAt.slice(0, 10), sections: {} });
+      }
+    } catch {
+      void 0;
+    }
+  }
+
+  const payload = finalize(releases, generatedAt, source);
   const next = `${JSON.stringify(payload, null, 2)}\n`;
   let prev = '';
   try {
