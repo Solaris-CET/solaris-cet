@@ -60,11 +60,14 @@ async function waitForServer(host, port, timeoutMs) {
   return false;
 }
 
-async function pickPort() {
-  for (let port = BASE_PORT; port < MAX_PORT; port += 1) {
+async function pickPort(startPort = BASE_PORT) {
+  for (let port = startPort; port < MAX_PORT; port += 1) {
     if (!(await isPortOpen(HOST, port))) return port;
   }
-  return BASE_PORT;
+  for (let port = BASE_PORT; port < startPort; port += 1) {
+    if (!(await isPortOpen(HOST, port))) return port;
+  }
+  return startPort;
 }
 
 async function waitForPortClosed(host, port, timeoutMs) {
@@ -168,9 +171,11 @@ const defaultBatches = [
 const batches = cliFiles.length ? [cliFiles] : defaultBatches;
 
 let lastExitCode = 0;
+let nextPort = BASE_PORT;
 
 for (const files of batches) {
-  const port = await pickPort();
+  const port = await pickPort(nextPort);
+  nextPort = port + 1;
   const distOk = await waitForDistIndex(60_000);
   if (!distOk) {
     lastExitCode = 1;

@@ -87,6 +87,7 @@ const desktopAssertByHref: Record<NavPrimaryInPageHref, (page: any) => Promise<v
   },
   '#how-to-buy': async (page) => {
     await scrollUntilSelectorAttached(page, '#how-to-buy');
+    await page.locator('#how-to-buy').scrollIntoViewIfNeeded();
     await expect(page.locator('#how-to-buy').getByText('HOW TO BUY')).toBeVisible({
       timeout: 15_000,
     });

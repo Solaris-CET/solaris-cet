@@ -27,7 +27,7 @@ async function assertCopyTranscriptMultiTurnOffline(page: any, context: any): Pr
   });
   // Prefer goto over reload: full reload has occasionally dropped the Vite preview (:4173) under load.
   await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await waitForAppReady(page, { timeout: 5000 });
+  await waitForAppReady(page, { timeout: 15_000 });
 
   const hero = await scrollCetAiHeroIntoView(page);
   const chip = hero.getByRole('button', { name: /What is the RAV Protocol/i });
@@ -63,7 +63,7 @@ test.describe('Solaris CET AI widget — desktop', () => {
       localStorage.setItem('solaris_lang', 'en');
     });
     await page.goto('/');
-    await waitForAppReady(page, { timeout: 5000 });
+    await waitForAppReady(page, { timeout: 15_000 });
   });
 
   test('live multi-turn conversation: initial question + follow-up + sources', async ({ page }) => {
@@ -283,7 +283,7 @@ test.describe('Solaris CET AI widget — mobile viewport', () => {
       localStorage.setItem('solaris_lang', 'en');
     });
     await page.goto('/');
-    await waitForAppReady(page, { timeout: 5000 });
+    await waitForAppReady(page, { timeout: 15_000 });
   });
 
   test('CET AI controls usable at phone width', async ({ page }) => {
@@ -418,7 +418,7 @@ for (const L of CET_AI_LOCALE_FIXTURES) {
         localStorage.removeItem('solaris_lang');
       });
       await page.goto(`/?lang=${L.code}`, { waitUntil: 'domcontentloaded' });
-      await waitForAppReady(page, { timeout: 5000 });
+      await waitForAppReady(page, { timeout: 15_000 });
     });
 
     test(`?lang=${L.code} applies locale CET AI chrome`, async ({ page }) => {

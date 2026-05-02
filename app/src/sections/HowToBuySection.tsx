@@ -90,10 +90,7 @@ const HowToBuySection = () => {
   }, [linkCopied]);
 
   return (
-    <section
-      id="how-to-buy"
-      className="relative section-glass section-padding-y overflow-hidden mesh-bg"
-    >
+    <section className="relative section-glass section-padding-y overflow-hidden mesh-bg">
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute bottom-0 left-0 right-0 h-[40vh] grid-floor opacity-15" />

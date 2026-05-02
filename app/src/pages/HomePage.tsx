@@ -203,7 +203,7 @@ export default function HomePage({ heroCinematic = false }: { heroCinematic?: bo
         </LazyLoadWrapper>
       </div>
 
-      <div className="relative z-[80]">
+      <section id="how-to-buy" className="relative z-[80] scroll-mt-24">
         <LazyLoadWrapper>
           <ScrollFadeUp>
             <ErrorBoundary>
@@ -211,7 +211,7 @@ export default function HomePage({ heroCinematic = false }: { heroCinematic?: bo
             </ErrorBoundary>
           </ScrollFadeUp>
         </LazyLoadWrapper>
-      </div>
+      </section>
 
       <div className="relative z-[90]">
         <LazyLoadWrapper>
