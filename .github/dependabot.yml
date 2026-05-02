@@ -1,42 +1,12 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/app"
+    directory: "/"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 2
     groups:
-      app:
-        patterns:
-          - "*"
-
-  - package-ecosystem: "npm"
-    directory: "/api"
-    schedule:
-      interval: "monthly"
-    open-pull-requests-limit: 2
-    groups:
-      api:
-        patterns:
-          - "*"
-
-  - package-ecosystem: "npm"
-    directory: "/contracts"
-    schedule:
-      interval: "monthly"
-    open-pull-requests-limit: 2
-    groups:
-      contracts:
-        patterns:
-          - "*"
-
-  - package-ecosystem: "npm"
-    directory: "/scripts"
-    schedule:
-      interval: "monthly"
-    open-pull-requests-limit: 2
-    groups:
-      scripts:
+      npm:
         patterns:
           - "*"
 
