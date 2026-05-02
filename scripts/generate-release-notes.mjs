@@ -1,7 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const REPO_ROOT = path.resolve(process.cwd());
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CHANGELOG_PATH = path.join(REPO_ROOT, 'CHANGELOG.md');
 const OUTPUT_PATH = path.join(REPO_ROOT, 'app', 'public', 'release-notes.json');
 

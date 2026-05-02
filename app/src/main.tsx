@@ -1,4 +1,5 @@
 // Entry: Vite + React SPA (production: Coolify → solaris-cet.com).
+import './polyfills'
 import './index.css'
 
 const scheduleSyneFonts = () => {
