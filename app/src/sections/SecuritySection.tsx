@@ -80,11 +80,7 @@ const SecuritySection = () => {
     [tx.trustBadges]
   );
   return (
-    <section
-      id="security"
-      aria-label={t.sectionAria.security}
-      className="relative section-glass section-padding-y overflow-hidden"
-    >
+    <section aria-label={t.sectionAria.security} className="relative section-glass section-padding-y overflow-hidden mesh-bg">
       {/* Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute bottom-0 left-0 right-0 h-[40vh] grid-floor opacity-15" />

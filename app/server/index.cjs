@@ -10,9 +10,26 @@ const pino = require('pino');
 const otelReady = require('./otel.cjs');
 const { context: otelContext, trace: otelTrace } = require('@opentelemetry/api');
 
+async function readFileStable(filePath) {
+  for (let attempt = 0; attempt < 400; attempt += 1) {
+    try {
+      return await readFile(filePath);
+    } catch (err) {
+      if (err && err.code === 'ENOENT' && attempt < 399) {
+        await new Promise((r) => setTimeout(r, 50));
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
 const appRoot = path.resolve(__dirname, '..');
 const distDir = path.join(appRoot, 'dist');
 const apiDistDir = path.join(appRoot, '.api-dist');
+
+const distIndexPath = path.join(distDir, 'index.html');
+let distIndexHtml = null;
 
 const port = Number.parseInt(process.env.PORT ?? '3000', 10);
 const host = process.env.HOST ?? '0.0.0.0';
@@ -719,7 +736,7 @@ async function tryServeStatic(req, reqUrl, res) {
 
 async function serveSpaIndex(req, res, nonce, isHttps, origin) {
   const indexPath = path.join(distDir, 'index.html');
-  const html = String(await readFile(indexPath));
+  const html = String(await readFileStable(indexPath));
   const withNonce = nonce ? html.replaceAll('__CSP_NONCE__', nonce) : html;
   res.statusCode = 200;
   setSecurityHeaders(res, { nonce, isHttps, origin });
@@ -753,8 +770,10 @@ async function serveIndex(req, res, reqUrl) {
   setSecurityHeaders(res, { nonce, isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
   res.setHeader('Content-Type', contentTypes['.html']);
   res.setHeader('Cache-Control', 'no-store');
-  const indexPath = path.join(distDir, 'index.html');
-  const html = String(await readFile(indexPath));
+  if (distIndexHtml == null) {
+    distIndexHtml = String(await readFileStable(distIndexPath));
+  }
+  const html = distIndexHtml;
   const raw = Buffer.from(html.replaceAll('__CSP_NONCE__', nonce), 'utf8');
   if (raw.length >= 1024 && shouldServeBrotli(req)) {
     const br = zlib.brotliCompressSync(raw, {

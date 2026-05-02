@@ -215,7 +215,6 @@ const RwaSection = () => {
 
   return (
     <section
-      id="rwa"
       aria-label={t.sectionAria.rwa}
       className="relative section-glass section-padding-y overflow-hidden mesh-bg"
     >

@@ -165,7 +165,6 @@ const CompetitionSection = () => {
 
   return (
     <section
-      id="competition"
       aria-label={t.sectionAria.competition}
       className="relative section-glass section-padding-y overflow-hidden mesh-bg"
     >

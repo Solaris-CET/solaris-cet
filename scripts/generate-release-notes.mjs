@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,12 +23,27 @@ function isReferenceLink(line) {
   return /^\[[^\]]+\]:\s+https?:\/\//.test(line);
 }
 
-function finalize(releases) {
+function finalize(releases, generatedAt) {
   return {
-    generatedAt: new Date().toISOString(),
+    generatedAt,
     source: 'CHANGELOG.md',
     releases,
   };
+}
+
+function detectGeneratedAt() {
+  const fromEnv = String(process.env.BUILD_TIMESTAMP ?? '').trim();
+  if (fromEnv) return fromEnv;
+  try {
+    const iso = execSync('git log -1 --format=%cI -- CHANGELOG.md', {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    if (iso) return iso;
+  } catch {
+    void 0;
+  }
+  return new Date().toISOString();
 }
 
 function parseChangelog(markdown) {
@@ -85,9 +101,17 @@ function parseChangelog(markdown) {
 async function main() {
   const markdown = await fs.readFile(CHANGELOG_PATH, 'utf8');
   const releases = parseChangelog(markdown);
-  const payload = finalize(releases);
+  const payload = finalize(releases, detectGeneratedAt());
+  const next = `${JSON.stringify(payload, null, 2)}\n`;
+  let prev = '';
+  try {
+    prev = await fs.readFile(OUTPUT_PATH, 'utf8');
+  } catch {
+    prev = '';
+  }
+  if (prev === next) return;
   await fs.mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
-  await fs.writeFile(OUTPUT_PATH, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+  await fs.writeFile(OUTPUT_PATH, next, 'utf8');
 }
 
 await main();

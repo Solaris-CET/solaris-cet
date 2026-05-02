@@ -1,3 +1,4 @@
+import { formatAiPromMetrics } from '../lib/aiMetrics';
 import { getAllowedOrigin } from '../lib/cors';
 
 export const config = { runtime: 'edge' };
@@ -24,7 +25,7 @@ export default async function handler(req: Request): Promise<Response> {
       headers: {
         'Access-Control-Allow-Origin': allowedOrigin,
         'Access-Control-Allow-Methods': 'GET, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Vary': 'Origin',
       },
     });
@@ -119,6 +120,8 @@ export default async function handler(req: Request): Promise<Response> {
     `solaris_env_upstash_token_present ${hasUpstashToken ? 1 : 0}`,
     '',
   ];
+
+  lines.push(formatAiPromMetrics());
 
   return response(lines.join('\n'), allowedOrigin);
 }

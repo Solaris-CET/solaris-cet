@@ -1,5 +1,5 @@
 import { Fingerprint, Leaf, LineChart, Shield } from 'lucide-react';
-import { useEffect, useMemo, useState, type ReactElement } from 'react';
+import { type ReactElement,useEffect, useMemo, useState } from 'react';
 
 import { buildVirtualLandGrid, type VirtualParcel, type VirtualParcelStatus } from '@/lib/virtualLand';
 
@@ -189,7 +189,7 @@ export function VirtualAgriculturalLandShowcase(props: {
           </div>
         </div>
 
-        <aside className="lg:col-span-4 rounded-2xl border border-white/10 bg-black/35 p-5">
+        <div className="lg:col-span-4 rounded-2xl border border-white/10 bg-black/35 p-5">
           <div className="text-[11px] font-mono uppercase tracking-widest text-solaris-muted">
             {ui.map.selectedLabel}
           </div>
@@ -232,7 +232,7 @@ export function VirtualAgriculturalLandShowcase(props: {
               {ui.header.titleLead} {ui.header.titleAccent} {ui.header.titleTail}
             </div>
           )}
-        </aside>
+        </div>
       </div>
 
       <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -316,7 +316,6 @@ const RoadmapSection = () => {
 
   return (
     <div
-      id="roadmap"
       ref={sectionRef}
       className="relative section-glass section-padding-y overflow-hidden mesh-bg"
     >

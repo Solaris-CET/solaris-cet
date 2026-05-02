@@ -15,15 +15,18 @@ test.describe('Primary navigation (desktop)', () => {
   test.setTimeout(60_000);
 
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/cetuia/tokens?all=1', async (route) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('solaris_lang', 'en');
+    });
+    await page.route(/\/api\/cetuia\/tokens\?all=1(?:$|&)/, async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
           ok: true,
           tokens: [
-            { id: 1, status: 'reserved' },
-            { id: 2, status: 'sold' },
+            { id: 9, status: 'reserved' },
+            { id: 10, status: 'sold' },
           ],
         }),
       });

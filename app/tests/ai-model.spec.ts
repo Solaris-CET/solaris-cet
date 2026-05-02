@@ -112,10 +112,7 @@ test.describe('AI Model Execution — Intelligence Core', () => {
   });
 
   test('Verifiable AI Decision Loops label is rendered', async ({ page }) => {
-    const section = page.locator('#intelligence');
-    await section.scrollIntoViewIfNeeded({ timeout: 15_000 });
-    await expect(section.getByText(/Verifiable AI Decision Loops/)).toBeAttached({
-      timeout: 15_000,
-    });
+    await scrollToIntelligence(page);
+    await expect(page.getByText(/Verifiable AI Decision Loops/).first()).toBeAttached({ timeout: 15_000 });
   });
 });

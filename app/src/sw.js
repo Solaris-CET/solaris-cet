@@ -1,4 +1,4 @@
-import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
+import { cleanupOutdatedCaches, createHandlerBoundToURL, matchPrecache, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute, setCatchHandler } from 'workbox-routing'
 import { CacheFirst, NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies'
 import { ExpirationPlugin } from 'workbox-expiration'
@@ -167,6 +167,21 @@ sw.addEventListener('activate', (event) => {
       }
     })(),
   )
+
+  jobs.push(
+    (async () => {
+      try {
+        const cacheName = cache('meta-files-cache')
+        const c = await sw.caches.open(cacheName)
+        const u = '/offline-image.svg'
+        const req = new Request(u, { cache: 'reload', credentials: 'omit' })
+        const res = await fetch(req)
+        if (res.ok) await c.put(req, res.clone())
+      } catch {
+        void 0
+      }
+    })(),
+  )
   if (jobs.length) event.waitUntil(Promise.all(jobs))
 })
 
@@ -257,6 +272,27 @@ sw.addEventListener('message', (event) => {
           source?.postMessage?.({ type: 'PREFETCH_DONE', okCount, failCount })
         } catch {
           void 0
+        }
+      })(),
+    )
+  }
+
+  if (data && typeof data === 'object' && data.type === 'PROBE_APP_SHELL') {
+    event.waitUntil(
+      (async () => {
+        try {
+          const res = await matchPrecache('/index.html')
+          event.source?.postMessage?.({
+            type: 'PROBE_APP_SHELL_RESULT',
+            ok: Boolean(res),
+            status: res?.status ?? null,
+          })
+        } catch {
+          try {
+            event.source?.postMessage?.({ type: 'PROBE_APP_SHELL_RESULT', ok: false, status: null })
+          } catch {
+            void 0
+          }
         }
       })(),
     )

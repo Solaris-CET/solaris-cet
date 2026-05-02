@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises'
+import { execSync } from 'node:child_process'
 import path from 'node:path'
 import matter from 'gray-matter'
 
@@ -30,7 +31,27 @@ function yyyyMmDd(d) {
   return dt.toISOString().slice(0, 10)
 }
 
-async function listBlogEntries() {
+function stableBuildDate() {
+  const raw = String(
+    process.env.BUILD_TIMESTAMP || process.env.VITE_BUILD_TIMESTAMP || process.env.SOURCE_DATE_EPOCH || '',
+  ).trim()
+  if (raw) {
+    const epoch = Number.parseInt(raw, 10)
+    if (Number.isFinite(epoch) && epoch > 0 && raw === String(epoch)) {
+      return yyyyMmDd(new Date(epoch * 1000))
+    }
+    return yyyyMmDd(raw)
+  }
+  try {
+    const iso = execSync('git log -1 --format=%cI', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
+    if (iso) return yyyyMmDd(iso)
+  } catch {
+    void 0
+  }
+  return yyyyMmDd(new Date())
+}
+
+async function listBlogEntries(fallbackLastmod) {
   const out = []
   for (const locale of blogLocales) {
     const dir = path.join(contentDir, locale)
@@ -47,14 +68,14 @@ async function listBlogEntries() {
       const raw = await fs.readFile(abs, 'utf8')
       const parsed = matter(raw)
       const date = typeof parsed.data?.date === 'string' ? parsed.data.date : ''
-      out.push({ locale, slug, lastmod: yyyyMmDd(date || new Date()) })
+      out.push({ locale, slug, lastmod: yyyyMmDd(date || fallbackLastmod) })
     }
   }
   return out
 }
 
 async function writeSitemap() {
-  const today = yyyyMmDd(new Date())
+  const today = stableBuildDate()
   const staticLocalized = [
     { path: '/', lastmod: today },
     { path: '/rwa', lastmod: today },
@@ -69,7 +90,7 @@ async function writeSitemap() {
     { path: '/bug-bounty', lastmod: today },
   ]
 
-  const blog = await listBlogEntries()
+  const blog = await listBlogEntries(today)
   const urls = []
 
   for (const { path: p, lastmod } of staticLocalized) {

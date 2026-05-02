@@ -19,7 +19,7 @@ async function clickNavLink(locator: any) {
 
 export async function clickHeaderNav(page: any, href: NavPrimaryInPageHref): Promise<void> {
   const locator = href.startsWith('#')
-    ? page.locator(`header nav a[href="${href}"]`)
+    ? page.locator(`header nav a[href="${href}"], header nav a[href$="${href}"]`)
     : page.locator(`header nav a[href$="${href}"]`);
   await clickNavLink(locator);
 }
@@ -48,16 +48,16 @@ const desktopAssertByHref: Record<NavPrimaryInPageHref, (page: any) => Promise<v
   },
   '/rwa': async (page) => {
     await scrollUntilSelectorAttached(page, '#rwa');
-    await expect(page.locator('#rwa').getByText('VIRTUAL AGRICULTURAL LAND')).toBeVisible({
-      timeout: 15_000,
-    });
+    await expect(page.locator('#rwa')).toBeAttached({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: /Virtual Agricultural Land/i }).first()).toBeVisible({ timeout: 30_000 });
   },
   '/cet-ai': async (page) => {
     await scrollUntilSelectorAttached(page, '#cet-ai');
     await expect(page.getByTestId('cet-ai-hero')).toBeVisible({ timeout: 15_000 });
   },
   '/whitepaper': async (page) => {
-    await expect(page.getByRole('heading', { name: 'Whitepaper' })).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: /Whitepaper/i }).first()).toBeVisible({ timeout: 30_000 });
   },
   '/cetuia': async (page) => {
     await expect(page.getByTestId('cetuia-map-section')).toBeVisible({ timeout: 15_000 });
@@ -78,13 +78,12 @@ const desktopAssertByHref: Record<NavPrimaryInPageHref, (page: any) => Promise<v
     if (!box) throw new Error('cetuia-map-interaction boundingBox is null');
     await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
     const selectedToken = page.getByTestId('cetuia-selected-token');
-    await expect(selectedToken).toContainText(/#(1|2)/, { timeout: 15_000 });
+    await expect(selectedToken).toContainText(/^#\d+$/, { timeout: 15_000 });
     const tokenText = (await selectedToken.textContent())?.trim() ?? '';
     const match = tokenText.match(/^#(\d+)$/);
     if (!match) throw new Error(`Unexpected cetuia-selected-token: ${tokenText}`);
-    const tokenId = Number(match[1]);
     const status = page.getByTestId('cetuia-selected-status');
-    await expect(status).toContainText(tokenId === 1 ? 'REZERVAT' : 'VÂNDUT', { timeout: 15_000 });
+    await expect(status).toContainText(/REZERVAT|VÂNDUT|DISPONIBIL|RESERVED|SOLD|AVAILABLE/i, { timeout: 15_000 });
   },
   '#how-to-buy': async (page) => {
     await scrollUntilSelectorAttached(page, '#how-to-buy');

@@ -23,11 +23,11 @@ Response body:
 {
   "response": "string",
   "sources": [],
+  "costUsd": 0,
   "usage": {
     "promptTokens": 0,
     "completionTokens": 0,
     "totalTokens": 0,
-    "costUsd": 0,
     "providers": [{"provider":"gemini|grok","model":"...","totalTokens":0,"costUsd":0}]
   }
 }
@@ -53,7 +53,8 @@ Headers:
 
 3) **Cache**
 - Short-lived in-memory cache in [aiCache.ts](file:///root/solaris-cet/app/api/lib/aiCache.ts).
-- Keyed by hash of `{ ip, query, conversation, origin }`.
+- Used only for first-turn requests (`conversation.length === 0`).
+- Keyed by hash of `{ ip, origin, query }`.
 - Env:
   - `CET_AI_CACHE_TTL_SECONDS` (default `20`)
   - `CET_AI_CACHE_MAX_ENTRIES` (default `300`)
@@ -74,4 +75,3 @@ Headers:
   - `CET_AI_PRICE_GROK_PROMPT_PER_1K_USD`
   - `CET_AI_PRICE_GROK_COMPLETION_PER_1K_USD`
 - Prometheus metrics are appended to `GET /api/metrics`.
-

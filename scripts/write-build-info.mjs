@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { execSync } from 'node:child_process';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -19,15 +19,30 @@ function readGitSha() {
 }
 
 const sha = readGitSha().slice(0, 12);
-const iso = String(process.env.BUILD_TIMESTAMP ?? '').trim() || new Date().toISOString();
+const iso = (() => {
+  const fromEnv = String(process.env.BUILD_TIMESTAMP ?? '').trim();
+  if (fromEnv) return fromEnv;
+  try {
+    const gitIso = execSync('git log -1 --format=%cI', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    if (gitIso) return gitIso;
+  } catch {
+    void 0;
+  }
+  return new Date().toISOString();
+})();
 const date = iso.slice(0, 10);
 
-writeFileSync(
-  target,
-  [
-    `export const BUILD_GIT_SHA = ${JSON.stringify(sha)};`,
-    `export const BUILD_DATE = ${JSON.stringify(date)};`,
-    '',
-  ].join('\n'),
-);
-
+const next = [
+  `export const BUILD_GIT_SHA = ${JSON.stringify(sha)};`,
+  `export const BUILD_DATE = ${JSON.stringify(date)};`,
+  '',
+].join('\n');
+let prev = '';
+try {
+  prev = readFileSync(target, 'utf8');
+} catch {
+  prev = '';
+}
+if (prev !== next) {
+  writeFileSync(target, next);
+}

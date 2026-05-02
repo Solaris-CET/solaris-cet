@@ -183,7 +183,7 @@ export default function HomePage({ heroCinematic = false }: { heroCinematic?: bo
         </LazyLoadWrapper>
       </div>
 
-      <div className="relative z-[78]">
+      <section id="competition" aria-label={t.sectionAria.competition} className="relative z-[78] scroll-mt-24">
         <LazyLoadWrapper>
           <ScrollFadeUp>
             <ErrorBoundary>
@@ -191,7 +191,7 @@ export default function HomePage({ heroCinematic = false }: { heroCinematic?: bo
             </ErrorBoundary>
           </ScrollFadeUp>
         </LazyLoadWrapper>
-      </div>
+      </section>
 
       <div className="relative z-[79]">
         <LazyLoadWrapper>
@@ -233,7 +233,7 @@ export default function HomePage({ heroCinematic = false }: { heroCinematic?: bo
         </LazyLoadWrapper>
       </div>
 
-      <div className="relative z-[100]">
+      <section id="security" aria-label={t.sectionAria.security} className="relative z-[100] scroll-mt-24">
         <LazyLoadWrapper>
           <ScrollFadeUp>
             <ErrorBoundary>
@@ -241,7 +241,7 @@ export default function HomePage({ heroCinematic = false }: { heroCinematic?: bo
             </ErrorBoundary>
           </ScrollFadeUp>
         </LazyLoadWrapper>
-      </div>
+      </section>
 
       <div className="relative z-[105]">
         <LazyLoadWrapper>

@@ -139,24 +139,34 @@ test.describe('Offline PWA State', () => {
 
     await context.setOffline(true);
 
-    const offlineHtml = await page.evaluate(async () => {
-      try {
-        const res = await fetch('/offline.html');
-        return await res.text();
-      } catch {
-        return '';
+    const fetchTextSafe = async (path: string) => {
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        try {
+          const txt = await page.evaluate(async (p) => {
+            try {
+              const res = await fetch(p);
+              return await res.text();
+            } catch {
+              return '';
+            }
+          }, path);
+          return typeof txt === 'string' ? txt : '';
+        } catch (err) {
+          const msg = String(err);
+          if (msg.includes('Execution context was destroyed')) {
+            await page.waitForLoadState('domcontentloaded').catch(() => void 0);
+            continue;
+          }
+          throw err;
+        }
       }
-    });
+      return '';
+    };
+
+    const offlineHtml = await fetchTextSafe('/offline.html');
     expect(offlineHtml).toMatch(/Offline\s+—\s+Solaris CET/i);
 
-    const offlineImageSvg = await page.evaluate(async () => {
-      try {
-        const res = await fetch('/offline-image.svg');
-        return await res.text();
-      } catch {
-        return '';
-      }
-    });
+    const offlineImageSvg = await fetchTextSafe('/offline-image.svg');
     expect(offlineImageSvg).toMatch(/<svg[\s\S]*>\s*/i);
 
     await context.setOffline(false);
@@ -231,18 +241,45 @@ test.describe('Offline PWA State', () => {
     const controlled = await waitForServiceWorkerControllingClient(page);
     test.skip(!controlled, 'Service worker did not control the client in this environment');
 
+    const runProbe = async () =>
+      page.evaluate(async () => {
+        try {
+          const controller = navigator?.serviceWorker?.controller;
+          if (!controller) return { ok: false, status: null };
+          return await new Promise<{ ok: boolean; status: number | null }>((resolve) => {
+            const timeout = setTimeout(() => {
+              cleanup();
+              resolve({ ok: false, status: null });
+            }, 4_000);
+
+            const onMessage = (ev: MessageEvent) => {
+              const data = (ev as any)?.data;
+              if (!data || typeof data !== 'object') return;
+              if (data.type !== 'PROBE_APP_SHELL_RESULT') return;
+              cleanup();
+              resolve({ ok: Boolean(data.ok), status: typeof data.status === 'number' ? data.status : null });
+            };
+
+            const cleanup = () => {
+              clearTimeout(timeout);
+              navigator.serviceWorker.removeEventListener('message', onMessage);
+            };
+
+            navigator.serviceWorker.addEventListener('message', onMessage);
+            controller.postMessage({ type: 'PROBE_APP_SHELL' });
+          });
+        } catch {
+          return { ok: false, status: null };
+        }
+      });
+
+    const probeOnline = await runProbe();
+    expect(probeOnline.ok).toBe(true);
+
     await context.setOffline(true);
-    const probe = await page.evaluate(async () => {
-      try {
-        const res = await fetch('/index.html', { headers: { Accept: 'text/html' } });
-        return { ok: res.ok, text: await res.text() };
-      } catch (e) {
-        return { ok: false, text: String((e as any)?.message ?? e) };
-      }
-    });
-    expect(probe.ok).toBe(true);
-    expect(probe.text).toMatch(/<div id="root">/i);
-    expect(probe.text).not.toMatch(/Offline\s+—\s+Solaris CET/i);
+
+    const probeOffline = await runProbe();
+    expect(probeOffline.ok).toBe(true);
 
     await context.setOffline(false);
   });

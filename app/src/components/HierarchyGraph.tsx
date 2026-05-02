@@ -1,5 +1,5 @@
 import { Copy, ExternalLink } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState, type ComponentType } from 'react';
+import { type ComponentType,useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -136,20 +136,20 @@ export default function HierarchyGraph({
             type="button"
             data-testid="mermaid-copy-graph"
             onClick={async () => {
-              if (!graph) return;
               if (!canCopy) {
                 toast.error(tx.clipboardUnavailable);
                 return;
               }
               try {
-                await navigator.clipboard.writeText(graph);
+                const copyText = graph && graph.trim().length > 0 ? graph : buildLocalGraph(resolvedQuery, tx);
+                await navigator.clipboard.writeText(copyText);
                 toast.success(tx.graphCopied);
               } catch {
                 toast.error(tx.copyFailed);
               }
             }}
             className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-white/10 bg-white/5 text-solaris-muted hover:text-solaris-text hover:bg-white/10 transition-colors disabled:opacity-40"
-            disabled={!graph}
+            disabled={!canCopy}
             aria-label={tx.ariaCopyGraph}
           >
             <Copy className="w-4 h-4" aria-hidden />

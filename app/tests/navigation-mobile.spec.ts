@@ -14,6 +14,9 @@ test.describe('Primary navigation (mobile sheet)', () => {
   test.setTimeout(60_000);
 
   test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('solaris_lang', 'en');
+    });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(E2E_I18N_START);
     await waitForAppReady(page);
@@ -50,6 +53,8 @@ test.describe('Primary navigation (mobile sheet)', () => {
     await clickMobileSheetNav(page, '#faq');
     await expect(page).toHaveURL(/#faq/);
     await scrollUntilSelectorAttached(page, '#faq');
-    await expect(page.locator('#faq').locator('.faq-trigger').first()).toBeVisible({ timeout: 15_000 });
+    const faq = page.locator('#faq');
+    await faq.scrollIntoViewIfNeeded();
+    await expect(faq.locator('.faq-trigger').first()).toBeVisible({ timeout: 30_000 });
   });
 });

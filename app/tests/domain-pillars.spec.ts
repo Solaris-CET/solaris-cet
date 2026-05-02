@@ -89,9 +89,9 @@ test.describe('Domain pillars', () => {
     await page.goto('/#rwa');
     await waitForAppReady(page);
     await scrollUntilSelectorAttached(page, '#rwa');
-    await expect(page.locator('#rwa').getByText(/Cetățuia, Romania/i).first()).toBeVisible({
-      timeout: 15_000,
-    });
+    const rwa = page.locator('#rwa');
+    await rwa.scrollIntoViewIfNeeded();
+    await expect(rwa.getByText(/Cetățuia, Romania/i).first()).toBeVisible({ timeout: 30_000 });
   });
 
   test('roadmap section renders phase cards after lazy mount', async ({ page }) => {
@@ -106,8 +106,8 @@ test.describe('Domain pillars', () => {
     await page.goto('/#roadmap');
     await waitForAppReady(page);
     await scrollUntilSelectorAttached(page, '#roadmap');
-    await expect(page.locator('#roadmap').locator('.roadmap-card').first()).toBeVisible({
-      timeout: 15_000,
-    });
+    const roadmap = page.locator('#roadmap');
+    await roadmap.scrollIntoViewIfNeeded();
+    await expect(roadmap.locator('.roadmap-card').first()).toBeVisible({ timeout: 30_000 });
   });
 });

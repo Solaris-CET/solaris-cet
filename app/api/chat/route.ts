@@ -18,19 +18,22 @@
  * `runtime: 'edge'` matches edge-style adapters and compatible hosts (e.g. Coolify).
  */
 import OpenAI from 'openai';
-import { getAllowedOrigin } from '../lib/cors';
-import { getAiChatCache, getCacheTtlSeconds, setAiChatCache, sha256Hex } from '../lib/aiCache';
-import { clientIp } from '../lib/clientIp';
-import { resolveApiKey } from '../lib/crypto';
-import { buildCetAiRetrievalBlock } from '../lib/cetAiRetrieval';
-import { decideCetAiRavPlan, deriveCetAiResourceBudget } from '../lib/reactBrain';
-import { acquireConcurrencySlot } from '../lib/concurrencyLimit';
-import { circuitAllows, circuitReportFailure, circuitReportSuccess } from '../lib/circuitBreaker';
-import { withRateLimit } from '../lib/rateLimit';
-import { CET_CONTRACT_ADDRESS } from '../../src/lib/cetContract';
-import { CET_AI_MAX_QUERY_CHARS } from '../../src/lib/cetAiConstants';
-import { DEDUST_POOL_ADDRESS } from '../../src/lib/dedustUrls';
+
 import { TOKEN_DECIMALS } from '../../src/constants/token';
+import { CET_AI_MAX_QUERY_CHARS } from '../../src/lib/cetAiConstants';
+import { CET_CONTRACT_ADDRESS } from '../../src/lib/cetContract';
+import { DEDUST_POOL_ADDRESS } from '../../src/lib/dedustUrls';
+import { getAiChatCache, getCacheTtlSeconds, setAiChatCache, sha256Hex } from '../lib/aiCache';
+import { recordAiChatMetrics } from '../lib/aiMetrics';
+import { estimateCostUsd } from '../lib/aiPricing';
+import { buildCetAiRetrievalBlock } from '../lib/cetAiRetrieval';
+import { circuitAllows, circuitReportFailure, circuitReportSuccess } from '../lib/circuitBreaker';
+import { clientIp } from '../lib/clientIp';
+import { acquireConcurrencySlot } from '../lib/concurrencyLimit';
+import { getAllowedOrigin } from '../lib/cors';
+import { resolveApiKey } from '../lib/crypto';
+import { withRateLimit } from '../lib/rateLimit';
+import { decideCetAiRavPlan, deriveCetAiResourceBudget } from '../lib/reactBrain';
 
 export const config = { runtime: 'edge' };
 
@@ -217,6 +220,8 @@ async function fetchOnChainContext(): Promise<OnChainContext | null> {
 export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
   const allowedOrigin = getAllowedOrigin(origin);
+  const requestId = globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : `req-${Date.now()}`;
+  const startedAt = Date.now();
 
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -333,12 +338,13 @@ export default async function handler(req: Request): Promise<Response> {
   const ip = clientIp(req);
   const cacheKey =
     cacheTtlSeconds > 0 && conversation.length === 0
-      ? await sha256Hex(`${ip}|${trimmedQuery.toLowerCase()}`)
+      ? await sha256Hex(JSON.stringify({ v: 1, ip, origin: allowedOrigin, q: trimmedQuery.toLowerCase() }))
       : null;
 
   if (cacheKey) {
     const cached = getAiChatCache(cacheKey);
     if (cached) {
+      recordAiChatMetrics({ outcome: 'ok', cache: 'hit', providers: [] });
       return new Response(JSON.stringify({ ...cached, usage: cached.usage ?? {} }), {
         status: 200,
         headers: {
@@ -347,6 +353,7 @@ export default async function handler(req: Request): Promise<Response> {
           'X-Cet-Ai-Plan': 'cached',
           'X-Cet-Ai-Cache': 'hit',
           'X-Cet-Ai-Cache-Ttl': String(cacheTtlSeconds),
+          'X-Request-Id': requestId,
           'Access-Control-Allow-Origin': allowedOrigin,
           'Vary': 'Origin, X-Forwarded-For',
           'Cache-Control': 'no-store',
@@ -427,6 +434,14 @@ export default async function handler(req: Request): Promise<Response> {
 
   let reply: string;
   let usage: { gemini?: unknown; grok?: unknown } | null = null;
+  const providerUsage: Array<{
+    provider: 'gemini' | 'grok';
+    model: string;
+    promptTokens?: number;
+    completionTokens?: number;
+    totalTokens?: number;
+    costUsd?: number;
+  }> = [];
 
   if (plan.providers.strategy === 'dual') {
     const [geminiResult, grokResult] = await Promise.allSettled([
@@ -458,7 +473,39 @@ export default async function handler(req: Request): Promise<Response> {
     if (geminiOk && grokOk) {
       const geminiText = geminiResult.value.choices[0]?.message?.content ?? '';
       const grokText = grokResult.value.choices[0]?.message?.content ?? '';
-      usage = { gemini: geminiResult.value.usage ?? null, grok: grokResult.value.usage ?? null };
+      const gUsage = geminiResult.value.usage as
+        | { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number }
+        | undefined;
+      const xUsage = grokResult.value.usage as
+        | { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number }
+        | undefined;
+      usage = { gemini: gUsage ?? null, grok: xUsage ?? null };
+      providerUsage.push({
+        provider: 'gemini',
+        model: GEMINI_MODEL,
+        promptTokens: gUsage?.prompt_tokens,
+        completionTokens: gUsage?.completion_tokens,
+        totalTokens: gUsage?.total_tokens,
+        costUsd:
+          estimateCostUsd({
+            provider: 'gemini',
+            promptTokens: gUsage?.prompt_tokens,
+            completionTokens: gUsage?.completion_tokens,
+          }) ?? undefined,
+      });
+      providerUsage.push({
+        provider: 'grok',
+        model: GROK_MODEL,
+        promptTokens: xUsage?.prompt_tokens,
+        completionTokens: xUsage?.completion_tokens,
+        totalTokens: xUsage?.total_tokens,
+        costUsd:
+          estimateCostUsd({
+            provider: 'grok',
+            promptTokens: xUsage?.prompt_tokens,
+            completionTokens: xUsage?.completion_tokens,
+          }) ?? undefined,
+      });
       reply = `${geminiText.trim()}\n\n${grokText.trim()}`;
     } else if (geminiOk) {
       const fallbackClient = new OpenAI({
@@ -471,7 +518,23 @@ export default async function handler(req: Request): Promise<Response> {
         temperature: plan.temperature,
       });
       circuitReportSuccess('cet-ai:gemini');
-      usage = { gemini: fallback.usage ?? null };
+      const u = fallback.usage as
+        | { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number }
+        | undefined;
+      usage = { gemini: u ?? null };
+      providerUsage.push({
+        provider: 'gemini',
+        model: GEMINI_MODEL,
+        promptTokens: u?.prompt_tokens,
+        completionTokens: u?.completion_tokens,
+        totalTokens: u?.total_tokens,
+        costUsd:
+          estimateCostUsd({
+            provider: 'gemini',
+            promptTokens: u?.prompt_tokens,
+            completionTokens: u?.completion_tokens,
+          }) ?? undefined,
+      });
       reply = fallback.choices[0]?.message?.content ?? 'CET AI is silent.';
     } else if (grokOk) {
       const fallbackClient = new OpenAI({
@@ -484,7 +547,23 @@ export default async function handler(req: Request): Promise<Response> {
         temperature: plan.temperature,
       });
       circuitReportSuccess('cet-ai:grok');
-      usage = { grok: fallback.usage ?? null };
+      const u = fallback.usage as
+        | { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number }
+        | undefined;
+      usage = { grok: u ?? null };
+      providerUsage.push({
+        provider: 'grok',
+        model: GROK_MODEL,
+        promptTokens: u?.prompt_tokens,
+        completionTokens: u?.completion_tokens,
+        totalTokens: u?.total_tokens,
+        costUsd:
+          estimateCostUsd({
+            provider: 'grok',
+            promptTokens: u?.prompt_tokens,
+            completionTokens: u?.completion_tokens,
+          }) ?? undefined,
+      });
       reply = fallback.choices[0]?.message?.content ?? 'CET AI is silent.';
     } else {
       throw new Error('All AI providers failed to respond.');
@@ -499,7 +578,23 @@ export default async function handler(req: Request): Promise<Response> {
           temperature: plan.temperature,
         });
         circuitReportSuccess('cet-ai:grok');
-        usage = { grok: res.usage ?? null };
+        const u = res.usage as
+          | { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number }
+          | undefined;
+        usage = { grok: u ?? null };
+        providerUsage.push({
+          provider: 'grok',
+          model: GROK_MODEL,
+          promptTokens: u?.prompt_tokens,
+          completionTokens: u?.completion_tokens,
+          totalTokens: u?.total_tokens,
+          costUsd:
+            estimateCostUsd({
+              provider: 'grok',
+              promptTokens: u?.prompt_tokens,
+              completionTokens: u?.completion_tokens,
+            }) ?? undefined,
+        });
         reply = res.choices[0]?.message?.content ?? 'CET AI is silent.';
       } catch (e) {
         circuitReportFailure('cet-ai:grok');
@@ -527,7 +622,23 @@ export default async function handler(req: Request): Promise<Response> {
           temperature: plan.temperature,
         });
         circuitReportSuccess('cet-ai:gemini');
-        usage = { gemini: res.usage ?? null };
+        const u = res.usage as
+          | { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number }
+          | undefined;
+        usage = { gemini: u ?? null };
+        providerUsage.push({
+          provider: 'gemini',
+          model: GEMINI_MODEL,
+          promptTokens: u?.prompt_tokens,
+          completionTokens: u?.completion_tokens,
+          totalTokens: u?.total_tokens,
+          costUsd:
+            estimateCostUsd({
+              provider: 'gemini',
+              promptTokens: u?.prompt_tokens,
+              completionTokens: u?.completion_tokens,
+            }) ?? undefined,
+        });
         reply = res.choices[0]?.message?.content ?? 'CET AI is silent.';
       } catch (e) {
         circuitReportFailure('cet-ai:gemini');
@@ -545,8 +656,21 @@ export default async function handler(req: Request): Promise<Response> {
     `budget_ms=${plan.budget.budgetMs};` +
     `parallel=${plan.budget.maxParallel}`;
 
-  const payload = { response: reply, sources: retrieval.sources, plan, usage: usage ?? {} };
+  const durationMs = Math.max(0, Date.now() - startedAt);
+  const totalTokens = providerUsage.reduce((a, p) => a + (p.totalTokens ?? 0), 0) || undefined;
+  const totalCostUsd = providerUsage.reduce((a, p) => a + (p.costUsd ?? 0), 0) || undefined;
+
+  const payload = { response: reply, sources: retrieval.sources, plan, usage: usage ?? {}, costUsd: totalCostUsd };
   if (cacheKey) setAiChatCache(cacheKey, payload as any, cacheTtlSeconds);
+
+  recordAiChatMetrics({
+    outcome: 'ok',
+    cache: 'miss',
+    providers: providerUsage.map((p) => ({ provider: p.provider, model: p.model })),
+    durationMs,
+    providerUsage,
+    totalCostUsd,
+  });
 
   return new Response(JSON.stringify(payload), {
     status: 200,
@@ -555,12 +679,23 @@ export default async function handler(req: Request): Promise<Response> {
       'X-Cet-Ai-Source': 'live',
       'X-Cet-Ai-Plan': planHeader,
       'X-Cet-Ai-Cache': 'miss',
+      'X-Request-Id': requestId,
+      'X-Cet-Ai-Duration-Ms': String(durationMs),
+      ...(typeof totalTokens === 'number' ? { 'X-Cet-Ai-Total-Tokens': String(totalTokens) } : {}),
+      ...(typeof totalCostUsd === 'number' ? { 'X-Cet-Ai-Cost-Usd': totalCostUsd.toFixed(6) } : {}),
       'Access-Control-Allow-Origin': allowedOrigin,
       'Vary': 'Origin, X-Forwarded-For',
+      'Cache-Control': 'no-store',
     },
   });
   } catch (error: unknown) {
     console.error('API Route Error:', error);
+    recordAiChatMetrics({
+      outcome: 'error',
+      cache: 'miss',
+      providers: [],
+      durationMs: Math.max(0, Date.now() - startedAt),
+    });
     const message =
       error instanceof Error
         ? error.message
@@ -569,6 +704,7 @@ export default async function handler(req: Request): Promise<Response> {
       status: 500,
       headers: {
         'Content-Type': 'application/json',
+        'X-Request-Id': requestId,
         'Access-Control-Allow-Origin': allowedOrigin,
         'Vary': 'Origin',
       },
