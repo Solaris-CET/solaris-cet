@@ -5,9 +5,9 @@ import { NAV_PRIMARY_IN_PAGE } from '@/lib/navPrimaryHrefs';
 
 describe('navPrimaryHrefs', () => {
   it('keeps seven unique in-page targets with labels on every locale', () => {
-    expect(NAV_PRIMARY_IN_PAGE).toHaveLength(7);
+    expect(NAV_PRIMARY_IN_PAGE).toHaveLength(8);
     const hrefs = NAV_PRIMARY_IN_PAGE.map((e) => e.href);
-    expect(new Set(hrefs).size).toBe(7);
+    expect(new Set(hrefs).size).toBe(8);
 
     const langs = ['en', 'ro', 'es'] as const;
     for (const lang of langs) {
@@ -22,6 +22,7 @@ describe('navPrimaryHrefs', () => {
     const hrefByKey = Object.fromEntries(NAV_PRIMARY_IN_PAGE.map((e) => [e.navKey, e.href]));
     expect(hrefByKey.tokenomics).toBe('#staking');
     expect(hrefByKey.rwa).toBe('/rwa');
+    expect(hrefByKey.submitTask).toBe('/r2a');
     expect(hrefByKey.cetAi).toBe('/cet-ai');
     expect(hrefByKey.whitepaper).toBe('/whitepaper');
     expect(hrefByKey.faq).toBe('#faq');

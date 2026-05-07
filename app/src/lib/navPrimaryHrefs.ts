@@ -7,6 +7,7 @@ export const NAV_PRIMARY_IN_PAGE = [
   { navKey: 'tokenomics', href: '#staking' },
   { navKey: 'cetuia', href: '/cetuia' },
   { navKey: 'rwa', href: '/rwa' },
+  { navKey: 'submitTask', href: '/r2a' },
   { navKey: 'cetAi', href: '/cet-ai' },
   { navKey: 'whitepaper', href: '/whitepaper' },
   { navKey: 'howToBuy', href: '#how-to-buy' },

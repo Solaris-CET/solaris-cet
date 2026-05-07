@@ -33,7 +33,7 @@ const SECTION_IDS = [
 
 describe("Navigation + section IDs", () => {
   it("NAV_PRIMARY_IN_PAGE integrity and every hash href maps to a section id", () => {
-    expect(NAV_PRIMARY_IN_PAGE).toHaveLength(7);
+    expect(NAV_PRIMARY_IN_PAGE).toHaveLength(8);
     const hrefs = NAV_PRIMARY_IN_PAGE.map((i) => i.href);
     expect(new Set(hrefs).size).toBe(hrefs.length);
     expect(NAV_PRIMARY_IN_PAGE.find((i) => i.navKey === "howToBuy")?.href).toBe("#how-to-buy");

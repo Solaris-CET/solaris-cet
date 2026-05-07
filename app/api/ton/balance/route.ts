@@ -90,6 +90,38 @@ export default async function handler(req: Request): Promise<Response> {
     return null;
   })();
 
+  const cetJettonWalletAddressFromTonapi = (() => {
+    if (!tonapiJettons.ok) return null;
+    const raw = tonapiJettons.data.balances;
+    if (!Array.isArray(raw)) return null;
+    for (const item of raw) {
+      if (!item || typeof item !== 'object') continue;
+      const obj = item as Record<string, unknown>;
+      const jetton = obj.jetton;
+      const jettonAddr =
+        jetton && typeof jetton === 'object' && 'address' in jetton && typeof (jetton as { address?: unknown }).address === 'string'
+          ? (jetton as { address: string }).address
+          : '';
+      if (!jettonAddr) continue;
+      if (jettonAddr !== cetMaster) continue;
+      const candidate =
+        (obj.wallet_address as unknown) ??
+        (obj.walletAddress as unknown) ??
+        (obj.jetton_wallet as unknown) ??
+        (obj.jettonWallet as unknown);
+      if (typeof candidate === 'string') return candidate.trim() || null;
+      if (candidate && typeof candidate === 'object') {
+        const addr =
+          'address' in (candidate as Record<string, unknown>) && typeof (candidate as { address?: unknown }).address === 'string'
+            ? (candidate as { address: string }).address.trim()
+            : '';
+        return addr || null;
+      }
+      return null;
+    }
+    return null;
+  })();
+
   if (tonBalanceNanoFromTonapi != null || cetBalanceNanoFromTonapi != null) {
     return jsonResponse(
       {
@@ -97,6 +129,7 @@ export default async function handler(req: Request): Promise<Response> {
         address,
         tonBalanceNano: tonBalanceNanoFromTonapi,
         cetBalanceNano: cetBalanceNanoFromTonapi,
+        cetJettonWalletAddress: cetJettonWalletAddressFromTonapi,
         source: 'tonapi',
         network,
       },
@@ -125,6 +158,7 @@ export default async function handler(req: Request): Promise<Response> {
         address,
         tonBalanceNano,
         cetBalanceNano: null,
+        cetJettonWalletAddress: null,
         source: 'toncenter',
         network,
       },
@@ -132,6 +166,6 @@ export default async function handler(req: Request): Promise<Response> {
       200,
     );
   } catch {
-    return jsonResponse({ ok: false, address, error: 'unavailable', cetBalanceNano: null }, allowedOrigin, 200);
+    return jsonResponse({ ok: false, address, error: 'unavailable', cetBalanceNano: null, cetJettonWalletAddress: null }, allowedOrigin, 200);
   }
 }

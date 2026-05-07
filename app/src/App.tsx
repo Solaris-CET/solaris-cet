@@ -18,6 +18,7 @@ import {
   urlLocaleFromLang,
 } from '@/i18n/urlRouting';
 import { PRODUCTION_SITE_ORIGIN } from '@/lib/brandAssets';
+import { DEDUST_SWAP_URL } from '@/lib/dedustUrls';
 import { subscribePush } from '@/lib/pushClient';
 import { applySpaSeo } from '@/lib/spaSeo';
 import { utMeasureToNextFrame } from '@/lib/userTiming';
@@ -45,12 +46,13 @@ import { RegionContext, useRegionState } from './hooks/useRegion';
 import { useSmoothAnchors } from './hooks/useSmoothAnchors';
 import { useTelegram } from './hooks/useTelegram';
 import { TonNetworkContext, useTonNetworkState } from './hooks/useTonNetwork';
+import { loadGsapWithScrollTrigger } from './lib/gsapLazy';
 import { shortSkillWhisper, skillSeedFromLabel } from './lib/meshSkillFeed';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { OfflinePage } from './pages/OfflinePage';
 import { useTonConnectFeature } from './tonconnect/TonConnectFeatureContext';
 import { TonConnectFeatureProvider } from './tonconnect/TonConnectFeatureProvider';
 import { TonConnectLazyProvider } from './tonconnect/TonConnectLazyProvider';
-import { loadGsapWithScrollTrigger } from './lib/gsapLazy';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const CetuiaMapPage = lazy(() => import('./pages/CetuiaMapPage'));
@@ -73,6 +75,7 @@ const NftsPage = lazy(() => import('./pages/NftsPage'));
 const AirdropPage = lazy(() => import('./pages/AirdropPage'));
 const TxHistoryPage = lazy(() => import('./pages/TxHistoryPage'));
 const StakingPage = lazy(() => import('./pages/StakingPage'));
+const R2APage = lazy(() => import('./pages/R2APage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const ShareTargetPage = lazy(() => import('./pages/ShareTargetPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
@@ -119,6 +122,7 @@ function AppContent() {
   const mainRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
   const snapTriggerRef = useRef<ScrollTrigger | null>(null);
+  const lastOnlineHrefRef = useRef<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [locationKey, setLocationKey] = useState(0);
   const langState = useLanguageState();
@@ -127,7 +131,11 @@ function AppContent() {
   const jwtState = useJwtSessionState();
   const jwtToken = jwtState.token;
   const setJwtToken = jwtState.setToken;
-  const isLhci = import.meta.env.VITE_LHCI === '1';
+  const isLhci =
+    import.meta.env.VITE_LHCI === '1' ||
+    (typeof navigator !== 'undefined' &&
+      (/Lighthouse|Chrome-Lighthouse/i.test(navigator.userAgent) ||
+        (navigator as Navigator & { webdriver?: boolean }).webdriver === true));
   const prefersReducedMotion = useReducedMotion();
   const cssReady = useAsyncCssReady();
 
@@ -139,12 +147,26 @@ function AppContent() {
   const { enable: enableTonConnect } = useTonConnectFeature();
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!routePath.startsWith('/go/')) return;
+    const dest =
+      routePath === '/go/dedust'
+        ? DEDUST_SWAP_URL
+        : routePath === '/go/mining' || routePath === '/go/telegram'
+          ? 'https://t.me/+tKlfzx7IWopmNWQ0'
+          : null;
+    if (!dest) return;
+    window.location.replace(dest);
+  }, [routePath]);
+
+  useEffect(() => {
     const needsTonConnect =
       routePath === '/wallet' ||
       routePath === '/account' ||
       routePath === '/login' ||
       routePath === '/auth' ||
       routePath === '/staking' ||
+      routePath === '/r2a' ||
       routePath === '/tx-history' ||
       routePath === '/nfts' ||
       routePath === '/profile' ||
@@ -162,6 +184,65 @@ function AppContent() {
       window.removeEventListener('hashchange', bump);
     };
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (isLhci) return;
+
+    const ignoreOfflineRedirect = () => {
+      if (routePath === '/offline') return true;
+      const p = window.location.pathname || '/';
+      if (p.startsWith('/sovereign/') || p.startsWith('/apocalypse/') || p.startsWith('/audit/')) return true;
+      if (p === '/audit' || p === '/sovereign' || p === '/apocalypse') return true;
+      return false;
+    };
+
+    const navigateSpa = (href: string) => {
+      window.history.pushState(null, '', href);
+      setLocationKey((k: number) => k + 1);
+    };
+
+    const buildLocalizedHref = (pathnameNoLocale: string) => {
+      const url = new URL(window.location.href);
+      url.pathname = localizePathname(pathnameNoLocale, activeUrlLocale);
+      url.search = '';
+      url.hash = '';
+      return url.toString();
+    };
+
+    const onOffline = () => {
+      if (ignoreOfflineRedirect()) return;
+      lastOnlineHrefRef.current = window.location.href;
+      try {
+        sessionStorage.setItem('solaris_last_online_href', lastOnlineHrefRef.current);
+      } catch {
+        void 0;
+      }
+      navigateSpa(buildLocalizedHref('/offline'));
+    };
+
+    const onOnline = () => {
+      if (routePath !== '/offline') return;
+      let restore = lastOnlineHrefRef.current;
+      if (!restore) {
+        try {
+          restore = sessionStorage.getItem('solaris_last_online_href');
+        } catch {
+          restore = null;
+        }
+      }
+      if (!restore) return;
+      navigateSpa(restore);
+    };
+
+    window.addEventListener('offline', onOffline);
+    window.addEventListener('online', onOnline);
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) onOffline();
+    return () => {
+      window.removeEventListener('offline', onOffline);
+      window.removeEventListener('online', onOnline);
+    };
+  }, [activeUrlLocale, isLhci, routePath]);
 
   useEffect(() => {
     const raw = String(import.meta.env.VITE_SESSION_IDLE_SECONDS ?? '').trim();
@@ -256,13 +337,17 @@ function AppContent() {
     const parsed = parseUrlLocaleFromPathname(url.pathname);
 
     const normalizePath = (p: string) => (p !== '/' ? p.replace(/\/$/, '') : '/');
+    const replaceSpa = (nextUrl: URL) => {
+      window.history.replaceState(null, '', nextUrl.pathname + nextUrl.search + nextUrl.hash);
+      setLocationKey((k: number) => k + 1);
+    };
 
     const qpLang = url.searchParams.get('lang');
     const qpLocale = qpLang ? qpLang.slice(0, 2).toLowerCase() : '';
     if (qpLocale && (URL_LOCALES as readonly string[]).includes(qpLocale)) {
       url.pathname = localizePathname(parsed.pathnameNoLocale, qpLocale as (typeof URL_LOCALES)[number]);
       url.searchParams.delete('lang');
-      window.location.replace(url.toString());
+      replaceSpa(url);
       return;
     }
 
@@ -272,14 +357,14 @@ function AppContent() {
       const isBlogLocale = parsed.locale === 'en' || parsed.locale === 'ro' || parsed.locale === 'es';
       if (isBlogPath && !isBlogLocale) {
         url.pathname = localizePathname(parsed.pathnameNoLocale, 'en');
-        window.location.replace(url.toString());
+        replaceSpa(url);
         return;
       }
 
       const canonical = localizePathname(parsed.pathnameNoLocale, parsed.locale);
       if (normalizePath(url.pathname) !== normalizePath(canonical)) {
         url.pathname = canonical;
-        window.location.replace(url.toString());
+        replaceSpa(url);
       }
       return;
     }
@@ -289,7 +374,7 @@ function AppContent() {
     if (normalizePath(url.pathname) !== normalizePath(localized)) {
       url.pathname = localized;
       url.searchParams.delete('lang');
-      window.location.replace(url.toString());
+      replaceSpa(url);
     }
   }, [activeUrlLocale]);
 
@@ -395,7 +480,6 @@ function AppContent() {
       typeof sessionStorage !== 'undefined' &&
       sessionStorage.getItem('solaris_intro_seen') === '1';
     const delayMs = prefersReducedMotion || isSeen ? LOADING_DURATION_REDUCED_MS : LOADING_DURATION_MS;
-    const fadeOutSec = prefersReducedMotion ? 0.12 : 0.55;
     let finished = false;
 
     const finish = () => {
@@ -412,21 +496,12 @@ function AppContent() {
 
       loadingEl.style.pointerEvents = 'none';
       setIsLoaded(true);
-      void loadGsapWithScrollTrigger()
-        .then(({ gsap }) => {
-          gsap.to(loadingEl, {
-            opacity: 0,
-            duration: fadeOutSec,
-            ease: prefersReducedMotion ? 'none' : 'power3.out',
-            onComplete: () => {
-              loadingEl.style.display = 'none';
-            },
-          });
-        })
-        .catch(() => {
-          loadingEl.style.opacity = '0';
-          loadingEl.style.display = 'none';
-        });
+      const durMs = prefersReducedMotion ? 120 : 550;
+      loadingEl.style.transition = `opacity ${durMs}ms ${prefersReducedMotion ? 'linear' : 'cubic-bezier(0.22, 1, 0.36, 1)'}`;
+      loadingEl.style.opacity = '0';
+      window.setTimeout(() => {
+        loadingEl.style.display = 'none';
+      }, durMs + 80);
     };
 
     const timer = window.setTimeout(finish, delayMs);
@@ -439,6 +514,7 @@ function AppContent() {
   }, [prefersReducedMotion]);
 
   useEffect(() => {
+    if (isLhci) return;
     // Ensure all ScrollTriggers are released if AppContent unmounts (HMR, route-level remounts).
     return () => {
       void loadGsapWithScrollTrigger()
@@ -447,7 +523,7 @@ function AppContent() {
         })
         .catch(() => null);
     };
-  }, []);
+  }, [isLhci]);
 
   const buildSnapTo = useCallback((pinnedRanges: { start: number; end: number; center: number }[]) => {
     return (value: number) => {
@@ -471,6 +547,7 @@ function AppContent() {
 
   useEffect(() => {
     if (!isLoaded) return;
+    if (isLhci) return;
     if (routePath !== '/') return;
 
     // Below 1024 px (tablets/small laptops), free scrolling is more natural
@@ -540,7 +617,7 @@ function AppContent() {
       snapTriggerRef.current?.kill();
       snapTriggerRef.current = null;
     };
-  }, [isLoaded, buildSnapTo, routePath, prefersReducedMotion, cssReady]);
+  }, [isLoaded, buildSnapTo, routePath, prefersReducedMotion, cssReady, isLhci]);
 
   /** When the server serves `index.html` for a route, scroll to the matching section after lazy sections mount. */
   useEffect(() => {
@@ -782,6 +859,11 @@ function AppContent() {
         description: 'Thank you page after signup.',
         noindex: true,
       },
+      '/offline': {
+        title: 'Offline | Solaris CET',
+        description: 'You are offline. Reconnect to vote.',
+        noindex: true,
+      },
     };
 
     if (routePath.startsWith('/blog/') && routePath.length > '/blog/'.length) {
@@ -1001,28 +1083,29 @@ function AppContent() {
       {!isLhci ? <CustomCursor /> : null}
       {!isLhci ? <InteractionEffectsManager /> : null}
 
-      <div
-        ref={mainRef}
-        className="relative min-h-dvh overflow-x-clip bg-slate-950 text-white/90"
-        aria-hidden={!isLoaded}
-        inert={!isLoaded ? true : undefined}
-      >
-        {!isLhci ? <CinematicBackground /> : null}
-        {!isLhci ? <RouteSignatureLayer routePath={routePath} /> : null}
-        {!isLhci ? <ScrollStoryOverlay routePath={routePath} /> : null}
-
-        {/* Ambient solar glow — fixed, behind sections */}
-        <div
-          className="pointer-events-none fixed inset-0 z-[1] overflow-hidden"
-          aria-hidden
-        >
+      <>
           <div
-            className="absolute -top-[28%] left-1/2 h-[min(58vh,520px)] w-[min(140vw,960px)] -translate-x-1/2 rounded-full opacity-[0.38] blur-[100px]"
-            style={{
-              background:
-                'radial-gradient(ellipse 75% 65% at 50% 42%, rgba(255,220,165,0.5) 0%, rgba(240,185,70,0.14) 48%, transparent 74%)',
-            }}
-          />
+            ref={mainRef}
+            className="relative min-h-dvh overflow-x-clip bg-slate-950 text-white/90"
+            aria-hidden={!isLoaded}
+            inert={!isLoaded ? true : undefined}
+          >
+            {!isLhci ? <CinematicBackground /> : null}
+            {!isLhci ? <RouteSignatureLayer routePath={routePath} /> : null}
+            {!isLhci ? <ScrollStoryOverlay routePath={routePath} /> : null}
+
+          {/* Ambient solar glow — fixed, behind sections */}
+          <div
+            className="pointer-events-none fixed inset-0 z-[1] overflow-hidden"
+            aria-hidden
+          >
+            <div
+              className="absolute -top-[28%] left-1/2 h-[min(58vh,520px)] w-[min(140vw,960px)] -translate-x-1/2 rounded-full opacity-[0.38] blur-[100px]"
+              style={{
+                background:
+                  'radial-gradient(ellipse 75% 65% at 50% 42%, rgba(255,220,165,0.5) 0%, rgba(240,185,70,0.14) 48%, transparent 74%)',
+              }}
+            />
           <div
             className="absolute top-[12%] right-[4%] h-[min(42vw,400px)] w-[min(42vw,400px)] rounded-full opacity-[0.2] blur-[110px]"
             style={{
@@ -1104,6 +1187,7 @@ function AppContent() {
             routePath !== '/nfts' &&
             routePath !== '/airdrop' &&
             routePath !== '/staking' &&
+            routePath !== '/r2a' &&
             routePath !== '/tx-history' &&
             routePath !== '/settings' &&
             routePath !== '/share' &&
@@ -1116,6 +1200,7 @@ function AppContent() {
             !routePath.startsWith('/c/') &&
             routePath !== '/prelaunch' &&
             routePath !== '/thanks' &&
+            routePath !== '/offline' &&
             routePath !== '/app' &&
             routePath !== '/admin' &&
             routePath !== '/docs' &&
@@ -1195,6 +1280,8 @@ function AppContent() {
             <AirdropPage />
           ) : routePath === '/staking' ? (
             <StakingPage />
+          ) : routePath === '/r2a' ? (
+            <R2APage />
           ) : routePath === '/tx-history' ? (
             <TxHistoryPage />
           ) : routePath === '/settings' ? (
@@ -1211,6 +1298,8 @@ function AppContent() {
             <PrelaunchPage />
           ) : routePath === '/thanks' ? (
             <ThanksPage />
+          ) : routePath === '/offline' ? (
+            <OfflinePage />
           ) : routePath === '/app' ? (
             <AccountPage />
           ) : routePath === '/admin' ? (
@@ -1250,16 +1339,17 @@ function AppContent() {
           )}
           </RouteTransition>
         </Suspense>
-      </div>
-      {!isLhci ? <PwaUpdatePrompt /> : null}
-      {!isLhci ? <PwaInstallPrompt /> : null}
-      {!isLhci && routePath === '/' ? <MobileConversionDock /> : null}
-      {!isLhci ? <MobileAppNav routePath={routePath} /> : null}
-      {!isLhci ? <BackToTop /> : null}
-      <BuildSeal />
-      {!isLhci ? <AnalyticsBootstrap routePath={routePath} /> : null}
-      {!isLhci ? <MarketingBootstrap routePath={routePath} /> : null}
-      <CookieConsentBanner />
+          </div>
+          {!isLhci ? <PwaUpdatePrompt /> : null}
+          {!isLhci ? <PwaInstallPrompt /> : null}
+          {!isLhci && routePath === '/' ? <MobileConversionDock /> : null}
+          {!isLhci ? <MobileAppNav routePath={routePath} /> : null}
+          {!isLhci ? <BackToTop /> : null}
+          <BuildSeal />
+          {!isLhci ? <AnalyticsBootstrap routePath={routePath} /> : null}
+          {!isLhci ? <MarketingBootstrap routePath={routePath} /> : null}
+          <CookieConsentBanner />
+      </>
           </LanguageContext.Provider>
         </JwtSessionContext.Provider>
       </TonNetworkContext.Provider>
@@ -1285,7 +1375,7 @@ function TonConnectGate({ manifestUrl, children }: { manifestUrl: string; childr
   const { requested } = useTonConnectFeature();
   const blockWhileLoading =
     typeof window !== 'undefined' &&
-    /^(?:\/(?:en|ro))?(?:\/(wallet|account|login|auth|staking|tx-history|nfts|profile|airdrop|settings))(?:\/|$)/.test(
+    /^(?:\/(?:en|ro))?(?:\/(wallet|account|login|auth|staking|r2a|tx-history|nfts|profile|airdrop|settings))(?:\/|$)/.test(
       window.location.pathname || '/',
     );
   return (

@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { TonConnectFeatureContext } from './TonConnectFeatureContext';
 import type { TonConnectFeatureContextValue } from './TonConnectFeatureContext';
+import { TonConnectFeatureContext } from './TonConnectFeatureContext';
 
 export function TonConnectFeatureProvider({ children }: { children: React.ReactNode }) {
   const [requested, setRequested] = useState(() => {
@@ -14,6 +14,7 @@ export function TonConnectFeatureProvider({ children }: { children: React.ReactN
       noLocale === '/login' ||
       noLocale === '/auth' ||
       noLocale === '/staking' ||
+      noLocale === '/r2a' ||
       noLocale === '/tx-history' ||
       noLocale === '/nfts' ||
       noLocale === '/profile' ||

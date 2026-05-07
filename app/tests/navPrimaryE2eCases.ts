@@ -55,6 +55,10 @@ const desktopAssertByHref: Record<NavPrimaryInPageHref, (page: any) => Promise<v
     await scrollUntilSelectorAttached(page, '#cet-ai');
     await expect(page.getByTestId('cet-ai-hero')).toBeVisible({ timeout: 15_000 });
   },
+  '/r2a': async (page) => {
+    await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: /Submit Task/i }).first()).toBeVisible({ timeout: 30_000 });
+  },
   '/whitepaper': async (page) => {
     await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
     await expect(page.getByRole('heading', { name: /Whitepaper/i }).first()).toBeVisible({ timeout: 30_000 });
@@ -93,10 +97,10 @@ const desktopAssertByHref: Record<NavPrimaryInPageHref, (page: any) => Promise<v
     });
   },
   '#faq': async (page) => {
-    await scrollUntilSelectorAttached(page, '#faq .faq-trigger');
-    await expect(page.locator('#faq .faq-trigger').first()).toBeVisible({
-      timeout: 15_000,
-    });
+    const faq = page.locator('#faq');
+    await expect(faq).toBeAttached({ timeout: 15_000 });
+    await faq.scrollIntoViewIfNeeded();
+    await expect(page.locator('#faq .faq-trigger').first()).toBeVisible({ timeout: 15_000 });
   },
 };
 

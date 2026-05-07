@@ -40,6 +40,7 @@ export interface Translations {
     tokenomics: string;
     cetuia: string;
     rwa: string;
+    submitTask: string;
     cetAi: string;
     roadmap: string;
     team: string;
@@ -161,6 +162,7 @@ export interface Translations {
   livePool: {
     title: string;
     liveBadge: string;
+    staleBadge: string;
     labelCetPrice: string;
     labelTvl: string;
     labelVolume24h: string;
@@ -173,6 +175,7 @@ export interface Translations {
     twitterX: string;
     followSuffix: string;
     updatedPrefix: string;
+    stalePrefix: string;
   };
   communityProof: {
     title: string;
@@ -611,6 +614,7 @@ export interface Translations {
   securityUi: SecurityUi;
   rwaUi: RwaUi;
   rwaSectionUi: RwaSectionUi;
+  cetuiaMapUi: CetuiaMapUi;
   virtualLandUi: VirtualLandUi;
   ecosystemIndexUi: EcosystemIndexUi;
   rwaContentUi: RwaContentUi;
@@ -637,6 +641,7 @@ export type RoadmapUi = typeof roadmapUiEn;
 export type SecurityUi = typeof securityUiEn;
 export type RwaUi = typeof rwaUiEn;
 export type RwaSectionUi = typeof rwaSectionUiEn;
+export type CetuiaMapUi = typeof cetuiaMapUiEn;
 export type VirtualLandUi = typeof virtualLandUiEn;
 export type EcosystemIndexUi = typeof ecosystemIndexUiEn;
 export type RwaContentUi = typeof rwaContentUiEn;
@@ -2073,6 +2078,100 @@ const rwaSectionUiRo = {
   verifiedCta: 'Deschide bundle',
 };
 
+const cetuiaMapUiEn = {
+  kicker: 'CET • 9,000 TOKENS',
+  subtitle: 'Select a hex for details. Pan: drag. Zoom: +/−.',
+  selected: {
+    label: 'SELECTED TOKEN',
+  },
+  status: {
+    available: 'AVAILABLE',
+    reserved: 'RESERVED',
+    sold: 'SOLD',
+  },
+  actions: {
+    copyLink: 'Copy link',
+    center: 'Center',
+    expressInterestAvailable: 'Request allocation',
+    expressInterestAny: 'Join waitlist',
+  },
+  legend: {
+    title: 'LEGEND',
+    available: 'Available',
+    reserved: 'Reserved',
+    sold: 'Sold',
+  },
+  note: {
+    title: 'NOTE',
+    body: 'Statuses are currently served from a demo endpoint and will be connected to on-chain ownership proofs + indexer next.',
+  },
+  interest: {
+    kicker: 'INTEREST · {token}',
+    title: 'Request allocation',
+    body: 'Leave your email. We will follow up with availability and next steps for the selected token.',
+    emailLabel: 'EMAIL',
+    emailPlaceholder: 'you@email.com',
+    walletLabel: 'WALLET (OPTIONAL)',
+    walletPlaceholder: 'TON wallet address',
+    consentLabel: 'I agree to be contacted about availability and allocations for this token.',
+    newsletterLabel: 'Also send occasional Solaris CET updates (double opt-in).',
+    cancel: 'Cancel',
+    submit: 'Send',
+    submitting: 'Sending…',
+    doneTitle: 'Received',
+    doneBody: 'Check your inbox for updates if you opted in to the newsletter.',
+    toastSuccess: 'Request sent.',
+    toastError: 'Could not send request.',
+  },
+};
+
+const cetuiaMapUiRo = {
+  kicker: 'CET • 9.000 TOKENS',
+  subtitle: 'Selectează un hex pentru detalii. Pan: drag. Zoom: +/−.',
+  selected: {
+    label: 'TOKEN SELECTAT',
+  },
+  status: {
+    available: 'DISPONIBIL',
+    reserved: 'REZERVAT',
+    sold: 'VÂNDUT',
+  },
+  actions: {
+    copyLink: 'Copiază link',
+    center: 'Centrează',
+    expressInterestAvailable: 'Cere alocare',
+    expressInterestAny: 'Intră pe listă',
+  },
+  legend: {
+    title: 'LEGENDĂ',
+    available: 'Disponibil',
+    reserved: 'Rezervat',
+    sold: 'Vândut',
+  },
+  note: {
+    title: 'NOTE',
+    body: 'Statusurile sunt servite dintr-un endpoint de demo și vor fi conectate la dovada deținerii on-chain + indexer în pasul următor.',
+  },
+  interest: {
+    kicker: 'INTERES · {token}',
+    title: 'Cere alocare',
+    body: 'Lasă un email. Revenim cu disponibilitatea și pașii următori pentru tokenul selectat.',
+    emailLabel: 'EMAIL',
+    emailPlaceholder: 'tu@email.com',
+    walletLabel: 'WALLET (OPȚIONAL)',
+    walletPlaceholder: 'Adresă portofel TON',
+    consentLabel: 'Sunt de acord să fiu contactat(ă) despre disponibilitate și alocări pentru acest token.',
+    newsletterLabel: 'Trimite și update-uri Solaris CET (double opt-in).',
+    cancel: 'Anulează',
+    submit: 'Trimite',
+    submitting: 'Se trimite…',
+    doneTitle: 'Am primit cererea',
+    doneBody: 'Dacă ai bifat newsletter, verifică inbox-ul pentru confirmare.',
+    toastSuccess: 'Cerere trimisă.',
+    toastError: 'Nu pot trimite cererea.',
+  },
+};
+
 const virtualLandUiEn = {
   header: {
     titleLead: 'Virtual',
@@ -2098,6 +2197,8 @@ const virtualLandUiEn = {
     statusTokenized: 'TOKENIZED',
     statusAvailable: 'AVAILABLE',
     statusReserved: 'RESERVED',
+    openOnCetuia: 'Open on map',
+    expressInterest: 'Express interest',
   },
   features: {
     onChainTitle: 'On-chain Anchors',
@@ -2155,6 +2256,8 @@ const virtualLandUiRo = {
     statusTokenized: 'TOKENIZAT',
     statusAvailable: 'DISPONIBIL',
     statusReserved: 'REZERVAT',
+    openOnCetuia: 'Deschide harta',
+    expressInterest: 'Cere alocare',
   },
   features: {
     onChainTitle: 'Ancore on-chain',
@@ -2245,6 +2348,7 @@ const translations: Record<LangCode, Translations> = {
       tokenomics: 'Tokenomics',
       cetuia: 'Cetățuia Map',
       rwa: 'Virtual Land',
+      submitTask: 'Submit Task',
       cetAi: 'CET AI',
       roadmap: 'Roadmap',
       team: 'AI Team',
@@ -2326,6 +2430,7 @@ const translations: Record<LangCode, Translations> = {
     livePool: {
       title: 'Live DeDust Pool',
       liveBadge: 'LIVE',
+      staleBadge: 'STALE',
       labelCetPrice: 'CET Price',
       labelTvl: 'TVL',
       labelVolume24h: '24h Volume',
@@ -2338,6 +2443,7 @@ const translations: Record<LangCode, Translations> = {
       twitterX: 'Twitter / X',
       followSuffix: 'for real-time updates.',
       updatedPrefix: 'Updated',
+      stalePrefix: 'Stale (last)',
     },
     communityProof: {
       title: 'Social proof',
@@ -2771,6 +2877,7 @@ const translations: Record<LangCode, Translations> = {
     rwaContentUi: rwaContentUiEn,
     rwaUi: rwaUiEn,
     rwaSectionUi: rwaSectionUiEn,
+    cetuiaMapUi: cetuiaMapUiEn,
     virtualLandUi: virtualLandUiEn,
     ecosystemIndexUi: ecosystemIndexUiEn,
     faqContent: faqContentByLang.en,
@@ -2786,6 +2893,7 @@ const translations: Record<LangCode, Translations> = {
       tokenomics: 'Tokenómica',
       cetuia: 'Mapa Cetățuia',
       rwa: 'Tierra virtual',
+      submitTask: 'Enviar tarea',
       cetAi: 'CET AI',
       roadmap: 'Hoja de Ruta',
       team: 'Equipo IA',
@@ -2804,6 +2912,7 @@ const translations: Record<LangCode, Translations> = {
       trustLinkFreshcoins: 'Freshcoins',
       trustLinkKycPaper: 'KYC · Whitepaper',
     },
+    cetuiaMapUi: cetuiaMapUiEn,
     common: {
       backToTop: 'Volver arriba',
       switchLanguagePrefix: 'Cambiar idioma a',
@@ -2867,6 +2976,7 @@ const translations: Record<LangCode, Translations> = {
     livePool: {
       title: 'Pool DeDust en vivo',
       liveBadge: 'EN VIVO',
+      staleBadge: 'NO ACT.',
       labelCetPrice: 'Precio CET',
       labelTvl: 'TVL',
       labelVolume24h: 'Volumen 24h',
@@ -2879,6 +2989,7 @@ const translations: Record<LangCode, Translations> = {
       twitterX: 'Twitter / X',
       followSuffix: 'para actualizaciones en tiempo real.',
       updatedPrefix: 'Actualizado',
+      stalePrefix: 'No actualizado (último)',
     },
     communityProof: {
       title: 'Prueba social',
@@ -3327,6 +3438,7 @@ const translations: Record<LangCode, Translations> = {
       tokenomics: '代币经济学',
       cetuia: 'Cetățuia 地图',
       rwa: '虚拟土地',
+      submitTask: '提交任务',
       cetAi: 'CET AI',
       roadmap: '路线图',
       team: 'AI团队',
@@ -3345,6 +3457,7 @@ const translations: Record<LangCode, Translations> = {
       trustLinkFreshcoins: 'Freshcoins',
       trustLinkKycPaper: 'KYC · 白皮书',
     },
+    cetuiaMapUi: cetuiaMapUiEn,
     common: {
       backToTop: '返回顶部',
       switchLanguagePrefix: '切换语言为',
@@ -3365,6 +3478,7 @@ const translations: Record<LangCode, Translations> = {
     livePool: {
       title: 'DeDust 池 · 实时',
       liveBadge: '实时',
+      staleBadge: '数据未刷新',
       labelCetPrice: 'CET 价格',
       labelTvl: 'TVL',
       labelVolume24h: '24h 成交量',
@@ -3377,6 +3491,7 @@ const translations: Record<LangCode, Translations> = {
       twitterX: 'Twitter / X',
       followSuffix: '关注我们获取实时更新。',
       updatedPrefix: '更新于',
+      stalePrefix: '未刷新（上次）',
     },
     communityProof: {
       title: '社交证明',
@@ -3864,6 +3979,7 @@ const translations: Record<LangCode, Translations> = {
       tokenomics: 'Токеномика',
       cetuia: 'Карта Cetățuia',
       rwa: 'Виртуальная земля',
+      submitTask: 'Отправить задачу',
       cetAi: 'CET AI',
       roadmap: 'Дорожная карта',
       team: 'AI Команда',
@@ -3882,6 +3998,7 @@ const translations: Record<LangCode, Translations> = {
       trustLinkFreshcoins: 'Freshcoins',
       trustLinkKycPaper: 'KYC · Whitepaper',
     },
+    cetuiaMapUi: cetuiaMapUiEn,
     common: {
       backToTop: 'Наверх',
       switchLanguagePrefix: 'Переключить язык на',
@@ -3945,6 +4062,7 @@ const translations: Record<LangCode, Translations> = {
     livePool: {
       title: 'Пул DeDust — live',
       liveBadge: 'LIVE',
+      staleBadge: 'ДАННЫЕ УСТАРЕЛИ',
       labelCetPrice: 'Цена CET',
       labelTvl: 'TVL',
       labelVolume24h: 'Объём 24ч',
@@ -3957,6 +4075,7 @@ const translations: Record<LangCode, Translations> = {
       twitterX: 'Twitter / X',
       followSuffix: 'для актуальных обновлений.',
       updatedPrefix: 'Обновлено',
+      stalePrefix: 'Устарело (последнее)',
     },
     communityProof: {
       title: 'Социальное доказательство',
@@ -4411,6 +4530,7 @@ const translations: Record<LangCode, Translations> = {
       tokenomics: 'Tokenomică',
       cetuia: 'Harta Cetățuia',
       rwa: 'Teren virtual',
+      submitTask: 'Trimite task',
       cetAi: 'CET AI',
       roadmap: 'Foaie de Parcurs',
       team: 'Echipa AI',
@@ -4429,6 +4549,7 @@ const translations: Record<LangCode, Translations> = {
       trustLinkFreshcoins: 'Freshcoins',
       trustLinkKycPaper: 'KYC · Whitepaper',
     },
+    cetuiaMapUi: cetuiaMapUiRo,
     common: {
       backToTop: 'Înapoi sus',
       switchLanguagePrefix: 'Schimbă limba la',
@@ -4492,6 +4613,7 @@ const translations: Record<LangCode, Translations> = {
     livePool: {
       title: 'Pool DeDust live',
       liveBadge: 'LIVE',
+      staleBadge: 'DATE NEPROASPĂTATE',
       labelCetPrice: 'Preț CET',
       labelTvl: 'TVL',
       labelVolume24h: 'Volum 24h',
@@ -4504,6 +4626,7 @@ const translations: Record<LangCode, Translations> = {
       twitterX: 'Twitter / X',
       followSuffix: 'pentru actualizări în timp real.',
       updatedPrefix: 'Actualizat',
+      stalePrefix: 'Neproaspătate (ultima)',
     },
     communityProof: {
       title: 'Dovadă socială',
@@ -4952,6 +5075,7 @@ const translations: Record<LangCode, Translations> = {
       tokenomics: 'Tokenomia',
       cetuia: 'Mapa Cetățuia',
       rwa: 'Terra virtual',
+      submitTask: 'Enviar tarefa',
       cetAi: 'CET AI',
       roadmap: 'Roteiro',
       team: 'Equipa IA',
@@ -4970,6 +5094,7 @@ const translations: Record<LangCode, Translations> = {
       trustLinkFreshcoins: 'Freshcoins',
       trustLinkKycPaper: 'KYC · Whitepaper',
     },
+    cetuiaMapUi: cetuiaMapUiEn,
     common: {
       backToTop: 'Voltar ao topo',
       switchLanguagePrefix: 'Mudar idioma para',
@@ -5033,6 +5158,7 @@ const translations: Record<LangCode, Translations> = {
     livePool: {
       title: 'Pool DeDust ao vivo',
       liveBadge: 'AO VIVO',
+      staleBadge: 'DADOS DESATUALIZADOS',
       labelCetPrice: 'Preço CET',
       labelTvl: 'TVL',
       labelVolume24h: 'Volume 24h',
@@ -5045,6 +5171,7 @@ const translations: Record<LangCode, Translations> = {
       twitterX: 'Twitter / X',
       followSuffix: 'para atualizações em tempo real.',
       updatedPrefix: 'Atualizado',
+      stalePrefix: 'Desatualizado (último)',
     },
     communityProof: {
       title: 'Prova social',
@@ -5502,6 +5629,7 @@ const translations: Record<LangCode, Translations> = {
       tokenomics: 'Tokenomik',
       cetuia: 'Cetățuia Karte',
       rwa: 'Virtuelles Land',
+      submitTask: 'Task einreichen',
       cetAi: 'CET AI',
       roadmap: 'Fahrplan',
       team: 'KI-Team',
@@ -5520,6 +5648,7 @@ const translations: Record<LangCode, Translations> = {
       trustLinkFreshcoins: 'Freshcoins',
       trustLinkKycPaper: 'KYC · Whitepaper',
     },
+    cetuiaMapUi: cetuiaMapUiEn,
     common: {
       backToTop: 'Nach oben',
       switchLanguagePrefix: 'Sprache wechseln zu',
@@ -5583,6 +5712,7 @@ const translations: Record<LangCode, Translations> = {
     livePool: {
       title: 'Live DeDust-Pool',
       liveBadge: 'LIVE',
+      staleBadge: 'NICHT AKTUELL',
       labelCetPrice: 'CET-Preis',
       labelTvl: 'TVL',
       labelVolume24h: '24h-Volumen',
@@ -5595,6 +5725,7 @@ const translations: Record<LangCode, Translations> = {
       twitterX: 'Twitter / X',
       followSuffix: 'für Echtzeit-Updates.',
       updatedPrefix: 'Aktualisiert',
+      stalePrefix: 'Nicht aktuell (zuletzt)',
     },
     communityProof: {
       title: 'Social Proof',

@@ -41,6 +41,7 @@ interface ImportMetaEnv {
   readonly VITE_WALLETCONNECT_PROJECT_ID?: string
   readonly VITE_BSC_TESTNET_RPC_URL?: string
   readonly VITE_SPECIAL_NFT_COLLECTION_ADDRESS?: string
+  readonly VITE_R2A_TASK_CONTRACT_ADDRESS?: string
 
   readonly VITE_CRISP_WEBSITE_ID?: string
   readonly VITE_TAWK_PROPERTY_ID?: string
