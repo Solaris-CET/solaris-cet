@@ -33,7 +33,7 @@ import { acquireConcurrencySlot } from '../lib/concurrencyLimit';
 import { getAllowedOrigin } from '../lib/cors';
 import { resolveApiKey } from '../lib/crypto';
 import { withRateLimit } from '../lib/rateLimit';
-import { decideCetAiRavPlan, deriveCetAiResourceBudget } from '../lib/reactBrain';
+import { decideCetAiRavPlan, deriveCetAiResourceBudget, synthesizeConsensus } from '../lib/reactBrain';
 
 export const config = { runtime: 'edge' };
 
@@ -506,7 +506,11 @@ export default async function handler(req: Request): Promise<Response> {
             completionTokens: xUsage?.completion_tokens,
           }) ?? undefined,
       });
-      reply = `${geminiText.trim()}\n\n${grokText.trim()}`;
+      reply = synthesizeConsensus({
+        geminiReply: geminiText,
+        grokReply: grokText,
+        onChainContext: onChain,
+      });
     } else if (geminiOk) {
       const fallbackClient = new OpenAI({
         apiKey: geminiKey!,

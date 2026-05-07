@@ -1,4 +1,6 @@
 const http = require('node:http');
+const cluster = require('node:cluster');
+const os = require('node:os');
 const crypto = require('node:crypto');
 const zlib = require('node:zlib');
 const { readFile, stat } = require('node:fs/promises');
@@ -604,6 +606,33 @@ const apiRoutes = new Map([
 
 const handlerCache = new Map();
 
+/**
+ * Advanced LRU Response Cache for Hetzner Optimization
+ * Capacity: 1000 entries
+ */
+class ResponseCache {
+  constructor(capacity = 1000) {
+    this.capacity = capacity;
+    this.cache = new Map();
+  }
+  get(key) {
+    const item = this.cache.get(key);
+    if (item) {
+      this.cache.delete(key);
+      this.cache.set(key, item);
+      return item;
+    }
+    return null;
+  }
+  set(key, value) {
+    if (this.cache.size >= this.capacity) {
+      this.cache.delete(this.cache.keys().next().value);
+    }
+    this.cache.set(key, value);
+  }
+}
+const apiResponseCache = new ResponseCache();
+
 function getRequestUrl(req) {
   const proto = String(req.headers['x-forwarded-proto'] ?? 'http').split(',')[0].trim();
   const hostHeader = String(req.headers['x-forwarded-host'] ?? req.headers.host ?? 'localhost')
@@ -808,6 +837,20 @@ function loadApiHandler(relPath) {
 }
 
 async function serveApi(req, res, reqUrl) {
+  const isGet = req.method === 'GET' || req.method === 'HEAD';
+  const cacheKey = isGet ? reqUrl.toString() : null;
+
+  if (cacheKey) {
+    const cached = apiResponseCache.get(cacheKey);
+    if (cached) {
+      res.statusCode = cached.status;
+      for (const [k, v] of Object.entries(cached.headers)) res.setHeader(k, v);
+      res.setHeader('X-Cache', 'HIT');
+      res.end(cached.body);
+      return true;
+    }
+  }
+
   let rel = apiRoutes.get(reqUrl.pathname);
   if (!rel && reqUrl.pathname.startsWith('/api/')) {
     const candidate = `${reqUrl.pathname.slice(1)}/route.js`;
@@ -854,14 +897,43 @@ async function serveApi(req, res, reqUrl) {
   }
   res.statusCode = response.status;
   setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
-  for (const [k, v] of response.headers.entries()) res.setHeader(k, v);
+  const responseHeaders = {};
+  for (const [k, v] of response.headers.entries()) {
+    res.setHeader(k, v);
+    responseHeaders[k] = v;
+  }
   const buf = Buffer.from(await response.arrayBuffer());
+
+  if (cacheKey && response.status === 200) {
+    apiResponseCache.set(cacheKey, {
+      status: response.status,
+      headers: responseHeaders,
+      body: buf,
+    });
+  }
+
   res.end(buf);
   return true;
 }
 
 async function main() {
   await otelReady;
+
+  const numCPUs = os.cpus().length || 1;
+  const useCluster = process.env.NODE_ENV === 'production' && numCPUs > 1;
+
+  if (useCluster && cluster.isPrimary) {
+    console.log(`[Master] Primary ${process.pid} is running. Forking ${numCPUs} workers...`);
+    for (let i = 0; i < numCPUs; i++) {
+      cluster.fork();
+    }
+    cluster.on('exit', (worker, code, signal) => {
+      console.log(`[Master] Worker ${worker.process.pid} died. Forking replacement...`);
+      cluster.fork();
+    });
+    return;
+  }
+
   const server = http.createServer(async (req, res) => {
     const start = Date.now();
     const requestId = String(req.headers['x-request-id'] ?? '').trim() || crypto.randomUUID();
