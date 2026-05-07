@@ -39,16 +39,16 @@
     "three": "^0.184.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.8.1",
-    "@commitlint/config-conventional": "^19.8.1",
-    "@rolldown/binding-linux-x64-gnu": "^1.0.0-rc.17",
-    "@types/node": "^22.19.17",
+    "@commitlint/cli": "^20.5.3",
+    "@commitlint/config-conventional": "^20.5.3",
+    "@rolldown/binding-linux-x64-gnu": "^1.0.0-rc.18",
+    "@types/node": "^25.6.0",
     "css-tree": "^3.2.1",
-    "eslint": "^10.2.1",
+    "eslint": "^10.3.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
     "plop": "^4.0.1",
-    "typescript": "5.8.3",
+    "typescript": "6.0.3",
     "vite": "8.0.10",
     "vitest": "^4.1.2"
   },
@@ -68,7 +68,7 @@
     "gaxios": "7.1.2",
     "gcp-metadata": "8.1.2",
     "mermaid": "11.14.0",
-    "typescript": "5.8.3",
+    "typescript": "6.0.3",
     "@esbuild-kit/core-utils": {
       "esbuild": "0.27.7"
     },
