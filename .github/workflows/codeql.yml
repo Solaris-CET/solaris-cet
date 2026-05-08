@@ -49,6 +49,7 @@ jobs:
           # Use the default CodeQL query suite plus the security-extended pack
           # which covers OWASP Top 10 and other high-severity patterns.
           queries: security-extended
+          config-file: ./.github/codeql/codeql-config.yml
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
