@@ -16,7 +16,12 @@ varying vec3 vLocalPos;
 void main() {
   vUv = uv;
   vLocalPos = position;
-  vec4 worldPos = modelMatrix * vec4(position, 1.0);
+
+  // Quantum Jitter displacement
+  float jitter = sin(position.y * 10.0 + uTime * 5.0) * uBeat * 0.02;
+  vec3 jitterPos = position + normal * jitter;
+
+  vec4 worldPos = modelMatrix * vec4(jitterPos, 1.0);
   vWorldPos = worldPos.xyz;
   vNormalW = normalize(mat3(modelMatrix) * normal);
   vec3 camPos = cameraPosition;
@@ -65,11 +70,14 @@ float noise(vec2 p) {
 }
 
 void main() {
-  float fresnel = pow(1.0 - clamp(dot(normalize(vNormalW), normalize(vViewDirW)), 0.0, 1.0), uFresnelPow);
+  vec3 normalW = normalize(vNormalW);
+  vec3 viewDirW = normalize(vViewDirW);
+  float fresnel = pow(1.0 - clamp(dot(normalW, viewDirW), 0.0, 1.0), uFresnelPow);
 
   float scanPos = (vWorldPos.y + uTime * uScanSpeed) * uScanDensity;
+  float scanLine = smoothstep(0.1, 0.0, abs(fract(scanPos) - 0.5)) * 0.5;
   float scan = 0.5 + 0.5 * sin(scanPos);
-  scan = pow(scan, 3.0);
+  scan = pow(scan, 3.0) + scanLine;
 
   vec2 p = vUv * 12.0 + vec2(uTime * 0.08, -uTime * 0.05);
   float n = noise(p);
@@ -80,7 +88,7 @@ void main() {
 
   float pointerPulse = 0.18 * (1.0 - smoothstep(0.0, 0.9, length(uPointer)));
   float pulse = 0.12 * sin(uTime * 1.4 + vLocalPos.y * 2.2) + 0.12 * uPulse * (0.75 + uBeat * 0.85);
-  float aura = fresnel + scan * 0.85 + pointerPulse + pulse;
+  float aura = fresnel * 1.5 + scan * 0.85 + pointerPulse + pulse;
 
   vec3 base = mix(uColorA, uColorB, clamp(0.15 + 0.85 * (0.5 + 0.5 * sin(vWorldPos.y * 0.8 + uTime * 0.6)), 0.0, 1.0));
   base += uNoiseAmount * (n - 0.5) * vec3(0.8, 1.0, 1.2);
