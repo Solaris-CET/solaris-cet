@@ -607,31 +607,48 @@ const apiRoutes = new Map([
 const handlerCache = new Map();
 
 /**
- * Advanced LRU Response Cache for Hetzner Optimization
- * Capacity: 1000 entries
+ * Segmented LRU Response Cache for Hetzner Optimization (8vCPU)
+ * Distributes load across 16 segments to minimize V8 Map lock contention.
+ * Total Capacity: 2048 entries.
  */
-class ResponseCache {
-  constructor(capacity = 1000) {
-    this.capacity = capacity;
-    this.cache = new Map();
+class SegmentedResponseCache {
+  constructor(totalCapacity = 2048, segments = 16) {
+    this.segments = segments;
+    this.capacityPerSegment = Math.ceil(totalCapacity / segments);
+    this.caches = Array.from({ length: segments }, () => new Map());
   }
+
+  _getSegment(key) {
+    let hash = 0;
+    for (let i = 0; i < key.length; i++) {
+      hash = (hash << 5) - hash + key.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash) % this.segments;
+  }
+
   get(key) {
-    const item = this.cache.get(key);
+    const idx = this._getSegment(key);
+    const cache = this.caches[idx];
+    const item = cache.get(key);
     if (item) {
-      this.cache.delete(key);
-      this.cache.set(key, item);
+      cache.delete(key);
+      cache.set(key, item);
       return item;
     }
     return null;
   }
+
   set(key, value) {
-    if (this.cache.size >= this.capacity) {
-      this.cache.delete(this.cache.keys().next().value);
+    const idx = this._getSegment(key);
+    const cache = this.caches[idx];
+    if (cache.size >= this.capacityPerSegment) {
+      cache.delete(cache.keys().next().value);
     }
-    this.cache.set(key, value);
+    cache.set(key, value);
   }
 }
-const apiResponseCache = new ResponseCache();
+const apiResponseCache = new SegmentedResponseCache();
 
 function getRequestUrl(req) {
   const proto = String(req.headers['x-forwarded-proto'] ?? 'http').split(',')[0].trim();
