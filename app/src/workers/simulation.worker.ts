@@ -12,8 +12,12 @@ self.onmessage = (e: MessageEvent) => {
   if (type === 'RUN_MONTE_CARLO') {
     const { vars, iterations = 1000 } = payload as { vars: SimulationVariables, iterations: number };
 
-    let totalYield = 0;
-    const results: SimulationResult[] = [];
+    // Welford's Algorithm for incremental mean and variance calculation.
+    // O(1) space complexity, allowing millions of iterations on Hetzner 16GB RAM.
+    let count = 0;
+    let mean = 0;
+    let m2 = 0;
+    let lastState = 0;
 
     // Monte Carlo simulation with stochastic noise on environmental variables
     for (let i = 0; i < iterations; i++) {
@@ -24,13 +28,22 @@ self.onmessage = (e: MessageEvent) => {
         agentDensity: vars.agentDensity,
       };
 
-      const res = YieldSimulator.calculate(noisyVars);
-      totalYield += res.yieldKg;
-      results.push(res);
+      const res = YieldSimulator.calculate(noisyVars, lastState);
+      const val = res.yieldKg;
+
+      // Update state for next Markov step
+      lastState = res.volatilityState === 'Stable' ? 0 : res.volatilityState === 'Volatile' ? 1 : 2;
+
+      // Incremental mean/variance update
+      count++;
+      const delta = val - mean;
+      mean += delta / count;
+      const delta2 = val - mean;
+      m2 += delta * delta2;
     }
 
-    const averageYield = totalYield / iterations;
-    const variance = results.reduce((acc, r) => acc + Math.pow(r.yieldKg - averageYield, 2), 0) / iterations;
+    const averageYield = mean;
+    const variance = count > 1 ? m2 / (count - 1) : 0;
     const stdDev = Math.sqrt(variance);
 
     self.postMessage({
@@ -39,7 +52,10 @@ self.onmessage = (e: MessageEvent) => {
         averageYield,
         stdDev,
         iterations,
-        confidenceInterval: [averageYield - 1.96 * (stdDev / Math.sqrt(iterations)), averageYield + 1.96 * (stdDev / Math.sqrt(iterations))]
+        confidenceInterval: [
+          averageYield - 1.96 * (stdDev / Math.sqrt(iterations)),
+          averageYield + 1.96 * (stdDev / Math.sqrt(iterations))
+        ]
       }
     });
   }
