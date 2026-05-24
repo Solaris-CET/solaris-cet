@@ -16,6 +16,7 @@
     "app:dev": "npm --workspace=app run dev --",
     "app:build": "npm run build --workspace=app",
     "app:verify": "npm run verify --workspace=app",
+    "engine:start": "cd engine && ./farming-engine",
     "app:test:e2e": "npm run test:e2e --workspace=app",
     "app:test:e2e:stable": "PW_WORKERS=1 npm run test:e2e --workspace=app",
     "audit:prod": "npm audit --omit=dev --audit-level=high",
