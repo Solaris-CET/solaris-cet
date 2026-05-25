@@ -51,6 +51,8 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useSessionStorage } from '../hooks/useSessionStorage';
 import type { CetAiKnowledge, Translations } from '../i18n/translations';
+import DOMPurify from 'dompurify';
+
 import { SafeHtml } from './SafeHtml';
 
 // --- TYPE DEFINITIONS ---
@@ -1056,9 +1058,7 @@ export default function CetAiSearch(props: { initialPrompt?: string } = {}) {
 
     const isHtml = /<\/?[^>]+>/.test(finalResponse);
     const plain = isHtml
-      ? finalResponse
-          .replace(/<br\s*\/?\s*>/gi, '\n')
-          .replace(/<[^>]*>/g, '')
+      ? DOMPurify.sanitize(finalResponse.replace(/<br\s*\/?\s*>/gi, '\n'), { ALLOWED_TAGS: [] })
       : finalResponse;
 
     const myEpoch = generationEpochRef.current;
@@ -2464,9 +2464,7 @@ export default function CetAiSearch(props: { initialPrompt?: string } = {}) {
                             if (typingDone) return;
                             const isHtml = /<\/?[^>]+>/.test(finalResponse);
                             const plain = isHtml
-                              ? finalResponse
-                                  .replace(/<br\s*\/?\s*>/gi, '\n')
-                                  .replace(/<[^>]*>/g, '')
+                              ? DOMPurify.sanitize(finalResponse.replace(/<br\s*\/?\s*>/gi, '\n'), { ALLOWED_TAGS: [] })
                               : finalResponse;
                             setTypedResponse(plain);
                             setTypingDone(true);

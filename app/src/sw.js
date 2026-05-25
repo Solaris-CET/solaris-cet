@@ -214,6 +214,7 @@ precacheAndRoute(filteredManifest)
 cleanupOutdatedCaches()
 
 sw.addEventListener('message', (event) => {
+  if (event.origin && event.origin !== sw.location.origin) return
   const data = event?.data
   if (data && typeof data === 'object' && data.type === 'SKIP_WAITING') {
     sw.skipWaiting?.()

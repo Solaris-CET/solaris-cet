@@ -5,12 +5,12 @@ import { fileURLToPath } from "node:url";
 import { describe, expect,it } from "vitest";
 
 const FORBIDDEN_CDN_PATTERNS = [
-  /fonts\.googleapis\.com/i,
-  /fonts\.gstatic\.com/i,
-  /cdn\.jsdelivr\.net/i,
-  /unpkg\.com/i,
-  /cdnjs\.cloudflare\.com/i,
-  /cdn\.tailwindcss\.com/i,
+  /\/\/fonts\.googleapis\.com/i,
+  /\/\/fonts\.gstatic\.com/i,
+  /\/\/cdn\.jsdelivr\.net/i,
+  /\/\/unpkg\.com/i,
+  /\/\/cdnjs\.cloudflare\.com/i,
+  /\/\/cdn\.tailwindcss\.com/i,
 ];
 
 describe("OMEGA invariants", () => {

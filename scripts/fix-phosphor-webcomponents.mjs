@@ -1,4 +1,5 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import crypto from "node:crypto";
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -73,7 +74,9 @@ for (const file of files) {
   let after = before;
   for (const { re, to } of rewrites) after = after.replace(re, to);
   if (after !== before) {
-    writeFileSync(file, after, "utf8");
+    const tmp = `${file}.tmp.${crypto.randomBytes(6).toString("hex")}`;
+    writeFileSync(tmp, after, "utf8");
+    renameSync(tmp, file);
     changedFiles += 1;
   }
 }
@@ -86,7 +89,9 @@ function ensureStubIcon(name) {
   const base = name.startsWith("Ph") ? name.slice(2) : name;
   const tag = `ph-${base.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase()}`;
   const contents = `import { PhCircle } from "./PhCircle.mjs";\nif (!customElements.get(${JSON.stringify(tag)})) customElements.define(${JSON.stringify(tag)}, PhCircle);\nexport { PhCircle as ${name} };\n`;
-  writeFileSync(target, contents, "utf8");
+  const tmp = `${target}.tmp.${crypto.randomBytes(6).toString("hex")}`;
+  writeFileSync(tmp, contents, "utf8");
+  renameSync(tmp, target);
   return true;
 }
 

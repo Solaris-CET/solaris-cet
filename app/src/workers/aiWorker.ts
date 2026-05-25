@@ -215,6 +215,7 @@ function queryMemory(): void {
 // ---------------------------------------------------------------------------
 
 self.onmessage = async (event: MessageEvent<InboundMessage>): Promise<void> => {
+  if (event.origin && event.origin !== self.location.origin) return;
   try {
     switch (event.data.type) {
       case 'LOAD_MODEL':
