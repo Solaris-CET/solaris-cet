@@ -51,7 +51,10 @@ export async function subscribePush(authToken: string): Promise<PushSubscription
 
   const vapid = await getVapidPublicKey();
   const appKey = urlBase64ToUint8Array(vapid);
-  const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: appKey });
+  const sub = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: appKey.buffer as ArrayBuffer,
+  });
   const json = sub.toJSON() as { endpoint?: unknown; keys?: unknown };
 
   await fetch('/api/push/subscribe', {

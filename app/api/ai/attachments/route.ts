@@ -88,7 +88,7 @@ export default async function handler(req: Request): Promise<Response> {
         .where(and(eq(schema.aiAttachments.id, id), eq(schema.aiAttachments.userId, ctx.user.id)));
       if (!row) return jsonResponse(allowedOrigin, { error: 'Not found' }, 404);
       const bytes = decodeBase64(row.dataBase64);
-      return new Response(bytes, {
+      return new Response(bytes as any, {
         status: 200,
         headers: {
           'Content-Type': row.mimeType,
