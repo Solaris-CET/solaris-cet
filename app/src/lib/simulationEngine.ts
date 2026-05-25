@@ -35,7 +35,7 @@ export class YieldSimulator {
     // [0.20, 0.60, 0.20]
     // [0.10, 0.30, 0.60]
     const r = Math.random();
-    let currentState = 0;
+    let currentState: number;
     if (prevState === 0) {
       if (r < 0.85) currentState = 0;
       else if (r < 0.95) currentState = 1;

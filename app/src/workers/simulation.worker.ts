@@ -1,5 +1,5 @@
 import { YieldSimulator } from '../lib/simulationEngine';
-import type { SimulationVariables, SimulationResult } from '../lib/simulationEngine';
+import type { SimulationVariables } from '../lib/simulationEngine';
 
 /**
  * Simulation Worker — Handles high-density Monte Carlo simulations
