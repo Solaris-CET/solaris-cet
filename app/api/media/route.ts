@@ -19,7 +19,7 @@ export default async function handler(req: Request): Promise<Response> {
   const [asset] = await db.select().from(schema.cmsAssets).where(eq(schema.cmsAssets.id, id));
   if (!asset) return new Response('Not found', { status: 404 });
   const bytes = decodeBase64(asset.dataBase64);
-  return new Response(bytes, {
+  return new Response(bytes as any, {
     status: 200,
     headers: {
       'Content-Type': asset.mimeType,
