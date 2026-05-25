@@ -24,6 +24,7 @@ export type { MiningInput, MiningResult } from '../lib/mining-calc';
 // ---------------------------------------------------------------------------
 
 self.onmessage = (event: MessageEvent<{ type: string; payload: Parameters<typeof calculateRewards>[0] }>) => {
+  if (event.origin && event.origin !== self.location.origin) return;
   const { type, payload } = event.data;
 
   if (type === 'CALCULATE_REWARDS') {

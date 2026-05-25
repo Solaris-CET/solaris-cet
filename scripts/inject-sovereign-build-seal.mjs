@@ -3,8 +3,9 @@
  * After sync-sovereign copies to app/public/sovereign/, replace <!-- BUILD_SEAL_INJECT -->
  * with a static line (no JS) so the OMEGA surface shows artifact short hash + date.
  */
+import crypto from "node:crypto";
 import { execSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -53,5 +54,7 @@ if (!html.includes(marker)) {
 } else {
   html = html.replace(marker, seal);
 }
-writeFileSync(target, html);
+const tmp = `${target}.tmp.${crypto.randomBytes(6).toString("hex")}`;
+writeFileSync(tmp, html);
+renameSync(tmp, target);
 console.log("[inject-sovereign-build-seal]", hash, date);

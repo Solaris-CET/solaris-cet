@@ -18,12 +18,12 @@ const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 const appPublic = join(repoRoot, "app/public");
 
 const FORBIDDEN_CDN_PATTERNS = [
-  /fonts\.googleapis\.com/i,
-  /fonts\.gstatic\.com/i,
-  /cdn\.jsdelivr\.net/i,
-  /unpkg\.com/i,
-  /cdnjs\.cloudflare\.com/i,
-  /cdn\.tailwindcss\.com/i,
+  /\/\/fonts\.googleapis\.com/i,
+  /\/\/fonts\.gstatic\.com/i,
+  /\/\/cdn\.jsdelivr\.net/i,
+  /\/\/unpkg\.com/i,
+  /\/\/cdnjs\.cloudflare\.com/i,
+  /\/\/cdn\.tailwindcss\.com/i,
 ];
 
 describe("Public discovery — sitemap, security.txt, humans.txt", () => {

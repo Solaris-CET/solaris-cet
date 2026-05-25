@@ -294,14 +294,27 @@ export function trackWhitepaperClick(input: { destination: string; source?: stri
   });
 }
 
+function secureRandomString(length: number): string {
+  try {
+    const arr = new Uint8Array(Math.ceil(length / 2));
+    crypto.getRandomValues(arr);
+    return Array.from(arr, (byte) => byte.toString(16).padStart(2, '0'))
+      .join('')
+      .slice(0, length);
+  } catch {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, length + 2);
+  }
+}
+
 function randomId(): string {
   try {
-    const anyCrypto = crypto as unknown as { randomUUID?: () => string };
-    if (typeof anyCrypto.randomUUID === 'function') return anyCrypto.randomUUID();
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
   } catch {
     void 0;
   }
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  return `${Date.now().toString(36)}-${secureRandomString(8)}`;
 }
 
 function getAnonId(): string {
@@ -330,12 +343,12 @@ function getSessionId(nowMs: number): string {
       localStorage.setItem(lastKey, String(nowMs));
       return existing.trim().slice(0, 140);
     }
-    const created = `${getAnonId()}.${nowMs.toString(36)}.${Math.random().toString(36).slice(2, 8)}`;
+    const created = `${getAnonId()}.${nowMs.toString(36)}.${secureRandomString(6)}`;
     localStorage.setItem(idKey, created);
     localStorage.setItem(lastKey, String(nowMs));
     return created.slice(0, 140);
   } catch {
-    return `${getAnonId()}.${nowMs.toString(36)}.${Math.random().toString(36).slice(2, 8)}`.slice(0, 140);
+    return `${getAnonId()}.${nowMs.toString(36)}.${secureRandomString(6)}`.slice(0, 140);
   }
 }
 
