@@ -23,7 +23,8 @@
       "vitest": ["../node_modules/vitest/dist/index.d.ts"],
       "@testing-library/react": ["../node_modules/@testing-library/react/types/index.d.ts"],
       "onnxruntime-web": ["./src/types/onnxruntime-web.d.ts"],
-      "@sentry/browser": ["./src/types/sentry-browser.d.ts"]
+      "@sentry/browser": ["./src/types/sentry-browser.d.ts"],
+      "virtual:pwa-register/react": ["./src/types/virtual-pwa-register-react.d.ts"]
     },
     /* Bundler mode */
     "moduleResolution": "bundler",

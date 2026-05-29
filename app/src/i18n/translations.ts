@@ -36,6 +36,14 @@ export interface Translations {
   };
   nav: {
     home: string;
+    about: string;
+    services: string;
+    products: string;
+    cetToken: string;
+    contact: string;
+    requestOffer: string;
+    downloadApp: string;
+    download: string;
     cetApp: string;
     tokenomics: string;
     cetuia: string;
@@ -2344,6 +2352,14 @@ const translations: Record<LangCode, Translations> = {
     },
     nav: {
       home: 'Home',
+      about: 'About',
+      services: 'Services',
+      products: 'Products',
+      cetToken: 'CET Token',
+      contact: 'Contact',
+      requestOffer: 'Request quote',
+      downloadApp: 'Download app',
+      download: 'Download',
       cetApp: 'CET App',
       tokenomics: 'Tokenomics',
       cetuia: 'Cetățuia Map',
@@ -2889,6 +2905,14 @@ const translations: Record<LangCode, Translations> = {
     },
     nav: {
       home: 'Inicio',
+      about: 'Acerca de',
+      services: 'Servicios',
+      products: 'Productos',
+      cetToken: 'Token CET',
+      contact: 'Contacto',
+      requestOffer: 'Pedir presupuesto',
+      downloadApp: 'Descargar app',
+      download: 'Descargar',
       cetApp: 'App CET',
       tokenomics: 'Tokenómica',
       cetuia: 'Mapa Cetățuia',
@@ -3434,6 +3458,14 @@ const translations: Record<LangCode, Translations> = {
     },
     nav: {
       home: '首页',
+      about: '关于',
+      services: '服务',
+      products: '产品',
+      cetToken: 'CET 代币',
+      contact: '联系',
+      requestOffer: '获取报价',
+      downloadApp: '下载应用',
+      download: '下载',
       cetApp: 'CET 应用',
       tokenomics: '代币经济学',
       cetuia: 'Cetățuia 地图',
@@ -3975,6 +4007,14 @@ const translations: Record<LangCode, Translations> = {
     },
     nav: {
       home: 'Главная',
+      about: 'О нас',
+      services: 'Услуги',
+      products: 'Продукты',
+      cetToken: 'Токен CET',
+      contact: 'Контакты',
+      requestOffer: 'Запросить расчет',
+      downloadApp: 'Скачать приложение',
+      download: 'Скачать',
       cetApp: 'Приложение CET',
       tokenomics: 'Токеномика',
       cetuia: 'Карта Cetățuia',
@@ -4526,6 +4566,14 @@ const translations: Record<LangCode, Translations> = {
     },
     nav: {
       home: 'Acasă',
+      about: 'Despre',
+      services: 'Servicii',
+      products: 'Produse',
+      cetToken: 'Token CET',
+      contact: 'Contact',
+      requestOffer: 'Cere ofertă',
+      downloadApp: 'Descarcă aplicația',
+      download: 'Descarcă',
       cetApp: 'Aplicație CET',
       tokenomics: 'Tokenomică',
       cetuia: 'Harta Cetățuia',
@@ -5071,6 +5119,14 @@ const translations: Record<LangCode, Translations> = {
     },
     nav: {
       home: 'Início',
+      about: 'Sobre',
+      services: 'Serviços',
+      products: 'Produtos',
+      cetToken: 'Token CET',
+      contact: 'Contacto',
+      requestOffer: 'Pedir orçamento',
+      downloadApp: 'Baixar app',
+      download: 'Baixar',
       cetApp: 'App CET',
       tokenomics: 'Tokenomia',
       cetuia: 'Mapa Cetățuia',
@@ -5625,6 +5681,14 @@ const translations: Record<LangCode, Translations> = {
     },
     nav: {
       home: 'Startseite',
+      about: 'Über uns',
+      services: 'Leistungen',
+      products: 'Produkte',
+      cetToken: 'CET Token',
+      contact: 'Kontakt',
+      requestOffer: 'Angebot anfragen',
+      downloadApp: 'App herunterladen',
+      download: 'Download',
       cetApp: 'CET App',
       tokenomics: 'Tokenomik',
       cetuia: 'Cetățuia Karte',

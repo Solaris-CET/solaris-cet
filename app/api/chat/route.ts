@@ -277,33 +277,13 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   try {
-  // 1. Resolve API keys — prefer AES-256-GCM encrypted variants (*_ENC) when
-  //    ENCRYPTION_SECRET is set; fall back to plaintext variants for local dev.
-  const encryptionSecret = process.env.ENCRYPTION_SECRET;
-  const [grokKey, geminiKey, claudeKey] = await Promise.all([
-    resolveApiKey(process.env.GROK_API_KEY_ENC, process.env.GROK_API_KEY, encryptionSecret),
-    resolveApiKey(process.env.GEMINI_API_KEY_ENC, process.env.GEMINI_API_KEY, encryptionSecret),
-    resolveApiKey(process.env.ANTHROPIC_API_KEY_ENC, process.env.ANTHROPIC_API_KEY, encryptionSecret),
-  ]);
-
-  if (!grokKey && !geminiKey && !claudeKey) {
-    return new Response(
-      JSON.stringify({ message: 'No AI provider API key configured. Set GROK_API_KEY_ENC/GROK_API_KEY, GEMINI_API_KEY_ENC/GEMINI_API_KEY, or ANTHROPIC_API_KEY_ENC/ANTHROPIC_API_KEY in the server environment.' }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': allowedOrigin,
-          'Vary': 'Origin',
-        },
-      },
-    );
-  }
-
-  // 2. Parse Request
-  const body = (await req.json()) as { query?: unknown; conversation?: unknown };
+  const body = (await req.json()) as { query?: unknown; conversation?: unknown; context?: unknown };
   const userQuery = body.query;
   const conversation = normalizeConversation(body.conversation);
+  const context =
+    typeof body.context === 'object' && body.context !== null ? (body.context as Record<string, unknown>) : null;
+  const contextMode = typeof context?.mode === 'string' ? context.mode : '';
+  const contextDepartment = typeof context?.department === 'string' ? context.department : '';
 
   if (!userQuery || typeof userQuery !== 'string' || !userQuery.trim()) {
     return new Response(
@@ -362,6 +342,79 @@ export default async function handler(req: Request): Promise<Response> {
     }
   }
 
+  const encryptionSecret = process.env.ENCRYPTION_SECRET;
+  const [grokKey, geminiKey, claudeKey] = await Promise.all([
+    resolveApiKey(process.env.GROK_API_KEY_ENC, process.env.GROK_API_KEY, encryptionSecret),
+    resolveApiKey(process.env.GEMINI_API_KEY_ENC, process.env.GEMINI_API_KEY, encryptionSecret),
+    resolveApiKey(process.env.ANTHROPIC_API_KEY_ENC, process.env.ANTHROPIC_API_KEY, encryptionSecret),
+  ]);
+
+  if (!grokKey && !geminiKey && !claudeKey) {
+    const isRo = /[ăâîșț]/i.test(trimmedQuery) || /\b(ce|cat|cât|vreau|ofert[ăa]|acoperiș|fotovoltaic|reparații|mentenanță|montaj)\b/i.test(trimmedQuery);
+    const isCompany = contextMode === 'company' || /\b(fotovoltaic|panouri|acoperiș|tpo|șarpantă|țiglă|tablă|atice|fațade|ofert[ăa])\b/i.test(trimmedQuery);
+    const intro = isRo
+      ? 'Asistentul AI avansat este dezactivat (nu sunt configurate chei). Totuși, pot să te ajut să obții rapid o ofertă.'
+      : 'Advanced AI is disabled (no provider keys configured). I can still help you get a quote quickly.';
+    const reply = isCompany
+      ? isRo
+        ? [
+            intro,
+            '',
+            'Spune-mi 4 detalii și îți recomand pachetul potrivit:',
+            '1) Localitate/județ',
+            '2) Tip proiect: fotovoltaice / acoperiș / TPO / construcții / reparații',
+            '3) Date tehnice (ex: consum lunar, suprafață acoperiș, tip structură, infiltratii)',
+            '4) Când vrei să începi',
+            '',
+            `Contact direct: +40 769 889 721 · solaris-cet@protonmail.com`,
+          ].join('\n')
+        : [
+            intro,
+            '',
+            'Share 4 details and I will suggest the right package:',
+            '1) City/county',
+            '2) Project type: PV / roof / TPO / construction / repairs',
+            '3) Key details (usage, roof area, structure type, leaks)',
+            '4) Timeline',
+            '',
+            'Direct contact: +40 769 889 721 · solaris-cet@protonmail.com',
+          ].join('\n')
+      : intro;
+
+    const durationMs = Math.max(0, Date.now() - startedAt);
+    const payload = {
+      response: reply,
+      sources: [],
+      plan: {
+        agentCount: 0,
+        providers: { strategy: 'none' as const, useGemini: false, useGrok: false, useClaude: false, singleProvider: null },
+        useOnChain: false,
+        useWebRetrieval: false,
+        temperature: 0,
+        budget: { budgetMs: 0, maxParallel: 0 },
+        context: { mode: contextMode, department: contextDepartment },
+      },
+      usage: {},
+      costUsd: 0,
+    };
+    if (cacheKey) setAiChatCache(cacheKey, payload as any, cacheTtlSeconds);
+    recordAiChatMetrics({ outcome: 'ok', cache: 'miss', providers: [], durationMs, providerUsage: [], totalCostUsd: 0 });
+    return new Response(JSON.stringify(payload), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Cet-Ai-Source': 'offline',
+        'X-Cet-Ai-Plan': 'agents=0;providers=none;onchain=0;web=0;budget_ms=0;parallel=0',
+        'X-Cet-Ai-Cache': cacheKey ? 'miss' : 'skip',
+        'X-Request-Id': requestId,
+        'X-Cet-Ai-Duration-Ms': String(durationMs),
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Vary': 'Origin, X-Forwarded-For',
+        'Cache-Control': 'no-store',
+      },
+    });
+  }
+
   const budget = deriveCetAiResourceBudget(req);
   let plan = decideCetAiRavPlan({
     query: trimmedQuery,
@@ -371,6 +424,10 @@ export default async function handler(req: Request): Promise<Response> {
     hasClaude: Boolean(claudeKey),
     budget,
   });
+
+  if (contextMode === 'company') {
+    plan = { ...plan, useOnChain: false, useWebRetrieval: false };
+  }
 
   const allowGemini = Boolean(geminiKey) && circuitAllows('cet-ai:gemini');
   const allowGrok = Boolean(grokKey) && circuitAllows('cet-ai:grok');
@@ -400,7 +457,9 @@ export default async function handler(req: Request): Promise<Response> {
   // ── SHARED SYSTEM CONTEXT ─────────────────────────────────────────────────
   const sharedContext =
     multiTurnHint +
-    `You are Solaris CET AI — a helpful assistant for Solaris CET and general crypto/DeFi questions.\n\n` +
+    (contextMode === 'company'
+      ? `You are Solaris CET — a helpful assistant for a Romania-based company delivering photovoltaic installations, construction works, roofing (metal sheet / metal tiles / TPO membrane), metal parapets and facades, plus repairs and maintenance.\n\n`
+      : `You are Solaris CET AI — a helpful assistant for Solaris CET and general crypto/DeFi questions.\n\n`) +
     `LANGUAGE: Reply in the same language as the user's latest message.\n\n` +
     `RULES:\n` +
     `- Be accurate and explicit about uncertainty.\n` +

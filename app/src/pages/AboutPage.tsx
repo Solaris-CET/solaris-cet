@@ -1,129 +1,130 @@
-import { CalendarDays, CheckCircle2, Globe2, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, Clock, MapPin, ShieldCheck } from 'lucide-react';
 
+import { SolarisFooter } from '@/components/company/SolarisFooter';
 import { useLanguage } from '@/hooks/useLanguage';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
 
-type Milestone = {
+type Card = {
   title: string;
   body: string;
-  tag: string;
-  icon: typeof CalendarDays;
+  icon: typeof CheckCircle2;
 };
 
 export default function AboutPage() {
-  const prefersReducedMotion = useReducedMotion();
-  const { t } = useLanguage();
+  const { lang } = useLanguage();
+  const isRo = lang === 'ro';
 
-  const milestones: Milestone[] = [
+  const cards: Card[] = [
     {
-      title: 'Genesis: fixed scarcity on TON',
-      body: 'CET is engineered around a hard cap of 9,000 tokens and a 90-year mining horizon—designed for long-lived, verifiable ownership surfaces.',
-      tag: 'SUPPLY · 9,000',
-      icon: CheckCircle2,
-    },
-    {
-      title: 'Public liquidity & discovery',
-      body: 'Liquidity and discovery routes are designed to be simple and auditable: on-chain addresses, pool references, and repeatable verification steps.',
-      tag: 'DEX · AUDIT PATH',
-      icon: Globe2,
-    },
-    {
-      title: 'CET AI: RAV protocol demo',
-      body: 'The CET AI interface prioritises UX integrity: explicit fallback states, rate-limit handling, and a response format meant to be copy-pasteable for audits.',
-      tag: 'RAV · UX',
+      title: isRo ? 'Execuție profesionistă' : 'Professional execution',
+      body: isRo
+        ? 'Lucrăm etapizat, cu detalii curate și soluții corecte pentru situația din teren.'
+        : 'We work in clear stages, with clean detailing and solutions adapted to the site.',
       icon: ShieldCheck,
     },
     {
-      title: 'RWA narrative and documentation',
-      body: 'The RWA story is presented as navigable documentation: timeline, proof surfaces, and downloadable artifacts, with a print-friendly reading mode.',
-      tag: 'RWA · DOCS',
-      icon: CalendarDays,
+      title: isRo ? 'Termene clare' : 'Clear timelines',
+      body: isRo
+        ? 'Stabilim pașii și termenele în ofertă: evaluare, ofertare, execuție și predare.'
+        : 'We define steps and timelines: survey, offer, execution, and handover.',
+      icon: Clock,
+    },
+    {
+      title: isRo ? 'Acoperire națională' : 'Nationwide coverage',
+      body: isRo
+        ? 'Suntem în Cetatuia, Vaslui, dar lucrăm în toate județele, în funcție de proiect.'
+        : 'Based in Cetatuia, Vaslui, we work nationwide depending on the project.',
+      icon: MapPin,
+    },
+    {
+      title: isRo ? 'Mentenanță & intervenții' : 'Maintenance & interventions',
+      body: isRo
+        ? 'Oferim mentenanță și intervenții pentru fotovoltaice și acoperișuri, inclusiv reparații punctuale.'
+        : 'We provide maintenance and interventions for PV systems and roofs, including targeted repairs.',
+      icon: CheckCircle2,
     },
   ];
 
+  const steps = isRo
+    ? [
+        { title: '1) Discuție', body: 'Ne spui ce vrei să faci și ce constrângeri ai (buget, timp, locație).' },
+        { title: '2) Evaluare', body: 'Verificăm situația din teren: acoperiș, structură, umbriri, acces, detalii.' },
+        { title: '3) Ofertă', body: 'Primești o ofertă clară, cu opțiuni și pașii de execuție.' },
+        { title: '4) Execuție', body: 'Lucrăm curat și organizat, cu atenție la etanșare și detalii.' },
+        { title: '5) Predare', body: 'Predăm lucrarea și îți explicăm întreținerea/recomandările.' },
+      ]
+    : [
+        { title: '1) Call', body: 'You share your goals and constraints (budget, timing, location).' },
+        { title: '2) Survey', body: 'We check the site: roof, structure, shading, access, critical details.' },
+        { title: '3) Offer', body: 'You get a clear offer with options and a delivery plan.' },
+        { title: '4) Execution', body: 'We work cleanly and methodically, focusing on sealing and details.' },
+        { title: '5) Handover', body: 'We hand over the work and explain maintenance/recommendations.' },
+      ];
+
   return (
-    <main
-      id="main-content"
-      tabIndex={-1}
-      className="relative w-full overflow-x-clip pb-[var(--mobile-conversion-dock-reserve)] xl:pb-0"
-    >
-      <section className="relative section-glass section-padding-y overflow-hidden mesh-bg">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
-          <div className="absolute bottom-0 left-0 right-0 h-[40vh] grid-floor opacity-10" />
-          <div className="absolute top-[-10%] left-[-12%] h-[520px] w-[520px] rounded-full bg-solaris-gold/10 blur-[140px]" />
-          <div className="absolute bottom-[-14%] right-[-10%] h-[520px] w-[520px] rounded-full bg-solaris-cyan/10 blur-[160px]" />
-        </div>
-
-        <div className="relative z-10 section-padding-x mx-auto w-full max-w-6xl">
-          <div className="max-w-3xl">
-            <div className="hud-label text-solaris-gold">ABOUT</div>
-            <h1 className="mt-3 font-display font-bold text-[clamp(30px,4vw,52px)] text-solaris-text">
-              Solaris CET — why it exists
-            </h1>
-            <p className="mt-4 text-solaris-muted text-base leading-relaxed">
-              This page is a concise timeline and rationale layer. It avoids vague claims and instead focuses on verifiable primitives: supply, on-chain proof, and operational UX.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-mono text-solaris-text">
-                {t.nav.rwa}
-              </span>
-              <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-mono text-solaris-text">
-                {t.nav.cetAi}
-              </span>
-              <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-mono text-solaris-text">
-                {t.nav.whitepaper}
-              </span>
-            </div>
+    <main id="main-content" tabIndex={-1} className="pt-24 pb-0 bg-slate-950 text-white">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
+        <div className="max-w-3xl">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+            {isRo ? 'Despre Solaris CET' : 'About Solaris CET'}
+          </h1>
+          <p className="mt-4 text-lg text-solaris-muted">
+            {isRo
+              ? 'Executăm instalații fotovoltaice, lucrări de construcții și acoperișuri (tablă/țiglă/folie TPO), plus montaje atice și fațade de tablă.'
+              : 'We deliver PV installations, construction works, and roofing (metal/tiles/TPO membrane), plus metal parapets and facades.'}
+          </p>
+          <div className="mt-3 text-sm text-solaris-muted">
+            {isRo ? 'Cetatuia, Vaslui 737429 · acoperire națională · CUI: ***********' : 'Cetatuia, Vaslui 737429 · nationwide · VAT: ***********'}
           </div>
 
-          <div className="mt-12 grid gap-4 lg:grid-cols-2">
-            {milestones.map((m) => {
-              const Icon = m.icon;
-              return (
-                <div key={m.title} className="bento-card p-6 border border-white/10">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <div className="font-mono text-[10px] uppercase tracking-widest text-solaris-muted">
-                        {m.tag}
-                      </div>
-                      <h2 className="mt-2 font-display font-semibold text-solaris-text text-lg">
-                        {m.title}
-                      </h2>
-                    </div>
-                    <div className="h-10 w-10 shrink-0 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center">
-                      <Icon className="h-5 w-5 text-solaris-gold" aria-hidden />
-                    </div>
-                  </div>
-                  <p className="mt-3 text-solaris-muted text-sm leading-relaxed">{m.body}</p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a href="/contact" className="btn-filled-gold inline-flex items-center gap-2">
+              {isRo ? 'Cere ofertă' : 'Request an offer'}
+            </a>
+            <a href="tel:+40769889721" className="btn-outline-white inline-flex items-center gap-2">
+              +40 769 889 721
+            </a>
+            <a href="/token-cet" className="btn-outline-white inline-flex items-center gap-2">
+              {isRo ? 'Token CET' : 'CET token'}
+            </a>
+          </div>
+        </div>
+
+        <section className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {cards.map((c) => {
+            const Icon = c.icon;
+            return (
+              <div key={c.title} className="rounded-3xl border border-white/10 bg-white/5 p-6">
+                <div className="h-12 w-12 rounded-2xl border border-white/10 bg-black/20 flex items-center justify-center">
+                  <Icon className="h-5 w-5 text-solaris-gold" aria-hidden />
                 </div>
-              );
-            })}
-          </div>
+                <div className="mt-4 text-lg font-semibold">{c.title}</div>
+                <div className="mt-2 text-sm text-solaris-muted leading-relaxed">{c.body}</div>
+              </div>
+            );
+          })}
+        </section>
 
-          <div className="mt-10 flex flex-wrap gap-3">
-            <a
-              href="/"
-              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-solaris-gold/10 border border-solaris-gold/30 text-solaris-gold px-5 text-sm font-semibold hover:bg-solaris-gold/20 transition-colors btn-quantum"
-            >
-              Back to home
-            </a>
-            <a
-              href="/cet-ai"
-              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-solaris-text px-5 text-sm font-semibold hover:bg-white/10 transition-colors btn-quantum"
-            >
-              Open CET AI
-            </a>
-            <button
-              type="button"
-              onClick={() => window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' })}
-              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-solaris-text px-5 text-sm font-semibold hover:bg-white/10 transition-colors btn-quantum"
-            >
-              Top
-            </button>
+        <section className="mt-16">
+          <h2 className="text-2xl md:text-3xl font-bold">{isRo ? 'Cum lucrăm' : 'How we work'}</h2>
+          <p className="mt-3 text-solaris-muted max-w-3xl">
+            {isRo
+              ? 'Proces simplu, orientat pe rezultate: evaluare, ofertă, execuție, predare și mentenanță.'
+              : 'A simple, results-driven process: survey, offer, execution, handover, and maintenance.'}
+          </p>
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {steps.map((s) => (
+              <div key={s.title} className="rounded-3xl border border-white/10 bg-black/30 p-6">
+                <div className="text-sm font-mono text-solaris-gold">{s.title}</div>
+                <div className="mt-2 text-sm text-solaris-muted leading-relaxed">{s.body}</div>
+              </div>
+            ))}
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
+
+      <div className="mt-16">
+        <SolarisFooter />
+      </div>
     </main>
   );
 }
-

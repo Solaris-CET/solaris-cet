@@ -22,6 +22,23 @@ jobs:
           set -e
           curl -fsS https://solaris-cet.com/api/health | head -c 400
 
+      - name: Probe key pages
+        run: |
+          set -e
+          for p in / /servicii /contact /token-cet /privacy /terms /cookies; do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" -L "https://solaris-cet.com${p}")
+            if [ "$code" -lt 200 ] || [ "$code" -ge 400 ]; then
+              echo "Unexpected HTTP code for ${p}: $code"
+              exit 1
+            fi
+          done
+
+      - name: Probe sitemap and robots
+        run: |
+          set -e
+          curl -fsS https://solaris-cet.com/robots.txt | head -c 300
+          curl -fsS https://solaris-cet.com/sitemap.xml | head -c 300
+
       - name: Probe metrics
         run: |
           set -e
@@ -37,18 +54,3 @@ jobs:
           else
             curl -fsS https://solaris-cet.com/metrics | head -c 200
           fi
-
-      - name: Probe whitepaper route
-        run: |
-          set -e
-          code=$(curl -sS -o /dev/null -w "%{http_code}" -L https://solaris-cet.com/whitepaper)
-          if [ "$code" -lt 200 ] || [ "$code" -ge 400 ]; then
-            echo "Unexpected HTTP code: $code"
-            exit 1
-          fi
-
-      - name: Probe IPFS gateway (CID)
-        run: |
-          set -e
-          CID=bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a
-          curl -fsS "https://dweb.link/ipfs/${CID}" | head -c 200

@@ -14,6 +14,16 @@ async function fetchHealth() {
   return { url, ok: res.ok, status: res.status, json };
 }
 
+async function probePages(origin) {
+  const pages = ['/', '/servicii', '/contact', '/token-cet', '/privacy', '/terms', '/cookies', '/sitemap.xml', '/robots.txt'];
+  for (const p of pages) {
+    const url = `${origin}${p}`;
+    const res = await fetch(url, { headers: { accept: p.endsWith('.xml') ? 'application/xml' : 'text/html' }, cache: 'no-store' });
+    if (!res.ok) return { ok: false, url, status: res.status };
+  }
+  return { ok: true, url: `${origin}${pages[0]}`, status: 200 };
+}
+
 async function telegramSend(text) {
   const botToken = String(process.env.TELEGRAM_BOT_TOKEN ?? '').trim();
   const chatId = String(process.env.TELEGRAM_CHAT_ID ?? '').trim();
@@ -42,12 +52,18 @@ const health = await fetchHealth().catch((e) => ({ url: 'unknown', ok: false, st
 const statusLine = health.ok ? 'HEALTH OK' : `HEALTH BAD (${health.status || 'no_response'})`;
 const version = typeof health.json?.version === 'string' ? health.json.version : null;
 
+const origin = baseUrl ? baseUrl.replace(/\/+$/, '') : `http://127.0.0.1:${port}`;
+const pages = await probePages(origin).catch(() => ({ ok: false, url: `${origin}/`, status: 0 }));
+const pagesLine = pages.ok ? 'PAGES OK' : `PAGES BAD (${pages.status || 'no_response'})`;
+
 const msg = [
   `solaris-cet deploy: ${statusLine}`,
+  `pages: ${pagesLine}`,
   env ? `env: ${env}` : null,
   sha ? `sha: ${sha}` : null,
   version ? `version: ${version}` : null,
   `health: ${health.url}`,
+  pages.ok ? null : `failed: ${pages.url}`,
 ]
   .filter(Boolean)
   .join('\n');
@@ -55,4 +71,4 @@ const msg = [
 process.stdout.write(`${msg}\n`);
 await telegramSend(msg);
 
-if (!health.ok) process.exit(1);
+if (!health.ok || !pages.ok) process.exit(1);

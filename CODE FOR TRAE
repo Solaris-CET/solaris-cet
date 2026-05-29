@@ -1,0 +1,262 @@
+TITLE: CODE FOR TRAE — Jules Task Matrix (generate 10,000 tasks safely)
+
+PURPOSE
+You (Jules, Google) will produce high-quality code changes as incremental patches for this repository.
+Goal: improve Solaris CET (company website + optional CET token page) with strong reliability, automation, security, and performance.
+
+NON-NEGOTIABLE CONSTRAINTS
+1) No secrets in code, logs, workflow files, or docs.
+2) Everything must work without paid APIs (AI providers optional; must degrade gracefully).
+3) Keep build + deploy compatible with Coolify (Dockerfile + npm ci strict).
+4) Prefer changes that are O(n log n). Use O(n^2) only when n is tiny and the cost is clearly negligible.
+5) No “test/testnet/vibe-coding” wording on public-facing pages.
+6) Contact invariants:
+   - Phone: +40769889721
+   - Email: solaris-cet@protonmail.com
+
+HOW TO USE THIS FILE (IMPORTANT)
+This file defines:
+- A task taxonomy (areas, actions, targets)
+- 250 reusable task templates (with placeholders)
+- A deterministic expansion method to generate exactly 10,000 concrete tasks
+
+Jules must:
+1) Expand templates deterministically into exactly 10,000 tasks:
+   - Number tasks from T-00001 to T-10000
+   - Each task must be small and independently reviewable
+   - Each task must include: scope, files, change summary, acceptance checks
+2) Then pick a batch of 10–30 highest-impact tasks and deliver patches for them.
+3) For every patch: show changed files + explain rationale + provide verification commands.
+
+DEFINITIONS
+Areas:
+  A1  Performance (CWV: LCP/CLS/INP, bundle size)
+  A2  SEO / Structured content / Sitemap / Robots / Meta
+  A3  Accessibility (keyboard, aria, contrast, headings)
+  A4  Content & i18n correctness (RO-first, other locales acceptable)
+  A5  Conversion (CTA, contact flows, lead capture, WhatsApp/call/email)
+  A6  PWA (install, update flow, offline pages, caching)
+  A7  API reliability (graceful degradation, timeouts, rate limits)
+  A8  Observability (health, metrics, logs, post-deploy checks)
+  A9  Security hardening (CORS, headers, SSRF, token handling)
+  A10 Coolify/Docker reliability (npm ci, image size, healthcheck)
+  A11 Testing quality (unit tests, integration, e2e stability)
+  A12 Repo hygiene (dead code removal, docs runbooks, scripts)
+
+Targets (web):
+  P1  Home
+  P2  Services (/servicii)
+  P3  Products (packages)
+  P4  Contact (/contact)
+  P5  Token CET (/token-cet)
+  P6  About (/about)
+  P7  FAQ (/faq)
+  P8  Legal: privacy/terms/cookies/settings
+  P9  Nav/Footer
+  P10 Chat widget
+
+Targets (ops):
+  O1  Dockerfile
+  O2  docker/coolify.yml
+  O3  scripts/post-deploy.mjs
+  O4  scripts/smoke-http.mjs
+  O5  health.json + /api/health
+  O6  /metrics + /api/metrics
+  O7  GitHub workflows (optional; must not be required for runtime)
+
+Actions:
+  X1  Add (new capability)
+  X2  Improve (refine existing)
+  X3  Remove (delete dead/crypto-only)
+  X4  Refactor (same behavior, safer/faster)
+  X5  Secure (close a security gap)
+  X6  Verify (add tests/guards)
+  X7  Document (runbooks/how-to)
+
+EXPANSION RULE (makes 10,000 tasks)
+We will generate tasks by Cartesian product with a cap:
+1) Use the 250 templates below (K=250).
+2) For each template, generate N=40 concrete instances by varying:
+   - localeVariant ∈ {ro, en, de, es, pt} (5)
+   - deviceVariant ∈ {mobile, desktop} (2)
+   - scenarioVariant ∈ {new_user, returning_user, slow_3g, low_end_cpu} (4)
+   - Pick only one combination per instance (5*2*4 = 40).
+3) Total = 250 * 40 = 10,000 tasks.
+
+TASK OUTPUT FORMAT (MUST FOLLOW)
+T-00001
+Area: A1
+Target: P1
+Action: X2
+Variant: locale=ro, device=mobile, scenario=slow_3g
+Goal: <one sentence>
+Files: <list of file paths>
+Change: <2-6 bullet points>
+Acceptance:
+  - Commands: <exact commands>
+  - Expected: <what passes / what changes>
+Risk: <low/med/high + why>
+
+GLOBAL ACCEPTANCE COMMANDS (use where applicable)
+- cd /repo && npm run verify:fast
+- cd /repo/app && npm run verify
+- cd /repo && node scripts/smoke-http.mjs --base=https://solaris-cet.com
+
+TEMPLATE LIBRARY (250)
+Placeholders:
+  {LOCALE} {DEVICE} {SCENARIO} {PAGE} {AREA} {TARGET} {ACTION}
+  {FILES} {CMD} {EXPECTED}
+
+TEMPLATE-001
+Area: A1
+Target: P1
+Action: X2
+Goal: Reduce JS executed on first load by lazy-loading non-critical widgets.
+Files: app/src/App.tsx, app/src/pages/HomePage.tsx
+Change:
+  - Identify non-critical components rendered on initial route
+  - Lazy-load and add Suspense fallback=null
+Acceptance:
+  - Commands: cd /repo && npm run app:verify
+  - Expected: passes; initial bundle smaller; no runtime errors
+
+TEMPLATE-002
+Area: A2
+Target: P1
+Action: X2
+Goal: Ensure meta title/description are correct for {LOCALE} and match company positioning (no crypto).
+Files: app/src/App.tsx, app/index.html
+Change:
+  - Update per-route meta for /, /servicii, /contact, /token-cet
+  - Ensure no “test/testnet/tokenomics/defi” wording leaks to public meta
+Acceptance:
+  - Commands: cd /repo && npm run app:verify
+  - Expected: tests pass; meta assertions pass
+
+TEMPLATE-003
+Area: A3
+Target: P9
+Action: X5
+Goal: Keyboard navigation for header + mobile menu works end-to-end.
+Files: app/src/components/Navigation.tsx, app/src/components/Navigation.test.tsx
+Change:
+  - Ensure focus trap/close behavior
+  - aria-labels are stable across locales
+Acceptance:
+  - Commands: cd /repo && npm run test --workspace=app
+  - Expected: navigation tests pass; a11y checks pass
+
+TEMPLATE-004
+Area: A5
+Target: P4
+Action: X2
+Goal: Improve contact conversion for {DEVICE} by adding WhatsApp deep link + prefilled message.
+Files: app/src/pages/ContactPage.tsx
+Change:
+  - Add WhatsApp CTA (wa.me) with encoded text
+  - Keep phone/email invariants
+Acceptance:
+  - Commands: cd /repo && npm run app:verify
+  - Expected: build passes; CTA appears; no broken links
+
+TEMPLATE-005
+Area: A6
+Target: P9
+Action: X2
+Goal: Ensure “Download app” button behaves correctly across browsers (install prompt vs instructions).
+Files: app/src/components/company/DownloadAppButton.tsx
+Change:
+  - Test: hides prompt when already installed
+  - Add robust fallback text for iOS Safari
+Acceptance:
+  - Commands: cd /repo && npm run test --workspace=app
+  - Expected: tests pass; no toast “Update available”
+
+TEMPLATE-006
+Area: A7
+Target: P10
+Action: X5
+Goal: Chat API must never hard-fail when no provider keys; degrade gracefully.
+Files: app/api/chat/route.ts, app/src/__tests__/apiRoutes.integration.test.ts
+Change:
+  - Return {response} with offline guidance in company mode
+  - Keep CORS + rate limit behavior intact
+Acceptance:
+  - Commands: cd /repo && npm run verify:fast
+  - Expected: all tests pass; /api/chat returns 200 offline
+
+TEMPLATE-007
+Area: A8
+Target: O3
+Action: X2
+Goal: Post-deploy checks validate core pages (no crypto routes required).
+Files: scripts/post-deploy.mjs
+Change:
+  - Probe /, /servicii, /contact, /token-cet, /privacy, /terms, /cookies
+Acceptance:
+  - Commands: node scripts/post-deploy.mjs (with POST_DEPLOY_BASE_URL)
+  - Expected: exits 0 on success
+
+TEMPLATE-008
+Area: A10
+Target: O1
+Action: X2
+Goal: Docker build is reproducible with npm ci and minimal layers.
+Files: Dockerfile
+Change:
+  - Ensure workspace build uses app/index.html correctly
+  - Keep HEALTHCHECK stable
+Acceptance:
+  - Commands: docker build .
+  - Expected: build succeeds; image runs; health passes
+
+TEMPLATE-009
+Area: A4
+Target: P2
+Action: X2
+Goal: Rewrite services copy for {LOCALE} with clear scope: PV, construction, roofing, TPO, parapets, facades, repairs.
+Files: app/src/pages/ServicesPage.tsx, app/src/i18n/translations.ts
+Change:
+  - Keep claims realistic (no guarantees)
+  - Ensure headings hierarchy (h1 once)
+Acceptance:
+  - Commands: cd /repo && npm run app:verify
+  - Expected: build+tests pass; copy consistent
+
+TEMPLATE-010
+Area: A11
+Target: P4
+Action: X6
+Goal: Add unit test: contact form submits to /api/support/start and shows success state.
+Files: app/src/pages/ContactPage.tsx, app/src/pages/ContactPage.test.tsx (new)
+Change:
+  - Mock fetch to /api/support/start
+  - Assert payload contains phone/email + selected service
+Acceptance:
+  - Commands: cd /repo && npm run test --workspace=app
+  - Expected: tests pass
+
+… (Templates 011–250 follow the same style)
+
+IMPORTANT NOTE ABOUT TEMPLATE OMISSION
+For space, templates 011–250 must be generated by Jules using the taxonomy:
+Each template must map to exactly one (Area, Target, Action) triple and be clearly actionable.
+Jules must create them before expanding into 10,000 tasks.
+
+PRIORITY SEED LIST (first 30 tasks Jules should implement as code patches)
+1) Company-only system prompt and retrieval toggles in /api/chat (no crypto wording in company mode)
+2) Ensure /api/chat offline mode returns 200 and widget handles it smoothly
+3) Add WhatsApp CTA in Contact (prefilled message for selected service)
+4) Verify sitemap only includes firm routes; remove crypto routes from generator
+5) Verify robots + llms.txt align to company; no tokenomics/defi wording
+6) Improve LCP: ensure hero uses no heavy images; preload critical font only
+7) Ensure Services + Products pages have concise cards and no remote 8K images
+8) Add smoke checks (already present) + integrate into Coolify post-deploy hook
+9) Add caching headers for static assets in server (if applicable)
+10) Add metrics counters for /contact submission success/failure (no PII)
+… (continue to 30 with small safe tasks)
+
+OUTPUT EXPECTATIONS FOR JULES
+- Provide a patch plan + incremental diffs (not a single giant PR)
+- Always run verify commands after each batch
+- Never add secrets; never rely on GitHub paid features for runtime

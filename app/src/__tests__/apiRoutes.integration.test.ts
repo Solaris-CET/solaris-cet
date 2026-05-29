@@ -104,7 +104,7 @@ describe('API routes integration', () => {
     expect(res.headers.get('Access-Control-Allow-Methods')).toContain('POST');
   });
 
-  it('/api/chat: POST fails with 500 when no provider keys are set', async () => {
+  it('/api/chat: POST degrades gracefully with 200 when no provider keys are set', async () => {
     delete process.env.GROK_API_KEY;
     delete process.env.GEMINI_API_KEY;
 
@@ -114,9 +114,11 @@ describe('API routes integration', () => {
       body: JSON.stringify({ query: 'hi' }),
     });
     const res = await chatHandler(req);
-    expect(res.status).toBe(500);
-    const body = (await jsonBody(res)) as { message?: unknown };
-    expect(String(body.message || '')).toMatch(/No AI provider API key/i);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('X-Cet-Ai-Source')).toBe('offline');
+    const body = (await jsonBody(res)) as { response?: unknown; message?: unknown };
+    const text = typeof body.response === 'string' ? body.response : typeof body.message === 'string' ? body.message : '';
+    expect(text).toBeTruthy();
   });
 
   it('/api/chat: POST returns {response} on success', async () => {

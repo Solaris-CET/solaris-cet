@@ -1,6 +1,6 @@
 {
   "name": "solaris-cet",
-  "description": "Solaris CET — Real-World Asset Token landing page on TON Blockchain. Powered by the RAV Protocol with dual-AI: Grok × Gemini.",
+  "description": "Solaris CET — instalații fotovoltaice, construcții și acoperișuri (tablă/țiglă/TPO), atice & fațade tablă, reparații și mentenanță. România.",
   "version": "1.0.0",
   "private": true,
   "license": "MIT",
@@ -16,14 +16,12 @@
   "keywords": [
     "solaris",
     "cet",
-    "ton",
-    "blockchain",
-    "rwa",
-    "real-world-asset",
-    "defi",
     "token",
-    "dedust",
-    "rav-protocol",
+    "fotovoltaice",
+    "acoperis",
+    "tpo",
+    "constructii",
+    "romania",
     "react",
     "typescript",
     "vite"
@@ -33,9 +31,9 @@
     "node": ">=22"
   },
   "scripts": {
-    "predev": "node ../scripts/sync-sovereign-to-public.mjs && node ../scripts/sync-apocalypse-to-public.mjs && node ../scripts/sync-onnxruntime-assets.mjs && node ../scripts/inject-sovereign-build-seal.mjs && node ../scripts/generate-release-notes.mjs && node scripts/generate-seo-files.mjs && node scripts/generate-legal-digests.mjs",
+    "predev": "node ../scripts/generate-release-notes.mjs && node scripts/generate-seo-files.mjs && node scripts/generate-legal-digests.mjs",
     "dev": "../node_modules/.bin/vite",
-    "prebuild": "node ../scripts/write-build-info.mjs && node ../scripts/fix-phosphor-webcomponents.mjs && node ../scripts/sync-sovereign-to-public.mjs && node ../scripts/sync-apocalypse-to-public.mjs && node ../scripts/sync-onnxruntime-assets.mjs && node ../scripts/inject-sovereign-build-seal.mjs && node ../scripts/generate-release-notes.mjs && node scripts/generate-seo-files.mjs && node scripts/generate-legal-digests.mjs",
+    "prebuild": "node ../scripts/write-build-info.mjs && node ../scripts/fix-phosphor-webcomponents.mjs && node ../scripts/generate-release-notes.mjs && node scripts/generate-seo-files.mjs && node scripts/generate-legal-digests.mjs",
     "build": "../node_modules/.bin/tsc -b && ../node_modules/.bin/vite build",
     "build:ci": "node scripts/generate-legal-digests.mjs && tsc -b --pretty false && vite build --logLevel warn",
     "start": "../node_modules/.bin/vite preview --host 0.0.0.0 --port ${PORT:-4173}",

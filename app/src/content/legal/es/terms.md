@@ -1,6 +1,6 @@
 ---
 title: "Términos y Condiciones"
-description: "Reglas de uso del sitio y la aplicación Solaris CET."
+description: "Reglas de uso del sitio Solaris CET y para enviar solicitudes de presupuesto."
 lastUpdated: 2026-04-26
 ---
 
@@ -10,27 +10,15 @@ Estos Términos y Condiciones (“Términos”) regulan el acceso y uso del siti
 
 Si no estás de acuerdo, no uses el Servicio.
 
-## 2. Elegibilidad y cumplimiento
+## 2. Carácter informativo
 
-Debes cumplir con las leyes aplicables en tu jurisdicción. Eres responsable de verificar si los criptoactivos están permitidos o restringidos donde resides.
+El contenido del sitio se ofrece con fines informativos (servicios, ejemplos y guía general). Un presupuesto final depende de tus requisitos y, cuando corresponda, de una evaluación en el lugar.
 
-El Servicio no está dirigido a personas/territorios donde el acceso sea ilegal o requiera licencias/registro que la Compañía no tenga.
+## 3. Solicitudes y comunicaciones
 
-## 3. Sin asesoramiento financiero
+Cuando envías una solicitud o pides presupuesto, eres responsable de proporcionar información correcta y de no incluir datos sensibles. Podemos usar tus datos de contacto para responder, aclarar requisitos y programar una visita si procede.
 
-Nada en el Servicio constituye asesoramiento financiero, de inversión, legal o fiscal.
-
-## 4. Riesgos cripto
-
-Los criptoactivos son volátiles y pueden ser ilíquidos. Puedes perder fondos. Los smart contracts pueden fallar. Cambios de red (congestión, forks, upgrades) pueden afectar transacciones. Consulta el Risk Disclaimer.
-
-## 5. Wallets y transacciones
-
-Tú controlas tu wallet. La Compañía no custodia claves privadas ni puede recuperarlas. Las transacciones en blockchain suelen ser irreversibles.
-
-Eres responsable de verificar direcciones y parámetros (contratos, destinatarios, comisiones).
-
-## 6. Uso aceptable
+## 4. Uso aceptable
 
 Aceptas no:
 
@@ -42,30 +30,31 @@ Aceptas no:
 
 Podemos restringir o terminar el acceso ante violaciones.
 
-## 7. Propiedad intelectual
+## 5. Propiedad intelectual
 
-El Servicio y su contenido pertenecen a la Compañía o licenciantes. Componentes open-source pueden regirse por licencias separadas.
+El Servicio y su contenido pertenecen a la Compañía o licenciantes. No puedes copiar, modificar o distribuir el contenido salvo que la ley lo permita.
 
-## 8. Servicios de terceros
+## 6. Servicios de terceros
 
-Podemos enlazar a terceros (explorers, wallets, exchanges, DEX). No controlamos sus prácticas.
+Podemos enlazar a terceros (por ejemplo, mapas o plataformas de mensajería). No controlamos sus prácticas.
 
-## 9. Disponibilidad y cambios
+## 7. Disponibilidad y cambios
 
 Podemos modificar, suspender o discontinuar partes del Servicio. Algunas funciones pueden ser experimentales.
 
-## 10. Limitación de responsabilidad
+## 8. Limitación de responsabilidad
 
 En la medida permitida por la ley, no somos responsables por daños indirectos o consecuenciales y no garantizamos disponibilidad o ausencia de errores.
 
-## 11. Privacidad
+## 9. Privacidad
 
 La Política de Privacidad describe cómo tratamos los datos personales.
 
-## 12. Ley aplicable
+## 10. Ley aplicable
 
-Estos Términos se rigen por la ley de la jurisdicción de constitución de la Compañía, salvo normas imperativas aplicables.
+Estos Términos se rigen por la ley aplicable en Rumanía, salvo normas imperativas aplicables.
 
-## 13. Contacto
+## 11. Contacto
 
-Para avisos legales, usa la página de Contacto legal o el formulario DSAR.
+Para preguntas: solaris-cet@protonmail.com · +40 769 889 721  
+Identificación: CUI: *********** · Cetatuia, Vaslui, 737429, Rumanía

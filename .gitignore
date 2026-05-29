@@ -46,6 +46,7 @@ pulls/
 /task05-10 scope routes components ac"
 /tics + tsconfig refs"
 /h
+/tatus
 
 # JavaScript build helpers (Babel runtime, regenerator, etc.)
 *.js.map

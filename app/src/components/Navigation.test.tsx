@@ -18,15 +18,13 @@ vi.mock('../hooks/useLanguage', () => ({
       },
       nav: {
         primaryNavigation: 'Primary navigation',
-        tokenomics: 'Tokenomics',
-        rwa: 'RWA',
-        cetAi: 'CET AI',
-        whitepaper: 'Whitepaper',
-        howToBuy: 'How to buy',
-        resources: 'Resources',
-        faq: 'FAQ',
-        buyOnDedust: 'Buy on DeDust',
-        opensInNewWindow: '(opens in new window)',
+        home: 'Home',
+        services: 'Services',
+        products: 'Products',
+        cetToken: 'CET token',
+        contact: 'Contact',
+        requestOffer: 'Request offer',
+        downloadApp: 'Download app',
         openMenu: 'Open menu',
         sheetDescription: 'Menu',
       },
@@ -34,6 +32,7 @@ vi.mock('../hooks/useLanguage', () => ({
         startMining: 'Start mining',
       },
     },
+    lang: 'en',
   }),
 }));
 
@@ -74,10 +73,11 @@ describe('Navigation', () => {
     );
 
     expect(screen.getAllByRole('navigation', { name: 'Primary navigation' }).length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Tokenomics').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('RWA').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('CET AI').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Whitepaper').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Home').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Services').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Products').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('CET token').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Contact').length).toBeGreaterThan(0);
   });
 
   it('opens the mobile menu', async () => {

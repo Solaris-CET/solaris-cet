@@ -1,6 +1,6 @@
 ---
 title: "Terms & Conditions"
-description: "Rules for using the Solaris CET website and application."
+description: "Rules for using the Solaris CET website and for sending quote inquiries."
 lastUpdated: 2026-04-26
 ---
 
@@ -10,32 +10,15 @@ These Terms & Conditions (“Terms”) govern your access to and use of the Sola
 
 If you do not agree, do not use the Service.
 
-## 2. Eligibility and compliance
+## 2. Informational nature
 
-You must comply with all applicable laws and regulations in your jurisdiction. You are responsible for determining whether crypto-assets are permitted, restricted, or regulated where you live.
+The website content is provided for informational purposes (services, examples, and general guidance). A final quote and timeline depend on your requirements and, where needed, a site assessment.
 
-The Service is not directed to persons where access or use would be illegal or require licensing/registration not held by the Company.
+## 3. Quote requests and communications
 
-## 3. No financial advice
+When you send an inquiry or request a quote, you are responsible for providing accurate information and avoiding sensitive data. We may use your contact details to reply, clarify requirements, and schedule a visit if needed.
 
-Nothing on the Service constitutes financial, investment, legal, or tax advice. You should conduct your own research and consult professionals.
-
-## 4. Crypto risk disclosure
-
-Crypto-assets are volatile and may be illiquid. You can lose some or all of your funds. Smart contracts may fail. Network congestion, forks, or protocol changes can affect outcomes. See the Risk Disclaimer for details.
-
-## 5. Wallets and transactions
-
-You control your wallet. The Company does not custody your private keys and cannot recover them. Transactions on blockchain networks are generally irreversible.
-
-You are responsible for verifying:
-
-- contract addresses,
-- token symbols and decimals,
-- recipients,
-- and transaction parameters.
-
-## 6. Acceptable use
+## 4. Acceptable use
 
 You agree not to:
 
@@ -47,21 +30,19 @@ You agree not to:
 
 We may restrict or terminate access for violations.
 
-## 7. Intellectual property
+## 5. Intellectual property
 
 The Service and its content are owned by the Company or licensors and protected by IP laws. You may not copy, modify, distribute, or create derivative works except as permitted by law.
 
-Open-source components and smart contract code may be licensed under separate terms.
+## 6. Third-party links and services
 
-## 8. Third-party links and services
+The Service may link to third-party websites or tools (e.g. maps, messaging platforms). We do not control them and are not responsible for their content or practices. Your use is at your own risk.
 
-The Service may link to third-party websites, explorers, wallets, or exchanges. We do not control them and are not responsible for their content or practices. Your use is at your own risk.
-
-## 9. Availability and changes
+## 7. Availability and changes
 
 We may modify, suspend, or discontinue parts of the Service at any time. Features may be experimental and provided “as is”.
 
-## 10. Disclaimers
+## 8. Disclaimers
 
 To the maximum extent permitted by law:
 
@@ -69,22 +50,23 @@ To the maximum extent permitted by law:
 - we disclaim warranties of merchantability, fitness, and non-infringement,
 - we do not guarantee accuracy, uptime, or error-free operation.
 
-## 11. Limitation of liability
+## 9. Limitation of liability
 
 To the maximum extent permitted by law, the Company is not liable for indirect, incidental, special, consequential, or punitive damages, or for loss of profits, data, or goodwill, arising from your use of the Service.
 
-## 12. Indemnity
+## 10. Indemnity
 
 You agree to indemnify and hold the Company harmless from claims arising from your misuse of the Service or breach of these Terms.
 
-## 13. Privacy
+## 11. Privacy
 
 Our Privacy Policy explains how we process personal data. By using the Service, you acknowledge the Privacy Policy.
 
-## 14. Governing law and jurisdiction
+## 12. Governing law and jurisdiction
 
-These Terms are governed by the laws of the Company’s jurisdiction of incorporation. Courts of that jurisdiction will have exclusive jurisdiction, unless mandatory consumer law applies otherwise.
+These Terms are governed by the laws applicable in Romania, unless mandatory consumer law provides otherwise.
 
-## 15. Contact
+## 13. Contact
 
-For legal notices, use the Legal Contact page or the DSAR form.
+For questions: solaris-cet@protonmail.com · +40 769 889 721  
+Identification: CUI: *********** · Cetatuia, Vaslui, 737429, Romania

@@ -18,24 +18,25 @@ const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 const appPublic = join(repoRoot, "app/public");
 
 const FORBIDDEN_CDN_PATTERNS = [
-  /\/\/fonts\.googleapis\.com/i,
-  /\/\/fonts\.gstatic\.com/i,
-  /\/\/cdn\.jsdelivr\.net/i,
-  /\/\/unpkg\.com/i,
-  /\/\/cdnjs\.cloudflare\.com/i,
-  /\/\/cdn\.tailwindcss\.com/i,
+  /fonts\.googleapis\.com/i,
+  /fonts\.gstatic\.com/i,
+  /cdn\.jsdelivr\.net/i,
+  /unpkg\.com/i,
+  /cdnjs\.cloudflare\.com/i,
+  /cdn\.tailwindcss\.com/i,
 ];
 
 describe("Public discovery — sitemap, security.txt, humans.txt", () => {
   it("static assets ship with expected content", () => {
     const xml = readFileSync(join(appPublic, "sitemap.xml"), "utf8");
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/apocalypse/`);
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/sovereign/`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/en/servicii`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/en/contact`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/en/token-cet`);
 
     const sec = join(appPublic, ".well-known/security.txt");
     expect(existsSync(sec), "public/.well-known/security.txt must ship").toBe(true);
     const secBody = readFileSync(sec, "utf8");
-    expect(secBody).toMatch(/Contact:\s*https:\/\/t\.me\/SolarisCET/);
+    expect(secBody).toMatch(/Contact:\s*mailto:solaris-cet@protonmail\.com/);
     expect(secBody).toContain("Preferred-Languages:");
     expect(secBody).toMatch(/^Expires:\s/m);
 
@@ -44,15 +45,6 @@ describe("Public discovery — sitemap, security.txt, humans.txt", () => {
     const humBody = readFileSync(hum, "utf8");
     expect(humBody).toContain(productionSiteUrl());
     expect(humBody).toContain("github.com/Solaris-CET");
-  });
-});
-
-describe("OMEGA sovereign — self-hosted JetBrains Mono", () => {
-  const fontPath = join(repoRoot, "static/sovereign/fonts/jetbrains-mono-400.woff2");
-
-  it("woff2 exists under static/sovereign/fonts/", () => {
-    expect(existsSync(fontPath), `missing ${fontPath}`).toBe(true);
-    expect(statSync(fontPath).size).toBeGreaterThan(1000);
   });
 });
 
@@ -88,7 +80,7 @@ describe("index.html — canonical production site URL", () => {
   it("og:url, twitter:url, canonical link, and JSON-LD url fields use productionSiteUrl()", () => {
     const appIndexHtml = readFileSync(join(repoRoot, "app/index.html"), "utf8");
     const site = productionSiteUrl();
-    const canonical = `${site}/en/`;
+    const canonical = `${site}`;
     expect(appIndexHtml).toContain(`property="og:url" content="${canonical}"`);
     expect(appIndexHtml).toContain(`name="twitter:url" content="${canonical}"`);
     expect(appIndexHtml).toContain(`rel="canonical" href="${canonical}"`);
@@ -97,10 +89,11 @@ describe("index.html — canonical production site URL", () => {
 });
 
 describe("index.html — critical image preloads for LCP", () => {
-  it("preloads cinematic poster and avoids hero coin", () => {
+  it("preloads critical font and avoids image preloads", () => {
     const appIndexHtml = readFileSync(join(repoRoot, "app/index.html"), "utf8");
-    expect(appIndexHtml).toMatch(/rel="preload"[^>]+cosmic-poster-768\.webp/s);
-    expect(appIndexHtml).not.toMatch(/rel="preload"[^>]+hero-coin\.png/s);
+    expect(appIndexHtml).toMatch(/rel="preload"[^>]+jetbrains-mono-400\.woff2/s);
+    expect(appIndexHtml).not.toMatch(/rel="preload"[^>]+\.webp/s);
+    expect(appIndexHtml).not.toMatch(/rel="preload"[^>]+\.(png|jpg|jpeg)/s);
   });
 });
 
@@ -151,8 +144,8 @@ describe("TON Connect manifest — brand icon URL", () => {
   });
 });
 
-describe("OMEGA invariants", () => {
-  it("sovereign: no scripts, no forbidden CDNs; canonical CET/TON/Cetățuia copy", () => {
+describe("Static invariants", () => {
+  it("sovereign: no scripts, no forbidden CDNs; app index has no token/trading copy", () => {
     const sovereignHtml = readFileSync(join(repoRoot, "static/sovereign/index.html"), "utf8");
     const appIndexHtml = readFileSync(join(repoRoot, "app/index.html"), "utf8");
 
@@ -161,8 +154,9 @@ describe("OMEGA invariants", () => {
       expect(sovereignHtml).not.toMatch(pattern);
       expect(appIndexHtml).not.toMatch(pattern);
     }
-    expect(sovereignHtml).toMatch(/9,000\s*CET/i);
-    expect(sovereignHtml).toMatch(/\bTON\b/i);
-    expect(sovereignHtml).toMatch(/Cetățuia,\s*Romania/i);
+    expect(appIndexHtml).not.toMatch(/\bTON\b/i);
+    expect(appIndexHtml).not.toMatch(/dedust/i);
+    expect(appIndexHtml).not.toMatch(/tonscan/i);
+    expect(appIndexHtml).not.toMatch(/\b9,000\s*CET\b/i);
   });
 });

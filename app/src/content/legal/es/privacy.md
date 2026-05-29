@@ -1,15 +1,16 @@
 ---
 title: "Política de Privacidad"
-description: "Cómo Solaris CET trata datos personales, identificadores de wallet y cookies."
+description: "Cómo Solaris CET trata tus datos de contacto y datos técnicos (cookies) para responder a solicitudes."
 lastUpdated: 2026-04-26
 ---
 
 ## 1. Quiénes somos
 
-Esta Política de Privacidad explica cómo el sitio web y la aplicación Solaris CET (el “Servicio”) tratan datos personales.
+Esta Política de Privacidad explica cómo el sitio web y la aplicación Solaris CET (el “Servicio”) tratan datos personales cuando solicitas un presupuesto, envías un mensaje o navegas por el sitio.
 
 **Responsable:** Solaris CET (la “Compañía”).  
-**Contacto:** consulta la sección de “Contacto legal” del sitio (o usa el formulario DSAR).
+**Contacto:** solaris-cet@protonmail.com · +40 769 889 721
+**Identificación:** CUI: *********** · Cetatuia, Vaslui, 737429, Rumanía
 
 Si designas un DPO, publica aquí sus datos de contacto.
 
@@ -17,12 +18,10 @@ Si designas un DPO, publica aquí sus datos de contacto.
 
 Podemos tratar:
 
-- **Identificadores:** dirección de wallet (p. ej. TON), ID de usuario, identificadores de sesión.
-- **Contacto (opcional):** email, nombre visible (si lo proporcionas).
-- **Preferencias:** notificaciones, newsletter, elecciones de consentimiento de cookies.
-- **Uso y dispositivo:** datos técnicos básicos, marcas de tiempo, URLs e interacciones (según tu consentimiento).
-- **Soporte/DSAR:** mensajes que envías y metadatos asociados.
-- **Datos on-chain:** transacciones y balances en blockchain son públicos; podemos usarlos para funciones y verificaciones.
+- **Datos de contacto:** nombre, email y/o teléfono (si los proporcionas).
+- **Contenido de la solicitud:** detalles que nos envías (p. ej. tipo de servicio, ubicación, plazos).
+- **Datos técnicos:** datos básicos de navegador/dispositivo, marcas de tiempo, URLs y eventos necesarios para operar el Servicio.
+- **Preferencias:** elecciones de consentimiento de cookies (analítica/marketing), cuando corresponda.
 
 No solicitamos datos sensibles. Evita enviar información sensible en formularios.
 
@@ -30,10 +29,10 @@ No solicitamos datos sensibles. Evita enviar información sensible en formulario
 
 Tratamos datos para:
 
-- **Prestar y proteger el Servicio** (autenticación, sesiones, prevención de abuso).
-- **Funciones principales** (preferencias, notificaciones, soporte).
+- **Responder a solicitudes y presupuestos** (contactarte, aclarar requisitos, programar visita si procede).
+- **Operar y proteger el Servicio** (prevención de abuso, seguridad).
 - **Analítica y rendimiento** (solo con consentimiento).
-- **Marketing y retargeting** (solo con consentimiento).
+- **Marketing** (medición de campañas, solo con consentimiento).
 - **Cumplimiento legal** (responder a solicitudes legales, conservar registros).
 - **Defensa de reclamaciones** (cuando sea necesario).
 
@@ -74,7 +73,7 @@ Si tratamos datos fuera del EEE/UK, aplicamos salvaguardas apropiadas cuando cor
 
 ## 8. Conservación
 
-Conservamos los datos solo el tiempo necesario para los fines indicados, incluyendo seguridad, soporte/DSAR, cumplimiento y resolución de disputas.
+Conservamos los datos solo el tiempo necesario para los fines indicados, incluyendo seguridad, soporte, cumplimiento y resolución de disputas.
 
 ## 9. Tus derechos
 

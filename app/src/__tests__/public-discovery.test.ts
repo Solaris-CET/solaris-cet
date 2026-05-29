@@ -15,8 +15,9 @@ describe('Public discovery — sitemap, security.txt, humans.txt', () => {
     expect(robots).toContain('llms.txt');
 
     const xml = readFileSync(path.join(publicDir, 'sitemap.xml'), 'utf8');
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/apocalypse/`);
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/sovereign/`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/en/servicii`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/en/contact`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/en/token-cet`);
     expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/llms.txt`);
     expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/humans.txt`);
     expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/.well-known/security.txt`);
@@ -24,7 +25,7 @@ describe('Public discovery — sitemap, security.txt, humans.txt', () => {
     const sec = path.join(publicDir, '.well-known/security.txt');
     expect(existsSync(sec), 'public/.well-known/security.txt must ship').toBe(true);
     const secBody = readFileSync(sec, 'utf8');
-    expect(secBody).toMatch(/Contact:\s*https:\/\/t\.me\/SolarisCET/);
+    expect(secBody).toMatch(/Contact:\s*mailto:solaris-cet@protonmail\.com/);
     expect(secBody).toContain('Preferred-Languages:');
     expect(secBody).toMatch(/^Expires:\s/m);
 
@@ -33,13 +34,13 @@ describe('Public discovery — sitemap, security.txt, humans.txt', () => {
     const humBody = readFileSync(hum, 'utf8');
     expect(humBody).toContain(SITE);
     expect(humBody).toContain('github.com/Solaris-CET');
-    expect(humBody).toContain('#competition');
+    expect(humBody).toContain('STARTUPSOLARCOMPANY');
     expect(humBody).toContain('/llms.txt');
 
     const llms = readFileSync(path.join(publicDir, 'llms.txt'), 'utf8');
     expect(llms).toContain(SITE);
-    expect(llms).toContain('9,000 CET');
-    expect(llms).toContain('Cetățuia');
-    expect(llms).toContain('dedust.io');
+    expect(llms).toContain('Photovoltaic');
+    expect(llms).toContain('+40 769 889 721');
+    expect(llms).toContain('solaris-cet@protonmail.com');
   });
 });

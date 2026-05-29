@@ -1,311 +1,119 @@
-import { lazy } from 'react';
+import { ArrowRight, Building2, Home, PlugZap } from 'lucide-react';
 
+import AppImage from '@/components/AppImage';
+import { SolarisFooter } from '@/components/company/SolarisFooter';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import LazyLoadWrapper from '@/components/LazyLoadWrapper';
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
-import { useLanguage } from '@/hooks/useLanguage';
-import AuthorityTrustSection from '@/sections/AuthorityTrustSection';
-import CommsSection from '@/sections/CommsSection';
-import CommunityPulseSection from '@/sections/CommunityPulseSection';
-import ComplianceSection from '@/sections/ComplianceSection';
 import HeroSection from '@/sections/HeroSection';
-import HybridEngineSection from '@/sections/HybridEngineSection';
-import IntelligenceCoreSection from '@/sections/IntelligenceCoreSection';
-import NovaAppSection from '@/sections/NovaAppSection';
-import StatsBentoSection from '@/sections/StatsBentoSection';
-import TokenomicsSection from '@/sections/TokenomicsSection';
+import ProductsSection from '@/sections/ProductsSection';
+import ServicesSection from '@/sections/ServicesSection';
 
-const AgenticEngineSection = lazy(() => import('@/sections/AgenticEngineSection'));
-const RoadmapSection = lazy(() => import('@/sections/RoadmapSection'));
-const AITeamSection = lazy(() => import('@/sections/AITeamSection'));
-const CompetitionSection = lazy(() => import('@/sections/CompetitionSection'));
-const NetworkPulseSection = lazy(() => import('@/sections/NetworkPulseSection'));
-const HowToBuySection = lazy(() => import('@/sections/HowToBuySection'));
-const MiningCalculatorSection = lazy(() => import('@/sections/MiningCalculatorSection'));
-const StakingCalculatorSection = lazy(() => import('@/sections/StakingCalculatorSection'));
-const SecuritySection = lazy(() => import('@/sections/SecuritySection'));
-const WhitepaperSection = lazy(() => import('@/sections/WhitepaperSection'));
-const HighIntelligenceSection = lazy(() => import('@/sections/HighIntelligenceSection'));
-const EcosystemIndexSection = lazy(() => import('@/sections/EcosystemIndexSection'));
-const RwaSection = lazy(() => import('@/sections/RwaSection'));
-const ResourcesSection = lazy(() => import('@/sections/ResourcesSection'));
-const FAQSection = lazy(() => import('@/sections/FAQSection'));
-const FooterSection = lazy(() => import('@/sections/FooterSection'));
-const SocialProofSection = lazy(() => import('@/sections/SocialProofSection'));
-
-export default function HomePage({ heroCinematic = false }: { heroCinematic?: boolean }) {
-  const { t } = useLanguage();
-
+export default function HomePage() {
   return (
     <main
       id="main-content"
       tabIndex={-1}
-      className="relative w-full overflow-x-clip pb-[var(--mobile-conversion-dock-reserve)] xl:pb-0"
+      className="relative w-full overflow-x-clip"
     >
-      <section id="hero" aria-label={t.landmarks.hero} className="relative z-10">
+      <section id="hero" className="relative z-10">
         <ErrorBoundary>
-          <HeroSection cinematic={heroCinematic} />
+          <HeroSection />
         </ErrorBoundary>
       </section>
 
-      <CommsSection />
+      <section id="servicii" className="relative z-20">
+        <ScrollFadeUp>
+          <ServicesSection />
+        </ScrollFadeUp>
+      </section>
 
-      <CommunityPulseSection />
+      <section id="produse" className="relative z-20">
+        <ScrollFadeUp>
+          <ProductsSection />
+        </ScrollFadeUp>
+      </section>
 
-      <section
-        id="problem-agriculture"
-        aria-label={t.landmarks.problemAgriculture}
-        className="relative z-[15]"
-      >
-        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-          <div className="cosmic-burst -top-[10%] left-[10%] opacity-35" />
-          <div
-            className="cosmic-burst bottom-[-20%] right-[-10%] opacity-25"
-            style={{ animationDelay: '1.4s' }}
-          />
-        </div>
-        <div className="cosmic-event-stamp absolute right-5 top-6 sm:right-8 sm:top-8" aria-hidden>
-          EVENT · QUANTUM LATTICE
-        </div>
-        <div className="relative z-[15]">
-          <LazyLoadWrapper>
-            <ScrollFadeUp>
-              <StatsBentoSection />
-            </ScrollFadeUp>
-          </LazyLoadWrapper>
-        </div>
-        <div className="relative z-[16]">
-          <LazyLoadWrapper>
-            <ScrollFadeUp>
-              <AuthorityTrustSection />
-            </ScrollFadeUp>
-          </LazyLoadWrapper>
-        </div>
-        <div className="relative z-[17]">
-          <LazyLoadWrapper>
-            <ScrollFadeUp>
-              <ErrorBoundary>
-                <SocialProofSection />
-              </ErrorBoundary>
-            </ScrollFadeUp>
-          </LazyLoadWrapper>
-        </div>
-        <div className="relative z-20">
-          <ErrorBoundary>
-            <ScrollFadeUp>
-              <LazyLoadWrapper>
-                <IntelligenceCoreSection />
-              </LazyLoadWrapper>
-            </ScrollFadeUp>
-          </ErrorBoundary>
-        </div>
-        <div className="relative z-30">
-          <ErrorBoundary>
-            <ScrollFadeUp>
-              <HybridEngineSection />
-            </ScrollFadeUp>
-          </ErrorBoundary>
-        </div>
-        <div className="relative z-[32]">
-          <LazyLoadWrapper>
-            <ScrollFadeUp>
-              <ErrorBoundary>
-                <AgenticEngineSection />
-              </ErrorBoundary>
-            </ScrollFadeUp>
-          </LazyLoadWrapper>
+      <section id="proiecte" className="py-24 bg-slate-900/40">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
+          <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-12">
+            <div className="max-w-2xl">
+              <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Lucrări reprezentative</h2>
+              <p className="text-slate-400 text-lg">Exemple orientative de proiecte. Pentru ofertă exactă, evaluăm la locație.</p>
+            </div>
+            <a href="/contact" className="text-amber-400 font-bold flex items-center gap-2 hover:underline">
+              Cere ofertă <ArrowRight size={16} />
+            </a>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                title: 'Fotovoltaice rezidențial',
+                text: 'Sistem dimensionat pe consum, orientare și umbriri, cu monitorizare.',
+                icon: PlugZap,
+                img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Solar_panels_on_house_roof.jpg',
+                alt: 'Panouri fotovoltaice montate pe acoperiș rezidențial',
+              },
+              {
+                title: 'Acoperiș industrial TPO',
+                text: 'Detalii corecte la atice/străpungeri și etanșare profesionistă.',
+                icon: Building2,
+                img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Installation_of_zink_cladding_on_Kiasma_east_fa%C3%A7ade,_1997_(14117140288).jpg',
+                alt: 'Lucrări de montaj/placare fațadă și detalii la anvelopă',
+              },
+              {
+                title: 'Acoperiș tablă / țiglă metalică',
+                text: 'Montaj curat, finisaje moderne și detalii rezistente.',
+                icon: Home,
+                img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Standing_seam_metal_roof_3.jpg',
+                alt: 'Acoperiș din tablă tip standing seam',
+              },
+            ].map((p) => {
+              const Icon = p.icon;
+              return (
+                <div key={p.title} className="rounded-3xl border border-white/10 bg-black/30 overflow-hidden">
+                  <div className="aspect-[16/10] w-full overflow-hidden">
+                    <AppImage
+                      src={p.img}
+                      alt={p.alt}
+                      className="h-full w-full object-cover"
+                      width={1280}
+                      height={800}
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5">
+                      <Icon className="h-5 w-5 text-amber-400" aria-hidden />
+                    </div>
+                    <div className="mt-4 text-lg font-semibold text-white">{p.title}</div>
+                    <div className="mt-2 text-sm text-slate-400 leading-relaxed">{p.text}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      <section id="nova-app" aria-label={t.landmarks.novaApp} className="relative z-40 scroll-mt-24">
-        <ErrorBoundary>
-          <ScrollFadeUp>
-            <NovaAppSection />
-          </ScrollFadeUp>
-        </ErrorBoundary>
-      </section>
-
-      <section id="staking" aria-label={t.landmarks.tokenomics} className="relative z-50 scroll-mt-24">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-          <div
-            className="cosmic-burst -top-[18%] left-1/2 -translate-x-1/2 opacity-30"
-            style={{ animationDelay: '0.6s' }}
-          />
-          <div className="cosmic-shockwave" />
+      <section id="contact-promo" className="py-24 bg-amber-400">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 text-center">
+           <h2 className="text-4xl md:text-6xl font-black text-black mb-8">Cere o ofertă</h2>
+           <p className="text-black/80 text-xl font-bold mb-12 max-w-2xl mx-auto">
+             Îți răspundem rapid cu pașii următori: evaluare, ofertă și planificare execuție.
+           </p>
+           <a 
+             href="/contact" 
+             className="inline-block bg-black text-white text-xl font-bold py-5 px-12 rounded-2xl hover:scale-105 transition-transform"
+           >
+             Contactează-ne
+           </a>
         </div>
-        <div className="cosmic-event-stamp absolute left-5 top-6 sm:left-8 sm:top-8" aria-hidden>
-          EVENT · BIG BANG 9,000 CET
-        </div>
-        <ErrorBoundary>
-          <ScrollFadeUp>
-            <LazyLoadWrapper>
-              <TokenomicsSection />
-            </LazyLoadWrapper>
-          </ScrollFadeUp>
-        </ErrorBoundary>
       </section>
 
-      <section id="rwa" aria-label={t.landmarks.rwa} className="relative z-[55] scroll-mt-24">
-        <LazyLoadWrapper>
-          <ScrollFadeUp>
-            <ErrorBoundary>
-              <RwaSection />
-            </ErrorBoundary>
-          </ScrollFadeUp>
-        </LazyLoadWrapper>
-      </section>
-
-      <section id="roadmap" aria-label={t.landmarks.roadmap} className="relative z-[70] scroll-mt-24">
-        <LazyLoadWrapper>
-          <ScrollFadeUp>
-            <ErrorBoundary>
-              <RoadmapSection />
-            </ErrorBoundary>
-          </ScrollFadeUp>
-        </LazyLoadWrapper>
-      </section>
-
-      <div className="relative z-[72]">
-        <ErrorBoundary>
-          <ScrollFadeUp>
-            <ComplianceSection />
-          </ScrollFadeUp>
-        </ErrorBoundary>
+      <div className="relative z-[113]">
+        <SolarisFooter />
       </div>
-
-      <div className="relative z-[75]">
-        <LazyLoadWrapper>
-          <ScrollFadeUp>
-            <ErrorBoundary>
-              <AITeamSection />
-            </ErrorBoundary>
-          </ScrollFadeUp>
-        </LazyLoadWrapper>
-      </div>
-
-      <section id="competition" aria-label={t.sectionAria.competition} className="relative z-[78] scroll-mt-24">
-        <LazyLoadWrapper>
-          <ScrollFadeUp>
-            <ErrorBoundary>
-              <CompetitionSection />
-            </ErrorBoundary>
-          </ScrollFadeUp>
-        </LazyLoadWrapper>
-      </section>
-
-      <div className="relative z-[79]">
-        <LazyLoadWrapper>
-          <ScrollFadeUp>
-            <ErrorBoundary>
-              <NetworkPulseSection />
-            </ErrorBoundary>
-          </ScrollFadeUp>
-        </LazyLoadWrapper>
-      </div>
-
-      <section id="how-to-buy" className="relative z-[80] scroll-mt-24">
-        <LazyLoadWrapper>
-          <ScrollFadeUp>
-            <ErrorBoundary>
-              <HowToBuySection />
-            </ErrorBoundary>
-          </ScrollFadeUp>
-        </LazyLoadWrapper>
-      </section>
-
-      <div className="relative z-[90]">
-        <LazyLoadWrapper>
-          <ScrollFadeUp>
-            <ErrorBoundary>
-              <MiningCalculatorSection />
-            </ErrorBoundary>
-          </ScrollFadeUp>
-        </LazyLoadWrapper>
-      </div>
-
-      <div className="relative z-[95]">
-        <LazyLoadWrapper>
-          <ScrollFadeUp>
-            <ErrorBoundary>
-              <StakingCalculatorSection />
-            </ErrorBoundary>
-          </ScrollFadeUp>
-        </LazyLoadWrapper>
-      </div>
-
-      <section id="security" aria-label={t.sectionAria.security} className="relative z-[100] scroll-mt-24">
-        <LazyLoadWrapper>
-          <ScrollFadeUp>
-            <ErrorBoundary>
-              <SecuritySection />
-            </ErrorBoundary>
-          </ScrollFadeUp>
-        </LazyLoadWrapper>
-      </section>
-
-      <div className="relative z-[105]">
-        <LazyLoadWrapper>
-          <ScrollFadeUp>
-            <ErrorBoundary>
-              <WhitepaperSection />
-            </ErrorBoundary>
-          </ScrollFadeUp>
-        </LazyLoadWrapper>
-      </div>
-
-      <div className="relative z-[108]">
-        <LazyLoadWrapper>
-          <ScrollFadeUp>
-            <ErrorBoundary>
-              <HighIntelligenceSection />
-            </ErrorBoundary>
-          </ScrollFadeUp>
-        </LazyLoadWrapper>
-      </div>
-
-      <div className="relative z-[109]">
-        <LazyLoadWrapper>
-          <ScrollFadeUp>
-            <ErrorBoundary>
-              <EcosystemIndexSection />
-            </ErrorBoundary>
-          </ScrollFadeUp>
-        </LazyLoadWrapper>
-      </div>
-
-      <div id="resources" className="relative z-[110] scroll-mt-24">
-        <LazyLoadWrapper>
-          <ScrollFadeUp>
-            <ErrorBoundary>
-              <ResourcesSection />
-            </ErrorBoundary>
-          </ScrollFadeUp>
-        </LazyLoadWrapper>
-      </div>
-
-      <div id="faq" className="relative z-[112] scroll-mt-24">
-        <LazyLoadWrapper>
-          <ScrollFadeUp>
-            <ErrorBoundary>
-              <FAQSection />
-            </ErrorBoundary>
-          </ScrollFadeUp>
-        </LazyLoadWrapper>
-      </div>
-
-      <section
-        aria-label={t.landmarks.footer}
-        data-testid="footer-landmark-section"
-        className="relative z-[113]"
-      >
-        <LazyLoadWrapper>
-          <ScrollFadeUp>
-            <ErrorBoundary>
-              <FooterSection />
-            </ErrorBoundary>
-          </ScrollFadeUp>
-        </LazyLoadWrapper>
-      </section>
     </main>
   );
 }

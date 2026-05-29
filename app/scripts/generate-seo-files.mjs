@@ -1,15 +1,12 @@
 import fs from 'node:fs/promises'
 import { execSync } from 'node:child_process'
 import path from 'node:path'
-import matter from 'gray-matter'
 
 const appRoot = process.cwd()
 const publicDir = path.join(appRoot, 'public')
-const contentDir = path.join(appRoot, 'src', 'content', 'blog')
 
 const origin = String(process.env.VITE_PUBLIC_SITE_URL || 'https://solaris-cet.com').replace(/\/$/, '')
 const locales = ['en', 'es', 'zh', 'ru', 'ro', 'pt', 'de']
-const blogLocales = ['en', 'ro', 'es']
 
 function normalizePath(p) {
   if (!p) return '/'
@@ -51,46 +48,19 @@ function stableBuildDate() {
   return yyyyMmDd(new Date())
 }
 
-async function listBlogEntries(fallbackLastmod) {
-  const out = []
-  for (const locale of blogLocales) {
-    const dir = path.join(contentDir, locale)
-    let files = []
-    try {
-      files = await fs.readdir(dir)
-    } catch {
-      files = []
-    }
-    for (const f of files) {
-      if (!f.endsWith('.md')) continue
-      const slug = f.replace(/\.md$/i, '')
-      const abs = path.join(dir, f)
-      const raw = await fs.readFile(abs, 'utf8')
-      const parsed = matter(raw)
-      const date = typeof parsed.data?.date === 'string' ? parsed.data.date : ''
-      out.push({ locale, slug, lastmod: yyyyMmDd(date || fallbackLastmod) })
-    }
-  }
-  return out
-}
-
 async function writeSitemap() {
   const today = stableBuildDate()
   const staticLocalized = [
     { path: '/', lastmod: today },
-    { path: '/rwa', lastmod: today },
-    { path: '/cet-ai', lastmod: today },
-    { path: '/mining', lastmod: today },
-    { path: '/demo', lastmod: today },
-    { path: '/tokenomics', lastmod: today },
-    { path: '/faq', lastmod: today },
     { path: '/about', lastmod: today },
-    { path: '/accessibility', lastmod: today },
-    { path: '/responsible-disclosure', lastmod: today },
-    { path: '/bug-bounty', lastmod: today },
+    { path: '/faq', lastmod: today },
+    { path: '/servicii', lastmod: today },
+    { path: '/contact', lastmod: today },
+    { path: '/token-cet', lastmod: today },
+    { path: '/privacy', lastmod: today },
+    { path: '/terms', lastmod: today },
+    { path: '/cookies', lastmod: today },
   ]
-
-  const blog = await listBlogEntries(today)
   const urls = []
 
   for (const { path: p, lastmod } of staticLocalized) {
@@ -99,23 +69,10 @@ async function writeSitemap() {
     }
   }
 
-  urls.push(...blogLocales.map((locale) => ({ loc: `${origin}${localizePath('/blog', locale)}`, lastmod: today })))
-
-  for (const entry of blog) {
-    urls.push({
-      loc: `${origin}${localizePath(`/blog/${entry.slug}`, entry.locale)}`,
-      lastmod: entry.lastmod,
-    })
-  }
-
   const staticGlobal = [
-    { path: '/sovereign/', lastmod: today },
-    { path: '/apocalypse/', lastmod: today },
     { path: '/llms.txt', lastmod: today },
     { path: '/humans.txt', lastmod: today },
     { path: '/.well-known/security.txt', lastmod: today },
-    { path: '/audit/', lastmod: today },
-    { path: '/whitepaper', lastmod: today },
   ]
   for (const u of staticGlobal) {
     urls.push({ loc: `${origin}${normalizePath(u.path)}`, lastmod: u.lastmod })
