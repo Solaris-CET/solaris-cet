@@ -4,8 +4,12 @@ FROM node:${NODE_VERSION}-alpine AS builder
 
 WORKDIR /repo
 
-# Needed by build scripts that read git metadata (Coolify builder image doesn't include git by default).
-RUN apk add --no-cache git
+ARG VITE_PUBLIC_SITE_URL
+ARG VITE_GOOGLE_SITE_VERIFICATION
+ARG VITE_GIT_COMMIT_HASH
+ARG VITE_BUILD_TIMESTAMP
+ARG GIT_SHA
+ARG BUILD_TIMESTAMP
 
 # Install dependencies first for better layer caching.
 COPY package*.json ./
@@ -23,6 +27,12 @@ COPY CHANGELOG.md CHANGELOG.md
 
 # Build the frontend app.
 COPY app/ app/
+ENV VITE_PUBLIC_SITE_URL=${VITE_PUBLIC_SITE_URL}
+ENV VITE_GOOGLE_SITE_VERIFICATION=${VITE_GOOGLE_SITE_VERIFICATION}
+ENV VITE_GIT_COMMIT_HASH=${VITE_GIT_COMMIT_HASH}
+ENV VITE_BUILD_TIMESTAMP=${VITE_BUILD_TIMESTAMP}
+ENV GIT_SHA=${GIT_SHA}
+ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
 RUN --mount=type=cache,target=/root/.npm npm run build --workspace=app && npm run api:build --workspace=app && npm prune --omit=dev
 
 FROM node:${NODE_VERSION}-alpine AS runner

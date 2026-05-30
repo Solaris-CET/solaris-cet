@@ -35,12 +35,14 @@ If you get `nothing to commit, working tree clean`, there is no staged change to
 
 Rule:
 
-- Buildtime: only `VITE_*`
+Buildtime poate include și `GIT_SHA` / `BUILD_TIMESTAMP` (opțional), dar nu secrete.
 - Runtime: all secrets and backend runtime config
 
 ### Runtime ON, Buildtime OFF (always)
 
 - `DATABASE_URL`
+- `ADMIN_BOOTSTRAP_EMAIL`
+- `ADMIN_BOOTSTRAP_PASSWORD`
 - `ENCRYPTION_SECRET`
 - `GROK_API_KEY_ENC` or `GROK_API_KEY`
 - `GEMINI_API_KEY_ENC` or `GEMINI_API_KEY`

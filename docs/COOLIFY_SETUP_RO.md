@@ -51,13 +51,12 @@ curl -I https://solaris-cet.com/health.json | egrep -i 'HTTP/|strict-transport-s
 
 Regulă:
 
-- Buildtime: doar `VITE_*`
-- Runtime: toate secretele + config backend
 
 IMPORTANT (anti-fail + anti-leak):
 
 - Nu pune backticks (`` `...` ``) în valori și nu pune spații în jurul `=`. În logurile tale, Coolify a injectat în Dockerfile linii de forma `ARG TONCENTER_RPC_URL= https://...`, care pot strica parsing-ul Dockerfile (pentru `ARG` este invalid să existe un token separat după `NAME=`).
-- Nu trimite secrete ca Build Args. Dacă le pui la build, Coolify le inserează în Dockerfile final (vizibil în logs) și riști să pice build-ul / să expui secrete.
+- Nu trimite secrete ca Build Args. Dacă le pui la build, Coolify poate încerca să le insereze în Dockerfile final (vizibil în logs) și riști să pice build-ul / să expui secrete.
+- În repo-ul acesta, build-ul nu are nevoie de `DATABASE_URL` sau `ADMIN_BOOTSTRAP_PASSWORD`. Acestea trebuie setate doar la runtime.
 
 ### Buildtime (ON la build)
 
@@ -66,6 +65,8 @@ IMPORTANT (anti-fail + anti-leak):
 - `VITE_GIT_COMMIT_HASH` (opțional; altfel se citește din `git` la build)
 - `VITE_BUILD_TIMESTAMP` (opțional)
 - `VITE_UX_TEST_SRC` (opțional)
+- `GIT_SHA` (opțional)
+- `BUILD_TIMESTAMP` (opțional)
 
 ### Runtime (ON la runtime, OFF la build)
 
@@ -84,6 +85,10 @@ Checklist rapid (UI Coolify → Environment):
 
 - În secțiunea de Build/Build Args: să rămână doar `VITE_*` (dacă ai nevoie).
 - În secțiunea Runtime/Secrets: `DATABASE_URL`, `JWT_SECRET`, `ADMIN_BOOTSTRAP_PASSWORD`, `TONCENTER_RPC_URL`, etc.
+
+Dacă imporți `docker/coolify.yml` ca Compose în Coolify:
+
+- `docker/coolify.yml` nu include secrete la `frontend.environment` (intenționat), ca să evităm orice comportament de tip “env → build args”. Setează secretele în UI-ul Coolify la runtime.
 - Valori fără backticks și fără ghilimele “decorative”:
   - Corect: `TONCENTER_RPC_URL=https://toncenter.com/api/v2/jsonRPC`
   - Greșit: `TONCENTER_RPC_URL= \`https://toncenter.com/api/v2/jsonRPC\``
