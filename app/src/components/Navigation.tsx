@@ -437,7 +437,7 @@ const Navigation = () => {
                   )}
                 />
                 <span className={cn('font-mono text-[11px]', network === 'mainnet' ? 'text-emerald-400' : 'text-cyan-200')}>
-                  {network === 'mainnet' ? 'LIVE' : 'TESTNET'}
+                  {network === 'mainnet' ? 'LIVE' : 'BETA'}
                 </span>
               </div>
             </div>
@@ -569,7 +569,7 @@ const Navigation = () => {
                   )}
                 />
                 <span className={cn('font-mono text-[11px]', network === 'mainnet' ? 'text-emerald-400' : 'text-cyan-200')}>
-                  {network === 'mainnet' ? 'LIVE' : 'TESTNET'}
+                  {network === 'mainnet' ? 'LIVE' : 'BETA'}
                 </span>
               </div>
               <button

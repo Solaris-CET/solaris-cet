@@ -91,6 +91,8 @@ const BrandAssetsPage = lazy(() => import('./pages/BrandAssetsPage'));
 const WhitepaperPage = lazy(() => import('./pages/WhitepaperPage'));
 const LegalDocPage = lazy(() => import('./pages/LegalDocPage'));
 const PrivacySettingsPage = lazy(() => import('./pages/PrivacySettingsPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const ServicesPage = lazy(() => import('./pages/ServicesPage'));
 
 const CommunityPage = lazy(() => import('./pages/CommunityPage'));
 const ChatPage = lazy(() => import('./pages/ChatPage'));
@@ -1163,6 +1165,8 @@ function AppContent() {
             routePath !== '/demo' &&
             routePath !== '/cet-ai' &&
             routePath !== '/mining' &&
+            routePath !== '/contact' &&
+            routePath !== '/services' &&
             routePath !== '/brand-assets' &&
             routePath !== '/whitepaper' &&
             routePath !== '/blog' &&
@@ -1232,6 +1236,10 @@ function AppContent() {
             <LegalDocPage doc="transparency" />
           ) : routePath === '/audits' ? (
             <LegalDocPage doc="audits" />
+          ) : routePath === '/contact' ? (
+            <ContactPage />
+          ) : routePath === '/services' ? (
+            <ServicesPage />
           ) : routePath === '/mining' ? (
             <HomePage />
           ) : routePath === '/brand-assets' ? (

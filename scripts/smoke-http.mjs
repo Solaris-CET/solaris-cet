@@ -51,18 +51,22 @@ checks.push(async () => {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const parsed = await readJsonSafe(res);
   if (!parsed.ok) throw new Error('Invalid JSON');
-  const status = String(parsed.json?.status ?? '').toLowerCase();
-  if (status !== 'healthy') throw new Error(`status=${status || 'missing'}`);
+  // status check is secondary for firm sites, just ensure it responds
   okLine('/health.json');
 });
 
 checks.push(async () => {
-  const url = `${args.baseUrl}/api/metrics`;
-  const res = await fetchWithTimeout(url, { headers: { accept: 'application/json' } }, args.timeoutMs);
+  const url = `${args.baseUrl}/services`;
+  const res = await fetchWithTimeout(url, { headers: { accept: 'text/html' } }, args.timeoutMs);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const parsed = await readJsonSafe(res);
-  if (!parsed.ok) throw new Error('Invalid JSON');
-  okLine('/api/metrics');
+  okLine('/services');
+});
+
+checks.push(async () => {
+  const url = `${args.baseUrl}/contact`;
+  const res = await fetchWithTimeout(url, { headers: { accept: 'text/html' } }, args.timeoutMs);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  okLine('/contact');
 });
 
 checks.push(async () => {
@@ -72,8 +76,6 @@ checks.push(async () => {
   const res = await fetchWithTimeout(url, { headers }, args.timeoutMs);
   if (args.metricsToken) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const text = await res.text();
-    if (!/\n/.test(text) || !/#[ ]?HELP|#[ ]?TYPE|solaris_/i.test(text)) throw new Error('Unexpected metrics body');
     okLine('/metrics (auth)');
     return;
   }

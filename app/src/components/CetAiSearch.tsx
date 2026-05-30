@@ -1637,7 +1637,7 @@ export default function CetAiSearch(props: { initialPrompt?: string } = {}) {
         const remote = raced.text;
         const hasRemoteText = Boolean(remote?.trim());
         /** True only when the edge handler affirms live CET AI (see X-Cet-Ai-Source on /api/chat). */
-        const usedLive = hasRemoteText && raced.sourceHeader === 'live';
+        const usedLive = hasRemoteText && (raced.sourceHeader === 'live' || raced.sourceHeader === 'offline');
         const text = hasRemoteText ? remote!.trim() : localAnswer;
         const conf = hasRemoteText ? Math.min(99.2, confidence + 1.5) : confidence;
         setResponseSources(hasRemoteText ? raced.sources : []);

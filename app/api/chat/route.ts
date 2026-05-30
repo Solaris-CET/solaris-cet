@@ -286,24 +286,31 @@ export default async function handler(req: Request): Promise<Response> {
     resolveApiKey(process.env.ANTHROPIC_API_KEY_ENC, process.env.ANTHROPIC_API_KEY, encryptionSecret),
   ]);
 
+  // 2. Parse Request
+  const body = (await req.json()) as { query?: unknown; conversation?: unknown; mode?: unknown };
+  const userQuery = body.query;
+  const conversation = normalizeConversation(body.conversation);
+  const isCompanyMode = body.mode === 'company';
+
   if (!grokKey && !geminiKey && !claudeKey) {
+    // Graceful degradation: return 200 with an empty response to trigger frontend local fallback
     return new Response(
-      JSON.stringify({ message: 'No AI provider API key configured. Set GROK_API_KEY_ENC/GROK_API_KEY, GEMINI_API_KEY_ENC/GEMINI_API_KEY, or ANTHROPIC_API_KEY_ENC/ANTHROPIC_API_KEY in the server environment.' }),
+      JSON.stringify({
+        response: '',
+        message: 'OFFLINE_MODE',
+        note: 'No AI provider keys configured. Frontend should use built-in knowledge.'
+      }),
       {
-        status: 500,
+        status: 200,
         headers: {
           'Content-Type': 'application/json',
+          'X-Cet-Ai-Source': 'offline',
           'Access-Control-Allow-Origin': allowedOrigin,
           'Vary': 'Origin',
         },
       },
     );
   }
-
-  // 2. Parse Request
-  const body = (await req.json()) as { query?: unknown; conversation?: unknown };
-  const userQuery = body.query;
-  const conversation = normalizeConversation(body.conversation);
 
   if (!userQuery || typeof userQuery !== 'string' || !userQuery.trim()) {
     return new Response(
@@ -398,16 +405,22 @@ export default async function handler(req: Request): Promise<Response> {
       : '';
 
   // ── SHARED SYSTEM CONTEXT ─────────────────────────────────────────────────
+  const identity = isCompanyMode
+    ? 'You are Solaris CET AI — a professional assistant for Solaris CET company services (PV, construction, roofing).'
+    : 'You are Solaris CET AI — a helpful assistant for Solaris CET and general crypto/DeFi questions.';
+
   const sharedContext =
     multiTurnHint +
-    `You are Solaris CET AI — a helpful assistant for Solaris CET and general crypto/DeFi questions.\n\n` +
+    `${identity}\n\n` +
     `LANGUAGE: Reply in the same language as the user's latest message.\n\n` +
     `RULES:\n` +
     `- Be accurate and explicit about uncertainty.\n` +
-    `- Never invent on-chain prices, URLs, or claims.\n` +
+    `- Never invent prices, URLs, or claims.\n` +
     `- If the question is ambiguous, ask 1-2 clarifying questions.\n` +
-    `- If LIVE ON-CHAIN DATA is missing, say so briefly.\n` +
-    onChainBlock +
+    (isCompanyMode
+      ? `- Avoid all cryptocurrency, tokenomics, or DeFi terminology. Focus on company construction and engineering services.\n`
+      : `- If LIVE ON-CHAIN DATA is missing, say so briefly.\n`) +
+    (isCompanyMode ? '' : onChainBlock) +
     retrieval.block +
     (retrieval.sources.length > 0
       ? `\n\nCITATIONS:\n` +

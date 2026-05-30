@@ -66,7 +66,8 @@ const FooterSection = () => {
     },
     { id: 'bugBounty', label: t.footerNav.bugBounty, href: localizePathname('/bug-bounty', urlLocale), icon: undefined },
     { id: 'releaseNotes', label: t.footerNav.releaseNotes, href: localizePathname('/release-notes', urlLocale), icon: CalendarClock },
-    { id: 'contact', label: t.footerNav.contact, href: 'https://t.me/SolarisCET', icon: undefined },
+    { id: 'services', label: 'Services', href: localizePathname('/services', urlLocale), icon: undefined },
+    { id: 'contact', label: t.footerNav.contact, href: localizePathname('/contact', urlLocale), icon: undefined },
     { id: 'authorityTrust', label: t.footerNav.authorityTrust, href: '#authority-trust', icon: undefined },
     /** Global comparison — primary discovery here + FAQ; not duplicated in header nav (5–7 target). */
     { id: 'competition', label: t.nav.competition, href: '#competition', icon: undefined },

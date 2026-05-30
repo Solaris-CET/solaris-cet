@@ -4,8 +4,9 @@ import path from 'node:path'
 import matter from 'gray-matter'
 
 const appRoot = process.cwd()
-const publicDir = path.join(appRoot, 'public')
-const contentDir = path.join(appRoot, 'src', 'content', 'blog')
+const isAppSubdir = appRoot.endsWith('app');
+const publicDir = isAppSubdir ? path.join(appRoot, 'public') : path.join(appRoot, 'app', 'public');
+const contentDir = isAppSubdir ? path.join(appRoot, 'src', 'content', 'blog') : path.join(appRoot, 'app', 'src', 'content', 'blog');
 
 const origin = String(process.env.VITE_PUBLIC_SITE_URL || 'https://solaris-cet.com').replace(/\/$/, '')
 const locales = ['en', 'es', 'zh', 'ru', 'ro', 'pt', 'de']
@@ -78,13 +79,10 @@ async function writeSitemap() {
   const today = stableBuildDate()
   const staticLocalized = [
     { path: '/', lastmod: today },
-    { path: '/rwa', lastmod: today },
-    { path: '/cet-ai', lastmod: today },
-    { path: '/mining', lastmod: today },
-    { path: '/demo', lastmod: today },
-    { path: '/tokenomics', lastmod: today },
-    { path: '/faq', lastmod: today },
+    { path: '/services', lastmod: today },
+    { path: '/contact', lastmod: today },
     { path: '/about', lastmod: today },
+    { path: '/faq', lastmod: today },
     { path: '/accessibility', lastmod: today },
     { path: '/responsible-disclosure', lastmod: today },
     { path: '/bug-bounty', lastmod: today },

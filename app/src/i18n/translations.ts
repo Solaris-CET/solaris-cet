@@ -36,6 +36,9 @@ export interface Translations {
   };
   nav: {
     home: string;
+    services: string;
+    contact: string;
+    about: string;
     cetApp: string;
     tokenomics: string;
     cetuia: string;
@@ -2344,6 +2347,9 @@ const translations: Record<LangCode, Translations> = {
     },
     nav: {
       home: 'Home',
+      services: 'Services',
+      contact: 'Contact',
+      about: 'About',
       cetApp: 'CET App',
       tokenomics: 'Tokenomics',
       cetuia: 'Cetățuia Map',
@@ -2889,6 +2895,9 @@ const translations: Record<LangCode, Translations> = {
     },
     nav: {
       home: 'Inicio',
+      services: 'Servicios',
+      contact: 'Contacto',
+      about: 'Sobre nosotros',
       cetApp: 'App CET',
       tokenomics: 'Tokenómica',
       cetuia: 'Mapa Cetățuia',
@@ -3434,6 +3443,9 @@ const translations: Record<LangCode, Translations> = {
     },
     nav: {
       home: '首页',
+      services: '服务',
+      contact: '联系我们',
+      about: '关于我们',
       cetApp: 'CET 应用',
       tokenomics: '代币经济学',
       cetuia: 'Cetățuia 地图',
@@ -3975,6 +3987,9 @@ const translations: Record<LangCode, Translations> = {
     },
     nav: {
       home: 'Главная',
+      services: 'Услуги',
+      contact: 'Контакт',
+      about: 'О нас',
       cetApp: 'Приложение CET',
       tokenomics: 'Токеномика',
       cetuia: 'Карта Cetățuia',
@@ -4526,6 +4541,9 @@ const translations: Record<LangCode, Translations> = {
     },
     nav: {
       home: 'Acasă',
+      services: 'Servicii',
+      contact: 'Contact',
+      about: 'Despre',
       cetApp: 'Aplicație CET',
       tokenomics: 'Tokenomică',
       cetuia: 'Harta Cetățuia',
@@ -5071,6 +5089,9 @@ const translations: Record<LangCode, Translations> = {
     },
     nav: {
       home: 'Início',
+      services: 'Serviços',
+      contact: 'Contato',
+      about: 'Sobre',
       cetApp: 'App CET',
       tokenomics: 'Tokenomia',
       cetuia: 'Mapa Cetățuia',
@@ -5625,6 +5646,9 @@ const translations: Record<LangCode, Translations> = {
     },
     nav: {
       home: 'Startseite',
+      services: 'Dienstleistungen',
+      contact: 'Kontakt',
+      about: 'Über uns',
       cetApp: 'CET App',
       tokenomics: 'Tokenomik',
       cetuia: 'Cetățuia Karte',
