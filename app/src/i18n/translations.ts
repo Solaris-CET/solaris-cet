@@ -37,8 +37,11 @@ export interface Translations {
   nav: {
     home: string;
     about: string;
+    portfolio: string;
     services: string;
     products: string;
+    financing: string;
+    blog: string;
     cetToken: string;
     contact: string;
     requestOffer: string;
@@ -2353,8 +2356,11 @@ const translations: Record<LangCode, Translations> = {
     nav: {
       home: 'Home',
       about: 'About',
+      portfolio: 'Portfolio',
       services: 'Services',
       products: 'Products',
+      financing: 'Financing',
+      blog: 'Blog',
       cetToken: 'CET Token',
       contact: 'Contact',
       requestOffer: 'Request quote',
@@ -2906,8 +2912,11 @@ const translations: Record<LangCode, Translations> = {
     nav: {
       home: 'Inicio',
       about: 'Acerca de',
+      portfolio: 'Portafolio',
       services: 'Servicios',
       products: 'Productos',
+      financing: 'Financiación',
+      blog: 'Blog',
       cetToken: 'Token CET',
       contact: 'Contacto',
       requestOffer: 'Pedir presupuesto',
@@ -3459,8 +3468,11 @@ const translations: Record<LangCode, Translations> = {
     nav: {
       home: '首页',
       about: '关于',
+      portfolio: '案例',
       services: '服务',
       products: '产品',
+      financing: '补贴/融资',
+      blog: '博客',
       cetToken: 'CET 代币',
       contact: '联系',
       requestOffer: '获取报价',
@@ -4008,8 +4020,11 @@ const translations: Record<LangCode, Translations> = {
     nav: {
       home: 'Главная',
       about: 'О нас',
+      portfolio: 'Портфолио',
       services: 'Услуги',
       products: 'Продукты',
+      financing: 'Финансирование',
+      blog: 'Блог',
       cetToken: 'Токен CET',
       contact: 'Контакты',
       requestOffer: 'Запросить расчет',
@@ -4567,8 +4582,11 @@ const translations: Record<LangCode, Translations> = {
     nav: {
       home: 'Acasă',
       about: 'Despre',
+      portfolio: 'Portofoliu',
       services: 'Servicii',
       products: 'Produse',
+      financing: 'Finanțare',
+      blog: 'Blog',
       cetToken: 'Token CET',
       contact: 'Contact',
       requestOffer: 'Cere ofertă',
@@ -5120,8 +5138,11 @@ const translations: Record<LangCode, Translations> = {
     nav: {
       home: 'Início',
       about: 'Sobre',
+      portfolio: 'Portfólio',
       services: 'Serviços',
       products: 'Produtos',
+      financing: 'Financiamento',
+      blog: 'Blog',
       cetToken: 'Token CET',
       contact: 'Contacto',
       requestOffer: 'Pedir orçamento',
@@ -5682,8 +5703,11 @@ const translations: Record<LangCode, Translations> = {
     nav: {
       home: 'Startseite',
       about: 'Über uns',
+      portfolio: 'Portfolio',
       services: 'Leistungen',
       products: 'Produkte',
+      financing: 'Förderung',
+      blog: 'Blog',
       cetToken: 'CET Token',
       contact: 'Kontakt',
       requestOffer: 'Angebot anfragen',

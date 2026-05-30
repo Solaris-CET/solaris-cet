@@ -2,11 +2,33 @@ import { Mail, MapPin, Send } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { DownloadAppButton } from '@/components/company/DownloadAppButton';
+import { localizePathname, parseUrlLocaleFromPathname } from '@/i18n/urlRouting';
 
 export default function ContactPage() {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const utm = useMemo(() => {
+    try {
+      const u = new URL(window.location.href);
+      const pick = (k: string) => (u.searchParams.get(k) ?? '').trim() || null;
+      const ref = (document.referrer ?? '').trim();
+      return {
+        source: pick('utm_source'),
+        medium: pick('utm_medium'),
+        campaign: pick('utm_campaign'),
+        term: pick('utm_term'),
+        content: pick('utm_content'),
+        gclid: pick('gclid'),
+        fbclid: pick('fbclid'),
+        referrer: ref ? ref.slice(0, 300) : null,
+        landingPath: `${u.pathname}${u.search}${u.hash}`.slice(0, 300),
+      };
+    } catch {
+      return null;
+    }
+  }, []);
 
   const initialService = useMemo(() => {
     try {
@@ -62,6 +84,16 @@ export default function ContactPage() {
                 <a href="tel:+40769889721" className="text-lg font-medium hover:text-solar-yellow transition-colors">
                   +40 769 889 721
                 </a>
+                <div className="mt-1">
+                  <a
+                    href={`https://wa.me/40769889721?text=${encodeURIComponent('Bună! Aș dori o ofertă pentru: ')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-solaris-muted hover:text-solar-yellow transition-colors"
+                  >
+                    WhatsApp
+                  </a>
+                </div>
               </div>
             </div>
 
@@ -190,17 +222,22 @@ export default function ContactPage() {
                       email: em || null,
                       message: fullMessage,
                       pageUrl,
+                      utm,
                     }),
                   });
                   if (!res.ok) {
                     setError('Nu am putut trimite mesajul.');
                     return;
                   }
-                  setDone(true);
-                  setName('');
-                  setEmail('');
-                  setPhone('');
-                  setMessage('');
+                  try {
+                    const dataLayer = (window as unknown as { dataLayer?: Array<Record<string, unknown>> }).dataLayer;
+                    dataLayer?.push?.({ event: 'conversion', source: 'contact_form' });
+                  } catch {
+                    void 0;
+                  }
+
+                  const urlLocale = parseUrlLocaleFromPathname(window.location.pathname).locale ?? 'ro';
+                  window.location.href = localizePathname('/multumim', urlLocale);
                 } catch {
                   setError('Conexiunea a eșuat. Te rog încearcă din nou.');
                 } finally {

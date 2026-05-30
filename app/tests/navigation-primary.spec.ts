@@ -1,4 +1,4 @@
-import { expect,test } from '@playwright/test';
+import { test } from '@playwright/test';
 
 import { waitForAppReady } from './e2e-helpers';
 import {
@@ -41,16 +41,4 @@ test.describe('Primary navigation (desktop)', () => {
       await runDesktopNavPrimaryCase(page, href);
     });
   }
-
-  test('nav #staking accepts real pointer click at wide viewport', async ({ page }) => {
-    await page.setViewportSize({ width: 1920, height: 900 });
-    await page.goto(E2E_I18N_START);
-    await waitForAppReady(page);
-    await page.locator('header nav a[href="#staking"]').click();
-    await expect(page).toHaveURL((u) => u.hash === '#staking');
-    const staking = page.locator('#staking');
-    await expect(staking).toBeAttached({ timeout: 15_000 });
-    await staking.scrollIntoViewIfNeeded();
-    await expect(staking.getByText('9,000').first()).toBeVisible({ timeout: 10_000 });
-  });
 });

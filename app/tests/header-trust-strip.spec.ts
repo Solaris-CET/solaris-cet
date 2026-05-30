@@ -1,4 +1,4 @@
-import { expect,test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { waitForAppReady } from './e2e-helpers';
 
@@ -8,22 +8,28 @@ test.describe('Header trust strip', () => {
     await waitForAppReady(page);
   });
 
-  test('desktop header shows Cyberscope, Freshcoins, and whitepaper links', async ({ page }) => {
+  test('trust signals strip is visible on desktop', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
 
-    const header = page.locator('header');
-    await expect(header.getByRole('link', { name: /Cyberscope/ })).toBeVisible();
-    await expect(header.getByRole('link', { name: /Freshcoins/ })).toBeVisible();
-    await expect(header.locator('a[href*="bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a"]').first()).toBeVisible();
+    const sectionTitle = page.getByText('Încredere & conformitate').first();
+    await sectionTitle.scrollIntoViewIfNeeded();
+    await expect(sectionTitle).toBeVisible();
+
+    await expect(page.getByText('ANRE').first()).toBeVisible();
+    await expect(page.getByText('AFM').first()).toBeVisible();
+    await expect(page.getByText('Garanție').first()).toBeVisible();
+    await expect(page.getByText('Asigurat').first()).toBeVisible();
   });
 
-  test('mobile sheet exposes the same trust links after opening the menu', async ({ page }) => {
+  test('trust signals strip is visible on mobile', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.getByTestId('mobile-menu-toggle').click();
+    const sectionTitle = page.getByText('Încredere & conformitate').first();
+    await sectionTitle.scrollIntoViewIfNeeded();
+    await expect(sectionTitle).toBeVisible();
 
-    const sheet = page.locator('#mobile-menu');
-    await expect(sheet.getByRole('link', { name: /Cyberscope/ })).toBeVisible();
-    await expect(sheet.getByRole('link', { name: /Freshcoins/ })).toBeVisible();
-    await expect(sheet.locator('a[href*="bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a"]').first()).toBeVisible();
+    await expect(page.getByText('ANRE').first()).toBeVisible();
+    await expect(page.getByText('AFM').first()).toBeVisible();
+    await expect(page.getByText('Garanție').first()).toBeVisible();
+    await expect(page.getByText('Asigurat').first()).toBeVisible();
   });
 });

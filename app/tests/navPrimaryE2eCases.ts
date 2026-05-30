@@ -24,7 +24,9 @@ export async function clickHeaderNav(page: any, href: NavPrimaryInPageHref): Pro
 }
 
 export async function clickMobileSheetNav(page: any, href: NavPrimaryInPageHref): Promise<void> {
-  const locator = page.locator(`#mobile-menu nav a[href="${href}"]`);
+  const locator = href.startsWith('#')
+    ? page.locator(`#mobile-menu nav > a[href="${href}"]`)
+    : page.locator(`#mobile-menu nav > a[href="${href}"], #mobile-menu nav > a[href$="${href}"]`);
   await clickNavLink(locator);
 }
 
@@ -39,24 +41,34 @@ function stripLocalePrefix(pathname: string) {
 }
 
 const desktopAssertByHref: Record<NavPrimaryInPageHref, (page: any) => Promise<void>> = {
-  '/': async (page: any) => {
-    await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
+  '#hero': async (page: any) => {
+    await expect(page.locator('#hero')).toBeAttached({ timeout: 15_000 });
   },
-  '/services': async (page: any) => {
+  '#servicii': async (page: any) => {
+    await expect(page.locator('#servicii')).toBeAttached({ timeout: 15_000 });
+  },
+  '#proiecte': async (page: any) => {
+    await expect(page.locator('#proiecte')).toBeAttached({ timeout: 15_000 });
+  },
+  '/finantare': async (page: any) => {
     await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
-    await expect(page.getByRole('heading', { name: /Our Services/i }).first()).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText(/Casa Verde|Financing/i).first()).toBeVisible({ timeout: 30_000 });
+  },
+  '/blog': async (page: any) => {
+    await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
+    await expect(page.getByText(/Blog/i).first()).toBeVisible({ timeout: 30_000 });
+  },
+  '/despre': async (page: any) => {
+    await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
+    await expect(page.getByText(/Despre|About/i).first()).toBeVisible({ timeout: 30_000 });
+  },
+  '/token-cet': async (page: any) => {
+    await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
+    await expect(page.getByText(/CET/i).first()).toBeVisible({ timeout: 30_000 });
   },
   '/contact': async (page: any) => {
     await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
-    await expect(page.getByRole('heading', { name: /Contact Us/i }).first()).toBeVisible({ timeout: 30_000 });
-  },
-  '/about': async (page: any) => {
-    await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
-    await expect(page.getByRole('heading', { name: /Solaris CET — why it exists/i }).first()).toBeVisible({ timeout: 30_000 });
-  },
-  '/faq': async (page: any) => {
-    await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
-    await expect(page.getByRole('heading', { name: /FAQ/i }).first()).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText(/Contact/i).first()).toBeVisible({ timeout: 30_000 });
   },
 };
 
@@ -65,7 +77,7 @@ export async function runDesktopNavPrimaryCase(page: any, href: NavPrimaryInPage
   if (href.startsWith('#')) {
     await expect(page).toHaveURL((u: any) => u.hash === href);
   } else {
-    await expect(page).toHaveURL((u: any) => stripLocalePrefix(u.pathname).replace(/\/$/, '') === (href === '/' ? '' : href));
+    await expect(page).toHaveURL((u: any) => stripLocalePrefix(u.pathname).replace(/\/$/, '') === href);
   }
   await desktopAssertByHref[href](page);
 }

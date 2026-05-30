@@ -8,6 +8,11 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
   globalIgnores([
+    'next-env.d.ts',
+    '.next',
+    '**/.next/**',
+    'out',
+    '**/out/**',
     'dist',
     '**/dist/**',
     'coverage',
@@ -23,9 +28,9 @@ export default defineConfig([
       js.configs.recommended,
       tseslint.configs.recommended,
       reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
     ],
     plugins: {
+      'react-refresh': reactRefresh,
       'simple-import-sort': simpleImportSort,
     },
     languageOptions: {
@@ -58,6 +63,18 @@ export default defineConfig([
   },
   {
     files: ['**/src/components/SafeHtml.tsx'],
+    rules: {
+      'no-restricted-syntax': 'off',
+    },
+  },
+  {
+    files: ['**/components/JsonLd.tsx'],
+    rules: {
+      'no-restricted-syntax': 'off',
+    },
+  },
+  {
+    files: ['**/app/blog/\\[slug\\]/page.tsx'],
     rules: {
       'no-restricted-syntax': 'off',
     },

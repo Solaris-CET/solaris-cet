@@ -283,6 +283,7 @@ export default async function handler(req: Request): Promise<Response> {
   const context =
     typeof body.context === 'object' && body.context !== null ? (body.context as Record<string, unknown>) : null;
   const contextMode = typeof context?.mode === 'string' ? context.mode : '';
+  const isCompanyMode = contextMode === 'company';
   const contextDepartment = typeof context?.department === 'string' ? context.department : '';
 
   if (!userQuery || typeof userQuery !== 'string' || !userQuery.trim()) {
@@ -351,7 +352,7 @@ export default async function handler(req: Request): Promise<Response> {
 
   if (!grokKey && !geminiKey && !claudeKey) {
     const isRo = /[ăâîșț]/i.test(trimmedQuery) || /\b(ce|cat|cât|vreau|ofert[ăa]|acoperiș|fotovoltaic|reparații|mentenanță|montaj)\b/i.test(trimmedQuery);
-    const isCompany = contextMode === 'company' || /\b(fotovoltaic|panouri|acoperiș|tpo|șarpantă|țiglă|tablă|atice|fațade|ofert[ăa])\b/i.test(trimmedQuery);
+    const isCompany = isCompanyMode || /\b(fotovoltaic|panouri|acoperiș|tpo|șarpantă|țiglă|tablă|atice|fațade|ofert[ăa])\b/i.test(trimmedQuery);
     const intro = isRo
       ? 'Asistentul AI avansat este dezactivat (nu sunt configurate chei). Totuși, pot să te ajut să obții rapid o ofertă.'
       : 'Advanced AI is disabled (no provider keys configured). I can still help you get a quote quickly.';
@@ -425,7 +426,7 @@ export default async function handler(req: Request): Promise<Response> {
     budget,
   });
 
-  if (contextMode === 'company') {
+  if (isCompanyMode) {
     plan = { ...plan, useOnChain: false, useWebRetrieval: false };
   }
 
@@ -455,23 +456,19 @@ export default async function handler(req: Request): Promise<Response> {
       : '';
 
   // ── SHARED SYSTEM CONTEXT ─────────────────────────────────────────────────
-  const identity = isCompanyMode
-    ? 'You are Solaris CET AI — a professional assistant for Solaris CET company services (PV, construction, roofing).'
-    : 'You are Solaris CET AI — a helpful assistant for Solaris CET and general crypto/DeFi questions.';
-
   const sharedContext =
     multiTurnHint +
-    (contextMode === 'company'
-      ? `You are Solaris CET — a helpful assistant for a Romania-based company delivering photovoltaic installations, construction works, roofing (metal sheet / metal tiles / TPO membrane), metal parapets and facades, plus repairs and maintenance.
-STRICT RULE: Do NOT mention CET tokens, crypto, blockchain, jettons, DeDust, TON, or any financial investment topics. You only talk about physical construction and renewable energy services in Romania.\n\n`
+    (isCompanyMode
+      ? `You are Solaris CET — a helpful assistant for a Romania-based company delivering photovoltaic installations, construction works, roofing (metal sheet / metal tiles / TPO membrane), metal parapets and facades, plus repairs and maintenance.\n` +
+        `STRICT RULE: Do NOT mention CET tokens, crypto, blockchain, jettons, DeDust, TON, or any financial investment topics. You only talk about physical construction and renewable energy services in Romania.\n\n`
       : `You are Solaris CET AI — a helpful assistant for Solaris CET and general crypto/DeFi questions.\n\n`) +
     `LANGUAGE: Reply in the same language as the user's latest message.\n\n` +
     `RULES:\n` +
     `- Be accurate and explicit about uncertainty.\n` +
     `- Never invent URLs or claims.` +
-    (contextMode === 'company' ? '' : '\n- Never invent on-chain prices.') +
+    (isCompanyMode ? '' : '\n- Never invent on-chain prices.') +
     `\n- If the question is ambiguous, ask 1-2 clarifying questions.` +
-    (contextMode === 'company' ? '' : '\n- If LIVE ON-CHAIN DATA is missing, say so briefly.') +
+    (isCompanyMode ? '' : '\n- If LIVE ON-CHAIN DATA is missing, say so briefly.') +
     `\n\n` +
     onChainBlock +
     retrieval.block +

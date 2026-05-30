@@ -4,12 +4,10 @@ import { expect, test } from '@playwright/test';
 import { waitForAppReady } from './e2e-helpers';
 
 const ROUTES: Array<{ name: string; path: string }> = [
-  { name: 'home', path: '/en/' },
-  { name: 'rwa', path: '/en/#rwa' },
-  { name: 'cet-ai', path: '/en/cet-ai' },
-  { name: 'accessibility', path: '/en/accessibility' },
-  { name: 'wallet', path: '/en/wallet' },
-  { name: 'nfts', path: '/en/nfts' },
+  { name: 'home', path: '/' },
+  { name: 'services', path: '/servicii/' },
+  { name: 'service-detail', path: '/servicii/fotovoltaice-rezidentiale/' },
+  { name: 'contact', path: '/contact/' },
 ];
 
 test.describe('A11y (axe)', () => {
@@ -20,12 +18,16 @@ test.describe('A11y (axe)', () => {
     for (const r of ROUTES) {
       await test.step(r.name, async () => {
         await page.goto(r.path);
-        await waitForAppReady(page, { timeout: 15_000 });
+        const rootCount = await page.locator('#root').count();
+        if (rootCount > 0) {
+          await waitForAppReady(page, { timeout: 15_000 });
+        }
 
-        await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
+        const mainCount = await page.locator('#main-content').count();
+        const scope = mainCount > 0 ? '#main-content' : 'body';
 
         const results = await new AxeBuilder({ page })
-          .include('#main-content')
+          .include(scope)
           .exclude('iframe')
           .exclude('embed-place-card-element')
           .disableRules(['color-contrast'])

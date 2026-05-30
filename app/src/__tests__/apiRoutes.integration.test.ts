@@ -1,27 +1,77 @@
-import { describe, expect, it } from 'vitest';
-import chatHandler from '../../api/chat/route';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-async function jsonBody(res: Response) {
-  return await res.json();
+vi.mock('../../api/lib/cors', () => ({
+  getAllowedOrigin: () => 'https://allowed.test',
+}));
+
+vi.mock('../../api/lib/rateLimit', () => ({
+  withRateLimit: async () => null,
+}));
+
+vi.mock('../../api/lib/crypto', () => ({
+  resolveApiKey: async (_enc: unknown, plain: unknown) => (typeof plain === 'string' ? plain : null),
+}));
+
+vi.mock('../../api/lib/cetAiRetrieval', () => ({
+  buildCetAiRetrievalBlock: async () => ({ block: '', sources: [] as unknown[] }),
+}));
+
+vi.mock('../../api/lib/reactBrain', () => ({
+  deriveCetAiResourceBudget: () => ({ budgetMs: 5000, maxParallel: 2 }),
+  decideCetAiRavPlan: () => ({
+    agentCount: 2,
+    providers: { strategy: 'single', singleProvider: 'grok' },
+    temperature: 0.2,
+    useOnChain: false,
+    useWebRetrieval: false,
+    budget: { budgetMs: 5000, maxParallel: 2 },
+  }),
+}));
+
+vi.mock('openai', () => {
+  class OpenAI {
+    chat = {
+      completions: {
+        create: vi.fn(async () => ({
+          choices: [
+            {
+              message: {
+                content:
+                  '[DIAGNOSTIC INTERN]\nReason.\n\n[DECODARE ORACOL]\nAct.\n\n[DIRECTIVĂ DE ACȚIUNE]\nObserve.',
+              },
+            },
+          ],
+        })),
+      },
+    };
+  }
+  return { default: OpenAI };
+});
+
+import chatHandler from '../../api/chat/route';
+import healthRoute from '../../api/health/route';
+
+function jsonBody(res: Response): Promise<unknown> {
+  return res.text().then((t) => (t ? (JSON.parse(t) as unknown) : null));
 }
 
 describe('API routes integration', () => {
-  const envSnapshot = { ...process.env };
+  const originalEnv = { ...process.env };
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    process.env = { ...envSnapshot };
+    process.env = { ...originalEnv };
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
     consoleErrorSpy.mockRestore();
-    process.env = { ...envSnapshot };
+    process.env = { ...originalEnv };
   });
 
   it('/api/health: OPTIONS returns 204 with CORS headers', async () => {
     const req = new Request('http://test/api/health', { method: 'OPTIONS', headers: { origin: 'https://x.test' } });
-    const res = await healthHandler(req);
+    const res = await healthRoute(req);
     expect(res.status).toBe(204);
     expect(res.headers.get('Access-Control-Allow-Origin')).toBe('https://allowed.test');
     expect(res.headers.get('Access-Control-Allow-Methods')).toContain('GET');
@@ -34,7 +84,7 @@ describe('API routes integration', () => {
     process.env.GEMINI_API_KEY = 'gemini-test';
 
     const req = new Request('http://test/api/health', { method: 'GET', headers: { origin: 'https://x.test' } });
-    const res = await healthHandler(req);
+    const res = await healthRoute(req);
     expect(res.status).toBe(200);
     const body = (await jsonBody(res)) as {
       status: string;
@@ -81,12 +131,9 @@ describe('API routes integration', () => {
     });
     const res = await chatHandler(req);
     expect(res.status).toBe(200);
-    const body = (await jsonBody(res)) as { response?: string; message?: string };
-    expect(body.response).toBe('');
-    expect(body.message).toBe('OFFLINE_MODE');
-    expect(res.headers.get('X-Cet-Ai-Source')).toBe('offline');
-
-    // Restore env
-    process.env = originalEnv;
+    expect(res.headers.get('X-Cet-Ai-Source')).toBe('live');
+    const body = (await jsonBody(res)) as { response: unknown };
+    expect(typeof body.response).toBe('string');
+    expect(body.response).toContain('[DIAGNOSTIC INTERN]');
   });
 });

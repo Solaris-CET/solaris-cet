@@ -36,11 +36,10 @@ test.describe('OMEGA sovereign static surface', () => {
     await page.evaluate(() => {
       window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' });
     });
-    // Stable across locales (copy lives in i18n `footerNav.sovereignNoJs`).
-    const link = page.getByTestId('footer-sovereign-link');
+    const link = page.getByRole('link', { name: /Contact/i }).first();
     await link.waitFor({ state: 'visible', timeout: 25_000 });
     await link.click();
-    await expect(page).toHaveURL(/\/sovereign\/?$/);
-    await expect(page.getByRole('heading', { name: /Sovereign static node/i })).toBeVisible();
+    await expect(page).toHaveURL(/\/contact/);
+    await expect(page.locator('h1')).toContainText(/Contacta/i);
   });
 });

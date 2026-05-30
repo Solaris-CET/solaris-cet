@@ -6,7 +6,6 @@ const appRoot = process.cwd()
 const publicDir = path.join(appRoot, 'public')
 
 const origin = String(process.env.VITE_PUBLIC_SITE_URL || 'https://solaris-cet.com').replace(/\/$/, '')
-const locales = ['en', 'es', 'zh', 'ru', 'ro', 'pt', 'de']
 
 function normalizePath(p) {
   if (!p) return '/'
@@ -14,12 +13,6 @@ function normalizePath(p) {
   const cleaned = withSlash.replace(/\/+/g, '/')
   if (cleaned === '/index.html') return '/'
   return cleaned
-}
-
-function localizePath(p, locale) {
-  const pathname = normalizePath(p)
-  if (pathname === '/') return `/${locale}/`
-  return `/${locale}${pathname}`
 }
 
 function yyyyMmDd(d) {
@@ -48,25 +41,186 @@ function stableBuildDate() {
   return yyyyMmDd(new Date())
 }
 
+function escapeHtml(s) {
+  return String(s)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+}
+
+function renderStaticPageHtml({ title, description, canonicalPath, h1, bodyLines }) {
+  const canonical = `${origin}${normalizePath(canonicalPath)}`
+  const metaDesc = escapeHtml(description)
+  const metaTitle = escapeHtml(title)
+  const metaH1 = escapeHtml(h1)
+  const body = bodyLines.map((l) => `<p>${escapeHtml(l)}</p>`).join('\n')
+
+  return `<!doctype html>
+<html lang="ro">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>${metaTitle}</title>
+    <meta name="description" content="${metaDesc}" />
+    <link rel="canonical" href="${canonical}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="${metaTitle}" />
+    <meta property="og:description" content="${metaDesc}" />
+    <meta property="og:url" content="${canonical}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${metaTitle}" />
+    <meta name="twitter:description" content="${metaDesc}" />
+    <style>
+      :root { color-scheme: dark; }
+      body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif; background: #05070a; color: #fff; }
+      a { color: #f2c94c; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .wrap { max-width: 860px; margin: 0 auto; padding: 28px 18px; }
+      .card { border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.35); border-radius: 18px; padding: 18px; }
+      h1 { font-size: 34px; line-height: 1.1; margin: 0 0 10px; }
+      p { margin: 10px 0; color: rgba(255,255,255,.82); }
+      .nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+      .nav a { border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06); padding: 10px 12px; border-radius: 12px; font-weight: 700; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <nav class="nav" aria-label="Navigație">
+          <a href="/">Acasă</a>
+          <a href="/servicii/">Servicii</a>
+          <a href="/contact/">Contact</a>
+        </nav>
+      </header>
+      <main id="main-content">
+        <div class="card">
+          <h1>${metaH1}</h1>
+          ${body}
+          <p><strong>Telefon:</strong> <a href="tel:+40769889721">+40 769 889 721</a> · <strong>Email:</strong> <a href="mailto:solaris-cet@protonmail.com">solaris-cet@protonmail.com</a></p>
+          <p><a href="/contact/#oferta">Solicită ofertă →</a></p>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
+`
+}
+
+async function writeStaticPages() {
+  const pages = [
+    {
+      path: '/contact',
+      title: 'Contact — Solaris CET',
+      description: 'Contact Solaris CET pentru fotovoltaice, acoperișuri, reparații și mentenanță.',
+      h1: 'Contactați Solaris CET',
+      bodyLines: ['Instalații fotovoltaice, acoperișuri (tablă/țiglă/TPO), reparații și mentenanță în Vaslui și în toată România.'],
+    },
+    {
+      path: '/servicii',
+      title: 'Servicii — Solaris CET',
+      description: 'Servicii Solaris CET: fotovoltaice, acoperișuri, atice/fațade tablă, reparații și mentenanță.',
+      h1: 'Servicii Solaris CET',
+      bodyLines: ['Alege serviciul potrivit: fotovoltaice rezidențiale/industriale, acoperișuri, atice/fațade, reparații și mentenanță.'],
+    },
+    {
+      path: '/servicii/fotovoltaice-rezidentiale',
+      title: 'Instalații Fotovoltaice Rezidențiale — Solaris CET',
+      description: 'Instalații fotovoltaice pentru case: panouri, invertor, baterii, monitorizare.',
+      h1: 'Instalații Fotovoltaice Rezidențiale — Vaslui și împrejurimi',
+      bodyLines: ['Panouri mono/poli/bifacial, invertoare, baterii de stocare și monitorizare producție/consum.'],
+    },
+    {
+      path: '/servicii/fotovoltaice-industriale',
+      title: 'Sisteme Fotovoltaice Industriale — Solaris CET',
+      description: 'Sisteme fotovoltaice pentru hale și clădiri comerciale: proiectare, montaj, optimizare ROI.',
+      h1: 'Sisteme Fotovoltaice Industriale — Hale și clădiri comerciale',
+      bodyLines: ['Sisteme peste 100 kW, soluții pentru consum mare, optimizare și planificare ROI.'],
+    },
+    {
+      path: '/servicii/acoperisuri-tabla-tigla',
+      title: 'Montaj Acoperișuri Tablă și Țiglă Metalică — Solaris CET',
+      description: 'Montaj acoperișuri tablă/țiglă metalică: sisteme pluviale, parazăpezi, etanșări.',
+      h1: 'Montaj Acoperișuri Tablă și Țiglă Metalică — Vaslui, Bacău, Iași',
+      bodyLines: ['Tablă click/falțuită, țiglă metalică, sisteme pluviale și parazăpezi.'],
+    },
+    {
+      path: '/servicii/acoperisuri-industriale-tpo',
+      title: 'Acoperișuri Industriale Folie TPO — Solaris CET',
+      description: 'Membrană TPO pentru hale și depozite: detalii tehnice, durabilitate, execuție.',
+      h1: 'Acoperișuri Industriale Folie TPO — Hale și Depozite',
+      bodyLines: ['Specificații TPO, avantaje și detalii de execuție pentru durabilitate 20+ ani.'],
+    },
+    {
+      path: '/servicii/atice-fatade-tabla',
+      title: 'Atice și Fațade din Tablă — Solaris CET',
+      description: 'Atice și fațade din tablă: finisaje moderne, culori RAL, execuție curată.',
+      h1: 'Atice și Fațade din Tablă — Finisaje moderne',
+      bodyLines: ['Tipuri tablă fațadă, culori RAL disponibile și execuție cu detalii curate.'],
+    },
+    {
+      path: '/servicii/reparatii-mentenanta',
+      title: 'Reparații și Mentenanță Acoperiș — Solaris CET',
+      description: 'Reparații acoperiș: infiltrații, jgheaburi, curățare și inspecție anuală.',
+      h1: 'Reparații și Mentenanță Acoperiș — Intervenții rapide',
+      bodyLines: ['Hidroizolații, înlocuire jgheaburi, curățare, inspecție anuală și intervenții rapide.'],
+    },
+    {
+      path: '/despre',
+      title: 'Despre — Solaris CET',
+      description: 'Echipă locală pentru fotovoltaice, acoperișuri, reparații și mentenanță.',
+      h1: 'Despre Solaris CET',
+      bodyLines: ['Lucrări complete pentru fotovoltaice și acoperișuri, cu acoperire în mai multe județe.'],
+    },
+    {
+      path: '/portofoliu',
+      title: 'Portofoliu — Solaris CET',
+      description: 'Portofoliu proiecte: fotovoltaice, acoperișuri, fațade și lucrări diverse.',
+      h1: 'Portofoliu Solaris CET',
+      bodyLines: ['Exemple de lucrări (placeholder) până la încărcarea pozelor reale din proiecte.'],
+    },
+  ]
+
+  for (const p of pages) {
+    const outDir = path.join(publicDir, normalizePath(p.path).replace(/^\//, ''), 'index.html')
+    await fs.mkdir(path.dirname(outDir), { recursive: true })
+    const html = renderStaticPageHtml({
+      title: p.title,
+      description: p.description,
+      canonicalPath: `${p.path}/`,
+      h1: p.h1,
+      bodyLines: p.bodyLines,
+    })
+    await fs.writeFile(outDir, html, 'utf8')
+  }
+}
+
 async function writeSitemap() {
   const today = stableBuildDate()
-  const staticLocalized = [
-    { path: '/', lastmod: today },
-    { path: '/about', lastmod: today },
-    { path: '/faq', lastmod: today },
-    { path: '/servicii', lastmod: today },
-    { path: '/contact', lastmod: today },
-    { path: '/token-cet', lastmod: today },
-    { path: '/privacy', lastmod: today },
-    { path: '/terms', lastmod: today },
-    { path: '/cookies', lastmod: today },
-  ]
   const urls = []
 
-  for (const { path: p, lastmod } of staticLocalized) {
-    for (const locale of locales) {
-      urls.push({ loc: `${origin}${localizePath(p, locale)}`, lastmod })
-    }
+  const staticPages = [
+    '/',
+    '/servicii',
+    '/servicii/fotovoltaice-rezidentiale',
+    '/servicii/fotovoltaice-industriale',
+    '/servicii/acoperisuri-tabla-tigla',
+    '/servicii/acoperisuri-industriale-tpo',
+    '/servicii/atice-fatade-tabla',
+    '/servicii/reparatii-mentenanta',
+    '/contact',
+    '/despre',
+    '/portofoliu',
+    '/vaslui',
+    '/bacau',
+    '/iasi',
+    '/galati',
+    '/politica-cookies',
+    '/politica-confidentialitate',
+  ]
+  for (const p of staticPages) {
+    urls.push({ loc: `${origin}${normalizePath(p)}`, lastmod: today })
   }
 
   const staticGlobal = [
@@ -91,46 +245,11 @@ async function writeSitemap() {
 }
 
 async function writeRobots() {
-  const disallowGlobalPrefixes = ['/api/']
-
-  const disallowLocalizedPrefixes = [
-    '/admin',
-    '/console',
-    '/docs',
-    '/developers',
-    '/login',
-    '/auth',
-    '/app',
-    '/wallet',
-    '/nfts',
-    '/airdrop',
-    '/staking',
-    '/tx-history',
-    '/settings',
-    '/privacy-settings',
-    '/share',
-    '/lp/',
-    '/newsletter/confirm',
-    '/newsletter/verify',
-    '/newsletter/unsubscribe',
-    '/prelaunch',
-    '/thanks',
-  ]
-
-  const disallowLines = []
-
-  for (const p of disallowGlobalPrefixes) {
-    disallowLines.push(`Disallow: ${normalizePath(p)}`)
-  }
-
-  for (const locale of locales) {
-    for (const p of disallowLocalizedPrefixes) {
-      disallowLines.push(`Disallow: ${localizePath(p, locale)}`)
-    }
-  }
+  const disallowLines = [`Disallow: /api/`, `Disallow: /_next/`]
 
   const txt = [
     `User-agent: *`,
+    `Allow: /`,
     ...disallowLines,
     ``,
     `# llms.txt: ${origin}/llms.txt`,
@@ -144,4 +263,4 @@ async function writeRobots() {
   await fs.writeFile(path.join(publicDir, 'robots.txt'), txt, 'utf8')
 }
 
-await Promise.all([writeSitemap(), writeRobots()])
+await Promise.all([writeStaticPages(), writeSitemap(), writeRobots()])

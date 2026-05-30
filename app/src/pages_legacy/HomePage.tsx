@@ -4,9 +4,15 @@ import AppImage from '@/components/AppImage';
 import { SolarisFooter } from '@/components/company/SolarisFooter';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
+import CompanyFaqSection from '@/sections/CompanyFaqSection';
 import HeroSection from '@/sections/HeroSection';
 import ProductsSection from '@/sections/ProductsSection';
 import ServicesSection from '@/sections/ServicesSection';
+import SolarAiAssistantSection from '@/sections/SolarAiAssistantSection';
+import SolarCompetitionSection from '@/sections/SolarCompetitionSection';
+import SolarIntelligenceSection from '@/sections/SolarIntelligenceSection';
+import SolarSecuritySection from '@/sections/SolarSecuritySection';
+import TrustSignalsStrip from '@/sections/TrustSignalsStrip';
 
 export default function HomePage() {
   return (
@@ -21,7 +27,9 @@ export default function HomePage() {
         </ErrorBoundary>
       </section>
 
-      <section id="servicii" className="relative z-20">
+      <TrustSignalsStrip />
+
+      <section className="relative z-20">
         <ScrollFadeUp>
           <ServicesSection />
         </ScrollFadeUp>
@@ -32,6 +40,16 @@ export default function HomePage() {
           <ProductsSection />
         </ScrollFadeUp>
       </section>
+
+      <SolarAiAssistantSection />
+
+      <SolarIntelligenceSection />
+
+      <SolarCompetitionSection />
+
+      <SolarSecuritySection />
+
+      <CompanyFaqSection />
 
       <section id="proiecte" className="py-24 bg-slate-900/40">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
@@ -111,7 +129,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="relative z-[113]">
+      <div data-testid="footer-landmark-section" className="relative z-[113]">
         <SolarisFooter />
       </div>
     </main>

@@ -14,7 +14,8 @@
   },
   "scripts": {
     "app:dev": "npm --workspace=app run dev --",
-    "app:build": "npm run build --workspace=app",
+    "app:build": "npm run build --workspace=app && npm run api:build --workspace=app",
+    "app:build:next": "npm run build --workspace=app",
     "app:verify": "npm run verify --workspace=app",
     "engine:start": "cd engine && ./farming-engine",
     "app:test:e2e": "npm run test:e2e --workspace=app",
@@ -32,6 +33,7 @@
     "uptime:heartbeat": "node scripts/uptime-heartbeat.mjs",
     "verify:fast": "npm run audit:prod && npm run api:typecheck && npm run cli:typecheck && npm run scripts:typecheck && npm run contracts:test && npm run contracts:typecheck && npm run app:verify",
     "verify:all": "npm run verify:fast && npm run app:test:e2e:stable",
+    "gen:agent:5000": "node scripts/generate-agent-5000.mjs --count=5000",
     "gen:component": "plop component",
     "prepare": "husky"
   },

@@ -1,10 +1,7 @@
 User-agent: *
+Allow: /
 Disallow: /api/
-Disallow: /token-cet
-Disallow: /rwa
-Disallow: /mining
-Disallow: /demo
-Disallow: /tokenomics
+Disallow: /_next/
 
 # llms.txt: https://solaris-cet.com/llms.txt
 # humans.txt: https://solaris-cet.com/humans.txt

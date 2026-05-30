@@ -13,6 +13,9 @@ const SITE_ROOT = `${PRODUCTION_SITE_ORIGIN}/`;
 
 const SECTION_IDS = [
   "main-content",
+  "hero",
+  "servicii",
+  "proiecte",
   "nova-app",
   "staking",
   "roadmap",
@@ -33,10 +36,10 @@ const SECTION_IDS = [
 
 describe("Navigation + section IDs", () => {
   it("NAV_PRIMARY_IN_PAGE integrity and every hash href maps to a section id", () => {
-    expect(NAV_PRIMARY_IN_PAGE).toHaveLength(5);
+    expect(NAV_PRIMARY_IN_PAGE).toHaveLength(8);
     const hrefs = NAV_PRIMARY_IN_PAGE.map((i) => i.href);
     expect(new Set(hrefs).size).toBe(hrefs.length);
-    expect(NAV_PRIMARY_IN_PAGE.find((i) => i.navKey === "services")?.href).toBe("/services");
+    expect(NAV_PRIMARY_IN_PAGE.find((i) => i.navKey === "services")?.href).toBe("#servicii");
     expect(NAV_PRIMARY_IN_PAGE.find((i) => i.navKey === "contact")?.href).toBe("/contact");
 
     NAV_PRIMARY_IN_PAGE.forEach((item) => {

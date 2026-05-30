@@ -1,12 +1,11 @@
 {
-  "generatedAt": null,
-  "url": null,
+  "generatedAt": "2026-05-31T06:17:57.890Z",
+  "url": "http://localhost:40361/index.html",
   "scores": {
-    "performance": 0,
-    "accessibility": 0,
-    "bestPractices": 0,
-    "seo": 0,
-    "average": 0
+    "performance": 100,
+    "accessibility": 92,
+    "bestPractices": 96,
+    "seo": 100,
+    "average": 97
   }
 }
-

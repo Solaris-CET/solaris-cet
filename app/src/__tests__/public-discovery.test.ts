@@ -15,9 +15,9 @@ describe('Public discovery — sitemap, security.txt, humans.txt', () => {
     expect(robots).toContain('llms.txt');
 
     const xml = readFileSync(path.join(publicDir, 'sitemap.xml'), 'utf8');
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/en/servicii`);
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/en/contact`);
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/en/token-cet`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/servicii`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/contact`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/servicii/fotovoltaice-rezidentiale`);
     expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/llms.txt`);
     expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/humans.txt`);
     expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/.well-known/security.txt`);

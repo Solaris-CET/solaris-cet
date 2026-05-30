@@ -1,4 +1,4 @@
-import { expect,test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { URL_LOCALES } from '../src/i18n/urlRouting';
 import { NAV_PRIMARY_IN_PAGE } from '../src/lib/navPrimaryHrefs';
@@ -38,18 +38,18 @@ test.describe('Primary navigation (mobile sheet)', () => {
     }
   });
 
-  test('sheet in-page link /services reaches services page', async ({ page }) => {
+  test('sheet in-page link #servicii scrolls to services section', async ({ page }) => {
     await page.getByTestId('mobile-menu-toggle').click();
-    await clickMobileSheetNav(page, '/services' as any);
-    await expect(page).toHaveURL(/\/services/);
-    await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
+    await clickMobileSheetNav(page, '#servicii' as any);
+    await expect(page).toHaveURL((u) => u.hash === '#servicii');
+    await expect(page.locator('#servicii')).toBeAttached({ timeout: 15_000 });
   });
 
-  test('sheet in-page link /faq reaches accordion after lazy mount', async ({ page }) => {
+  test('sheet link /contact navigates to contact page', async ({ page }) => {
     await page.getByTestId('mobile-menu-toggle').click();
-    await clickMobileSheetNav(page, '/faq' as any);
-    await expect(page).toHaveURL(/\/faq/);
-    const faq = page.locator('#main-content');
-    await expect(faq).toBeAttached({ timeout: 15_000 });
+    await clickMobileSheetNav(page, '/contact' as any);
+    await expect(page).toHaveURL(new RegExp(`${LOCALE_PREFIX}/contact/?`));
+    await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: /Contacta/i }).first()).toBeVisible({ timeout: 15_000 });
   });
 });

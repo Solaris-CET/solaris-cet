@@ -29,9 +29,9 @@ const FORBIDDEN_CDN_PATTERNS = [
 describe("Public discovery — sitemap, security.txt, humans.txt", () => {
   it("static assets ship with expected content", () => {
     const xml = readFileSync(join(appPublic, "sitemap.xml"), "utf8");
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/en/servicii`);
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/en/contact`);
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/en/token-cet`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/servicii`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/contact`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/servicii/fotovoltaice-rezidentiale`);
 
     const sec = join(appPublic, ".well-known/security.txt");
     expect(existsSync(sec), "public/.well-known/security.txt must ship").toBe(true);

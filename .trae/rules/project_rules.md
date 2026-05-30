@@ -43,3 +43,75 @@ Context: <unde / fișiere>
 Încercat: <1-3 pași>
 Am nevoie de: <decizie / debugging / review>
 ```
+
+## Safety + Eficiență (rules hard)
+
+Aceste reguli maximizează siguranța și viteza în monorepo, dar nu pot elimina limitele platformei (policy, resurse, permisiuni).
+
+### 1) Safety non‑negociabil
+
+- Niciodată nu se introduc chei/parole în cod, Dockerfile, loguri sau fișiere commit‑uite.
+- În deploy (Coolify), secretele stau la runtime (Secrets/Environment), nu ca Build Args; build‑ul trebuie să fie reproducibil fără secrete.
+- Orice endpoint `/api/**` trebuie să aibă CORS corect, rate limit rezonabil și să degradeze sigur când lipsesc integrații/chei.
+- Nu se loghează payload‑uri brute cu PII (nume/telefon/email); doar metadate anonimizate.
+- Nu se execută comenzi destructive (delete, reset) fără confirmare explicită.
+- Nu se adaugă dependențe grele fără justificare + verificare CWV.
+
+### 2) Performanță + SEO (site public)
+
+- Conținutul vizibil trebuie să existe în HTML static (SSG/export) fără a necesita JS.
+- Nu se pune conținut critic în `Suspense` fără fallback HTML real.
+- Pentru componente client, există fallback `.no-js-only` cu același conținut esențial.
+- Meta tags complete pe toate paginile: title/description/canonical + OG/Twitter.
+- Schema.org validă: LocalBusiness pe homepage; Service + FAQ + Breadcrumb pe pagini servicii; Review/AggregateRating pe testimoniale; ImageObject în portofoliu.
+- Validare obligatorie înainte de livrare:
+  - `curl -A "Googlebot" https://solaris-cet.com/ | grep -i "fotovoltaic"`
+  - Lighthouse: SEO ≥ 95 (ideal ≥ 97)
+
+### 3) Build/CI determinist (monorepo)
+
+- Se rulează mereu verificarea repo înainte de commit:
+  - `cd /root/solaris-cet && npm run verify:fast`
+  - `cd /root/solaris-cet && npm run verify:all`
+- Scripturile de build trebuie să fie corecte pe workspace:
+  - build app: `--workspace=app`
+  - build api separat: `--workspace=api` doar dacă există script dedicat; altfel nu se confundă cu `app api:build` (care compilează `.api-dist`).
+- Nu se lint‑ează output generat (`.next/`, `out/`, `.api-dist/`).
+
+### 4) Eficiență operațională (agent)
+
+- Când se caută larg în repo, se folosește sub‑agent de search; când e “needle query”, se folosește grep/glob direct.
+- Se batch‑uiește citirea/căutarea (mai multe fișiere într-o singură rundă) ca să evităm context switches.
+- Nu se rulează comenzi interactive dacă există alternativă non‑interactivă.
+- Nu se aplică patch-uri repetate fără a re‑citi fișierul dacă au trecut 5+ mesaje sau conținutul s-a schimbat.
+
+### 5) Deploy Coolify (anti‑OOM + anti‑corupție Dockerfile)
+
+- Evită Build Args pentru secrete (poate corupe Dockerfile prin redaction/masking).
+- Dacă build-ul pică cu OOM:
+  - crește RAM/swap pe host sau limitele containerului
+  - setează `NODE_OPTIONS=--max-old-space-size=<MB>` în build stage
+  - evită pași inutili în build (ex: lint în `next build`, dacă e deja acoperit de `verify`).
+
+## Skill Catalog (invoke map)
+
+Folosește skill-uri dedicate pentru execuție rapidă și consistentă.
+
+- solaris-unlimited-coding: invoke pentru feature batches mari, refactor, bug-fix multi-fișier, cleanup + verificări.
+- solaris-unlimited-seo-cwv: invoke când schimbi pagini publice, meta tags, sitemap/robots, imagini, perf budgets.
+- solaris-unlimited-api-guardrails: invoke când adaugi/modifici orice `/api/**` (CORS, rate limit, validation, safe degrade).
+- solaris-coolify-deploy-doctor: invoke când deploy-ul eșuează (OOM, Build Args, Dockerfile masking, caching, env).
+- solaris-monorepo-build-orchestrator: invoke când există confuzie între workspaces sau build scripts.
+
+Skill-uri existente (built-in) utile:
+
+- solaris-testing-qa: schimbări de flow/API/contracte → adaugă/actualizează teste și stabilizează.
+- solaris-performance-cwv: animații/media heavy → optimizează LCP/CLS/INP.
+- solaris-ux-a11y-seo: layout/copy/a11y/SEO on-page → semantica headings + alt + focus.
+- solaris-db-data: orice schimbare DB/migrații → schema + safe data handling.
+- solaris-ops-ci: pipeline/infra/monitorizare → CI, Coolify/k8s, Lighthouse CI.
+
+## Limită practică (anti-bloat)
+
+- Nu se creează mii de skill-uri/“reguli” ca fișiere individuale: încetinește indexarea, crește costurile și scade calitatea execuției.
+- În loc de asta: skill-uri “macro” + rulepacks structurate + generator on-demand pentru liste foarte mari.

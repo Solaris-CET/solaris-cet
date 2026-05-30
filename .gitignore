@@ -12,6 +12,10 @@ app/coverage/
 app/test-results/
 app/playwright-report/
 app/coverage/
+app/.next/
+app/out/
+app/.lighthouseci/
+app/tsconfig.tsbuildinfo
 contracts/build/
 cli/dist/
 *.log
