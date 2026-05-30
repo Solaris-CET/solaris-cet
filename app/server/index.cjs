@@ -690,8 +690,10 @@ async function serveFile(res, absPath) {
     res.setHeader('Cache-Control', 'no-store');
   } else if (baseExt === '.html' || baseExt === '.json' || baseExt === '.xml' || baseExt === '.txt') {
     res.setHeader('Cache-Control', 'no-store');
-  } else {
+  } else if (absPath.includes('/assets/') || absPath.includes('/fonts/')) {
     res.setHeader('Cache-Control', 'public, max-age=31536000, s-maxage=31536000, immutable');
+  } else {
+    res.setHeader('Cache-Control', 'public, max-age=86400');
   }
   createReadStream(absPath).pipe(res);
 }

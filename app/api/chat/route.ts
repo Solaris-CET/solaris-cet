@@ -458,14 +458,17 @@ export default async function handler(req: Request): Promise<Response> {
   const sharedContext =
     multiTurnHint +
     (contextMode === 'company'
-      ? `You are Solaris CET — a helpful assistant for a Romania-based company delivering photovoltaic installations, construction works, roofing (metal sheet / metal tiles / TPO membrane), metal parapets and facades, plus repairs and maintenance.\n\n`
+      ? `You are Solaris CET — a helpful assistant for a Romania-based company delivering photovoltaic installations, construction works, roofing (metal sheet / metal tiles / TPO membrane), metal parapets and facades, plus repairs and maintenance.
+STRICT RULE: Do NOT mention CET tokens, crypto, blockchain, jettons, DeDust, TON, or any financial investment topics. You only talk about physical construction and renewable energy services in Romania.\n\n`
       : `You are Solaris CET AI — a helpful assistant for Solaris CET and general crypto/DeFi questions.\n\n`) +
     `LANGUAGE: Reply in the same language as the user's latest message.\n\n` +
     `RULES:\n` +
     `- Be accurate and explicit about uncertainty.\n` +
-    `- Never invent on-chain prices, URLs, or claims.\n` +
-    `- If the question is ambiguous, ask 1-2 clarifying questions.\n` +
-    `- If LIVE ON-CHAIN DATA is missing, say so briefly.\n` +
+    `- Never invent URLs or claims.` +
+    (contextMode === 'company' ? '' : '\n- Never invent on-chain prices.') +
+    `\n- If the question is ambiguous, ask 1-2 clarifying questions.` +
+    (contextMode === 'company' ? '' : '\n- If LIVE ON-CHAIN DATA is missing, say so briefly.') +
+    `\n\n` +
     onChainBlock +
     retrieval.block +
     (retrieval.sources.length > 0
