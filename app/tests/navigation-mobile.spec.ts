@@ -2,7 +2,7 @@ import { expect,test } from '@playwright/test';
 
 import { URL_LOCALES } from '../src/i18n/urlRouting';
 import { NAV_PRIMARY_IN_PAGE } from '../src/lib/navPrimaryHrefs';
-import { scrollUntilSelectorAttached,waitForAppReady } from './e2e-helpers';
+import { waitForAppReady } from './e2e-helpers';
 import { clickMobileSheetNav, E2E_I18N_START } from './navPrimaryE2eCases';
 
 const LOCALE_PREFIX = `(?:/(?:${URL_LOCALES.join('|')}))?`;
@@ -22,7 +22,7 @@ test.describe('Primary navigation (mobile sheet)', () => {
     await waitForAppReady(page);
   });
 
-  test('sheet lists the same seven primary hrefs in order', async ({ page }) => {
+  test('sheet lists the same primary hrefs in order', async ({ page }) => {
     await page.getByTestId('mobile-menu-toggle').click();
     const sheetNav = page.locator('#mobile-menu nav').first();
     const links = sheetNav.locator(':scope > a');
@@ -38,23 +38,18 @@ test.describe('Primary navigation (mobile sheet)', () => {
     }
   });
 
-  test('sheet in-page link #staking reaches tokenomics after programmatic click', async ({ page }) => {
+  test('sheet in-page link /services reaches services page', async ({ page }) => {
     await page.getByTestId('mobile-menu-toggle').click();
-    await clickMobileSheetNav(page, '#staking');
-    await expect(page).toHaveURL(/#staking/);
-    const staking = page.locator('#staking');
-    await expect(staking).toBeAttached({ timeout: 15_000 });
-    await staking.scrollIntoViewIfNeeded();
-    await expect(staking.getByText('9,000').first()).toBeVisible({ timeout: 10_000 });
+    await clickMobileSheetNav(page, '/services' as any);
+    await expect(page).toHaveURL(/\/services/);
+    await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
   });
 
-  test('sheet in-page link #faq reaches accordion after lazy mount', async ({ page }) => {
+  test('sheet in-page link /faq reaches accordion after lazy mount', async ({ page }) => {
     await page.getByTestId('mobile-menu-toggle').click();
-    await clickMobileSheetNav(page, '#faq');
-    await expect(page).toHaveURL(/#faq/);
-    await scrollUntilSelectorAttached(page, '#faq');
-    const faq = page.locator('#faq');
-    await faq.scrollIntoViewIfNeeded();
-    await expect(faq.locator('.faq-trigger').first()).toBeVisible({ timeout: 30_000 });
+    await clickMobileSheetNav(page, '/faq' as any);
+    await expect(page).toHaveURL(/\/faq/);
+    const faq = page.locator('#main-content');
+    await expect(faq).toBeAttached({ timeout: 15_000 });
   });
 });

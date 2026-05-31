@@ -455,6 +455,10 @@ export default async function handler(req: Request): Promise<Response> {
       : '';
 
   // ── SHARED SYSTEM CONTEXT ─────────────────────────────────────────────────
+  const identity = isCompanyMode
+    ? 'You are Solaris CET AI — a professional assistant for Solaris CET company services (PV, construction, roofing).'
+    : 'You are Solaris CET AI — a helpful assistant for Solaris CET and general crypto/DeFi questions.';
+
   const sharedContext =
     multiTurnHint +
     (contextMode === 'company'

@@ -1,3 +1,5 @@
+import { spawnSync } from 'node:child_process';
+
 const baseUrl = String(process.env.POST_DEPLOY_BASE_URL ?? '').trim();
 const port = String(process.env.PORT ?? '3000').trim();
 
@@ -49,7 +51,17 @@ const sha = String(process.env.GIT_SHA ?? process.env.SOURCE_COMMIT ?? process.e
 const env = String(process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV ?? 'production');
 
 const health = await fetchHealth().catch((e) => ({ url: 'unknown', ok: false, status: 0, json: { error: String(e) } }));
-const statusLine = health.ok ? 'HEALTH OK' : `HEALTH BAD (${health.status || 'no_response'})`;
+
+// Run full smoke test if we have a base URL
+let smokeOk = true;
+let smokeOutput = '';
+if (baseUrl) {
+  const smoke = spawnSync('node', ['scripts/smoke-http.mjs', `--base=${baseUrl}`], { encoding: 'utf8' });
+  smokeOk = smoke.status === 0;
+  smokeOutput = smoke.stdout || smoke.stderr;
+}
+
+const statusLine = (health.ok && smokeOk) ? 'HEALTH OK' : `HEALTH BAD (HTTP: ${health.status}, Smoke: ${smokeOk ? 'OK' : 'FAIL'})`;
 const version = typeof health.json?.version === 'string' ? health.json.version : null;
 
 const origin = baseUrl ? baseUrl.replace(/\/+$/, '') : `http://127.0.0.1:${port}`;

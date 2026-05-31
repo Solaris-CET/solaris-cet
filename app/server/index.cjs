@@ -214,6 +214,9 @@ function recordRequestMetric(method, pathname, statusCode, durationMs) {
   if (methodLabel === 'POST' && statusCode === 200 && pathname === '/api/admin/signup') {
     incMap(metrics.businessCounters, 'users_created_total|admin', 1);
   }
+  if (methodLabel === 'POST' && (statusCode === 200 || statusCode === 201) && pathname === '/api/support/start') {
+    incMap(metrics.businessCounters, 'contact_submissions_total', 1);
+  }
 }
 
 function formatPromMetrics() {
