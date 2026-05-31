@@ -1043,6 +1043,21 @@ async function main() {
       const reqUrl = getRequestUrl(req);
       const p = reqUrl.pathname;
 
+    if (p === '/health.json') {
+      res.statusCode = 200;
+      setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+      res.setHeader('Cache-Control', 'no-store');
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.end(
+        JSON.stringify({
+          ok: true,
+          uptime_s: Math.round(process.uptime()),
+          ts: new Date().toISOString(),
+        }),
+      );
+      return;
+    }
+
     if (p === '/favicon.ico') {
       try {
         const absPath = path.join(distDir, 'favicon-32x32.png');
@@ -1472,8 +1487,7 @@ async function main() {
       pathname.startsWith('/images/') ||
       pathname.startsWith('/fonts/') ||
       pathname.startsWith('/vendor/') ||
-      pathname.startsWith('/cinematic/') ||
-      pathname.startsWith('/_next/');
+      pathname.startsWith('/cinematic/');
     if (isStaticPrefix || isLikelyFileRequest(pathname)) {
       await serveNotFoundHtml(req, res, reqUrl);
       return;

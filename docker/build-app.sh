@@ -2,7 +2,6 @@
 set -eu
 
 export HUSKY=0
-export NEXT_TELEMETRY_DISABLED=1
 export CI=1
 
 if [ -z "${NODE_OPTIONS:-}" ]; then
@@ -12,4 +11,3 @@ fi
 npm --workspace=app run build
 npm --workspace=app run api:build
 npm prune --omit=dev
-

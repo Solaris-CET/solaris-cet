@@ -287,6 +287,7 @@ plugins.push(
         '**/assets/@react-three/postprocessing-*.js*',
       ],
       maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+      rollupFormat: 'iife',
     },
   }) as unknown as PluginOption,
 )
