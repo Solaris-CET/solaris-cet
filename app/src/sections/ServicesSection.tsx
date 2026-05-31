@@ -1,99 +1,203 @@
-import { Building2, Home, PlugZap, Settings, ShieldCheck } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { type ReactNode,useMemo } from 'react';
 
-const services = [
-  {
-    title: 'Instalații fotovoltaice',
-    id: 'fotovoltaice',
-    icon: PlugZap,
-    accent: 'text-amber-400',
-    description: 'Sisteme rezidențiale și industriale: proiectare, montaj, punere în funcțiune și mentenanță.',
-    features: ['Evaluare tehnică', 'Dimensionare corectă', 'Montaj profesionist', 'Monitorizare și optimizări'],
-    href: '/contact?service=fotovoltaice',
-  },
-  {
-    title: 'Lucrări de construcții',
-    id: 'constructii',
-    icon: Building2,
-    accent: 'text-sky-300',
-    description: 'Lucrări rezidențiale și industriale, structură, reparații și finisaje, după necesități.',
-    features: ['Execuție pe etape', 'Coordonare șantier', 'Detalii curate', 'Termene clare în ofertă'],
-    href: '/contact?service=constructii',
-  },
-  {
-    title: 'Acoperișuri (tablă / țiglă)',
-    id: 'acoperisuri',
-    icon: Home,
-    accent: 'text-emerald-300',
-    description: 'Montaj, reparații și înlocuiri: tablă, țiglă metalică și accesorii pentru etanșeitate.',
-    features: ['Detalii de etanșare', 'Sisteme pluviale', 'Reparații infiltrații', 'Finisaje rezistente'],
-    href: '/contact?service=acoperisuri',
-  },
-  {
-    title: 'Acoperișuri industriale (folie TPO)',
-    id: 'tpo',
-    icon: Building2,
-    accent: 'text-cyan-300',
-    description: 'Membrane TPO pentru hale și centre comerciale: montaj, reparații și mentenanță.',
-    features: ['Detalii la atice/străpungeri', 'Reparații punctuale', 'Inspecție + recomandări', 'Întreținere preventivă'],
-    href: '/contact?service=tpo',
-  },
-  {
-    title: 'Atice și fațade tablă',
-    id: 'atice-fatade',
-    icon: Building2,
-    accent: 'text-violet-300',
-    description: 'Montaje atice și fațade din tablă, finisaje curate și detalii rezistente.',
-    features: ['Montaj atice', 'Placări fațade', 'Reparații locale', 'Înlocuiri elemente'],
-    href: '/contact?service=atice-fatade',
-  },
-  {
-    title: 'Reparații și mentenanță',
-    id: 'reparatii',
-    icon: Settings,
-    accent: 'text-rose-300',
-    description: 'Intervenții rapide și mentenanță pentru fotovoltaice și acoperișuri.',
-    features: ['Diagnostic + soluție', 'Verificări periodice', 'Înlocuiri locale', 'Plan de mentenanță'],
-    href: '/contact?service=reparatii',
-  },
-];
+import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
+
+function IconFrame({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[#1e293b] bg-black/10 transition-colors duration-300 group-hover:border-amber-400/60 group-hover:bg-white/5">
+      {children}
+    </div>
+  );
+}
+
+function SvgIcon({ children }: { children: ReactNode }) {
+  return (
+    <svg
+      width="48"
+      height="48"
+      viewBox="0 0 44 44"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      className="text-slate-200 transition-colors duration-300 group-hover:text-amber-400"
+    >
+      <g stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        {children}
+      </g>
+    </svg>
+  );
+}
+
+function IconHouseSolar() {
+  return (
+    <SvgIcon>
+      <path d="M7 20.5L22 9l15 11.5" />
+      <path d="M11 19.5V33h22V19.5" />
+      <path d="M14 26h9" />
+      <path d="M14 29h9" />
+      <path d="M25.5 24.5h10v7h-10z" />
+      <path d="M25.5 27.5h10" />
+      <path d="M30.5 24.5v7" />
+      <path d="M11 33h22" />
+    </SvgIcon>
+  );
+}
+
+function IconIndustrialSolar() {
+  return (
+    <SvgIcon>
+      <path d="M8 33h28" />
+      <path d="M10 33V20l7-6 6 5 5-4 8 6v12" />
+      <path d="M12.5 23.5h10.5" />
+      <path d="M12.5 26.5h10.5" />
+      <path d="M25.5 24.5h10v7h-10z" />
+      <path d="M25.5 27.5h10" />
+      <path d="M30.5 24.5v7" />
+    </SvgIcon>
+  );
+}
+
+function IconRoofSlope() {
+  return (
+    <SvgIcon>
+      <path d="M8 28l14-12 14 12" />
+      <path d="M10.5 28h23" />
+      <path d="M14 22.5l8-7 8 7" />
+      <path d="M17 28v-4.5" />
+      <path d="M22 28v-7" />
+      <path d="M27 28v-3" />
+    </SvgIcon>
+  );
+}
+
+function IconFlatTpo() {
+  return (
+    <SvgIcon>
+      <path d="M9 31h26" />
+      <path d="M12 31V20h20v11" />
+      <path d="M12 20l6-4h8l6 4" />
+      <path d="M15 24h14" />
+      <path d="M15 27h14" />
+      <path d="M18 14h8" />
+      <path d="M22 12v4" />
+    </SvgIcon>
+  );
+}
+
+function IconFacade() {
+  return (
+    <SvgIcon>
+      <path d="M10 33h24" />
+      <path d="M12 33V12h20v21" />
+      <path d="M16 16v13" />
+      <path d="M20 16v13" />
+      <path d="M24 16v13" />
+      <path d="M28 16v13" />
+      <path d="M12 12h20" />
+    </SvgIcon>
+  );
+}
+
+function IconRepair() {
+  return (
+    <SvgIcon>
+      <path d="M9 27l13-11 13 11" />
+      <path d="M12 27h20" />
+      <path d="M14.5 31.5l6-6" />
+      <path d="M22.5 33.5l-6-6" />
+      <path d="M26.5 30.5l6-6" />
+      <path d="M30.5 24.5l-2 2" />
+      <path d="M31.5 23.5l1 1" />
+    </SvgIcon>
+  );
+}
 
 export default function ServicesSection() {
+  const services = useMemo(
+    () => [
+      {
+        title: 'Fotovoltaice Rezidențiale',
+        id: 'fotovoltaice-rezidentiale',
+        icon: <IconHouseSolar />,
+        description: 'Sisteme dimensionate pe consum, orientare și umbriri, cu monitorizare și suport post-instalare.',
+        href: '/servicii/fotovoltaice-rezidentiale',
+      },
+      {
+        title: 'Fotovoltaice Industriale',
+        id: 'fotovoltaice-industriale',
+        icon: <IconIndustrialSolar />,
+        description: 'Proiectare și execuție pentru hale și spații comerciale, cu focus pe eficiență și siguranță.',
+        href: '/servicii/fotovoltaice-industriale',
+      },
+      {
+        title: 'Acoperișuri Tablă/Țiglă',
+        id: 'acoperisuri-tabla-tigla',
+        icon: <IconRoofSlope />,
+        description: 'Montaj, reparații și înlocuiri cu detalii curate, etanșări corecte și accesorii complete.',
+        href: '/servicii/acoperisuri-tabla-tigla',
+      },
+      {
+        title: 'Acoperișuri Industriale TPO',
+        id: 'acoperisuri-tpo',
+        icon: <IconFlatTpo />,
+        description: 'Montaj și reparații membrane TPO pentru clădiri industriale, atice și străpungeri fără compromis.',
+        href: '/servicii/acoperisuri-industriale-tpo',
+      },
+      {
+        title: 'Atice și Fațade Tablă',
+        id: 'atice-fatade-tabla',
+        icon: <IconFacade />,
+        description: 'Placări moderne, muchii precise și soluții durabile pentru atice, fațade și elemente de anvelopă.',
+        href: '/servicii/atice-si-fatade-tabla',
+      },
+      {
+        title: 'Reparații și Mentenanță',
+        id: 'reparatii-mentenanta',
+        icon: <IconRepair />,
+        description: 'Diagnostic rapid, intervenții punctuale și mentenanță preventivă pentru acoperișuri și fotovoltaice.',
+        href: '/servicii/reparatii-si-mentenanta',
+      },
+    ],
+    []
+  );
+
+  const { elementRef, isVisible } = useIntersectionObserver<HTMLElement>({
+    threshold: 0.2,
+    rootMargin: '0px 0px -10% 0px',
+    freezeOnceVisible: true,
+  });
+
   return (
-    <section className="py-24 bg-slate-900/50 relative overflow-hidden">
+    <section id="servicii" ref={elementRef} className="py-24 relative overflow-hidden bg-[#05060B]">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 relative z-10">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Serviciile Noastre</h2>
-          <p className="text-slate-400 max-w-2xl mx-auto text-lg">
-            Solaris CET oferă servicii complete: fotovoltaice, construcții, acoperișuri tablă/țiglă/TPO, atice și fațade tablă, reparații.
-          </p>
+          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Serviciile noastre</h2>
+          <p className="text-slate-400 max-w-2xl mx-auto text-lg">Soluții complete pentru energie și construcții</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((service) => {
-            const Icon = service.icon;
-            return (
+          {services.map((service, idx) => (
             <a
               key={service.id}
               href={service.href}
-              className="bg-black/30 border border-white/10 p-7 rounded-3xl hover:border-solaris-gold/40 transition-colors group hover:bg-black/40"
+              className="group rounded-3xl border border-[#1e293b] bg-[#0d1117] p-7 transition-all duration-300 hover:scale-[1.02] hover:border-amber-400 hover:bg-[#101826] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 motion-reduce:transform-none"
+              style={{
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? 'translateY(0px)' : 'translateY(14px)',
+                transitionDelay: `${idx * 100}ms`,
+              }}
             >
-              <div className="mb-6 p-4 bg-white/5 rounded-2xl w-fit group-hover:scale-110 transition-transform">
-                <Icon className={`h-8 w-8 ${service.accent}`} aria-hidden />
+              <IconFrame>{service.icon}</IconFrame>
+              <h3 className="mt-5 text-xl font-medium text-white">{service.title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-slate-400">{service.description}</p>
+              <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-amber-300 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-1 motion-reduce:opacity-100 motion-reduce:translate-x-0">
+                Află mai mult
+                <ArrowRight className="h-4 w-4" aria-hidden />
               </div>
-              <h3 className="text-xl font-bold text-white mb-4">{service.title}</h3>
-              <p className="text-slate-400 mb-6 text-sm leading-relaxed">
-                {service.description}
-              </p>
-              <ul className="space-y-3">
-                {service.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-center gap-2 text-[13px] text-slate-300">
-                    <ShieldCheck size={16} className="text-amber-400" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
             </a>
-          )})}
+          ))}
         </div>
       </div>
     </section>

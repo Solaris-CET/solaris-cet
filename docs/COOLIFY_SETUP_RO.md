@@ -58,6 +58,13 @@ IMPORTANT (anti-fail + anti-leak):
 - Nu trimite secrete ca Build Args. Dacă le pui la build, Coolify poate încerca să le insereze în Dockerfile final (vizibil în logs) și riști să pice build-ul / să expui secrete.
 - În repo-ul acesta, build-ul nu are nevoie de `DATABASE_URL` sau `ADMIN_BOOTSTRAP_PASSWORD`. Acestea trebuie setate doar la runtime.
 
+### Dacă build-ul moare brusc (Exit Code 255)
+
+Cel mai des este un OOM kill în containerul de build (spike de memorie la `next build`). Soluții:
+
+- Crește memory limit pentru build în Coolify.
+- Configurează swap pe host (ex: 8–16GB) și rulează redeploy cu "No Cache".
+
 ### Buildtime (ON la build)
 
 - `VITE_PUBLIC_SITE_URL`

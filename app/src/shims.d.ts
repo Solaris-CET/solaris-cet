@@ -67,6 +67,7 @@ declare module 'lucide-react' {
     export const Brain: LucideIcon;
     export const Building2: LucideIcon;
     export const Calculator: LucideIcon;
+    export const Camera: LucideIcon;
     export const Calendar: LucideIcon;
     export const CalendarClock: LucideIcon;
     export const CalendarDays: LucideIcon;
@@ -85,6 +86,7 @@ declare module 'lucide-react' {
     export const Circle: LucideIcon;
     export const CircleCheckIcon: LucideIcon;
     export const CircleIcon: LucideIcon;
+    export const CircleDollarSign: LucideIcon;
     export const CircleX: LucideIcon;
     export const ClipboardList: LucideIcon;
     export const Clock: LucideIcon;
@@ -156,6 +158,7 @@ declare module 'lucide-react' {
     export const Percent: LucideIcon;
     export const Pickaxe: LucideIcon;
     export const Pin: LucideIcon;
+    export const Phone: LucideIcon;
     export const Play: LucideIcon;
     export const PlugZap: LucideIcon;
     export const Plus: LucideIcon;

@@ -5,21 +5,22 @@
 module.exports = {
   ci: {
     collect: {
-      staticDistDir: './dist',
+      staticDistDir: './out',
+      url: ['/index.html'],
       numberOfRuns: 1,
       settings: {
         preset: 'desktop',
         throttlingMethod: 'provided',
         onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo'],
+        chromeFlags: '--no-sandbox --disable-dev-shm-usage',
       },
     },
     assert: {
       assertions: {
-        // Stricter than legacy 0.4 floor; static dist + third-party scripts vary by Lighthouse run.
-        'categories:performance': ['error', { minScore: 0.65 }],
-        'categories:accessibility': ['error', { minScore: 0.8 }],
-        'categories:best-practices': ['error', { minScore: 0.65 }],
-        'categories:seo': ['error', { minScore: 0.8 }],
+        'categories:performance': ['error', { minScore: 0.9 }],
+        'categories:accessibility': ['error', { minScore: 0.9 }],
+        'categories:best-practices': ['error', { minScore: 0.9 }],
+        'categories:seo': ['error', { minScore: 0.95 }],
         'document-title': 'error',
         'html-has-lang': 'error',
         'image-alt': 'error',

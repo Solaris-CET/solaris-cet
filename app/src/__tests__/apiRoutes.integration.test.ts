@@ -1,4 +1,4 @@
-import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../api/lib/cors', () => ({
   getAllowedOrigin: () => 'https://allowed.test',
@@ -49,29 +49,29 @@ vi.mock('openai', () => {
 });
 
 import chatHandler from '../../api/chat/route';
-import healthHandler from '../../api/health/route';
+import healthRoute from '../../api/health/route';
 
 function jsonBody(res: Response): Promise<unknown> {
   return res.text().then((t) => (t ? (JSON.parse(t) as unknown) : null));
 }
 
 describe('API routes integration', () => {
-  const envSnapshot = { ...process.env };
+  const originalEnv = { ...process.env };
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    process.env = { ...envSnapshot };
+    process.env = { ...originalEnv };
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
     consoleErrorSpy.mockRestore();
-    process.env = { ...envSnapshot };
+    process.env = { ...originalEnv };
   });
 
   it('/api/health: OPTIONS returns 204 with CORS headers', async () => {
     const req = new Request('http://test/api/health', { method: 'OPTIONS', headers: { origin: 'https://x.test' } });
-    const res = await healthHandler(req);
+    const res = await healthRoute(req);
     expect(res.status).toBe(204);
     expect(res.headers.get('Access-Control-Allow-Origin')).toBe('https://allowed.test');
     expect(res.headers.get('Access-Control-Allow-Methods')).toContain('GET');
@@ -84,7 +84,7 @@ describe('API routes integration', () => {
     process.env.GEMINI_API_KEY = 'gemini-test';
 
     const req = new Request('http://test/api/health', { method: 'GET', headers: { origin: 'https://x.test' } });
-    const res = await healthHandler(req);
+    const res = await healthRoute(req);
     expect(res.status).toBe(200);
     const body = (await jsonBody(res)) as {
       status: string;

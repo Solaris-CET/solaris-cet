@@ -696,6 +696,59 @@ async function serveFile(res, absPath) {
   createReadStream(absPath).pipe(res);
 }
 
+function injectCspNonceIntoHtml(html, nonce) {
+  if (!nonce) return html;
+  const withPlaceholder = html.includes('__CSP_NONCE__') ? html.replaceAll('__CSP_NONCE__', nonce) : html;
+  const withScriptNonces = withPlaceholder.replace(/<script\b(?![^>]*\bnonce=)([^>]*)>/gi, `<script nonce="${nonce}"$1>`);
+  return withScriptNonces.replace(/<style\b(?![^>]*\bnonce=)([^>]*)>/gi, `<style nonce="${nonce}"$1>`);
+}
+
+async function serveHtmlFile(req, res, reqUrl, absPath, statusCode = 200) {
+  const nonce = generateNonce();
+  setSecurityHeaders(res, { nonce, isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+  res.statusCode = statusCode;
+  res.setHeader('Content-Type', contentTypes['.html']);
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  const html = String(await readFileStable(absPath));
+  const withNonce = injectCspNonceIntoHtml(html, nonce);
+  const raw = Buffer.from(withNonce, 'utf8');
+  if (raw.length >= 1024 && shouldServeBrotli(req)) {
+    const br = zlib.brotliCompressSync(raw, { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 4 } });
+    res.setHeader('Content-Encoding', 'br');
+    res.setHeader('Vary', 'Accept-Encoding');
+    res.end(br);
+    return;
+  }
+  if (raw.length >= 1024 && shouldServeGzip(req)) {
+    const gz = zlib.gzipSync(raw);
+    res.setHeader('Content-Encoding', 'gzip');
+    res.setHeader('Vary', 'Accept-Encoding');
+    res.end(gz);
+    return;
+  }
+  res.end(raw);
+}
+
+async function serveNotFoundHtml(req, res, reqUrl) {
+  const candidates = [path.join(distDir, '404.html'), path.join(distDir, '404', 'index.html')];
+  for (const p of candidates) {
+    try {
+      const st = await stat(p);
+      if (st.isFile()) {
+        await serveHtmlFile(req, res, reqUrl, p, 404);
+        return;
+      }
+    } catch {
+      void 0;
+    }
+  }
+  res.statusCode = 404;
+  setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-store');
+  res.end('Not found');
+}
+
 async function tryServeStatic(req, reqUrl, res) {
   let pathname = decodeURIComponent(reqUrl.pathname);
   if (pathname.includes('\0')) return false;
@@ -748,13 +801,12 @@ async function tryServeStatic(req, reqUrl, res) {
 
       const st = await stat(absPath);
       if (!st.isFile()) continue;
-      const nonce = absPath === path.join(distDir, 'index.html') ? generateNonce() : '';
-      setSecurityHeaders(res, { nonce, isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
-      if (nonce) {
-        await serveSpaIndex(req, res, nonce, reqUrl.protocol === 'https:', reqUrl.origin);
-      } else {
-        await serveFile(res, absPath);
+      if (path.extname(absPath).toLowerCase() === '.html') {
+        await serveHtmlFile(req, res, reqUrl, absPath);
+        return true;
       }
+      setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+      await serveFile(res, absPath);
       return true;
     }
     return false;
@@ -1013,6 +1065,11 @@ async function main() {
     }
 
     const URL_LOCALES = ['en', 'es', 'zh', 'ru', 'ro', 'pt', 'de'];
+    const ENABLE_LOCALE_PREFIX = (() => {
+      const v = String(process.env.ENABLE_LOCALE_PREFIX ?? '').trim();
+      if (!v) return false;
+      return v !== '0' && v.toLowerCase() !== 'false';
+    })();
     const normalizePathname = (pathname) => {
       const s = String(pathname || '/');
       const withSlash = s.startsWith('/') ? s : `/${s}`;
@@ -1068,7 +1125,15 @@ async function main() {
       if (normalized === '/privacy-policy') return '/privacy';
       if (normalized === '/terms-and-conditions') return '/terms';
       if (normalized === '/cookie-policy') return '/cookies';
+      if (normalized === '/privacy') return '/politica-confidentialitate';
+      if (normalized === '/cookies') return '/politica-cookies';
       return normalized;
+    };
+    const canonicalizePathname = (pathnameNoLocale) => {
+      const base = rewriteLegacyPathnameNoLocale(pathnameNoLocale);
+      if (!shouldLocalePrefixPathname(base)) return base;
+      if (base === '/') return '/';
+      return base.endsWith('/') ? base : `${base}/`;
     };
     const localizePathname = (pathnameNoLocale, locale) => {
       const base = rewriteLegacyPathnameNoLocale(pathnameNoLocale);
@@ -1103,7 +1168,7 @@ async function main() {
       return 'en';
     };
 
-    if ((req.method === 'GET' || req.method === 'HEAD') && shouldLocalePrefixPathname(p)) {
+    if ((req.method === 'GET' || req.method === 'HEAD') && ENABLE_LOCALE_PREFIX && shouldLocalePrefixPathname(p)) {
       const accept = String(req.headers.accept || '');
       const acceptsHtml = !accept || accept.includes('text/html') || accept.includes('*/*');
       if (acceptsHtml) {
@@ -1147,6 +1212,22 @@ async function main() {
             return;
           }
         }
+      }
+    }
+
+    if ((req.method === 'GET' || req.method === 'HEAD') && !ENABLE_LOCALE_PREFIX) {
+      const localeMatch = p.match(/^\/(en|es|zh|ru|ro|pt|de)(\/.*)?$/);
+      if (localeMatch) {
+        const restRaw = localeMatch[2] ?? '/';
+        const target = canonicalizePathname(restRaw);
+        const location = new URL(reqUrl.toString());
+        location.pathname = target;
+        res.statusCode = 301;
+        setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+        res.setHeader('Location', location.toString());
+        res.setHeader('Cache-Control', 'no-store');
+        res.end();
+        return;
       }
     }
 
@@ -1386,16 +1467,13 @@ async function main() {
       pathname.startsWith('/images/') ||
       pathname.startsWith('/fonts/') ||
       pathname.startsWith('/vendor/') ||
-      pathname.startsWith('/cinematic/');
+      pathname.startsWith('/cinematic/') ||
+      pathname.startsWith('/_next/');
     if (isStaticPrefix || isLikelyFileRequest(pathname)) {
-      res.statusCode = 404;
-      setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
-      res.setHeader('Cache-Control', 'no-store');
-      res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.end(JSON.stringify({ error: 'Not found' }));
+      await serveNotFoundHtml(req, res, reqUrl);
       return;
     }
-    await serveIndex(req, res, reqUrl);
+    await serveNotFoundHtml(req, res, reqUrl);
     } catch (err) {
       try {
         incMap(metrics.logCounters, 'server_error', 1);

@@ -283,6 +283,7 @@ export default async function handler(req: Request): Promise<Response> {
   const context =
     typeof body.context === 'object' && body.context !== null ? (body.context as Record<string, unknown>) : null;
   const contextMode = typeof context?.mode === 'string' ? context.mode : '';
+  const isCompanyMode = contextMode === 'company';
   const contextDepartment = typeof context?.department === 'string' ? context.department : '';
 
   if (!userQuery || typeof userQuery !== 'string' || !userQuery.trim()) {
@@ -351,7 +352,7 @@ export default async function handler(req: Request): Promise<Response> {
 
   if (!grokKey && !geminiKey && !claudeKey) {
     const isRo = /[ăâîșț]/i.test(trimmedQuery) || /\b(ce|cat|cât|vreau|ofert[ăa]|acoperiș|fotovoltaic|reparații|mentenanță|montaj)\b/i.test(trimmedQuery);
-    const isCompany = contextMode === 'company' || /\b(fotovoltaic|panouri|acoperiș|tpo|șarpantă|țiglă|tablă|atice|fațade|ofert[ăa])\b/i.test(trimmedQuery);
+    const isCompany = isCompanyMode || /\b(fotovoltaic|panouri|acoperiș|tpo|șarpantă|țiglă|tablă|atice|fațade|ofert[ăa])\b/i.test(trimmedQuery);
     const intro = isRo
       ? 'Asistentul AI avansat este dezactivat (nu sunt configurate chei). Totuși, pot să te ajut să obții rapid o ofertă.'
       : 'Advanced AI is disabled (no provider keys configured). I can still help you get a quote quickly.';
@@ -425,7 +426,7 @@ export default async function handler(req: Request): Promise<Response> {
     budget,
   });
 
-  if (contextMode === 'company') {
+  if (isCompanyMode) {
     plan = { ...plan, useOnChain: false, useWebRetrieval: false };
   }
 
@@ -457,7 +458,7 @@ export default async function handler(req: Request): Promise<Response> {
   // ── SHARED SYSTEM CONTEXT ─────────────────────────────────────────────────
   const sharedContext =
     multiTurnHint +
-    (contextMode === 'company'
+    (isCompanyMode
       ? `You are Solaris CET — a helpful assistant for a Romania-based company delivering photovoltaic installations, construction works, roofing (metal sheet / metal tiles / TPO membrane), metal parapets and facades, plus repairs and maintenance.\n\n`
       : `You are Solaris CET AI — a helpful assistant for Solaris CET and general crypto/DeFi questions.\n\n`) +
     `LANGUAGE: Reply in the same language as the user's latest message.\n\n` +

@@ -4,6 +4,9 @@ FROM node:${NODE_VERSION}-alpine AS builder
 
 WORKDIR /repo
 
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV CI=1
+
 ARG VITE_PUBLIC_SITE_URL
 ARG VITE_GOOGLE_SITE_VERIFICATION
 ARG VITE_GIT_COMMIT_HASH
@@ -25,15 +28,19 @@ COPY scripts/ scripts/
 COPY static/ static/
 COPY CHANGELOG.md CHANGELOG.md
 
+COPY docker/build-app.sh /usr/local/bin/build-app
+
 # Build the frontend app.
 COPY app/ app/
+ENV NEXT_TELEMETRY_DISABLED=1
 ENV VITE_PUBLIC_SITE_URL=${VITE_PUBLIC_SITE_URL}
 ENV VITE_GOOGLE_SITE_VERIFICATION=${VITE_GOOGLE_SITE_VERIFICATION}
 ENV VITE_GIT_COMMIT_HASH=${VITE_GIT_COMMIT_HASH}
 ENV VITE_BUILD_TIMESTAMP=${VITE_BUILD_TIMESTAMP}
 ENV GIT_SHA=${GIT_SHA}
 ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
-RUN --mount=type=cache,target=/root/.npm npm run build --workspace=app && npm run api:build --workspace=app && npm prune --omit=dev
+ENV NODE_OPTIONS=--max-old-space-size=4096
+RUN --mount=type=cache,target=/root/.npm chmod +x /usr/local/bin/build-app && /usr/local/bin/build-app
 
 FROM node:${NODE_VERSION}-alpine AS runner
 
@@ -47,6 +54,8 @@ COPY --from=builder --chown=app:app /repo/node_modules /app/node_modules
 COPY --from=builder --chown=app:app /repo/app/dist /app/dist
 COPY --from=builder --chown=app:app /repo/app/.api-dist /app/.api-dist
 COPY --from=builder --chown=app:app /repo/app/server /app/server
+
+ENV NODE_OPTIONS=--max-old-space-size=512
 
 EXPOSE 3000
 

@@ -19,8 +19,11 @@ vi.mock('../hooks/useLanguage', () => ({
       nav: {
         primaryNavigation: 'Primary navigation',
         home: 'Home',
+        about: 'About',
+        portfolio: 'Portfolio',
         services: 'Services',
-        products: 'Products',
+        financing: 'Financing',
+        blog: 'Blog',
         cetToken: 'CET token',
         contact: 'Contact',
         requestOffer: 'Request offer',
@@ -75,7 +78,10 @@ describe('Navigation', () => {
     expect(screen.getAllByRole('navigation', { name: 'Primary navigation' }).length).toBeGreaterThan(0);
     expect(screen.getAllByText('Home').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Services').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Products').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Portfolio').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Financing').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Blog').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('About').length).toBeGreaterThan(0);
     expect(screen.getAllByText('CET token').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Contact').length).toBeGreaterThan(0);
   });

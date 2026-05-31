@@ -53,12 +53,15 @@ export default function Navigation() {
       return [
         { key: 'home', label: t.nav.home, href: isHome ? '#hero' : homePath },
         { key: 'services', label: t.nav.services, href: isHome ? '#servicii' : anchor('servicii') },
-        { key: 'products', label: t.nav.products, href: isHome ? '#produse' : anchor('produse') },
+        { key: 'portfolio', label: t.nav.portfolio, href: isHome ? '#proiecte' : anchor('proiecte') },
+        { key: 'financing', label: t.nav.financing, href: localizePathname('/finantare', urlLocale) },
+        { key: 'blog', label: t.nav.blog, href: localizePathname('/blog', urlLocale) },
+        { key: 'about', label: t.nav.about, href: localizePathname('/despre', urlLocale) },
         { key: 'token', label: t.nav.cetToken, href: localizePathname('/token-cet', urlLocale) },
         { key: 'contact', label: t.nav.contact, href: localizePathname('/contact', urlLocale) },
       ];
     },
-    [t.nav.cetToken, t.nav.contact, t.nav.home, t.nav.products, t.nav.services, urlLocale],
+    [t.nav.about, t.nav.blog, t.nav.cetToken, t.nav.contact, t.nav.financing, t.nav.home, t.nav.portfolio, t.nav.services, urlLocale],
   );
 
   const [activeHref, setActiveHref] = useState<string>('/');
@@ -97,7 +100,17 @@ export default function Navigation() {
   useEffect(() => {
     const pathname = typeof window !== 'undefined' ? (window.location.pathname || '/') : '/';
     const normalized = pathname !== '/' ? pathname.replace(/\/$/, '') : '/';
-    const best = navLinks.find((l) => l.href === normalized)?.href ?? (normalized.startsWith('/servicii') ? '/servicii' : normalized);
+    const best =
+      navLinks.find((l) => l.href === normalized)?.href ??
+      (normalized.startsWith('/servicii')
+        ? '/servicii'
+        : normalized.startsWith('/finantare')
+          ? '/finantare'
+          : normalized.startsWith('/blog')
+            ? '/blog'
+            : normalized.startsWith('/despre')
+              ? '/despre'
+              : normalized);
     setActiveHref(best);
   }, [navLinks]);
 

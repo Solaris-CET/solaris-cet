@@ -110,45 +110,87 @@ export default function ArticlesPage() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {filtered.map((p) => {
-                const href = localizePathname(`/blog/${p.slug}`, locale)
-                return (
-                  <a
-                    key={`${p.locale}:${p.slug}`}
-                    href={href}
+            <div>
+              <div className="mb-5 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className={cn(
+                    'px-4 py-2 rounded-full border text-sm font-semibold transition-colors',
+                    !filters.category
+                      ? 'border-emerald-400/40 bg-emerald-400/10 text-emerald-200'
+                      : 'border-white/10 bg-white/5 text-solaris-muted hover:text-solaris-text',
+                  )}
+                  onClick={() => {
+                    setFilters((s) => ({ ...s, category: '' }))
+                    const url = new URL(window.location.href)
+                    url.searchParams.delete('category')
+                    window.history.replaceState({}, '', url.toString())
+                  }}
+                >
+                  {t.blog.all}
+                </button>
+                {categories.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
                     className={cn(
-                      'bento-card p-6 border border-white/10 hover:border-solaris-gold/30 transition-colors',
-                      'group block',
+                      'px-4 py-2 rounded-full border text-sm font-semibold transition-colors',
+                      filters.category === c
+                        ? 'border-emerald-400/40 bg-emerald-400/10 text-emerald-200'
+                        : 'border-white/10 bg-white/5 text-solaris-muted hover:text-solaris-text',
                     )}
+                    onClick={() => {
+                      setFilters((s) => ({ ...s, category: c }))
+                      const url = new URL(window.location.href)
+                      url.searchParams.set('category', c)
+                      window.history.replaceState({}, '', url.toString())
+                    }}
                   >
-                    <div className="flex items-center gap-2 text-[11px] font-mono text-solaris-muted">
-                      <Calendar className="w-3.5 h-3.5" aria-hidden />
-                      <span>{p.frontmatter.date}</span>
-                      {p.frontmatter.category ? (
-                        <span className="ml-auto">
-                          <Badge variant="secondary">{p.frontmatter.category}</Badge>
-                        </span>
+                    {c}
+                  </button>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {filtered.map((p) => {
+                  const href = localizePathname(`/blog/${p.slug}`, locale)
+                  return (
+                    <a
+                      key={`${p.locale}:${p.slug}`}
+                      href={href}
+                      className={cn(
+                        'bento-card p-6 border border-white/10 hover:border-solaris-gold/30 transition-colors',
+                        'group block',
+                      )}
+                    >
+                      <div className="flex items-center gap-2 text-[11px] font-mono text-solaris-muted">
+                        <Calendar className="w-3.5 h-3.5" aria-hidden />
+                        <span>{p.frontmatter.date}</span>
+                        {p.frontmatter.category ? (
+                          <span className="ml-auto">
+                            <Badge variant="secondary">{p.frontmatter.category}</Badge>
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="mt-3">
+                        <div className="font-display text-lg text-solaris-text group-hover:text-solaris-gold transition-colors">
+                          {p.frontmatter.title}
+                        </div>
+                        <div className="mt-2 text-sm text-solaris-muted line-clamp-3">{p.frontmatter.description}</div>
+                      </div>
+                      {(p.frontmatter.tags?.length ?? 0) > 0 ? (
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {(p.frontmatter.tags ?? []).slice(0, 4).map((tag) => (
+                            <Badge key={tag} variant="outline" className="border-white/10 text-solaris-muted">
+                              #{tag}
+                            </Badge>
+                          ))}
+                        </div>
                       ) : null}
-                    </div>
-                    <div className="mt-3">
-                      <div className="font-display text-lg text-solaris-text group-hover:text-solaris-gold transition-colors">
-                        {p.frontmatter.title}
-                      </div>
-                      <div className="mt-2 text-sm text-solaris-muted line-clamp-3">{p.frontmatter.description}</div>
-                    </div>
-                    {(p.frontmatter.tags?.length ?? 0) > 0 ? (
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {(p.frontmatter.tags ?? []).slice(0, 4).map((tag) => (
-                          <Badge key={tag} variant="outline" className="border-white/10 text-solaris-muted">
-                            #{tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    ) : null}
-                  </a>
-                )
-              })}
+                    </a>
+                  )
+                })}
+              </div>
             </div>
           )}
         </div>

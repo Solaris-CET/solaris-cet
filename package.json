@@ -14,7 +14,8 @@
   },
   "scripts": {
     "app:dev": "npm --workspace=app run dev --",
-    "app:build": "npm run build --workspace=app",
+    "app:build": "npm run build --workspace=app && npm run api:build --workspace=app",
+    "app:build:next": "npm run build --workspace=app",
     "app:verify": "npm run verify --workspace=app",
     "engine:start": "cd engine && ./farming-engine",
     "app:test:e2e": "npm run test:e2e --workspace=app",

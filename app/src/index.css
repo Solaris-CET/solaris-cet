@@ -25,6 +25,12 @@
 
   :root {
     /* Premium Dark & Gold — slate-950 canvas (#020617) */
+    --bg-primary: #05060b;
+    --bg-secondary: #0d1117;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --brand-accent: #f59e0b;
+    --brand-border: #1e293b;
     --background: 222.2 84% 4.9%;
     --foreground: 0 0% 100%;
     --card: 240 6% 8%;
@@ -98,6 +104,12 @@
   }
 
   .light {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --brand-accent: #d97706;
+    --brand-border: #e2e8f0;
     --background: 210 40% 98%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -124,6 +136,15 @@
     --solaris-void: #f8fafc;
     --solaris-panel: rgba(255, 255, 255, 0.92);
   }
+
+  html[data-theme='light'] {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --brand-accent: #d97706;
+    --brand-border: #e2e8f0;
+  }
 }
 
 @layer base {
@@ -132,7 +153,7 @@
   }
   
   html {
-    scroll-behavior: auto;
+    scroll-behavior: smooth;
     /* Chrome / Edge: native scrollbars, form controls, and form-factor UI match dark canvas */
     color-scheme: dark;
     @apply min-h-dvh bg-background text-foreground;
@@ -155,6 +176,7 @@
     min-height: 100vh;
     overflow-x: hidden;
     overscroll-behavior-x: none;
+    transition: background-color 200ms, color 200ms;
     font-feature-settings: "ss01" on, "cv01" on;
     /* Chromium: consistent legibility on LCD + mobile */
     text-rendering: optimizeLegibility;
@@ -165,6 +187,24 @@
   /** Premium micro-interactions: all native buttons animate cohesively */
   button {
     @apply transition-all duration-300 ease-out;
+  }
+
+  :where(a, button, input, select, textarea, summary, [role='button']):focus-visible {
+    outline: 2px solid var(--brand-accent);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 
   h1, h2, h3, h4, h5, h6 {

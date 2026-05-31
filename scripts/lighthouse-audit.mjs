@@ -13,7 +13,7 @@ async function resolveChromePath() {
   if (fromEnv) return fromEnv;
 
   try {
-    const m = await import('playwright');
+    const m = await import('@playwright/test');
     const p = m?.chromium?.executablePath?.();
     if (typeof p === 'string' && p.trim()) return p.trim();
   } catch {

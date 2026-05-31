@@ -1,10 +1,12 @@
 import { marked } from 'marked'
 
-import { extractFrontmatter } from './frontmatter'
-
 import launchEn from '../content/blog/en/launch.md?raw'
 import launchEs from '../content/blog/es/launch.md?raw'
+import pvCostRo from '../content/blog/ro/cat-costa-un-sistem-fotovoltaic-2026.md?raw'
 import launchRo from '../content/blog/ro/launch.md?raw'
+import pvMaintenanceRo from '../content/blog/ro/mentenanta-panouri-fotovoltaice.md?raw'
+import roofCompareRo from '../content/blog/ro/tabla-click-vs-tigla-metalica.md?raw'
+import { extractFrontmatter } from './frontmatter'
 
 export type BlogLocale = 'en' | 'ro' | 'es'
 
@@ -15,6 +17,8 @@ export type BlogFrontmatter = {
   category?: string
   tags?: string[]
   coverImageUrl?: string
+  author?: string
+  readingTimeMinutes?: number
 }
 
 export type BlogPost = {
@@ -59,12 +63,34 @@ function extractLocaleAndSlug(filePath: string): { locale: BlogLocale; slug: str
 function parseFrontmatter(input: unknown): BlogFrontmatter {
   const data = typeof input === 'object' && input !== null ? (input as Record<string, unknown>) : {}
   const title = typeof data.title === 'string' ? data.title : ''
-  const description = typeof data.description === 'string' ? data.description : ''
+  const description =
+    typeof data.description === 'string'
+      ? data.description
+      : typeof data.descriere === 'string'
+        ? data.descriere
+        : ''
   const date = typeof data.date === 'string' ? data.date : ''
-  const category = typeof data.category === 'string' ? data.category : undefined
+  const category =
+    typeof data.category === 'string'
+      ? data.category
+      : typeof data.categoria === 'string'
+        ? data.categoria
+        : undefined
   const tags = Array.isArray(data.tags) ? data.tags.filter((t) => typeof t === 'string') : undefined
-  const coverImageUrl = typeof data.coverImageUrl === 'string' ? data.coverImageUrl : undefined
-  return { title, description, date, category, tags, coverImageUrl }
+  const coverImageUrl =
+    typeof data.coverImageUrl === 'string'
+      ? data.coverImageUrl
+      : typeof data.imagine === 'string'
+        ? data.imagine
+        : undefined
+  const author = typeof data.author === 'string' ? data.author : typeof data.autor === 'string' ? data.autor : undefined
+  const readingTimeMinutes =
+    typeof data.readingTimeMinutes === 'number'
+      ? data.readingTimeMinutes
+      : typeof data.timp_citire === 'number'
+        ? data.timp_citire
+        : undefined
+  return { title, description, date, category, tags, coverImageUrl, author, readingTimeMinutes }
 }
 
 function safeDateMs(iso: string): number {
@@ -76,6 +102,9 @@ const rawModules: Record<string, string> = {
   '../content/blog/en/launch.md?raw': launchEn,
   '../content/blog/ro/launch.md?raw': launchRo,
   '../content/blog/es/launch.md?raw': launchEs,
+  '../content/blog/ro/cat-costa-un-sistem-fotovoltaic-2026.md?raw': pvCostRo,
+  '../content/blog/ro/tabla-click-vs-tigla-metalica.md?raw': roofCompareRo,
+  '../content/blog/ro/mentenanta-panouri-fotovoltaice.md?raw': pvMaintenanceRo,
 }
 
 const rawIndex: RawIndexItem[] = Object.entries(rawModules)

@@ -59,3 +59,29 @@ docker system prune -af --volumes
 ```
 
 În Coolify, redeclanșează deployment cu opțiunea "No Cache".
+
+## 7) Dacă build-ul moare brusc (Exit Code 255 / OOM)
+
+Simptom tipic: logul se oprește imediat după `npm ci`, înainte de `npm run build`, iar sesiunea de exec e terminată (exit 255). Cel mai des este un kill de memorie (OOM) în containerul de build.
+
+Recomandări:
+
+- În Coolify, crește limita de memorie pentru build (dacă există setare de resources/limits pentru build container).
+- Activează/crește swap pe host (Hetzner) ca să absoarbă spike-urile de la `next build`.
+
+Comenzi pe server (SSH) pentru swap (exemplu 8GB):
+
+```bash
+sudo fallocate -l 8G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+swapon --show
+free -h
+```
+
+Note:
+
+- Dacă ai limită strictă în Coolify pentru containerul de build, swap-ul host poate să nu fie suficient; atunci trebuie ridicată limita de memorie.
+- În repo, `Dockerfile` setează `NODE_OPTIONS=--max-old-space-size=4096` pentru a limita vârful de heap în timpul build-ului.
