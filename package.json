@@ -71,7 +71,9 @@
     "gaxios": "7.1.2",
     "gcp-metadata": "8.1.2",
     "mermaid": "11.14.0",
+    "ox": "0.14.22",
     "typescript": "6.0.3",
+    "viem": "2.50.4",
     "@esbuild-kit/core-utils": {
       "esbuild": "0.27.7"
     },
