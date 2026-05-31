@@ -16,16 +16,26 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+type WeatherState int
+
+const (
+	WeatherNormal WeatherState = iota
+	WeatherDrought
+	WeatherFlood
+)
+
 // Land reprezintă un teren virtual
 type Land struct {
-	mu          sync.Mutex
-	ID          uint64    `json:"id"`
-	Owner       string    `json:"owner"`        // TON address
-	SoilQuality float32   `json:"soil_quality"` // 0.0 - 1.0
-	WaterLevel  float32   `json:"water"`
-	SunExposure float32   `json:"sun"`
-	Crops       []Crop    `json:"crops"`
-	LastUpdate  time.Time `json:"last_update"`
+	mu           sync.Mutex
+	ID           uint64       `json:"id"`
+	Owner        string       `json:"owner"` // TON address
+	SoilQuality  float32      `json:"soil_quality"`
+	WaterLevel   float32      `json:"water"`
+	SunExposure  float32      `json:"sun"`
+	Weather      WeatherState `json:"weather"`
+	Crops        []Crop       `json:"crops"`
+	LastUpdate   time.Time    `json:"last_update"`
+	NutrientBuff float32      `json:"nutrient_buff"` // 0.0 - 1.0
 }
 
 // Crop reprezintă o cultură plantată
@@ -217,24 +227,68 @@ func (e *FarmingEngine) simulateLand(land *Land) {
 	land.mu.Lock()
 	defer land.mu.Unlock()
 
-	delta := time.Since(land.LastUpdate).Hours()
+	now := time.Now()
+	delta := now.Sub(land.LastUpdate).Hours()
 	if delta < 0.008 { // ~30 secunde
 		return
 	}
 
-	growthRate := land.SoilQuality * 0.85 * (land.WaterLevel*0.6 + land.SunExposure*0.4)
+	// Update Weather State (Stochastic transition)
+	randVal := float32(now.UnixNano()%1000) / 1000.0
+	switch land.Weather {
+	case WeatherNormal:
+		if randVal < 0.05 {
+			land.Weather = WeatherDrought
+		} else if randVal > 0.95 {
+			land.Weather = WeatherFlood
+		}
+	case WeatherDrought:
+		if randVal > 0.85 {
+			land.Weather = WeatherNormal
+		}
+	case WeatherFlood:
+		if randVal > 0.85 {
+			land.Weather = WeatherNormal
+		}
+	}
+
+	// Dynamic factors based on weather
+	waterMod := float32(1.0)
+	sunMod := float32(1.0)
+	healthPenalty := float32(0.0)
+
+	switch land.Weather {
+	case WeatherDrought:
+		waterMod = 0.4
+		sunMod = 1.2
+		healthPenalty = 0.05
+	case WeatherFlood:
+		waterMod = 1.5
+		sunMod = 0.5
+		healthPenalty = 0.08
+	}
+
+	growthRate := land.SoilQuality * 0.85 * (land.WaterLevel*waterMod*0.6 + land.SunExposure*sunMod*0.4)
+	if land.NutrientBuff > 0 {
+		growthRate *= (1.0 + land.NutrientBuff*0.3)
+	}
 
 	for i := range land.Crops {
 		crop := &land.Crops[i]
-		crop.Growth += float32(float64(growthRate) * delta * (1.0 - float64(crop.Growth)*0.7))
+		// Non-linear logistic growth approximation
+		growthIncrement := float32(float64(growthRate) * delta * (1.0 - float64(crop.Growth)*0.8))
+		crop.Growth += growthIncrement
+
 		if crop.Growth > 1.0 {
 			crop.Growth = 1.0
 		}
 
-		if land.WaterLevel < 0.3 || land.SunExposure < 0.25 {
-			crop.Health -= float32(delta * 0.08)
+		// Health management
+		crop.Health -= healthPenalty * float32(delta)
+		if land.WaterLevel*waterMod < 0.2 || land.SunExposure*sunMod < 0.2 {
+			crop.Health -= float32(delta * 0.1)
 		} else {
-			crop.Health += float32(delta * 0.03)
+			crop.Health += float32(delta * 0.05)
 		}
 
 		if crop.Health > 1.0 {
@@ -245,7 +299,13 @@ func (e *FarmingEngine) simulateLand(land *Land) {
 		}
 	}
 
-	land.LastUpdate = time.Now()
+	// Nutrient depletion
+	land.NutrientBuff -= float32(delta * 0.01)
+	if land.NutrientBuff < 0 {
+		land.NutrientBuff = 0
+	}
+
+	land.LastUpdate = now
 
 	// Queue for persistence (non-blocking)
 	select {
