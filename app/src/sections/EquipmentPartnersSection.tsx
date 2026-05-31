@@ -39,24 +39,24 @@ function parseBrandsEnv(): string[] | null {
 function defaultBrandGroups(): BrandGroup[] {
   return [
     {
-      label: 'Panouri fotovoltaice (uzual)',
-      items: ['LONGi', 'JinkoSolar', 'Trina Solar', 'JA Solar', 'Canadian Solar'],
+      label: 'Panouri fotovoltaice (criterii)',
+      items: ['N-type TOPCon', 'Half-cut', 'All-black (opțional)', 'Bifacial (opțional)', 'Garanții producător'],
     },
     {
-      label: 'Invertoare (uzual)',
-      items: ['Huawei', 'Fronius', 'Sungrow', 'Growatt', 'SMA'],
+      label: 'Invertoare (criterii)',
+      items: ['On-grid 1F / 3F', 'Hibrid (opțional)', 'Monitorizare online', 'Optimizare consum', 'Protecții integrate'],
     },
     {
-      label: 'Baterii (uzual)',
-      items: ['BYD', 'Pylontech', 'Huawei LUNA2000', 'Sungrow', 'Growatt'],
+      label: 'Baterii (criterii)',
+      items: ['LiFePO4', 'Modularitate', 'Putere descărcare', 'Garanție', 'Integrare invertor'],
     },
     {
       label: 'Structură & prinderi',
-      items: ['K2 Systems', 'Schletter', 'Renusol'],
+      items: ['Șine aluminiu', 'Elemente inox', 'Etanșări corecte', 'Compatibilitate învelitoare', 'Protecție anticorozivă'],
     },
     {
       label: 'Protecții & tablouri',
-      items: ['Schneider Electric', 'ABB', 'Hager'],
+      items: ['SPD DC/AC', 'Siguranțe corecte', 'Împământare', 'Etichetare', 'Documentație'],
     },
   ];
 }
@@ -154,8 +154,8 @@ export default function EquipmentPartnersSection() {
             <div className="rounded-3xl border border-white/10 bg-white/5 p-7 backdrop-blur">
               <div className="text-sm font-semibold uppercase tracking-wider text-white/80">Branduri / furnizori</div>
               <div className="mt-3 text-sm leading-relaxed text-slate-300">
-                Afișăm branduri uzuale din piață, iar echiparea finală se stabilește în funcție de disponibilitate, garanții
-                și proiect.
+                Afișăm criterii tehnice și standarde de echipare. Brandurile concrete se confirmă la ofertă, în funcție de
+                disponibilitate, garanții și proiect.
               </div>
 
               {brands ? (
@@ -192,7 +192,7 @@ export default function EquipmentPartnersSection() {
 
             {!brands ? (
               <div className="mt-6 rounded-3xl border border-white/10 bg-black/25 p-7">
-                <div className="text-sm font-semibold uppercase tracking-wider text-white/80">Branduri uzuale (vizual)</div>
+                <div className="text-sm font-semibold uppercase tracking-wider text-white/80">Specificații uzuale (vizual)</div>
                 <div className="mt-4 solaris-marquee overflow-hidden">
                   <div className="solaris-marquee-track flex items-center gap-3 pr-6">
                     {[...marqueeBrands, ...marqueeBrands].map((b, idx) => (

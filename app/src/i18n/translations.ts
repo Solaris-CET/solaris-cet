@@ -41,6 +41,8 @@ export interface Translations {
     services: string;
     products: string;
     equipment: string;
+    businessGroup: string;
+    tokenGroup: string;
     financing: string;
     blog: string;
     cetToken: string;
@@ -2361,6 +2363,8 @@ const translations: Record<LangCode, Translations> = {
       services: 'Services',
       products: 'Products',
       equipment: 'Equipment',
+      businessGroup: 'Business',
+      tokenGroup: 'Token',
       financing: 'Financing',
       blog: 'Blog',
       cetToken: 'CET Token',
@@ -2918,6 +2922,8 @@ const translations: Record<LangCode, Translations> = {
       services: 'Servicios',
       products: 'Productos',
       equipment: 'Equipos',
+      businessGroup: 'Negocio',
+      tokenGroup: 'Token',
       financing: 'Financiación',
       blog: 'Blog',
       cetToken: 'Token CET',
@@ -3475,6 +3481,8 @@ const translations: Record<LangCode, Translations> = {
       services: '服务',
       products: '产品',
       equipment: '设备',
+      businessGroup: '业务',
+      tokenGroup: '代币',
       financing: '补贴/融资',
       blog: '博客',
       cetToken: 'CET 代币',
@@ -4028,6 +4036,8 @@ const translations: Record<LangCode, Translations> = {
       services: 'Услуги',
       products: 'Продукты',
       equipment: 'Оборудование',
+      businessGroup: 'Бизнес',
+      tokenGroup: 'Токен',
       financing: 'Финансирование',
       blog: 'Блог',
       cetToken: 'Токен CET',
@@ -4591,6 +4601,8 @@ const translations: Record<LangCode, Translations> = {
       services: 'Servicii',
       products: 'Produse',
       equipment: 'Echipamente',
+      businessGroup: 'Firmă',
+      tokenGroup: 'Token',
       financing: 'Finanțare',
       blog: 'Blog',
       cetToken: 'Token CET',
@@ -5148,6 +5160,8 @@ const translations: Record<LangCode, Translations> = {
       services: 'Serviços',
       products: 'Produtos',
       equipment: 'Equipamentos',
+      businessGroup: 'Negócio',
+      tokenGroup: 'Token',
       financing: 'Financiamento',
       blog: 'Blog',
       cetToken: 'Token CET',
@@ -5714,6 +5728,8 @@ const translations: Record<LangCode, Translations> = {
       services: 'Leistungen',
       products: 'Produkte',
       equipment: 'Ausrüstung',
+      businessGroup: 'Business',
+      tokenGroup: 'Token',
       financing: 'Förderung',
       blog: 'Blog',
       cetToken: 'CET Token',

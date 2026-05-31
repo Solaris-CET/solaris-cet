@@ -78,6 +78,11 @@ export default function Navigation() {
     ],
   );
 
+  const businessLinks = useMemo(() => navLinks.filter((l) => l.key !== 'token'), [navLinks]);
+  const tokenLinks = useMemo(() => navLinks.filter((l) => l.key === 'token'), [navLinks]);
+  const desktopPrimaryLinks = useMemo(() => businessLinks.filter((l) => l.key !== 'contact'), [businessLinks]);
+  const desktopUtilityLinks = useMemo(() => businessLinks.filter((l) => l.key === 'contact'), [businessLinks]);
+
   const [activeHref, setActiveHref] = useState<string>('/');
 
   useEffect(() => {
@@ -185,7 +190,47 @@ export default function Navigation() {
             className="hidden relative z-30 min-w-0 overflow-x-auto overflow-y-visible [-ms-overflow-style:none] [scrollbar-width:none] lg:flex lg:flex-nowrap lg:items-center lg:justify-center lg:gap-4 2xl:gap-6 [&::-webkit-scrollbar]:hidden"
             aria-label={t.nav.primaryNavigation}
           >
-            {navLinks.map((link) => (
+            {desktopPrimaryLinks.map((link) => (
+              <a
+                key={link.key}
+                href={link.href}
+                className={cn(
+                  'shrink-0 text-sm transition-colors duration-300 relative group px-2 py-1.5',
+                  activeHref === link.href ? 'text-solaris-text' : 'text-solaris-muted hover:text-solaris-text',
+                )}
+              >
+                {link.label}
+                <span
+                  className={cn(
+                    'absolute -bottom-1 left-2 right-2 h-px origin-left scale-x-0 bg-gradient-to-r from-solaris-gold via-solaris-cyan to-solaris-gold transition-transform duration-300',
+                    activeHref === link.href ? 'scale-x-100' : 'group-hover:scale-x-100',
+                  )}
+                />
+              </a>
+            ))}
+
+            <span className="mx-1 h-4 w-px bg-white/10" aria-hidden />
+
+            {tokenLinks.map((link) => (
+              <a
+                key={link.key}
+                href={link.href}
+                className={cn(
+                  'shrink-0 text-sm transition-colors duration-300 relative group px-2 py-1.5',
+                  activeHref === link.href ? 'text-solaris-text' : 'text-solaris-muted hover:text-solaris-text',
+                )}
+              >
+                {link.label}
+                <span
+                  className={cn(
+                    'absolute -bottom-1 left-2 right-2 h-px origin-left scale-x-0 bg-gradient-to-r from-solaris-gold via-solaris-cyan to-solaris-gold transition-transform duration-300',
+                    activeHref === link.href ? 'scale-x-100' : 'group-hover:scale-x-100',
+                  )}
+                />
+              </a>
+            ))}
+
+            {desktopUtilityLinks.map((link) => (
               <a
                 key={link.key}
                 href={link.href}
@@ -267,7 +312,24 @@ export default function Navigation() {
             className="flex flex-col flex-1 items-center px-6 sm:px-10 py-10 gap-2 min-h-0 w-full max-w-full"
             aria-label={t.nav.primaryNavigation}
           >
-            {navLinks.map((link) => (
+            <div className="w-full max-w-[20rem] pb-2 text-center text-xs font-bold uppercase tracking-widest text-white/45">
+              {t.nav.businessGroup}
+            </div>
+            {businessLinks.map((link) => (
+              <a
+                key={link.key}
+                href={link.href}
+                className="w-full max-w-[20rem] text-center py-4 text-[32px] leading-tight font-semibold text-solaris-muted hover:text-solaris-text transition-colors rounded-2xl hover:bg-white/[0.04]"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {link.label}
+              </a>
+            ))}
+
+            <div className="w-full max-w-[20rem] pt-6 pb-2 text-center text-xs font-bold uppercase tracking-widest text-white/45">
+              {t.nav.tokenGroup}
+            </div>
+            {tokenLinks.map((link) => (
               <a
                 key={link.key}
                 href={link.href}
