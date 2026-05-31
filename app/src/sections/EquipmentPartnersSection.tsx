@@ -9,6 +9,11 @@ type Equipment = {
   tag: string;
 };
 
+type BrandGroup = {
+  label: string;
+  items: string[];
+};
+
 function parseBrandsEnv(): string[] | null {
   const raw = (import.meta.env.VITE_EQUIPMENT_BRANDS_JSON as string | undefined)?.trim();
   if (!raw) return null;
@@ -20,6 +25,31 @@ function parseBrandsEnv(): string[] | null {
   } catch {
     return null;
   }
+}
+
+function defaultBrandGroups(): BrandGroup[] {
+  return [
+    {
+      label: 'Panouri fotovoltaice (uzual)',
+      items: ['LONGi', 'JinkoSolar', 'Trina Solar', 'JA Solar', 'Canadian Solar'],
+    },
+    {
+      label: 'Invertoare (uzual)',
+      items: ['Huawei', 'Fronius', 'Sungrow', 'Growatt', 'SMA'],
+    },
+    {
+      label: 'Baterii (uzual)',
+      items: ['BYD', 'Pylontech', 'Huawei LUNA2000', 'Sungrow', 'Growatt'],
+    },
+    {
+      label: 'Structură & prinderi',
+      items: ['K2 Systems', 'Schletter', 'Renusol'],
+    },
+    {
+      label: 'Protecții & tablouri',
+      items: ['Schneider Electric', 'ABB', 'Hager'],
+    },
+  ];
 }
 
 export default function EquipmentPartnersSection() {
@@ -54,6 +84,7 @@ export default function EquipmentPartnersSection() {
   );
 
   const brands = useMemo(() => parseBrandsEnv(), []);
+  const groups = useMemo(() => defaultBrandGroups(), []);
 
   return (
     <section id="echipamente" className="relative overflow-hidden bg-slate-950 py-24">
@@ -85,25 +116,40 @@ export default function EquipmentPartnersSection() {
             <div className="rounded-3xl border border-white/10 bg-white/5 p-7 backdrop-blur">
               <div className="text-sm font-semibold uppercase tracking-wider text-white/80">Branduri / furnizori</div>
               <div className="mt-3 text-sm leading-relaxed text-slate-300">
-                Listă configurabilă (îți pot pune exact brandurile cu care lucrezi). Dacă nu e setată încă, afișăm categorii
-                generice.
+                Afișăm branduri uzuale din piață, iar echiparea finală se stabilește în funcție de disponibilitate, garanții
+                și proiect.
               </div>
 
-              <div className="mt-5 flex flex-wrap gap-2">
-                {(brands ?? [
-                  'Panouri fotovoltaice (Tier-1)',
-                  'Invertoare on-grid / hibrid',
-                  'Baterii (opțional)',
-                  'Structură & accesorii',
-                ]).map((b) => (
-                  <span
-                    key={b}
-                    className="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm font-semibold text-white/85"
-                  >
-                    {b}
-                  </span>
-                ))}
-              </div>
+              {brands ? (
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {brands.map((b) => (
+                    <span
+                      key={b}
+                      className="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm font-semibold text-white/85"
+                    >
+                      {b}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <div className="mt-5 space-y-5">
+                  {groups.map((g) => (
+                    <div key={g.label}>
+                      <div className="text-xs font-bold uppercase tracking-wider text-white/70">{g.label}</div>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {g.items.map((b) => (
+                          <span
+                            key={b}
+                            className="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm font-semibold text-white/85"
+                          >
+                            {b}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="mt-6 rounded-3xl border border-white/10 bg-black/25 p-7">
