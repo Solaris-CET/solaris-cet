@@ -5,6 +5,7 @@ import { SolarisFooter } from '@/components/company/SolarisFooter';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import CompanyFaqSection from '@/sections/CompanyFaqSection';
+import EquipmentPartnersSection from '@/sections/EquipmentPartnersSection';
 import HeroSection from '@/sections/HeroSection';
 import ProductsSection from '@/sections/ProductsSection';
 import ServicesSection from '@/sections/ServicesSection';
@@ -41,6 +42,12 @@ export default function HomePage() {
         </ScrollFadeUp>
       </section>
 
+      <section id="echipamente" className="relative z-20">
+        <ScrollFadeUp>
+          <EquipmentPartnersSection />
+        </ScrollFadeUp>
+      </section>
+
       <SolarAiAssistantSection />
 
       <SolarIntelligenceSection />
@@ -69,21 +76,21 @@ export default function HomePage() {
                 title: 'Fotovoltaice rezidențial',
                 text: 'Sistem dimensionat pe consum, orientare și umbriri, cu monitorizare.',
                 icon: PlugZap,
-                img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Solar_panels_on_house_roof.jpg',
+                img: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20a%20modern%20Romanian%20house%20roof%20with%20black%20solar%20panels%20installed%2C%20clean%20cabling%2C%20golden%20hour%20light%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
                 alt: 'Panouri fotovoltaice montate pe acoperiș rezidențial',
               },
               {
                 title: 'Acoperiș industrial TPO',
                 text: 'Detalii corecte la atice/străpungeri și etanșare profesionistă.',
                 icon: Building2,
-                img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Installation_of_zink_cladding_on_Kiasma_east_fa%C3%A7ade,_1997_(14117140288).jpg',
-                alt: 'Lucrări de montaj/placare fațadă și detalii la anvelopă',
+                img: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20an%20industrial%20flat%20roof%20with%20white%20TPO%20membrane%20installation%2C%20clean%20details%20around%20parapets%20and%20penetrations%2C%20modern%20warehouse%20background%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
+                alt: 'Acoperiș industrial cu folie TPO, detalii de etanșare executate corect',
               },
               {
                 title: 'Acoperiș tablă / țiglă metalică',
                 text: 'Montaj curat, finisaje moderne și detalii rezistente.',
                 icon: Home,
-                img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Standing_seam_metal_roof_3.jpg',
+                img: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20close-up%20of%20a%20standing%20seam%20metal%20roof%20on%20a%20modern%20house%2C%20clean%20lines%2C%20premium%20finish%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
                 alt: 'Acoperiș din tablă tip standing seam',
               },
             ].map((p) => {
