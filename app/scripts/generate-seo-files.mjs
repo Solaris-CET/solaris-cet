@@ -180,6 +180,20 @@ async function writeStaticPages() {
       h1: 'Portofoliu Solaris CET',
       bodyLines: ['Exemple de lucrări (placeholder) până la încărcarea pozelor reale din proiecte.'],
     },
+    {
+      path: '/token-cet',
+      title: 'Token CET — Solaris CET (BETA)',
+      description: 'Informații despre tokenul utilitar CET și integrarea acestuia în ecosistemul Solaris.',
+      h1: 'Token CET (BETA)',
+      bodyLines: ['Tokenul CET este un activ digital experimental utilizat pentru stimularea performanței și transparenței în proiectele Solaris.'],
+    },
+    {
+      path: '/finantare',
+      title: 'Finanțare Fotovoltaice — Solaris CET',
+      description: 'Ghiduri de finanțare pentru sisteme fotovoltaice: Casa Verde 2025, REPowerEU și soluții de creditare.',
+      h1: 'Finanțare Sisteme Fotovoltaice',
+      bodyLines: ['Oferim consultanță pentru accesarea fondurilor nerambursabile și soluții de finanțare personalizate pentru persoane fizice și companii.'],
+    },
   ]
 
   for (const p of pages) {
@@ -216,6 +230,10 @@ async function writeSitemap() {
     '/bacau',
     '/iasi',
     '/galati',
+    '/finantare',
+    '/finantare/casa-verde-2025',
+    '/finantare/repowereu',
+    '/token-cet',
     '/politica-cookies',
     '/politica-confidentialitate',
   ]

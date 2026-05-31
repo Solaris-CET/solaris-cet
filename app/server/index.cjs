@@ -611,10 +611,10 @@ const handlerCache = new Map();
 
 /**
  * Advanced LRU Response Cache for Hetzner Optimization
- * Capacity: 1000 entries
+ * Capacity: 8192 entries (Optimized for 16GB RAM)
  */
 class ResponseCache {
-  constructor(capacity = 1000) {
+  constructor(capacity = 8192) {
     this.capacity = capacity;
     this.cache = new Map();
   }

@@ -49,11 +49,14 @@ type FarmingEngine struct {
 }
 
 func NewFarmingEngine(dbPath string) (*FarmingEngine, error) {
+	// Optimized for 8vCPU / 16GB RAM
 	opts := badger.DefaultOptions(dbPath).
-		WithNumMemtables(2).
-		WithValueLogFileSize(32 << 20).
-		WithMemTableSize(32 << 20).
-		WithLogger(nil)
+		WithNumMemtables(4).
+		WithValueLogFileSize(64 << 20).
+		WithMemTableSize(64 << 20).
+		WithLogger(nil).
+		WithBlockCacheSize(256 << 20).
+		WithIndexCacheSize(128 << 20)
 
 	db, err := badger.Open(opts)
 	if err != nil {
@@ -64,7 +67,7 @@ func NewFarmingEngine(dbPath string) (*FarmingEngine, error) {
 
 	engine := &FarmingEngine{
 		db:     db,
-		lands:  make(map[uint64]*Land, 10000),
+		lands:  make(map[uint64]*Land, 50000),
 		ticker: time.NewTicker(30 * time.Second),
 		ctx:    ctx,
 		cancel: cancel,
