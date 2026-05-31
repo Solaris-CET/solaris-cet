@@ -1,10 +1,13 @@
 import { ArrowRight, BadgeCheck, Phone } from 'lucide-react';
-import { type CSSProperties,useEffect, useMemo, useState } from 'react';
+import { type CSSProperties, lazy, Suspense, useEffect, useMemo, useState } from 'react';
 
 import AppImage from '@/components/AppImage';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
+import { useDesktop3DEligible } from '@/hooks/useDesktop3DEligible';
 
 import styles from './HeroSolaris.module.css';
+
+const HeroTokenHologram = lazy(() => import('@/experience/HeroTokenHologram'));
 
 type Particle = {
   size: number;
@@ -190,6 +193,21 @@ export default function HeroSection() {
     freezeOnceVisible: true,
   });
 
+  const { elementRef: visualRef, isVisible: visualVisible } = useIntersectionObserver<HTMLDivElement>({
+    threshold: 0.1,
+    rootMargin: '200px 0px',
+    freezeOnceVisible: true,
+  });
+
+  const desktop3DEligible = useDesktop3DEligible();
+  const [show3D, setShow3D] = useState(false);
+
+  useEffect(() => {
+    if (!desktop3DEligible) return;
+    if (!visualVisible) return;
+    setShow3D(true);
+  }, [desktop3DEligible, visualVisible]);
+
   const projects = useCountUp({ to: 50, enabled: isVisible });
   const kw = useCountUp({ to: 750, enabled: isVisible });
   const counties = useCountUp({ to: 12, enabled: isVisible });
@@ -285,16 +303,21 @@ export default function HeroSection() {
               />
 
               <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-black/20">
-                <div className={`relative aspect-[4/3] w-full ${styles.clipImage}`}>
+                <div ref={visualRef} className={`relative aspect-[4/3] w-full ${styles.clipImage}`}>
                   <AppImage
                     src="/images/hero-solaris.svg"
                     alt="Montaj fotovoltaic și acoperișuri executate profesional"
-                    className="h-full w-full object-cover"
+                    className={`h-full w-full object-cover transition-opacity duration-500 ${show3D ? 'opacity-30' : 'opacity-100'}`}
                     width={1600}
                     height={1200}
                     loading="eager"
                     fetchPriority="high"
                   />
+                  {show3D ? (
+                    <Suspense fallback={null}>
+                      <HeroTokenHologram quality="high" seed={0.62} />
+                    </Suspense>
+                  ) : null}
                 </div>
 
                 <div className="absolute inset-0 bg-gradient-to-tr from-[#05060B]/70 via-transparent to-transparent" aria-hidden />
