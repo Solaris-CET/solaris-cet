@@ -1,3 +1,4 @@
+import { SolarisFooter } from '@/components/company/SolarisFooter';
 import FAQSection from '@/sections/FAQSection';
 
 export default function FaqPage() {
@@ -5,11 +6,12 @@ export default function FaqPage() {
     <main
       id="main-content"
       tabIndex={-1}
-      className="relative w-full overflow-x-clip pb-[var(--mobile-conversion-dock-reserve)] xl:pb-0"
+      className="pt-24 pb-0 bg-slate-950 text-white"
     >
-      <h1 className="sr-only">FAQ</h1>
       <FAQSection />
+      <div className="mt-0">
+        <SolarisFooter />
+      </div>
     </main>
   );
 }
-

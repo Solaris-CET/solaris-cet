@@ -54,6 +54,11 @@ Regulă:
 - Buildtime: doar `VITE_*`
 - Runtime: toate secretele + config backend
 
+IMPORTANT (anti-fail + anti-leak):
+
+- Nu pune backticks (`` `...` ``) în valori și nu pune spații în jurul `=`. În logurile tale, Coolify a injectat în Dockerfile linii de forma `ARG TONCENTER_RPC_URL= https://...`, care pot strica parsing-ul Dockerfile (pentru `ARG` este invalid să existe un token separat după `NAME=`).
+- Nu trimite secrete ca Build Args. Dacă le pui la build, Coolify le inserează în Dockerfile final (vizibil în logs) și riști să pice build-ul / să expui secrete.
+
 ### Buildtime (ON la build)
 
 - `VITE_PUBLIC_SITE_URL`
@@ -74,6 +79,15 @@ Regulă:
 - Cron/jobs (opțional): `CRON_SECRET` (header `x-cron-secret`) și/sau `CRON_TOKEN` (query `?token=` / `Authorization: Bearer`).
 
 După update, fă `Redeploy`.
+
+Checklist rapid (UI Coolify → Environment):
+
+- În secțiunea de Build/Build Args: să rămână doar `VITE_*` (dacă ai nevoie).
+- În secțiunea Runtime/Secrets: `DATABASE_URL`, `JWT_SECRET`, `ADMIN_BOOTSTRAP_PASSWORD`, `TONCENTER_RPC_URL`, etc.
+- Valori fără backticks și fără ghilimele “decorative”:
+  - Corect: `TONCENTER_RPC_URL=https://toncenter.com/api/v2/jsonRPC`
+  - Greșit: `TONCENTER_RPC_URL= \`https://toncenter.com/api/v2/jsonRPC\``
+  - Greșit: `TONCENTER_RPC_URL= https://toncenter.com/api/v2/jsonRPC`
 
 ## 5) Webhook Git pentru deploy automat
 

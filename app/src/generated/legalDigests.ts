@@ -6,7 +6,7 @@ export const LEGAL_DIGESTS = {
     },
     "ro": {
       "version": "2026-04-26",
-      "sha256": "a1b3c4334ec2f302db42f6a3bddea5e28679f58c50428e101b3da2f1a9150ef8"
+      "sha256": "e56c0e21b4b6386125503f2e76c7399a2736f7e0a92153ccd9a7bc1c80a80023"
     },
     "es": {
       "version": "2026-04-26",

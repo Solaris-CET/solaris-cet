@@ -1,6 +1,6 @@
 ---
 title: "Termeni și Condiții"
-description: "Reguli pentru utilizarea site-ului și aplicației Solaris CET."
+description: "Reguli pentru utilizarea site-ului Solaris CET și pentru trimiterea solicitărilor de ofertă."
 lastUpdated: 2026-04-26
 ---
 
@@ -10,73 +10,42 @@ Acești Termeni și Condiții („Termeni”) reglementează accesul și utiliza
 
 Dacă nu ești de acord, nu utiliza Serviciul.
 
-## 2. Eligibilitate și conformitate
+## 2. Scopul informațiilor de pe site
 
-Trebuie să respecți toate legile aplicabile în jurisdicția ta. Ești responsabil să verifici dacă utilizarea crypto-asset-urilor este permisă sau restricționată în zona ta.
+Informațiile de pe site sunt prezentate cu scop informativ (servicii, exemple, pași de lucru). O ofertă finală se stabilește după colectarea cerințelor și, după caz, evaluarea la locație.
 
-Serviciul nu este destinat persoanelor/teritoriilor în care accesul ar fi ilegal sau ar necesita licențiere/înregistrare pe care Compania nu o deține.
+## 3. Solicitări de ofertă și comunicări
 
-## 3. Fără consultanță financiară
+Când trimiți un mesaj sau o solicitare de ofertă, ești responsabil ca datele furnizate să fie corecte și să nu includă informații sensibile. Putem folosi datele de contact pentru a răspunde solicitării și pentru a programa o evaluare.
 
-Nimic din Serviciu nu reprezintă consultanță financiară, investițională, legală sau fiscală. Fă propriul research și consultă profesioniști.
-
-## 4. Disclaimer de risc crypto
-
-Crypto-asset-urile sunt volatile și pot fi ilichide. Poți pierde parțial sau integral fondurile. Contractele smart pot avea vulnerabilități. Schimbările de rețea (congestie, fork, upgrade) pot afecta tranzacțiile. Vezi pagina de Risk Disclaimer.
-
-## 5. Wallet-uri și tranzacții
-
-Tu controlezi wallet-ul. Compania nu custodiază chei private și nu le poate recupera. Tranzacțiile on-chain sunt, de regulă, ireversibile.
-
-Ești responsabil să verifici:
-
-- adresa contractului,
-- simbolul/decimalele tokenului,
-- adresa destinatarului,
-- parametrii tranzacției.
-
-## 6. Utilizare acceptabilă
+## 4. Utilizare acceptabilă
 
 Ești de acord să nu:
 
 - folosești Serviciul pentru activități ilegale,
 - încerci acces neautorizat sau să afectezi securitatea,
-- transmiți malware,
-- abuzezi sau supraîncarci Serviciul,
-- denaturezi identitatea sau afilierea.
+- transmiți malware sau conținut abuziv,
+- supraîncarci Serviciul.
 
-Putem restricționa sau închide accesul pentru încălcări.
+Putem restricționa accesul pentru încălcări.
 
-## 7. Proprietate intelectuală
+## 5. Proprietate intelectuală
 
-Serviciul și conținutul sunt deținute de Companie sau licențiatori și sunt protejate de legi IP. Nu ai dreptul să copiezi/modifici/distribui decât dacă legea permite.
+Serviciul și conținutul sunt deținute de Companie sau licențiatori și sunt protejate de legi privind proprietatea intelectuală. Nu ai dreptul să copiezi/modifici/distribui conținutul decât dacă legea permite sau ai acordul Companiei.
 
-Componente open-source și codul smart contract pot fi guvernate de licențe separate.
+## 6. Linkuri către terți
 
-## 8. Terți
+Serviciul poate include linkuri către terți (de ex. hărți, platforme de comunicare). Nu controlăm aceste servicii și nu suntem responsabili pentru practicile lor.
 
-Serviciul poate include linkuri către terți (explorer, wallet-uri, exchange-uri, DEX). Nu controlăm aceste servicii și nu suntem responsabili pentru practicile lor.
+## 7. Disponibilitate și limitarea răspunderii
 
-## 9. Disponibilitate și modificări
+În măsura maximă permisă de lege, Compania nu garantează că Serviciul va fi disponibil fără întreruperi sau fără erori. Informațiile de pe site pot fi actualizate oricând.
 
-Putem modifica, suspenda sau opri anumite funcționalități oricând. Unele funcții pot fi experimentale și sunt oferite „as is”.
+## 8. Lege aplicabilă
 
-## 10. Limitarea răspunderii
+Acești Termeni sunt guvernați de legea aplicabilă în România, sub rezerva normelor obligatorii de protecție a consumatorilor (dacă se aplică).
 
-În măsura maximă permisă de lege, Compania nu răspunde pentru daune indirecte sau consecințiale și nu garantează disponibilitatea sau lipsa erorilor.
+## 9. Contact
 
-## 11. Despăgubiri
-
-Ești de acord să despăgubești Compania pentru pretenții rezultate din încălcarea Termenilor sau utilizare abuzivă.
-
-## 12. Confidențialitate
-
-Politica de Confidențialitate explică modul în care prelucrăm datele personale.
-
-## 13. Lege aplicabilă
-
-Acești Termeni sunt guvernați de legea jurisdicției de încorporare a Companiei, sub rezerva normelor obligatorii de protecție a consumatorilor (dacă se aplică).
-
-## 14. Contact
-
-Pentru notificări legale, folosește pagina Contact Legal sau formularul DSAR.
+Pentru întrebări: solaris-cet@protonmail.com · +40 769 889 721  
+Date identificare: CUI: *********** · Cetatuia, Vaslui, 737429, România

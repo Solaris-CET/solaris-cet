@@ -18,7 +18,7 @@
   "overrides": {
     "axios": "1.16.1",
     "@ton/ton": {
-      "axios": "1.16.0"
+      "axios": "1.16.1"
     },
     "brace-expansion": "^2.0.3",
     "yaml": "^2.8.3"

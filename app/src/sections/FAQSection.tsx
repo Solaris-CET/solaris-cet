@@ -1,195 +1,110 @@
-import { ChevronDown, HelpCircle } from 'lucide-react';
-import { useMemo,useRef, useState } from 'react';
+import { HelpCircle } from 'lucide-react';
 
-import { ScrollFadeUp } from '@/components/ScrollFadeUp';
-import { ScrollStaggerFadeUp } from '@/components/ScrollStaggerFadeUp';
-import { PUBLIC_WHITEPAPER_IPFS_URL } from '@/lib/publicTrustLinks';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { useLanguage } from '@/hooks/useLanguage';
 
-import GlowOrbs from '../components/GlowOrbs';
-import MeshSkillRibbon from '../components/MeshSkillRibbon';
-import { useLanguage } from '../hooks/useLanguage';
-import type { FaqContent } from '../i18n/faqContent.types';
+type FaqItem = {
+  q: string;
+  a: string;
+};
 
-interface FAQLink {
-  label: string;
-  href: string;
-}
+export default function FAQSection() {
+  const { lang } = useLanguage();
+  const isRo = lang === 'ro';
 
-interface FAQ {
-  question: string;
-  answer: string;
-  link?: FAQLink;
-  links?: FAQLink[];
-}
-
-/** Canonical URLs — labels come from `t.faqContent`. */
-const FAQ_HREF_WHITEPAPER = PUBLIC_WHITEPAPER_IPFS_URL;
-const FAQ_HREF_TELEGRAM = 'https://t.me/SolarisCET';
-const FAQ_HREF_GITHUB = 'https://github.com/Solaris-CET/solaris-cet';
-const FAQ_HREF_COMPARISON = '#competition';
-
-function buildFaqs(f: FaqContent): FAQ[] {
-  return [
-    { question: f.q1, answer: f.a1 },
-    { question: f.q2, answer: f.a2 },
-    { question: f.q3, answer: f.a3 },
-    { question: f.q4, answer: f.a4 },
-    { question: f.q5, answer: f.a5 },
-    { question: f.q6, answer: f.a6 },
-    { question: f.q7, answer: f.a7 },
-    { question: f.q8, answer: f.a8 },
-    {
-      question: f.q9,
-      answer: f.a9,
-      link: { label: f.linkWhitepaper, href: FAQ_HREF_WHITEPAPER },
-    },
-    {
-      question: f.q10,
-      answer: f.a10,
-      links: [
-        { label: f.linkTelegram, href: FAQ_HREF_TELEGRAM },
-        { label: f.linkGithub, href: FAQ_HREF_GITHUB },
-      ],
-    },
-    {
-      question: f.q11,
-      answer: f.a11,
-      links: [{ label: f.linkComparison, href: FAQ_HREF_COMPARISON }],
-    },
-    { question: f.q12, answer: f.a12 },
-    { question: f.q13, answer: f.a13 },
-    { question: f.q14, answer: f.a14 },
-  ];
-}
-
-const FAQSection = () => {
-  const { t } = useLanguage();
-  const faqs = useMemo(() => buildFaqs(t.faqContent), [t.faqContent]);
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const listRef = useRef<HTMLDivElement>(null);
-
-  const handleKeyDown = (e: React.KeyboardEvent, i: number) => {
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      const triggers = listRef.current?.querySelectorAll<HTMLButtonElement>('.faq-trigger');
-      triggers?.[Math.min(i + 1, faqs.length - 1)]?.focus();
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      const triggers = listRef.current?.querySelectorAll<HTMLButtonElement>('.faq-trigger');
-      triggers?.[Math.max(i - 1, 0)]?.focus();
-    } else if (e.key === 'Home') {
-      e.preventDefault();
-      listRef.current?.querySelectorAll<HTMLButtonElement>('.faq-trigger')[0]?.focus();
-    } else if (e.key === 'End') {
-      e.preventDefault();
-      const triggers = listRef.current?.querySelectorAll<HTMLButtonElement>('.faq-trigger');
-      triggers?.[faqs.length - 1]?.focus();
-    }
-  };
+  const faqs: FaqItem[] = isRo
+    ? [
+        {
+          q: 'Cât durează o instalare fotovoltaică?',
+          a: 'Depinde de complexitate și de condițiile din teren. După evaluare, îți spunem pașii și termenele realiste (montaj + punere în funcțiune).',
+        },
+        {
+          q: 'Ce informații vă trebuie pentru ofertă?',
+          a: 'Locația, consumul (facturi), tipul acoperișului/structurii, orientare/umbriri și ce obiectiv ai (autoconsum, baterie, EV, industrial).',
+        },
+        {
+          q: 'Faceți reparații la acoperiș și infiltrații?',
+          a: 'Da. Facem diagnostic și intervenții punctuale (tablă/țiglă/TPO) și putem propune un plan de mentenanță preventivă.',
+        },
+        {
+          q: 'Lucrați și la acoperișuri industriale tip supermarket (folie TPO)?',
+          a: 'Da. Montăm și reparăm membrane TPO și acordăm atenție zonelor critice: atice, scurgeri, străpungeri și îmbinări.',
+        },
+        {
+          q: 'Oferiți mentenanță pentru fotovoltaice?',
+          a: 'Da. Putem face verificări periodice, monitorizare și intervenții atunci când apar probleme (în funcție de proiect).',
+        },
+        {
+          q: 'Acoperiți toată România?',
+          a: 'Da. Suntem în Cetatuia, Vaslui, dar putem lucra în toate județele, în funcție de proiect.',
+        },
+      ]
+    : [
+        {
+          q: 'How long does a PV installation take?',
+          a: 'It depends on complexity and site conditions. After a survey, we provide clear steps and realistic timelines (installation + commissioning).',
+        },
+        {
+          q: 'What do you need for an offer?',
+          a: 'Location, consumption (bills), roof/structure type, orientation/shading, and your goal (self-consumption, battery, EV, industrial).',
+        },
+        {
+          q: 'Do you handle roof repairs and leaks?',
+          a: 'Yes. We diagnose and fix targeted issues (metal/tiles/TPO) and can propose a preventive maintenance plan.',
+        },
+        {
+          q: 'Do you work on industrial roofs (TPO membrane)?',
+          a: 'Yes. We install and repair TPO membranes and focus on critical details: parapets, drains, penetrations, and seams.',
+        },
+        {
+          q: 'Do you provide PV maintenance?',
+          a: 'Yes. We can do periodic checks, monitoring, and interventions when issues occur (depending on the project).',
+        },
+        {
+          q: 'Do you work nationwide in Romania?',
+          a: 'Yes. We are based in Cetatuia, Vaslui, and we can work nationwide depending on the project.',
+        },
+      ];
 
   return (
-    <section
-      id="faq"
-      aria-label={t.sectionAria.faq}
-      className="relative section-glass section-padding-y overflow-hidden mesh-bg"
-    >
-      <GlowOrbs variant="cyan" />
-
-      <div className="relative z-10 section-padding-x max-w-4xl mx-auto w-full">
-        {/* Section heading */}
-        <ScrollFadeUp className="max-w-2xl mb-16 max-md:mx-auto max-md:text-center">
-          <div className="flex items-center gap-3 mb-4 max-md:justify-center">
-            <div className="w-10 h-10 rounded-xl bg-cyan-400/10 flex items-center justify-center">
-              <HelpCircle className="w-5 h-5 text-cyan-400" />
-            </div>
-            <span className="hud-label text-cyan-400">{t.faqContent.headingBadge}</span>
+    <section className="py-24 bg-slate-900/40">
+      <div className="max-w-4xl mx-auto px-5 sm:px-8 xl:px-12">
+        <div className="flex items-center gap-3">
+          <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5">
+            <HelpCircle className="h-5 w-5 text-solaris-gold" aria-hidden />
+          </span>
+          <div>
+            <h2 className="text-3xl md:text-5xl font-bold text-white">{isRo ? 'Întrebări frecvente' : 'FAQ'}</h2>
+            <p className="mt-2 text-solaris-muted">
+              {isRo
+                ? 'Răspunsuri scurte și clare despre servicii, ofertare și execuție.'
+                : 'Short, clear answers about services, offers, and delivery.'}
+            </p>
           </div>
-
-          <h2 className="font-display font-bold text-[clamp(28px,3.5vw,48px)] text-solaris-text mb-4">
-            {t.faqContent.titleBefore}{' '}
-            <span className="text-gradient-gold">{t.faqContent.titleHighlight}</span>
-          </h2>
-
-          <p className="text-solaris-muted text-base lg:text-lg leading-relaxed">
-            {t.faqContent.subtitle}
-          </p>
-        </ScrollFadeUp>
-
-        {/* FAQ accordion */}
-        <div ref={listRef} role="list">
-          <ScrollStaggerFadeUp className="flex flex-col gap-3">
-            {faqs.map((faq, i) => (
-              <div key={i} className="faq-item bento-card border border-white/8 overflow-hidden" role="listitem">
-              <button
-                id={`faq-btn-${i}`}
-                className="faq-trigger w-full flex items-center justify-between p-5 sm:p-6 md:p-7 text-left group transition-all duration-300"
-                aria-expanded={openIndex === i}
-                aria-controls={`faq-panel-${i}`}
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                onKeyDown={(e) => handleKeyDown(e, i)}
-                type="button"
-              >
-                <span className="font-display font-semibold text-solaris-text text-base group-hover:text-solaris-gold transition-colors pr-4">
-                  {faq.question}
-                </span>
-                <ChevronDown
-                  className={`w-5 h-5 text-solaris-gold shrink-0 transition-transform duration-300 ${
-                    openIndex === i ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
-              <div
-                id={`faq-panel-${i}`}
-                role="region"
-                aria-labelledby={`faq-btn-${i}`}
-                className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                  openIndex === i ? 'max-h-96' : 'max-h-0'
-                }`}
-              >
-                <div className="px-5 sm:px-6 md:px-7 pb-6 space-y-3">
-                  <p className="text-solaris-muted text-sm leading-relaxed">{faq.answer}</p>
-                  {faq.link && (
-                    <a
-                      href={faq.link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center text-sm font-semibold text-solaris-gold hover:opacity-90 transition-opacity btn-quantum"
-                    >
-                      {faq.link.label}
-                    </a>
-                  )}
-                  {faq.links && (
-                    <div className="flex flex-wrap gap-4">
-                      {faq.links.map((l) => {
-                        const isInPage = l.href.startsWith('#');
-                        return (
-                          <a
-                            key={l.href}
-                            href={l.href}
-                            {...(isInPage
-                              ? {}
-                              : { target: '_blank', rel: 'noopener noreferrer' })}
-                            className="inline-flex items-center text-sm font-semibold text-solaris-cyan hover:opacity-80 transition-opacity"
-                          >
-                            {l.label}
-                          </a>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </div>
-              </div>
-            ))}
-          </ScrollStaggerFadeUp>
         </div>
 
-        <div className="mt-10 max-w-3xl mx-auto">
-          <MeshSkillRibbon variant="compact" saltOffset={1920} className="border-fuchsia-500/12 bg-fuchsia-500/[0.03]" />
+        <div className="mt-10 rounded-3xl border border-white/10 bg-black/30 p-4 sm:p-6">
+          <Accordion type="single" collapsible>
+            {faqs.map((x) => (
+              <AccordionItem key={x.q} value={x.q} className="border-white/10">
+                <AccordionTrigger className="text-white hover:no-underline">
+                  <span className="text-left">{x.q}</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-solaris-muted leading-relaxed">{x.a}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+
+        <div className="mt-10 flex flex-wrap gap-3">
+          <a href="/contact" className="btn-filled-gold inline-flex items-center gap-2">
+            {isRo ? 'Cere ofertă' : 'Request an offer'}
+          </a>
+          <a href="tel:+40769889721" className="btn-outline-white inline-flex items-center gap-2">
+            +40 769 889 721
+          </a>
         </div>
       </div>
     </section>
   );
-};
-
-export default FAQSection;
+}

@@ -3,11 +3,13 @@ function parseArgs(argv) {
     baseUrl: 'https://solaris-cet.com',
     metricsToken: null,
     timeoutMs: 8000,
+    skipApi: false,
   };
   for (const a of argv) {
     if (a.startsWith('--base=')) out.baseUrl = a.slice('--base='.length).trim();
     if (a.startsWith('--metrics-token=')) out.metricsToken = a.slice('--metrics-token='.length).trim();
     if (a.startsWith('--timeout-ms=')) out.timeoutMs = Number.parseInt(a.slice('--timeout-ms='.length), 10);
+    if (a === '--skip-api' || a === '--skip-api=1' || a === '--skip-api=true') out.skipApi = true;
   }
   if (!Number.isFinite(out.timeoutMs) || out.timeoutMs <= 0) out.timeoutMs = 8000;
   out.baseUrl = out.baseUrl.replace(/\/+$/, '');
@@ -56,8 +58,42 @@ checks.push(async () => {
 });
 
 checks.push(async () => {
-  const url = `${args.baseUrl}/services`;
-  const res = await fetchWithTimeout(url, { headers: { accept: 'text/html' } }, args.timeoutMs);
+  const pages = ['/', '/servicii', '/contact', '/token-cet', '/privacy', '/terms', '/cookies'];
+  for (const p of pages) {
+    const url = `${args.baseUrl}${p}`;
+    const res = await fetchWithTimeout(url, { headers: { accept: 'text/html' } }, args.timeoutMs);
+    if (!res.ok) throw new Error(`HTTP ${res.status} for ${p}`);
+    const ct = String(res.headers.get('content-type') ?? '');
+    if (!ct.includes('text/html')) throw new Error(`Unexpected content-type for ${p}: ${ct || 'missing'}`);
+  }
+  okLine('pages');
+});
+
+checks.push(async () => {
+  const url = `${args.baseUrl}/sitemap.xml`;
+  const res = await fetchWithTimeout(url, { headers: { accept: 'application/xml' } }, args.timeoutMs);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const body = await res.text().catch(() => '');
+  if (!body.includes('<urlset') || !body.includes('<loc>')) throw new Error('Unexpected sitemap body');
+  okLine('/sitemap.xml');
+});
+
+checks.push(async () => {
+  const url = `${args.baseUrl}/robots.txt`;
+  const res = await fetchWithTimeout(url, { headers: { accept: 'text/plain' } }, args.timeoutMs);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const body = await res.text().catch(() => '');
+  if (!/Sitemap:/i.test(body)) throw new Error('Unexpected robots body');
+  okLine('/robots.txt');
+});
+
+checks.push(async () => {
+  const url = `${args.baseUrl}/api/metrics`;
+  const res = await fetchWithTimeout(url, { headers: { accept: 'application/json' } }, args.timeoutMs);
+  if (args.skipApi && res.status === 404) {
+    okLine('/api/metrics (skipped)');
+    return;
+  }
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   okLine('/services');
 });
@@ -74,6 +110,10 @@ checks.push(async () => {
   const headers = { accept: 'text/plain' };
   if (args.metricsToken) headers.authorization = `Bearer ${args.metricsToken}`;
   const res = await fetchWithTimeout(url, { headers }, args.timeoutMs);
+  if (args.skipApi && res.status === 404) {
+    okLine('/metrics (skipped)');
+    return;
+  }
   if (args.metricsToken) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     okLine('/metrics (auth)');

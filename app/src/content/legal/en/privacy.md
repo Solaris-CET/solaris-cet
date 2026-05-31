@@ -1,15 +1,16 @@
 ---
 title: "Privacy Policy"
-description: "How Solaris CET processes personal data, wallet identifiers, and cookies."
+description: "How Solaris CET processes your contact details and technical data (cookies) to respond to inquiries."
 lastUpdated: 2026-04-26
 ---
 
 ## 1. Who we are
 
-This Privacy Policy explains how the Solaris CET website and application (the “Service”) process personal data.
+This Privacy Policy explains how the Solaris CET website and application (the “Service”) process personal data when you request a quote, send a message, or browse the website.
 
 **Controller:** Solaris CET (the “Company”).  
-**Contact:** see the “Legal contact” section on the website (or use the DSAR form).
+**Contact:** solaris-cet@protonmail.com · +40 769 889 721
+**Identification:** CUI: *********** · Cetatuia, Vaslui, 737429, Romania
 
 If you appoint a Data Protection Officer (DPO), the DPO contact details should be published here and in the Service.
 
@@ -17,12 +18,10 @@ If you appoint a Data Protection Officer (DPO), the DPO contact details should b
 
 We may process the following categories of data:
 
-- **Identifiers:** blockchain wallet address (e.g. TON address), user ID, session identifiers.
-- **Contact data (optional):** email address, display name (if you provide it).
-- **Account & preferences:** notification preferences, newsletter status, consent choices for cookies.
-- **Usage & device data:** basic technical data such as IP-derived region (approximate), user agent, timestamps, page URLs, and interactions (depending on your cookie choices).
-- **Support messages:** messages you submit via support/DSAR forms and related metadata (e.g. timestamps).
-- **On-chain data:** blockchain transactions and balances are public. We may reference public on-chain data to power features and to verify actions.
+- **Contact details:** name, email and/or phone number (if you provide them).
+- **Inquiry content:** the details you send us (e.g. service type, location, timelines).
+- **Technical data:** basic device/browser data (e.g. user agent), timestamps, page URLs and events necessary to operate the Service.
+- **Preferences:** cookie consent choices (analytics/marketing), where applicable.
 
 We do not ask you to provide sensitive data (special categories under GDPR). Please avoid submitting sensitive data via forms.
 
@@ -30,10 +29,10 @@ We do not ask you to provide sensitive data (special categories under GDPR). Ple
 
 We process personal data for:
 
-- **Providing and securing the Service** (authentication, sessions, abuse prevention, incident response).
-- **Operating core features** (account preferences, notifications, support).
+- **Responding to inquiries and quoting** (contacting you, clarifying details, scheduling a site visit where needed).
+- **Providing and securing the Service** (abuse prevention, operational security).
 - **Analytics and performance** (to improve UX, only if you consent).
-- **Marketing and retargeting** (only if you consent).
+- **Marketing** (campaign measurement, only if you consent).
 - **Legal compliance** (e.g. responding to lawful requests, maintaining required records).
 - **Defending legal claims** (where necessary).
 
@@ -77,7 +76,7 @@ If data is processed outside the EEA/UK, we use appropriate safeguards (e.g. SCC
 We keep personal data only as long as necessary for the purposes above, including:
 
 - security and fraud prevention,
-- support and DSAR handling,
+- support handling,
 - accounting/legal obligations,
 - and dispute resolution.
 
@@ -96,11 +95,11 @@ Depending on your jurisdiction, you may have rights to:
 - withdraw consent,
 - lodge a complaint with your supervisory authority.
 
-You can request access/portability via the data export feature or DSAR form.
+To exercise your rights (access, deletion, rectification), contact us at solaris-cet@protonmail.com.
 
 ## 10. Security
 
-We apply reasonable technical and organizational measures to protect data. No system is 100% secure. If you believe you found a security issue, use the Responsible Disclosure page.
+We apply reasonable technical and organizational measures to protect data. No system is 100% secure. If you believe you found a problem, contact us at solaris-cet@protonmail.com.
 
 ## 11. Children
 

@@ -20,6 +20,8 @@ Poți alege ce categorii opționale permiți și îți poți modifica preferinț
 
 Dezactivarea analiticelor/marketingului nu ar trebui să blocheze funcțiile esențiale.
 
+Preferințele sunt stocate pe dispozitivul tău (local storage) pentru a fi reținute între vizite.
+
 ## 4. Ce date pot fi prelucrate
 
 În funcție de consimțământ, cookie-urile pot prelucra:
@@ -38,3 +40,8 @@ Durata cookie-urilor variază. Stocăm consimțământul pentru a reține prefer
 ## 6. Actualizări
 
 Putem actualiza această Politică. Data „last updated” indică ultima versiune.
+
+## 7. Contact
+
+Pentru întrebări: solaris-cet@protonmail.com · +40 769 889 721  
+Date identificare: CUI: *********** · Cetatuia, Vaslui, 737429, România

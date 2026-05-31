@@ -24,6 +24,7 @@ export default defineConfig({
       "@sections": path.resolve(__dirname, "./src/sections"),
       "@hooks": path.resolve(__dirname, "./src/hooks"),
       "@lib": path.resolve(__dirname, "./src/lib"),
+      "virtual:pwa-register/react": path.resolve(__dirname, "./src/test/pwaRegisterMock.ts"),
     },
   },
 });
