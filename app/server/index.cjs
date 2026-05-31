@@ -1492,7 +1492,7 @@ async function main() {
       await serveNotFoundHtml(req, res, reqUrl);
       return;
     }
-    await serveNotFoundHtml(req, res, reqUrl);
+    await serveHtmlFile(req, res, reqUrl, path.join(distDir, 'index.html'), 200);
     } catch (err) {
       try {
         incMap(metrics.logCounters, 'server_error', 1);

@@ -5,8 +5,8 @@ import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import CookieConsentBanner from '@/components/CookieConsentBanner';
 import { Toaster } from '@/components/ui/sonner';
 import { parseUrlLocaleFromPathname, type UrlLocale,urlLocaleFromLang } from '@/i18n/urlRouting';
+import { getServiceDetail } from '@/lib/serviceDetails';
 import { applySpaSeo } from '@/lib/spaSeo';
-import { getServiceDetail } from '@/pages_legacy/ServiceDetailPage';
 import { companyFaqItems } from '@/sections/CompanyFaqSection';
 
 import Navigation from './components/Navigation';

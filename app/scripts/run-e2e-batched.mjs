@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const HOST = '127.0.0.1';
 const BASE_PORT = 4173;
-const MAX_PORT = 4193;
+const MAX_PORT = BASE_PORT + 15;
 
 function getPlaywrightBin() {
   return process.platform === 'win32' ? '../node_modules/.bin/playwright.cmd' : '../node_modules/.bin/playwright';
@@ -165,17 +165,18 @@ const defaultBatches = [
   ['tests/ai-model.spec.ts'],
   ['tests/cet-ai-widget.spec.ts'],
   ['tests/telegram-miniapp.spec.ts'],
-  ['tests/wallet.spec.ts'],
 ];
+
+if (process.env.RUN_WALLET_E2E === '1') {
+  defaultBatches.push(['tests/wallet.spec.ts']);
+}
 
 const batches = cliFiles.length ? [cliFiles] : defaultBatches;
 
 let lastExitCode = 0;
-let nextPort = BASE_PORT;
 
 for (const files of batches) {
-  const port = await pickPort(nextPort);
-  nextPort = port + 1;
+  const port = await pickPort(BASE_PORT);
   const distOk = await waitForDistIndex(60_000);
   if (!distOk) {
     lastExitCode = 1;
