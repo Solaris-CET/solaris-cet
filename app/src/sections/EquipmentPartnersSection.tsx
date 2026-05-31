@@ -2,6 +2,8 @@ import { ArrowRight, Battery, Pickaxe, PlugZap, Sun } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { useMemo } from 'react';
 
+import AppImage from '@/components/AppImage';
+
 type Equipment = {
   title: string;
   description: string;
@@ -12,6 +14,13 @@ type Equipment = {
 type BrandGroup = {
   label: string;
   items: string[];
+};
+
+type ShowcaseItem = {
+  title: string;
+  subtitle: string;
+  img: string;
+  alt: string;
 };
 
 function parseBrandsEnv(): string[] | null {
@@ -85,6 +94,35 @@ export default function EquipmentPartnersSection() {
 
   const brands = useMemo(() => parseBrandsEnv(), []);
   const groups = useMemo(() => defaultBrandGroups(), []);
+  const marqueeBrands = useMemo(() => {
+    const picked = groups.flatMap((g) => g.items);
+    const unique = Array.from(new Set(picked));
+    return unique.slice(0, 14);
+  }, [groups]);
+
+  const showcase = useMemo<ShowcaseItem[]>(
+    () => [
+      {
+        title: 'Panouri',
+        subtitle: 'Montaj curat',
+        img: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20a%20modern%20roof%20with%20black%20monocrystalline%20solar%20panels%20installed%2C%20clean%20cable%20management%2C%20golden%20hour%20light%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
+        alt: 'Panouri fotovoltaice monocristaline montate pe acoperiș',
+      },
+      {
+        title: 'Invertor',
+        subtitle: 'Monitorizare',
+        img: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20a%20modern%20solar%20inverter%20installed%20on%20a%20utility%20room%20wall%2C%20neat%20cabling%2C%20breaker%20panel%20nearby%2C%20clean%20industrial%20look%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
+        alt: 'Invertor fotovoltaic montat într-o cameră tehnică, cu cablare ordonată',
+      },
+      {
+        title: 'Baterie',
+        subtitle: 'Autoconsum',
+        img: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20a%20home%20energy%20storage%20battery%20unit%20installed%20in%20a%20garage%20or%20utility%20room%2C%20clean%20setup%2C%20premium%20look%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
+        alt: 'Sistem de stocare energie (baterie) instalat în spațiu tehnic',
+      },
+    ],
+    [],
+  );
 
   return (
     <section id="echipamente" className="relative overflow-hidden bg-slate-950 py-24">
@@ -152,6 +190,24 @@ export default function EquipmentPartnersSection() {
               )}
             </div>
 
+            {!brands ? (
+              <div className="mt-6 rounded-3xl border border-white/10 bg-black/25 p-7">
+                <div className="text-sm font-semibold uppercase tracking-wider text-white/80">Branduri uzuale (vizual)</div>
+                <div className="mt-4 solaris-marquee overflow-hidden">
+                  <div className="solaris-marquee-track flex items-center gap-3 pr-6">
+                    {[...marqueeBrands, ...marqueeBrands].map((b, idx) => (
+                      <span
+                        key={`${b}-${idx}`}
+                        className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/85"
+                      >
+                        {b}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
             <div className="mt-6 rounded-3xl border border-white/10 bg-black/25 p-7">
               <div className="text-sm font-semibold uppercase tracking-wider text-white/80">Ce primești</div>
               <ul className="mt-4 space-y-2 text-sm text-slate-300">
@@ -170,7 +226,29 @@ export default function EquipmentPartnersSection() {
           </div>
 
           <div className="lg:col-span-7">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {showcase.map((x) => (
+                <div key={x.title} className="group relative overflow-hidden rounded-3xl border border-white/10 bg-black/20">
+                  <div className="aspect-[16/10] w-full overflow-hidden">
+                    <AppImage
+                      src={x.img}
+                      alt={x.alt}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                      width={1280}
+                      height={800}
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/70 via-black/10 to-transparent" aria-hidden />
+                  <div className="absolute left-4 top-4 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 backdrop-blur">
+                    <div className="text-sm font-bold text-white">{x.title}</div>
+                    <div className="text-xs font-semibold text-white/70">{x.subtitle}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {equipment.map((e) => {
                 const Icon = e.icon;
                 return (

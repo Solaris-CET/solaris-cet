@@ -137,8 +137,15 @@ export default function ProductsSection() {
             return (
               <div
                 key={s.id}
-                className="bg-slate-900 border border-white/5 rounded-3xl overflow-hidden hover:scale-[1.01] transition-transform"
+                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900/70 transition-transform hover:-translate-y-0.5"
               >
+                <div
+                  className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  aria-hidden
+                >
+                  <div className="absolute -inset-20 bg-[conic-gradient(from_200deg_at_50%_50%,rgba(242,201,76,0.16),rgba(46,231,255,0.10),rgba(242,201,76,0.16))] blur-3xl animate-hero-conic-drift" />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-black/55 via-transparent to-transparent" />
+                </div>
                 <div className="p-8">
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
@@ -172,7 +179,7 @@ export default function ProductsSection() {
                     <span className="text-white font-semibold">Cere ofertă</span>
                     <a
                       href={s.href}
-                      className="p-3 bg-white/5 border border-white/10 rounded-xl text-white hover:bg-amber-400 hover:text-black transition-colors"
+                      className="p-3 bg-white/5 border border-white/10 rounded-xl text-white transition-colors hover:bg-amber-400 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
                       aria-label="Cere ofertă"
                     >
                       <ArrowRight size={18} />

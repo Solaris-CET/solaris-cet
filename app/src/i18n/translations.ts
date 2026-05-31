@@ -40,6 +40,7 @@ export interface Translations {
     portfolio: string;
     services: string;
     products: string;
+    equipment: string;
     financing: string;
     blog: string;
     cetToken: string;
@@ -2359,6 +2360,7 @@ const translations: Record<LangCode, Translations> = {
       portfolio: 'Portfolio',
       services: 'Services',
       products: 'Products',
+      equipment: 'Equipment',
       financing: 'Financing',
       blog: 'Blog',
       cetToken: 'CET Token',
@@ -2915,6 +2917,7 @@ const translations: Record<LangCode, Translations> = {
       portfolio: 'Portafolio',
       services: 'Servicios',
       products: 'Productos',
+      equipment: 'Equipos',
       financing: 'Financiación',
       blog: 'Blog',
       cetToken: 'Token CET',
@@ -3471,6 +3474,7 @@ const translations: Record<LangCode, Translations> = {
       portfolio: '案例',
       services: '服务',
       products: '产品',
+      equipment: '设备',
       financing: '补贴/融资',
       blog: '博客',
       cetToken: 'CET 代币',
@@ -4023,6 +4027,7 @@ const translations: Record<LangCode, Translations> = {
       portfolio: 'Портфолио',
       services: 'Услуги',
       products: 'Продукты',
+      equipment: 'Оборудование',
       financing: 'Финансирование',
       blog: 'Блог',
       cetToken: 'Токен CET',
@@ -4585,6 +4590,7 @@ const translations: Record<LangCode, Translations> = {
       portfolio: 'Portofoliu',
       services: 'Servicii',
       products: 'Produse',
+      equipment: 'Echipamente',
       financing: 'Finanțare',
       blog: 'Blog',
       cetToken: 'Token CET',
@@ -5141,6 +5147,7 @@ const translations: Record<LangCode, Translations> = {
       portfolio: 'Portfólio',
       services: 'Serviços',
       products: 'Produtos',
+      equipment: 'Equipamentos',
       financing: 'Financiamento',
       blog: 'Blog',
       cetToken: 'Token CET',
@@ -5706,6 +5713,7 @@ const translations: Record<LangCode, Translations> = {
       portfolio: 'Portfolio',
       services: 'Leistungen',
       products: 'Produkte',
+      equipment: 'Ausrüstung',
       financing: 'Förderung',
       blog: 'Blog',
       cetToken: 'CET Token',

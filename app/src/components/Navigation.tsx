@@ -53,6 +53,8 @@ export default function Navigation() {
       return [
         { key: 'home', label: t.nav.home, href: isHome ? '#hero' : homePath },
         { key: 'services', label: t.nav.services, href: isHome ? '#servicii' : anchor('servicii') },
+        { key: 'products', label: t.nav.products, href: isHome ? '#produse' : anchor('produse') },
+        { key: 'equipment', label: t.nav.equipment, href: isHome ? '#echipamente' : anchor('echipamente') },
         { key: 'portfolio', label: t.nav.portfolio, href: isHome ? '#proiecte' : anchor('proiecte') },
         { key: 'financing', label: t.nav.financing, href: localizePathname('/finantare', urlLocale) },
         { key: 'blog', label: t.nav.blog, href: localizePathname('/blog', urlLocale) },
@@ -61,7 +63,19 @@ export default function Navigation() {
         { key: 'contact', label: t.nav.contact, href: localizePathname('/contact', urlLocale) },
       ];
     },
-    [t.nav.about, t.nav.blog, t.nav.cetToken, t.nav.contact, t.nav.financing, t.nav.home, t.nav.portfolio, t.nav.services, urlLocale],
+    [
+      t.nav.about,
+      t.nav.blog,
+      t.nav.cetToken,
+      t.nav.contact,
+      t.nav.equipment,
+      t.nav.financing,
+      t.nav.home,
+      t.nav.portfolio,
+      t.nav.products,
+      t.nav.services,
+      urlLocale,
+    ],
   );
 
   const [activeHref, setActiveHref] = useState<string>('/');

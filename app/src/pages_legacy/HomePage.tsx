@@ -36,13 +36,13 @@ export default function HomePage() {
         </ScrollFadeUp>
       </section>
 
-      <section id="produse" className="relative z-20">
+      <section className="relative z-20">
         <ScrollFadeUp>
           <ProductsSection />
         </ScrollFadeUp>
       </section>
 
-      <section id="echipamente" className="relative z-20">
+      <section className="relative z-20">
         <ScrollFadeUp>
           <EquipmentPartnersSection />
         </ScrollFadeUp>
