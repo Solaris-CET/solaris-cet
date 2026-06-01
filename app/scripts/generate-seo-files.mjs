@@ -50,12 +50,35 @@ function escapeHtml(s) {
     .replaceAll("'", '&#39;')
 }
 
-function renderStaticPageHtml({ title, description, canonicalPath, h1, bodyLines }) {
+function safeJsonLd(value) {
+  return JSON.stringify(value).replaceAll('<', '\\u003c')
+}
+
+function wrapJsonLd(graph) {
+  return { '@context': 'https://schema.org', '@graph': graph }
+}
+
+function breadcrumb(items) {
+  return {
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((x, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      name: x.name,
+      item: `${origin}${normalizePath(x.path)}`,
+    })),
+  }
+}
+
+function renderStaticPageHtml({ title, description, canonicalPath, h1, bodyLines, jsonLd }) {
   const canonical = `${origin}${normalizePath(canonicalPath)}`
   const metaDesc = escapeHtml(description)
   const metaTitle = escapeHtml(title)
   const metaH1 = escapeHtml(h1)
   const body = bodyLines.map((l) => `<p>${escapeHtml(l)}</p>`).join('\n')
+  const jsonLdBlock = jsonLd
+    ? `\n    <script type="application/ld+json">${safeJsonLd(jsonLd)}</script>\n`
+    : '\n'
 
   return `<!doctype html>
 <html lang="ro">
@@ -72,6 +95,7 @@ function renderStaticPageHtml({ title, description, canonicalPath, h1, bodyLines
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${metaTitle}" />
     <meta name="twitter:description" content="${metaDesc}" />
+${jsonLdBlock}
     <style>
       :root { color-scheme: dark; }
       body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif; background: #05070a; color: #fff; }
@@ -99,7 +123,7 @@ function renderStaticPageHtml({ title, description, canonicalPath, h1, bodyLines
           <h1>${metaH1}</h1>
           ${body}
           <p><strong>Telefon:</strong> <a href="tel:+40769889721">+40 769 889 721</a> · <strong>Email:</strong> <a href="mailto:solaris-cet@protonmail.com">solaris-cet@protonmail.com</a></p>
-          <p><a href="/contact/#oferta">Solicită ofertă →</a></p>
+          <p><a href="/contact/">Solicită ofertă →</a></p>
         </div>
       </main>
     </div>
@@ -109,13 +133,73 @@ function renderStaticPageHtml({ title, description, canonicalPath, h1, bodyLines
 }
 
 async function writeStaticPages() {
+  const localBusiness = {
+    '@type': 'LocalBusiness',
+    name: 'Solaris CET',
+    url: origin,
+    telephone: '+40769889721',
+    email: 'solaris-cet@protonmail.com',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Cetățuia',
+      addressRegion: 'Vaslui',
+      addressCountry: 'RO',
+    },
+    areaServed: 'RO',
+  }
+
+  const serviceFaq = {
+    'fotovoltaice-rezidentiale': [
+      { q: 'Cât durează montajul pentru o casă?', a: 'De obicei 1–3 zile, în funcție de acces, tip acoperiș și complexitate.' },
+      { q: 'Funcționează sistemul și iarna?', a: 'Da. Producția diferă sezonier, dar sistemul generează energie și pe vreme rece/înnorată.' },
+      { q: 'E nevoie de baterie?', a: 'Nu obligatoriu. Bateria ajută la autoconsum seara și backup (parțial), dar depinde de obiectiv și buget.' },
+    ],
+    'fotovoltaice-industriale': [
+      { q: 'Se poate monta pe TPO?', a: 'Da, cu detalii și proceduri corecte pentru etanșare și protecție.' },
+      { q: 'Aveți soluții de monitorizare?', a: 'Da. Configurăm monitorizare și alerte pentru performanță.' },
+      { q: 'Se poate face pe etape?', a: 'Da. Planificăm în funcție de operațiunile locației.' },
+    ],
+    'acoperisuri-tabla-tigla': [
+      { q: 'Tablă click sau țiglă metalică?', a: 'Depinde de arhitectură, buget și geometria acoperișului; recomandăm după evaluare.' },
+      { q: 'Includeți și jgheaburi/burlane?', a: 'Da, dacă sunt necesare pentru drenaj corect.' },
+      { q: 'Cât durează o reparație?', a: 'De la intervenții punctuale până la reparații mai ample, în funcție de situație.' },
+    ],
+    'acoperisuri-industriale-tpo': [
+      { q: 'Ce este TPO?', a: 'O membrană termoplastică folosită frecvent la acoperișuri plate industriale.' },
+      { q: 'Cât de des e nevoie de inspecție?', a: 'Recomandăm minim 1–2 inspecții/an pentru acoperișuri industriale.' },
+      { q: 'Se poate monta PV peste TPO?', a: 'Da, cu soluții compatibile și detalii corecte de fixare/etanșare.' },
+    ],
+    'atice-fatade-tabla': [
+      { q: 'Se pot repara doar zonele afectate?', a: 'Da. Facem reparații locale sau înlocuiri punctuale unde este realist.' },
+      { q: 'Includeți și etanșări?', a: 'Da, acolo unde sunt necesare pentru protecția anvelopei.' },
+      { q: 'Cum arată finisajul?', a: 'Punem accent pe linii curate, muchii și elemente de fixare discrete.' },
+    ],
+    'reparatii-mentenanta': [
+      { q: 'În cât timp interveniți?', a: 'Depinde de locație și urgență; confirmăm rapid disponibilitatea.' },
+      { q: 'Reparați și lucrări făcute de alții?', a: 'Da, după evaluare și dacă soluția este tehnic corectă.' },
+      { q: 'Ce include un plan de mentenanță?', a: 'Inspecții periodice, checklist, recomandări și intervenții prioritizate.' },
+    ],
+  }
+
   const pages = [
     {
       path: '/contact',
       title: 'Contact — Solaris CET',
       description: 'Contact Solaris CET pentru fotovoltaice, acoperișuri, reparații și mentenanță.',
-      h1: 'Contactați Solaris CET',
+      h1: 'Contact Solaris CET',
       bodyLines: ['Instalații fotovoltaice, acoperișuri (tablă/țiglă/TPO), reparații și mentenanță în Vaslui și în toată România.'],
+      jsonLd: wrapJsonLd([
+        localBusiness,
+        {
+          '@type': 'ContactPage',
+          name: 'Contact Solaris CET',
+          url: `${origin}/contact/`,
+        },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Contact', path: '/contact' },
+        ]),
+      ]),
     },
     {
       path: '/servicii',
@@ -123,6 +207,24 @@ async function writeStaticPages() {
       description: 'Servicii Solaris CET: fotovoltaice, acoperișuri, atice/fațade tablă, reparații și mentenanță.',
       h1: 'Servicii Solaris CET',
       bodyLines: ['Alege serviciul potrivit: fotovoltaice rezidențiale/industriale, acoperișuri, atice/fațade, reparații și mentenanță.'],
+      jsonLd: wrapJsonLd([
+        {
+          '@type': 'ItemList',
+          name: 'Servicii Solaris CET',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Fotovoltaice rezidențiale', url: `${origin}/servicii/fotovoltaice-rezidentiale/` },
+            { '@type': 'ListItem', position: 2, name: 'Fotovoltaice industriale', url: `${origin}/servicii/fotovoltaice-industriale/` },
+            { '@type': 'ListItem', position: 3, name: 'Acoperișuri tablă/țiglă', url: `${origin}/servicii/acoperisuri-tabla-tigla/` },
+            { '@type': 'ListItem', position: 4, name: 'Acoperișuri industriale TPO', url: `${origin}/servicii/acoperisuri-industriale-tpo/` },
+            { '@type': 'ListItem', position: 5, name: 'Atice și fațade tablă', url: `${origin}/servicii/atice-fatade-tabla/` },
+            { '@type': 'ListItem', position: 6, name: 'Reparații și mentenanță', url: `${origin}/servicii/reparatii-mentenanta/` },
+          ],
+        },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Servicii', path: '/servicii' },
+        ]),
+      ]),
     },
     {
       path: '/servicii/fotovoltaice-rezidentiale',
@@ -130,6 +232,28 @@ async function writeStaticPages() {
       description: 'Instalații fotovoltaice pentru case: panouri, invertor, baterii, monitorizare.',
       h1: 'Instalații Fotovoltaice Rezidențiale — Vaslui și împrejurimi',
       bodyLines: ['Panouri mono/poli/bifacial, invertoare, baterii de stocare și monitorizare producție/consum.'],
+      jsonLd: wrapJsonLd([
+        {
+          '@type': 'Service',
+          name: 'Instalații fotovoltaice rezidențiale',
+          provider: localBusiness,
+          areaServed: 'RO',
+          url: `${origin}/servicii/fotovoltaice-rezidentiale/`,
+        },
+        {
+          '@type': 'FAQPage',
+          mainEntity: serviceFaq['fotovoltaice-rezidentiale'].map((x) => ({
+            '@type': 'Question',
+            name: x.q,
+            acceptedAnswer: { '@type': 'Answer', text: x.a },
+          })),
+        },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Servicii', path: '/servicii' },
+          { name: 'Fotovoltaice rezidențiale', path: '/servicii/fotovoltaice-rezidentiale' },
+        ]),
+      ]),
     },
     {
       path: '/servicii/fotovoltaice-industriale',
@@ -137,6 +261,28 @@ async function writeStaticPages() {
       description: 'Sisteme fotovoltaice pentru hale și clădiri comerciale: proiectare, montaj, optimizare ROI.',
       h1: 'Sisteme Fotovoltaice Industriale — Hale și clădiri comerciale',
       bodyLines: ['Sisteme peste 100 kW, soluții pentru consum mare, optimizare și planificare ROI.'],
+      jsonLd: wrapJsonLd([
+        {
+          '@type': 'Service',
+          name: 'Sisteme fotovoltaice industriale',
+          provider: localBusiness,
+          areaServed: 'RO',
+          url: `${origin}/servicii/fotovoltaice-industriale/`,
+        },
+        {
+          '@type': 'FAQPage',
+          mainEntity: serviceFaq['fotovoltaice-industriale'].map((x) => ({
+            '@type': 'Question',
+            name: x.q,
+            acceptedAnswer: { '@type': 'Answer', text: x.a },
+          })),
+        },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Servicii', path: '/servicii' },
+          { name: 'Fotovoltaice industriale', path: '/servicii/fotovoltaice-industriale' },
+        ]),
+      ]),
     },
     {
       path: '/servicii/acoperisuri-tabla-tigla',
@@ -144,6 +290,28 @@ async function writeStaticPages() {
       description: 'Montaj acoperișuri tablă/țiglă metalică: sisteme pluviale, parazăpezi, etanșări.',
       h1: 'Montaj Acoperișuri Tablă și Țiglă Metalică — Vaslui, Bacău, Iași',
       bodyLines: ['Tablă click/falțuită, țiglă metalică, sisteme pluviale și parazăpezi.'],
+      jsonLd: wrapJsonLd([
+        {
+          '@type': 'Service',
+          name: 'Acoperișuri tablă / țiglă',
+          provider: localBusiness,
+          areaServed: 'RO',
+          url: `${origin}/servicii/acoperisuri-tabla-tigla/`,
+        },
+        {
+          '@type': 'FAQPage',
+          mainEntity: serviceFaq['acoperisuri-tabla-tigla'].map((x) => ({
+            '@type': 'Question',
+            name: x.q,
+            acceptedAnswer: { '@type': 'Answer', text: x.a },
+          })),
+        },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Servicii', path: '/servicii' },
+          { name: 'Acoperișuri tablă/țiglă', path: '/servicii/acoperisuri-tabla-tigla' },
+        ]),
+      ]),
     },
     {
       path: '/servicii/acoperisuri-industriale-tpo',
@@ -151,6 +319,28 @@ async function writeStaticPages() {
       description: 'Membrană TPO pentru hale și depozite: detalii tehnice, durabilitate, execuție.',
       h1: 'Acoperișuri Industriale Folie TPO — Hale și Depozite',
       bodyLines: ['Specificații TPO, avantaje și detalii de execuție pentru durabilitate 20+ ani.'],
+      jsonLd: wrapJsonLd([
+        {
+          '@type': 'Service',
+          name: 'Acoperișuri industriale TPO',
+          provider: localBusiness,
+          areaServed: 'RO',
+          url: `${origin}/servicii/acoperisuri-industriale-tpo/`,
+        },
+        {
+          '@type': 'FAQPage',
+          mainEntity: serviceFaq['acoperisuri-industriale-tpo'].map((x) => ({
+            '@type': 'Question',
+            name: x.q,
+            acceptedAnswer: { '@type': 'Answer', text: x.a },
+          })),
+        },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Servicii', path: '/servicii' },
+          { name: 'Acoperișuri industriale TPO', path: '/servicii/acoperisuri-industriale-tpo' },
+        ]),
+      ]),
     },
     {
       path: '/servicii/atice-fatade-tabla',
@@ -158,6 +348,28 @@ async function writeStaticPages() {
       description: 'Atice și fațade din tablă: finisaje moderne, culori RAL, execuție curată.',
       h1: 'Atice și Fațade din Tablă — Finisaje moderne',
       bodyLines: ['Tipuri tablă fațadă, culori RAL disponibile și execuție cu detalii curate.'],
+      jsonLd: wrapJsonLd([
+        {
+          '@type': 'Service',
+          name: 'Atice și fațade tablă',
+          provider: localBusiness,
+          areaServed: 'RO',
+          url: `${origin}/servicii/atice-fatade-tabla/`,
+        },
+        {
+          '@type': 'FAQPage',
+          mainEntity: serviceFaq['atice-fatade-tabla'].map((x) => ({
+            '@type': 'Question',
+            name: x.q,
+            acceptedAnswer: { '@type': 'Answer', text: x.a },
+          })),
+        },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Servicii', path: '/servicii' },
+          { name: 'Atice și fațade tablă', path: '/servicii/atice-fatade-tabla' },
+        ]),
+      ]),
     },
     {
       path: '/servicii/reparatii-mentenanta',
@@ -165,6 +377,28 @@ async function writeStaticPages() {
       description: 'Reparații acoperiș: infiltrații, jgheaburi, curățare și inspecție anuală.',
       h1: 'Reparații și Mentenanță Acoperiș — Intervenții rapide',
       bodyLines: ['Hidroizolații, înlocuire jgheaburi, curățare, inspecție anuală și intervenții rapide.'],
+      jsonLd: wrapJsonLd([
+        {
+          '@type': 'Service',
+          name: 'Reparații și mentenanță',
+          provider: localBusiness,
+          areaServed: 'RO',
+          url: `${origin}/servicii/reparatii-mentenanta/`,
+        },
+        {
+          '@type': 'FAQPage',
+          mainEntity: serviceFaq['reparatii-mentenanta'].map((x) => ({
+            '@type': 'Question',
+            name: x.q,
+            acceptedAnswer: { '@type': 'Answer', text: x.a },
+          })),
+        },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Servicii', path: '/servicii' },
+          { name: 'Reparații și mentenanță', path: '/servicii/reparatii-mentenanta' },
+        ]),
+      ]),
     },
     {
       path: '/despre',
@@ -172,6 +406,18 @@ async function writeStaticPages() {
       description: 'Echipă locală pentru fotovoltaice, acoperișuri, reparații și mentenanță.',
       h1: 'Despre Solaris CET',
       bodyLines: ['Lucrări complete pentru fotovoltaice și acoperișuri, cu acoperire în mai multe județe.'],
+      jsonLd: wrapJsonLd([
+        {
+          '@type': 'AboutPage',
+          name: 'Despre Solaris CET',
+          url: `${origin}/despre/`,
+        },
+        localBusiness,
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Despre', path: '/despre' },
+        ]),
+      ]),
     },
     {
       path: '/portofoliu',
@@ -179,6 +425,17 @@ async function writeStaticPages() {
       description: 'Portofoliu proiecte: fotovoltaice, acoperișuri, fațade și lucrări diverse.',
       h1: 'Portofoliu Solaris CET',
       bodyLines: ['Exemple de lucrări (placeholder) până la încărcarea pozelor reale din proiecte.'],
+      jsonLd: wrapJsonLd([
+        {
+          '@type': 'CollectionPage',
+          name: 'Portofoliu Solaris CET',
+          url: `${origin}/portofoliu/`,
+        },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Portofoliu', path: '/portofoliu' },
+        ]),
+      ]),
     },
   ]
 
@@ -191,6 +448,7 @@ async function writeStaticPages() {
       canonicalPath: `${p.path}/`,
       h1: p.h1,
       bodyLines: p.bodyLines,
+      jsonLd: p.jsonLd,
     })
     await fs.writeFile(outDir, html, 'utf8')
   }

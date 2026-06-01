@@ -313,6 +313,7 @@ export default function HeroSection() {
                     loading="eager"
                     fetchPriority="high"
                   />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/55 via-black/10 to-transparent" aria-hidden />
                   {show3D ? (
                     <Suspense fallback={null}>
                       <HeroTokenHologram quality="high" seed={0.62} />

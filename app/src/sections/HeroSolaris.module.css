@@ -56,7 +56,7 @@
 }
 
 .clipImage {
-  clip-path: polygon(6% 0%, 100% 0%, 94% 100%, 0% 100%);
+  clip-path: polygon(2% 0%, 100% 0%, 96% 100%, 0% 100%);
 }
 
 .diagonalSplit {
