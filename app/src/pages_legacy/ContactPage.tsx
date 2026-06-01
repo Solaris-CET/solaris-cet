@@ -58,20 +58,24 @@ export default function ContactPage() {
     [],
   );
 
+  const serviceQuick = useMemo(
+    () => serviceOptions.filter((x) => x.value !== 'constructii').slice(0, 4),
+    [serviceOptions],
+  );
+
   return (
     <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-solaris-offblack text-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-solar-yellow to-amber-500 bg-clip-text text-transparent">
-            Contactați Solaris Cet
+            Contact Solaris CET
           </h1>
           <p className="mt-4 text-xl text-solaris-muted max-w-2xl mx-auto">
-            Suntem aici să vă ajutăm cu proiectul dumneavoastră de energie regenerabilă sau construcții.
+            Spune-ne ce vrei să construiești. Revenim rapid cu pașii următori: evaluare, ofertă și planificare execuție.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Contact Information */}
           <div className="space-y-8 bg-black/40 p-8 rounded-3xl border border-white/10 backdrop-blur-sm">
             <h2 className="text-2xl font-semibold mb-6">Informații de Contact</h2>
             
@@ -136,7 +140,7 @@ export default function ContactPage() {
               </div>
               <div>
                 <p className="text-sm text-solaris-muted">Locație</p>
-                <p className="text-lg font-medium">Cetatuia, Vaslui, 737429, România</p>
+                <p className="text-lg font-medium">Cetățuia, Vaslui, 737429, România</p>
                 <p className="mt-1 text-sm text-solaris-muted">Acoperire: toate județele</p>
               </div>
             </div>
@@ -155,6 +159,10 @@ export default function ContactPage() {
               <div className="shrink-0">
                 <DownloadAppButton />
               </div>
+            </div>
+
+            <div className="mt-2 text-sm text-solaris-muted">
+              Dacă nu ai timp de formular, trimite direct pe WhatsApp sau sună. Pentru ofertă, ne ajută locația și câteva detalii.
             </div>
 
             {done ? (
@@ -184,19 +192,19 @@ export default function ContactPage() {
                 const ph = phone.trim();
                 const msg = message.trim();
                 if (!n) {
-                  setError('Te rog completează numele.');
+                  setError('Completează numele.');
                   return;
                 }
                 if (!em && !ph) {
-                  setError('Te rog completează email sau telefon.');
+                  setError('Completează email sau telefon.');
                   return;
                 }
                 if (!msg) {
-                  setError('Te rog completează mesajul.');
+                  setError('Completează mesajul.');
                   return;
                 }
                 if (!consent) {
-                  setError('Te rog confirmă consimțământul pentru prelucrarea datelor.');
+                  setError('Confirmă acordul pentru prelucrarea datelor, ca să te putem contacta.');
                   return;
                 }
 
@@ -208,6 +216,7 @@ export default function ContactPage() {
                     `Serviciu: ${serviceLabel || 'n/a'}`,
                     ph ? `Telefon: ${ph}` : null,
                     em ? `Email: ${em}` : null,
+                    utm?.referrer ? `Referrer: ${utm.referrer}` : null,
                     '',
                     msg,
                   ]
@@ -246,21 +255,27 @@ export default function ContactPage() {
               }}
             >
               <div>
-                <label className="block text-sm font-medium text-solaris-muted mb-1">Nume complet</label>
+                <label htmlFor="contact-name" className="block text-sm font-medium text-solaris-muted mb-1">
+                  Nume complet
+                </label>
                 <input
+                  id="contact-name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   type="text"
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-solar-yellow outline-none transition-colors"
-                  placeholder="Popescu Ion"
+                  placeholder="Ion Popescu"
                   autoComplete="name"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-solaris-muted mb-1">Email</label>
+                  <label htmlFor="contact-email" className="block text-sm font-medium text-solaris-muted mb-1">
+                    Email
+                  </label>
                   <input
+                    id="contact-email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     type="email"
@@ -270,8 +285,11 @@ export default function ContactPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-solaris-muted mb-1">Telefon</label>
+                  <label htmlFor="contact-phone" className="block text-sm font-medium text-solaris-muted mb-1">
+                    Telefon
+                  </label>
                   <input
+                    id="contact-phone"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     type="tel"
@@ -283,8 +301,29 @@ export default function ContactPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-solaris-muted mb-1">Serviciu</label>
+                <div className="flex items-end justify-between gap-3">
+                  <label htmlFor="contact-service" className="block text-sm font-medium text-solaris-muted mb-1">
+                    Serviciu (opțional)
+                  </label>
+                  <div className="hidden sm:flex items-center gap-2">
+                    {serviceQuick.map((o) => (
+                      <button
+                        key={o.value}
+                        type="button"
+                        onClick={() => setService(o.value)}
+                        className={`rounded-full border px-3 py-1 text-xs font-bold transition-colors ${
+                          service === o.value
+                            ? 'border-amber-400/40 bg-amber-400/15 text-amber-200'
+                            : 'border-white/10 bg-white/5 text-white/70 hover:text-white'
+                        }`}
+                      >
+                        {o.label.replace('Instalații ', '').replace('Acoperișuri ', 'Acoperiș')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <select
+                  id="contact-service"
                   value={service}
                   onChange={(e) => setService(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-solar-yellow outline-none transition-colors appearance-none"
@@ -299,13 +338,16 @@ export default function ContactPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-solaris-muted mb-1">Mesaj</label>
+                <label htmlFor="contact-message" className="block text-sm font-medium text-solaris-muted mb-1">
+                  Mesaj
+                </label>
                 <textarea
+                  id="contact-message"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   rows={5}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-solar-yellow outline-none transition-colors"
-                  placeholder="Detaliile proiectului: locație, tip clădire, suprafață, termen, preferințe…"
+                  placeholder="Detalii utile: locație, tip clădire, suprafață, consum/putere dorită, termen, preferințe…"
                 />
               </div>
 
@@ -318,6 +360,11 @@ export default function ContactPage() {
                 />
                 <span>
                   Sunt de acord cu prelucrarea datelor pentru a fi contactat în legătură cu solicitarea mea.
+                  <span className="ml-2">
+                    <a href="/privacy" className="underline underline-offset-4 decoration-white/20 hover:decoration-white/60 hover:text-white">
+                      Politica de confidențialitate
+                    </a>
+                  </span>
                 </span>
               </label>
 

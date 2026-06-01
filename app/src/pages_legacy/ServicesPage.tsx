@@ -2,6 +2,7 @@ import { ChevronRight, ShieldCheck } from 'lucide-react';
 
 import AppImage from '@/components/AppImage';
 import { SolarisFooter } from '@/components/company/SolarisFooter';
+import TrustProcessSection from '@/sections/TrustProcessSection';
 
 type ServiceBlock = {
   id: string;
@@ -56,28 +57,28 @@ const blocks: ServiceBlock[] = [
 
 const serviceImages: Record<string, { src: string; alt: string }> = {
   fotovoltaice: {
-    src: 'https://commons.wikimedia.org/wiki/Special:FilePath/Solar_panels_on_house_roof.jpg',
+    src: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20a%20modern%20Romanian%20house%20roof%20with%20black%20monocrystalline%20solar%20panels%20installed%2C%20clean%20cabling%2C%20golden%20hour%20light%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
     alt: 'Panouri fotovoltaice montate pe acoperiș',
   },
   constructii: {
-    src: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mario_Kleff_On_Construction_Site_in_Pattaya.jpg',
-    alt: 'Șantier și lucrări de construcții',
+    src: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20a%20small%20construction%20site%20with%20scaffolding%2C%20workers%20not%20visible%2C%20clean%20organized%20materials%2C%20modern%20residential%20building%20exterior%2C%20high%20detail%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
+    alt: 'Lucrări de construcții rezidențiale, șantier organizat',
   },
   acoperisuri: {
-    src: 'https://commons.wikimedia.org/wiki/Special:FilePath/Standing_seam_metal_roof_3.jpg',
+    src: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20close-up%20of%20a%20standing%20seam%20metal%20roof%20on%20a%20modern%20house%2C%20clean%20lines%2C%20premium%20finish%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
     alt: 'Acoperiș din tablă tip standing seam',
   },
   tpo: {
-    src: 'https://commons.wikimedia.org/wiki/Special:FilePath/FinishedEPDMcoveredRoof.jpg',
-    alt: 'Acoperiș tip membrană (industrial)',
+    src: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20an%20industrial%20flat%20roof%20with%20white%20TPO%20membrane%20installation%2C%20clean%20details%20around%20parapets%20and%20penetrations%2C%20modern%20warehouse%20background%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
+    alt: 'Acoperiș industrial cu membrană TPO, detalii de etanșare',
   },
   'atice-fatade': {
-    src: 'https://commons.wikimedia.org/wiki/Special:FilePath/Installation_of_zink_cladding_on_Kiasma_east_fa%C3%A7ade,_1997_(14117140288).jpg',
-    alt: 'Placare fațadă metalică și detalii de anvelopă',
+    src: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20a%20modern%20building%20with%20metal%20cladding%20facade%20details%2C%20clean%20lines%2C%20premium%20finish%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
+    alt: 'Fațadă cu placare metalică și detalii de anvelopă',
   },
   reparatii: {
-    src: 'https://commons.wikimedia.org/wiki/Special:FilePath/Standing_seam_metal_roof_up_close.webp',
-    alt: 'Detaliu acoperiș din tablă (reparații/mentenanță)',
+    src: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20a%20roof%20inspection%20scene%20showing%20close-up%20of%20metal%20roof%20details%2C%20sealants%20and%20fasteners%2C%20maintenance%20context%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
+    alt: 'Detalii acoperiș pentru reparații și mentenanță',
   },
 };
 
@@ -91,7 +92,7 @@ export default function ServicesPage() {
             Fotovoltaice, construcții, acoperișuri (tablă/țiglă/TPO), atice și fațade tablă, reparații.
           </p>
           <p className="mt-2 text-sm text-solaris-muted">
-            Cetatuia, Vaslui 737429 · acoperire națională · CUI: ***********
+            Cetățuia, Vaslui · acoperire națională
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <a href="/contact" className="btn-filled-gold inline-flex items-center gap-2">
@@ -102,6 +103,10 @@ export default function ServicesPage() {
               +40 769 889 721
             </a>
           </div>
+        </div>
+
+        <div className="mt-16">
+          <TrustProcessSection />
         </div>
 
         <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4">

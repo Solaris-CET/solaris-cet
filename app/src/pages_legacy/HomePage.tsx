@@ -13,6 +13,7 @@ import SolarAiAssistantSection from '@/sections/SolarAiAssistantSection';
 import SolarCompetitionSection from '@/sections/SolarCompetitionSection';
 import SolarIntelligenceSection from '@/sections/SolarIntelligenceSection';
 import SolarSecuritySection from '@/sections/SolarSecuritySection';
+import TrustProcessSection from '@/sections/TrustProcessSection';
 import TrustSignalsStrip from '@/sections/TrustSignalsStrip';
 
 export default function HomePage() {
@@ -33,6 +34,12 @@ export default function HomePage() {
       <section className="relative z-20">
         <ScrollFadeUp>
           <ServicesSection />
+        </ScrollFadeUp>
+      </section>
+
+      <section className="relative z-20">
+        <ScrollFadeUp>
+          <TrustProcessSection />
         </ScrollFadeUp>
       </section>
 

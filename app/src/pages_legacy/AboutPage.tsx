@@ -83,7 +83,7 @@ export default function AboutPage() {
               <div className="rounded-3xl border border-white/10 bg-black/30 p-6 sm:p-8">
                 <h3 className="text-lg font-semibold">Zona noastră de activitate</h3>
                 <p className="mt-2 text-sm text-slate-400">
-                  Suntem bazați în Cetățuia (Vaslui) și deplasăm echipele în raza de 200km, în funcție de proiect.
+                  Suntem bazați în Cetățuia (Vaslui) și ne deplasăm cu echipele într-o rază de până la 200 km, în funcție de proiect.
                 </p>
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -125,7 +125,7 @@ export default function AboutPage() {
         <section className="mt-16">
           <h2 className="text-2xl md:text-3xl font-bold">Certificări și acreditări</h2>
           <p className="mt-3 text-slate-300 max-w-3xl">
-            Folosim practici corecte și ne aliniem cerințelor de siguranță și calitate. Putem furniza documentația necesară la cerere.
+            Folosim practici corecte și ne aliniem cerințelor de siguranță și calitate. Putem furniza documentația necesară la cerere, unde se aplică.
           </p>
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
