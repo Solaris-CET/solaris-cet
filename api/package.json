@@ -9,7 +9,7 @@
     "typecheck": "../node_modules/.bin/tsc --noEmit"
   },
   "dependencies": {
-    "openai": "^6.37.0"
+    "openai": "^6.41.0"
   },
   "devDependencies": {
     "@types/node": "^25.6.2",
