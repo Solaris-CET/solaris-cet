@@ -135,7 +135,7 @@ ${jsonLdBlock}
 async function writeStaticPages() {
   const localBusiness = {
     '@type': 'LocalBusiness',
-    name: 'Solaris CET',
+    name: 'Solaris Engineering',
     url: origin,
     telephone: '+40769889721',
     email: 'solaris-cet@protonmail.com',
@@ -184,15 +184,15 @@ async function writeStaticPages() {
   const pages = [
     {
       path: '/contact',
-      title: 'Contact — Solaris CET',
-      description: 'Contact Solaris CET pentru fotovoltaice, acoperișuri, reparații și mentenanță.',
-      h1: 'Contact Solaris CET',
+      title: 'Contact — Solaris Engineering',
+      description: 'Contact Solaris Engineering pentru fotovoltaice, acoperișuri, reparații și mentenanță.',
+      h1: 'Contact Solaris Engineering',
       bodyLines: ['Instalații fotovoltaice, acoperișuri (tablă/țiglă/TPO), reparații și mentenanță în Vaslui și în toată România.'],
       jsonLd: wrapJsonLd([
         localBusiness,
         {
           '@type': 'ContactPage',
-          name: 'Contact Solaris CET',
+          name: 'Contact Solaris Engineering',
           url: `${origin}/contact/`,
         },
         breadcrumb([
@@ -203,14 +203,14 @@ async function writeStaticPages() {
     },
     {
       path: '/servicii',
-      title: 'Servicii — Solaris CET',
-      description: 'Servicii Solaris CET: fotovoltaice, acoperișuri, atice/fațade tablă, reparații și mentenanță.',
-      h1: 'Servicii Solaris CET',
+      title: 'Servicii — Solaris Engineering',
+      description: 'Servicii Solaris Engineering: fotovoltaice, acoperișuri, atice/fațade tablă, reparații și mentenanță.',
+      h1: 'Servicii Solaris Engineering',
       bodyLines: ['Alege serviciul potrivit: fotovoltaice rezidențiale/industriale, acoperișuri, atice/fațade, reparații și mentenanță.'],
       jsonLd: wrapJsonLd([
         {
           '@type': 'ItemList',
-          name: 'Servicii Solaris CET',
+          name: 'Servicii Solaris Engineering',
           itemListElement: [
             { '@type': 'ListItem', position: 1, name: 'Fotovoltaice rezidențiale', url: `${origin}/servicii/fotovoltaice-rezidentiale/` },
             { '@type': 'ListItem', position: 2, name: 'Fotovoltaice industriale', url: `${origin}/servicii/fotovoltaice-industriale/` },

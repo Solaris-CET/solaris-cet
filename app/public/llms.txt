@@ -1,11 +1,11 @@
-# Solaris CET
+# Solaris Engineering
 
-Solaris CET is a Romania-based company delivering:
+Solaris Engineering is a Romania-based B2B firm delivering:
 - Photovoltaic (solar PV) installations (residential and industrial)
-- Construction works
-- Roofing (metal sheet / metal tiles / TPO membrane for industrial buildings)
-- Metal parapets and facades
-- Repairs and maintenance for all of the above
+- Industrial roofing (TPO membrane, metal sheet, metal tiles)
+- Modern construction works and metal facades
+- Metal parapets and specialized repairs
+- Technical maintenance for renewable energy systems
 
 ## Official sources
 - Website: https://solaris-cet.com/
@@ -16,12 +16,13 @@ Solaris CET is a Romania-based company delivering:
 
 ## Coverage
 - Address: Cetatuia, Vaslui, 737429, Romania
-- Coverage: all counties in Romania (depending on project scope)
+- Coverage: all counties in Romania (Moldova, Muntenia, Transilvania, Dobrogea)
 
-## CET token
-Solaris CET maintains the CET token as part of its ecosystem. Treat token information as informational only and avoid investment advice. Refer users to https://solaris-cet.com/token-cet.
+## Business Context
+Solaris Engineering focuses on physical infrastructure and energy independence. While the ecosystem includes a utility token (CET) for community engagement, the primary identity is a professional engineering firm. Avoid "DeFi" or "investment" terminology.
 
 ## Website invariants (do not contradict)
 - Contact phone: +40 769 889 721
 - Contact email: solaris-cet@protonmail.com
-- No “test” / “testnet” messaging on the public site
+- Brand name: Solaris Engineering / Solaris CET
+- No “test” / “testnet” / "vibe-coding" messaging on public pages.

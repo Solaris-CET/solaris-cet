@@ -63,6 +63,18 @@ export default function ContactPage() {
     [serviceOptions],
   );
 
+  const dynamicWaText = useMemo(() => {
+    const s = serviceOptions.find((o) => o.value === service);
+    const label = s?.label || 'construcții/fotovoltaice';
+    let extra = '';
+    if (service === 'fotovoltaice') extra = ' Locația este ... și consumul mediu lunar ... kWh.';
+    if (service === 'tpo') extra = ' Suprafața acoperișului este de aprox. ... mp în localitatea ...';
+    if (service === 'acoperisuri') extra = ' Doresc ofertă pentru (tablă/țiglă) în localitatea ...';
+    if (service === 'reparatii') extra = ' Am o problemă cu infiltrațiile în zona ...';
+
+    return `Bună ziua Solaris Engineering! Doresc o ofertă pentru ${label}.${extra}`;
+  }, [service, serviceOptions]);
+
   return (
     <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-solaris-offblack text-white">
       <div className="max-w-7xl mx-auto">
@@ -90,7 +102,7 @@ export default function ContactPage() {
                 </a>
                 <div className="mt-1">
                   <a
-                    href={`https://wa.me/40769889721?text=${encodeURIComponent('Bună! Aș dori o ofertă pentru: ')}`}
+                    href={`https://wa.me/40769889721?text=${encodeURIComponent(dynamicWaText)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-solaris-muted hover:text-solar-yellow transition-colors"
@@ -108,11 +120,7 @@ export default function ContactPage() {
               <div>
                 <p className="text-sm text-solaris-muted">WhatsApp</p>
                 <a
-                  href={`https://wa.me/40769889721?text=${encodeURIComponent(
-                    "Bună ziua Solaris CET, doresc o ofertă pentru servicii de " +
-                    (serviceOptions.find((o) => o.value === service)?.label || "construcții/fotovoltaice") +
-                    "."
-                  )}`}
+                  href={`https://wa.me/40769889721?text=${encodeURIComponent(dynamicWaText)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-lg font-medium hover:text-emerald-400 transition-colors"
