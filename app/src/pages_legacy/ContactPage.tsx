@@ -68,7 +68,7 @@ export default function ContactPage() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-solar-yellow to-amber-500 bg-clip-text text-transparent">
-            Contact Solaris CET
+            Contact Solaris Engineering
           </h1>
           <p className="mt-4 text-xl text-solaris-muted max-w-2xl mx-auto">
             Spune-ne ce vrei să construiești. Revenim rapid cu pașii următori: evaluare, ofertă și planificare execuție.
@@ -90,7 +90,11 @@ export default function ContactPage() {
                 </a>
                 <div className="mt-1">
                   <a
-                    href={`https://wa.me/40769889721?text=${encodeURIComponent('Bună! Aș dori o ofertă pentru: ')}`}
+                    href={`https://wa.me/40769889721?text=${encodeURIComponent(
+                      "Bună ziua Solaris Engineering! Doresc o ofertă pentru: " +
+                      (serviceOptions.find((o) => o.value === service)?.label || "construcții/fotovoltaice") +
+                      "."
+                    )}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-solaris-muted hover:text-solar-yellow transition-colors"
@@ -109,7 +113,7 @@ export default function ContactPage() {
                 <p className="text-sm text-solaris-muted">WhatsApp</p>
                 <a
                   href={`https://wa.me/40769889721?text=${encodeURIComponent(
-                    "Bună ziua Solaris CET, doresc o ofertă pentru servicii de " +
+                    "Bună ziua Solaris Engineering! Doresc o ofertă pentru servicii de " +
                     (serviceOptions.find((o) => o.value === service)?.label || "construcții/fotovoltaice") +
                     "."
                   )}`}
