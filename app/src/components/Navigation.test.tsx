@@ -78,11 +78,6 @@ describe('Navigation', () => {
     expect(screen.getAllByRole('navigation', { name: 'Primary navigation' }).length).toBeGreaterThan(0);
     expect(screen.getAllByText('Home').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Services').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Portfolio').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Financing').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Blog').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('About').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('CET token').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Contact').length).toBeGreaterThan(0);
   });
 
@@ -96,5 +91,11 @@ describe('Navigation', () => {
     screen.getByTestId('mobile-menu-toggle').click();
     expect(await screen.findByText(/Solaris/i)).toBeInTheDocument();
     expect(document.getElementById('mobile-menu')).not.toBeNull();
+
+    expect(screen.getAllByText('Portfolio').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Financing').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Blog').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('About').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('CET token').length).toBeGreaterThan(0);
   });
 });
