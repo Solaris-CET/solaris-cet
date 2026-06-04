@@ -1,5 +1,5 @@
 .hero {
-  background: linear-gradient(180deg, #05060b 0%, #0a1628 100%);
+  background: radial-gradient(ellipse at 60% 40%, #0f2d5c 0%, #05060b 65%);
 }
 
 .particles {
@@ -85,6 +85,71 @@
   }
 }
 
+.rays {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 1;
+}
+
+.ray {
+  stroke-dasharray: 240;
+  stroke-dashoffset: 240;
+  animation: rayDash 8s ease-in-out infinite;
+  animation-delay: var(--delay);
+  will-change: stroke-dashoffset, opacity;
+}
+
+@keyframes rayDash {
+  0% {
+    stroke-dashoffset: 240;
+    opacity: 0.1;
+  }
+  50% {
+    stroke-dashoffset: 0;
+    opacity: 0.25;
+  }
+  100% {
+    stroke-dashoffset: -240;
+    opacity: 0.12;
+  }
+}
+
+.heroSerif {
+  font-family:
+    ui-serif,
+    Georgia,
+    Cambria,
+    'Times New Roman',
+    Times,
+    serif;
+}
+
+.typewriter {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.caret {
+  width: 10px;
+  height: 1.05em;
+  margin-left: 8px;
+  border-left: 2px solid rgba(242, 201, 76, 0.85);
+  animation: caretBlink 1.1s ease-in-out infinite;
+}
+
+@keyframes caretBlink {
+  0%,
+  60%,
+  100% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .particle {
     animation: none;
@@ -96,5 +161,14 @@
   }
   .badgePulse {
     animation: none;
+  }
+  .ray {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 0.18;
+  }
+  .caret {
+    animation: none;
+    opacity: 0;
   }
 }
