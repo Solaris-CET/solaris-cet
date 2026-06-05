@@ -93,12 +93,19 @@ export class ScrollReveal {
     if (this.handled.has(el)) return;
 
     if (el.hasAttribute('data-reveal-stagger')) {
+      const msRaw = (el.getAttribute('data-reveal-stagger-ms') ?? '').trim();
+      const capRaw = (el.getAttribute('data-reveal-stagger-cap') ?? '').trim();
+      const customMs = Number.parseInt(msRaw, 10);
+      const customCap = Number.parseInt(capRaw, 10);
+      const staggerMs = Number.isFinite(customMs) && customMs > 0 ? customMs : this.config.staggerMs;
+      const staggerCap = Number.isFinite(customCap) && customCap >= 0 ? customCap : this.config.staggerCap;
+
       const kids = Array.from(el.children).filter((x): x is HTMLElement => x instanceof HTMLElement);
       for (let i = 0; i < kids.length; i += 1) {
         const child = kids[i];
         child.classList.add('reveal');
-        const delaySteps = Math.min(i, this.config.staggerCap);
-        const delay = delaySteps * this.config.staggerMs;
+        const delaySteps = Math.min(i, staggerCap);
+        const delay = delaySteps * staggerMs;
         window.setTimeout(() => child.classList.add('revealed'), delay);
       }
       this.handled.add(el);
