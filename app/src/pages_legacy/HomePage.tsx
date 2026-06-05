@@ -72,9 +72,14 @@ export default function HomePage() {
               <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Lucrări reprezentative</h2>
               <p className="text-slate-400 text-lg">Exemple orientative de proiecte. Pentru ofertă exactă, evaluăm la locație.</p>
             </div>
-            <a href="/contact" className="text-amber-400 font-bold flex items-center gap-2 hover:underline">
-              Cere ofertă <ArrowRight size={16} />
-            </a>
+            <div className="flex flex-wrap items-center gap-4">
+              <a href="/proiecte" className="text-amber-300 font-bold flex items-center gap-2 hover:underline">
+                Vezi toate proiectele <ArrowRight size={16} />
+              </a>
+              <a href="/contact" className="text-amber-400 font-bold flex items-center gap-2 hover:underline">
+                Cere ofertă <ArrowRight size={16} />
+              </a>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

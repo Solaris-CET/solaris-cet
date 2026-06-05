@@ -29,6 +29,7 @@ const FinancingHubPage = lazy(() => import('./pages_legacy/FinancingHubPage'));
 const FinancingCasaVerde2025Page = lazy(() => import('./pages_legacy/FinancingCasaVerde2025Page'));
 const FinancingCasaVerdeBaterii2026Page = lazy(() => import('./pages_legacy/FinancingCasaVerdeBaterii2026Page'));
 const FinancingRePowerEuPage = lazy(() => import('./pages_legacy/FinancingRePowerEuPage'));
+const ProjectsPage = lazy(() => import('./pages_legacy/ProjectsPage'));
 const ThankYouPage = lazy(() => import('./pages_legacy/ThankYouPage'));
 const LegalDocPage = lazy(() => import('./pages_legacy/LegalDocPage'));
 const CookieSettingsPage = lazy(() => import('./pages_legacy/CookieSettingsPage'));
@@ -169,6 +170,18 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
     '/cere-oferta': {
       title: 'Cere ofertă — Solaris CET',
       description: 'Cere ofertă pentru fotovoltaice, acoperișuri sau mentenanță. Revenim rapid cu pașii următori.',
+      ogType: 'website',
+    },
+    '/proiecte': {
+      title: 'Proiecte — Solaris CET',
+      description: 'Galerie proiecte: fotovoltaice, acoperișuri și atice/fațade tablă. Vezi lucrări orientative și cere ofertă.',
+      keywords: 'proiecte fotovoltaice, portofoliu, lucrari acoperisuri, tpo, atice, fatade tabla, vaslui',
+      ogType: 'website',
+    },
+    '/portofoliu': {
+      title: 'Portofoliu — Solaris CET',
+      description: 'Galerie proiecte: fotovoltaice, acoperișuri și atice/fațade tablă. Vezi lucrări orientative și cere ofertă.',
+      keywords: 'portofoliu, proiecte fotovoltaice, lucrari acoperisuri, tpo, atice, fatade tabla, vaslui',
       ogType: 'website',
     },
     '/multumim': {
@@ -645,6 +658,8 @@ function App() {
           <ContactPage />
         ) : routePath === '/cere-oferta' ? (
           <ContactPage />
+        ) : routePath === '/proiecte' || routePath === '/portofoliu' ? (
+          <ProjectsPage />
         ) : routePath === '/token-cet' ? (
           <TokenCetPage />
         ) : routePath === '/despre' || routePath === '/about' ? (

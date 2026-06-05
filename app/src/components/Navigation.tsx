@@ -91,10 +91,11 @@ export default function Navigation() {
     const homePath = localizePathname('/', urlLocale);
     return [
       { key: 'home', label: t.nav.home, href: isHome ? '#hero' : homePath },
+      { key: 'portfolio', label: t.nav.portfolio, href: localizePathname('/proiecte', urlLocale) },
       { key: 'services', label: t.nav.services, href: localizePathname('/servicii', urlLocale) },
       { key: 'contact', label: t.nav.contact, href: localizePathname('/contact', urlLocale) },
     ];
-  }, [t.nav.contact, t.nav.home, t.nav.services, urlLocale]);
+  }, [t.nav.contact, t.nav.home, t.nav.portfolio, t.nav.services, urlLocale]);
 
   const [activeHref, setActiveHref] = useState<string>('/');
   const [indicator, setIndicator] = useState<{ left: number; width: number; visible: boolean }>({
@@ -134,7 +135,13 @@ export default function Navigation() {
     const update = () => {
       const pathname = typeof window !== 'undefined' ? (window.location.pathname || '/') : '/';
       const normalized = pathname !== '/' ? pathname.replace(/\/$/, '') : '/';
-      const best = normalized.startsWith('/servicii') ? '/servicii' : normalized.startsWith('/contact') ? '/contact' : '/';
+      const best = normalized.startsWith('/servicii')
+        ? '/servicii'
+        : normalized.startsWith('/proiecte') || normalized.startsWith('/portofoliu')
+          ? '/proiecte'
+          : normalized.startsWith('/contact')
+            ? '/contact'
+            : '/';
       setActiveHref(best);
     };
     update();
@@ -152,6 +159,7 @@ export default function Navigation() {
       if (!container) return;
       const el =
         (activeHref === '/servicii' ? desktopLinkRefs.current.services : null) ??
+        (activeHref === '/proiecte' ? desktopLinkRefs.current.portfolio : null) ??
         (activeHref === '/contact' ? desktopLinkRefs.current.contact : null) ??
         desktopLinkRefs.current.home;
       if (!el) {
@@ -249,10 +257,21 @@ export default function Navigation() {
                   ref={(el) => {
                     desktopLinkRefs.current[link.key] = el;
                   }}
-                  onClick={() => setActiveHref(link.key === 'services' ? '/servicii' : link.key === 'contact' ? '/contact' : '/')}
+                  onClick={() =>
+                    setActiveHref(
+                      link.key === 'services'
+                        ? '/servicii'
+                        : link.key === 'portfolio'
+                          ? '/proiecte'
+                          : link.key === 'contact'
+                            ? '/contact'
+                            : '/',
+                    )
+                  }
                   className={cn(
                     'relative z-10 px-4 py-2 text-sm font-semibold transition-colors',
                     (activeHref === '/servicii' && link.key === 'services') ||
+                      (activeHref === '/proiecte' && link.key === 'portfolio') ||
                       (activeHref === '/contact' && link.key === 'contact') ||
                       (activeHref === '/' && link.key === 'home')
                       ? 'text-white'
