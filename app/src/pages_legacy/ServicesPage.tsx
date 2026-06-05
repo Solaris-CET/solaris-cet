@@ -129,7 +129,7 @@ function ServiceCardItem({ card }: { card: ServiceCard }) {
         </span>
       </div>
 
-      <h3 className="mt-5 text-xl font-black tracking-tight text-white">
+                <h3 className="mt-5 font-black tracking-tight text-white font-display text-[length:var(--text-h3)] leading-[var(--lh-display)]">
         <a href={detailHref} className="hover:underline underline-offset-4 decoration-white/20 hover:decoration-white/60">
           {card.title}
         </a>
@@ -164,7 +164,7 @@ export default function ServicesPage() {
     <main id="main-content" tabIndex={-1} className="pt-24 pb-0 bg-slate-950 text-white">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="max-w-3xl">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+          <h1 className="font-display font-bold tracking-tight text-[length:var(--text-h1)] leading-[var(--lh-display)]">
             <span className="text-white">Servicii</span>
             <span className="mx-3 text-white/20" aria-hidden>
               /

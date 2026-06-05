@@ -116,13 +116,7 @@
 }
 
 .heroSerif {
-  font-family:
-    ui-serif,
-    Georgia,
-    Cambria,
-    'Times New Roman',
-    Times,
-    serif;
+  font-family: var(--font-display);
 }
 
 .typewriter {

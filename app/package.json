@@ -65,6 +65,8 @@
     "storybook:build": "../node_modules/.bin/storybook build"
   },
   "dependencies": {
+    "@fontsource/dm-sans": "^5.2.7",
+    "@fontsource/playfair-display": "^5.2.7",
     "@fontsource/syne": "^5.2.7",
     "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.2.2",

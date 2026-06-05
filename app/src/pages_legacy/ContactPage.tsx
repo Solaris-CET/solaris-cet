@@ -203,8 +203,8 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-solaris-offblack text-white">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-solar-yellow to-amber-500 bg-clip-text text-transparent">
+          <div className="text-center mb-16">
+            <h1 className="font-display font-bold bg-gradient-to-r from-solar-yellow to-amber-500 bg-clip-text text-transparent text-[length:var(--text-h1)] leading-[var(--lh-display)]">
             Contact Solaris CET
           </h1>
           <p className="mt-4 text-xl text-solaris-muted max-w-2xl mx-auto">
