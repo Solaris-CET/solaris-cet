@@ -4,6 +4,7 @@ import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 
 import CookieConsentBanner from '@/components/CookieConsentBanner';
 import { Toaster } from '@/components/ui/sonner';
+import { companyProfile } from '@/data/companyProfile';
 import { parseUrlLocaleFromPathname, type UrlLocale,urlLocaleFromLang } from '@/i18n/urlRouting';
 import { refreshScrollReveal } from '@/js/reveal';
 import { getServiceDetail } from '@/lib/serviceDetails';
@@ -119,6 +120,24 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
       jsonLd: {
         '@context': 'https://schema.org',
         '@graph': [
+          {
+            '@type': 'LocalBusiness',
+            name: companyProfile.name,
+            url: `${origin}/${urlLocale}/`,
+            telephone: companyProfile.phoneDisplay,
+            email: companyProfile.email,
+            address: {
+              '@type': 'PostalAddress',
+              addressLocality: 'Vaslui',
+              addressCountry: 'RO',
+            },
+            areaServed: 'RO',
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: companyProfile.reviews.ratingValue,
+              reviewCount: companyProfile.reviews.ratingCount,
+            },
+          },
           {
             '@type': 'FAQPage',
             mainEntity: companyFaqItems.map((x) => ({

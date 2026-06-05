@@ -9,6 +9,11 @@ export const companyProfile = {
   location: 'Cetățuia, Vaslui',
   program: 'Luni–Vineri 08:00–18:00',
   urgent: 'Urgențe: 24/7',
+  reviews: {
+    ratingValue: 4.9,
+    ratingCount: 50,
+    sourceLabel: 'Google Recenzii',
+  },
   cui: '',
   regCom: '',
   social: {
@@ -17,4 +22,3 @@ export const companyProfile = {
     youtube: '',
   },
 } as const;
-
