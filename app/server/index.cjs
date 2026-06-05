@@ -611,10 +611,10 @@ const handlerCache = new Map();
 
 /**
  * Advanced LRU Response Cache for Hetzner Optimization
- * Capacity: 1000 entries
+ * Capacity: 8192 entries (Optimized for 16GB RAM)
  */
 class ResponseCache {
-  constructor(capacity = 1000) {
+  constructor(capacity = 8192) {
     this.capacity = capacity;
     this.cache = new Map();
   }
@@ -634,7 +634,7 @@ class ResponseCache {
     this.cache.set(key, value);
   }
 }
-const apiResponseCache = new ResponseCache();
+const apiResponseCache = new ResponseCache(8192);
 
 function getRequestUrl(req) {
   const proto = String(req.headers['x-forwarded-proto'] ?? 'http').split(',')[0].trim();
@@ -692,7 +692,7 @@ async function serveFile(res, absPath) {
   if (baseName === 'sw.js' || /^sw-[a-f0-9]{7}\.js$/i.test(baseName)) {
     res.setHeader('Cache-Control', 'no-store');
   } else if (baseExt === '.html' || baseExt === '.json' || baseExt === '.xml' || baseExt === '.txt') {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', 'public, max-age=600');
   } else if (absPath.includes('/assets/') || absPath.includes('/fonts/')) {
     res.setHeader('Cache-Control', 'public, max-age=31536000, s-maxage=31536000, immutable');
   } else {
@@ -713,7 +713,7 @@ async function serveHtmlFile(req, res, reqUrl, absPath, statusCode = 200) {
   setSecurityHeaders(res, { nonce, isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
   res.statusCode = statusCode;
   res.setHeader('Content-Type', contentTypes['.html']);
-  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.setHeader('Cache-Control', 'public, max-age=600');
   const html = String(await readFileStable(absPath));
   const withNonce = injectCspNonceIntoHtml(html, nonce);
   const raw = Buffer.from(withNonce, 'utf8');
