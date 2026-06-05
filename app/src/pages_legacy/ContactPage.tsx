@@ -203,8 +203,8 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-solaris-offblack text-white">
       <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h1 className="font-display font-bold bg-gradient-to-r from-solar-yellow to-amber-500 bg-clip-text text-transparent text-[length:var(--text-h1)] leading-[var(--lh-display)]">
+        <div className="text-center mb-16" data-reveal>
+          <h1 className="font-display font-bold bg-gradient-to-r from-solar-yellow to-amber-500 bg-clip-text text-transparent text-[length:var(--text-h1)] leading-[var(--lh-display)]">
             Contact Solaris CET
           </h1>
           <p className="mt-4 text-xl text-solaris-muted max-w-2xl mx-auto">
@@ -213,7 +213,7 @@ export default function ContactPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div className="space-y-8 bg-black/40 p-8 rounded-3xl border border-white/10 backdrop-blur-sm">
+          <div className="space-y-8 bg-black/40 p-8 rounded-3xl border border-white/10 backdrop-blur-sm" data-reveal-stagger>
             <h2 className="text-2xl font-semibold mb-6">Informații de Contact</h2>
             
             <div className="flex items-start gap-4">
@@ -302,78 +302,78 @@ export default function ContactPage() {
             </div>
           </div>
 
-            <div className="bg-black/40 p-8 rounded-3xl border border-white/10 backdrop-blur-sm">
-              <div className="flex items-start justify-between gap-4">
-                <h2 className="text-2xl font-semibold mb-2">Cere ofertă</h2>
-                <div className="shrink-0">
-                  <DownloadAppButton />
-                </div>
+          <div className="bg-black/40 p-8 rounded-3xl border border-white/10 backdrop-blur-sm" data-reveal>
+            <div className="flex items-start justify-between gap-4">
+              <h2 className="text-2xl font-semibold mb-2">Cere ofertă</h2>
+              <div className="shrink-0">
+                <DownloadAppButton />
+              </div>
+            </div>
+
+            <div className="mt-2 text-sm text-solaris-muted">Formular rapid în 3 pași. Pentru urgențe: sună sau scrie pe WhatsApp.</div>
+
+            <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 overflow-hidden">
+              <div className="h-[2px] bg-white/10">
+                <div className={`h-[2px] bg-orange-400 ${styles.progressFill}`} style={{ width: `${progressPct}%` }} />
               </div>
 
-              <div className="mt-2 text-sm text-solaris-muted">Formular rapid în 3 pași. Pentru urgențe: sună sau scrie pe WhatsApp.</div>
-
-              <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 overflow-hidden">
-                <div className="h-[2px] bg-white/10">
-                  <div className={`h-[2px] bg-orange-400 ${styles.progressFill}`} style={{ width: `${progressPct}%` }} />
-                </div>
-
-                <div className="px-6 pt-5 pb-4 border-b border-white/10">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm font-bold text-white">Pasul {step + 1} din 3</div>
-                    <div className="flex items-center gap-2" aria-label="Progres">
-                      {[0, 1, 2].map((i) => (
-                        <span
-                          key={i}
-                          className={`h-2.5 w-2.5 rounded-full ${styles.dot} ${
-                            i <= step ? 'bg-orange-400 opacity-100' : 'bg-white/20 opacity-70'
-                          }`}
-                          style={i === step ? { transform: 'scale(1.12)' } : undefined}
-                          aria-hidden
-                        />
-                      ))}
-                    </div>
+              <div className="px-6 pt-5 pb-4 border-b border-white/10">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-bold text-white">Pasul {step + 1} din 3</div>
+                  <div className="flex items-center gap-2" aria-label="Progres">
+                    {[0, 1, 2].map((i) => (
+                      <span
+                        key={i}
+                        className={`h-2.5 w-2.5 rounded-full ${styles.dot} ${
+                          i <= step ? 'bg-orange-400 opacity-100' : 'bg-white/20 opacity-70'
+                        }`}
+                        style={i === step ? { transform: 'scale(1.12)' } : undefined}
+                        aria-hidden
+                      />
+                    ))}
                   </div>
-                  <div className="mt-2 text-sm text-white/70">{step === 0 ? 'Alege serviciul' : step === 1 ? 'Detalii proiect' : 'Date de contact'}</div>
                 </div>
+                <div className="mt-2 text-sm text-white/70">{step === 0 ? 'Alege serviciul' : step === 1 ? 'Detalii proiect' : 'Date de contact'}</div>
+              </div>
 
-                <div className="relative px-6 py-6">
-                  {done ? (
-                    <div className="relative rounded-3xl border border-emerald-400/20 bg-emerald-400/10 p-6 overflow-hidden">
-                      <div className={styles.confetti} aria-hidden>
-                        {Array.from({ length: 40 }).map((_, i) => {
-                          const dx = `${(i % 10) * 20 - 90}px`;
-                          const dy = `${140 + (i % 6) * 26}px`;
-                          const d = `${(i % 8) * 30}ms`;
-                          const r = `${(i * 37) % 360}deg`;
-                          const c = i % 4 === 0 ? '#f97316' : i % 4 === 1 ? '#fbbf24' : i % 4 === 2 ? '#22c55e' : '#60a5fa';
-                          return (
-                            <div
-                              key={i}
-                              className={styles.confettiPiece}
-                              style={{
-                                ['--dx' as never]: dx,
-                                ['--dy' as never]: dy,
-                                ['--d' as never]: d,
-                                ['--r' as never]: r,
-                                ['--c' as never]: c,
-                              }}
-                            />
-                          );
-                        })}
-                      </div>
-                      <div className="text-sm font-black text-white">Solicitare trimisă</div>
-                      <div className="mt-2 text-sm text-white/80">Vă vom contacta în 24h. Pentru urgențe: +40 769 889 721.</div>
-                      <button
-                        type="button"
-                        onClick={resetAll}
-                        className="mt-5 inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-bold text-white hover:bg-white/10"
-                      >
-                        Trimite o altă solicitare
-                      </button>
+              <div className="relative px-6 py-6">
+                {done ? (
+                  <div className="relative rounded-3xl border border-emerald-400/20 bg-emerald-400/10 p-6 overflow-hidden">
+                    <div className={styles.confetti} aria-hidden>
+                      {Array.from({ length: 40 }).map((_, i) => {
+                        const dx = `${(i % 10) * 20 - 90}px`;
+                        const dy = `${140 + (i % 6) * 26}px`;
+                        const d = `${(i % 8) * 30}ms`;
+                        const r = `${(i * 37) % 360}deg`;
+                        const c = i % 4 === 0 ? '#f97316' : i % 4 === 1 ? '#fbbf24' : i % 4 === 2 ? '#22c55e' : '#60a5fa';
+                        return (
+                          <div
+                            key={i}
+                            className={styles.confettiPiece}
+                            style={{
+                              ['--dx' as never]: dx,
+                              ['--dy' as never]: dy,
+                              ['--d' as never]: d,
+                              ['--r' as never]: r,
+                              ['--c' as never]: c,
+                            }}
+                          />
+                        );
+                      })}
                     </div>
-                  ) : (
-                    <form
-                      onSubmit={async (e) => {
+                    <div className="text-sm font-black text-white">Solicitare trimisă</div>
+                    <div className="mt-2 text-sm text-white/80">Vă vom contacta în 24h. Pentru urgențe: +40 769 889 721.</div>
+                    <button
+                      type="button"
+                      onClick={resetAll}
+                      className="mt-5 inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-bold text-white hover:bg-white/10"
+                    >
+                      Trimite o altă solicitare
+                    </button>
+                  </div>
+                ) : (
+                  <form
+                    onSubmit={async (e) => {
                         e.preventDefault();
                         if (busy) return;
                         setError(null);
@@ -503,62 +503,62 @@ export default function ContactPage() {
                           setBusy(false);
                         }
                       }}
-                    >
-                      {error ? (
-                        <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3">
-                          <div className="text-sm font-semibold text-white">Verifică</div>
-                          <div className="mt-1 text-sm text-solaris-muted">{error}</div>
-                        </div>
-                      ) : null}
+                  >
+                    {error ? (
+                      <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3">
+                        <div className="text-sm font-semibold text-white">Verifică</div>
+                        <div className="mt-1 text-sm text-solaris-muted">{error}</div>
+                      </div>
+                    ) : null}
 
-                      <div className="overflow-hidden">
-                        <div className={styles.track} style={{ transform: `translateX(-${step * 33.3333}%)` }}>
-                          <section className="w-1/3 pr-4">
-                            <div className={`grid grid-cols-2 gap-3 ${shakeKey === 'service' ? styles.shake : ''}`}>
-                              {serviceOptions.map((o) => {
-                                const Icon = o.icon;
-                                const selected = serviceChoice === o.value;
-                                return (
-                                  <button
-                                    key={o.value}
-                                    type="button"
-                                    onClick={() => setServiceChoice(o.value)}
-                                    className={`group rounded-2xl border px-4 py-4 text-left transition-colors ${
-                                      selected ? 'border-orange-400/70 bg-orange-400/10' : 'border-white/10 bg-black/20 hover:bg-white/5 hover:border-white/20'
-                                    }`}
-                                  >
-                                    <div className="flex items-start gap-3">
-                                      <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-black/20 text-orange-400">
-                                        <Icon className="h-7 w-7" />
-                                      </span>
-                                      <div className="min-w-0">
-                                        <div className="text-sm font-black text-white leading-tight">{o.label}</div>
-                                        <div className="mt-1 text-xs text-white/55">Alege</div>
-                                      </div>
+                    <div className="overflow-hidden">
+                      <div className={styles.track} style={{ transform: `translateX(-${step * 33.3333}%)` }}>
+                        <section className="w-1/3 pr-4">
+                          <div className={`grid grid-cols-2 gap-3 ${shakeKey === 'service' ? styles.shake : ''}`}>
+                            {serviceOptions.map((o) => {
+                              const Icon = o.icon;
+                              const selected = serviceChoice === o.value;
+                              return (
+                                <button
+                                  key={o.value}
+                                  type="button"
+                                  onClick={() => setServiceChoice(o.value)}
+                                  className={`group rounded-2xl border px-4 py-4 text-left transition-colors ${
+                                    selected ? 'border-orange-400/70 bg-orange-400/10' : 'border-white/10 bg-black/20 hover:bg-white/5 hover:border-white/20'
+                                  }`}
+                                >
+                                  <div className="flex items-start gap-3">
+                                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-black/20 text-orange-400">
+                                      <Icon className="h-7 w-7" />
+                                    </span>
+                                    <div className="min-w-0">
+                                      <div className="text-sm font-black text-white leading-tight">{o.label}</div>
+                                      <div className="mt-1 text-xs text-white/55">Alege</div>
                                     </div>
-                                  </button>
-                                );
-                              })}
-                            </div>
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
 
-                            <div className="mt-5 flex items-center justify-between">
-                              <div className="text-xs text-white/55">Selectează un serviciu ca să continui</div>
-                              <button
-                                type="button"
-                                disabled={!canNextStep1}
-                                onClick={() => {
-                                  if (!canNextStep1) {
-                                    shake('service');
-                                    return;
-                                  }
-                                  setStep(1);
-                                }}
-                                className="inline-flex items-center gap-2 rounded-2xl bg-orange-400 px-5 py-3 text-sm font-black text-black disabled:opacity-50"
-                              >
-                                Continuă <ArrowRight className="h-4 w-4" aria-hidden />
-                              </button>
-                            </div>
-                          </section>
+                          <div className="mt-5 flex items-center justify-between">
+                            <div className="text-xs text-white/55">Selectează un serviciu ca să continui</div>
+                            <button
+                              type="button"
+                              disabled={!canNextStep1}
+                              onClick={() => {
+                                if (!canNextStep1) {
+                                  shake('service');
+                                  return;
+                                }
+                                setStep(1);
+                              }}
+                              className="inline-flex items-center gap-2 rounded-2xl bg-orange-400 px-5 py-3 text-sm font-black text-black disabled:opacity-50"
+                            >
+                              Continuă <ArrowRight className="h-4 w-4" aria-hidden />
+                            </button>
+                          </div>
+                        </section>
 
                           <section className="w-1/3 px-2">
                             <div className="text-sm font-bold text-white">Detalii proiect</div>
@@ -740,13 +740,13 @@ export default function ContactPage() {
                               Serviciu: <span className="text-white/80">{selectedServiceLabel || '—'}</span>
                             </div>
                           </section>
-                        </div>
                       </div>
-                    </form>
-                  )}
-                </div>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
+          </div>
         </div>
       </div>
     </div>

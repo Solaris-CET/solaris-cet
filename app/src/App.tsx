@@ -5,6 +5,7 @@ import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import CookieConsentBanner from '@/components/CookieConsentBanner';
 import { Toaster } from '@/components/ui/sonner';
 import { parseUrlLocaleFromPathname, type UrlLocale,urlLocaleFromLang } from '@/i18n/urlRouting';
+import { refreshScrollReveal } from '@/js/reveal';
 import { getServiceDetail } from '@/lib/serviceDetails';
 import { applySpaSeo } from '@/lib/spaSeo';
 import { companyFaqItems } from '@/sections/CompanyFaqSection';
@@ -518,6 +519,11 @@ function App() {
     if (typeof window === 'undefined') return '/';
     return normalizePathname(window.location.pathname || '/');
   }, [locationKey]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    requestAnimationFrame(() => refreshScrollReveal());
+  }, [routePath]);
 
   useEffect(() => {
     const origin = typeof window === 'undefined' ? 'https://solaris-cet.com' : window.location.origin;

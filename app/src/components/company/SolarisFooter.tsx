@@ -59,11 +59,11 @@ export function SolarisFooter({ className }: { className?: string }) {
   ];
 
   return (
-    <footer id="footer" className={cn('bg-[#020617] text-white', className)}>
+    <footer id="footer" data-reveal className={cn('bg-[#020617] text-white', className)}>
       <div className="h-px w-full bg-gradient-to-r from-transparent via-amber-400/70 to-transparent" aria-hidden />
 
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-10" data-reveal-stagger>
           <div className="space-y-4">
             <a href={homePath} className="inline-flex items-center gap-3" aria-label={companyProfile.name}>
               <span className="h-11 w-11 rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
@@ -144,7 +144,7 @@ export function SolarisFooter({ className }: { className?: string }) {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col gap-6">
+        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col gap-6" data-reveal>
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="text-xs text-slate-500">{yearLine}</div>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs">

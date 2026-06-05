@@ -129,7 +129,7 @@ function ServiceCardItem({ card }: { card: ServiceCard }) {
         </span>
       </div>
 
-                <h3 className="mt-5 font-black tracking-tight text-white font-display text-[length:var(--text-h3)] leading-[var(--lh-display)]">
+      <h3 className="mt-5 font-black tracking-tight text-white font-display text-[length:var(--text-h3)] leading-[var(--lh-display)]">
         <a href={detailHref} className="hover:underline underline-offset-4 decoration-white/20 hover:decoration-white/60">
           {card.title}
         </a>
@@ -163,7 +163,7 @@ export default function ServicesPage() {
   return (
     <main id="main-content" tabIndex={-1} className="pt-24 pb-0 bg-slate-950 text-white">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
-        <div className="max-w-3xl">
+        <div className="max-w-3xl" data-reveal>
           <h1 className="font-display font-bold tracking-tight text-[length:var(--text-h1)] leading-[var(--lh-display)]">
             <span className="text-white">Servicii</span>
             <span className="mx-3 text-white/20" aria-hidden>
@@ -186,13 +186,13 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" data-reveal-stagger>
           {cards.map((c) => (
             <ServiceCardItem key={c.slug} card={c} />
           ))}
         </div>
 
-        <div className="mt-16">
+        <div className="mt-16" data-reveal>
           <TrustProcessSection />
         </div>
       </div>

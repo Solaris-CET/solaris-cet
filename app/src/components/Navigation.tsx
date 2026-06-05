@@ -188,6 +188,7 @@ export default function Navigation() {
 
   return (
     <header
+      data-reveal
       className={cn(
         `fixed top-0 left-0 right-0 z-[1000] max-w-full overflow-x-hidden lg:overflow-x-visible ${styles.bar}`,
         isScrolled

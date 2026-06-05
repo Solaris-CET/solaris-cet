@@ -343,7 +343,12 @@ export default function HeroSection() {
             </a>
           </div>
 
-          <div ref={elementRef} className={`mt-8 flex flex-wrap gap-3 ${styles.fadeUp}`} style={{ animationDelay: '0.9s' }}>
+          <div
+            ref={elementRef}
+            data-reveal-stagger
+            className={`mt-8 flex flex-wrap gap-3 ${styles.fadeUp}`}
+            style={{ animationDelay: '0.9s' }}
+          >
             <div className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur">
               <div className="text-base font-black text-white tabular-nums">{projects}+</div>
               <div className="text-sm font-semibold text-slate-200">Proiecte</div>
