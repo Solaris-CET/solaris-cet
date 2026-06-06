@@ -186,6 +186,68 @@
           outline: 2px solid #f2c94c;
           outline-offset: 2px;
         }
+        .solaris-noscript-fallback .grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 0.75rem;
+          margin-top: 1rem;
+        }
+        .solaris-noscript-fallback .card {
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(0, 0, 0, 0.25);
+          border-radius: 1rem;
+          padding: 0.85rem;
+        }
+        .solaris-noscript-fallback .card h2 {
+          margin: 0 0 0.35rem;
+          font-size: 0.95rem;
+          font-weight: 900;
+          letter-spacing: -0.01em;
+          color: #f8fafc;
+        }
+        .solaris-noscript-fallback .muted {
+          color: #94a3b8;
+          font-size: 0.9rem;
+        }
+        .solaris-noscript-fallback .ctaRow {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.6rem;
+          margin-top: 0.85rem;
+        }
+        .solaris-noscript-fallback .btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          padding: 0.55rem 0.8rem;
+          border-radius: 0.9rem;
+          font-weight: 800;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          background: rgba(255, 255, 255, 0.06);
+          text-decoration: none;
+        }
+        .solaris-noscript-fallback .btnPrimary {
+          border-color: rgba(242, 201, 76, 0.35);
+          background: rgba(242, 201, 76, 0.14);
+          color: #f2c94c;
+        }
+        .solaris-noscript-fallback .footer {
+          margin-top: 1.25rem;
+          padding-top: 1rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.07);
+          color: #94a3b8;
+          font-size: 0.85rem;
+        }
+        .solaris-noscript-fallback .footer a {
+          color: #e2e8f0;
+          font-weight: 700;
+        }
+        @media (max-width: 720px) {
+          .solaris-noscript-fallback .grid {
+            grid-template-columns: 1fr;
+          }
+        }
       </style>
       <div class="solaris-noscript-fallback no-js-only" role="region" aria-label="Solaris CET (mod simplificat)">
         <h1>Solaris CET</h1>
@@ -213,6 +275,20 @@
           <li>Atice și fațade tablă</li>
           <li>Reparații și mentenanță</li>
         </ul>
+        <div class="grid" role="region" aria-label="Repere rapide">
+          <div class="card">
+            <h2>Evaluare + ofertă</h2>
+            <div class="muted">Îți cerem câteva detalii, apoi îți dăm pașii următori.</div>
+          </div>
+          <div class="card">
+            <h2>Execuție curată</h2>
+            <div class="muted">Detalii corecte, trasee ordonate, fără improvizații.</div>
+          </div>
+          <div class="card">
+            <h2>Vaslui & RO</h2>
+            <div class="muted">Lucrăm în Vaslui și în toată România (în funcție de proiect).</div>
+          </div>
+        </div>
         <p>
           Contact rapid:
         </p>
@@ -221,6 +297,23 @@
           <li><a href="mailto:solaris-cet@protonmail.com">solaris-cet@protonmail.com</a></li>
           <li><a href="/servicii">Servicii</a> · <a href="/contact">Cere ofertă</a></li>
         </ul>
+        <div class="ctaRow" role="group" aria-label="Acțiuni rapide">
+          <a class="btn btnPrimary" href="tel:+40769889721">Sună acum</a>
+          <a
+            class="btn"
+            href="https://wa.me/40769889721?text=Bun%C4%83%20ziua%2C%20vreau%20o%20ofert%C4%83%20pentru%20fotovoltaice%2Facoperi%C8%99%20-%20m%C4%83%20pute%C8%9Bi%20ajuta%3F"
+            rel="noopener"
+          >
+            WhatsApp
+          </a>
+          <a class="btn" href="/proiecte">Vezi proiecte</a>
+        </div>
+        <div class="footer" role="contentinfo" aria-label="Linkuri utile">
+          <div>
+            <a href="/privacy">Confidențialitate</a> · <a href="/cookies">Cookies</a> · <a href="/terms">Termeni</a> · <a href="/contact">Contact</a>
+          </div>
+          <div style="margin-top: 0.4rem">© Solaris CET</div>
+        </div>
       </div>
     </noscript>
 
