@@ -4,6 +4,7 @@ import AppImage from '@/components/AppImage';
 import { SolarisFooter } from '@/components/company/SolarisFooter';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
+import { SolarisLogoMark } from '@/components/SolarisLogoMark';
 import CompanyFaqSection from '@/sections/CompanyFaqSection';
 import EquipmentPartnersSection from '@/sections/EquipmentPartnersSection';
 import HeroSection from '@/sections/HeroSection';
@@ -109,7 +110,7 @@ export default function HomePage() {
               const Icon = p.icon;
               return (
                 <div key={p.title} className="rounded-3xl border border-white/10 bg-black/30 overflow-hidden">
-                  <div className="aspect-[16/10] w-full overflow-hidden">
+                  <div className="relative aspect-[16/10] w-full overflow-hidden">
                     <AppImage
                       src={p.img}
                       alt={p.alt}
@@ -118,6 +119,9 @@ export default function HomePage() {
                       height={800}
                       referrerPolicy="no-referrer"
                     />
+                    <div className="pointer-events-none absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-black/35 backdrop-blur">
+                      <SolarisLogoMark className="h-7 w-7 text-orange-300" aria-hidden />
+                    </div>
                   </div>
                   <div className="p-6">
                     <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5">

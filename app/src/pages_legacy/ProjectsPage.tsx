@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import AppImage from '@/components/AppImage';
 import { SolarisFooter } from '@/components/company/SolarisFooter';
+import { SolarisLogoMark } from '@/components/SolarisLogoMark';
 import { cn } from '@/lib/utils';
 
 import styles from './ProjectsGallery.module.css';
@@ -436,6 +437,12 @@ export default function ProjectsPage() {
                       <span className={styles.plus} aria-hidden>
                         +
                       </span>
+                      <span
+                        className="pointer-events-none absolute bottom-3 right-3 z-[3] inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-black/35 backdrop-blur"
+                        aria-hidden
+                      >
+                        <SolarisLogoMark className="h-7 w-7 text-orange-300" />
+                      </span>
                       <AppImage
                         src={p.image.src}
                         alt={p.image.alt}
@@ -513,6 +520,12 @@ export default function ProjectsPage() {
               className={styles.lightboxImg}
               referrerPolicy="no-referrer"
             />
+            <span
+              className="pointer-events-none fixed bottom-6 right-6 inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-black/35 text-orange-300/90 backdrop-blur"
+              aria-hidden
+            >
+              <SolarisLogoMark className="h-8 w-8" />
+            </span>
           </>
         ) : null}
       </div>
