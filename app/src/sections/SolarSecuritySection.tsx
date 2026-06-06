@@ -1,6 +1,12 @@
 import { BadgeCheck, ShieldCheck } from 'lucide-react';
 
+import { useLanguage } from '@/hooks/useLanguage';
+import { localizePathname, urlLocaleFromLang } from '@/i18n/urlRouting';
+
 export default function SolarSecuritySection() {
+  const { lang } = useLanguage();
+  const urlLocale = urlLocaleFromLang(lang);
+
   const items = [
     {
       title: 'Garanție și responsabilitate',
@@ -15,9 +21,10 @@ export default function SolarSecuritySection() {
   ];
 
   const links = [
-    { label: 'Politică de confidențialitate', href: '/politica-confidentialitate/' },
-    { label: 'Politică cookies', href: '/politica-cookies/' },
-    { label: 'Contact', href: '/contact/' },
+    { label: 'Politică de confidențialitate', href: localizePathname('/privacy', urlLocale) },
+    { label: 'Politică cookies', href: localizePathname('/cookies', urlLocale) },
+    { label: 'Termeni și condiții', href: localizePathname('/terms', urlLocale) },
+    { label: 'Contact', href: localizePathname('/contact', urlLocale) },
     { label: 'Sună acum', href: 'tel:+40769889721' },
   ];
 
@@ -60,4 +67,3 @@ export default function SolarSecuritySection() {
     </section>
   );
 }
-

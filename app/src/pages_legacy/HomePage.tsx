@@ -10,9 +10,7 @@ import EquipmentPartnersSection from '@/sections/EquipmentPartnersSection';
 import HeroSection from '@/sections/HeroSection';
 import ProductsSection from '@/sections/ProductsSection';
 import ServicesSection from '@/sections/ServicesSection';
-import SolarAiAssistantSection from '@/sections/SolarAiAssistantSection';
 import SolarCompetitionSection from '@/sections/SolarCompetitionSection';
-import SolarIntelligenceSection from '@/sections/SolarIntelligenceSection';
 import SolarSecuritySection from '@/sections/SolarSecuritySection';
 import TrustProcessSection from '@/sections/TrustProcessSection';
 import TrustSignalsStrip from '@/sections/TrustSignalsStrip';
@@ -55,10 +53,6 @@ export default function HomePage() {
           <EquipmentPartnersSection />
         </ScrollFadeUp>
       </section>
-
-      <SolarAiAssistantSection />
-
-      <SolarIntelligenceSection />
 
       <SolarCompetitionSection />
 
