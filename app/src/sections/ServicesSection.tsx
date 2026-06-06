@@ -1,7 +1,5 @@
 import { ArrowRight } from 'lucide-react';
-import { type ReactNode,useMemo } from 'react';
-
-import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
+import { type ReactNode, useMemo } from 'react';
 
 function IconFrame({ children }: { children: ReactNode }) {
   return (
@@ -163,31 +161,20 @@ export default function ServicesSection() {
     []
   );
 
-  const { elementRef, isVisible } = useIntersectionObserver<HTMLElement>({
-    threshold: 0.2,
-    rootMargin: '0px 0px -10% 0px',
-    freezeOnceVisible: true,
-  });
-
   return (
-    <section id="servicii" ref={elementRef} className="py-24 relative overflow-hidden bg-[#05060B]">
+    <section id="servicii" className="py-24 relative overflow-hidden bg-[#05060B]">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 relative z-10">
-        <div className="text-center mb-16">
+        <div className="text-center mb-16" data-reveal>
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Serviciile noastre</h2>
           <p className="text-slate-400 max-w-2xl mx-auto text-lg">Soluții complete pentru energie și construcții</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((service, idx) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-reveal-stagger>
+          {services.map((service) => (
             <a
               key={service.id}
               href={service.href}
               className="group rounded-3xl border border-[#1e293b] bg-[#0d1117] p-7 transition-all duration-300 hover:scale-[1.02] hover:border-amber-400 hover:bg-[#101826] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 motion-reduce:transform-none"
-              style={{
-                opacity: isVisible ? 1 : 0,
-                transform: isVisible ? 'translateY(0px)' : 'translateY(14px)',
-                transitionDelay: `${idx * 100}ms`,
-              }}
             >
               <IconFrame>{service.icon}</IconFrame>
               <h3 className="mt-5 text-xl font-medium text-white">{service.title}</h3>

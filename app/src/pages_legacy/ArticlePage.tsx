@@ -73,7 +73,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
   if (!post) {
     return (
       <main id="main-content" className="relative z-10 w-full px-5 sm:px-8 xl:px-12 pt-28 pb-20">
-        <div className="max-w-4xl mx-auto bento-card p-8 border border-white/10">
+        <div className="max-w-4xl mx-auto bento-card p-8 border border-white/10" data-reveal-stagger>
           <div className="text-solaris-text font-semibold">{t.blog.notFoundTitle}</div>
           <div className="text-solaris-muted text-sm mt-1">{t.blog.notFoundBody}</div>
           <a href={blogHref} className="btn-filled-gold mt-4 inline-flex">
@@ -87,7 +87,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
   return (
     <main id="main-content" className="relative z-10 w-full px-5 sm:px-8 xl:px-12 pt-28 pb-20">
       <div className="max-w-7xl mx-auto">
-      <div className="mb-6">
+      <div className="mb-6" data-reveal>
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -108,6 +108,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
       <a
         href={blogHref}
         className="inline-flex items-center gap-2 text-sm text-solaris-muted hover:text-solaris-text transition-colors"
+        data-reveal
       >
         <ArrowLeft className="w-4 h-4" aria-hidden />
         {t.blog.backToBlog}
@@ -115,7 +116,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
 
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-10">
         <article className="lg:col-span-8">
-          <header>
+          <header data-reveal-stagger>
             <h1 className="font-display text-4xl md:text-5xl text-solaris-text tracking-tight">{post.frontmatter.title}</h1>
             <p className="mt-3 text-solaris-muted">{post.frontmatter.description}</p>
 
@@ -200,7 +201,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
             ) : null}
           </header>
 
-          <div className="mt-10">
+          <div className="mt-10" data-reveal>
             <SafeHtml
               html={post.html}
               config={MARKDOWN_HTML_CONFIG}
@@ -215,7 +216,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
         </article>
 
         <aside className="lg:col-span-4">
-          <div className="sticky top-24 space-y-4">
+          <div className="sticky top-24 space-y-4" data-reveal-stagger>
             <div className="rounded-3xl border border-white/10 bg-black/30 p-6">
               <div className="text-solaris-text font-semibold">Solicită ofertă gratuită</div>
               <div className="mt-1 text-solaris-muted text-sm">Vă contactăm în 24 de ore cu pașii următori.</div>
@@ -226,7 +227,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
 
             <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
               <div className="text-solaris-text font-semibold">Alte articole</div>
-              <div className="mt-4 grid gap-3">
+              <div className="mt-4 grid gap-3" data-reveal-stagger>
                 {otherPosts.map((p) => (
                   <a
                     key={`${p.locale}:${p.slug}`}

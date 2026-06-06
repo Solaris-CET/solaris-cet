@@ -47,12 +47,12 @@ export default function CompanyFaqSection() {
   return (
     <section className="py-24 bg-slate-950">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
-        <div className="max-w-2xl">
+        <div className="max-w-2xl" data-reveal>
           <h2 className="text-3xl md:text-5xl font-bold text-white">Întrebări frecvente</h2>
           <p className="mt-4 text-slate-400 text-lg">Răspunsuri scurte la întrebările cele mai comune înainte de ofertare.</p>
         </div>
 
-        <div className="mt-10">
+        <div className="mt-10" data-reveal>
           <FaqAccordion items={items} />
         </div>
       </div>
@@ -61,4 +61,3 @@ export default function CompanyFaqSection() {
 }
 
 export const companyFaqItems = items;
-

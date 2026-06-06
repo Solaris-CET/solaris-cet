@@ -62,7 +62,7 @@ export default function HomePage() {
 
       <section id="proiecte" className="py-24 bg-slate-900/40">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
-          <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-12">
+          <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-12" data-reveal-stagger>
             <div className="max-w-2xl">
               <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Lucrări reprezentative</h2>
               <p className="text-slate-400 text-lg">Exemple orientative de proiecte. Pentru ofertă exactă, evaluăm la locație.</p>
@@ -77,7 +77,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6" data-reveal-stagger>
             {[
               {
                 title: 'Fotovoltaice rezidențial',
@@ -132,7 +132,7 @@ export default function HomePage() {
       </section>
 
       <section id="contact-promo" className="py-24 bg-amber-400">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 text-center">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 text-center" data-reveal>
            <h2 className="text-4xl md:text-6xl font-black text-black mb-8">Cere o ofertă</h2>
            <p className="text-black/80 text-xl font-bold mb-12 max-w-2xl mx-auto">
              Îți răspundem rapid cu pașii următori: evaluare, ofertă și planificare execuție.

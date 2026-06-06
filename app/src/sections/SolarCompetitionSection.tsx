@@ -21,14 +21,14 @@ export default function SolarCompetitionSection() {
   return (
     <section id="competition" className="py-24 bg-[#05060B]">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
-        <div className="max-w-3xl">
+        <div className="max-w-3xl" data-reveal>
           <h2 className="text-3xl md:text-5xl font-bold text-white">Comparație rapidă</h2>
           <p className="mt-4 text-slate-300 text-lg">
             Un tabel simplu care arată ce primești când alegi Solaris CET pentru fotovoltaice și acoperișuri.
           </p>
         </div>
 
-        <div className="mt-10 overflow-x-auto rounded-3xl border border-white/10 bg-black/25">
+        <div className="mt-10 overflow-x-auto rounded-3xl border border-white/10 bg-black/25" data-reveal>
           <table className="w-full min-w-[640px] border-collapse">
             <thead>
               <tr className="border-b border-white/10">
@@ -43,7 +43,7 @@ export default function SolarCompetitionSection() {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody data-reveal-stagger>
               {rows.map((r) => (
                 <tr key={r.label} className="border-b border-white/5 last:border-b-0">
                   <th scope="row" className="p-5 text-left text-sm text-slate-200">
@@ -65,7 +65,7 @@ export default function SolarCompetitionSection() {
           </table>
         </div>
 
-        <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-4" data-reveal>
           <a
             href="/contact?service=fotovoltaice"
             className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-7 py-4 text-base font-black text-black"
@@ -80,4 +80,3 @@ export default function SolarCompetitionSection() {
     </section>
   );
 }
-

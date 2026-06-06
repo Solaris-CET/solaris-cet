@@ -7,7 +7,7 @@ export default function AboutPage() {
   return (
     <main id="main-content" tabIndex={-1} className="pt-24 pb-0 bg-slate-950 text-white">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
-        <section className="rounded-3xl border border-white/10 bg-black/30 p-8 sm:p-10">
+        <section className="rounded-3xl border border-white/10 bg-black/30 p-8 sm:p-10" data-reveal-stagger>
           <div className="text-xs text-slate-400 flex items-center gap-2">
             <a href="/" className="hover:text-white">Acasă</a>
             <ChevronRight className="h-3.5 w-3.5" aria-hidden />
@@ -21,7 +21,7 @@ export default function AboutPage() {
         </section>
 
         <section className="mt-14 space-y-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center" data-reveal>
             <div className="lg:col-span-6">
               <h2 className="text-2xl md:text-3xl font-bold">Povestea noastră</h2>
               <p className="mt-3 text-slate-300 leading-relaxed">
@@ -48,14 +48,14 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center" data-reveal>
             <div className="lg:col-span-6 lg:order-2">
               <h2 className="text-2xl md:text-3xl font-bold">Misiunea noastră</h2>
               <p className="mt-3 text-slate-300 leading-relaxed">
                 Misiunea Solaris CET este să aducă soluții eficiente și durabile: proiecte fotovoltaice corect dimensionate
                 și execuție de construcții/învelitori care rezistă în timp. Preferăm calitatea, transparența și responsabilitatea.
               </p>
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4" data-reveal-stagger>
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
                   <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/10 border border-amber-400/20">
                     <Sparkles className="h-5 w-5 text-amber-400" aria-hidden />
@@ -88,7 +88,7 @@ export default function AboutPage() {
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                     <div className="text-xs text-slate-400">Județe deservite frecvent</div>
-                    <ul className="mt-3 space-y-2 text-sm text-slate-200">
+                    <ul className="mt-3 space-y-2 text-sm text-slate-200" data-reveal-stagger>
                       {['Vaslui', 'Bacău', 'Iași', 'Galați', 'Vrancea', 'Botoșani'].map((x) => (
                         <li key={x} className="flex items-center gap-2">
                           <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden />
@@ -122,12 +122,12 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="mt-16">
+        <section className="mt-16" data-reveal-stagger>
           <h2 className="text-2xl md:text-3xl font-bold">Certificări și acreditări</h2>
           <p className="mt-3 text-slate-300 max-w-3xl">
             Folosim practici corecte și ne aliniem cerințelor de siguranță și calitate. Putem furniza documentația necesară la cerere, unde se aplică.
           </p>
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" data-reveal-stagger>
             {[
               { title: 'ANRE', body: 'Atestat / conformitate pentru lucrări PV (unde se aplică).' },
               { title: 'AFM', body: 'Suport pentru programe de finanțare (Casa Verde / ghiduri).' },
@@ -145,10 +145,10 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="mt-16">
+        <section className="mt-16" data-reveal-stagger>
           <h2 className="text-2xl md:text-3xl font-bold">Echipa</h2>
           <p className="mt-3 text-slate-300 max-w-3xl">O echipă compactă, orientată pe execuție și detalii.</p>
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-reveal-stagger>
             {[
               { name: 'Coordonator proiect', role: 'Planificare, ofertare, calitate execuție' },
               { name: 'Tehnician fotovoltaic', role: 'Montaj, punere în funcțiune, verificări' },
@@ -163,7 +163,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="mt-16 mb-16 rounded-3xl border border-white/10 bg-amber-400 p-10 text-black">
+        <section className="mt-16 mb-16 rounded-3xl border border-white/10 bg-amber-400 p-10 text-black" data-reveal-stagger>
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 text-sm font-bold">
               <MapPin className="h-4 w-4" aria-hidden />

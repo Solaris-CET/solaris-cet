@@ -70,7 +70,7 @@ export default function ArticlesPage() {
 
   return (
     <main id="main-content" className="relative z-10 w-full max-w-6xl mx-auto px-6 pt-28 pb-20">
-      <div className="mb-6">
+      <div className="mb-6" data-reveal>
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -86,13 +86,13 @@ export default function ArticlesPage() {
 
       <div className="flex flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-10">
         <div>
-          <div className="mb-7">
+          <div className="mb-7" data-reveal-stagger>
             <h1 className="font-display text-4xl text-solaris-text tracking-tight">{t.blog.title}</h1>
             <p className="mt-2 text-solaris-muted max-w-2xl">{t.blog.subtitle}</p>
           </div>
 
           {filtered.length === 0 ? (
-            <div className="bento-card p-8 border border-white/10">
+            <div className="bento-card p-8 border border-white/10" data-reveal-stagger>
               <div className="text-solaris-text font-semibold">{t.blog.emptyTitle}</div>
               <div className="text-solaris-muted text-sm mt-1">{t.blog.emptyBody}</div>
               <button
@@ -111,7 +111,7 @@ export default function ArticlesPage() {
             </div>
           ) : (
             <div>
-              <div className="mb-5 flex flex-wrap gap-2">
+              <div className="mb-5 flex flex-wrap gap-2" data-reveal-stagger>
                 <button
                   type="button"
                   className={cn(
@@ -151,7 +151,7 @@ export default function ArticlesPage() {
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" data-reveal-stagger>
                 {filtered.map((p) => {
                   const href = localizePathname(`/blog/${p.slug}`, locale)
                   return (
@@ -196,12 +196,12 @@ export default function ArticlesPage() {
         </div>
 
         <aside className="lg:pt-2">
-          <div className="bento-card p-6 border border-white/10 sticky top-24">
+          <div className="bento-card p-6 border border-white/10 sticky top-24" data-reveal-stagger>
             <div className="text-solaris-text font-semibold">{t.blog.filtersTitle}</div>
 
             <div className="mt-4">
               <div className="hud-label text-[10px] mb-2">{t.blog.filterCategory}</div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2" data-reveal-stagger>
                 <button
                   type="button"
                   className={cn(
@@ -247,7 +247,7 @@ export default function ArticlesPage() {
                 <Tag className="w-3.5 h-3.5" aria-hidden />
                 <span>{t.blog.filterTags}</span>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2" data-reveal-stagger>
                 <button
                   type="button"
                   className={cn(

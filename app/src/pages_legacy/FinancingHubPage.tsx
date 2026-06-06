@@ -27,7 +27,7 @@ export default function FinancingHubPage() {
   return (
     <main id="main-content" tabIndex={-1} className="pt-24 pb-0 bg-slate-950 text-white">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
-        <section className="rounded-3xl border border-white/10 bg-black/30 p-8 sm:p-10">
+        <section className="rounded-3xl border border-white/10 bg-black/30 p-8 sm:p-10" data-reveal-stagger>
           <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-[11px] font-bold tracking-wider text-emerald-300">
             FINANȚARE
           </div>
@@ -51,7 +51,7 @@ export default function FinancingHubPage() {
           </div>
         </section>
 
-        <section className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-6" data-reveal-stagger>
           {cards.map((c) => (
             <a
               key={c.href}
