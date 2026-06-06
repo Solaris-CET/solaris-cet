@@ -705,6 +705,8 @@ function App() {
           <HomePage />
         ) : routePath === '/servicii' ? (
           <ServicesPage />
+        ) : routePath === '/servicii/atice-fatade-tabla' ? (
+          <ServiceDetailPage slug="atice-si-fatade-tabla" />
         ) : routePath.startsWith('/servicii/') ? (
           <ServiceDetailPage slug={routePath.replace(/^\/servicii\//, '')} />
         ) : routePath === '/contact' ? (

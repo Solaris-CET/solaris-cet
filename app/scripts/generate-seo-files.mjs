@@ -237,7 +237,7 @@ async function writeStaticPages() {
       { q: 'Cât de des e nevoie de inspecție?', a: 'Recomandăm minim 1–2 inspecții/an pentru acoperișuri industriale.' },
       { q: 'Se poate monta PV peste TPO?', a: 'Da, cu soluții compatibile și detalii corecte de fixare/etanșare.' },
     ],
-    'atice-fatade-tabla': [
+    'atice-si-fatade-tabla': [
       { q: 'Se pot repara doar zonele afectate?', a: 'Da. Facem reparații locale sau înlocuiri punctuale unde este realist.' },
       { q: 'Includeți și etanșări?', a: 'Da, acolo unde sunt necesare pentru protecția anvelopei.' },
       { q: 'Cum arată finisajul?', a: 'Punem accent pe linii curate, muchii și elemente de fixare discrete.' },
@@ -289,7 +289,7 @@ async function writeStaticPages() {
             { '@type': 'ListItem', position: 2, name: 'Fotovoltaice industriale', url: `${origin}/servicii/fotovoltaice-industriale/` },
             { '@type': 'ListItem', position: 3, name: 'Acoperișuri tablă/țiglă', url: `${origin}/servicii/acoperisuri-tabla-tigla/` },
             { '@type': 'ListItem', position: 4, name: 'Acoperișuri industriale TPO', url: `${origin}/servicii/acoperisuri-industriale-tpo/` },
-            { '@type': 'ListItem', position: 5, name: 'Atice și fațade tablă', url: `${origin}/servicii/atice-fatade-tabla/` },
+            { '@type': 'ListItem', position: 5, name: 'Atice și fațade tablă', url: `${origin}/servicii/atice-si-fatade-tabla/` },
             { '@type': 'ListItem', position: 6, name: 'Reparații și mentenanță', url: `${origin}/servicii/reparatii-mentenanta/` },
           ],
         },
@@ -444,7 +444,7 @@ async function writeStaticPages() {
       ]),
     },
     {
-      path: '/servicii/atice-fatade-tabla',
+      path: '/servicii/atice-si-fatade-tabla',
       title: 'Atice și Fațade din Tablă — Solaris CET',
       description: 'Atice și fațade din tablă: finisaje moderne, culori RAL, execuție curată.',
       h1: 'Atice și Fațade din Tablă — Finisaje moderne',
@@ -459,11 +459,11 @@ async function writeStaticPages() {
           name: 'Atice și fațade tablă',
           provider: localBusiness,
           areaServed: 'RO',
-          url: `${origin}/servicii/atice-fatade-tabla/`,
+          url: `${origin}/servicii/atice-si-fatade-tabla/`,
         },
         {
           '@type': 'FAQPage',
-          mainEntity: serviceFaq['atice-fatade-tabla'].map((x) => ({
+          mainEntity: serviceFaq['atice-si-fatade-tabla'].map((x) => ({
             '@type': 'Question',
             name: x.q,
             acceptedAnswer: { '@type': 'Answer', text: x.a },
@@ -472,7 +472,24 @@ async function writeStaticPages() {
         breadcrumb([
           { name: 'Acasă', path: '/' },
           { name: 'Servicii', path: '/servicii' },
-          { name: 'Atice și fațade tablă', path: '/servicii/atice-fatade-tabla' },
+          { name: 'Atice și fațade tablă', path: '/servicii/atice-si-fatade-tabla' },
+        ]),
+      ]),
+    },
+    {
+      path: '/servicii/atice-fatade-tabla',
+      title: 'Atice și Fațade din Tablă — Solaris CET',
+      description: 'Pagina s-a mutat.',
+      h1: 'Pagina s-a mutat',
+      bodyLines: ['Folosește noua adresă pentru acest serviciu.'],
+      canonicalPath: '/servicii/atice-si-fatade-tabla/',
+      redirectTo: '/servicii/atice-si-fatade-tabla/',
+      noindex: true,
+      jsonLd: wrapJsonLd([
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Servicii', path: '/servicii' },
+          { name: 'Atice și fațade tablă', path: '/servicii/atice-si-fatade-tabla' },
         ]),
       ]),
     },
@@ -628,6 +645,140 @@ async function writeStaticPages() {
       ]),
     },
     {
+      path: '/blog/cat-costa-un-sistem-fotovoltaic-2026',
+      title: 'Cât costă un sistem fotovoltaic în 2026 — Solaris CET',
+      description: 'Ghid orientativ: prețuri, ce influențează costul, diferențe 5 kW vs 10 kW și cum compari corect ofertele.',
+      h1: 'Cât costă un sistem fotovoltaic în 2026?',
+      bodyLines: ['Articol complet în secțiunea Blog.'],
+      extraHtml: `
+          <div style="margin-top: 12px;">
+            <p><a href="/blog/cat-costa-un-sistem-fotovoltaic-2026">Deschide articolul →</a></p>
+          </div>
+      `,
+      jsonLd: wrapJsonLd([
+        { '@type': 'WebPage', name: 'Cât costă un sistem fotovoltaic în 2026', url: `${origin}/blog/cat-costa-un-sistem-fotovoltaic-2026/` },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Blog', path: '/blog' },
+          { name: 'Cât costă un sistem fotovoltaic în 2026', path: '/blog/cat-costa-un-sistem-fotovoltaic-2026' },
+        ]),
+      ]),
+    },
+    {
+      path: '/blog/mentenanta-panouri-fotovoltaice',
+      title: 'Mentenanța panourilor fotovoltaice — Solaris CET',
+      description: 'Ghid practic: ce verifici periodic, curățare, semne de problemă și cum păstrezi randamentul în timp.',
+      h1: 'Mentenanța panourilor fotovoltaice',
+      bodyLines: ['Articol complet în secțiunea Blog.'],
+      extraHtml: `
+          <div style="margin-top: 12px;">
+            <p><a href="/blog/mentenanta-panouri-fotovoltaice">Deschide articolul →</a></p>
+          </div>
+      `,
+      jsonLd: wrapJsonLd([
+        { '@type': 'WebPage', name: 'Mentenanța panourilor fotovoltaice', url: `${origin}/blog/mentenanta-panouri-fotovoltaice/` },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Blog', path: '/blog' },
+          { name: 'Mentenanța panourilor fotovoltaice', path: '/blog/mentenanta-panouri-fotovoltaice' },
+        ]),
+      ]),
+    },
+    {
+      path: '/blog/tabla-click-vs-tigla-metalica',
+      title: 'Tablă click vs Țiglă metalică — Solaris CET',
+      description: 'Comparație practică: când e potrivită tabla click și când e potrivită țigla metalică, plus zone critice la montaj.',
+      h1: 'Tablă click vs Țiglă metalică',
+      bodyLines: ['Articol complet în secțiunea Blog.'],
+      extraHtml: `
+          <div style="margin-top: 12px;">
+            <p><a href="/blog/tabla-click-vs-tigla-metalica">Deschide articolul →</a></p>
+          </div>
+      `,
+      jsonLd: wrapJsonLd([
+        { '@type': 'WebPage', name: 'Tablă click vs Țiglă metalică', url: `${origin}/blog/tabla-click-vs-tigla-metalica/` },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Blog', path: '/blog' },
+          { name: 'Tablă click vs Țiglă metalică', path: '/blog/tabla-click-vs-tigla-metalica' },
+        ]),
+      ]),
+    },
+    {
+      path: '/blog/tpo-vs-membrana-clasica',
+      title: 'TPO vs membrane clasice — Solaris CET',
+      description: 'Comparație practică pentru acoperișuri industriale: detalii critice, mentenanță și greșeli frecvente.',
+      h1: 'Acoperiș TPO vs membrane clasice',
+      bodyLines: ['Articol complet în secțiunea Blog.'],
+      extraHtml: `
+          <div style="margin-top: 12px;">
+            <p><a href="/blog/tpo-vs-membrana-clasica">Deschide articolul →</a></p>
+          </div>
+      `,
+      jsonLd: wrapJsonLd([
+        { '@type': 'WebPage', name: 'TPO vs membrane clasice', url: `${origin}/blog/tpo-vs-membrana-clasica/` },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Blog', path: '/blog' },
+          { name: 'TPO vs membrane clasice', path: '/blog/tpo-vs-membrana-clasica' },
+        ]),
+      ]),
+    },
+    {
+      path: '/blog/cum-accesezi-programul-casa-verde',
+      title: 'Cum accesezi Casa Verde — Solaris CET',
+      description: 'Pași orientativi și checklist pentru Casa Verde (AFM): cum pregătești documentele și cum alegi soluția tehnică potrivită.',
+      h1: 'Cum accesezi programul Casa Verde',
+      bodyLines: ['Articol complet în secțiunea Blog.'],
+      extraHtml: `
+          <div style="margin-top: 12px;">
+            <p><a href="/blog/cum-accesezi-programul-casa-verde">Deschide articolul →</a></p>
+          </div>
+      `,
+      jsonLd: wrapJsonLd([
+        { '@type': 'WebPage', name: 'Cum accesezi programul Casa Verde', url: `${origin}/blog/cum-accesezi-programul-casa-verde/` },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Blog', path: '/blog' },
+          { name: 'Casa Verde', path: '/blog/cum-accesezi-programul-casa-verde' },
+        ]),
+      ]),
+    },
+    ...[
+      {
+        slug: 'panouri-bifaciale-vs-monocristaline',
+        title: 'DRAFT: Panouri bifaciale vs monocristaline',
+      },
+      {
+        slug: 'mentenanta-acoperis-tpo-checklist',
+        title: 'DRAFT: Mentenanța acoperișului TPO',
+      },
+      {
+        slug: 'invertor-hibrid-baterie-cand-merita',
+        title: 'DRAFT: Invertor hibrid + baterie',
+      },
+    ].map((x) => ({
+      path: `/blog/${x.slug}`,
+      title: `${x.title} — Solaris CET`,
+      description: 'Articol în lucru.',
+      h1: x.title,
+      bodyLines: ['Acest articol este în lucru.'],
+      extraHtml: `
+          <div style="margin-top: 12px;">
+            <p><a href="/blog/${x.slug}">Deschide articolul →</a></p>
+          </div>
+      `,
+      noindex: true,
+      jsonLd: wrapJsonLd([
+        { '@type': 'WebPage', name: x.title, url: `${origin}/blog/${x.slug}/` },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Blog', path: '/blog' },
+          { name: x.title, path: `/blog/${x.slug}` },
+        ]),
+      ]),
+    })),
+    {
       path: '/privacy',
       title: 'Politica de confidențialitate — Solaris CET',
       description: 'Politica de confidențialitate Solaris CET (GDPR).',
@@ -766,13 +917,18 @@ async function writeSitemap() {
     '/servicii/fotovoltaice-industriale',
     '/servicii/acoperisuri-tabla-tigla',
     '/servicii/acoperisuri-industriale-tpo',
-    '/servicii/atice-fatade-tabla',
+    '/servicii/atice-si-fatade-tabla',
     '/servicii/reparatii-mentenanta',
     '/contact',
     '/despre',
     '/portofoliu',
     '/faq',
     '/blog',
+    '/blog/cat-costa-un-sistem-fotovoltaic-2026',
+    '/blog/mentenanta-panouri-fotovoltaice',
+    '/blog/tabla-click-vs-tigla-metalica',
+    '/blog/tpo-vs-membrana-clasica',
+    '/blog/cum-accesezi-programul-casa-verde',
     '/privacy',
     '/terms',
     '/cookies',

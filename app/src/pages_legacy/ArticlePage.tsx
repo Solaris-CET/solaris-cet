@@ -84,6 +84,8 @@ export default function ArticlePage({ slug }: { slug: string }) {
     )
   }
 
+  const coverIsIllustration = Boolean(post.frontmatter.coverImageUrl?.includes('text_to_image'))
+
   return (
     <main id="main-content" className="relative z-10 w-full px-5 sm:px-8 xl:px-12 pt-28 pb-20">
       <div className="max-w-7xl mx-auto">
@@ -163,7 +165,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
             </div>
 
             {post.frontmatter.coverImageUrl ? (
-              <div className="mt-8 rounded-3xl overflow-hidden border border-white/10 bg-white/5">
+              <div className="mt-8 rounded-3xl overflow-hidden border border-white/10 bg-white/5 relative">
                 <AppImage
                   src={post.frontmatter.coverImageUrl}
                   alt={post.frontmatter.title}
@@ -172,6 +174,11 @@ export default function ArticlePage({ slug }: { slug: string }) {
                   loading="lazy"
                   className="w-full h-auto"
                 />
+                {coverIsIllustration ? (
+                  <span className="pointer-events-none absolute top-4 left-4 rounded-full border border-white/10 bg-black/45 px-3 py-1 text-[10px] font-bold tracking-wide text-white/80 backdrop-blur">
+                    Ilustrație reprezentativă
+                  </span>
+                ) : null}
               </div>
             ) : null}
 
