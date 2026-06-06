@@ -33,12 +33,14 @@ const ProjectsPage = lazy(() => import('./pages_legacy/ProjectsPage'));
 const ThankYouPage = lazy(() => import('./pages_legacy/ThankYouPage'));
 const LegalDocPage = lazy(() => import('./pages_legacy/LegalDocPage'));
 const CookieSettingsPage = lazy(() => import('./pages_legacy/CookieSettingsPage'));
+const LocationPage = lazy(() => import('./pages_legacy/LocationPage'));
 const SolarisChatWidget = lazy(() =>
   import('@/components/company/SolarisChatWidget').then((m) => ({ default: m.SolarisChatWidget })),
 );
 
 function normalizePathname(pathname: string): string {
   const clean = (pathname || '/').replace(/\/$/, '') || '/';
+  if (clean === '/index.html') return '/';
   const m = clean.match(/^\/(en|ro|es|de|pt|ru|zh)(\/|$)/);
   if (!m) return clean || '/';
   const rest = clean.slice(3);
@@ -194,6 +196,7 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
       title: 'Token CET — Solaris CET',
       description: 'Informații despre tokenul CET și ecosistemul Solaris CET.',
       ogType: 'article',
+      noindex: true,
     },
     '/despre': {
       title: 'Despre noi — Solaris CET',
@@ -245,6 +248,56 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
       title: 'Cookie-uri — Solaris CET',
       description: 'Politica de cookie-uri Solaris CET.',
       ogType: 'article',
+    },
+    '/politica-confidentialitate': {
+      title: 'Confidențialitate — Solaris CET',
+      description: 'Politica de confidențialitate Solaris CET.',
+      ogType: 'article',
+      noindex: true,
+    },
+    '/politica-cookies': {
+      title: 'Cookie-uri — Solaris CET',
+      description: 'Politica de cookie-uri Solaris CET.',
+      ogType: 'article',
+      noindex: true,
+    },
+    '/termeni-si-conditii': {
+      title: 'Termeni — Solaris CET',
+      description: 'Termeni și condiții Solaris CET.',
+      ogType: 'article',
+      noindex: true,
+    },
+    '/despre-noi': {
+      title: 'Despre noi — Solaris CET',
+      description: 'Despre Solaris CET: fotovoltaice, construcții, acoperișuri și mentenanță, cu acoperire în Moldova și național.',
+      ogType: 'article',
+      noindex: true,
+    },
+    '/galerie': {
+      title: 'Portofoliu — Solaris CET',
+      description: 'Galerie proiecte: fotovoltaice, acoperișuri și atice/fațade tablă.',
+      ogType: 'website',
+      noindex: true,
+    },
+    '/vaslui': {
+      title: 'Vaslui — Solaris CET',
+      description: 'Servicii Solaris CET în Vaslui: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță.',
+      ogType: 'website',
+    },
+    '/bacau': {
+      title: 'Bacău — Solaris CET',
+      description: 'Servicii Solaris CET în Bacău: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță.',
+      ogType: 'website',
+    },
+    '/iasi': {
+      title: 'Iași — Solaris CET',
+      description: 'Servicii Solaris CET în Iași: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță.',
+      ogType: 'website',
+    },
+    '/galati': {
+      title: 'Galați — Solaris CET',
+      description: 'Servicii Solaris CET în Galați: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță.',
+      ogType: 'website',
     },
     '/privacy-settings': {
       title: 'Setări cookie — Solaris CET',
@@ -660,9 +713,19 @@ function App() {
           <ContactPage />
         ) : routePath === '/proiecte' || routePath === '/portofoliu' ? (
           <ProjectsPage />
+        ) : routePath === '/galerie' ? (
+          <ProjectsPage />
+        ) : routePath === '/vaslui' ? (
+          <LocationPage city="Vaslui" slug="vaslui" />
+        ) : routePath === '/bacau' ? (
+          <LocationPage city="Bacău" slug="bacau" />
+        ) : routePath === '/iasi' ? (
+          <LocationPage city="Iași" slug="iasi" />
+        ) : routePath === '/galati' ? (
+          <LocationPage city="Galați" slug="galati" />
         ) : routePath === '/token-cet' ? (
           <TokenCetPage />
-        ) : routePath === '/despre' || routePath === '/about' ? (
+        ) : routePath === '/despre' || routePath === '/about' || routePath === '/despre-noi' ? (
           <AboutPage />
         ) : routePath === '/finantare' ? (
           <FinancingHubPage />
@@ -686,6 +749,12 @@ function App() {
           <LegalDocPage doc="terms" />
         ) : routePath === '/cookies' ? (
           <LegalDocPage doc="cookies" />
+        ) : routePath === '/politica-confidentialitate' ? (
+          <LegalDocPage doc="privacy" />
+        ) : routePath === '/politica-cookies' ? (
+          <LegalDocPage doc="cookies" />
+        ) : routePath === '/termeni-si-conditii' ? (
+          <LegalDocPage doc="terms" />
         ) : routePath === '/privacy-settings' ? (
           <CookieSettingsPage />
         ) : (

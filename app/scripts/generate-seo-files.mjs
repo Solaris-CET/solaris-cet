@@ -70,15 +70,23 @@ function breadcrumb(items) {
   }
 }
 
-function renderStaticPageHtml({ title, description, canonicalPath, h1, bodyLines, jsonLd }) {
+function renderStaticPageHtml({ title, description, canonicalPath, h1, bodyLines, jsonLd, noindex, redirectTo, extraHtml }) {
   const canonical = `${origin}${normalizePath(canonicalPath)}`
   const metaDesc = escapeHtml(description)
   const metaTitle = escapeHtml(title)
   const metaH1 = escapeHtml(h1)
   const body = bodyLines.map((l) => `<p>${escapeHtml(l)}</p>`).join('\n')
+  const extra = typeof extraHtml === 'string' && extraHtml.trim() ? `\n${extraHtml.trim()}\n` : '\n'
   const jsonLdBlock = jsonLd
     ? `\n    <script type="application/ld+json">${safeJsonLd(jsonLd)}</script>\n`
     : '\n'
+  const robotsMeta = noindex ? `    <meta name="robots" content="noindex,follow" />\n` : ''
+  const redirectMeta = redirectTo ? `    <meta http-equiv="refresh" content="0; url=${escapeHtml(redirectTo)}" />\n` : ''
+  const redirectBody = redirectTo
+    ? `<p><strong>Redirecționare:</strong> această pagină s-a mutat la <a href="${escapeHtml(redirectTo)}">${escapeHtml(
+        redirectTo,
+      )}</a>.</p>`
+    : ''
 
   return `<!doctype html>
 <html lang="ro">
@@ -88,7 +96,7 @@ function renderStaticPageHtml({ title, description, canonicalPath, h1, bodyLines
     <title>${metaTitle}</title>
     <meta name="description" content="${metaDesc}" />
     <link rel="canonical" href="${canonical}" />
-    <meta property="og:type" content="website" />
+${robotsMeta}${redirectMeta}    <meta property="og:type" content="website" />
     <meta property="og:title" content="${metaTitle}" />
     <meta property="og:description" content="${metaDesc}" />
     <meta property="og:url" content="${canonical}" />
@@ -121,7 +129,9 @@ ${jsonLdBlock}
       <main id="main-content">
         <div class="card">
           <h1>${metaH1}</h1>
+          ${redirectBody}
           ${body}
+          ${extra}
           <p><strong>Telefon:</strong> <a href="tel:+40769889721">+40 769 889 721</a> · <strong>Email:</strong> <a href="mailto:solaris-cet@protonmail.com">solaris-cet@protonmail.com</a></p>
           <p><a href="/contact/">Solicită ofertă →</a></p>
         </div>
@@ -133,6 +143,64 @@ ${jsonLdBlock}
 }
 
 async function writeStaticPages() {
+  const formspreeEndpoint = String(process.env.VITE_FORMSPREE_ENDPOINT || '').trim()
+
+  const contactFormHtml = (() => {
+    const action = formspreeEndpoint || 'mailto:solaris-cet@protonmail.com'
+    const enctype = formspreeEndpoint ? 'application/x-www-form-urlencoded' : 'text/plain'
+    const method = formspreeEndpoint ? 'POST' : 'POST'
+    const hidden = formspreeEndpoint
+      ? `<input type="hidden" name="_subject" value="Solicitare ofertă — Solaris CET" />`
+      : `<input type="hidden" name="subject" value="Solicitare ofertă — Solaris CET" />`
+
+    return `
+          <div style="margin-top: 14px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Cere ofertă (formular)</h2>
+            <form action="${escapeHtml(action)}" method="${method}" enctype="${enctype}">
+              ${hidden}
+              <div style="display:grid; gap:10px;">
+                <label>
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Nume</div>
+                  <input name="name" required style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
+                </label>
+                <label>
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Telefon</div>
+                  <input name="phone" inputmode="tel" required style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
+                </label>
+                <label>
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Email (opțional)</div>
+                  <input name="email" inputmode="email" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
+                </label>
+                <label>
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Serviciu</div>
+                  <select name="service" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;">
+                    <option value="fotovoltaice">Fotovoltaice</option>
+                    <option value="acoperisuri">Acoperișuri tablă/țiglă</option>
+                    <option value="tpo">Acoperișuri industriale TPO</option>
+                    <option value="atice-fatade">Atice & fațade tablă</option>
+                    <option value="reparatii">Reparații & mentenanță</option>
+                  </select>
+                </label>
+                <label>
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Detalii</div>
+                  <textarea name="message" rows="5" required style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;"></textarea>
+                </label>
+                <button type="submit" style="cursor:pointer; border-radius:12px; border:1px solid rgba(245,158,11,.45); background:rgba(245,158,11,.14); color:#fbbf24; font-weight:900; padding:12px 12px;">Trimite</button>
+              </div>
+              <div style="margin-top:10px; font-size:12px; color: rgba(255,255,255,.65);">
+                Dacă trimiterea nu funcționează, folosește <a href="mailto:solaris-cet@protonmail.com">email</a> sau <a href="tel:+40769889721">telefon</a>.
+              </div>
+            </form>
+          </div>
+          <div style="margin-top: 14px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Hartă</h2>
+            <div style="border-radius: 14px; overflow:hidden; border:1px solid rgba(255,255,255,.12);">
+              <iframe title="Hartă Vaslui, România" src="https://www.google.com/maps?q=Vaslui%2C%20Romania&output=embed" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:260px; border:0;"></iframe>
+            </div>
+          </div>
+    `
+  })()
+
   const localBusiness = {
     '@type': 'LocalBusiness',
     name: 'Solaris CET',
@@ -188,6 +256,7 @@ async function writeStaticPages() {
       description: 'Contact Solaris CET pentru fotovoltaice, acoperișuri, reparații și mentenanță.',
       h1: 'Contact Solaris CET',
       bodyLines: ['Instalații fotovoltaice, acoperișuri (tablă/țiglă/TPO), reparații și mentenanță în Vaslui și în toată România.'],
+      extraHtml: contactFormHtml,
       jsonLd: wrapJsonLd([
         localBusiness,
         {
@@ -206,7 +275,11 @@ async function writeStaticPages() {
       title: 'Servicii — Solaris CET',
       description: 'Servicii Solaris CET: fotovoltaice, acoperișuri, atice/fațade tablă, reparații și mentenanță.',
       h1: 'Servicii Solaris CET',
-      bodyLines: ['Alege serviciul potrivit: fotovoltaice rezidențiale/industriale, acoperișuri, atice/fațade, reparații și mentenanță.'],
+      bodyLines: [
+        'Alege serviciul potrivit: fotovoltaice rezidențiale/industriale, acoperișuri, atice/fațade, reparații și mentenanță.',
+        'Lucrăm pe baza unei evaluări tehnice (telefon + poze, apoi vizită după caz), ofertă clară și execuție cu detalii curate.',
+        'Pentru ofertă: locație, tip acoperiș/structură, consum (facturi) și termenul dorit.',
+      ],
       jsonLd: wrapJsonLd([
         {
           '@type': 'ItemList',
@@ -231,7 +304,22 @@ async function writeStaticPages() {
       title: 'Instalații Fotovoltaice Rezidențiale — Solaris CET',
       description: 'Instalații fotovoltaice pentru case: panouri, invertor, baterii, monitorizare.',
       h1: 'Instalații Fotovoltaice Rezidențiale — Vaslui și împrejurimi',
-      bodyLines: ['Panouri mono/poli/bifacial, invertoare, baterii de stocare și monitorizare producție/consum.'],
+      bodyLines: [
+        'Instalăm sisteme fotovoltaice pentru case (3–12 kW și peste), optimizate pentru autoconsum și economie pe termen lung.',
+        'Folosim proiectare orientată pe siguranță: protecții DC/AC, împământare, trasee corecte și etanșări curate pe acoperiș.',
+        'Opțional: baterii de stocare, încărcător EV, monitorizare și optimizare consum.',
+        'Pentru o ofertă rapidă: trimite consumul (factură), locația și câteva poze cu acoperișul.',
+      ],
+      extraHtml: `
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Ce includem</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Dimensionare orientată pe consum + opțiuni (autoconsum vs baterie).</li>
+              <li>Montaj structură + cablare + protecții + etanșări.</li>
+              <li>Testare, punere în funcțiune și instruire utilizare.</li>
+            </ul>
+          </div>
+      `,
       jsonLd: wrapJsonLd([
         {
           '@type': 'Service',
@@ -260,7 +348,12 @@ async function writeStaticPages() {
       title: 'Sisteme Fotovoltaice Industriale — Solaris CET',
       description: 'Sisteme fotovoltaice pentru hale și clădiri comerciale: proiectare, montaj, optimizare ROI.',
       h1: 'Sisteme Fotovoltaice Industriale — Hale și clădiri comerciale',
-      bodyLines: ['Sisteme peste 100 kW, soluții pentru consum mare, optimizare și planificare ROI.'],
+      bodyLines: [
+        'Sisteme fotovoltaice pentru hale și clădiri comerciale: proiectare, montaj, punere în funcțiune și monitorizare.',
+        'Planificăm execuția ca să nu afecteze operațiunile: lucrări pe etape, programare, zone de siguranță și documentație.',
+        'Optimizăm ROI: profil de consum, orientare, limitări de rețea și scenarii de extindere.',
+        'Lucrăm și pe acoperișuri industriale cu membrană TPO, cu detalii corecte pentru durabilitate.',
+      ],
       jsonLd: wrapJsonLd([
         {
           '@type': 'Service',
@@ -289,7 +382,11 @@ async function writeStaticPages() {
       title: 'Montaj Acoperișuri Tablă și Țiglă Metalică — Solaris CET',
       description: 'Montaj acoperișuri tablă/țiglă metalică: sisteme pluviale, parazăpezi, etanșări.',
       h1: 'Montaj Acoperișuri Tablă și Țiglă Metalică — Vaslui, Bacău, Iași',
-      bodyLines: ['Tablă click/falțuită, țiglă metalică, sisteme pluviale și parazăpezi.'],
+      bodyLines: [
+        'Montaj și reparații acoperișuri din tablă click/falțuită și țiglă metalică, cu detalii de finisaj curate.',
+        'Rezolvăm zone critice: coame, dolii, străpungeri, atice, jgheaburi/burlane și etanșări.',
+        'Lucrăm pe evaluare la fața locului (după caz) și îți recomandăm varianta potrivită pentru geometria acoperișului.',
+      ],
       jsonLd: wrapJsonLd([
         {
           '@type': 'Service',
@@ -318,7 +415,11 @@ async function writeStaticPages() {
       title: 'Acoperișuri Industriale Folie TPO — Solaris CET',
       description: 'Membrană TPO pentru hale și depozite: detalii tehnice, durabilitate, execuție.',
       h1: 'Acoperișuri Industriale Folie TPO — Hale și Depozite',
-      bodyLines: ['Specificații TPO, avantaje și detalii de execuție pentru durabilitate 20+ ani.'],
+      bodyLines: [
+        'Montaj și reparații pentru membrane TPO la hale, depozite și clădiri comerciale.',
+        'Atenție la detalii: îmbinări, colțuri, atice, scurgeri, străpungeri și treceri de instalații.',
+        'Oferim inspecții periodice și intervenții rapide pentru infiltrații.',
+      ],
       jsonLd: wrapJsonLd([
         {
           '@type': 'Service',
@@ -347,7 +448,11 @@ async function writeStaticPages() {
       title: 'Atice și Fațade din Tablă — Solaris CET',
       description: 'Atice și fațade din tablă: finisaje moderne, culori RAL, execuție curată.',
       h1: 'Atice și Fațade din Tablă — Finisaje moderne',
-      bodyLines: ['Tipuri tablă fațadă, culori RAL disponibile și execuție cu detalii curate.'],
+      bodyLines: [
+        'Executăm atice și fațade din tablă pentru un aspect modern și protecție durabilă a anvelopei.',
+        'Ne concentrăm pe muchii, îmbinări și fixări discrete, cu finisaje curate.',
+        'Reparații punctuale sau refacere completă, în funcție de starea existentă.',
+      ],
       jsonLd: wrapJsonLd([
         {
           '@type': 'Service',
@@ -376,7 +481,11 @@ async function writeStaticPages() {
       title: 'Reparații și Mentenanță Acoperiș — Solaris CET',
       description: 'Reparații acoperiș: infiltrații, jgheaburi, curățare și inspecție anuală.',
       h1: 'Reparații și Mentenanță Acoperiș — Intervenții rapide',
-      bodyLines: ['Hidroizolații, înlocuire jgheaburi, curățare, inspecție anuală și intervenții rapide.'],
+      bodyLines: [
+        'Intervenții pentru infiltrații, reparații la acoperiș, jgheaburi/burlane și mentenanță preventivă.',
+        'Facem diagnostic, identificăm cauza și propunem soluții realiste (local sau etapizat).',
+        'Recomandăm inspecții periodice pentru acoperișuri industriale și zonele critice (atice, scurgeri, străpungeri).',
+      ],
       jsonLd: wrapJsonLd([
         {
           '@type': 'Service',
@@ -405,7 +514,11 @@ async function writeStaticPages() {
       title: 'Despre — Solaris CET',
       description: 'Echipă locală pentru fotovoltaice, acoperișuri, reparații și mentenanță.',
       h1: 'Despre Solaris CET',
-      bodyLines: ['Lucrări complete pentru fotovoltaice și acoperișuri, cu acoperire în mai multe județe.'],
+      bodyLines: [
+        'Suntem o echipă orientată pe execuție corectă: detalii, etanșări, siguranță electrică și lucrări curate la predare.',
+        'Ne ocupăm de fotovoltaice, acoperișuri (tablă/țiglă/TPO), atice/fațade tablă și mentenanță.',
+        'Suntem în Cetățuia (Vaslui) și ne deplasăm în funcție de proiect, inclusiv în județele limitrofe.',
+      ],
       jsonLd: wrapJsonLd([
         {
           '@type': 'AboutPage',
@@ -424,7 +537,10 @@ async function writeStaticPages() {
       title: 'Portofoliu — Solaris CET',
       description: 'Portofoliu proiecte: fotovoltaice, acoperișuri, fațade și lucrări diverse.',
       h1: 'Portofoliu Solaris CET',
-      bodyLines: ['Exemple de lucrări (placeholder) până la încărcarea pozelor reale din proiecte.'],
+      bodyLines: [
+        'Selecție orientativă de lucrări reprezentative: fotovoltaice, acoperișuri și detalii de anvelopă.',
+        'La cerere, îți trimitem poze reale din proiecte similare (WhatsApp) și te ajutăm să alegi soluția potrivită pentru casa/afacerea ta.',
+      ],
       jsonLd: wrapJsonLd([
         {
           '@type': 'CollectionPage',
@@ -437,6 +553,188 @@ async function writeStaticPages() {
         ]),
       ]),
     },
+    {
+      path: '/faq',
+      title: 'Întrebări frecvente — Solaris CET',
+      description: 'Întrebări frecvente despre fotovoltaice, acoperișuri, mentenanță și ofertare.',
+      h1: 'Întrebări frecvente (FAQ)',
+      bodyLines: [
+        'Răspunsuri scurte și clare despre ofertare, execuție și mentenanță (fotovoltaice, acoperișuri, TPO).',
+        'Dacă ai o întrebare specifică, scrie pe WhatsApp sau folosește formularul de ofertă.',
+      ],
+      extraHtml: `
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">FAQ rapid</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li><strong>Cât durează o instalare fotovoltaică?</strong> Depinde de complexitate; după evaluare îți spunem pașii și termenele realiste.</li>
+              <li><strong>Ce vă trebuie pentru ofertă?</strong> Locație, consum (facturi), tip acoperiș/structură, orientare/umbriri și obiectiv.</li>
+              <li><strong>Faceți reparații la infiltrații?</strong> Da. Facem diagnostic și intervenții punctuale (tablă/țiglă/TPO).</li>
+              <li><strong>Acoperiți toată România?</strong> Da, în funcție de proiect.</li>
+            </ul>
+          </div>
+      `,
+      jsonLd: wrapJsonLd([
+        {
+          '@type': 'FAQPage',
+          mainEntity: [
+            {
+              '@type': 'Question',
+              name: 'Cât durează o instalare fotovoltaică?',
+              acceptedAnswer: { '@type': 'Answer', text: 'Depinde de complexitate și de condițiile din teren. După evaluare, îți spunem pașii și termenele realiste.' },
+            },
+            {
+              '@type': 'Question',
+              name: 'Ce informații vă trebuie pentru ofertă?',
+              acceptedAnswer: { '@type': 'Answer', text: 'Locația, consumul (facturi), tipul acoperișului/structurii, orientare/umbriri și obiectivul proiectului.' },
+            },
+          ],
+        },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'FAQ', path: '/faq' },
+        ]),
+      ]),
+    },
+    {
+      path: '/blog',
+      title: 'Blog — Solaris CET',
+      description: 'Articole utile despre fotovoltaice, acoperișuri, mentenanță și finanțare.',
+      h1: 'Blog Solaris CET',
+      bodyLines: [
+        'Articole utile pentru clienți (fotovoltaice, acoperișuri, mentenanță și finanțare).',
+        'Dacă vrei o recomandare pentru cazul tău, cere ofertă și îți răspundem cu pașii următori.',
+      ],
+      extraHtml: `
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Subiecte populare</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Cum alegi puterea unui sistem (3–6 kW, 6–12 kW, hibrid).</li>
+              <li>Diferența dintre autoconsum și baterie.</li>
+              <li>Mentenanță: ce verifici anual la un acoperiș (tablă/țiglă/TPO).</li>
+              <li>Finanțare: pași orientativi pentru programe populare.</li>
+            </ul>
+          </div>
+      `,
+      jsonLd: wrapJsonLd([
+        {
+          '@type': 'Blog',
+          name: 'Blog Solaris CET',
+          url: `${origin}/blog/`,
+        },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Blog', path: '/blog' },
+        ]),
+      ]),
+    },
+    {
+      path: '/privacy',
+      title: 'Politica de confidențialitate — Solaris CET',
+      description: 'Politica de confidențialitate Solaris CET (GDPR).',
+      h1: 'Politica de confidențialitate',
+      bodyLines: [
+        'Folosim datele de contact doar pentru a răspunde solicitărilor (ofertare / suport) și pentru a putea livra serviciile cerute.',
+        'Nu vindem datele către terți. Pentru cereri GDPR (acces/ștergere), scrie-ne pe email.',
+      ],
+      jsonLd: wrapJsonLd([
+        { '@type': 'WebPage', name: 'Politica de confidențialitate', url: `${origin}/privacy/` },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Confidențialitate', path: '/privacy' },
+        ]),
+      ]),
+    },
+    {
+      path: '/cookies',
+      title: 'Politica de cookie-uri — Solaris CET',
+      description: 'Politica de cookie-uri Solaris CET.',
+      h1: 'Politica de cookie-uri',
+      bodyLines: [
+        'Cookie-urile ne ajută să îmbunătățim experiența și să înțelegem cum este folosit site-ul (după consimțământ).',
+        'Poți schimba preferințele din Setări cookie.',
+      ],
+      extraHtml: `
+          <div style="margin-top: 12px;">
+            <p><a href="/privacy-settings/">Setări cookie →</a></p>
+          </div>
+      `,
+      jsonLd: wrapJsonLd([
+        { '@type': 'WebPage', name: 'Politica de cookie-uri', url: `${origin}/cookies/` },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Cookie-uri', path: '/cookies' },
+        ]),
+      ]),
+    },
+    {
+      path: '/terms',
+      title: 'Termeni și condiții — Solaris CET',
+      description: 'Termeni și condiții Solaris CET.',
+      h1: 'Termeni și condiții',
+      bodyLines: [
+        'Conținutul site-ului are rol informativ. Oferta finală se face după evaluarea tehnică și confirmarea condițiilor proiectului.',
+        'Pentru întrebări, contactează-ne.',
+      ],
+      jsonLd: wrapJsonLd([
+        { '@type': 'WebPage', name: 'Termeni și condiții', url: `${origin}/terms/` },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Termeni', path: '/terms' },
+        ]),
+      ]),
+    },
+    {
+      path: '/politica-confidentialitate',
+      title: 'Politica de confidențialitate — Solaris CET',
+      description: 'Pagina s-a mutat.',
+      h1: 'Pagina s-a mutat',
+      bodyLines: ['Folosește noua adresă pentru Politica de confidențialitate.'],
+      canonicalPath: '/privacy/',
+      redirectTo: '/privacy/',
+      noindex: true,
+      jsonLd: wrapJsonLd([breadcrumb([{ name: 'Acasă', path: '/' }, { name: 'Confidențialitate', path: '/privacy' }])]),
+    },
+    {
+      path: '/politica-cookies',
+      title: 'Politica de cookie-uri — Solaris CET',
+      description: 'Pagina s-a mutat.',
+      h1: 'Pagina s-a mutat',
+      bodyLines: ['Folosește noua adresă pentru Politica de cookie-uri.'],
+      canonicalPath: '/cookies/',
+      redirectTo: '/cookies/',
+      noindex: true,
+      jsonLd: wrapJsonLd([breadcrumb([{ name: 'Acasă', path: '/' }, { name: 'Cookie-uri', path: '/cookies' }])]),
+    },
+    ...[
+      { slug: 'vaslui', city: 'Vaslui' },
+      { slug: 'bacau', city: 'Bacău' },
+      { slug: 'iasi', city: 'Iași' },
+      { slug: 'galati', city: 'Galați' },
+    ].map((x) => ({
+      path: `/${x.slug}`,
+      title: `Fotovoltaice & Acoperișuri în ${x.city} — Solaris CET`,
+      description: `Servicii Solaris CET în ${x.city}: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță.`,
+      h1: `Servicii Solaris CET în ${x.city}`,
+      bodyLines: [
+        `Suntem bazați în Cetățuia (Vaslui) și ne deplasăm în ${x.city} și zonele apropiate, în funcție de proiect.`,
+        'Oferim: fotovoltaice (rezidențial/industrial), acoperișuri tablă/țiglă, acoperișuri TPO, atice/fațade tablă, reparații și mentenanță.',
+        'Trimite consumul și câteva poze cu locația, iar noi îți propunem pașii și o ofertă clară.',
+      ],
+      jsonLd: wrapJsonLd([
+        localBusiness,
+        {
+          '@type': 'Service',
+          name: 'Servicii Solaris CET',
+          areaServed: { '@type': 'City', name: x.city, addressCountry: 'RO' },
+          provider: localBusiness,
+          url: `${origin}/${x.slug}/`,
+        },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: x.city, path: `/${x.slug}` },
+        ]),
+      ]),
+    })),
   ]
 
   for (const p of pages) {
@@ -445,10 +743,13 @@ async function writeStaticPages() {
     const html = renderStaticPageHtml({
       title: p.title,
       description: p.description,
-      canonicalPath: `${p.path}/`,
+      canonicalPath: typeof p.canonicalPath === 'string' ? p.canonicalPath : `${p.path}/`,
       h1: p.h1,
       bodyLines: p.bodyLines,
+      extraHtml: p.extraHtml,
       jsonLd: p.jsonLd,
+      noindex: Boolean(p.noindex),
+      redirectTo: p.redirectTo,
     })
     await fs.writeFile(outDir, html, 'utf8')
   }
@@ -470,12 +771,15 @@ async function writeSitemap() {
     '/contact',
     '/despre',
     '/portofoliu',
+    '/faq',
+    '/blog',
+    '/privacy',
+    '/terms',
+    '/cookies',
     '/vaslui',
     '/bacau',
     '/iasi',
     '/galati',
-    '/politica-cookies',
-    '/politica-confidentialitate',
   ]
   for (const p of staticPages) {
     urls.push({ loc: `${origin}${normalizePath(p)}`, lastmod: today })

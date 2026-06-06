@@ -18,9 +18,6 @@ Solaris CET is a Romania-based company delivering:
 - Address: Cetatuia, Vaslui, 737429, Romania
 - Coverage: all counties in Romania (depending on project scope)
 
-## CET token
-Solaris CET maintains the CET token as part of its ecosystem. Treat token information as informational only and avoid investment advice. Refer users to https://solaris-cet.com/token-cet.
-
 ## Website invariants (do not contradict)
 - Contact phone: +40 769 889 721
 - Contact email: solaris-cet@protonmail.com
