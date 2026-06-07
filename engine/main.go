@@ -36,23 +36,38 @@ type Crop struct {
 	YieldBonus float32 `json:"yield_bonus"`
 }
 
-// Engine-ul principal - ultra optimizat
+// WeatherState reprezintă starea vremii (Markov)
+type WeatherState int
+
+const (
+	WeatherNormal WeatherState = iota
+	WeatherDrought
+	WeatherFlood
+)
+
+// Engine-ul principal - ultra optimizat pentru 16GB RAM / 8vCPU
 type FarmingEngine struct {
-	db     *badger.DB
-	mu     sync.RWMutex
-	lands  map[uint64]*Land // cache în memorie (hot data)
-	ticker *time.Ticker
-	ctx    context.Context
-	cancel context.CancelFunc
-	saveCh chan *Land
-	wg     sync.WaitGroup
+	db           *badger.DB
+	mu           sync.RWMutex
+	lands        map[uint64]*Land // cache în memorie (hot data)
+	weather      WeatherState
+	weatherMu    sync.RWMutex
+	ticker       *time.Ticker
+	weatherTicks int
+	ctx          context.Context
+	cancel       context.CancelFunc
+	saveCh       chan *Land
+	wg           sync.WaitGroup
 }
 
 func NewFarmingEngine(dbPath string) (*FarmingEngine, error) {
+	// Optimizat pentru Hetzner 16GB RAM
 	opts := badger.DefaultOptions(dbPath).
-		WithNumMemtables(2).
-		WithValueLogFileSize(32 << 20).
-		WithMemTableSize(32 << 20).
+		WithNumMemtables(4).
+		WithValueLogFileSize(64 << 20).
+		WithMemTableSize(64 << 20).
+		WithBlockCacheSize(256 << 20).
+		WithIndexCacheSize(128 << 20).
 		WithLogger(nil)
 
 	db, err := badger.Open(opts)
@@ -63,12 +78,13 @@ func NewFarmingEngine(dbPath string) (*FarmingEngine, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	engine := &FarmingEngine{
-		db:     db,
-		lands:  make(map[uint64]*Land, 10000),
-		ticker: time.NewTicker(30 * time.Second),
-		ctx:    ctx,
-		cancel: cancel,
-		saveCh: make(chan *Land, 5000), // Buffered channel for persistence
+		db:      db,
+		lands:   make(map[uint64]*Land, 50000),
+		weather: WeatherNormal,
+		ticker:  time.NewTicker(30 * time.Second),
+		ctx:     ctx,
+		cancel:  cancel,
+		saveCh:  make(chan *Land, 10000), // Buffered channel for persistence
 	}
 
 	// Preîncărcare cache
@@ -165,12 +181,40 @@ func (e *FarmingEngine) saveLand(land *Land) {
 	}
 }
 
+func (e *FarmingEngine) updateWeather() {
+	e.weatherMu.Lock()
+	defer e.weatherMu.Unlock()
+
+	// Markov transition logic
+	r := float64(time.Now().UnixNano()%100) / 100.0
+	switch e.weather {
+	case WeatherNormal:
+		if r < 0.05 {
+			e.weather = WeatherDrought
+		} else if r < 0.10 {
+			e.weather = WeatherFlood
+		}
+	case WeatherDrought:
+		if r < 0.20 {
+			e.weather = WeatherNormal
+		}
+	case WeatherFlood:
+		if r < 0.25 {
+			e.weather = WeatherNormal
+		}
+	}
+}
+
 func (e *FarmingEngine) simulationLoop() {
 	for {
 		select {
 		case <-e.ctx.Done():
 			return
 		case <-e.ticker.C:
+			e.weatherTicks++
+			if e.weatherTicks%10 == 0 {
+				e.updateWeather()
+			}
 			e.simulateAllLands()
 		}
 	}
@@ -214,24 +258,52 @@ func (e *FarmingEngine) simulateLand(land *Land) {
 	land.mu.Lock()
 	defer land.mu.Unlock()
 
+	e.weatherMu.RLock()
+	weather := e.weather
+	e.weatherMu.RUnlock()
+
 	delta := time.Since(land.LastUpdate).Hours()
 	if delta < 0.008 { // ~30 secunde
 		return
 	}
 
-	growthRate := land.SoilQuality * 0.85 * (land.WaterLevel*0.6 + land.SunExposure*0.4)
+	// Stochastic modifiers based on weather state
+	waterMod := float32(1.0)
+	sunMod := float32(1.0)
+	healthPenalty := float32(0.0)
+
+	switch weather {
+	case WeatherDrought:
+		waterMod = 0.4
+		sunMod = 1.5
+		healthPenalty = 0.1
+	case WeatherFlood:
+		waterMod = 2.0
+		sunMod = 0.3
+		healthPenalty = 0.15
+	}
+
+	effectiveWater := land.WaterLevel * waterMod
+	effectiveSun := land.SunExposure * sunMod
+
+	// Logistic growth model: r * N * (1 - N/K)
+	growthRate := land.SoilQuality * 0.85 * (effectiveWater*0.6 + effectiveSun*0.4)
 
 	for i := range land.Crops {
 		crop := &land.Crops[i]
-		crop.Growth += float32(float64(growthRate) * delta * (1.0 - float64(crop.Growth)*0.7))
+		// Non-linear logistic-style advancement
+		incrementalGrowth := float64(growthRate) * delta * (1.0 - float64(crop.Growth))
+		crop.Growth += float32(incrementalGrowth)
+
 		if crop.Growth > 1.0 {
 			crop.Growth = 1.0
 		}
 
-		if land.WaterLevel < 0.3 || land.SunExposure < 0.25 {
-			crop.Health -= float32(delta * 0.08)
+		// Health dynamics
+		if effectiveWater < 0.25 || effectiveSun < 0.2 || healthPenalty > 0 {
+			crop.Health -= float32(delta*0.1) + healthPenalty*float32(delta)
 		} else {
-			crop.Health += float32(delta * 0.03)
+			crop.Health += float32(delta * 0.05)
 		}
 
 		if crop.Health > 1.0 {

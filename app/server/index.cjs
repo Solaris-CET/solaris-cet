@@ -217,6 +217,9 @@ function recordRequestMetric(method, pathname, statusCode, durationMs) {
   if (methodLabel === 'POST' && (statusCode === 200 || statusCode === 201) && pathname === '/api/support/start') {
     incMap(metrics.businessCounters, 'contact_submissions_total', 1);
   }
+  if (methodLabel === 'POST' && statusCode >= 400 && pathname === '/api/support/start') {
+    incMap(metrics.businessCounters, 'contact_submissions_failed_total', 1);
+  }
 }
 
 function formatPromMetrics() {
@@ -339,6 +342,20 @@ function formatPromMetrics() {
     if (name !== 'users_created_total') continue;
     lines.push(`solaris_business_users_created_total{kind="${escapePromLabel(label)}"} ${v}`);
   }
+
+  lines.push(
+    '# HELP solaris_business_contact_submissions_total Total contact form submissions.',
+    '# TYPE solaris_business_contact_submissions_total counter',
+  );
+  const contactTotal = metrics.businessCounters.get('contact_submissions_total') ?? 0;
+  lines.push(`solaris_business_contact_submissions_total ${contactTotal}`);
+
+  lines.push(
+    '# HELP solaris_business_contact_submissions_failed_total Total failed contact form submissions.',
+    '# TYPE solaris_business_contact_submissions_failed_total counter',
+  );
+  const contactFailed = metrics.businessCounters.get('contact_submissions_failed_total') ?? 0;
+  lines.push(`solaris_business_contact_submissions_failed_total ${contactFailed}`);
 
   lines.push('# HELP solaris_log_events_total Log events emitted by the Node server.', '# TYPE solaris_log_events_total counter');
   for (const [k, v] of metrics.logCounters.entries()) {
@@ -611,10 +628,10 @@ const handlerCache = new Map();
 
 /**
  * Advanced LRU Response Cache for Hetzner Optimization
- * Capacity: 1000 entries
+ * Capacity: 8192 entries (Optimized for 16GB RAM)
  */
 class ResponseCache {
-  constructor(capacity = 1000) {
+  constructor(capacity = 8192) {
     this.capacity = capacity;
     this.cache = new Map();
   }
@@ -634,7 +651,7 @@ class ResponseCache {
     this.cache.set(key, value);
   }
 }
-const apiResponseCache = new ResponseCache();
+const apiResponseCache = new ResponseCache(8192);
 
 function getRequestUrl(req) {
   const proto = String(req.headers['x-forwarded-proto'] ?? 'http').split(',')[0].trim();
