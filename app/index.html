@@ -122,6 +122,95 @@
 
     <!-- OMEGA policy: no external font/style CDNs in shipped runtime HTML -->
 
+    <style nonce="__CSP_NONCE__">
+      .solaris-preload {
+        box-sizing: border-box;
+        margin: 0 auto;
+        max-width: 56rem;
+        padding: 6.5rem 1.25rem 2.5rem;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, sans-serif;
+        color: #f8fafc;
+      }
+      .solaris-preload .wrap {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(2, 6, 23, 0.94);
+        border-radius: 1.5rem;
+        padding: 1.25rem;
+      }
+      .solaris-preload h1 {
+        margin: 0;
+        font-size: 1.65rem;
+        font-weight: 900;
+        letter-spacing: -0.02em;
+        color: #f2c94c;
+      }
+      .solaris-preload p {
+        margin: 0.75rem 0 0;
+        font-size: 0.98rem;
+        color: rgba(226, 232, 240, 0.78);
+        line-height: 1.55;
+      }
+      .solaris-preload .ctaRow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin-top: 0.95rem;
+      }
+      .solaris-preload .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        padding: 0.75rem 1rem;
+        border-radius: 0.95rem;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 800;
+        font-size: 0.92rem;
+      }
+      .solaris-preload .btnPrimary {
+        background: rgba(242, 201, 76, 0.14);
+        border-color: rgba(242, 201, 76, 0.35);
+        color: #f2c94c;
+      }
+      .solaris-preload .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+      .solaris-preload .card {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.25);
+        border-radius: 1rem;
+        padding: 0.85rem;
+      }
+      .solaris-preload .card h2 {
+        margin: 0 0 0.35rem;
+        font-size: 0.95rem;
+        font-weight: 900;
+        letter-spacing: -0.01em;
+        color: #f8fafc;
+      }
+      .solaris-preload .muted {
+        color: rgba(148, 163, 184, 0.95);
+        font-size: 0.9rem;
+      }
+      .solaris-preload a {
+        color: inherit;
+      }
+      @media (max-width: 760px) {
+        .solaris-preload {
+          padding-top: 5.5rem;
+        }
+        .solaris-preload .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+
   </head>
   <body>
     <!--
@@ -131,6 +220,7 @@
     -->
     <noscript>
       <style nonce="__CSP_NONCE__">
+        .solaris-preload { display: none !important; }
         .solaris-noscript-fallback {
           box-sizing: border-box;
           margin: 0 auto;
@@ -317,7 +407,43 @@
       </div>
     </noscript>
 
-    <div id="root"></div>
+    <div id="root">
+      <div class="solaris-preload" role="region" aria-label="Solaris CET">
+        <div class="wrap">
+          <h1>Solaris CET</h1>
+          <p>
+            Instalații fotovoltaice, acoperișuri (tablă / țiglă / TPO), atice & fațade tablă și mentenanță. Vaslui și România (în funcție de proiect).
+          </p>
+          <div class="ctaRow" role="group" aria-label="Acțiuni rapide">
+            <a class="btn btnPrimary" href="tel:+40769889721">Sună acum</a>
+            <a class="btn" href="/contact">Cere ofertă</a>
+            <a
+              class="btn"
+              href="https://wa.me/40769889721?text=Bun%C4%83%20ziua%2C%20vreau%20o%20ofert%C4%83%20pentru%20fotovoltaice%2Facoperi%C8%99%20-%20m%C4%83%20pute%C8%9Bi%20ajuta%3F"
+              rel="noopener"
+            >
+              WhatsApp
+            </a>
+            <a class="btn" href="/proiecte">Portofoliu</a>
+            <a class="btn" href="/servicii">Servicii</a>
+          </div>
+          <div class="grid" role="region" aria-label="Repere rapide">
+            <div class="card">
+              <h2>Evaluare + ofertă</h2>
+              <div class="muted">Îți cerem detalii (consum + poze) și îți dăm pașii următori.</div>
+            </div>
+            <div class="card">
+              <h2>Execuție curată</h2>
+              <div class="muted">Detalii corecte, trasee ordonate, fără improvizații.</div>
+            </div>
+            <div class="card">
+              <h2>Proiecte orientative</h2>
+              <div class="muted">Vezi exemple și cere poze reale din lucrări similare pe WhatsApp.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
