@@ -30,6 +30,7 @@ const FinancingCasaVerde2025Page = lazy(() => import('./pages_legacy/FinancingCa
 const FinancingCasaVerdeBaterii2026Page = lazy(() => import('./pages_legacy/FinancingCasaVerdeBaterii2026Page'));
 const FinancingRePowerEuPage = lazy(() => import('./pages_legacy/FinancingRePowerEuPage'));
 const ProjectsPage = lazy(() => import('./pages_legacy/ProjectsPage'));
+const SolarCalculatorPage = lazy(() => import('./pages_legacy/SolarCalculatorPage'));
 const ThankYouPage = lazy(() => import('./pages_legacy/ThankYouPage'));
 const LegalDocPage = lazy(() => import('./pages_legacy/LegalDocPage'));
 const CookieSettingsPage = lazy(() => import('./pages_legacy/CookieSettingsPage'));
@@ -167,6 +168,12 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
       title: 'Contact — Solaris CET',
       description: 'Cere ofertă sau contactează Solaris CET: +40 769 889 721 · solaris-cet@protonmail.com.',
       keywords: 'contact solaris cet, oferta fotovoltaice, vaslui, cetatuia, telefon, email',
+      ogType: 'website',
+    },
+    '/calculator': {
+      title: 'Calculator fotovoltaic — Solaris CET',
+      description: 'Estimare orientativă: putere sistem, număr panouri, preț estimat, economii și amortizare. Cere ofertă personalizată.',
+      keywords: 'calculator fotovoltaic, instalatii fotovoltaice pret, panouri solare vaslui, economii energie',
       ogType: 'website',
     },
     '/cere-oferta': {
@@ -725,6 +732,8 @@ function App() {
           <ServiceDetailPage slug={routePath.replace(/^\/servicii\//, '')} />
         ) : routePath === '/contact' ? (
           <ContactPage />
+        ) : routePath === '/calculator' ? (
+          <SolarCalculatorPage />
         ) : routePath === '/cere-oferta' ? (
           <ContactPage />
         ) : routePath === '/proiecte' || routePath === '/portofoliu' ? (

@@ -1,5 +1,5 @@
 import { ArrowRight, Mail, MapPin } from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { DownloadAppButton } from '@/components/company/DownloadAppButton';
 
@@ -92,6 +92,99 @@ export default function ContactPage() {
   const [location, setLocation] = useState('');
   const [urgent, setUrgent] = useState(false);
   const [consent, setConsent] = useState(false);
+  const [hp, setHp] = useState('');
+  const [mathAnswer, setMathAnswer] = useState('');
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const [antiSpam, setAntiSpam] = useState(() => ({ a: 4, b: 7, sum: 11 }));
+
+  const draftKey = 'solaris_offer_draft_v1';
+  const draftTimerRef = useRef<number>(0);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(draftKey);
+      if (!raw) return;
+      const data = JSON.parse(raw) as Partial<{
+        step: number;
+        serviceChoice: string;
+        details: string;
+        location: string;
+        urgent: boolean;
+        name: string;
+        email: string;
+        phone: string;
+        consent: boolean;
+        mathAnswer: string;
+        antiSpamA: number;
+        antiSpamB: number;
+      }>;
+      if (typeof data.step === 'number') setStep(Math.max(0, Math.min(2, data.step)));
+      if (typeof data.serviceChoice === 'string') setServiceChoice(data.serviceChoice);
+      if (typeof data.details === 'string') setDetails(data.details);
+      if (typeof data.location === 'string') setLocation(data.location);
+      if (typeof data.urgent === 'boolean') setUrgent(data.urgent);
+      if (typeof data.name === 'string') setName(data.name);
+      if (typeof data.email === 'string') setEmail(data.email);
+      if (typeof data.phone === 'string') setPhone(data.phone);
+      if (typeof data.consent === 'boolean') setConsent(data.consent);
+      if (typeof data.mathAnswer === 'string') setMathAnswer(data.mathAnswer);
+      if (typeof data.antiSpamA === 'number' && typeof data.antiSpamB === 'number') {
+        const a = Math.max(2, Math.min(9, Math.round(data.antiSpamA)));
+        const b = Math.max(2, Math.min(9, Math.round(data.antiSpamB)));
+        setAntiSpam({ a, b, sum: a + b });
+      }
+    } catch {
+      void 0;
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(draftKey);
+      if (raw) return;
+    } catch {
+      void 0;
+    }
+
+    try {
+      const buf = new Uint32Array(2);
+      window.crypto.getRandomValues(buf);
+      const a = 2 + (buf[0] % 8);
+      const b = 2 + (buf[1] % 8);
+      setAntiSpam({ a, b, sum: a + b });
+    } catch {
+      void 0;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (done) return;
+    window.clearTimeout(draftTimerRef.current);
+    draftTimerRef.current = window.setTimeout(() => {
+      try {
+        window.localStorage.setItem(
+          draftKey,
+          JSON.stringify({
+            step,
+            serviceChoice,
+            details,
+            location,
+            urgent,
+            name,
+            email,
+            phone,
+            consent,
+            mathAnswer,
+            antiSpamA: antiSpam.a,
+            antiSpamB: antiSpam.b,
+          }),
+        );
+      } catch {
+        void 0;
+      }
+    }, 150);
+  }, [antiSpam.a, antiSpam.b, consent, details, done, email, location, mathAnswer, name, phone, serviceChoice, step, urgent]);
 
   const serviceOptions = useMemo<ServiceOption[]>(
     () => [
@@ -191,6 +284,14 @@ export default function ContactPage() {
     setEmail('');
     setPhone('');
     setConsent(false);
+    setHp('');
+    setMathAnswer('');
+    setTouched({});
+    try {
+      window.localStorage.removeItem(draftKey);
+    } catch {
+      void 0;
+    }
   };
 
   const canNextStep1 = Boolean(serviceChoice);
@@ -198,7 +299,8 @@ export default function ContactPage() {
   const phoneDigits = phone.replace(/\D/g, '');
   const isPhoneValid = phone.trim() ? (phoneDigits.startsWith('40') ? phoneDigits.length >= 11 : phoneDigits.length >= 9) : false;
   const emailOk = email.trim() ? isEmailValid(email) : true;
-  const canSubmit = Boolean(name.trim()) && Boolean(phone.trim() || email.trim()) && isPhoneValid && emailOk && consent;
+  const isMathOk = mathAnswer.trim() ? Number(mathAnswer.trim()) === antiSpam.sum : false;
+  const canSubmit = Boolean(name.trim()) && Boolean(phone.trim() || email.trim()) && isPhoneValid && emailOk && consent && isMathOk;
 
   return (
     <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-solaris-offblack text-white">
@@ -378,6 +480,16 @@ export default function ContactPage() {
                         if (busy) return;
                         setError(null);
 
+                        if (hp.trim()) {
+                          setDone(true);
+                          try {
+                            window.localStorage.removeItem(draftKey);
+                          } catch {
+                            void 0;
+                          }
+                          return;
+                        }
+
                         if (!serviceChoice) {
                           setStep(0);
                           shake('service');
@@ -417,6 +529,12 @@ export default function ContactPage() {
                         if (!consent) {
                           shake('consent');
                           setError('Confirmă acordul pentru prelucrarea datelor, ca să te putem contacta.');
+                          return;
+                        }
+                        if (!isMathOk) {
+                          setStep(2);
+                          shake('math');
+                          setError('Verificare anti-spam: răspuns greșit.');
                           return;
                         }
 
@@ -497,6 +615,11 @@ export default function ContactPage() {
                           }
 
                           setDone(true);
+                          try {
+                            window.localStorage.removeItem(draftKey);
+                          } catch {
+                            void 0;
+                          }
                         } catch {
                           setError('Conexiunea a eșuat. Te rog încearcă din nou.');
                         } finally {
@@ -642,6 +765,7 @@ export default function ContactPage() {
                                 id="offer-name"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
+                                onBlur={() => setTouched((t) => ({ ...t, name: true }))}
                                 type="text"
                                 className={`w-full bg-white/5 border rounded-2xl px-4 py-3 outline-none transition-colors ${
                                   name.trim() ? 'border-emerald-400/50 focus:border-emerald-400' : 'border-white/10 focus:border-orange-400'
@@ -649,6 +773,9 @@ export default function ContactPage() {
                                 placeholder="Ion Popescu"
                                 autoComplete="name"
                               />
+                              {touched.name && !name.trim() ? (
+                                <div className="mt-2 text-xs text-red-300">Completează numele.</div>
+                              ) : null}
                             </div>
 
                             <div className={`mt-4 ${shakeKey === 'phone' ? styles.shake : ''}`}>
@@ -659,6 +786,7 @@ export default function ContactPage() {
                                 id="offer-phone"
                                 value={phone}
                                 onChange={(e) => setPhone(formatRoPhone(e.target.value))}
+                                onBlur={() => setTouched((t) => ({ ...t, phone: true }))}
                                 type="tel"
                                 className={`w-full bg-white/5 border rounded-2xl px-4 py-3 outline-none transition-colors ${
                                   phone.trim()
@@ -670,6 +798,9 @@ export default function ContactPage() {
                                 placeholder="+40 7xx xxx xxx"
                                 autoComplete="tel"
                               />
+                              {touched.phone && phone.trim() && !isPhoneValid ? (
+                                <div className="mt-2 text-xs text-red-300">Număr invalid. Exemplu: +40 769 889 721</div>
+                              ) : null}
                             </div>
 
                             <div className={`mt-4 ${shakeKey === 'email' ? styles.shake : ''}`}>
@@ -681,6 +812,7 @@ export default function ContactPage() {
                                   id="offer-email"
                                   value={email}
                                   onChange={(e) => setEmail(e.target.value)}
+                                  onBlur={() => setTouched((t) => ({ ...t, email: true }))}
                                   type="email"
                                   className={`w-full bg-white/5 border rounded-2xl px-4 py-3 pr-10 outline-none transition-colors ${
                                     email.trim()
@@ -704,6 +836,51 @@ export default function ContactPage() {
                                   />
                                 </svg>
                               </div>
+                              {touched.email && email.trim() && !emailOk ? (
+                                <div className="mt-2 text-xs text-red-300">Email invalid.</div>
+                              ) : null}
+                            </div>
+
+                            <div className="mt-4">
+                              <label htmlFor="offer-hp" className="sr-only">
+                                Website
+                              </label>
+                              <input
+                                id="offer-hp"
+                                value={hp}
+                                onChange={(e) => setHp(e.target.value)}
+                                type="text"
+                                tabIndex={-1}
+                                autoComplete="off"
+                                className="absolute left-[-9999px] top-auto h-px w-px opacity-0"
+                                aria-hidden
+                              />
+                            </div>
+
+                            <div className={`mt-4 ${shakeKey === 'math' ? styles.shake : ''}`}>
+                              <label htmlFor="offer-math" className="block text-sm font-medium text-white/70 mb-1">
+                                Verificare anti-spam: cât face {antiSpam.a} + {antiSpam.b}?
+                              </label>
+                              <input
+                                id="offer-math"
+                                value={mathAnswer}
+                                onChange={(e) => setMathAnswer(e.target.value.replace(/[^\d]/g, '').slice(0, 3))}
+                                onBlur={() => setTouched((t) => ({ ...t, math: true }))}
+                                inputMode="numeric"
+                                className={`w-full bg-white/5 border rounded-2xl px-4 py-3 outline-none transition-colors ${
+                                  mathAnswer.trim()
+                                    ? isMathOk
+                                      ? 'border-emerald-400/50 focus:border-emerald-400'
+                                      : 'border-red-400/50 focus:border-red-400'
+                                    : 'border-white/10 focus:border-orange-400'
+                                }`}
+                                placeholder="Răspuns"
+                              />
+                              {touched.math && !mathAnswer.trim() ? (
+                                <div className="mt-2 text-xs text-red-300">Completează verificarea anti-spam.</div>
+                              ) : touched.math && mathAnswer.trim() && !isMathOk ? (
+                                <div className="mt-2 text-xs text-red-300">Răspuns greșit.</div>
+                              ) : null}
                             </div>
 
                             <label className={`mt-5 flex items-start gap-3 text-sm text-white/70 ${shakeKey === 'consent' ? styles.shake : ''}`}>

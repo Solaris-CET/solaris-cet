@@ -271,6 +271,25 @@ async function writeStaticPages() {
       ]),
     },
     {
+      path: '/calculator',
+      title: 'Calculator fotovoltaic — Solaris CET',
+      description: 'Estimare orientativă: putere sistem, număr panouri, preț estimat, economii și amortizare.',
+      h1: 'Calculator fotovoltaic (estimare)',
+      bodyLines: ['Calculatorul complet este disponibil în aplicație.'],
+      extraHtml: `
+        <div style="margin-top: 12px;">
+          <p><a href="/calculator">Deschide calculatorul →</a></p>
+        </div>
+      `,
+      jsonLd: wrapJsonLd([
+        { '@type': 'WebPage', name: 'Calculator fotovoltaic', url: `${origin}/calculator/` },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Calculator', path: '/calculator' },
+        ]),
+      ]),
+    },
+    {
       path: '/servicii',
       title: 'Servicii — Solaris CET',
       description: 'Servicii Solaris CET: fotovoltaice, acoperișuri, atice/fațade tablă, reparații și mentenanță.',
@@ -942,6 +961,7 @@ async function writeSitemap() {
     '/servicii/atice-si-fatade-tabla',
     '/servicii/reparatii-mentenanta',
     '/contact',
+    '/calculator',
     '/despre',
     '/portofoliu',
     '/faq',

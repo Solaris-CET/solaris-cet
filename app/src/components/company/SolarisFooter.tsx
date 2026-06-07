@@ -150,7 +150,7 @@ export function SolarisFooter({ className }: { className?: string }) {
               </div>
 
               <a
-                href={localizePathname('/contact', urlLocale)}
+                href={localizePathname('/calculator', urlLocale)}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-black/20 px-5 py-3 text-sm font-black text-white/85 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/60"
               >
                 Calculează economiile <ArrowRight className="h-4 w-4" aria-hidden />
