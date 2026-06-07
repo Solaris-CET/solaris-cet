@@ -186,6 +186,18 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
       keywords: 'portofoliu, proiecte fotovoltaice, lucrari acoperisuri, tpo, atice, fatade tabla, vaslui',
       ogType: 'website',
     },
+    '/portfolio': {
+      title: 'Portofoliu — Solaris CET',
+      description: 'Portofoliu proiecte: fotovoltaice, acoperișuri și atice/fațade tablă.',
+      ogType: 'website',
+      noindex: true,
+    },
+    '/services': {
+      title: 'Servicii — Solaris CET',
+      description: 'Servicii Solaris CET: fotovoltaice, acoperișuri, atice/fațade tablă, reparații și mentenanță.',
+      ogType: 'website',
+      noindex: true,
+    },
     '/multumim': {
       title: 'Mulțumim — Solaris CET',
       description: 'Am primit cererea ta. Revenim în cel mult 24 de ore.',
@@ -705,6 +717,8 @@ function App() {
           <HomePage />
         ) : routePath === '/servicii' ? (
           <ServicesPage />
+        ) : routePath === '/services' ? (
+          <NotFoundPage attemptedPath={routePath} staticRedirectHref="/servicii" />
         ) : routePath === '/servicii/atice-fatade-tabla' ? (
           <ServiceDetailPage slug="atice-si-fatade-tabla" />
         ) : routePath.startsWith('/servicii/') ? (
@@ -715,6 +729,8 @@ function App() {
           <ContactPage />
         ) : routePath === '/proiecte' || routePath === '/portofoliu' ? (
           <ProjectsPage />
+        ) : routePath === '/portfolio' ? (
+          <NotFoundPage attemptedPath={routePath} staticRedirectHref="/proiecte" />
         ) : routePath === '/galerie' ? (
           <ProjectsPage />
         ) : routePath === '/vaslui' ? (
