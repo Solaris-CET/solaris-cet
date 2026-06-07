@@ -132,6 +132,31 @@ export default function ServiceDetailPage({ slug }: { slug: string }) {
               </div>
             ) : null}
 
+            {service.longDescription?.length ? (
+              <div className={service.highlights?.length ? 'mt-8 rounded-3xl border border-white/10 bg-white/5 p-7' : 'rounded-3xl border border-white/10 bg-white/5 p-7'} data-reveal>
+                <h2 className="text-2xl font-bold">Descriere</h2>
+                <div className="mt-4 space-y-4 text-sm text-slate-200/90 leading-relaxed">
+                  {service.longDescription.map((p) => (
+                    <p key={p}>{p}</p>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {service.steps?.length ? (
+              <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-7" data-reveal-stagger>
+                <h2 className="text-2xl font-bold">Pași de lucru</h2>
+                <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {service.steps.map((s) => (
+                    <div key={s.title} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                      <div className="text-sm font-bold text-white">{s.title}</div>
+                      <div className="mt-1 text-sm text-slate-300 leading-relaxed">{s.body}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
             <div className={service.highlights?.length ? 'mt-8 rounded-3xl border border-white/10 bg-white/5 p-7' : 'rounded-3xl border border-white/10 bg-white/5 p-7'} data-reveal>
               <h2 className="text-2xl font-bold">Ce include</h2>
               <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -143,6 +168,38 @@ export default function ServiceDetailPage({ slug }: { slug: string }) {
                 ))}
               </div>
             </div>
+
+            {service.pricing?.length ? (
+              <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-7" data-reveal-stagger>
+                <h2 className="text-2xl font-bold">Preț orientativ</h2>
+                <p className="mt-2 text-sm text-slate-300 leading-relaxed">
+                  Repere orientative. Oferta finală depinde de evaluare, acces, detalii și configurație.
+                </p>
+                <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {service.pricing.map((p) => (
+                    <div key={p.label} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-white/55">{p.label}</div>
+                      <div className="mt-1 text-sm font-semibold text-white/85">{p.value}</div>
+                      {p.note ? <div className="mt-2 text-xs text-slate-400 leading-relaxed">{p.note}</div> : null}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {service.warranty?.length ? (
+              <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-7" data-reveal>
+                <h2 className="text-2xl font-bold">Garanții & mentenanță</h2>
+                <div className="mt-5 space-y-3">
+                  {service.warranty.map((x) => (
+                    <div key={x} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-black/20 p-4">
+                      <CheckCircle2 className="h-5 w-5 text-amber-300 mt-0.5" aria-hidden />
+                      <div className="text-sm text-slate-200 leading-relaxed">{x}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
 
             <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-7" data-reveal>
               <h2 className="text-2xl font-bold">FAQ</h2>
@@ -158,6 +215,12 @@ export default function ServiceDetailPage({ slug }: { slug: string }) {
               <div className="mt-2 text-sm text-slate-300 leading-relaxed">Trimite cererea și revenim cu pașii următori.</div>
               <a href={contactHref} className="mt-6 inline-flex w-full items-center justify-center rounded-2xl bg-amber-400 px-6 py-4 text-black font-black">
                 Cere ofertă
+              </a>
+              <a
+                href="/calculator"
+                className="mt-3 inline-flex w-full items-center justify-center rounded-2xl border border-white/15 bg-white/5 px-6 py-4 text-white font-bold hover:bg-white/10"
+              >
+                Calculează economiile <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
               </a>
               <div className="mt-4 text-xs text-slate-400">Preferi să suni? +40 769 889 721</div>
               <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4">

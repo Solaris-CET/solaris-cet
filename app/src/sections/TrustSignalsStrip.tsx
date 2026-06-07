@@ -159,7 +159,7 @@ export default function TrustSignalsStrip() {
                     <div className="text-sm font-black text-white">Clienți mulțumiți</div>
                     <div className="mt-1 text-xs text-white/60">{reviewLine}</div>
                   </div>
-                  <div className="flex items-center gap-1 text-amber-400" aria-label={reviewLine}>
+                  <div role="img" className="flex items-center gap-1 text-amber-400" aria-label={reviewLine}>
                     {Array.from({ length: 5 }).map((_, i) => (
                       <Star
                         key={i}

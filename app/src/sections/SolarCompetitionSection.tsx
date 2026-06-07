@@ -28,7 +28,13 @@ export default function SolarCompetitionSection() {
           </p>
         </div>
 
-        <div className="mt-10 overflow-x-auto rounded-3xl border border-white/10 bg-black/25" data-reveal>
+        <div
+          className="mt-10 overflow-x-auto rounded-3xl border border-white/10 bg-black/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#05060B]"
+          data-reveal
+          role="region"
+          aria-label="Tabel de comparație Solaris CET vs. concurență"
+          tabIndex={0}
+        >
           <table className="w-full min-w-[640px] border-collapse">
             <thead>
               <tr className="border-b border-white/10">

@@ -11,6 +11,7 @@ import HeroSection from '@/sections/HeroSection';
 import ProductsSection from '@/sections/ProductsSection';
 import ServicesSection from '@/sections/ServicesSection';
 import SolarCompetitionSection from '@/sections/SolarCompetitionSection';
+import SolarIntelligenceSection from '@/sections/SolarIntelligenceSection';
 import SolarSecuritySection from '@/sections/SolarSecuritySection';
 import TrustProcessSection from '@/sections/TrustProcessSection';
 import TrustSignalsStrip from '@/sections/TrustSignalsStrip';
@@ -33,6 +34,12 @@ export default function HomePage() {
       <section className="relative z-20">
         <ScrollFadeUp>
           <ServicesSection />
+        </ScrollFadeUp>
+      </section>
+
+      <section className="relative z-20">
+        <ScrollFadeUp>
+          <SolarIntelligenceSection />
         </ScrollFadeUp>
       </section>
 

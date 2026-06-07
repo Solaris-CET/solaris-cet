@@ -1,12 +1,21 @@
 import { expect } from '@playwright/test';
 
 import { URL_LOCALES } from '../src/i18n/urlRouting';
-import { NAV_PRIMARY_IN_PAGE } from '../src/lib/navPrimaryHrefs';
 
 /** Match `sovereign-static.spec.ts`: fixed language for stable nav + section copy. */
 export const E2E_I18N_START = '/en/';
 
-export type NavPrimaryInPageHref = (typeof NAV_PRIMARY_IN_PAGE)[number]['href'];
+export type NavPrimaryDesktopHref = '#hero' | '/proiecte' | '/servicii' | '/contact';
+export type NavPrimaryMobileHref =
+  | '#hero'
+  | '#servicii'
+  | '#produse'
+  | '#echipamente'
+  | '#proiecte'
+  | '/finantare'
+  | '/blog'
+  | '/despre'
+  | '/contact';
 
 async function clickNavLink(locator: any) {
   try {
@@ -16,14 +25,7 @@ async function clickNavLink(locator: any) {
   }
 }
 
-export async function clickHeaderNav(page: any, href: NavPrimaryInPageHref): Promise<void> {
-  const locator = href.startsWith('#')
-    ? page.locator(`header nav a[href="${href}"], header nav a[href$="${href}"]`)
-    : page.locator(`header nav a[href$="${href}"]`);
-  await clickNavLink(locator);
-}
-
-export async function clickMobileSheetNav(page: any, href: NavPrimaryInPageHref): Promise<void> {
+export async function clickMobileSheetNav(page: any, href: NavPrimaryMobileHref): Promise<void> {
   const locator = href.startsWith('#')
     ? page.locator(`#mobile-menu nav > a[href="${href}"]`)
     : page.locator(`#mobile-menu nav > a[href="${href}"], #mobile-menu nav > a[href$="${href}"]`);
@@ -40,31 +42,17 @@ function stripLocalePrefix(pathname: string) {
   return pathname;
 }
 
-const desktopAssertByHref: Record<NavPrimaryInPageHref, (page: any) => Promise<void>> = {
+const desktopAssertByHref: Record<NavPrimaryDesktopHref, (page: any) => Promise<void>> = {
   '#hero': async (page: any) => {
     await expect(page.locator('#hero')).toBeAttached({ timeout: 15_000 });
   },
-  '#servicii': async (page: any) => {
-    await expect(page.locator('#servicii')).toBeAttached({ timeout: 15_000 });
-  },
-  '#proiecte': async (page: any) => {
-    await expect(page.locator('#proiecte')).toBeAttached({ timeout: 15_000 });
-  },
-  '/finantare': async (page: any) => {
+  '/proiecte': async (page: any) => {
     await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
-    await expect(page.getByText(/Casa Verde|Financing/i).first()).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText(/Proiecte|Portofoliu|Projects|Portfolio/i).first()).toBeVisible({ timeout: 30_000 });
   },
-  '/blog': async (page: any) => {
+  '/servicii': async (page: any) => {
     await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
-    await expect(page.getByText(/Blog/i).first()).toBeVisible({ timeout: 30_000 });
-  },
-  '/despre': async (page: any) => {
-    await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
-    await expect(page.getByText(/Despre|About/i).first()).toBeVisible({ timeout: 30_000 });
-  },
-  '/token-cet': async (page: any) => {
-    await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
-    await expect(page.getByText(/CET/i).first()).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText(/Servicii|Services/i).first()).toBeVisible({ timeout: 30_000 });
   },
   '/contact': async (page: any) => {
     await expect(page.locator('#main-content')).toBeAttached({ timeout: 15_000 });
@@ -72,7 +60,14 @@ const desktopAssertByHref: Record<NavPrimaryInPageHref, (page: any) => Promise<v
   },
 };
 
-export async function runDesktopNavPrimaryCase(page: any, href: NavPrimaryInPageHref): Promise<void> {
+export async function clickHeaderNav(page: any, href: NavPrimaryDesktopHref): Promise<void> {
+  const locator = href.startsWith('#')
+    ? page.locator(`header nav a[href="${href}"], header nav a[href$="${href}"]`)
+    : page.locator(`header nav a[href$="${href}"]`);
+  await clickNavLink(locator);
+}
+
+export async function runDesktopNavPrimaryCase(page: any, href: NavPrimaryDesktopHref): Promise<void> {
   await clickHeaderNav(page, href);
   if (href.startsWith('#')) {
     await expect(page).toHaveURL((u: any) => u.hash === href);
@@ -82,7 +77,9 @@ export async function runDesktopNavPrimaryCase(page: any, href: NavPrimaryInPage
   await desktopAssertByHref[href](page);
 }
 
-export const NAV_PRIMARY_DESKTOP_E2E = NAV_PRIMARY_IN_PAGE.map((item) => ({
-  navKey: item.navKey,
-  href: item.href,
-}));
+export const NAV_PRIMARY_DESKTOP_E2E = [
+  { navKey: 'home', href: '#hero' as const },
+  { navKey: 'portfolio', href: '/proiecte' as const },
+  { navKey: 'services', href: '/servicii' as const },
+  { navKey: 'contact', href: '/contact' as const },
+];

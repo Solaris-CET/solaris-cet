@@ -307,11 +307,14 @@ export default function HeroSection() {
           </div>
 
           <h1 className={`mt-7 leading-[0.92] tracking-[-0.05em] text-white ${styles.fadeUp}`} style={{ animationDelay: '0.35s' }}>
-            <span className={`block font-black uppercase ${styles.heroSerif} text-[2.75rem] sm:text-[3.5rem] md:text-[4.5rem] lg:text-[4.8rem]`}>
-              SOLARIS
+            <span className={`block font-black ${styles.heroSerif} text-[2.4rem] sm:text-[3.1rem] md:text-[4.0rem] lg:text-[4.4rem]`}>
+              Instalații fotovoltaice
             </span>
-            <span className={`mt-1 block font-black uppercase text-amber-300 ${styles.heroSerif} text-[1.8rem] sm:text-[2.2rem] md:text-[2.6rem]`}>
-              CET
+            <span className={`mt-1 block font-black ${styles.heroSerif} text-[2.1rem] sm:text-[2.7rem] md:text-[3.4rem] lg:text-[3.8rem]`}>
+              și acoperișuri
+            </span>
+            <span className="mt-3 block text-base sm:text-lg font-extrabold tracking-wide text-amber-300">
+              Solaris CET · Vaslui · România
             </span>
           </h1>
 

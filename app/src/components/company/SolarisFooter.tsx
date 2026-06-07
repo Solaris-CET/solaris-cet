@@ -39,6 +39,7 @@ export function SolarisFooter({ className }: { className?: string }) {
     { label: 'Politică Cookies', href: localizePathname('/cookies', urlLocale) },
     { label: 'Confidențialitate', href: localizePathname('/privacy', urlLocale) },
     { label: 'Termeni și Condiții', href: localizePathname('/terms', urlLocale) },
+    { label: 'Contact', href: localizePathname('/contact', urlLocale) },
   ];
 
   const facebookUrl = companyProfile.social.facebook || 'https://facebook.com';

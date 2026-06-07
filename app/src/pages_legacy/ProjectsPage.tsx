@@ -245,7 +245,7 @@ export default function ProjectsPage() {
         tag: 'fotovoltaice',
         typeLabel: 'Fotovoltaice',
         title: 'Invertor + protecții — montaj curat',
-        location: 'Vaslui',
+        location: 'Bârlad',
         caseStudy: {
           summary:
             'Montaj invertor și protecții cu trasee ordonate, etichetare, verificări și predare cu explicații pentru utilizare și siguranță.',
@@ -259,7 +259,7 @@ export default function ProjectsPage() {
           challenge: 'Spațiu tehnic mic și cablare existentă nealiniată.',
           solution: 'Reorganizare trasee, fixări corecte și verificare finală înainte de pornire.',
           testimonial: {
-            name: 'Client rezidențial, Vaslui',
+            name: 'Client rezidențial, Bârlad',
             text: 'Apreciez că au pus totul ordonat și ne-au arătat ce să urmărim în aplicație. Se vede atenția la detalii.',
           },
         },

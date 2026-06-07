@@ -303,7 +303,11 @@ export default function ContactPage() {
   const canSubmit = Boolean(name.trim()) && Boolean(phone.trim() || email.trim()) && isPhoneValid && emailOk && consent && isMathOk;
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-solaris-offblack text-white">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-solaris-offblack text-white"
+    >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16" data-reveal>
           <h1 className="font-display font-bold bg-gradient-to-r from-solar-yellow to-amber-500 bg-clip-text text-transparent text-[length:var(--text-h1)] leading-[var(--lh-display)]">
@@ -926,6 +930,6 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

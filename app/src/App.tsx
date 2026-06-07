@@ -163,6 +163,37 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
       keywords:
         'servicii fotovoltaice, montaj panouri fotovoltaice, acoperis tpo, acoperis tabla, reparatii acoperis, mentenanta fotovoltaice',
       ogType: 'website',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'ItemList',
+            itemListElement: [
+              {
+                '@type': 'ListItem',
+                position: 1,
+                item: { '@type': 'Service', name: 'Fotovoltaice Rezidențiale', url: `${origin}/${urlLocale}/servicii/fotovoltaice-rezidentiale` },
+              },
+              {
+                '@type': 'ListItem',
+                position: 2,
+                item: { '@type': 'Service', name: 'Fotovoltaice Industriale', url: `${origin}/${urlLocale}/servicii/fotovoltaice-industriale` },
+              },
+              {
+                '@type': 'ListItem',
+                position: 3,
+                item: { '@type': 'Service', name: 'Acoperișuri Tablă/Țiglă', url: `${origin}/${urlLocale}/servicii/acoperisuri-tabla-tigla` },
+              },
+              {
+                '@type': 'ListItem',
+                position: 4,
+                item: { '@type': 'Service', name: 'Acoperișuri Industriale TPO', url: `${origin}/${urlLocale}/servicii/acoperisuri-industriale-tpo` },
+              },
+            ],
+          },
+          buildBreadcrumbJsonLd(origin, urlLocale, '/servicii'),
+        ],
+      },
     },
     '/contact': {
       title: 'Contact — Solaris CET',
@@ -175,6 +206,13 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
       description: 'Estimare orientativă: putere sistem, număr panouri, preț estimat, economii și amortizare. Cere ofertă personalizată.',
       keywords: 'calculator fotovoltaic, instalatii fotovoltaice pret, panouri solare vaslui, economii energie',
       ogType: 'website',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@graph': [
+          { '@type': 'WebApplication', name: 'Calculator fotovoltaic', applicationCategory: 'BusinessApplication', url: `${origin}/${urlLocale}/calculator` },
+          buildBreadcrumbJsonLd(origin, urlLocale, '/calculator'),
+        ],
+      },
     },
     '/cere-oferta': {
       title: 'Cere ofertă — Solaris CET',
