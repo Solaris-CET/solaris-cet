@@ -354,31 +354,31 @@ export default async function handler(req: Request): Promise<Response> {
     const isRo = /[ăâîșț]/i.test(trimmedQuery) || /\b(ce|cat|cât|vreau|ofert[ăa]|acoperiș|fotovoltaic|reparații|mentenanță|montaj)\b/i.test(trimmedQuery);
     const isCompany = isCompanyMode || /\b(fotovoltaic|panouri|acoperiș|tpo|șarpantă|țiglă|tablă|atice|fațade|ofert[ăa])\b/i.test(trimmedQuery);
     const intro = isRo
-      ? 'Asistentul AI avansat este dezactivat (nu sunt configurate chei). Totuși, pot să te ajut să obții rapid o ofertă.'
-      : 'Advanced AI is disabled (no provider keys configured). I can still help you get a quote quickly.';
+      ? 'Sistemul Solaris Engineering (BETA) este pregătit. Deoarece suntem în regim de mentenanță AI, te pot ajuta manual să obții o ofertă.'
+      : 'Solaris Engineering (BETA) system is ready. As we are in AI maintenance mode, I can help you manually to get a quote.';
     const reply = isCompany
       ? isRo
         ? [
             intro,
             '',
-            'Spune-mi 4 detalii și îți recomand pachetul potrivit:',
-            '1) Localitate/județ',
-            '2) Tip proiect: fotovoltaice / acoperiș / TPO / construcții / reparații',
-            '3) Date tehnice (ex: consum lunar, suprafață acoperiș, tip structură, infiltratii)',
-            '4) Când vrei să începi',
+            'Te rog să ne transmiți 4 detalii tehnice pentru o configurare corectă:',
+            '1) Localitatea proiectului (pentru evaluarea zonei de însorire/vânt)',
+            '2) Tipul lucrării: Sisteme PV / Acoperiș TPO / Tablă & Fațade / Reparații',
+            '3) Date tehnice: Consum lunar (kWh), suprafață estimată (mp) și tipul structurii',
+            '4) Termenul dorit pentru începerea execuției',
             '',
-            `Contact direct: +40 769 889 721 · solaris-cet@protonmail.com`,
+            `Inginer de serviciu: +40 769 889 721 · solaris-cet@protonmail.com`,
           ].join('\n')
         : [
             intro,
             '',
-            'Share 4 details and I will suggest the right package:',
-            '1) City/county',
-            '2) Project type: PV / roof / TPO / construction / repairs',
-            '3) Key details (usage, roof area, structure type, leaks)',
-            '4) Timeline',
+            'Please provide 4 technical details for a correct configuration:',
+            '1) Project location (for solar/wind exposure assessment)',
+            '2) Project type: PV Systems / TPO Roofing / Metal Facades / Repairs',
+            '3) Technical data: Monthly usage (kWh), estimated area (sqm), and structure type',
+            '4) Desired start date for execution',
             '',
-            'Direct contact: +40 769 889 721 · solaris-cet@protonmail.com',
+            'Engineering Support: +40 769 889 721 · solaris-cet@protonmail.com',
           ].join('\n')
       : intro;
 
@@ -459,9 +459,9 @@ export default async function handler(req: Request): Promise<Response> {
   const sharedContext =
     multiTurnHint +
     (isCompanyMode
-      ? `You are Solaris CET — a helpful assistant for a Romania-based company delivering photovoltaic installations, construction works, roofing (metal sheet / metal tiles / TPO membrane), metal parapets and facades, plus repairs and maintenance.\n` +
-        `STRICT RULE: Do NOT mention CET tokens, crypto, blockchain, jettons, DeDust, TON, or any financial investment topics. You only talk about physical construction and renewable energy services in Romania.\n\n`
-      : `You are Solaris CET AI — a helpful assistant for Solaris CET and general crypto/DeFi questions.\n\n`) +
+      ? `You are Solaris Engineering — a professional engineering firm assistant specialized in B2B/B2C photovoltaic systems, industrial TPO roofing, and metal facades in Romania.\n` +
+        `STRICT RULE: NEVER mention 'CET' tokens, crypto, blockchain, 'vibes', or any DeFi terminology. Focus exclusively on technical engineering, PV ROI, roofing durability, and professional services. Use a formal, engineering-focused tone.\n\n`
+      : `You are Solaris CET AI — a helpful assistant for Solaris Engineering and general crypto/DeFi questions.\n\n`) +
     `LANGUAGE: Reply in the same language as the user's latest message.\n\n` +
     `RULES:\n` +
     `- Be accurate and explicit about uncertainty.\n` +
