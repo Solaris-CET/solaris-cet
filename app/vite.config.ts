@@ -195,7 +195,10 @@ function gitShort(): string {
   const fromEnv = process.env.VITE_GIT_COMMIT_HASH?.trim()
   if (fromEnv) return fromEnv.slice(0, 7)
   try {
-    return execSync("git rev-parse --short HEAD", { encoding: "utf8" }).trim().slice(0, 7)
+    return execSync("git rev-parse --short HEAD", {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim().slice(0, 7)
   } catch {
     return "unknown"
   }
