@@ -2,7 +2,7 @@ export const companyProfile = {
   name: 'Solaris CET',
   tagline: 'Fotovoltaice, acoperișuri și execuție curată.',
   shortDescription:
-    'Instalații fotovoltaice, acoperișuri (tablă/țiglă/TPO), atice/fațade tablă și reparații, cu intervenții în Vaslui și în toată Moldova.',
+    'Instalații fotovoltaice, acoperișuri (tablă/țiglă/TPO), atice/fațade tablă și reparații, cu intervenții în Vaslui, Moldova și proiecte selectate la nivel național.',
   phone: '+40769889721',
   phoneDisplay: '+40 769 889 721',
   email: 'solaris-cet@protonmail.com',

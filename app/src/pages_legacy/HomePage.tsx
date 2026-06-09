@@ -146,6 +146,9 @@ export default function HomePage() {
                       height={800}
                       referrerPolicy="no-referrer"
                     />
+                    <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-white/85 backdrop-blur">
+                      Vizual orientativ
+                    </div>
                     <div className="pointer-events-none absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-black/35 backdrop-blur">
                       <SolarisLogoMark className="h-7 w-7 text-orange-300" aria-hidden />
                     </div>

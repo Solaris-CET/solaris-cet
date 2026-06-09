@@ -127,7 +127,7 @@ export function SolarisFooter({ className }: { className?: string }) {
               <a className="block text-sm font-semibold text-white/60 hover:text-orange-300 transition-colors" href={emailUrl}>
                 {companyProfile.email}
               </a>
-              <div className="text-sm text-white/55">Vaslui & toată România</div>
+              <div className="text-sm text-white/55">Vaslui, Moldova & proiecte selectate la nivel național</div>
               <div className="text-xs text-white/45">Program: {companyProfile.program} · {companyProfile.urgent}</div>
             </div>
           </div>

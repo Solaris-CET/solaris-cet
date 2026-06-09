@@ -364,10 +364,14 @@ export default function HeroSection() {
                   width={1200}
                   height={900}
                   loading="eager"
+                  fetchPriority="high"
                   className="aspect-[4/3] h-full w-full object-cover"
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#04050a] via-[#04050a]/10 to-transparent" aria-hidden />
+                <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-white/85 backdrop-blur">
+                  Vizual orientativ
+                </div>
                 <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
                   <div className="rounded-[1.4rem] border border-white/10 bg-black/45 p-5 backdrop-blur-md">
                     <div className="text-[11px] font-black uppercase tracking-[0.2em] text-amber-300">Ce vede clientul</div>
