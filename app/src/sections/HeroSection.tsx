@@ -1,10 +1,10 @@
-import { ArrowRight, BadgeCheck } from 'lucide-react';
+import { ArrowRight, BadgeCheck, MapPin, Phone } from 'lucide-react';
 import { type CSSProperties, useEffect, useMemo, useState } from 'react';
 
+import AppImage from '@/components/AppImage';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
 
 import styles from './HeroSolaris.module.css';
-
 
 type Particle = {
   size: number;
@@ -64,6 +64,9 @@ function useCountUp({
 }
 
 export default function HeroSection() {
+  const mainVisual =
+    'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20a%20Romanian%20house%20with%20a%20clean%20black%20solar%20panel%20installation%20on%20the%20roof%2C%20installer%20team%20working%20neatly%2C%20modern%20gutters%2C%20golden%20hour%20light%2C%20premium%20commercial%20look%2C%20high%20detail%2C%20no%20logos%2C%20no%20text&image_size=portrait_4_3';
+
   const particles = useMemo<Particle[]>(
     () => [
       {
@@ -181,7 +184,7 @@ export default function HeroSection() {
         hiddenOnMobile: true,
       },
     ],
-    []
+    [],
   );
 
   const { elementRef, isVisible } = useIntersectionObserver<HTMLDivElement>({
@@ -192,44 +195,6 @@ export default function HeroSection() {
 
   const projects = useCountUp({ to: 200, enabled: isVisible });
   const years = useCountUp({ to: 5, enabled: isVisible, durationMs: 650 });
-
-  const fullTagline = 'Fotovoltaice · Acoperișuri · Construcții';
-  const [typed, setTyped] = useState('');
-
-  useEffect(() => {
-    const reduceMotion =
-      typeof window !== 'undefined' &&
-      window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (reduceMotion) {
-      setTyped(fullTagline);
-      return;
-    }
-
-    let i = 0;
-    let timer = 0;
-    let pause = 0;
-
-    const tick = () => {
-      if (pause > 0) {
-        pause -= 1;
-        timer = window.setTimeout(tick, 120);
-        return;
-      }
-
-      i += 1;
-      setTyped(fullTagline.slice(0, i));
-      if (i >= fullTagline.length) {
-        pause = 16;
-        i = 0;
-      }
-      timer = window.setTimeout(tick, 42);
-    };
-
-    timer = window.setTimeout(tick, 240);
-    return () => window.clearTimeout(timer);
-  }, []);
 
   const rays = useMemo(
     () =>
@@ -277,7 +242,7 @@ export default function HeroSection() {
             }
           />
         ))}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#05060B] via-[#05060B]/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#05060B] via-[#05060B]/55 to-transparent" />
       </div>
 
       <svg className={styles.rays} viewBox="0 0 1000 800" preserveAspectRatio="none" aria-hidden>
@@ -296,78 +261,137 @@ export default function HeroSection() {
         ))}
       </svg>
 
-      <div className="relative mx-auto max-w-7xl px-5 sm:px-8 xl:px-12 pt-24 sm:pt-28 pb-14">
-        <div className="min-h-[85svh] md:min-h-[100svh] flex flex-col justify-center">
-          <div
-            className={`inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-semibold tracking-wider text-white/85 backdrop-blur ${styles.fadeUp}`}
-            style={{ animationDelay: '0.2s' }}
-          >
-            <span className="h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_18px_rgba(245,158,11,0.55)]" />
-            SOLUȚII COMPLETE · EXECUȚIE PROFESIONISTĂ
-          </div>
-
-          <h1 className={`mt-7 leading-[0.92] tracking-[-0.05em] text-white ${styles.fadeUp}`} style={{ animationDelay: '0.35s' }}>
-            <span className={`block font-black ${styles.heroSerif} text-[2.4rem] sm:text-[3.1rem] md:text-[4.0rem] lg:text-[4.4rem]`}>
-              Instalații fotovoltaice
-            </span>
-            <span className={`mt-1 block font-black ${styles.heroSerif} text-[2.1rem] sm:text-[2.7rem] md:text-[3.4rem] lg:text-[3.8rem]`}>
-              și acoperișuri
-            </span>
-            <span className="mt-3 block text-base sm:text-lg font-extrabold tracking-wide text-amber-300">
-              Solaris CET · Vaslui · România
-            </span>
-          </h1>
-
-          <div className={`mt-5 text-[1.2rem] sm:text-[1.35rem] text-slate-200 ${styles.fadeUp}`} style={{ animationDelay: '0.5s' }}>
-            <span className={styles.typewriter}>
-              <span className="font-semibold">{typed}</span>
-              <span className={styles.caret} aria-hidden />
-            </span>
-          </div>
-
-          <p className={`mt-5 text-[1.05rem] leading-relaxed text-slate-300 max-w-2xl ${styles.fadeUp}`} style={{ animationDelay: '0.6s' }}>
-            Instalații fotovoltaice, acoperișuri (tablă / țiglă / TPO), lucrări de construcții, atice & fațade din tablă, plus reparații și mentenanță.
-          </p>
-
-          <div className={`mt-8 flex flex-col sm:flex-row gap-4 ${styles.fadeUp}`} style={{ animationDelay: '0.75s' }}>
-            <a
-              href="/contact"
-              className="group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-7 py-4 text-base font-black text-black shadow-[0_18px_60px_rgba(245,158,11,0.18)] transition-transform will-change-transform hover:-translate-y-0.5 active:translate-y-0"
+      <div className="relative mx-auto max-w-7xl px-5 pb-14 pt-24 sm:px-8 sm:pt-28 xl:px-12">
+        <div className="grid min-h-[85svh] items-center gap-10 py-8 lg:min-h-[100svh] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+          <div className="max-w-3xl">
+            <div
+              className={`inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-semibold tracking-wider text-white/85 backdrop-blur ${styles.fadeUp}`}
+              style={{ animationDelay: '0.2s' }}
             >
-              Cere ofertă
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
-            </a>
+              <span className="h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_18px_rgba(245,158,11,0.55)]" />
+              FOTOVOLTAICE · ACOPERIȘURI · VASLUI & MOLDOVA
+            </div>
 
-            <a
-              href="/servicii"
-              className="inline-flex w-full sm:w-auto items-center justify-center rounded-2xl border border-white/35 bg-white/0 px-7 py-4 text-base font-bold text-white transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
+            <h1 className={`mt-7 leading-[0.95] tracking-[-0.05em] text-white ${styles.fadeUp}`} style={{ animationDelay: '0.35s' }}>
+              <span className={`block font-black ${styles.heroSerif} text-[2.5rem] sm:text-[3.25rem] md:text-[4.1rem] lg:text-[4.55rem]`}>
+                Sisteme fotovoltaice
+              </span>
+              <span className={`mt-2 block font-black ${styles.heroSerif} text-[2rem] text-white/90 sm:text-[2.6rem] md:text-[3.3rem] lg:text-[3.75rem]`}>
+                și acoperișuri
+              </span>
+              <span className="mt-4 block max-w-2xl text-lg font-bold tracking-wide text-amber-300 sm:text-xl">
+                executate profesionist în Vaslui și în toată zona Moldovei
+              </span>
+            </h1>
+
+            <p className={`mt-6 max-w-2xl text-[1.05rem] leading-relaxed text-slate-300 sm:text-[1.12rem] ${styles.fadeUp}`} style={{ animationDelay: '0.55s' }}>
+              Proiectare, montaj și punere în funcțiune pentru fotovoltaice rezidențiale și industriale, plus acoperișuri din tablă,
+              țiglă metalică sau TPO. Primești ofertă clară, pași reali și execuție curată.
+            </p>
+
+            <div className={`mt-7 flex flex-wrap gap-3 text-sm text-slate-200 ${styles.fadeUp}`} style={{ animationDelay: '0.65s' }}>
+              <div className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur">
+                <MapPin className="h-4 w-4 text-amber-400" aria-hidden />
+                <span className="font-semibold">Vaslui · deplasare în Moldova</span>
+              </div>
+              <div className={`inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-black/35 px-4 py-3 font-semibold text-white backdrop-blur ${styles.badgePulse}`}>
+                <BadgeCheck className="h-4 w-4 text-amber-400" aria-hidden />
+                <span>Atestat ANRE · execuție conformă</span>
+              </div>
+            </div>
+
+            <div className={`mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap ${styles.fadeUp}`} style={{ animationDelay: '0.78s' }}>
+              <a
+                href="/contact"
+                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-7 py-4 text-base font-black text-black shadow-[0_18px_60px_rgba(245,158,11,0.18)] transition-transform will-change-transform hover:-translate-y-0.5 active:translate-y-0"
+              >
+                Cere ofertă
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+              </a>
+
+              <a
+                href="tel:+40769889721"
+                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl border border-white/25 bg-white/[0.03] px-7 py-4 text-base font-bold text-white transition-colors hover:border-white/45 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
+              >
+                <Phone className="h-4 w-4" aria-hidden />
+                Sună acum
+              </a>
+
+              <a
+                href="#proiecte"
+                className="inline-flex w-full sm:w-auto items-center justify-center rounded-2xl border border-white/10 bg-black/25 px-7 py-4 text-base font-bold text-white/85 transition-colors hover:border-amber-400/40 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60"
+              >
+                Vezi lucrări
+              </a>
+            </div>
+
+            <div
+              ref={elementRef}
+              data-reveal-stagger
+              className={`mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4 ${styles.fadeUp}`}
+              style={{ animationDelay: '0.9s' }}
             >
-              Servicii
-            </a>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-4 backdrop-blur">
+                <div className="text-2xl font-black text-white tabular-nums">{projects}+</div>
+                <div className="mt-1 text-sm font-semibold text-slate-200">proiecte estimate</div>
+                <div className="mt-1 text-xs text-slate-400">fotovoltaice, acoperișuri și intervenții</div>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-4 backdrop-blur">
+                <div className="text-2xl font-black text-white">4.9/5</div>
+                <div className="mt-1 text-sm font-semibold text-slate-200">Google Recenzii</div>
+                <div className="mt-1 text-xs text-slate-400">semnal de încredere pentru lucrări locale</div>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-4 backdrop-blur">
+                <div className="text-2xl font-black text-white tabular-nums">{years}+</div>
+                <div className="mt-1 text-sm font-semibold text-slate-200">ani experiență</div>
+                <div className="mt-1 text-xs text-slate-400">cu accent pe execuție curată și suport</div>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-4 backdrop-blur">
+                <div className="text-2xl font-black text-white">24h</div>
+                <div className="mt-1 text-sm font-semibold text-slate-200">răspuns comercial</div>
+                <div className="mt-1 text-xs text-slate-400">pentru ofertă, clarificări și pași următori</div>
+              </div>
+            </div>
           </div>
 
-          <div
-            ref={elementRef}
-            data-reveal-stagger
-            className={`mt-8 flex flex-wrap gap-3 ${styles.fadeUp}`}
-            style={{ animationDelay: '0.9s' }}
-          >
-            <div className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur">
-              <div className="text-base font-black text-white tabular-nums">{projects}+</div>
-              <div className="text-sm font-semibold text-slate-200">Proiecte</div>
+          <div className={`relative ${styles.fadeUp}`} style={{ animationDelay: '0.55s' }}>
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03] p-3 shadow-[0_40px_120px_rgba(0,0,0,0.35)] backdrop-blur">
+              <div className="absolute inset-x-10 top-0 h-32 rounded-full bg-amber-400/20 blur-3xl" aria-hidden />
+              <div className="relative overflow-hidden rounded-[1.6rem] border border-white/10">
+                <AppImage
+                  src={mainVisual}
+                  alt="Lucrare fotovoltaică pe acoperiș rezidențial, cu montaj curat și echipă în teren"
+                  width={1200}
+                  height={900}
+                  loading="eager"
+                  className="aspect-[4/3] h-full w-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#04050a] via-[#04050a]/10 to-transparent" aria-hidden />
+                <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                  <div className="rounded-[1.4rem] border border-white/10 bg-black/45 p-5 backdrop-blur-md">
+                    <div className="text-[11px] font-black uppercase tracking-[0.2em] text-amber-300">Ce vede clientul</div>
+                    <div className="mt-3 text-2xl font-black text-white sm:text-[1.8rem]">Montaj curat, ofertă clară, contact rapid</div>
+                    <div className="mt-2 max-w-lg text-sm leading-relaxed text-slate-300">
+                      De la consum și tipul acoperișului până la structură, protecții și punere în funcțiune, primești o soluție explicată pe
+                      românește.
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur">
-              <div className="text-sm font-black text-white">Vaslui</div>
-              <div className="text-sm text-white/55">·</div>
-              <div className="text-sm font-bold text-slate-200">toată România</div>
-            </div>
-            <div className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur">
-              <div className="text-base font-black text-white tabular-nums">{years}</div>
-              <div className="text-sm font-semibold text-slate-200">ani experiență</div>
-            </div>
-            <div className={`inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm font-semibold text-white backdrop-blur ${styles.badgePulse}`}>
-              <BadgeCheck className="h-5 w-5 text-amber-400" aria-hidden />
-              <span>Atestat ANRE</span>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-3xl border border-white/10 bg-black/30 p-5 backdrop-blur">
+                <div className="text-xs font-black uppercase tracking-[0.18em] text-amber-300/90">Pentru case</div>
+                <div className="mt-2 text-lg font-bold text-white">Consum, orientare, umbriri, baterie</div>
+                <div className="mt-2 text-sm leading-relaxed text-slate-300">Dimensionăm sistemul pe situația reală, nu după un șablon generic.</div>
+              </div>
+              <div className="rounded-3xl border border-white/10 bg-black/30 p-5 backdrop-blur">
+                <div className="text-xs font-black uppercase tracking-[0.18em] text-amber-300/90">Pentru hale & business</div>
+                <div className="mt-2 text-lg font-bold text-white">Acoperiș, TPO și fotovoltaic în același flux</div>
+                <div className="mt-2 text-sm leading-relaxed text-slate-300">Coerență între soluția tehnică, etanșare, acces și planificarea execuției.</div>
+              </div>
             </div>
           </div>
         </div>

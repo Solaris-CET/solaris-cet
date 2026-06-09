@@ -1,4 +1,4 @@
-import { ArrowRight, Building2, Home, PlugZap } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Building2, Home, PlugZap } from 'lucide-react';
 
 import AppImage from '@/components/AppImage';
 import { SolarisFooter } from '@/components/company/SolarisFooter';
@@ -16,6 +16,45 @@ import SolarSecuritySection from '@/sections/SolarSecuritySection';
 import TrustProcessSection from '@/sections/TrustProcessSection';
 import TrustSignalsStrip from '@/sections/TrustSignalsStrip';
 
+const proofPillars = [
+  {
+    title: 'Mesaj clar pentru client',
+    text: 'Spunem din primul ecran ce facem, unde lucrăm și care este următorul pas: evaluare, ofertă, execuție.',
+  },
+  {
+    title: 'Ofertă pe situația reală',
+    text: 'Consumul, acoperișul, umbririle și tipul proiectului dictează soluția. Nu vindem un pachet generic tuturor.',
+  },
+  {
+    title: 'Execuție curată, fără improvizații',
+    text: 'Montaj ordonat, detalii corecte și suport după lucrare, atât pentru fotovoltaice, cât și pentru acoperișuri.',
+  },
+] as const;
+
+const projectCards = [
+  {
+    title: 'Fotovoltaice rezidențial',
+    text: 'Sistem dimensionat pe consum, orientare și umbriri, cu monitorizare și punere în funcțiune.',
+    icon: PlugZap,
+    img: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20a%20modern%20Romanian%20house%20roof%20with%20black%20solar%20panels%20installed%2C%20clean%20cabling%2C%20golden%20hour%20light%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
+    alt: 'Panouri fotovoltaice montate pe acoperiș rezidențial',
+  },
+  {
+    title: 'Acoperiș industrial TPO',
+    text: 'Detalii corecte la atice și străpungeri, cu etanșare profesionistă și plan de intervenție clar.',
+    icon: Building2,
+    img: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20an%20industrial%20flat%20roof%20with%20white%20TPO%20membrane%20installation%2C%20clean%20details%20around%20parapets%20and%20penetrations%2C%20modern%20warehouse%20background%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
+    alt: 'Acoperiș industrial cu folie TPO, detalii de etanșare executate corect',
+  },
+  {
+    title: 'Acoperiș tablă / țiglă metalică',
+    text: 'Montaj curat, accesorii corecte și finisaje rezistente pentru proiecte rezidențiale sau comerciale.',
+    icon: Home,
+    img: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20close-up%20of%20a%20standing%20seam%20metal%20roof%20on%20a%20modern%20house%2C%20clean%20lines%2C%20premium%20finish%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
+    alt: 'Acoperiș din tablă tip standing seam',
+  },
+] as const;
+
 export default function HomePage() {
   return (
     <main
@@ -31,16 +70,98 @@ export default function HomePage() {
 
       <TrustSignalsStrip />
 
+      <section className="relative z-20 bg-[#07101c] py-18 sm:py-20">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 xl:px-12">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
+            <div data-reveal>
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-amber-300/90 backdrop-blur">
+                <BadgeCheck className="h-4 w-4" aria-hidden />
+                De ce Solaris CET
+              </div>
+              <h2 className="mt-5 text-3xl font-bold text-white md:text-5xl">Un homepage care inspiră încredere înainte să ceri oferta</h2>
+              <p className="mt-4 max-w-2xl text-lg leading-relaxed text-slate-300">
+                Clientul vede rapid lucrările relevante, înțelege diferența dintre tipurile de servicii și ajunge imediat la contact. Exact asta
+                trebuie să facă homepage-ul unei firme comerciale locale.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a href="#proiecte" className="btn-outline-white inline-flex items-center gap-2">
+                  Vezi lucrări
+                  <span aria-hidden>→</span>
+                </a>
+                <a href="/contact" className="btn-filled-gold inline-flex items-center gap-2">
+                  Cere ofertă
+                  <span aria-hidden>→</span>
+                </a>
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3" data-reveal-stagger>
+              {proofPillars.map((item) => (
+                <article key={item.title} className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur">
+                  <div className="text-sm font-black text-white">{item.title}</div>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-300">{item.text}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="relative z-20">
         <ScrollFadeUp>
           <ServicesSection />
         </ScrollFadeUp>
       </section>
 
-      <section className="relative z-20">
-        <ScrollFadeUp>
-          <SolarIntelligenceSection />
-        </ScrollFadeUp>
+      <section id="proiecte" className="bg-slate-900/40 py-24">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 xl:px-12">
+          <div className="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between" data-reveal-stagger>
+            <div className="max-w-2xl">
+              <h2 className="text-3xl font-bold text-white md:text-5xl">Lucrări reprezentative</h2>
+              <p className="mt-4 text-lg text-slate-400">
+                Exemple orientative de proiecte. Pentru oferta exactă, evaluăm consumul, acoperișul și condițiile reale din teren.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-4">
+              <a href="/proiecte" className="flex items-center gap-2 font-bold text-amber-300 hover:underline">
+                Vezi toate proiectele <ArrowRight size={16} />
+              </a>
+              <a href="/contact" className="flex items-center gap-2 font-bold text-amber-400 hover:underline">
+                Cere ofertă <ArrowRight size={16} />
+              </a>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3" data-reveal-stagger>
+            {projectCards.map((project) => {
+              const Icon = project.icon;
+              return (
+                <article key={project.title} className="overflow-hidden rounded-3xl border border-white/10 bg-black/30">
+                  <div className="relative aspect-[16/10] w-full overflow-hidden">
+                    <AppImage
+                      src={project.img}
+                      alt={project.alt}
+                      className="h-full w-full object-cover"
+                      width={1280}
+                      height={800}
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="pointer-events-none absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-black/35 backdrop-blur">
+                      <SolarisLogoMark className="h-7 w-7 text-orange-300" aria-hidden />
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5">
+                      <Icon className="h-5 w-5 text-amber-400" aria-hidden />
+                    </div>
+                    <div className="mt-4 text-lg font-semibold text-white">{project.title}</div>
+                    <div className="mt-2 text-sm leading-relaxed text-slate-400">{project.text}</div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </div>
       </section>
 
       <section className="relative z-20">
@@ -61,95 +182,30 @@ export default function HomePage() {
         </ScrollFadeUp>
       </section>
 
+      <section className="relative z-20">
+        <ScrollFadeUp>
+          <SolarIntelligenceSection />
+        </ScrollFadeUp>
+      </section>
+
       <SolarCompetitionSection />
 
       <SolarSecuritySection />
 
       <CompanyFaqSection />
 
-      <section id="proiecte" className="py-24 bg-slate-900/40">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
-          <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-12" data-reveal-stagger>
-            <div className="max-w-2xl">
-              <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Lucrări reprezentative</h2>
-              <p className="text-slate-400 text-lg">Exemple orientative de proiecte. Pentru ofertă exactă, evaluăm la locație.</p>
-            </div>
-            <div className="flex flex-wrap items-center gap-4">
-              <a href="/proiecte" className="text-amber-300 font-bold flex items-center gap-2 hover:underline">
-                Vezi toate proiectele <ArrowRight size={16} />
-              </a>
-              <a href="/contact" className="text-amber-400 font-bold flex items-center gap-2 hover:underline">
-                Cere ofertă <ArrowRight size={16} />
-              </a>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6" data-reveal-stagger>
-            {[
-              {
-                title: 'Fotovoltaice rezidențial',
-                text: 'Sistem dimensionat pe consum, orientare și umbriri, cu monitorizare.',
-                icon: PlugZap,
-                img: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20a%20modern%20Romanian%20house%20roof%20with%20black%20solar%20panels%20installed%2C%20clean%20cabling%2C%20golden%20hour%20light%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
-                alt: 'Panouri fotovoltaice montate pe acoperiș rezidențial',
-              },
-              {
-                title: 'Acoperiș industrial TPO',
-                text: 'Detalii corecte la atice/străpungeri și etanșare profesionistă.',
-                icon: Building2,
-                img: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20an%20industrial%20flat%20roof%20with%20white%20TPO%20membrane%20installation%2C%20clean%20details%20around%20parapets%20and%20penetrations%2C%20modern%20warehouse%20background%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
-                alt: 'Acoperiș industrial cu folie TPO, detalii de etanșare executate corect',
-              },
-              {
-                title: 'Acoperiș tablă / țiglă metalică',
-                text: 'Montaj curat, finisaje moderne și detalii rezistente.',
-                icon: Home,
-                img: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20close-up%20of%20a%20standing%20seam%20metal%20roof%20on%20a%20modern%20house%2C%20clean%20lines%2C%20premium%20finish%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
-                alt: 'Acoperiș din tablă tip standing seam',
-              },
-            ].map((p) => {
-              const Icon = p.icon;
-              return (
-                <div key={p.title} className="rounded-3xl border border-white/10 bg-black/30 overflow-hidden">
-                  <div className="relative aspect-[16/10] w-full overflow-hidden">
-                    <AppImage
-                      src={p.img}
-                      alt={p.alt}
-                      className="h-full w-full object-cover"
-                      width={1280}
-                      height={800}
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="pointer-events-none absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-black/35 backdrop-blur">
-                      <SolarisLogoMark className="h-7 w-7 text-orange-300" aria-hidden />
-                    </div>
-                  </div>
-                  <div className="p-6">
-                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5">
-                      <Icon className="h-5 w-5 text-amber-400" aria-hidden />
-                    </div>
-                    <div className="mt-4 text-lg font-semibold text-white">{p.title}</div>
-                    <div className="mt-2 text-sm text-slate-400 leading-relaxed">{p.text}</div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section id="contact-promo" className="py-24 bg-amber-400">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 text-center" data-reveal>
-           <h2 className="text-4xl md:text-6xl font-black text-black mb-8">Cere o ofertă</h2>
-           <p className="text-black/80 text-xl font-bold mb-12 max-w-2xl mx-auto">
-             Îți răspundem rapid cu pașii următori: evaluare, ofertă și planificare execuție.
-           </p>
-           <a 
-             href="/contact" 
-             className="inline-block bg-black text-white text-xl font-bold py-5 px-12 rounded-2xl hover:scale-105 transition-transform"
-           >
-             Contactează-ne
-           </a>
+      <section id="contact-promo" className="bg-amber-400 py-24">
+        <div className="mx-auto max-w-7xl px-5 text-center sm:px-8" data-reveal>
+          <h2 className="mb-8 text-4xl font-black text-black md:text-6xl">Cere o ofertă</h2>
+          <p className="mx-auto mb-12 max-w-2xl text-xl font-bold text-black/80">
+            Îți răspundem rapid cu pașii următori: evaluare, ofertă și planificare execuție.
+          </p>
+          <a
+            href="/contact"
+            className="inline-block rounded-2xl bg-black px-12 py-5 text-xl font-bold text-white transition-transform hover:scale-105"
+          >
+            Contactează-ne
+          </a>
         </div>
       </section>
 

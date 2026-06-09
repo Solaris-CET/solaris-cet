@@ -289,9 +289,6 @@ export default function Navigation() {
           </nav>
 
           <div className="relative z-20 flex items-center gap-2 sm:gap-3 shrink-0">
-            <div className="lg:hidden">
-              <DownloadAppButton className="px-3" />
-            </div>
             <div className="hidden lg:flex items-center gap-3">
               <a
                 href="tel:+40769889721"
@@ -300,9 +297,23 @@ export default function Navigation() {
                 )}
                 aria-label="Sună acum la +40 769 889 721"
               >
-                +40 769 889 721
+                Sună acum · +40 769 889 721
+              </a>
+              <a
+                href={localizePathname('/contact', urlLocale)}
+                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2 text-sm font-black text-black shadow-[0_18px_40px_rgba(245,158,11,0.18)] transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
+              >
+                {t.nav.requestOffer}
               </a>
             </div>
+
+            <a
+              href="tel:+40769889721"
+              className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-orange-400/35 bg-black/30 px-3 text-white lg:hidden"
+              aria-label="Sună acum la +40 769 889 721"
+            >
+              <span className="text-xs font-black">Sună</span>
+            </a>
 
             <button
               type="button"
