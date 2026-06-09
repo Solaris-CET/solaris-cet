@@ -18,6 +18,18 @@ export default function AboutPage() {
             Specialiști în energie solară și construcții din inima Moldovei. Livrăm proiecte curate, sigure și durabile:
             fotovoltaice, acoperișuri și lucrări de construcții.
           </p>
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {[
+              { label: 'Profil companie', value: 'Execuție tehnică + comunicare clară' },
+              { label: 'Acoperire', value: 'Vaslui și județe apropiate, plus proiecte selectate național' },
+              { label: 'Scop', value: 'Să transformăm cererea în plan de lucru realist, nu în promisiuni vagi' },
+            ].map((item) => (
+              <div key={item.label} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{item.label}</div>
+                <div className="mt-2 text-base font-semibold text-white">{item.value}</div>
+              </div>
+            ))}
+          </div>
         </section>
 
         <section className="mt-14 space-y-10">
@@ -123,6 +135,27 @@ export default function AboutPage() {
         </section>
 
         <section className="mt-16" data-reveal-stagger>
+          <h2 className="text-2xl md:text-3xl font-bold">De ce inspirăm încredere</h2>
+          <p className="mt-3 text-slate-300 max-w-3xl">
+            Un site bun de firmă nu înseamnă doar estetică. Înseamnă să înțelegi din 30 de secunde cine execută, cum lucrează și ce primești
+            concret dacă trimiți cererea.
+          </p>
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4" data-reveal-stagger>
+            {[
+              'Folosim limbaj comercial clar: explicăm pașii, nu ascundem complexitatea în spatele expresiilor vagi.',
+              'Pentru fotovoltaice, împingem clientul spre calculator și amortizare, nu direct spre un formular generic.',
+              'Pentru acoperișuri și TPO, oferim criterii simple: tip lucrare, urgență, poze necesare, nivel de intervenție.',
+              'Fiecare pagină importantă are un rol distinct: portofoliu pentru dovadă, servicii pentru claritate, contact pentru conversie.',
+            ].map((item) => (
+              <div key={item} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-black/25 p-5">
+                <BadgeCheck className="mt-0.5 h-5 w-5 text-amber-400" aria-hidden />
+                <div className="text-sm leading-relaxed text-slate-200">{item}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-16" data-reveal-stagger>
           <h2 className="text-2xl md:text-3xl font-bold">Certificări și acreditări</h2>
           <p className="mt-3 text-slate-300 max-w-3xl">
             Folosim practici corecte și ne aliniem cerințelor de siguranță și calitate. Putem furniza documentația necesară la cerere, unde se aplică.
@@ -158,6 +191,23 @@ export default function AboutPage() {
                 <div className="h-12 w-12 rounded-2xl border border-white/10 bg-white/5" aria-hidden />
                 <div className="mt-4 text-lg font-semibold">{p.name}</div>
                 <div className="mt-1 text-sm text-slate-400">{p.role}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-16 rounded-3xl border border-white/10 bg-black/25 p-8 sm:p-10" data-reveal-stagger>
+          <h2 className="text-2xl md:text-3xl font-bold">Cum lucrăm, pe scurt</h2>
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+            {[
+              { title: '1. Clarificare', body: 'Înțelegem lucrarea, contextul și ce vrei să rezolvi efectiv.' },
+              { title: '2. Verificare', body: 'Cerem poze, consum, localitate sau organizăm evaluarea.' },
+              { title: '3. Ofertă', body: 'Primești o propunere clară, cu pași și nivelul real de intervenție.' },
+              { title: '4. Execuție', body: 'Planificăm realist și livrăm o lucrare curată, cu detalii bine închise.' },
+            ].map((step) => (
+              <div key={step.title} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                <div className="text-sm font-bold text-white">{step.title}</div>
+                <div className="mt-2 text-sm leading-relaxed text-slate-300">{step.body}</div>
               </div>
             ))}
           </div>

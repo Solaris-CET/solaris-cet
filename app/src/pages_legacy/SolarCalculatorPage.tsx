@@ -94,15 +94,29 @@ export default function SolarCalculatorPage() {
   const maxMonthly = Math.max(1, ...model.monthlyProd);
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-solaris-offblack text-white">
+    <main id="main-content" tabIndex={-1} className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-solaris-offblack text-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12" data-reveal>
           <h1 className="font-display font-bold bg-gradient-to-r from-solar-yellow to-amber-500 bg-clip-text text-transparent text-[length:var(--text-h1)] leading-[var(--lh-display)]">
             Calculator fotovoltaic (estimare)
           </h1>
           <p className="mt-4 text-lg text-solaris-muted max-w-3xl mx-auto">
-            Estimare orientativă pe baza consumului și a condițiilor. Pentru ofertă exactă, trimite consumul și poze cu acoperișul.
+            Estimare orientativă pe baza consumului și a condițiilor. Pagina aceasta există ca să vezi rapid ordinul de mărime pentru sistem,
+            buget și amortizare înainte să intri în cererea de ofertă.
           </p>
+        </div>
+
+        <div className="mb-8 grid gap-4 md:grid-cols-3" data-reveal-stagger>
+          {[
+            { label: 'Ce afli aici', value: 'Putere recomandată, buget orientativ, economie anuală și amortizare' },
+            { label: 'Ce nu este', value: 'Nu este ofertă finală; evaluarea exactă ține cont de poze, acoperiș și tabloul electric' },
+            { label: 'Cum îl folosești corect', value: 'Introdu consumul real mediu și tratează rezultatul ca reper pentru decizia inițială' },
+          ].map((item) => (
+            <div key={item.label} className="rounded-3xl border border-white/10 bg-white/5 p-5">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-white/50">{item.label}</div>
+              <div className="mt-2 text-base font-semibold text-white">{item.value}</div>
+            </div>
+          ))}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -296,6 +310,27 @@ export default function SolarCalculatorPage() {
                 </a>
               </div>
             </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-7" data-reveal-stagger>
+              <div className="text-sm font-black text-white">Repere rapide de buget (2026)</div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                {[
+                  { title: '3–4 kW', body: 'Potrivit pentru consum mic / casă eficientă', price: 'aprox. 3.200–4.500 EUR' },
+                  { title: '5–6 kW', body: 'Cel mai comun pachet rezidențial', price: 'aprox. 4.500–6.000 EUR' },
+                  { title: '8–10 kW', body: 'Consum mare / pompă de căldură / extindere', price: 'aprox. 6.800–9.500 EUR' },
+                ].map((pack) => (
+                  <div key={pack.title} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div className="text-sm font-bold text-white">{pack.title}</div>
+                    <div className="mt-1 text-sm leading-relaxed text-slate-300">{pack.body}</div>
+                    <div className="mt-3 text-sm font-semibold text-amber-300">{pack.price}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 text-xs leading-relaxed text-white/55">
+                Intervalele sunt orientative și nu includ toate particularitățile din teren. Prețul final depinde de structură, trasee, protecții,
+                acces, branduri și eventuale cerințe speciale.
+              </div>
+            </div>
           </section>
         </div>
 
@@ -303,7 +338,6 @@ export default function SolarCalculatorPage() {
           <SolarisFooter />
         </div>
       </div>
-    </div>
+    </main>
   );
 }
-

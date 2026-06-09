@@ -242,7 +242,7 @@ async function writeStaticPages() {
       { q: 'Includeți și etanșări?', a: 'Da, acolo unde sunt necesare pentru protecția anvelopei.' },
       { q: 'Cum arată finisajul?', a: 'Punem accent pe linii curate, muchii și elemente de fixare discrete.' },
     ],
-    'reparatii-mentenanta': [
+    'reparatii-si-mentenanta': [
       { q: 'În cât timp interveniți?', a: 'Depinde de locație și urgență; confirmăm rapid disponibilitatea.' },
       { q: 'Reparați și lucrări făcute de alții?', a: 'Da, după evaluare și dacă soluția este tehnic corectă.' },
       { q: 'Ce include un plan de mentenanță?', a: 'Inspecții periodice, checklist, recomandări și intervenții prioritizate.' },
@@ -309,7 +309,7 @@ async function writeStaticPages() {
             { '@type': 'ListItem', position: 3, name: 'Acoperișuri tablă/țiglă', url: `${origin}/servicii/acoperisuri-tabla-tigla/` },
             { '@type': 'ListItem', position: 4, name: 'Acoperișuri industriale TPO', url: `${origin}/servicii/acoperisuri-industriale-tpo/` },
             { '@type': 'ListItem', position: 5, name: 'Atice și fațade tablă', url: `${origin}/servicii/atice-si-fatade-tabla/` },
-            { '@type': 'ListItem', position: 6, name: 'Reparații și mentenanță', url: `${origin}/servicii/reparatii-mentenanta/` },
+            { '@type': 'ListItem', position: 6, name: 'Reparații și mentenanță', url: `${origin}/servicii/reparatii-si-mentenanta/` },
           ],
         },
         breadcrumb([
@@ -513,7 +513,7 @@ async function writeStaticPages() {
       ]),
     },
     {
-      path: '/servicii/reparatii-mentenanta',
+      path: '/servicii/reparatii-si-mentenanta',
       title: 'Reparații și Mentenanță Acoperiș — Solaris CET',
       description: 'Reparații acoperiș: infiltrații, jgheaburi, curățare și inspecție anuală.',
       h1: 'Reparații și Mentenanță Acoperiș — Intervenții rapide',
@@ -528,11 +528,11 @@ async function writeStaticPages() {
           name: 'Reparații și mentenanță',
           provider: localBusiness,
           areaServed: 'RO',
-          url: `${origin}/servicii/reparatii-mentenanta/`,
+          url: `${origin}/servicii/reparatii-si-mentenanta/`,
         },
         {
           '@type': 'FAQPage',
-          mainEntity: serviceFaq['reparatii-mentenanta'].map((x) => ({
+          mainEntity: serviceFaq['reparatii-si-mentenanta'].map((x) => ({
             '@type': 'Question',
             name: x.q,
             acceptedAnswer: { '@type': 'Answer', text: x.a },
@@ -541,7 +541,24 @@ async function writeStaticPages() {
         breadcrumb([
           { name: 'Acasă', path: '/' },
           { name: 'Servicii', path: '/servicii' },
-          { name: 'Reparații și mentenanță', path: '/servicii/reparatii-mentenanta' },
+          { name: 'Reparații și mentenanță', path: '/servicii/reparatii-si-mentenanta' },
+        ]),
+      ]),
+    },
+    {
+      path: '/servicii/reparatii-mentenanta',
+      title: 'Reparații și Mentenanță Acoperiș — Solaris CET',
+      description: 'Pagina s-a mutat.',
+      h1: 'Pagina s-a mutat',
+      bodyLines: ['Folosește noua adresă pentru acest serviciu.'],
+      canonicalPath: '/servicii/reparatii-si-mentenanta/',
+      redirectTo: '/servicii/reparatii-si-mentenanta/',
+      noindex: true,
+      jsonLd: wrapJsonLd([
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Servicii', path: '/servicii' },
+          { name: 'Reparații și mentenanță', path: '/servicii/reparatii-si-mentenanta' },
         ]),
       ]),
     },
@@ -959,7 +976,7 @@ async function writeSitemap() {
     '/servicii/acoperisuri-tabla-tigla',
     '/servicii/acoperisuri-industriale-tpo',
     '/servicii/atice-si-fatade-tabla',
-    '/servicii/reparatii-mentenanta',
+    '/servicii/reparatii-si-mentenanta',
     '/contact',
     '/calculator',
     '/despre',

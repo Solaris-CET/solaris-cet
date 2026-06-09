@@ -2,6 +2,7 @@ import { ArrowLeft, Calendar, MessageCircle, Share2, Tag } from 'lucide-react'
 import { useMemo } from 'react'
 
 import AppImage from '@/components/AppImage'
+import { SolarisFooter } from '@/components/company/SolarisFooter'
 import { CopyButton } from '@/components/CopyButton'
 import { SafeHtml } from '@/components/SafeHtml'
 import { Badge } from '@/components/ui/badge'
@@ -72,21 +73,25 @@ export default function ArticlePage({ slug }: { slug: string }) {
 
   if (!post) {
     return (
-      <main id="main-content" className="relative z-10 w-full px-5 sm:px-8 xl:px-12 pt-28 pb-20">
-        <div className="max-w-4xl mx-auto bento-card p-8 border border-white/10" data-reveal-stagger>
-          <div className="text-solaris-text font-semibold">{t.blog.notFoundTitle}</div>
-          <div className="text-solaris-muted text-sm mt-1">{t.blog.notFoundBody}</div>
-          <a href={blogHref} className="btn-filled-gold mt-4 inline-flex">
-            {t.blog.backToBlog}
-          </a>
-        </div>
-      </main>
+      <>
+        <main id="main-content" className="relative z-10 w-full px-5 sm:px-8 xl:px-12 pt-28 pb-20">
+          <div className="max-w-4xl mx-auto bento-card p-8 border border-white/10" data-reveal-stagger>
+            <div className="text-solaris-text font-semibold">{t.blog.notFoundTitle}</div>
+            <div className="text-solaris-muted text-sm mt-1">{t.blog.notFoundBody}</div>
+            <a href={blogHref} className="btn-filled-gold mt-4 inline-flex">
+              {t.blog.backToBlog}
+            </a>
+          </div>
+        </main>
+        <SolarisFooter />
+      </>
     )
   }
 
   const coverIsIllustration = Boolean(post.frontmatter.coverImageUrl?.includes('text_to_image'))
 
   return (
+    <>
     <main id="main-content" className="relative z-10 w-full px-5 sm:px-8 xl:px-12 pt-28 pb-20">
       <div className="max-w-7xl mx-auto">
       <div className="mb-6" data-reveal>
@@ -230,6 +235,9 @@ export default function ArticlePage({ slug }: { slug: string }) {
               <a href={localizePathname('/contact', locale)} className="btn-filled-gold mt-4 inline-flex w-full justify-center">
                 {t.nav.requestOffer}
               </a>
+              <a href={localizePathname('/calculator', locale)} className="btn-outline-white mt-3 inline-flex w-full justify-center">
+                Deschide calculatorul
+              </a>
             </div>
 
             <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
@@ -252,5 +260,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
       </div>
       </div>
     </main>
+    <SolarisFooter />
+    </>
   )
 }

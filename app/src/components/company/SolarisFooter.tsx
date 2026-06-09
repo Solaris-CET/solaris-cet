@@ -24,15 +24,13 @@ export function SolarisFooter({ className }: { className?: string }) {
   }, []);
 
   const homePath = localizePathname('/', urlLocale);
-  const servicesHref = localizePathname('/servicii', urlLocale);
-
   const serviceLinks: FooterLink[] = [
-    { label: 'Fotovoltaice Rezidențiale', href: `${servicesHref}#fotovoltaice` },
-    { label: 'Fotovoltaice Industriale', href: `${servicesHref}#fotovoltaice` },
-    { label: 'Acoperișuri Tablă/Țiglă', href: `${servicesHref}#acoperisuri` },
-    { label: 'Acoperișuri TPO', href: `${servicesHref}#tpo` },
-    { label: 'Atice și Fațade', href: `${servicesHref}#atice-fatade` },
-    { label: 'Reparații și Mentenanță', href: `${servicesHref}#reparatii` },
+    { label: 'Fotovoltaice Rezidențiale', href: localizePathname('/servicii/fotovoltaice-rezidentiale', urlLocale) },
+    { label: 'Fotovoltaice Industriale', href: localizePathname('/servicii/fotovoltaice-industriale', urlLocale) },
+    { label: 'Acoperișuri Tablă/Țiglă', href: localizePathname('/servicii/acoperisuri-tabla-tigla', urlLocale) },
+    { label: 'Acoperișuri TPO', href: localizePathname('/servicii/acoperisuri-industriale-tpo', urlLocale) },
+    { label: 'Atice și Fațade', href: localizePathname('/servicii/atice-si-fatade-tabla', urlLocale) },
+    { label: 'Reparații și Mentenanță', href: localizePathname('/servicii/reparatii-si-mentenanta', urlLocale) },
   ];
 
   const legalLinks: FooterLink[] = [
@@ -141,7 +139,7 @@ export function SolarisFooter({ className }: { className?: string }) {
                   <div className="min-w-0">
                     <div className="text-sm font-black text-white">Vaslui, România</div>
                     <div className="mt-1 text-sm text-white/60">📍 {companyProfile.location}</div>
-                    <div className="mt-2 text-xs text-white/45">Mini card adresă (stil Google) — detalii complete la contact.</div>
+                    <div className="mt-2 text-xs text-white/45">Adresă operațională și zonă de deplasare confirmate la cerere.</div>
                   </div>
                 </div>
                 <div
@@ -154,7 +152,7 @@ export function SolarisFooter({ className }: { className?: string }) {
                 href={localizePathname('/calculator', urlLocale)}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-black/20 px-5 py-3 text-sm font-black text-white/85 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/60"
               >
-                Calculează economiile <ArrowRight className="h-4 w-4" aria-hidden />
+                Deschide calculatorul <ArrowRight className="h-4 w-4" aria-hidden />
               </a>
             </div>
           </div>
