@@ -49,10 +49,13 @@ type FarmingEngine struct {
 }
 
 func NewFarmingEngine(dbPath string) (*FarmingEngine, error) {
+	// Optimized for 16GB RAM / 8vCPU Hetzner environment
 	opts := badger.DefaultOptions(dbPath).
-		WithNumMemtables(2).
-		WithValueLogFileSize(32 << 20).
-		WithMemTableSize(32 << 20).
+		WithNumMemtables(4).
+		WithValueLogFileSize(64 << 20).
+		WithMemTableSize(64 << 20).
+		WithBlockCacheSize(256 << 20).
+		WithIndexCacheSize(128 << 20).
 		WithLogger(nil)
 
 	db, err := badger.Open(opts)
@@ -64,7 +67,7 @@ func NewFarmingEngine(dbPath string) (*FarmingEngine, error) {
 
 	engine := &FarmingEngine{
 		db:     db,
-		lands:  make(map[uint64]*Land, 10000),
+		lands:  make(map[uint64]*Land, 50000),
 		ticker: time.NewTicker(30 * time.Second),
 		ctx:    ctx,
 		cancel: cancel,

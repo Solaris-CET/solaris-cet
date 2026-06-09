@@ -203,7 +203,7 @@ async function writeStaticPages() {
 
   const localBusiness = {
     '@type': 'LocalBusiness',
-    name: 'Solaris CET',
+    name: 'Solaris Engineering',
     url: origin,
     telephone: '+40769889721',
     email: 'solaris-cet@protonmail.com',
@@ -252,16 +252,16 @@ async function writeStaticPages() {
   const pages = [
     {
       path: '/contact',
-      title: 'Contact — Solaris CET',
-      description: 'Contact Solaris CET pentru fotovoltaice, acoperișuri, reparații și mentenanță.',
-      h1: 'Contact Solaris CET',
-      bodyLines: ['Instalații fotovoltaice, acoperișuri (tablă/țiglă/TPO), reparații și mentenanță în Vaslui și în toată România.'],
+      title: 'Contact — Solaris Engineering',
+      description: 'Contact Solaris Engineering pentru sisteme fotovoltaice, acoperișuri TPO, fațade și reparații.',
+      h1: 'Contact Solaris Engineering',
+      bodyLines: ['Inginerie și execuție pentru instalații fotovoltaice, acoperișuri industriale (TPO), fațade și mentenanță în toată România.'],
       extraHtml: contactFormHtml,
       jsonLd: wrapJsonLd([
         localBusiness,
         {
           '@type': 'ContactPage',
-          name: 'Contact Solaris CET',
+          name: 'Contact Solaris Engineering',
           url: `${origin}/contact/`,
         },
         breadcrumb([

@@ -354,31 +354,33 @@ export default async function handler(req: Request): Promise<Response> {
     const isRo = /[ăâîșț]/i.test(trimmedQuery) || /\b(ce|cat|cât|vreau|ofert[ăa]|acoperiș|fotovoltaic|reparații|mentenanță|montaj)\b/i.test(trimmedQuery);
     const isCompany = isCompanyMode || /\b(fotovoltaic|panouri|acoperiș|tpo|șarpantă|țiglă|tablă|atice|fațade|ofert[ăa])\b/i.test(trimmedQuery);
     const intro = isRo
-      ? 'Asistentul AI avansat este dezactivat (nu sunt configurate chei). Totuși, pot să te ajut să obții rapid o ofertă.'
-      : 'Advanced AI is disabled (no provider keys configured). I can still help you get a quote quickly.';
+      ? 'Asistentul Solaris Engineering este în mod offline (mentenanță API). Putem prelua solicitarea ta manual.'
+      : 'Solaris Engineering AI is offline (API maintenance). We can still process your request manually.';
     const reply = isCompany
       ? isRo
         ? [
             intro,
             '',
-            'Spune-mi 4 detalii și îți recomand pachetul potrivit:',
-            '1) Localitate/județ',
-            '2) Tip proiect: fotovoltaice / acoperiș / TPO / construcții / reparații',
-            '3) Date tehnice (ex: consum lunar, suprafață acoperiș, tip structură, infiltratii)',
-            '4) Când vrei să începi',
+            'Te rugăm să ne oferi următoarele detalii pentru a prioritiza oferta:',
+            '- Locația proiectului (Localitate/Județ)',
+            '- Tipul lucrării (Fotovoltaice, TPO, Acoperiș, Fațade)',
+            '- Date tehnice (Consum lunar estimat sau suprafață în mp)',
+            '- Data dorită pentru începerea lucrărilor',
             '',
-            `Contact direct: +40 769 889 721 · solaris-cet@protonmail.com`,
+            `Inginer de serviciu: +40 769 889 721`,
+            `Email: solaris-cet@protonmail.com`,
           ].join('\n')
         : [
             intro,
             '',
-            'Share 4 details and I will suggest the right package:',
-            '1) City/county',
-            '2) Project type: PV / roof / TPO / construction / repairs',
-            '3) Key details (usage, roof area, structure type, leaks)',
-            '4) Timeline',
+            'Please provide the following details to prioritize your quote:',
+            '- Project location (City/County)',
+            '- Type of work (Solar PV, TPO, Roofing, Facades)',
+            '- Technical data (Monthly usage or roof area in sqm)',
+            '- Desired start date',
             '',
-            'Direct contact: +40 769 889 721 · solaris-cet@protonmail.com',
+            'Direct Engineering Line: +40 769 889 721',
+            'Email: solaris-cet@protonmail.com',
           ].join('\n')
       : intro;
 
@@ -459,8 +461,8 @@ export default async function handler(req: Request): Promise<Response> {
   const sharedContext =
     multiTurnHint +
     (isCompanyMode
-      ? `You are Solaris CET — a helpful assistant for a Romania-based company delivering photovoltaic installations, construction works, roofing (metal sheet / metal tiles / TPO membrane), metal parapets and facades, plus repairs and maintenance.\n` +
-        `STRICT RULE: Do NOT mention CET tokens, crypto, blockchain, jettons, DeDust, TON, or any financial investment topics. You only talk about physical construction and renewable energy services in Romania.\n\n`
+      ? `You are Solaris Engineering — a professional engineering firm in Romania specializing in Photovoltaic systems, Industrial TPO roofing, and metal facades.\n` +
+        `STRICT RULE: Do NOT mention CET tokens, crypto, blockchain, jettons, DeDust, TON, or any financial investment topics. You only talk about physical construction and renewable energy services in Romania. Use a professional, B2B engineering tone.\n\n`
       : `You are Solaris CET AI — a helpful assistant for Solaris CET and general crypto/DeFi questions.\n\n`) +
     `LANGUAGE: Reply in the same language as the user's latest message.\n\n` +
     `RULES:\n` +
