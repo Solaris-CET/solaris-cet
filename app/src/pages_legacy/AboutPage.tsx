@@ -50,12 +50,15 @@ export default function AboutPage() {
               <div className="rounded-3xl overflow-hidden border border-white/10 bg-white/5">
                 <AppImage
                   src="/images/team-placeholder.svg"
-                  alt="Echipă Solaris CET (imagine demonstrativă)"
+                  alt="Ilustrație reprezentativă pentru echipa Solaris CET"
                   className="w-full h-full object-cover"
                   width={1200}
                   height={800}
                   loading="lazy"
                 />
+              </div>
+              <div className="mt-3 text-xs leading-relaxed text-slate-400">
+                Imagine reprezentativă. Până la publicarea fotografiilor reale de echipă, preferăm transparența în locul unor imagini care ar putea fi interpretate greșit.
               </div>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import { ArrowRight, Globe, Mail, MapPin, MessageCircle, Phone } from 'lucide-react';
+import type { ReactElement } from 'react';
 import { useMemo } from 'react';
 
 import AppImage from '@/components/AppImage';
@@ -40,10 +41,14 @@ export function SolarisFooter({ className }: { className?: string }) {
     { label: 'Contact', href: localizePathname('/contact', urlLocale) },
   ];
 
-  const facebookUrl = companyProfile.social.facebook || 'https://facebook.com';
   const whatsappUrl = `https://wa.me/40769889721?text=${encodeURIComponent('Bună! Aș dori o ofertă pentru: ')}`;
   const emailUrl = `mailto:${companyProfile.email}`;
-  const recomUrl = companyProfile.cui ? `https://www.recom.ro/?cui=${encodeURIComponent(companyProfile.cui)}` : 'https://www.recom.ro/';
+  const recomUrl = companyProfile.cui ? `https://www.recom.ro/?cui=${encodeURIComponent(companyProfile.cui)}` : null;
+  const socialLinks = [
+    companyProfile.social.facebook ? { label: 'Facebook', href: companyProfile.social.facebook, icon: <Globe className="h-7 w-7" aria-hidden /> } : null,
+    { label: 'WhatsApp', href: whatsappUrl, icon: <MessageCircle className="h-7 w-7" aria-hidden /> },
+    { label: 'Email', href: emailUrl, icon: <Mail className="h-7 w-7" aria-hidden /> },
+  ].filter(Boolean) as Array<{ label: string; href: string; icon: ReactElement }>;
 
   return (
     <footer id="footer" data-reveal className={cn('bg-[#08101E] text-white', className)}>
@@ -78,13 +83,12 @@ export function SolarisFooter({ className }: { className?: string }) {
             </a>
             <div className="text-sm font-semibold text-white/80">{companyProfile.tagline}</div>
             <div className="text-sm text-white/55 leading-relaxed max-w-sm">{companyProfile.shortDescription}</div>
+            <div className="text-xs text-white/45 leading-relaxed">
+              Lucrăm transparent: când imaginile sunt ilustrative sau orientative, le marcăm ca atare. Când un reper de preț este estimativ, spunem explicit.
+            </div>
 
             <div className="flex items-center gap-3 pt-2">
-              {[
-                { label: 'Facebook', href: facebookUrl, icon: <Globe className="h-7 w-7" aria-hidden /> },
-                { label: 'WhatsApp', href: whatsappUrl, icon: <MessageCircle className="h-7 w-7" aria-hidden /> },
-                { label: 'Email', href: emailUrl, icon: <Mail className="h-7 w-7" aria-hidden /> },
-              ].map((x) => (
+              {socialLinks.map((x) => (
                 <a
                   key={x.label}
                   href={x.href}
@@ -189,9 +193,13 @@ export function SolarisFooter({ className }: { className?: string }) {
             </div>
 
             <div className="text-xs text-white/45">
-              <a href={recomUrl} target="_blank" rel="noopener noreferrer" className="hover:text-orange-300 transition-colors">
-                {companyProfile.cui ? `CUI: ${companyProfile.cui}` : 'Verificare firmă (RECOM)'}
-              </a>
+              {recomUrl ? (
+                <a href={recomUrl} target="_blank" rel="noopener noreferrer" className="hover:text-orange-300 transition-colors">
+                  {`CUI: ${companyProfile.cui}`}
+                </a>
+              ) : (
+                <span>Datele de înregistrare se comunică la cerere sau pe documentele comerciale.</span>
+              )}
               {companyProfile.regCom ? <span className="mx-2 text-white/20">•</span> : null}
               {companyProfile.regCom ? <span>Nr. Reg. Com.: {companyProfile.regCom}</span> : null}
             </div>

@@ -6,6 +6,9 @@ import { SolarisFooter } from '@/components/company/SolarisFooter';
 type CountyKey = 'vaslui' | 'iasi' | 'bacau' | 'galati' | 'vrancea' | 'bucuresti' | 'other';
 type OrientationKey = 'south' | 'east_west' | 'north';
 type RoofKey = 'pitched' | 'flat' | 'ground';
+type ClientTypeKey = 'residential' | 'business';
+type PhaseKey = 'single' | 'three';
+type BatteryKey = 'no' | 'yes';
 
 const counties: Array<{ key: CountyKey; label: string; factor: number }> = [
   { key: 'vaslui', label: 'Vaslui', factor: 1.13 },
@@ -41,8 +44,15 @@ function formatNumber(n: number) {
   return new Intl.NumberFormat('ro-RO', { maximumFractionDigits: 0 }).format(n);
 }
 
+function formatEuroRange(low: number, high: number) {
+  return `${formatNumber(low)}–${formatNumber(high)} EUR`;
+}
+
 export default function SolarCalculatorPage() {
   const [monthlyKwh, setMonthlyKwh] = useState('350');
+  const [clientType, setClientType] = useState<ClientTypeKey>('residential');
+  const [phase, setPhase] = useState<PhaseKey>('single');
+  const [battery, setBattery] = useState<BatteryKey>('no');
   const [county, setCounty] = useState<CountyKey>('vaslui');
   const [roof, setRoof] = useState<RoofKey>('pitched');
   const [orientation, setOrientation] = useState<OrientationKey>('south');
@@ -53,21 +63,30 @@ export default function SolarCalculatorPage() {
     const countyFactor = counties.find((c) => c.key === county)?.factor ?? 1.1;
     const roofFactor = roofs.find((r) => r.key === roof)?.factor ?? 1.0;
     const orientationFactor = orientations.find((o) => o.key === orientation)?.factor ?? 1.0;
+    const clientFactor = clientType === 'business' ? 1.04 : 1.0;
+    const phaseFactor = phase === 'three' ? 1.04 : 0.97;
+    const batteryFactor = battery === 'yes' ? 1.02 : 1.0;
 
     const baselineYield = 1200;
     const yieldKwhPerKw = baselineYield * countyFactor * roofFactor * orientationFactor;
     const neededKw = annualConsumption / Math.max(600, yieldKwhPerKw);
-    const kwRounded = Math.max(2.0, Math.round(neededKw * 10) / 10);
+    const adjustedKw = neededKw * clientFactor * phaseFactor * batteryFactor;
+    const kwRounded = Math.max(clientType === 'business' ? 5.0 : 2.0, Math.round(adjustedKw * 10) / 10);
 
     const panelW = 0.45;
     const panels = Math.max(6, Math.ceil(kwRounded / panelW));
     const kwFinal = Math.round(panels * panelW * 10) / 10;
 
-    const pricePerKw = kwFinal <= 6 ? 5200 : kwFinal <= 12 ? 4800 : 4400;
-    const estimatePrice = Math.round(kwFinal * pricePerKw);
+    const pricePerKw =
+      clientType === 'business' ? (kwFinal <= 30 ? 4600 : 4200) : kwFinal <= 6 ? 5200 : kwFinal <= 12 ? 4800 : 4500;
+    const batteryAdder = battery === 'yes' ? (clientType === 'business' ? 24000 : 18000) : 0;
+    const estimatePrice = Math.round(kwFinal * pricePerKw + batteryAdder);
+    const estimateLow = Math.round(estimatePrice * 0.92);
+    const estimateHigh = Math.round(estimatePrice * 1.1);
 
     const energyPrice = 1.1;
-    const selfConsumption = kwFinal <= 6 ? 0.62 : 0.55;
+    const selfConsumptionBase = clientType === 'business' ? 0.72 : kwFinal <= 6 ? 0.62 : 0.55;
+    const selfConsumption = clamp(selfConsumptionBase + (battery === 'yes' ? 0.12 : 0), 0.45, 0.88);
     const annualSavings = Math.round(annualConsumption * energyPrice * selfConsumption);
     const paybackYears = clamp(estimatePrice / Math.max(1, annualSavings), 2.5, 14);
     const co2Kg = Math.round(annualConsumption * 0.35);
@@ -82,14 +101,22 @@ export default function SolarCalculatorPage() {
       kwFinal,
       panels,
       estimatePrice,
+      estimateLow,
+      estimateHigh,
       annualSavings,
       paybackYears,
       co2Kg,
       yieldKwhPerKw,
       annualProd,
       monthlyProd,
+      recommendation:
+        clientType === 'business'
+          ? 'Merită evaluare la locație și verificarea profilului de consum înainte de ofertă finală.'
+          : battery === 'yes'
+            ? 'Merită să compari scenariul cu și fără baterie; bateria crește autoconsumul, dar și investiția.'
+            : 'Scenariul fără baterie este bun pentru primul pas; poți adăuga baterie doar dacă vrei consum mai mare seara.',
     };
-  }, [county, monthlyKwh, orientation, roof]);
+  }, [battery, clientType, county, monthlyKwh, orientation, phase, roof]);
 
   const maxMonthly = Math.max(1, ...model.monthlyProd);
 
@@ -124,6 +151,21 @@ export default function SolarCalculatorPage() {
             <div className="text-sm font-black text-white">Date de intrare</div>
             <div className="mt-5 grid gap-4">
               <div>
+                <label htmlFor="clientType" className="block text-sm font-semibold text-white/70">
+                  Tip client
+                </label>
+                <select
+                  id="clientType"
+                  value={clientType}
+                  onChange={(e) => setClientType(e.target.value as ClientTypeKey)}
+                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-orange-400"
+                >
+                  <option value="residential">Rezidențial</option>
+                  <option value="business">Business / comercial</option>
+                </select>
+              </div>
+
+              <div>
                 <label htmlFor="kwh" className="block text-sm font-semibold text-white/70">
                   Consum lunar (kWh)
                 </label>
@@ -135,6 +177,21 @@ export default function SolarCalculatorPage() {
                   className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-orange-400"
                   placeholder="Ex: 350"
                 />
+              </div>
+
+              <div>
+                <label htmlFor="phase" className="block text-sm font-semibold text-white/70">
+                  Faze disponibile
+                </label>
+                <select
+                  id="phase"
+                  value={phase}
+                  onChange={(e) => setPhase(e.target.value as PhaseKey)}
+                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-orange-400"
+                >
+                  <option value="single">Monofazat</option>
+                  <option value="three">Trifazat</option>
+                </select>
               </div>
 
               <div>
@@ -190,11 +247,26 @@ export default function SolarCalculatorPage() {
                   ))}
                 </select>
               </div>
+
+              <div>
+                <label htmlFor="battery" className="block text-sm font-semibold text-white/70">
+                  Baterie
+                </label>
+                <select
+                  id="battery"
+                  value={battery}
+                  onChange={(e) => setBattery(e.target.value as BatteryKey)}
+                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-orange-400"
+                >
+                  <option value="no">Fără baterie</option>
+                  <option value="yes">Cu baterie</option>
+                </select>
+              </div>
             </div>
 
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <a
-                href={`/contact?service=fotovoltaice`}
+                href={`/contact?service=fotovoltaice&client=${clientType}&consum=${encodeURIComponent(monthlyKwh)}&judet=${county}&faze=${phase}&baterie=${battery}`}
                 className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-orange-400 px-6 py-3 text-sm font-black text-black"
               >
                 Cere ofertă <ArrowRight className="h-4 w-4" aria-hidden />
@@ -225,7 +297,8 @@ export default function SolarCalculatorPage() {
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
                   <div className="text-[10px] font-bold uppercase tracking-widest text-white/55">Preț estimat</div>
-                  <div className="mt-1 text-sm font-black text-white">{formatRon(model.estimatePrice)}</div>
+                  <div className="mt-1 text-sm font-black text-white">{formatEuroRange(model.estimateLow / 5, model.estimateHigh / 5)}</div>
+                  <div className="mt-1 text-[11px] text-white/55">{formatRon(model.estimatePrice)} orientativ</div>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
                   <div className="text-[10px] font-bold uppercase tracking-widest text-white/55">Amortizare</div>
@@ -281,6 +354,11 @@ export default function SolarCalculatorPage() {
               <div className="mt-5 text-xs text-white/55 leading-relaxed">
                 Estimare orientativă. Prețul final depinde de evaluare (acoperiș/structură, distanțe cabluri, protecții, acces, configurație), iar economia depinde de autoconsum și tarifele de energie.
               </div>
+
+              <div className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-400/10 p-5">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-amber-200/75">Recomandare de pas următor</div>
+                <div className="mt-2 text-sm leading-relaxed text-white/90">{model.recommendation}</div>
+              </div>
             </div>
 
             <div className="rounded-3xl border border-white/10 bg-black/30 p-7" data-reveal>
@@ -300,7 +378,7 @@ export default function SolarCalculatorPage() {
               <div className="mt-5">
                 <a
                   href={`https://wa.me/40769889721?text=${encodeURIComponent(
-                    `Bună! Vreau ofertă fotovoltaic. Consum ~${monthlyKwh || '—'} kWh/lună, județ: ${counties.find((c) => c.key === county)?.label ?? '—'}.`,
+                    `Bună! Vreau ofertă fotovoltaic. Tip client: ${clientType === 'business' ? 'business' : 'rezidențial'}, consum ~${monthlyKwh || '—'} kWh/lună, județ: ${counties.find((c) => c.key === county)?.label ?? '—'}, faze: ${phase === 'three' ? 'trifazat' : 'monofazat'}, baterie: ${battery === 'yes' ? 'da' : 'nu'}.`,
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"

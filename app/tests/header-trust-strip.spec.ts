@@ -15,8 +15,8 @@ test.describe('Header trust strip', () => {
     await sectionTitle.scrollIntoViewIfNeeded();
     await expect(sectionTitle).toBeVisible();
 
-    await expect(page.getByText('Proiecte finalizate').first()).toBeVisible();
-    await expect(page.getByText('Garanție lucrări').first()).toBeVisible();
+    await expect(page.getByText('Scor recenzii').first()).toBeVisible();
+    await expect(page.getByText('Tipuri de lucrări').first()).toBeVisible();
     await expect(page.getByText('Clienți mulțumiți').first()).toBeVisible();
   });
 
@@ -26,8 +26,8 @@ test.describe('Header trust strip', () => {
     await sectionTitle.scrollIntoViewIfNeeded();
     await expect(sectionTitle).toBeVisible();
 
-    await expect(page.getByText('Proiecte finalizate').first()).toBeVisible();
-    await expect(page.getByText('Garanție lucrări').first()).toBeVisible();
+    await expect(page.getByText('Scor recenzii').first()).toBeVisible();
+    await expect(page.getByText('Tipuri de lucrări').first()).toBeVisible();
     await expect(page.getByText('Clienți mulțumiți').first()).toBeVisible();
   });
 });

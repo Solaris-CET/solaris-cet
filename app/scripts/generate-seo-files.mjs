@@ -588,23 +588,13 @@ async function writeStaticPages() {
     {
       path: '/portofoliu',
       title: 'Portofoliu — Solaris CET',
-      description: 'Portofoliu proiecte: fotovoltaice, acoperișuri, fațade și lucrări diverse.',
-      h1: 'Portofoliu Solaris CET',
-      bodyLines: [
-        'Selecție orientativă de lucrări reprezentative: fotovoltaice, acoperișuri și detalii de anvelopă.',
-        'La cerere, îți trimitem poze reale din proiecte similare (WhatsApp) și te ajutăm să alegi soluția potrivită pentru casa/afacerea ta.',
-      ],
-      jsonLd: wrapJsonLd([
-        {
-          '@type': 'CollectionPage',
-          name: 'Portofoliu Solaris CET',
-          url: `${origin}/portofoliu/`,
-        },
-        breadcrumb([
-          { name: 'Acasă', path: '/' },
-          { name: 'Portofoliu', path: '/portofoliu' },
-        ]),
-      ]),
+      description: 'Pagina s-a mutat.',
+      h1: 'Pagina s-a mutat',
+      bodyLines: ['Portofoliul principal este disponibil la /proiecte/.'],
+      canonicalPath: '/proiecte/',
+      redirectTo: '/proiecte/',
+      noindex: true,
+      jsonLd: wrapJsonLd([breadcrumb([{ name: 'Acasă', path: '/' }, { name: 'Portofoliu', path: '/proiecte' }])]),
     },
     {
       path: '/faq',

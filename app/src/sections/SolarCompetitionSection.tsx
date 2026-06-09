@@ -10,12 +10,12 @@ function Mark({ ok }: { ok: boolean }) {
 
 export default function SolarCompetitionSection() {
   const rows = [
-    { label: 'Atestat ANRE / parteneri autorizați', us: true, others: true },
-    { label: 'Documentație AFM Casa Verde (suport)', us: true, others: false },
-    { label: 'Garanție lucrare + echipamente', us: true, others: true },
-    { label: 'Monitorizare și optimizare producție', us: true, others: false },
-    { label: 'Mentenanță & intervenții rapide', us: true, others: false },
-    { label: 'Planificare execuție + detalii curate', us: true, others: true },
+    { label: 'Clarificare tip lucrare și obiectiv comercial', us: true, others: false },
+    { label: 'Repere de buget și următorul pas potrivit', us: true, others: false },
+    { label: 'Explicații despre documente / finanțare (când se aplică)', us: true, others: false },
+    { label: 'Detalii tehnice minime cerute pentru ofertă bună', us: true, others: false },
+    { label: 'Variantă pentru mentenanță / reparații / urgențe', us: true, others: false },
+    { label: 'Trimitere către calculator, serviciu sau contact corect', us: true, others: false },
   ];
 
   return (
@@ -24,7 +24,7 @@ export default function SolarCompetitionSection() {
         <div className="max-w-3xl" data-reveal>
           <h2 className="text-3xl md:text-5xl font-bold text-white">Comparație rapidă</h2>
           <p className="mt-4 text-slate-300 text-lg">
-            Un tabel simplu care arată ce primești când alegi Solaris CET pentru fotovoltaice și acoperișuri.
+            Nu comparăm promisiuni vagi cu alte firme. Comparăm o ofertare clară, ghidată comercial, cu o cerere generică în care clientul nu știe ce urmează.
           </p>
         </div>
 
@@ -45,7 +45,7 @@ export default function SolarCompetitionSection() {
                   Solaris CET
                 </th>
                 <th scope="col" className="p-5 text-center text-sm font-semibold text-slate-200">
-                  Concurență (generic)
+                  Cerere generică
                 </th>
               </tr>
             </thead>
