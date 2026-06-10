@@ -125,7 +125,7 @@ export default function BridgeSimulatorPanel({ token }: { token: string }) {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-white font-semibold">
           <ArrowLeftRight className="h-4 w-4" />
-          Bridge simulator (TON ↔ BSC testnet)
+          Bridge simulator (TON ↔ BSC BETA)
         </div>
         <div className="flex items-center gap-3">
           <div className="text-xs text-white/60">

@@ -253,9 +253,9 @@ async function writeStaticPages() {
     {
       path: '/contact',
       title: 'Contact — Solaris Engineering',
-      description: 'Contact Solaris Engineering pentru sisteme fotovoltaice, acoperișuri TPO, fațade și reparații.',
+      description: 'Contact Solaris Engineering pentru fotovoltaice, acoperișuri, reparații și mentenanță.',
       h1: 'Contact Solaris Engineering',
-      bodyLines: ['Inginerie și execuție pentru instalații fotovoltaice, acoperișuri industriale (TPO), fațade și mentenanță în toată România.'],
+      bodyLines: ['Instalații fotovoltaice, acoperișuri (tablă/țiglă/TPO), reparații și mentenanță în Vaslui și în toată România.'],
       extraHtml: contactFormHtml,
       jsonLd: wrapJsonLd([
         localBusiness,
@@ -305,7 +305,7 @@ async function writeStaticPages() {
       jsonLd: wrapJsonLd([
         {
           '@type': 'ItemList',
-          name: 'Servicii Solaris CET',
+          name: 'Servicii Solaris Engineering',
           itemListElement: [
             { '@type': 'ListItem', position: 1, name: 'Fotovoltaice rezidențiale', url: `${origin}/servicii/fotovoltaice-rezidentiale/` },
             { '@type': 'ListItem', position: 2, name: 'Fotovoltaice industriale', url: `${origin}/servicii/fotovoltaice-industriale/` },
