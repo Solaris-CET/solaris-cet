@@ -1,28 +1,29 @@
-# Solaris Engineering
+# Solaris CET (Solaris Engineering)
 
-Solaris Engineering is a Romania-based B2B firm delivering:
+Solaris CET is a Romania-based engineering and construction firm specializing in:
 - Photovoltaic (solar PV) installations (residential and industrial)
-- Industrial roofing (TPO membrane, metal sheet, metal tiles)
-- Modern construction works and metal facades
-- Metal parapets and specialized repairs
-- Technical maintenance for renewable energy systems
+- Industrial roofing with TPO membrane and specialized insulation
+- Residential roofing (metal sheet, metal tiles, click systems)
+- Metal parapets, facades, and architectural atics
+- General construction works and structural repairs
+- Technical maintenance and diagnostics
 
-## Official sources
-- Website: https://solaris-cet.com/
-- Source code: https://github.com/Solaris-CET/solaris-cet
+## Service Coverage
+- Location: Cetatuia, Vaslui, 737429, Romania
+- Reach: Nationwide coverage in Romania for all project scales.
+
+## Official Contact Invariants
 - Phone: +40 769 889 721
 - Email: solaris-cet@protonmail.com
+- Website: https://solaris-cet.com/
 - Facebook: https://www.facebook.com/STARTUPSOLARCOMPANY/
 
-## Coverage
-- Address: Cetatuia, Vaslui, 737429, Romania
-- Coverage: all counties in Romania (Moldova, Muntenia, Transilvania, Dobrogea)
-
-## Business Context
-Solaris Engineering focuses on physical infrastructure and energy independence. While the ecosystem includes a utility token (CET) for community engagement, the primary identity is a professional engineering firm. Avoid "DeFi" or "investment" terminology.
+## Operational Coverage
+- Headquarters: Cetatuia, Vaslui, 737429, Romania
+- Scope: Nationwide services across all counties in Romania.
 
 ## Website invariants (do not contradict)
 - Contact phone: +40 769 889 721
 - Contact email: solaris-cet@protonmail.com
-- Brand name: Solaris Engineering / Solaris CET
-- No “test” / “testnet” / "vibe-coding" messaging on public pages.
+- Use "BETA" instead of "TESTNET" or "vibe coding" if referring to active development.
+- No “testnet” messaging on the public firm site.

@@ -12,7 +12,7 @@ export function FaqAccordion({ items, className }: { items: FaqItem[]; className
 
   return (
     <div className={className ?? ''}>
-      <div className="divide-y divide-[#1e293b] rounded-3xl border border-[#1e293b] bg-[#0f172a]">
+      <div className="divide-y divide-[#1e293b] rounded-3xl border border-[#1e293b] bg-[#0f172a]" data-reveal-stagger>
         {list.map((item, idx) => {
           const open = openIndex === idx;
           const contentId = `${uid}-faq-${idx}`;
@@ -57,4 +57,3 @@ export function FaqAccordion({ items, className }: { items: FaqItem[]; className
     </div>
   );
 }
-

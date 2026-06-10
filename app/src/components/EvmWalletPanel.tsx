@@ -48,7 +48,7 @@ export default function EvmWalletPanel() {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-white font-semibold">
           <PlugZap className="h-4 w-4 text-solaris-cyan" />
-          EVM Wallet (BSC testnet)
+          EVM Wallet (BSC BETA)
         </div>
         <div className="flex items-center gap-2">
           <span
@@ -84,7 +84,7 @@ export default function EvmWalletPanel() {
         ) : (
           <>
             <Button onClick={() => void w.ensureBscTestnet()} className="rounded-xl">
-              Switch to BSC testnet
+              Switch to BSC BETA
             </Button>
             <Button
               variant="outline"

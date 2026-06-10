@@ -37,7 +37,7 @@ export default function FinancingCasaVerdeBaterii2026Page() {
   return (
     <main id="main-content" tabIndex={-1} className="pt-24 pb-0 bg-slate-950 text-white">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
-        <section className="rounded-3xl border border-white/10 bg-black/30 p-8 sm:p-10">
+        <section className="rounded-3xl border border-white/10 bg-black/30 p-8 sm:p-10" data-reveal-stagger>
           <div className="flex flex-wrap items-center gap-3">
             <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-[11px] font-bold tracking-wider text-emerald-300">
               <CalendarDays className="h-4 w-4" aria-hidden />
@@ -72,7 +72,7 @@ export default function FinancingCasaVerdeBaterii2026Page() {
         </section>
 
         <section className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-8 space-y-10">
+          <div className="lg:col-span-8 space-y-10" data-reveal-stagger>
             <div className="rounded-3xl border border-white/10 bg-white/5 p-7">
               <div className="flex items-center gap-3">
                 <HelpCircle className="h-5 w-5 text-emerald-300" aria-hidden />
@@ -94,7 +94,7 @@ export default function FinancingCasaVerdeBaterii2026Page() {
                 <BadgeCheck className="h-5 w-5 text-emerald-300" aria-hidden />
                 <h2 className="text-xl font-bold">Cine poate beneficia</h2>
               </div>
-              <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3" data-reveal-stagger>
                 {[
                   'Persoane fizice (conform ghidului AFM)',
                   'Drept de proprietate / folosință (după caz)',
@@ -125,7 +125,7 @@ export default function FinancingCasaVerdeBaterii2026Page() {
                 <ShieldCheck className="h-5 w-5 text-emerald-300" aria-hidden />
                 <h2 className="text-xl font-bold">Pașii de urmat</h2>
               </div>
-              <ol className="mt-5 space-y-3">
+              <ol className="mt-5 space-y-3" data-reveal-stagger>
                 {[
                   'Discuție inițială: consum, obiectiv, tip acoperiș/instalație existentă.',
                   'Evaluare tehnică: compatibilitate, spațiu, protecții și configurare.',
@@ -182,7 +182,7 @@ export default function FinancingCasaVerdeBaterii2026Page() {
           </div>
 
           <aside className="lg:col-span-4">
-            <div className="sticky top-24 rounded-3xl border border-white/10 bg-black/30 p-7">
+            <div className="sticky top-24 rounded-3xl border border-white/10 bg-black/30 p-7" data-reveal-stagger>
               <div className="text-sm font-semibold text-white">Solaris CET vă ajută cu întregul dosar</div>
               <div className="mt-2 text-sm text-slate-300 leading-relaxed">
                 Îți clarificăm pașii, verificăm documentele și îți spunem ce e realist din punct de vedere tehnic.

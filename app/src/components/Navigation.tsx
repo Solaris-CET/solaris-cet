@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 
 import { useLanguage } from '../hooks/useLanguage';
 import { DownloadAppButton } from './company/DownloadAppButton';
+import styles from './NavigationFloating.module.css';
 import { SolarisLogoMark } from './SolarisLogoMark';
 
 const MOBILE_MENU_FOCUSABLE_SELECTOR =
@@ -31,7 +32,6 @@ function tryFocusFirstFocusable(nodes: NodeListOf<HTMLElement>): void {
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const progressBarRef = useRef<HTMLDivElement>(null);
   const scrollRafRef = useRef<number>(0);
   const isScrolledRef = useRef<boolean | null>(null);
   const mobileMenuToggleRef = useRef<HTMLButtonElement>(null);
@@ -39,6 +39,8 @@ export default function Navigation() {
   const wasMobileMenuOpenRef = useRef(false);
   const { t, lang } = useLanguage();
   const urlLocale = useMemo(() => urlLocaleFromLang(lang), [lang]);
+  const desktopNavRef = useRef<HTMLDivElement>(null);
+  const desktopLinkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
 
   const navLinks = useMemo(
     () => {
@@ -59,14 +61,12 @@ export default function Navigation() {
         { key: 'financing', label: t.nav.financing, href: localizePathname('/finantare', urlLocale) },
         { key: 'blog', label: t.nav.blog, href: localizePathname('/blog', urlLocale) },
         { key: 'about', label: t.nav.about, href: localizePathname('/despre', urlLocale) },
-        { key: 'token', label: t.nav.cetToken, href: localizePathname('/token-cet', urlLocale) },
         { key: 'contact', label: t.nav.contact, href: localizePathname('/contact', urlLocale) },
       ];
     },
     [
       t.nav.about,
       t.nav.blog,
-      t.nav.cetToken,
       t.nav.contact,
       t.nav.equipment,
       t.nav.financing,
@@ -78,27 +78,38 @@ export default function Navigation() {
     ],
   );
 
-  const businessLinks = useMemo(() => navLinks.filter((l) => l.key !== 'token'), [navLinks]);
-  const tokenLinks = useMemo(() => navLinks.filter((l) => l.key === 'token'), [navLinks]);
-  const desktopPrimaryLinks = useMemo(() => businessLinks.filter((l) => l.key !== 'contact'), [businessLinks]);
-  const desktopUtilityLinks = useMemo(() => businessLinks.filter((l) => l.key === 'contact'), [businessLinks]);
+  const primaryLinks = useMemo(() => {
+    const pathnameNoLocale =
+      typeof window === 'undefined'
+        ? '/'
+        : parseUrlLocaleFromPathname(window.location.pathname).pathnameNoLocale || '/';
+    const isHome = pathnameNoLocale === '/';
+    const homePath = localizePathname('/', urlLocale);
+    return [
+      { key: 'home', label: t.nav.home, href: isHome ? '#hero' : homePath },
+      { key: 'portfolio', label: t.nav.portfolio, href: localizePathname('/proiecte', urlLocale) },
+      { key: 'services', label: t.nav.services, href: localizePathname('/servicii', urlLocale) },
+      { key: 'contact', label: t.nav.contact, href: localizePathname('/contact', urlLocale) },
+    ];
+  }, [t.nav.contact, t.nav.home, t.nav.portfolio, t.nav.services, urlLocale]);
 
   const [activeHref, setActiveHref] = useState<string>('/');
+  const [indicator, setIndicator] = useState<{ left: number; width: number; visible: boolean }>({
+    left: 0,
+    width: 0,
+    visible: false,
+  });
 
   useEffect(() => {
     const apply = () => {
       scrollRafRef.current = 0;
       const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       const nextIsScrolled = scrollTop > 80;
       const prevIsScrolled = isScrolledRef.current;
       if (prevIsScrolled === null || prevIsScrolled !== nextIsScrolled) {
         isScrolledRef.current = nextIsScrolled;
         setIsScrolled(nextIsScrolled);
       }
-      const nextProgress = docHeight > 0 ? Math.max(0, Math.min(100, (scrollTop / docHeight) * 100)) : 0;
-      const bar = progressBarRef.current;
-      if (bar) bar.style.width = `${nextProgress}%`;
     };
 
     const onScroll = () => {
@@ -117,21 +128,52 @@ export default function Navigation() {
   }, []);
 
   useEffect(() => {
-    const pathname = typeof window !== 'undefined' ? (window.location.pathname || '/') : '/';
-    const normalized = pathname !== '/' ? pathname.replace(/\/$/, '') : '/';
-    const best =
-      navLinks.find((l) => l.href === normalized)?.href ??
-      (normalized.startsWith('/servicii')
+    const update = () => {
+      const pathname = typeof window !== 'undefined' ? (window.location.pathname || '/') : '/';
+      const normalized = pathname !== '/' ? pathname.replace(/\/$/, '') : '/';
+      const best = normalized.startsWith('/servicii')
         ? '/servicii'
-        : normalized.startsWith('/finantare')
-          ? '/finantare'
-          : normalized.startsWith('/blog')
-            ? '/blog'
-            : normalized.startsWith('/despre')
-              ? '/despre'
-              : normalized);
-    setActiveHref(best);
-  }, [navLinks]);
+        : normalized.startsWith('/proiecte') || normalized.startsWith('/portofoliu')
+          ? '/proiecte'
+          : normalized.startsWith('/contact')
+            ? '/contact'
+            : '/';
+      setActiveHref(best);
+    };
+    update();
+    window.addEventListener('popstate', update);
+    window.addEventListener('hashchange', update);
+    return () => {
+      window.removeEventListener('popstate', update);
+      window.removeEventListener('hashchange', update);
+    };
+  }, []);
+
+  useEffect(() => {
+    const update = () => {
+      const container = desktopNavRef.current;
+      if (!container) return;
+      const el =
+        (activeHref === '/servicii' ? desktopLinkRefs.current.services : null) ??
+        (activeHref === '/proiecte' ? desktopLinkRefs.current.portfolio : null) ??
+        (activeHref === '/contact' ? desktopLinkRefs.current.contact : null) ??
+        desktopLinkRefs.current.home;
+      if (!el) {
+        setIndicator((p) => (p.visible ? { ...p, visible: false } : p));
+        return;
+      }
+      const c = container.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      const left = Math.max(0, r.left - c.left);
+      const width = Math.max(0, r.width);
+      setIndicator({ left, width, visible: width > 0 });
+    };
+
+    update();
+    const onResize = () => update();
+    window.addEventListener('resize', onResize, { passive: true });
+    return () => window.removeEventListener('resize', onResize);
+  }, [activeHref]);
 
   useEffect(() => {
     if (!isMobileMenuOpen) {
@@ -146,108 +188,104 @@ export default function Navigation() {
     tryFocusFirstFocusable(focusable);
   }, [isMobileMenuOpen]);
 
+  const barHeightClass = isScrolled ? 'h-12' : 'h-16';
+
   return (
     <header
+      data-reveal
       className={cn(
-        'fixed top-0 left-0 right-0 z-[1000] border-b transition-all duration-300 transform-gpu backface-hidden max-w-full overflow-x-hidden lg:overflow-x-visible',
+        `fixed top-0 left-0 right-0 z-[1000] max-w-full overflow-x-hidden lg:overflow-x-visible ${styles.bar}`,
         isScrolled
-          ? 'bg-[rgba(10,10,30,0.85)] backdrop-blur-[20px] border-white/10 shadow-[0_1px_0_rgba(242,201,76,0.08),0_12px_36px_rgba(0,0,0,0.45)]'
-          : 'bg-[rgba(10,10,30,0.55)] backdrop-blur-[20px] border-white/6',
+          ? 'bg-[rgba(5,6,11,0.85)] backdrop-blur-[20px] border-b border-white/10 shadow-[0_1px_0_rgba(251,146,60,0.10),0_16px_50px_rgba(0,0,0,0.55)]'
+          : 'bg-[rgba(5,6,11,0.55)] backdrop-blur-[16px] border-b border-white/0',
       )}
       style={{ top: 'var(--solaris-announcement-offset, 0px)' }}
     >
-      <div
-        ref={progressBarRef}
-        className="absolute bottom-0 left-0 h-[1px] transition-none"
-        style={{
-          width: '0%',
-          background:
-            'linear-gradient(90deg, var(--solaris-gold), var(--solaris-cyan), rgb(167 139 250), var(--solaris-gold))',
-          backgroundSize: '200% 100%',
-          animation: 'text-shimmer 3s linear infinite',
-          boxShadow: '0 0 6px rgba(242,201,76,0.4)',
-        }}
-      />
-
       <div className="w-full min-w-0 max-w-full overflow-x-hidden section-padding-x xl:px-12">
-        <div className="flex h-16 w-full min-w-0 max-w-full items-center justify-between gap-2 sm:gap-3 lg:grid lg:h-20 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center lg:gap-4 2xl:gap-6">
+        <div className={cn('flex w-full min-w-0 max-w-full items-center justify-between gap-2 sm:gap-3', barHeightClass)}>
           <a
             href={localizePathname('/', urlLocale)}
-            className="group relative z-20 flex shrink-0 items-center"
+            className="group relative z-20 flex shrink-0 items-center gap-2"
             aria-label="Solaris CET"
           >
-            <div className="relative flex h-10 shrink-0 origin-left items-center justify-center transition-transform duration-500 ease-out group-hover:scale-[1.04] lg:h-11">
-              <SolarisLogoMark
-                crop="full"
-                priority
-                className="h-10 lg:h-11 w-auto max-h-full drop-shadow-[0_0_14px_rgba(242,201,76,0.35)]"
-              />
-              <div className="pointer-events-none absolute inset-[-3px] rounded-xl bg-solaris-gold/18 blur-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-            </div>
+            <span className="relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur">
+              <svg viewBox="0 0 24 24" className="h-5 w-5 text-orange-300" aria-hidden>
+                <circle cx="12" cy="12" r="4.2" fill="currentColor" opacity="0.85" />
+                {Array.from({ length: 8 }).map((_, i) => {
+                  const a = (i / 8) * Math.PI * 2;
+                  const x1 = 12 + Math.cos(a) * 7.2;
+                  const y1 = 12 + Math.sin(a) * 7.2;
+                  const x2 = 12 + Math.cos(a) * 10.4;
+                  const y2 = 12 + Math.sin(a) * 10.4;
+                  return (
+                    <line
+                      key={i}
+                      x1={x1}
+                      y1={y1}
+                      x2={x2}
+                      y2={y2}
+                      stroke="currentColor"
+                      strokeWidth="1"
+                      opacity="0.55"
+                      strokeLinecap="round"
+                    />
+                  );
+                })}
+              </svg>
+            </span>
+            <span className="leading-none">
+              <span className="block text-sm font-black tracking-tight text-white">
+                S<span className="text-orange-300">·</span>CET
+              </span>
+              <span className="block text-[11px] font-semibold tracking-widest text-white/55">SOLARIS</span>
+            </span>
           </a>
 
           <nav
-            className="hidden relative z-30 min-w-0 overflow-x-auto overflow-y-visible [-ms-overflow-style:none] [scrollbar-width:none] lg:flex lg:flex-nowrap lg:items-center lg:justify-center lg:gap-4 2xl:gap-6 [&::-webkit-scrollbar]:hidden"
+            className="hidden relative z-30 min-w-0 lg:flex lg:items-center lg:justify-center"
             aria-label={t.nav.primaryNavigation}
           >
-            {desktopPrimaryLinks.map((link) => (
-              <a
-                key={link.key}
-                href={link.href}
-                className={cn(
-                  'shrink-0 text-sm transition-colors duration-300 relative group px-2 py-1.5',
-                  activeHref === link.href ? 'text-solaris-text' : 'text-solaris-muted hover:text-solaris-text',
-                )}
-              >
-                {link.label}
-                <span
+            <div ref={desktopNavRef} className="relative flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-1 backdrop-blur">
+              {primaryLinks.map((link) => (
+                <a
+                  key={link.key}
+                  href={link.href}
+                  ref={(el) => {
+                    desktopLinkRefs.current[link.key] = el;
+                  }}
+                  onClick={() =>
+                    setActiveHref(
+                      link.key === 'services'
+                        ? '/servicii'
+                        : link.key === 'portfolio'
+                          ? '/proiecte'
+                          : link.key === 'contact'
+                            ? '/contact'
+                            : '/',
+                    )
+                  }
                   className={cn(
-                    'absolute -bottom-1 left-2 right-2 h-px origin-left scale-x-0 bg-gradient-to-r from-solaris-gold via-solaris-cyan to-solaris-gold transition-transform duration-300',
-                    activeHref === link.href ? 'scale-x-100' : 'group-hover:scale-x-100',
+                    'relative z-10 px-4 py-2 text-sm font-semibold transition-colors',
+                    (activeHref === '/servicii' && link.key === 'services') ||
+                      (activeHref === '/proiecte' && link.key === 'portfolio') ||
+                      (activeHref === '/contact' && link.key === 'contact') ||
+                      (activeHref === '/' && link.key === 'home')
+                      ? 'text-white'
+                      : 'text-white/70 hover:text-white',
                   )}
-                />
-              </a>
-            ))}
-
-            <span className="mx-1 h-4 w-px bg-white/10" aria-hidden />
-
-            {tokenLinks.map((link) => (
-              <a
-                key={link.key}
-                href={link.href}
+                >
+                  {link.label}
+                </a>
+              ))}
+              <span
+                aria-hidden
                 className={cn(
-                  'shrink-0 text-sm transition-colors duration-300 relative group px-2 py-1.5',
-                  activeHref === link.href ? 'text-solaris-text' : 'text-solaris-muted hover:text-solaris-text',
+                  `absolute bottom-1.5 h-[2px] rounded-full bg-orange-400 ${styles.indicator}`,
+                  indicator.visible ? 'opacity-100' : 'opacity-0',
                 )}
-              >
-                {link.label}
-                <span
-                  className={cn(
-                    'absolute -bottom-1 left-2 right-2 h-px origin-left scale-x-0 bg-gradient-to-r from-solaris-gold via-solaris-cyan to-solaris-gold transition-transform duration-300',
-                    activeHref === link.href ? 'scale-x-100' : 'group-hover:scale-x-100',
-                  )}
-                />
-              </a>
-            ))}
-
-            {desktopUtilityLinks.map((link) => (
-              <a
-                key={link.key}
-                href={link.href}
-                className={cn(
-                  'shrink-0 text-sm transition-colors duration-300 relative group px-2 py-1.5',
-                  activeHref === link.href ? 'text-solaris-text' : 'text-solaris-muted hover:text-solaris-text',
-                )}
-              >
-                {link.label}
-                <span
-                  className={cn(
-                    'absolute -bottom-1 left-2 right-2 h-px origin-left scale-x-0 bg-gradient-to-r from-solaris-gold via-solaris-cyan to-solaris-gold transition-transform duration-300',
-                    activeHref === link.href ? 'scale-x-100' : 'group-hover:scale-x-100',
-                  )}
-                />
-              </a>
-            ))}
+                style={{ width: `${indicator.width}px`, transform: `translateX(${indicator.left}px)` }}
+              />
+            </div>
           </nav>
 
           <div className="relative z-20 flex items-center gap-2 sm:gap-3 shrink-0">
@@ -255,12 +293,14 @@ export default function Navigation() {
               <DownloadAppButton className="px-3" />
             </div>
             <div className="hidden lg:flex items-center gap-3">
-              <DownloadAppButton />
-              <a href="tel:+40769889721" className="btn-outline-white text-xs px-4 py-2 font-mono flex items-center gap-2">
+              <a
+                href="tel:+40769889721"
+                className={cn(
+                  `relative inline-flex items-center justify-center rounded-full border border-orange-400/45 bg-black/25 px-5 py-2 text-sm font-bold text-white backdrop-blur ${styles.pulseRing}`,
+                )}
+                aria-label="Sună acum la +40 769 889 721"
+              >
                 +40 769 889 721
-              </a>
-              <a href={navLinks.find((x) => x.key === 'contact')?.href ?? '/contact'} className="btn-filled-gold text-sm px-6 py-2">
-                {t.nav.requestOffer}
               </a>
             </div>
 
@@ -315,25 +355,14 @@ export default function Navigation() {
             <div className="w-full max-w-[20rem] pb-2 text-center text-xs font-bold uppercase tracking-widest text-white/45">
               {t.nav.businessGroup}
             </div>
-            {businessLinks.map((link) => (
+            {navLinks.map((link) => (
               <a
                 key={link.key}
                 href={link.href}
-                className="w-full max-w-[20rem] text-center py-4 text-[32px] leading-tight font-semibold text-solaris-muted hover:text-solaris-text transition-colors rounded-2xl hover:bg-white/[0.04]"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {link.label}
-              </a>
-            ))}
-
-            <div className="w-full max-w-[20rem] pt-6 pb-2 text-center text-xs font-bold uppercase tracking-widest text-white/45">
-              {t.nav.tokenGroup}
-            </div>
-            {tokenLinks.map((link) => (
-              <a
-                key={link.key}
-                href={link.href}
-                className="w-full max-w-[20rem] text-center py-4 text-[32px] leading-tight font-semibold text-solaris-muted hover:text-solaris-text transition-colors rounded-2xl hover:bg-white/[0.04]"
+                className={cn(
+                  `w-full max-w-[20rem] text-center py-4 text-[32px] leading-tight font-semibold text-solaris-muted hover:text-solaris-text transition-colors rounded-2xl hover:bg-white/[0.04] ${styles.overlayItem}`,
+                )}
+                style={{ animationDelay: `${Math.min(900, 120 + navLinks.indexOf(link) * 70)}ms` }}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.label}

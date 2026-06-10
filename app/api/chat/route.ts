@@ -361,26 +361,22 @@ export default async function handler(req: Request): Promise<Response> {
         ? [
             intro,
             '',
-            'Pentru o ofertă rapidă (Solaris Engineering), te rog să ne transmiți următoarele detalii:',
-            '1) Locația proiectului (Localitate/Județ)',
-            '2) Tipul lucrării (Fotovoltaice, Acoperiș TPO/Tablă, Fațade, Construcții)',
-            '3) Detalii tehnice (Ex: putere dorită kW, suprafață acoperiș mp, tip învelitoare actuală)',
-            '4) Regimul de execuție (Urgent, Planificat 2025)',
-            '',
-            'Echipa noastră tehnică va analiza datele și revine cu un apel sau mesaj.',
+            'Spune-mi 4 detalii și îți recomand pachetul potrivit:',
+            '1) Localitate/județ',
+            '2) Tip proiect: fotovoltaice / acoperiș / TPO / construcții / reparații',
+            '3) Date tehnice (ex: consum lunar, suprafață acoperiș, tip structură, infiltratii)',
+            '4) Data de început dorită',
             '',
             `Contact direct: +40 769 889 721 · solaris-cet@protonmail.com`,
           ].join('\n')
         : [
             intro,
             '',
-            'For a quick Solaris Engineering quote, please provide:',
-            '1) Project location (City/County)',
-            '2) Work type (Solar PV, TPO/Metal Roofing, Facades, Construction)',
-            '3) Technical specs (e.g., target kW, roof area in sqm, current roofing material)',
-            '4) Timeline (Urgent, Planned 2025)',
-            '',
-            'Our engineering team will review and contact you shortly.',
+            'Share 4 details and I will suggest the right package:',
+            '1) Location (City/County)',
+            '2) Project Type: PV / roof / TPO / construction / repairs',
+            '3) Technical Data (usage, roof area, structure type, leaks)',
+            '4) Start Date',
             '',
             'Direct contact: +40 769 889 721 · solaris-cet@protonmail.com',
           ].join('\n')
@@ -463,9 +459,8 @@ export default async function handler(req: Request): Promise<Response> {
   const sharedContext =
     multiTurnHint +
     (isCompanyMode
-      ? `You are Solaris Engineering — a professional B2B engineering and construction firm in Romania. We specialize in photovoltaic (PV) systems, industrial TPO roofing, metal facades, and high-durability construction.\n` +
-        `STRICT RULE: You are NOT an AI for crypto, blockchain, or tokens. Never mention "CET token", "DeFi", "DeDust", "TON blockchain", or "jettons". If asked about these, politely redirect to physical engineering services or state that you specialize in solar energy and construction.\n` +
-        `CORE IDENTITY: Professional, technical, and localized for the Romanian market.\n\n`
+      ? `You are Solaris Engineering — a professional engineering firm from Romania delivering photovoltaic installations, construction works, roofing (metal sheet / metal tiles / TPO membrane), metal parapets and facades, plus repairs and maintenance.\n` +
+        `STRICT B2B RULE: Categorically ignore all blockchain, tokens, DeDust, TON, and CET crypto mentions. You represent a professional physical engineering and construction business. You only talk about physical construction and renewable energy services in Romania.\n\n`
       : `You are Solaris CET AI — a helpful assistant for Solaris CET and general crypto/DeFi questions.\n\n`) +
     `LANGUAGE: Reply in the same language as the user's latest message (default Romanian for local queries).\n\n` +
     `RULES:\n` +

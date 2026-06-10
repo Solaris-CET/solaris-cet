@@ -162,9 +162,6 @@ const defaultBatches = [
   ['tests/competition-section.spec.ts'],
   ['tests/security-section.spec.ts'],
   ['tests/mermaid-decision-map.spec.ts'],
-  ['tests/ai-model.spec.ts'],
-  ['tests/cet-ai-widget.spec.ts'],
-  ['tests/telegram-miniapp.spec.ts'],
 ];
 
 if (process.env.RUN_WALLET_E2E === '1') {

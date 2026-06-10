@@ -3,9 +3,14 @@ import { marked } from 'marked'
 import launchEn from '../content/blog/en/launch.md?raw'
 import launchEs from '../content/blog/es/launch.md?raw'
 import pvCostRo from '../content/blog/ro/cat-costa-un-sistem-fotovoltaic-2026.md?raw'
+import casaVerdeRo from '../content/blog/ro/cum-accesezi-programul-casa-verde.md?raw'
+import hybridBatteryRo from '../content/blog/ro/invertor-hibrid-baterie-cand-merita.md?raw'
 import launchRo from '../content/blog/ro/launch.md?raw'
+import tpoMaintenanceRo from '../content/blog/ro/mentenanta-acoperis-tpo-checklist.md?raw'
 import pvMaintenanceRo from '../content/blog/ro/mentenanta-panouri-fotovoltaice.md?raw'
+import bifacialRo from '../content/blog/ro/panouri-bifaciale-vs-monocristaline.md?raw'
 import roofCompareRo from '../content/blog/ro/tabla-click-vs-tigla-metalica.md?raw'
+import tpoCompareRo from '../content/blog/ro/tpo-vs-membrana-clasica.md?raw'
 import { extractFrontmatter } from './frontmatter'
 
 export type BlogLocale = 'en' | 'ro' | 'es'
@@ -103,8 +108,13 @@ const rawModules: Record<string, string> = {
   '../content/blog/ro/launch.md?raw': launchRo,
   '../content/blog/es/launch.md?raw': launchEs,
   '../content/blog/ro/cat-costa-un-sistem-fotovoltaic-2026.md?raw': pvCostRo,
+  '../content/blog/ro/cum-accesezi-programul-casa-verde.md?raw': casaVerdeRo,
   '../content/blog/ro/tabla-click-vs-tigla-metalica.md?raw': roofCompareRo,
   '../content/blog/ro/mentenanta-panouri-fotovoltaice.md?raw': pvMaintenanceRo,
+  '../content/blog/ro/tpo-vs-membrana-clasica.md?raw': tpoCompareRo,
+  '../content/blog/ro/panouri-bifaciale-vs-monocristaline.md?raw': bifacialRo,
+  '../content/blog/ro/mentenanta-acoperis-tpo-checklist.md?raw': tpoMaintenanceRo,
+  '../content/blog/ro/invertor-hibrid-baterie-cand-merita.md?raw': hybridBatteryRo,
 }
 
 const rawIndex: RawIndexItem[] = Object.entries(rawModules)

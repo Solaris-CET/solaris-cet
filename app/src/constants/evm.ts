@@ -9,7 +9,7 @@ export type EvmChain = {
 
 export const BSC_TESTNET: EvmChain = {
   key: 'bsc_testnet',
-  name: 'BNB Smart Chain Testnet',
+  name: 'BNB Smart Chain BETA',
   chainId: 97,
   rpcUrl: import.meta.env.VITE_BSC_TESTNET_RPC_URL || 'https://data-seed-prebsc-1-s1.binance.org:8545/',
   blockExplorerUrl: 'https://testnet.bscscan.com',
