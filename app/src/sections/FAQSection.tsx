@@ -69,7 +69,7 @@ export default function FAQSection() {
   return (
     <section className="py-24 bg-slate-900/40">
       <div className="max-w-4xl mx-auto px-5 sm:px-8 xl:px-12">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3" data-reveal-stagger>
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5">
             <HelpCircle className="h-5 w-5 text-solaris-gold" aria-hidden />
           </span>
@@ -83,8 +83,8 @@ export default function FAQSection() {
           </div>
         </div>
 
-        <div className="mt-10 rounded-3xl border border-white/10 bg-black/30 p-4 sm:p-6">
-          <Accordion type="single" collapsible>
+        <div className="mt-10 rounded-3xl border border-white/10 bg-black/30 p-4 sm:p-6" data-reveal>
+          <Accordion type="single" collapsible data-reveal-stagger>
             {faqs.map((x) => (
               <AccordionItem key={x.q} value={x.q} className="border-white/10">
                 <AccordionTrigger className="text-white hover:no-underline">
@@ -96,7 +96,7 @@ export default function FAQSection() {
           </Accordion>
         </div>
 
-        <div className="mt-10 flex flex-wrap gap-3">
+        <div className="mt-10 flex flex-wrap gap-3" data-reveal>
           <a href="/contact" className="btn-filled-gold inline-flex items-center gap-2">
             {isRo ? 'Cere ofertă' : 'Request an offer'}
           </a>

@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect,useState } from 'react';
 
 import translations, { type LangCode, type Translations } from '../i18n/translations';
+import { parseUrlLocaleFromPathname } from '../i18n/urlRouting';
 import { getTextDirForLang } from '../lib/textDirection';
 
 export type { LangCode };
@@ -48,6 +49,12 @@ async function detectCountryLanguage(): Promise<LangCode | null> {
 
 const detectLanguage = (): LangCode => {
   try {
+    if (typeof window !== 'undefined') {
+      const urlLocale = parseUrlLocaleFromPathname(window.location.pathname).locale;
+      if (urlLocale && (SUPPORTED_LANGS as string[]).includes(urlLocale)) {
+        return urlLocale as LangCode;
+      }
+    }
     const stored = localStorage.getItem('solaris_lang');
     if (stored && (SUPPORTED_LANGS as string[]).includes(stored)) {
       return stored as LangCode;
@@ -56,9 +63,9 @@ const detectLanguage = (): LangCode => {
     if (cookieLang) return cookieLang;
     const nav = detectNavigatorLanguage();
     if (nav) return nav;
-    return 'en';
+    return 'ro';
   } catch {
-    return 'en';
+    return 'ro';
   }
 };
 
@@ -150,14 +157,14 @@ function resolveInitialLang(): LangCode {
  * outside the normal React render cycle.
  */
 export function getActiveLangSync(): LangCode {
-  if (typeof window === 'undefined') return 'en';
+  if (typeof window === 'undefined') return 'ro';
   return resolveInitialLang();
 }
 
 export const LanguageContext = createContext<LanguageContextValue>({
-  lang: 'en',
+  lang: 'ro',
   setLang: () => undefined,
-  t: translations.en,
+  t: translations.ro,
 });
 
 export const useLanguage = () => useContext(LanguageContext);

@@ -1,29 +1,28 @@
-# Solaris Engineering
+# Solaris CET (Solaris Engineering)
 
-Solaris Engineering is a professional engineering and construction firm based in Romania, specializing in renewable energy and advanced building solutions.
+Solaris CET is a Romania-based engineering and construction firm specializing in:
+- Photovoltaic (solar PV) installations (residential and industrial)
+- Industrial roofing with TPO membrane and specialized insulation
+- Residential roofing (metal sheet, metal tiles, click systems)
+- Metal parapets, facades, and architectural atics
+- General construction works and structural repairs
+- Technical maintenance and diagnostics
 
-## Primary Services
-- **Photovoltaic (Solar PV) Systems**: Full-cycle residential and industrial installations.
-- **Roofing Solutions**: Specialized in TPO membranes for industrial buildings, metal sheet, and metal tiles.
-- **Metal Works**: Design and installation of metal parapets and facades.
-- **Construction & Repairs**: Comprehensive construction works, maintenance, and expert leak repairs.
+## Service Coverage
+- Location: Cetatuia, Vaslui, 737429, Romania
+- Reach: Nationwide coverage in Romania for all project scales.
 
-## Official Channels
-- Website: https://solaris-cet.com/
-- Source code: https://github.com/Solaris-CET/solaris-cet
+## Official Contact Invariants
 - Phone: +40 769 889 721
 - Email: solaris-cet@protonmail.com
+- Website: https://solaris-cet.com/
 - Facebook: https://www.facebook.com/STARTUPSOLARCOMPANY/
 
 ## Operational Coverage
 - Headquarters: Cetatuia, Vaslui, 737429, Romania
 - Scope: Nationwide services across all counties in Romania.
 
-## Business Invariants
-- Official Phone: +40 769 889 721
-- Official Email: solaris-cet@protonmail.com
-- Strictly B2B/Professional identity (Solaris Engineering).
-- No "test" or "vibe-coding" terminology.
-
-## Legacy/Community Context
-Solaris Engineering maintains a historical and community connection to the CET token ecosystem. Information regarding the token is for transparency only and does not constitute financial advice. Detailed token data is available at https://solaris-cet.com/token-cet.
+## Website invariants (do not contradict)
+- Contact phone: +40 769 889 721
+- Contact email: solaris-cet@protonmail.com
+- No “test” / “testnet” messaging on the public site

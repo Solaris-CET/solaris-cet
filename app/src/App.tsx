@@ -4,7 +4,9 @@ import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 
 import CookieConsentBanner from '@/components/CookieConsentBanner';
 import { Toaster } from '@/components/ui/sonner';
+import { companyProfile } from '@/data/companyProfile';
 import { parseUrlLocaleFromPathname, type UrlLocale,urlLocaleFromLang } from '@/i18n/urlRouting';
+import { refreshScrollReveal } from '@/js/reveal';
 import { getServiceDetail } from '@/lib/serviceDetails';
 import { applySpaSeo } from '@/lib/spaSeo';
 import { companyFaqItems } from '@/sections/CompanyFaqSection';
@@ -27,15 +29,19 @@ const FinancingHubPage = lazy(() => import('./pages_legacy/FinancingHubPage'));
 const FinancingCasaVerde2025Page = lazy(() => import('./pages_legacy/FinancingCasaVerde2025Page'));
 const FinancingCasaVerdeBaterii2026Page = lazy(() => import('./pages_legacy/FinancingCasaVerdeBaterii2026Page'));
 const FinancingRePowerEuPage = lazy(() => import('./pages_legacy/FinancingRePowerEuPage'));
+const ProjectsPage = lazy(() => import('./pages_legacy/ProjectsPage'));
+const SolarCalculatorPage = lazy(() => import('./pages_legacy/SolarCalculatorPage'));
 const ThankYouPage = lazy(() => import('./pages_legacy/ThankYouPage'));
 const LegalDocPage = lazy(() => import('./pages_legacy/LegalDocPage'));
 const CookieSettingsPage = lazy(() => import('./pages_legacy/CookieSettingsPage'));
+const LocationPage = lazy(() => import('./pages_legacy/LocationPage'));
 const SolarisChatWidget = lazy(() =>
   import('@/components/company/SolarisChatWidget').then((m) => ({ default: m.SolarisChatWidget })),
 );
 
 function normalizePathname(pathname: string): string {
   const clean = (pathname || '/').replace(/\/$/, '') || '/';
+  if (clean === '/index.html') return '/';
   const m = clean.match(/^\/(en|ro|es|de|pt|ru|zh)(\/|$)/);
   if (!m) return clean || '/';
   const rest = clean.slice(3);
@@ -119,6 +125,24 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
         '@context': 'https://schema.org',
         '@graph': [
           {
+            '@type': 'LocalBusiness',
+            name: companyProfile.name,
+            url: `${origin}/${urlLocale}/`,
+            telephone: companyProfile.phoneDisplay,
+            email: companyProfile.email,
+            address: {
+              '@type': 'PostalAddress',
+              addressLocality: 'Vaslui',
+              addressCountry: 'RO',
+            },
+            areaServed: 'RO',
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: companyProfile.reviews.ratingValue,
+              reviewCount: companyProfile.reviews.ratingCount,
+            },
+          },
+          {
             '@type': 'FAQPage',
             mainEntity: companyFaqItems.map((x) => ({
               '@type': 'Question',
@@ -139,6 +163,37 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
       keywords:
         'servicii fotovoltaice, montaj panouri fotovoltaice, acoperis tpo, acoperis tabla, reparatii acoperis, mentenanta fotovoltaice',
       ogType: 'website',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'ItemList',
+            itemListElement: [
+              {
+                '@type': 'ListItem',
+                position: 1,
+                item: { '@type': 'Service', name: 'Fotovoltaice Rezidențiale', url: `${origin}/${urlLocale}/servicii/fotovoltaice-rezidentiale` },
+              },
+              {
+                '@type': 'ListItem',
+                position: 2,
+                item: { '@type': 'Service', name: 'Fotovoltaice Industriale', url: `${origin}/${urlLocale}/servicii/fotovoltaice-industriale` },
+              },
+              {
+                '@type': 'ListItem',
+                position: 3,
+                item: { '@type': 'Service', name: 'Acoperișuri Tablă/Țiglă', url: `${origin}/${urlLocale}/servicii/acoperisuri-tabla-tigla` },
+              },
+              {
+                '@type': 'ListItem',
+                position: 4,
+                item: { '@type': 'Service', name: 'Acoperișuri Industriale TPO', url: `${origin}/${urlLocale}/servicii/acoperisuri-industriale-tpo` },
+              },
+            ],
+          },
+          buildBreadcrumbJsonLd(origin, urlLocale, '/servicii'),
+        ],
+      },
     },
     '/contact': {
       title: 'Contact — Solaris CET',
@@ -146,10 +201,47 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
       keywords: 'contact solaris cet, oferta fotovoltaice, vaslui, cetatuia, telefon, email',
       ogType: 'website',
     },
+    '/calculator': {
+      title: 'Calculator fotovoltaic — Solaris CET',
+      description: 'Estimare orientativă: putere sistem, număr panouri, preț estimat, economii și amortizare. Cere ofertă personalizată.',
+      keywords: 'calculator fotovoltaic, instalatii fotovoltaice pret, panouri solare vaslui, economii energie',
+      ogType: 'website',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@graph': [
+          { '@type': 'WebApplication', name: 'Calculator fotovoltaic', applicationCategory: 'BusinessApplication', url: `${origin}/${urlLocale}/calculator` },
+          buildBreadcrumbJsonLd(origin, urlLocale, '/calculator'),
+        ],
+      },
+    },
     '/cere-oferta': {
       title: 'Cere ofertă — Solaris CET',
       description: 'Cere ofertă pentru fotovoltaice, acoperișuri sau mentenanță. Revenim rapid cu pașii următori.',
       ogType: 'website',
+    },
+    '/proiecte': {
+      title: 'Proiecte — Solaris CET',
+      description: 'Galerie proiecte: fotovoltaice, acoperișuri și atice/fațade tablă. Vezi lucrări orientative și cere ofertă.',
+      keywords: 'proiecte fotovoltaice, portofoliu, lucrari acoperisuri, tpo, atice, fatade tabla, vaslui',
+      ogType: 'website',
+    },
+    '/portofoliu': {
+      title: 'Portofoliu — Solaris CET',
+      description: 'Galerie proiecte: fotovoltaice, acoperișuri și atice/fațade tablă. Vezi lucrări orientative și cere ofertă.',
+      keywords: 'portofoliu, proiecte fotovoltaice, lucrari acoperisuri, tpo, atice, fatade tabla, vaslui',
+      ogType: 'website',
+    },
+    '/portfolio': {
+      title: 'Portofoliu — Solaris CET',
+      description: 'Portofoliu proiecte: fotovoltaice, acoperișuri și atice/fațade tablă.',
+      ogType: 'website',
+      noindex: true,
+    },
+    '/services': {
+      title: 'Servicii — Solaris CET',
+      description: 'Servicii Solaris CET: fotovoltaice, acoperișuri, atice/fațade tablă, reparații și mentenanță.',
+      ogType: 'website',
+      noindex: true,
     },
     '/multumim': {
       title: 'Mulțumim — Solaris CET',
@@ -161,6 +253,7 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
       title: 'Token CET — Solaris CET',
       description: 'Informații despre tokenul CET și ecosistemul Solaris CET.',
       ogType: 'article',
+      noindex: true,
     },
     '/despre': {
       title: 'Despre noi — Solaris CET',
@@ -212,6 +305,56 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
       title: 'Cookie-uri — Solaris CET',
       description: 'Politica de cookie-uri Solaris CET.',
       ogType: 'article',
+    },
+    '/politica-confidentialitate': {
+      title: 'Confidențialitate — Solaris CET',
+      description: 'Politica de confidențialitate Solaris CET.',
+      ogType: 'article',
+      noindex: true,
+    },
+    '/politica-cookies': {
+      title: 'Cookie-uri — Solaris CET',
+      description: 'Politica de cookie-uri Solaris CET.',
+      ogType: 'article',
+      noindex: true,
+    },
+    '/termeni-si-conditii': {
+      title: 'Termeni — Solaris CET',
+      description: 'Termeni și condiții Solaris CET.',
+      ogType: 'article',
+      noindex: true,
+    },
+    '/despre-noi': {
+      title: 'Despre noi — Solaris CET',
+      description: 'Despre Solaris CET: fotovoltaice, construcții, acoperișuri și mentenanță, cu acoperire în Moldova și național.',
+      ogType: 'article',
+      noindex: true,
+    },
+    '/galerie': {
+      title: 'Portofoliu — Solaris CET',
+      description: 'Galerie proiecte: fotovoltaice, acoperișuri și atice/fațade tablă.',
+      ogType: 'website',
+      noindex: true,
+    },
+    '/vaslui': {
+      title: 'Vaslui — Solaris CET',
+      description: 'Servicii Solaris CET în Vaslui: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță.',
+      ogType: 'website',
+    },
+    '/bacau': {
+      title: 'Bacău — Solaris CET',
+      description: 'Servicii Solaris CET în Bacău: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță.',
+      ogType: 'website',
+    },
+    '/iasi': {
+      title: 'Iași — Solaris CET',
+      description: 'Servicii Solaris CET în Iași: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță.',
+      ogType: 'website',
+    },
+    '/galati': {
+      title: 'Galați — Solaris CET',
+      description: 'Servicii Solaris CET în Galați: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță.',
+      ogType: 'website',
     },
     '/privacy-settings': {
       title: 'Setări cookie — Solaris CET',
@@ -520,6 +663,11 @@ function App() {
   }, [locationKey]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    requestAnimationFrame(() => refreshScrollReveal());
+  }, [routePath]);
+
+  useEffect(() => {
     const origin = typeof window === 'undefined' ? 'https://solaris-cet.com' : window.location.origin;
     const urlLocale =
       typeof window === 'undefined'
@@ -614,15 +762,37 @@ function App() {
           <HomePage />
         ) : routePath === '/servicii' ? (
           <ServicesPage />
+        ) : routePath === '/services' ? (
+          <NotFoundPage attemptedPath={routePath} staticRedirectHref="/servicii" />
+        ) : routePath === '/servicii/atice-fatade-tabla' ? (
+          <ServiceDetailPage slug="atice-si-fatade-tabla" />
+        ) : routePath === '/servicii/reparatii-mentenanta' ? (
+          <ServiceDetailPage slug="reparatii-si-mentenanta" />
         ) : routePath.startsWith('/servicii/') ? (
           <ServiceDetailPage slug={routePath.replace(/^\/servicii\//, '')} />
         ) : routePath === '/contact' ? (
           <ContactPage />
+        ) : routePath === '/calculator' ? (
+          <SolarCalculatorPage />
         ) : routePath === '/cere-oferta' ? (
           <ContactPage />
+        ) : routePath === '/proiecte' || routePath === '/portofoliu' ? (
+          <ProjectsPage />
+        ) : routePath === '/portfolio' ? (
+          <NotFoundPage attemptedPath={routePath} staticRedirectHref="/proiecte" />
+        ) : routePath === '/galerie' ? (
+          <ProjectsPage />
+        ) : routePath === '/vaslui' ? (
+          <LocationPage city="Vaslui" slug="vaslui" />
+        ) : routePath === '/bacau' ? (
+          <LocationPage city="Bacău" slug="bacau" />
+        ) : routePath === '/iasi' ? (
+          <LocationPage city="Iași" slug="iasi" />
+        ) : routePath === '/galati' ? (
+          <LocationPage city="Galați" slug="galati" />
         ) : routePath === '/token-cet' ? (
           <TokenCetPage />
-        ) : routePath === '/despre' || routePath === '/about' ? (
+        ) : routePath === '/despre' || routePath === '/about' || routePath === '/despre-noi' ? (
           <AboutPage />
         ) : routePath === '/finantare' ? (
           <FinancingHubPage />
@@ -646,6 +816,12 @@ function App() {
           <LegalDocPage doc="terms" />
         ) : routePath === '/cookies' ? (
           <LegalDocPage doc="cookies" />
+        ) : routePath === '/politica-confidentialitate' ? (
+          <LegalDocPage doc="privacy" />
+        ) : routePath === '/politica-cookies' ? (
+          <LegalDocPage doc="cookies" />
+        ) : routePath === '/termeni-si-conditii' ? (
+          <LegalDocPage doc="terms" />
         ) : routePath === '/privacy-settings' ? (
           <CookieSettingsPage />
         ) : (

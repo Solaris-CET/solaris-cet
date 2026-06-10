@@ -3,10 +3,10 @@
 exports[`Static cards snapshots > BuildSeal snapshot 1`] = `
 <DocumentFragment>
   <div
-    aria-label="Deployment artifact: short commit unknown, build date . Compare with the repository to verify this deployment."
+    aria-label="Artefact de deployment: commit scurt unknown, dată build . Compară cu depozitul pentru a verifica."
     class="pointer-events-none fixed bottom-4 right-4 z-[200] opacity-30 transition-opacity motion-reduce:transition-none hover:pointer-events-auto hover:opacity-100"
     role="status"
-    title="Deployment artifact: short commit unknown, build date . Compare with the repository to verify this deployment."
+    title="Artefact de deployment: commit scurt unknown, dată build . Compară cu depozitul pentru a verifica."
   >
     <div
       class="rounded border border-white/10 bg-slate-950/90 px-3 py-1 font-mono text-[9px] tracking-widest text-slate-500 shadow-lg backdrop-blur-sm"
@@ -39,11 +39,11 @@ exports[`Static cards snapshots > BuildSeal snapshot 1`] = `
 exports[`Static cards snapshots > HeaderTrustStrip snapshot 1`] = `
 <DocumentFragment>
   <nav
-    aria-label="Third-party audit and verification shortcuts"
+    aria-label="Scurtături audit și verificare terță parte"
     class="flex flex-wrap items-center gap-x-2 gap-y-0.5 max-w-[min(100%,14rem)] justify-end"
   >
     <a
-      aria-label="Cyberscope (opens in new window)"
+      aria-label="Cyberscope (se deschide într-o fereastră nouă)"
       class="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-solaris-muted hover:text-solaris-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solaris-gold/70 rounded-sm transition-colors whitespace-nowrap py-1.5 px-2"
       href="https://www.cyberscope.io/"
       rel="noopener noreferrer"
@@ -58,7 +58,7 @@ exports[`Static cards snapshots > HeaderTrustStrip snapshot 1`] = `
       ·
     </span>
     <a
-      aria-label="Freshcoins (opens in new window)"
+      aria-label="Freshcoins (se deschide într-o fereastră nouă)"
       class="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-solaris-muted hover:text-solaris-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solaris-gold/70 rounded-sm transition-colors whitespace-nowrap py-1.5 px-2"
       href="https://www.freshcoins.io/"
       rel="noopener noreferrer"
@@ -73,7 +73,7 @@ exports[`Static cards snapshots > HeaderTrustStrip snapshot 1`] = `
       ·
     </span>
     <a
-      aria-label="KYC · Whitepaper (opens in new window)"
+      aria-label="KYC · Whitepaper (se deschide într-o fereastră nouă)"
       class="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-solaris-muted hover:text-solaris-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solaris-gold/70 rounded-sm transition-colors whitespace-nowrap py-1.5 px-2"
       href="https://dweb.link/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a"
       rel="noopener noreferrer"

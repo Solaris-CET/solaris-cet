@@ -44,10 +44,10 @@ export default function LegalDocPage({ doc }: { doc: LegalDocKey }) {
 
   return (
     <main id="main-content" className="relative z-10 w-full max-w-4xl mx-auto px-6 pt-28 pb-20">
-      <a href={homeHref} className="text-sm text-solaris-muted hover:text-solaris-text transition-colors">
+      <a href={homeHref} className="text-sm text-solaris-muted hover:text-solaris-text transition-colors" data-reveal>
         {t.nav.home}
       </a>
-      <header className="mt-6">
+      <header className="mt-6" data-reveal-stagger>
         <h1 className="font-display text-3xl md:text-4xl text-solaris-text tracking-tight">{content.frontmatter.title}</h1>
         {content.frontmatter.description ? <p className="mt-3 text-solaris-muted">{content.frontmatter.description}</p> : null}
         {content.frontmatter.lastUpdated ? (
@@ -55,7 +55,7 @@ export default function LegalDocPage({ doc }: { doc: LegalDocKey }) {
         ) : null}
       </header>
 
-      <article className="mt-10">
+      <article className="mt-10" data-reveal>
         <SafeHtml
           html={content.html}
           config={MARKDOWN_HTML_CONFIG}

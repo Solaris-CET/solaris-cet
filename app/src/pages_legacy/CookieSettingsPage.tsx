@@ -25,7 +25,7 @@ export default function CookieSettingsPage() {
 
   return (
     <main id="main-content" className="min-h-screen pt-24 pb-16 px-5 sm:px-8 xl:px-12 bg-slate-950 text-white">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-3xl mx-auto" data-reveal-stagger>
         <h1 className="text-3xl md:text-5xl font-bold tracking-tight">{ui.cookieSettings}</h1>
         <p className="mt-4 text-solaris-muted">
           {ui.bannerBody} <span className="text-solaris-text/90 font-semibold">{summary}</span>
@@ -37,7 +37,7 @@ export default function CookieSettingsPage() {
           </div>
         ) : null}
 
-        <div className="mt-10 space-y-4">
+        <div className="mt-10 space-y-4" data-reveal-stagger>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
             <div className="text-sm font-semibold text-solaris-text">{ui.essentialTitle}</div>
             <div className="mt-2 text-sm text-solaris-muted">{ui.essentialBody}</div>
@@ -70,7 +70,7 @@ export default function CookieSettingsPage() {
             />
           </label>
 
-          <div className="flex flex-wrap gap-3 pt-2">
+          <div className="flex flex-wrap gap-3 pt-2" data-reveal>
             <button
               type="button"
               className="btn-filled-gold text-sm px-5 py-3"

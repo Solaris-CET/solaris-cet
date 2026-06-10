@@ -40,6 +40,6 @@ test.describe('OMEGA sovereign static surface', () => {
     await link.waitFor({ state: 'visible', timeout: 25_000 });
     await link.click();
     await expect(page).toHaveURL(/\/contact/);
-    await expect(page.locator('h1')).toContainText(/Contacta/i);
+    await expect(page.locator('h1')).toContainText(/Contact Solaris/i);
   });
 });
