@@ -2,6 +2,7 @@ import { ArrowLeft, Calendar, MessageCircle, Share2, Tag } from 'lucide-react'
 import { useMemo } from 'react'
 
 import AppImage from '@/components/AppImage'
+import { SolarisFooter } from '@/components/company/SolarisFooter'
 import { CopyButton } from '@/components/CopyButton'
 import { SafeHtml } from '@/components/SafeHtml'
 import { Badge } from '@/components/ui/badge'
@@ -72,22 +73,28 @@ export default function ArticlePage({ slug }: { slug: string }) {
 
   if (!post) {
     return (
-      <main id="main-content" className="relative z-10 w-full px-5 sm:px-8 xl:px-12 pt-28 pb-20">
-        <div className="max-w-4xl mx-auto bento-card p-8 border border-white/10">
-          <div className="text-solaris-text font-semibold">{t.blog.notFoundTitle}</div>
-          <div className="text-solaris-muted text-sm mt-1">{t.blog.notFoundBody}</div>
-          <a href={blogHref} className="btn-filled-gold mt-4 inline-flex">
-            {t.blog.backToBlog}
-          </a>
-        </div>
-      </main>
+      <>
+        <main id="main-content" className="relative z-10 w-full px-5 sm:px-8 xl:px-12 pt-28 pb-20">
+          <div className="max-w-4xl mx-auto bento-card p-8 border border-white/10" data-reveal-stagger>
+            <div className="text-solaris-text font-semibold">{t.blog.notFoundTitle}</div>
+            <div className="text-solaris-muted text-sm mt-1">{t.blog.notFoundBody}</div>
+            <a href={blogHref} className="btn-filled-gold mt-4 inline-flex">
+              {t.blog.backToBlog}
+            </a>
+          </div>
+        </main>
+        <SolarisFooter />
+      </>
     )
   }
 
+  const coverIsIllustration = Boolean(post.frontmatter.coverImageUrl?.includes('text_to_image'))
+
   return (
+    <>
     <main id="main-content" className="relative z-10 w-full px-5 sm:px-8 xl:px-12 pt-28 pb-20">
       <div className="max-w-7xl mx-auto">
-      <div className="mb-6">
+      <div className="mb-6" data-reveal>
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -108,6 +115,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
       <a
         href={blogHref}
         className="inline-flex items-center gap-2 text-sm text-solaris-muted hover:text-solaris-text transition-colors"
+        data-reveal
       >
         <ArrowLeft className="w-4 h-4" aria-hidden />
         {t.blog.backToBlog}
@@ -115,7 +123,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
 
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-10">
         <article className="lg:col-span-8">
-          <header>
+          <header data-reveal-stagger>
             <h1 className="font-display text-4xl md:text-5xl text-solaris-text tracking-tight">{post.frontmatter.title}</h1>
             <p className="mt-3 text-solaris-muted">{post.frontmatter.description}</p>
 
@@ -162,7 +170,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
             </div>
 
             {post.frontmatter.coverImageUrl ? (
-              <div className="mt-8 rounded-3xl overflow-hidden border border-white/10 bg-white/5">
+              <div className="mt-8 rounded-3xl overflow-hidden border border-white/10 bg-white/5 relative">
                 <AppImage
                   src={post.frontmatter.coverImageUrl}
                   alt={post.frontmatter.title}
@@ -171,6 +179,11 @@ export default function ArticlePage({ slug }: { slug: string }) {
                   loading="lazy"
                   className="w-full h-auto"
                 />
+                {coverIsIllustration ? (
+                  <span className="pointer-events-none absolute top-4 left-4 rounded-full border border-white/10 bg-black/45 px-3 py-1 text-[10px] font-bold tracking-wide text-white/80 backdrop-blur">
+                    Ilustrație reprezentativă
+                  </span>
+                ) : null}
               </div>
             ) : null}
 
@@ -200,7 +213,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
             ) : null}
           </header>
 
-          <div className="mt-10">
+          <div className="mt-10" data-reveal>
             <SafeHtml
               html={post.html}
               config={MARKDOWN_HTML_CONFIG}
@@ -215,18 +228,21 @@ export default function ArticlePage({ slug }: { slug: string }) {
         </article>
 
         <aside className="lg:col-span-4">
-          <div className="sticky top-24 space-y-4">
+          <div className="sticky top-24 space-y-4" data-reveal-stagger>
             <div className="rounded-3xl border border-white/10 bg-black/30 p-6">
               <div className="text-solaris-text font-semibold">Solicită ofertă gratuită</div>
               <div className="mt-1 text-solaris-muted text-sm">Vă contactăm în 24 de ore cu pașii următori.</div>
               <a href={localizePathname('/contact', locale)} className="btn-filled-gold mt-4 inline-flex w-full justify-center">
                 {t.nav.requestOffer}
               </a>
+              <a href={localizePathname('/calculator', locale)} className="btn-outline-white mt-3 inline-flex w-full justify-center">
+                Deschide calculatorul
+              </a>
             </div>
 
             <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
               <div className="text-solaris-text font-semibold">Alte articole</div>
-              <div className="mt-4 grid gap-3">
+              <div className="mt-4 grid gap-3" data-reveal-stagger>
                 {otherPosts.map((p) => (
                   <a
                     key={`${p.locale}:${p.slug}`}
@@ -244,5 +260,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
       </div>
       </div>
     </main>
+    <SolarisFooter />
+    </>
   )
 }

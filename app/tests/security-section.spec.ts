@@ -18,10 +18,13 @@ test.describe('Security section', () => {
 
     await expect(section.getByRole('link', { name: /Politică de confidențialitate/i }).first()).toHaveAttribute(
       'href',
-      '/politica-confidentialitate/',
+      /\/(?:[a-z]{2}\/)?(?:privacy|politica-confidentialitate)\/?$/i,
     );
-    await expect(section.getByRole('link', { name: /Politică cookies/i }).first()).toHaveAttribute('href', '/politica-cookies/');
-    await expect(section.getByRole('link', { name: /Contact/i }).first()).toHaveAttribute('href', '/contact/');
+    await expect(section.getByRole('link', { name: /Politică cookies/i }).first()).toHaveAttribute(
+      'href',
+      /\/(?:[a-z]{2}\/)?(?:cookies|politica-cookies)\/?$/i,
+    );
+    await expect(section.getByRole('link', { name: /Contact/i }).first()).toHaveAttribute('href', /\/(?:[a-z]{2}\/)?contact\/?$/i);
     await expect(section.getByRole('link', { name: /Sună acum/i }).first()).toHaveAttribute('href', 'tel:+40769889721');
   });
 

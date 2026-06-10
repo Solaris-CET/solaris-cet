@@ -2,7 +2,7 @@ export default function TokenCetPage() {
   return (
     <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-solaris-offblack text-white">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-16" data-reveal-stagger>
           <div className="inline-flex items-center gap-2 bg-solar-yellow/20 text-solar-yellow px-4 py-2 rounded-full mb-6 border border-solar-yellow/30">
             <span className="text-lg font-black" aria-hidden>
               CET
@@ -25,7 +25,7 @@ export default function TokenCetPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20" data-reveal-stagger>
           {[
             {
               title: 'Reduceri & prioritizare',
@@ -55,7 +55,7 @@ export default function TokenCetPage() {
           ))}
         </div>
 
-        <div className="bg-gradient-to-br from-solar-yellow/10 to-transparent p-10 sm:p-12 rounded-[3rem] border border-solar-yellow/20 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-solar-yellow/10 to-transparent p-10 sm:p-12 rounded-[3rem] border border-solar-yellow/20 relative overflow-hidden" data-reveal>
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold mb-6">Cum funcționează CET</h2>

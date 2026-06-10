@@ -7,7 +7,7 @@ export default function AboutPage() {
   return (
     <main id="main-content" tabIndex={-1} className="pt-24 pb-0 bg-slate-950 text-white">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
-        <section className="rounded-3xl border border-white/10 bg-black/30 p-8 sm:p-10">
+        <section className="rounded-3xl border border-white/10 bg-black/30 p-8 sm:p-10" data-reveal-stagger>
           <div className="text-xs text-slate-400 flex items-center gap-2">
             <a href="/" className="hover:text-white">Acasă</a>
             <ChevronRight className="h-3.5 w-3.5" aria-hidden />
@@ -18,10 +18,22 @@ export default function AboutPage() {
             Specialiști în energie solară și construcții din inima Moldovei. Livrăm proiecte curate, sigure și durabile:
             fotovoltaice, acoperișuri și lucrări de construcții.
           </p>
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {[
+              { label: 'Profil companie', value: 'Execuție tehnică + comunicare clară' },
+              { label: 'Acoperire', value: 'Vaslui și județe apropiate, plus proiecte selectate național' },
+              { label: 'Scop', value: 'Să transformăm cererea în plan de lucru realist, nu în promisiuni vagi' },
+            ].map((item) => (
+              <div key={item.label} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{item.label}</div>
+                <div className="mt-2 text-base font-semibold text-white">{item.value}</div>
+              </div>
+            ))}
+          </div>
         </section>
 
         <section className="mt-14 space-y-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center" data-reveal>
             <div className="lg:col-span-6">
               <h2 className="text-2xl md:text-3xl font-bold">Povestea noastră</h2>
               <p className="mt-3 text-slate-300 leading-relaxed">
@@ -38,24 +50,27 @@ export default function AboutPage() {
               <div className="rounded-3xl overflow-hidden border border-white/10 bg-white/5">
                 <AppImage
                   src="/images/team-placeholder.svg"
-                  alt="Echipă Solaris CET (imagine demonstrativă)"
+                  alt="Ilustrație reprezentativă pentru echipa Solaris CET"
                   className="w-full h-full object-cover"
                   width={1200}
                   height={800}
                   loading="lazy"
                 />
               </div>
+              <div className="mt-3 text-xs leading-relaxed text-slate-400">
+                Imagine reprezentativă. Până la publicarea fotografiilor reale de echipă, preferăm transparența în locul unor imagini care ar putea fi interpretate greșit.
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center" data-reveal>
             <div className="lg:col-span-6 lg:order-2">
               <h2 className="text-2xl md:text-3xl font-bold">Misiunea noastră</h2>
               <p className="mt-3 text-slate-300 leading-relaxed">
                 Misiunea Solaris CET este să aducă soluții eficiente și durabile: proiecte fotovoltaice corect dimensionate
                 și execuție de construcții/învelitori care rezistă în timp. Preferăm calitatea, transparența și responsabilitatea.
               </p>
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4" data-reveal-stagger>
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
                   <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/10 border border-amber-400/20">
                     <Sparkles className="h-5 w-5 text-amber-400" aria-hidden />
@@ -88,7 +103,7 @@ export default function AboutPage() {
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                     <div className="text-xs text-slate-400">Județe deservite frecvent</div>
-                    <ul className="mt-3 space-y-2 text-sm text-slate-200">
+                    <ul className="mt-3 space-y-2 text-sm text-slate-200" data-reveal-stagger>
                       {['Vaslui', 'Bacău', 'Iași', 'Galați', 'Vrancea', 'Botoșani'].map((x) => (
                         <li key={x} className="flex items-center gap-2">
                           <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden />
@@ -122,12 +137,33 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="mt-16">
+        <section className="mt-16" data-reveal-stagger>
+          <h2 className="text-2xl md:text-3xl font-bold">De ce inspirăm încredere</h2>
+          <p className="mt-3 text-slate-300 max-w-3xl">
+            Un site bun de firmă nu înseamnă doar estetică. Înseamnă să înțelegi din 30 de secunde cine execută, cum lucrează și ce primești
+            concret dacă trimiți cererea.
+          </p>
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4" data-reveal-stagger>
+            {[
+              'Folosim limbaj comercial clar: explicăm pașii, nu ascundem complexitatea în spatele expresiilor vagi.',
+              'Pentru fotovoltaice, împingem clientul spre calculator și amortizare, nu direct spre un formular generic.',
+              'Pentru acoperișuri și TPO, oferim criterii simple: tip lucrare, urgență, poze necesare, nivel de intervenție.',
+              'Fiecare pagină importantă are un rol distinct: portofoliu pentru dovadă, servicii pentru claritate, contact pentru conversie.',
+            ].map((item) => (
+              <div key={item} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-black/25 p-5">
+                <BadgeCheck className="mt-0.5 h-5 w-5 text-amber-400" aria-hidden />
+                <div className="text-sm leading-relaxed text-slate-200">{item}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-16" data-reveal-stagger>
           <h2 className="text-2xl md:text-3xl font-bold">Certificări și acreditări</h2>
           <p className="mt-3 text-slate-300 max-w-3xl">
             Folosim practici corecte și ne aliniem cerințelor de siguranță și calitate. Putem furniza documentația necesară la cerere, unde se aplică.
           </p>
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" data-reveal-stagger>
             {[
               { title: 'ANRE', body: 'Atestat / conformitate pentru lucrări PV (unde se aplică).' },
               { title: 'AFM', body: 'Suport pentru programe de finanțare (Casa Verde / ghiduri).' },
@@ -145,10 +181,10 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="mt-16">
+        <section className="mt-16" data-reveal-stagger>
           <h2 className="text-2xl md:text-3xl font-bold">Echipa</h2>
           <p className="mt-3 text-slate-300 max-w-3xl">O echipă compactă, orientată pe execuție și detalii.</p>
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-reveal-stagger>
             {[
               { name: 'Coordonator proiect', role: 'Planificare, ofertare, calitate execuție' },
               { name: 'Tehnician fotovoltaic', role: 'Montaj, punere în funcțiune, verificări' },
@@ -163,7 +199,24 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="mt-16 mb-16 rounded-3xl border border-white/10 bg-amber-400 p-10 text-black">
+        <section className="mt-16 rounded-3xl border border-white/10 bg-black/25 p-8 sm:p-10" data-reveal-stagger>
+          <h2 className="text-2xl md:text-3xl font-bold">Cum lucrăm, pe scurt</h2>
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+            {[
+              { title: '1. Clarificare', body: 'Înțelegem lucrarea, contextul și ce vrei să rezolvi efectiv.' },
+              { title: '2. Verificare', body: 'Cerem poze, consum, localitate sau organizăm evaluarea.' },
+              { title: '3. Ofertă', body: 'Primești o propunere clară, cu pași și nivelul real de intervenție.' },
+              { title: '4. Execuție', body: 'Planificăm realist și livrăm o lucrare curată, cu detalii bine închise.' },
+            ].map((step) => (
+              <div key={step.title} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                <div className="text-sm font-bold text-white">{step.title}</div>
+                <div className="mt-2 text-sm leading-relaxed text-slate-300">{step.body}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-16 mb-16 rounded-3xl border border-white/10 bg-amber-400 p-10 text-black" data-reveal-stagger>
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 text-sm font-bold">
               <MapPin className="h-4 w-4" aria-hidden />

@@ -1,0 +1,60 @@
+.ticker {
+  overflow: hidden;
+  white-space: nowrap;
+  mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+}
+
+.tickerTrack {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5rem;
+  animation: ticker 20s linear infinite;
+  will-change: transform;
+}
+
+.tickerChunk {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5rem;
+  padding-right: 2.5rem;
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.star {
+  transform: scale(0);
+  opacity: 0;
+}
+
+.starsVisible .star {
+  animation: starPop 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes starPop {
+  from {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tickerTrack {
+    animation: none;
+  }
+  .star {
+    transform: none;
+    opacity: 1;
+    animation: none !important;
+  }
+}

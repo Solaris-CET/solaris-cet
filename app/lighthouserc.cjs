@@ -5,7 +5,7 @@
 module.exports = {
   ci: {
     collect: {
-      staticDistDir: './out',
+      staticDistDir: './dist',
       url: ['/index.html'],
       numberOfRuns: 1,
       settings: {

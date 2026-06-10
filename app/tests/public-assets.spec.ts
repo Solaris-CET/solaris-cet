@@ -20,6 +20,6 @@ test.describe('Public assets', () => {
 
   test('contact page is served', async ({ page }) => {
     await page.goto('/contact', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText(/Contacta/i)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/Contact Solaris/i)).toBeVisible({ timeout: 15000 });
   });
 });
