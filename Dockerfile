@@ -22,7 +22,7 @@ COPY api/package.json api/package.json
 COPY cli/package.json cli/package.json
 COPY contracts/package.json contracts/package.json
 COPY scripts/package.json scripts/package.json
-RUN --mount=type=cache,target=/root/.npm HUSKY=0 npm ci --include=dev --legacy-peer-deps
+RUN --mount=type=cache,target=/root/.npm HUSKY=0 npm ci --legacy-peer-deps
 
 # Build prerequisites used by app prebuild script.
 COPY scripts/ scripts/
