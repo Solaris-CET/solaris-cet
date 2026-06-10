@@ -1,9 +1,9 @@
 ---
-title: "DRAFT: Invertor hibrid + baterie — când merită și ce să întrebi în ofertă"
+title: "Invertor hibrid + baterie — când merită și ce să întrebi în ofertă"
 slug: "invertor-hibrid-baterie-cand-merita"
 date: "2026-06-06"
 categoria: "fotovoltaic"
-descriere: "Draft articol: scenarii unde bateria are sens (autoconsum seara, backup parțial), ce limitări există și cum alegi o arhitectură compatibilă."
+descriere: "Scenarii unde bateria are sens, ce limitări există și cum alegi o arhitectură compatibilă cu obiectivul tău real."
 autor: "Solaris CET"
 timp_citire: 5
 tags:
@@ -12,7 +12,7 @@ tags:
   - invertor
 ---
 
-Acest articol este un **draft**. Ideea: bateria poate crește autoconsumul, dar trebuie aleasă corect, altfel costul nu se justifică.
+Bateria poate crește autoconsumul și poate oferi backup parțial, dar trebuie aleasă corect, altfel costul nu se justifică.
 
 ## Când merită bateria
 

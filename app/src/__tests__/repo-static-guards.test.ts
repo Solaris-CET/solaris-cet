@@ -44,7 +44,7 @@ describe("Public discovery — sitemap, security.txt, humans.txt", () => {
     expect(existsSync(hum), "public/humans.txt must ship").toBe(true);
     const humBody = readFileSync(hum, "utf8");
     expect(humBody).toContain(productionSiteUrl());
-    expect(humBody).toContain("github.com/Solaris-CET");
+    expect(humBody).not.toContain("github.com/");
   });
 });
 

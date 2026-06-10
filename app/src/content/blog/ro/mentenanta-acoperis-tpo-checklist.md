@@ -1,9 +1,9 @@
 ---
-title: "DRAFT: Mentenanța acoperișului TPO — checklist 15 minute (1–2 ori/an)"
+title: "Mentenanța acoperișului TPO — checklist 15 minute (1–2 ori/an)"
 slug: "mentenanta-acoperis-tpo-checklist"
 date: "2026-06-06"
 categoria: "acoperisuri"
-descriere: "Draft articol: checklist simplu pentru proprietari/administratori de hale: scurgeri, atice, străpungeri, îmbinări și semne timpurii de infiltrații."
+descriere: "Checklist simplu pentru proprietari și administratori de hale: scurgeri, atice, străpungeri, îmbinări și semne timpurii de infiltrații."
 autor: "Solaris CET"
 timp_citire: 4
 tags:
@@ -12,7 +12,7 @@ tags:
   - mentenanta
 ---
 
-Acest articol este un **draft**. Scopul: un checklist scurt care reduce infiltrațiile și costurile.
+Scopul acestui checklist este să reduci infiltrațiile și costurile printr-o inspecție scurtă, făcută constant.
 
 ## Când faci inspecția
 

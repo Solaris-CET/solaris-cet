@@ -4,7 +4,6 @@ Site: https://solaris-cet.com/
 Contact: mailto:solaris-cet@protonmail.com
 Phone: tel:+40769889721
 Facebook: https://www.facebook.com/STARTUPSOLARCOMPANY/
-Repository: https://github.com/Solaris-CET/solaris-cet
 
 Location: Cetatuia, Vaslui, Romania
 LLM / agent brief: https://solaris-cet.com/llms.txt

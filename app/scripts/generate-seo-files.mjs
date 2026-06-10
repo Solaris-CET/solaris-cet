@@ -146,12 +146,14 @@ async function writeStaticPages() {
   const formspreeEndpoint = String(process.env.VITE_FORMSPREE_ENDPOINT || '').trim()
 
   const contactFormHtml = (() => {
-    const action = formspreeEndpoint || 'mailto:solaris-cet@protonmail.com'
-    const enctype = formspreeEndpoint ? 'application/x-www-form-urlencoded' : 'text/plain'
+    const action = formspreeEndpoint || '/api/support/start'
+    const enctype = 'application/x-www-form-urlencoded'
     const method = formspreeEndpoint ? 'POST' : 'POST'
     const hidden = formspreeEndpoint
       ? `<input type="hidden" name="_subject" value="Solicitare ofertă — Solaris CET" />`
-      : `<input type="hidden" name="subject" value="Solicitare ofertă — Solaris CET" />`
+      : `<input type="hidden" name="pageUrl" value="/contact" />
+                 <input type="hidden" name="consent_version" value="2026-06" />
+                 <input type="text" name="company" tabindex="-1" autocomplete="off" style="position:absolute; left:-9999px; width:1px; height:1px; opacity:0;" aria-hidden="true" />`
 
     return `
           <div style="margin-top: 14px;">
@@ -182,20 +184,32 @@ async function writeStaticPages() {
                   </select>
                 </label>
                 <label>
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Localitate / județ</div>
+                  <input name="location" placeholder="Ex: Vaslui, Iași, Galați" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
+                </label>
+                <label>
                   <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Detalii</div>
                   <textarea name="message" rows="5" required style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;"></textarea>
+                </label>
+                <label style="display:flex; gap:10px; align-items:flex-start;">
+                  <input type="checkbox" name="urgent" value="yes" />
+                  <span style="font-size:13px; color: rgba(255,255,255,.82);">Bifează dacă proiectul este urgent și vrei apel prioritar.</span>
+                </label>
+                <label style="display:flex; gap:10px; align-items:flex-start;">
+                  <input type="checkbox" name="consent" value="yes" required />
+                  <span style="font-size:13px; color: rgba(255,255,255,.82);">Sunt de acord ca Solaris CET să folosească datele trimise pentru a mă contacta privind oferta cerută, conform <a href="/privacy">politicii de confidențialitate</a>.</span>
                 </label>
                 <button type="submit" style="cursor:pointer; border-radius:12px; border:1px solid rgba(245,158,11,.45); background:rgba(245,158,11,.14); color:#fbbf24; font-weight:900; padding:12px 12px;">Trimite</button>
               </div>
               <div style="margin-top:10px; font-size:12px; color: rgba(255,255,255,.65);">
-                Dacă trimiterea nu funcționează, folosește <a href="mailto:solaris-cet@protonmail.com">email</a> sau <a href="tel:+40769889721">telefon</a>.
+                Solicitarea ajunge direct în sistemul nostru intern de ofertare. Dacă trimiterea nu funcționează, folosește <a href="mailto:solaris-cet@protonmail.com">email</a> sau <a href="tel:+40769889721">telefon</a>.
               </div>
             </form>
           </div>
           <div style="margin-top: 14px;">
             <h2 style="font-size: 18px; margin: 0 0 10px;">Hartă</h2>
             <div style="border-radius: 14px; overflow:hidden; border:1px solid rgba(255,255,255,.12);">
-              <iframe title="Hartă Vaslui, România" src="https://www.google.com/maps?q=Vaslui%2C%20Romania&output=embed" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:260px; border:0;"></iframe>
+              <iframe title="Hartă Vaslui, România" src="https://www.openstreetmap.org/export/embed.html?bbox=27.68%2C46.59%2C27.78%2C46.67&layer=mapnik&marker=46.63%2C27.73" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:260px; border:0;"></iframe>
             </div>
           </div>
     `
@@ -1003,22 +1017,22 @@ async function writeStaticPages() {
     ...[
       {
         slug: 'panouri-bifaciale-vs-monocristaline',
-        title: 'DRAFT: Panouri bifaciale vs monocristaline',
+        title: 'Panouri bifaciale vs monocristaline',
       },
       {
         slug: 'mentenanta-acoperis-tpo-checklist',
-        title: 'DRAFT: Mentenanța acoperișului TPO',
+        title: 'Mentenanța acoperișului TPO',
       },
       {
         slug: 'invertor-hibrid-baterie-cand-merita',
-        title: 'DRAFT: Invertor hibrid + baterie',
+        title: 'Invertor hibrid + baterie',
       },
     ].map((x) => ({
       path: `/blog/${x.slug}`,
       title: `${x.title} — Solaris CET`,
-      description: 'Articol în lucru.',
+      description: 'Ghid orientativ publicat în regim de pre-lansare editorială.',
       h1: x.title,
-      bodyLines: ['Acest articol este în lucru.'],
+      bodyLines: ['Acest articol este publicat ca ghid orientativ și se actualizează pe măsură ce adăugăm exemple și date din proiecte reale.'],
       extraHtml: `
           <div style="margin-top: 12px;">
             <p><a href="/blog/${x.slug}">Deschide articolul →</a></p>

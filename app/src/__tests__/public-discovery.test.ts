@@ -33,7 +33,7 @@ describe('Public discovery — sitemap, security.txt, humans.txt', () => {
     expect(existsSync(hum), 'public/humans.txt must ship').toBe(true);
     const humBody = readFileSync(hum, 'utf8');
     expect(humBody).toContain(SITE);
-    expect(humBody).toContain('github.com/Solaris-CET');
+    expect(humBody).not.toContain('github.com/');
     expect(humBody).toContain('STARTUPSOLARCOMPANY');
     expect(humBody).toContain('/llms.txt');
 

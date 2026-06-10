@@ -1,9 +1,9 @@
 ---
-title: "DRAFT: Panouri bifaciale vs. monocristaline — cum alegi corect"
+title: "Panouri bifaciale vs. monocristaline — cum alegi corect"
 slug: "panouri-bifaciale-vs-monocristaline"
 date: "2026-06-06"
 categoria: "fotovoltaic"
-descriere: "Draft articol: diferențe, când merită bifacial, ce condiții trebuie să fie îndeplinite și ce întrebări să pui în ofertă."
+descriere: "Diferențe, condiții reale în care merită bifacialul și întrebările corecte pe care să le pui înainte de ofertare."
 autor: "Solaris CET"
 timp_citire: 5
 tags:
@@ -12,7 +12,7 @@ tags:
   - bifacial
 ---
 
-Acest articol este un **draft** (îl completăm cu exemple și valori orientative). Ideea principală: „bifacial” nu înseamnă automat „mai bun” pentru orice casă.
+Ideea principală este simplă: „bifacial” nu înseamnă automat „mai bun” pentru orice casă sau orice acoperiș.
 
 ## Ce înseamnă panouri bifaciale
 
