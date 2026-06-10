@@ -216,11 +216,31 @@ const services: ServiceDetail[] = [
       { label: 'Rezultat', value: 'protecție anvelopă' },
     ],
     bullets: ['Montaj atice', 'Placări fațade', 'Reparații locale', 'Înlocuiri elemente'],
+    longDescription: [
+      'Lucrările la atice și fațade din tablă par simple în poze, dar diferența reală se vede în muchii, colțuri, dilatări, scurgeri și în felul în care se termină fiecare detaliu. Dacă aceste zone sunt tratate superficial, apar infiltrații, deformări sau un finisaj care arată improvizat chiar din prima lună.',
+      'Pentru Solaris CET, această categorie înseamnă multă atenție la trasare, rigidizare, muchii curate și fixări discrete. Intervenim atât pe lucrări noi, cât și pe refaceri locale: elemente deformate, capace de atic, racorduri, plăci de închidere și zone unde tabla trebuie să protejeze anvelopa, nu doar să „acopere” vizual o problemă.',
+      'Dacă proiectul implică și acoperiș sau TPO, tratăm aticele și fațadele ca parte din ansamblu. Asta înseamnă continuitate la drenaj, compatibilitate între materiale și un rezultat coerent, nu un colaj de intervenții făcute separat.',
+    ],
+    steps: [
+      { title: 'Măsurători & diagnostic', body: 'Verificăm muchiile, racordurile, elementele deformate și modul în care se scurge apa.' },
+      { title: 'Soluție & materiale', body: 'Stabilim tipul de tablă, finisajul, sistemul de fixare și detaliile de protecție.' },
+      { title: 'Execuție', body: 'Trasare, tăieri, plieri, montaj și închidere curată a colțurilor și racordurilor.' },
+      { title: 'Verificare finală', body: 'Control vizual și tehnic pentru muchii, îmbinări și zone expuse la apă și vânt.' },
+    ],
+    pricing: [
+      { label: 'Placări / capace atic', value: 'după măsurători și lungimi', note: 'bugetul depinde de colțuri, înălțimi și acces' },
+      { label: 'Reparații locale', value: 'după evaluare', note: 'intervențiile punctuale pot fi ofertate separat' },
+    ],
+    warranty: [
+      'Garanția depinde de tipul proiectului și de materialele alese.',
+      'Pentru expuneri puternice la vânt sau apă, recomandăm verificări periodice ale muchiilor și racordurilor.',
+    ],
     faq: [
       { question: 'Ce materiale folosiți?', answer: 'În funcție de proiect: tablă cutată/panouri/elemente de anvelopă compatibile.' },
       { question: 'Se pot repara doar zonele afectate?', answer: 'Da. Facem reparații locale sau înlocuiri punctuale unde e realist.' },
       { question: 'Cum arată finisajul?', answer: 'Punem accent pe linii curate, muchii și elemente de fixare discrete.' },
       { question: 'Includeți și etanșări?', answer: 'Da, acolo unde sunt necesare pentru protecția anvelopei.' },
+      { question: 'Lucrați și la detalii de atic pentru acoperișuri plate?', answer: 'Da. Tratăm aticele ca detalii critice pentru drenaj, etanșare și durabilitate.' },
     ],
     contactServiceParam: 'atice-fatade',
   },
@@ -235,11 +255,31 @@ const services: ServiceDetail[] = [
       { label: 'Acoperire', value: 'în funcție de proiect' },
     ],
     bullets: ['Diagnostic + soluție', 'Verificări periodice', 'Intervenții punctuale', 'Plan mentenanță'],
+    longDescription: [
+      'Când apare o infiltrație sau o scădere de producție la sistemul fotovoltaic, tentația este să cauți „cea mai rapidă reparație”. Problema este că intervențiile făcute fără diagnostic clar ajung să coste mai mult: defectul revine, apar daune colaterale sau se schimbă componente care nu erau cauza reală.',
+      'Serviciul nostru de reparații și mentenanță pornește tocmai de la diagnostic. Pentru acoperișuri, căutăm cauza tehnică: scurgere, racord, străpungere, element de tinichigerie, îmbinare TPO sau degradare învelitoare. Pentru fotovoltaice, verificăm contextul: murdărire, umbriri noi, alarmă invertor, cablare, protecții sau parametrizare.',
+      'Scopul nu este doar „să reparăm azi”, ci să îți spunem realist dacă ai nevoie de intervenție punctuală, reparație pe zonă sau plan de mentenanță. Asta este diferența între un serviciu de urgență și unul care chiar protejează investiția în timp.',
+    ],
+    steps: [
+      { title: 'Preluare context', body: 'Primim poze, descrierea problemei, localitatea și, dacă există, istoricul intervențiilor.' },
+      { title: 'Diagnostic', body: 'Identificăm cauza probabilă și stabilim dacă intervenția poate fi punctuală sau necesită evaluare în teren.' },
+      { title: 'Intervenție', body: 'Refacem zona defectă sau corectăm problema tehnică, cu explicații clare despre ce s-a făcut.' },
+      { title: 'Prevenție', body: 'Propunem verificări sau mentenanță periodică acolo unde riscul de reapariție este ridicat.' },
+    ],
+    pricing: [
+      { label: 'Intervenție punctuală', value: 'după diagnostic', note: 'în funcție de acces, zonă și severitatea problemei' },
+      { label: 'Plan mentenanță', value: 'periodic, după tipul proiectului', note: 'util pentru acoperișuri industriale și sisteme PV monitorizate' },
+    ],
+    warranty: [
+      'Explicăm clar ce garantează intervenția și ce ține de starea generală a sistemului sau a acoperișului.',
+      'Pentru proiectele cu uzură extinsă, recomandăm plan etapizat, nu promisiuni nerealiste pe o singură reparație.',
+    ],
     faq: [
       { question: 'În cât timp interveniți?', answer: 'Depinde de locație și urgență; îți confirmăm rapid disponibilitatea.' },
       { question: 'Reparați și lucrări făcute de alții?', answer: 'Da, după evaluare și dacă soluția este tehnic corectă.' },
       { question: 'Faceți mentenanță PV?', answer: 'Da: verificări, curățare la nevoie, diagnostic și remediere.' },
       { question: 'Ce include un plan de mentenanță?', answer: 'Inspecții periodice, checklist, recomandări și intervenții prioritizate.' },
+      { question: 'Puteți spune din poze dacă este urgent?', answer: 'De multe ori da, cel puțin ca triere. Pentru oferta corectă, uneori e necesară verificarea la locație.' },
     ],
     contactServiceParam: 'reparatii',
   },

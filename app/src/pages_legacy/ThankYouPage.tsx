@@ -39,12 +39,10 @@ export default function ThankYouPage() {
           <div className="mt-10 flex flex-col sm:flex-row gap-3" data-reveal>
             <a href="/" className="inline-flex items-center justify-center rounded-2xl bg-amber-400 px-7 py-4 text-black font-black">Înapoi acasă</a>
             <a
-              href="https://facebook.com"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/servicii"
               className="inline-flex items-center justify-center rounded-2xl border border-white/20 px-7 py-4 text-white font-semibold hover:bg-white/5"
             >
-              Urmăriți-ne pe Facebook
+              Vezi serviciile
             </a>
           </div>
         </section>

@@ -242,7 +242,7 @@ async function writeStaticPages() {
       { q: 'Includeți și etanșări?', a: 'Da, acolo unde sunt necesare pentru protecția anvelopei.' },
       { q: 'Cum arată finisajul?', a: 'Punem accent pe linii curate, muchii și elemente de fixare discrete.' },
     ],
-    'reparatii-mentenanta': [
+    'reparatii-si-mentenanta': [
       { q: 'În cât timp interveniți?', a: 'Depinde de locație și urgență; confirmăm rapid disponibilitatea.' },
       { q: 'Reparați și lucrări făcute de alții?', a: 'Da, după evaluare și dacă soluția este tehnic corectă.' },
       { q: 'Ce include un plan de mentenanță?', a: 'Inspecții periodice, checklist, recomandări și intervenții prioritizate.' },
@@ -273,12 +273,15 @@ async function writeStaticPages() {
     {
       path: '/calculator',
       title: 'Calculator fotovoltaic — Solaris CET',
-      description: 'Estimare orientativă: putere sistem, număr panouri, preț estimat, economii și amortizare.',
-      h1: 'Calculator fotovoltaic (estimare)',
-      bodyLines: ['Calculatorul complet este disponibil în aplicație.'],
+      description: 'Calculator web pentru estimarea puterii sistemului, intervalului de cost, economiilor și amortizării.',
+      h1: 'Calculator fotovoltaic cu estimare în browser',
+      bodyLines: [
+        'Introdu consumul lunar, tipul clientului, fazele, bateria și contextul proiectului.',
+        'Pagina estimează direct în browser puterea sistemului, costul orientativ, economia anuală și amortizarea.',
+      ],
       extraHtml: `
         <div style="margin-top: 12px;">
-          <p><a href="/calculator">Deschide calculatorul →</a></p>
+          <p><a href="/calculator">Folosește calculatorul web →</a></p>
         </div>
       `,
       jsonLd: wrapJsonLd([
@@ -292,12 +295,12 @@ async function writeStaticPages() {
     {
       path: '/servicii',
       title: 'Servicii — Solaris CET',
-      description: 'Servicii Solaris CET: fotovoltaice, acoperișuri, atice/fațade tablă, reparații și mentenanță.',
+      description: 'Servicii complete Solaris CET: fotovoltaice, acoperișuri, TPO, atice/fațade și mentenanță, cu pași clari și CTA-uri utile.',
       h1: 'Servicii Solaris CET',
       bodyLines: [
-        'Alege serviciul potrivit: fotovoltaice rezidențiale/industriale, acoperișuri, atice/fațade, reparații și mentenanță.',
-        'Lucrăm pe baza unei evaluări tehnice (telefon + poze, apoi vizită după caz), ofertă clară și execuție cu detalii curate.',
-        'Pentru ofertă: locație, tip acoperiș/structură, consum (facturi) și termenul dorit.',
+        'Alege serviciul potrivit și vezi ce include, pentru cine este potrivit și care este pasul următor corect.',
+        'Nu trimitem clientul într-un formular generic fără context: pentru fotovoltaice există calculator, iar pentru restul lucrărilor cerem datele minime utile.',
+        'Pentru ofertă bună: localitate, poze, consum sau suprafață aproximativă și termenul dorit.',
       ],
       jsonLd: wrapJsonLd([
         {
@@ -309,7 +312,7 @@ async function writeStaticPages() {
             { '@type': 'ListItem', position: 3, name: 'Acoperișuri tablă/țiglă', url: `${origin}/servicii/acoperisuri-tabla-tigla/` },
             { '@type': 'ListItem', position: 4, name: 'Acoperișuri industriale TPO', url: `${origin}/servicii/acoperisuri-industriale-tpo/` },
             { '@type': 'ListItem', position: 5, name: 'Atice și fațade tablă', url: `${origin}/servicii/atice-si-fatade-tabla/` },
-            { '@type': 'ListItem', position: 6, name: 'Reparații și mentenanță', url: `${origin}/servicii/reparatii-mentenanta/` },
+            { '@type': 'ListItem', position: 6, name: 'Reparații și mentenanță', url: `${origin}/servicii/reparatii-si-mentenanta/` },
           ],
         },
         breadcrumb([
@@ -513,7 +516,7 @@ async function writeStaticPages() {
       ]),
     },
     {
-      path: '/servicii/reparatii-mentenanta',
+      path: '/servicii/reparatii-si-mentenanta',
       title: 'Reparații și Mentenanță Acoperiș — Solaris CET',
       description: 'Reparații acoperiș: infiltrații, jgheaburi, curățare și inspecție anuală.',
       h1: 'Reparații și Mentenanță Acoperiș — Intervenții rapide',
@@ -528,11 +531,11 @@ async function writeStaticPages() {
           name: 'Reparații și mentenanță',
           provider: localBusiness,
           areaServed: 'RO',
-          url: `${origin}/servicii/reparatii-mentenanta/`,
+          url: `${origin}/servicii/reparatii-si-mentenanta/`,
         },
         {
           '@type': 'FAQPage',
-          mainEntity: serviceFaq['reparatii-mentenanta'].map((x) => ({
+          mainEntity: serviceFaq['reparatii-si-mentenanta'].map((x) => ({
             '@type': 'Question',
             name: x.q,
             acceptedAnswer: { '@type': 'Answer', text: x.a },
@@ -541,7 +544,24 @@ async function writeStaticPages() {
         breadcrumb([
           { name: 'Acasă', path: '/' },
           { name: 'Servicii', path: '/servicii' },
-          { name: 'Reparații și mentenanță', path: '/servicii/reparatii-mentenanta' },
+          { name: 'Reparații și mentenanță', path: '/servicii/reparatii-si-mentenanta' },
+        ]),
+      ]),
+    },
+    {
+      path: '/servicii/reparatii-mentenanta',
+      title: 'Reparații și Mentenanță Acoperiș — Solaris CET',
+      description: 'Pagina s-a mutat.',
+      h1: 'Pagina s-a mutat',
+      bodyLines: ['Folosește noua adresă pentru acest serviciu.'],
+      canonicalPath: '/servicii/reparatii-si-mentenanta/',
+      redirectTo: '/servicii/reparatii-si-mentenanta/',
+      noindex: true,
+      jsonLd: wrapJsonLd([
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Servicii', path: '/servicii' },
+          { name: 'Reparații și mentenanță', path: '/servicii/reparatii-si-mentenanta' },
         ]),
       ]),
     },
@@ -571,23 +591,13 @@ async function writeStaticPages() {
     {
       path: '/portofoliu',
       title: 'Portofoliu — Solaris CET',
-      description: 'Portofoliu proiecte: fotovoltaice, acoperișuri, fațade și lucrări diverse.',
-      h1: 'Portofoliu Solaris CET',
-      bodyLines: [
-        'Selecție orientativă de lucrări reprezentative: fotovoltaice, acoperișuri și detalii de anvelopă.',
-        'La cerere, îți trimitem poze reale din proiecte similare (WhatsApp) și te ajutăm să alegi soluția potrivită pentru casa/afacerea ta.',
-      ],
-      jsonLd: wrapJsonLd([
-        {
-          '@type': 'CollectionPage',
-          name: 'Portofoliu Solaris CET',
-          url: `${origin}/portofoliu/`,
-        },
-        breadcrumb([
-          { name: 'Acasă', path: '/' },
-          { name: 'Portofoliu', path: '/portofoliu' },
-        ]),
-      ]),
+      description: 'Pagina s-a mutat.',
+      h1: 'Pagina s-a mutat',
+      bodyLines: ['Portofoliul principal este disponibil la /proiecte/.'],
+      canonicalPath: '/proiecte/',
+      redirectTo: '/proiecte/',
+      noindex: true,
+      jsonLd: wrapJsonLd([breadcrumb([{ name: 'Acasă', path: '/' }, { name: 'Portofoliu', path: '/proiecte' }])]),
     },
     {
       path: '/faq',
@@ -634,20 +644,20 @@ async function writeStaticPages() {
     {
       path: '/blog',
       title: 'Blog — Solaris CET',
-      description: 'Articole utile despre fotovoltaice, acoperișuri, mentenanță și finanțare.',
+      description: 'Articole reale și ghiduri practice despre costuri, finanțare, mentenanță și alegerea sistemului potrivit.',
       h1: 'Blog Solaris CET',
       bodyLines: [
-        'Articole utile pentru clienți (fotovoltaice, acoperișuri, mentenanță și finanțare).',
-        'Dacă vrei o recomandare pentru cazul tău, cere ofertă și îți răspundem cu pașii următori.',
+        'Articole și ghiduri care ajută clientul să ia o decizie mai bună înainte de ofertare.',
+        'Fiecare material trimite spre calculator, serviciul relevant sau contactul scurt, nu rămâne o simplă listă de subiecte.',
       ],
       extraHtml: `
           <div style="margin-top: 12px;">
             <h2 style="font-size: 18px; margin: 0 0 10px;">Subiecte populare</h2>
             <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
-              <li>Cum alegi puterea unui sistem (3–6 kW, 6–12 kW, hibrid).</li>
-              <li>Diferența dintre autoconsum și baterie.</li>
-              <li>Mentenanță: ce verifici anual la un acoperiș (tablă/țiglă/TPO).</li>
-              <li>Finanțare: pași orientativi pentru programe populare.</li>
+              <li><a href="/blog/cat-costa-un-sistem-fotovoltaic-2026">Cât costă un sistem fotovoltaic în 2026</a></li>
+              <li><a href="/blog/cum-accesezi-programul-casa-verde">Cum accesezi programul Casa Verde</a></li>
+              <li><a href="/blog/tpo-vs-membrana-clasica">Avantaje acoperiș TPO vs membrană clasică</a></li>
+              <li><a href="/blog/mentenanta-panouri-fotovoltaice">Mentenanța panourilor fotovoltaice</a></li>
             </ul>
           </div>
       `,
@@ -959,7 +969,7 @@ async function writeSitemap() {
     '/servicii/acoperisuri-tabla-tigla',
     '/servicii/acoperisuri-industriale-tpo',
     '/servicii/atice-si-fatade-tabla',
-    '/servicii/reparatii-mentenanta',
+    '/servicii/reparatii-si-mentenanta',
     '/contact',
     '/calculator',
     '/despre',

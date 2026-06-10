@@ -1463,7 +1463,7 @@ const agenticEngineUiRo = {
 };
 
 const hierarchyGraphUiEn = {
-  title: 'DECISION MAP (MERMAID)',
+  title: 'SOLAR DECISION MAP',
   render: 'Render',
   rendered: 'Rendered',
   clipboardUnavailable: 'Clipboard unavailable',
@@ -1472,20 +1472,20 @@ const hierarchyGraphUiEn = {
   ariaCopyGraph: 'Copy Mermaid graph',
   ariaOpenMermaid: 'Open Mermaid Live Editor',
   graphUnavailable: 'Mermaid graph unavailable right now.',
-  renderOptional: 'Render is optional to keep performance tight. Use the Render button if you want the SVG.',
+  renderOptional: 'Interactive rendering is optional. Open the source below to review the decision logic.',
   source: 'Source',
   expand: 'expand',
   collapse: 'collapse',
-  localUserAsks: 'User asks',
-  localIsWalletConnected: 'Wallet connected?',
-  localShowBalance: 'Show CET balance / staking options',
-  localShowConnect: 'Show connect wallet',
-  localNextActions: 'Show next actions: Buy / Stake / Learn',
-  localLinks: 'Show links + calculators',
+  localUserAsks: 'Client asks',
+  localIsWalletConnected: 'Residential or business project?',
+  localShowBalance: 'Residential: check roof, monthly use, battery and payback',
+  localShowConnect: 'Business: check load profile, roof type and implementation stages',
+  localNextActions: 'Recommend system size, budget range and next step',
+  localLinks: 'Open calculator / services / contact',
 };
 
 const hierarchyGraphUiRo = {
-  title: 'HARTĂ DECIZIE (MERMAID)',
+  title: 'HARTĂ DE DECIZIE SOLARĂ',
   render: 'Randează',
   rendered: 'Randat',
   clipboardUnavailable: 'Clipboard indisponibil',
@@ -1494,16 +1494,16 @@ const hierarchyGraphUiRo = {
   ariaCopyGraph: 'Copiază graful Mermaid',
   ariaOpenMermaid: 'Deschide Mermaid Live Editor',
   graphUnavailable: 'Graful Mermaid este indisponibil momentan.',
-  renderOptional: 'Randarea este opțională pentru performanță. Folosește butonul Randează dacă vrei SVG-ul.',
+  renderOptional: 'Randarea interactivă este opțională. Deschide sursa de mai jos pentru a vedea logica deciziei.',
   source: 'Sursă',
   expand: 'extinde',
   collapse: 'restrânge',
-  localUserAsks: 'Utilizatorul întreabă',
-  localIsWalletConnected: 'Portofel conectat?',
-  localShowBalance: 'Arată soldul CET / opțiuni de staking',
-  localShowConnect: 'Arată conectarea portofelului',
-  localNextActions: 'Arată acțiunile următoare: Cumpără / Staking / Învață',
-  localLinks: 'Arată linkuri + calculatoare',
+  localUserAsks: 'Clientul întreabă',
+  localIsWalletConnected: 'Proiect rezidențial sau business?',
+  localShowBalance: 'Rezidențial: verifică acoperișul, consumul lunar, bateria și amortizarea',
+  localShowConnect: 'Business: verifică profilul de consum, tipul acoperișului și etapele de execuție',
+  localNextActions: 'Recomandă puterea sistemului, bugetul și pasul următor',
+  localLinks: 'Trimite spre calculator / servicii / contact',
 };
 
 const resourcesUiEn = {

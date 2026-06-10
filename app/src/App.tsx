@@ -766,6 +766,8 @@ function App() {
           <NotFoundPage attemptedPath={routePath} staticRedirectHref="/servicii" />
         ) : routePath === '/servicii/atice-fatade-tabla' ? (
           <ServiceDetailPage slug="atice-si-fatade-tabla" />
+        ) : routePath === '/servicii/reparatii-mentenanta' ? (
+          <ServiceDetailPage slug="reparatii-si-mentenanta" />
         ) : routePath.startsWith('/servicii/') ? (
           <ServiceDetailPage slug={routePath.replace(/^\/servicii\//, '')} />
         ) : routePath === '/contact' ? (
