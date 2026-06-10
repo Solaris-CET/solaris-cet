@@ -1,0 +1,56 @@
+.bar {
+  transition:
+    height 250ms cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 250ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.indicator {
+  transition:
+    transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
+    width 300ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 180ms ease-out;
+  will-change: transform, width, opacity;
+}
+
+.pulseRing {
+  animation: pulse-ring 1.8s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(251, 146, 60, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 12px rgba(251, 146, 60, 0);
+  }
+}
+
+.overlayItem {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+  animation: overlay-in 520ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes overlay-in {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indicator {
+    transition: none;
+  }
+  .pulseRing {
+    animation: none;
+  }
+  .overlayItem {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
+

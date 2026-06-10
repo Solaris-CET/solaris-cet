@@ -1,13 +1,10 @@
-import { ArrowRight, BadgeCheck, Phone } from 'lucide-react';
-import { type CSSProperties, lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { ArrowRight, BadgeCheck } from 'lucide-react';
+import { type CSSProperties, useEffect, useMemo, useState } from 'react';
 
-import AppImage from '@/components/AppImage';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
-import { useDesktop3DEligible } from '@/hooks/useDesktop3DEligible';
 
 import styles from './HeroSolaris.module.css';
 
-const HeroTokenHologram = lazy(() => import('@/experience/HeroTokenHologram'));
 
 type Particle = {
   size: number;
@@ -193,24 +190,72 @@ export default function HeroSection() {
     freezeOnceVisible: true,
   });
 
-  const { elementRef: visualRef, isVisible: visualVisible } = useIntersectionObserver<HTMLDivElement>({
-    threshold: 0.1,
-    rootMargin: '200px 0px',
-    freezeOnceVisible: true,
-  });
+  const projects = useCountUp({ to: 200, enabled: isVisible });
+  const years = useCountUp({ to: 5, enabled: isVisible, durationMs: 650 });
 
-  const desktop3DEligible = useDesktop3DEligible();
-  const [show3D, setShow3D] = useState(false);
+  const fullTagline = 'Fotovoltaice · Acoperișuri · Construcții';
+  const [typed, setTyped] = useState('');
 
   useEffect(() => {
-    if (!desktop3DEligible) return;
-    if (!visualVisible) return;
-    setShow3D(true);
-  }, [desktop3DEligible, visualVisible]);
+    const reduceMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const projects = useCountUp({ to: 50, enabled: isVisible });
-  const kw = useCountUp({ to: 750, enabled: isVisible });
-  const counties = useCountUp({ to: 12, enabled: isVisible });
+    if (reduceMotion) {
+      setTyped(fullTagline);
+      return;
+    }
+
+    let i = 0;
+    let timer = 0;
+    let pause = 0;
+
+    const tick = () => {
+      if (pause > 0) {
+        pause -= 1;
+        timer = window.setTimeout(tick, 120);
+        return;
+      }
+
+      i += 1;
+      setTyped(fullTagline.slice(0, i));
+      if (i >= fullTagline.length) {
+        pause = 16;
+        i = 0;
+      }
+      timer = window.setTimeout(tick, 42);
+    };
+
+    timer = window.setTimeout(tick, 240);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const rays = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, idx) => {
+        const angle = (idx / 12) * Math.PI * 2 - Math.PI * 0.18;
+        const cx = 600;
+        const cy = 350;
+        const r0 = 90;
+        const r1 = 520;
+        const x1 = cx + Math.cos(angle) * r0;
+        const y1 = cy + Math.sin(angle) * r0;
+        const x2 = cx + Math.cos(angle) * r1;
+        const y2 = cy + Math.sin(angle) * r1;
+        const baseOpacity = 0.08 + (idx % 4) * 0.04;
+        return {
+          key: idx,
+          x1,
+          y1,
+          x2,
+          y2,
+          opacity: Math.min(0.25, baseOpacity),
+          delay: `${idx * 0.08}s`,
+        };
+      }),
+    [],
+  );
 
   return (
     <section className={`relative overflow-hidden ${styles.hero}`}>
@@ -235,122 +280,95 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#05060B] via-[#05060B]/50 to-transparent" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-5 sm:px-8 xl:px-12 pt-24 sm:pt-28 pb-10 sm:pb-14">
-        <div className={styles.diagonalSplit} aria-hidden />
+      <svg className={styles.rays} viewBox="0 0 1000 800" preserveAspectRatio="none" aria-hidden>
+        {rays.map((r) => (
+          <line
+            key={r.key}
+            x1={r.x1}
+            y1={r.y1}
+            x2={r.x2}
+            y2={r.y2}
+            stroke={`rgba(242,201,76,${r.opacity})`}
+            strokeWidth="1"
+            className={styles.ray}
+            style={{ ['--delay' as never]: r.delay } as CSSProperties}
+          />
+        ))}
+      </svg>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center min-h-[calc(100svh-7rem)]">
-          <div className="lg:col-span-6">
-            <div
-              className={`inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-semibold tracking-wider text-white/85 ${styles.fadeUp}`}
-              style={{ animationDelay: '0.2s' }}
-            >
-              <span className="h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_18px_rgba(245,158,11,0.55)]" />
-              SOLUȚII COMPLETE · EXECUȚIE PROFESIONISTĂ
-            </div>
-
-            <h1
-              className={`mt-6 font-display font-bold leading-[1.02] tracking-[-0.04em] text-white text-[2rem] sm:text-[2.6rem] lg:text-[3.5rem] ${styles.fadeUp}`}
-              style={{ animationDelay: '0.4s' }}
-            >
-              Solaris <span className="text-amber-400">CET</span> —
-              <span className={`ml-2 ${styles.gradientWord}`}>fotovoltaice</span> și acoperișuri care arată impecabil
-            </h1>
-
-            <p
-              className={`mt-5 text-[1.05rem] leading-relaxed text-slate-300 max-w-xl ${styles.fadeUp}`}
-              style={{ animationDelay: '0.55s' }}
-            >
-              Instalăm sisteme fotovoltaice, executăm lucrări de construcții și realizăm acoperișuri tablă/țiglă/folie TPO,
-              atice și fațade din tablă, plus reparații și mentenanță.
-            </p>
-
-            <div className={`mt-8 flex flex-col sm:flex-row gap-4 ${styles.fadeUp}`} style={{ animationDelay: '0.7s' }}>
-              <a
-                href="/contact"
-                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-7 py-4 text-base font-black text-black shadow-[0_18px_60px_rgba(245,158,11,0.18)] transition-transform will-change-transform hover:-translate-y-0.5 active:translate-y-0"
-              >
-                Cere ofertă gratuită
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
-              </a>
-
-              <a
-                href="tel:+40769889721"
-                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl border border-white/35 bg-white/0 px-7 py-4 text-base font-bold text-white transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
-                aria-label="Sună acum la +40 769 889 721"
-              >
-                <Phone className="h-4 w-4" aria-hidden />
-                Sună acum
-              </a>
-            </div>
-
-            <div className={`mt-7 text-sm text-white/70 ${styles.fadeUp}`} style={{ animationDelay: '0.85s' }}>
-              <a
-                className="hover:text-white underline underline-offset-4 decoration-white/20 hover:decoration-white/60"
-                href="mailto:solaris-cet@protonmail.com"
-              >
-                solaris-cet@protonmail.com
-              </a>
-              <span className="mx-2 text-white/35">•</span>
-              <span className="text-white/60">Acoperire națională</span>
-            </div>
+      <div className="relative mx-auto max-w-7xl px-5 sm:px-8 xl:px-12 pt-24 sm:pt-28 pb-14">
+        <div className="min-h-[85svh] md:min-h-[100svh] flex flex-col justify-center">
+          <div
+            className={`inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-semibold tracking-wider text-white/85 backdrop-blur ${styles.fadeUp}`}
+            style={{ animationDelay: '0.2s' }}
+          >
+            <span className="h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_18px_rgba(245,158,11,0.55)]" />
+            SOLUȚII COMPLETE · EXECUȚIE PROFESIONISTĂ
           </div>
 
-          <div className="lg:col-span-6 relative">
-            <div className="relative">
-              <div
-                className="absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-amber-400/15 via-orange-500/5 to-transparent blur-2xl"
-                aria-hidden
-              />
+          <h1 className={`mt-7 leading-[0.92] tracking-[-0.05em] text-white ${styles.fadeUp}`} style={{ animationDelay: '0.35s' }}>
+            <span className={`block font-black ${styles.heroSerif} text-[2.4rem] sm:text-[3.1rem] md:text-[4.0rem] lg:text-[4.4rem]`}>
+              Instalații fotovoltaice
+            </span>
+            <span className={`mt-1 block font-black ${styles.heroSerif} text-[2.1rem] sm:text-[2.7rem] md:text-[3.4rem] lg:text-[3.8rem]`}>
+              și acoperișuri
+            </span>
+            <span className="mt-3 block text-base sm:text-lg font-extrabold tracking-wide text-amber-300">
+              Solaris CET · Vaslui · România
+            </span>
+          </h1>
 
-              <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-black/20">
-                <div ref={visualRef} className={`relative aspect-[4/3] w-full ${styles.clipImage}`}>
-                  <AppImage
-                    src="/images/hero-solaris.svg"
-                    alt="Montaj fotovoltaic și acoperișuri executate profesional"
-                    className={`h-full w-full object-cover transition-opacity duration-500 ${show3D ? 'opacity-30' : 'opacity-100'}`}
-                    width={1600}
-                    height={1200}
-                    loading="eager"
-                    fetchPriority="high"
-                  />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/55 via-black/10 to-transparent" aria-hidden />
-                  {show3D ? (
-                    <Suspense fallback={null}>
-                      <HeroTokenHologram quality="high" seed={0.62} />
-                    </Suspense>
-                  ) : null}
-                </div>
-
-                <div className="absolute inset-0 bg-gradient-to-tr from-[#05060B]/70 via-transparent to-transparent" aria-hidden />
-
-                <div
-                  className={`absolute left-5 top-5 inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 text-sm font-semibold text-white backdrop-blur ${styles.badgePulse}`}
-                >
-                  <BadgeCheck className="h-5 w-5 text-amber-400" aria-hidden />
-                  <span>Atestat ANRE</span>
-                </div>
-              </div>
-            </div>
+          <div className={`mt-5 text-[1.2rem] sm:text-[1.35rem] text-slate-200 ${styles.fadeUp}`} style={{ animationDelay: '0.5s' }}>
+            <span className={styles.typewriter}>
+              <span className="font-semibold">{typed}</span>
+              <span className={styles.caret} aria-hidden />
+            </span>
           </div>
-        </div>
 
-        <div ref={elementRef} className="mt-10 sm:mt-12">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 rounded-3xl border border-white/10 bg-white/5 px-6 py-6 backdrop-blur">
-            <div className="text-center sm:text-left">
-              <div className="text-3xl font-black text-white tabular-nums">{projects}+</div>
-              <div className="mt-1 text-sm font-semibold text-slate-300">proiecte</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-black text-white tabular-nums">{kw} kW</div>
-              <div className="mt-1 text-sm font-semibold text-slate-300">instalați</div>
-            </div>
-            <div className="text-center sm:text-right">
-              <div className="text-3xl font-black text-white tabular-nums">{counties}</div>
-              <div className="mt-1 text-sm font-semibold text-slate-300">județe</div>
-            </div>
+          <p className={`mt-5 text-[1.05rem] leading-relaxed text-slate-300 max-w-2xl ${styles.fadeUp}`} style={{ animationDelay: '0.6s' }}>
+            Instalații fotovoltaice, acoperișuri (tablă / țiglă / TPO), lucrări de construcții, atice & fațade din tablă, plus reparații și mentenanță.
+          </p>
+
+          <div className={`mt-8 flex flex-col sm:flex-row gap-4 ${styles.fadeUp}`} style={{ animationDelay: '0.75s' }}>
+            <a
+              href="/contact"
+              className="group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-7 py-4 text-base font-black text-black shadow-[0_18px_60px_rgba(245,158,11,0.18)] transition-transform will-change-transform hover:-translate-y-0.5 active:translate-y-0"
+            >
+              Cere ofertă
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+            </a>
+
+            <a
+              href="/servicii"
+              className="inline-flex w-full sm:w-auto items-center justify-center rounded-2xl border border-white/35 bg-white/0 px-7 py-4 text-base font-bold text-white transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
+            >
+              Servicii
+            </a>
           </div>
-          <div className="mt-3 text-xs text-slate-400">
-            Valorile sunt orientative și se actualizează pe baza portofoliului curent.
+
+          <div
+            ref={elementRef}
+            data-reveal-stagger
+            className={`mt-8 flex flex-wrap gap-3 ${styles.fadeUp}`}
+            style={{ animationDelay: '0.9s' }}
+          >
+            <div className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur">
+              <div className="text-base font-black text-white tabular-nums">{projects}+</div>
+              <div className="text-sm font-semibold text-slate-200">Proiecte</div>
+            </div>
+            <div className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur">
+              <div className="text-sm font-black text-white">Vaslui</div>
+              <div className="text-sm text-white/55">·</div>
+              <div className="text-sm font-bold text-slate-200">toată România</div>
+            </div>
+            <div className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur">
+              <div className="text-base font-black text-white tabular-nums">{years}</div>
+              <div className="text-sm font-semibold text-slate-200">ani experiență</div>
+            </div>
+            <div className={`inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm font-semibold text-white backdrop-blur ${styles.badgePulse}`}>
+              <BadgeCheck className="h-5 w-5 text-amber-400" aria-hidden />
+              <span>Atestat ANRE</span>
+            </div>
           </div>
         </div>
       </div>

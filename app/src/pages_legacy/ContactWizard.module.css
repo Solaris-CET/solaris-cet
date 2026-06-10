@@ -1,0 +1,105 @@
+.track {
+  display: flex;
+  width: 300%;
+  transition: transform 350ms ease;
+  will-change: transform;
+}
+
+.progressFill {
+  transition: width 400ms ease;
+}
+
+.dot {
+  transition:
+    background-color 220ms ease,
+    transform 220ms ease,
+    opacity 220ms ease;
+}
+
+.checkPath {
+  stroke-dasharray: 80;
+  stroke-dashoffset: 80;
+  transition: stroke-dashoffset 320ms ease;
+}
+
+.checkValid {
+  stroke-dashoffset: 0;
+}
+
+.shake {
+  animation: shake 420ms ease;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  20% {
+    transform: translate3d(-6px, 0, 0);
+  }
+  40% {
+    transform: translate3d(6px, 0, 0);
+  }
+  60% {
+    transform: translate3d(-4px, 0, 0);
+  }
+  80% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+.confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confettiPiece {
+  position: absolute;
+  left: 50%;
+  top: 44px;
+  width: 7px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--c);
+  opacity: 0;
+  transform: translate3d(0, 0, 0) rotate(var(--r));
+  animation: confetti 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: var(--d);
+}
+
+@keyframes confetti {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(var(--r));
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--dx), var(--dy), 0) rotate(calc(var(--r) + 220deg));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    transition: none;
+  }
+  .progressFill {
+    transition: none;
+  }
+  .dot {
+    transition: none;
+  }
+  .checkPath {
+    transition: none;
+  }
+  .shake {
+    animation: none;
+  }
+  .confettiPiece {
+    animation: none;
+    opacity: 0;
+  }
+}
+

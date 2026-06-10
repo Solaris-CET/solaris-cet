@@ -133,7 +133,7 @@ export default function EquipmentPartnersSection() {
       </div>
 
       <div className="relative mx-auto max-w-7xl px-5 sm:px-8 xl:px-12">
-        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between" data-reveal-stagger>
           <div className="max-w-2xl">
             <h2 className="text-3xl font-bold text-white md:text-5xl">Echipamente & parteneri</h2>
             <p className="mt-5 text-lg leading-relaxed text-slate-300">
@@ -149,8 +149,8 @@ export default function EquipmentPartnersSection() {
           </a>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
-          <div className="lg:col-span-5">
+        <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12" data-reveal-stagger>
+          <div className="lg:col-span-5" data-reveal-stagger>
             <div className="rounded-3xl border border-white/10 bg-white/5 p-7 backdrop-blur">
               <div className="text-sm font-semibold uppercase tracking-wider text-white/80">Branduri / furnizori</div>
               <div className="mt-3 text-sm leading-relaxed text-slate-300">
@@ -226,7 +226,7 @@ export default function EquipmentPartnersSection() {
           </div>
 
           <div className="lg:col-span-7">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3" data-reveal-stagger>
               {showcase.map((x) => (
                 <div key={x.title} className="group relative overflow-hidden rounded-3xl border border-white/10 bg-black/20">
                   <div className="aspect-[16/10] w-full overflow-hidden">
@@ -248,7 +248,7 @@ export default function EquipmentPartnersSection() {
               ))}
             </div>
 
-            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2" data-reveal-stagger>
               {equipment.map((e) => {
                 const Icon = e.icon;
                 return (

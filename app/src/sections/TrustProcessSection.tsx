@@ -50,14 +50,14 @@ export default function TrustProcessSection() {
       </div>
 
       <div className="relative mx-auto max-w-7xl px-5 sm:px-8 xl:px-12">
-        <div className="max-w-3xl">
+        <div className="max-w-3xl" data-reveal>
           <h2 className="text-3xl font-bold text-white md:text-5xl">Proces simplu. Execuție curată.</h2>
           <p className="mt-4 text-lg leading-relaxed text-slate-300">
             Îți arătăm pașii, apoi livrăm: fotovoltaice și acoperișuri cu detalii corecte, fără improvizații.
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4" data-reveal-stagger>
           {steps.map((s) => {
             const Icon = s.icon;
             return (
@@ -81,7 +81,7 @@ export default function TrustProcessSection() {
           })}
         </div>
 
-        <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3" data-reveal-stagger>
           {promiseCards.map((p) => {
             const Icon = p.icon;
             return (
@@ -100,7 +100,7 @@ export default function TrustProcessSection() {
           })}
         </div>
 
-        <div className="mt-10 flex flex-wrap gap-3">
+        <div className="mt-10 flex flex-wrap gap-3" data-reveal>
           <a href="/contact" className="btn-filled-gold inline-flex items-center gap-2">
             Cere ofertă
             <span aria-hidden>→</span>
@@ -114,4 +114,3 @@ export default function TrustProcessSection() {
     </section>
   );
 }
-

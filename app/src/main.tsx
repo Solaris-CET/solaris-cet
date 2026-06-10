@@ -1,16 +1,21 @@
 // Entry: Vite + React SPA (production: Coolify → solaris-cet.com).
 import './polyfills'
 import './index.css'
+import './css/type.css'
+import './css/reveal.css'
 
-const scheduleSyneFonts = () => {
+const scheduleEditorialFonts = () => {
   const w = window as unknown as {
     requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
     cancelIdleCallback?: (id: number) => void;
   };
   const load = () => {
-    void import('@fontsource/syne/latin-400.css');
-    void import('@fontsource/syne/latin-600.css');
-    void import('@fontsource/syne/latin-700.css');
+    void import('@fontsource/dm-sans/latin-400.css');
+    void import('@fontsource/dm-sans/latin-500.css');
+    void import('@fontsource/dm-sans/latin-700.css');
+    void import('@fontsource/playfair-display/latin-400.css');
+    void import('@fontsource/playfair-display/latin-700.css');
+    void import('@fontsource/playfair-display/latin-900.css');
   };
   if (typeof w.requestIdleCallback === 'function') {
     w.requestIdleCallback(load, { timeout: 2500 });
@@ -21,9 +26,9 @@ const scheduleSyneFonts = () => {
 
 if (typeof window !== 'undefined' && import.meta.env.VITE_LHCI !== '1') {
   if (document.readyState === 'complete') {
-    scheduleSyneFonts();
+    scheduleEditorialFonts();
   } else {
-    window.addEventListener('load', scheduleSyneFonts, { once: true });
+    window.addEventListener('load', scheduleEditorialFonts, { once: true });
   }
 }
 

@@ -208,6 +208,10 @@ const filteredManifest = wbManifest.filter((entry) => {
   if (url === 'apple-touch-icon.png') return true
   if (url === 'safari-pinned-tab.svg') return true
 
+  if (url.startsWith('assets/') && (url.endsWith('.js') || url.endsWith('.css'))) return true
+  if (url.startsWith('images/')) return true
+  if (url.startsWith('fonts/')) return true
+
   return false
 })
 precacheAndRoute(filteredManifest)
@@ -399,12 +403,22 @@ registerRoute(
 )
 
 const appShellHandler = createHandlerBoundToURL('/index.html')
+const navigationNetworkFirst = new NetworkFirst({
+  cacheName: cache('html-pages'),
+  networkTimeoutSeconds: 3,
+  plugins: [
+    new CacheableResponsePlugin({ statuses: [200] }),
+    new ExpirationPlugin({ maxEntries: 32, maxAgeSeconds: 60 * 60 * 24 }),
+  ],
+})
 registerRoute(
   new NavigationRoute(
     async (options) => {
       try {
         const preload = await options?.event?.preloadResponse
         if (preload) return preload
+        const network = await navigationNetworkFirst.handle(options)
+        if (network) return network
         return await appShellHandler(options)
       } catch {
         const u = options?.request?.url ? new URL(options.request.url) : null

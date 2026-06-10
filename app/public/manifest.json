@@ -1,8 +1,8 @@
 {
   "name": "Solaris CET",
-  "short_name": "Solaris",
+  "short_name": "SolarisCET",
   "description": "Solaris CET — instalații fotovoltaice, construcții și acoperișuri (tablă/țiglă/TPO).",
-  "theme_color": "#05060B",
+  "theme_color": "#F97316",
   "background_color": "#05060B",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],

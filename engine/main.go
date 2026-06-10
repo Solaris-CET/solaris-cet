@@ -17,7 +17,6 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-// WeatherState definește starea vremii
 type WeatherState int
 
 const (
@@ -30,13 +29,14 @@ const (
 type Land struct {
 	mu           sync.Mutex
 	ID           uint64       `json:"id"`
-	Owner        string       `json:"owner"`        // TON address
-	SoilQuality  float32      `json:"soil_quality"` // 0.0 - 1.0
+	Owner        string       `json:"owner"` // TON address
+	SoilQuality  float32      `json:"soil_quality"`
 	WaterLevel   float32      `json:"water"`
 	SunExposure  float32      `json:"sun"`
-	WeatherState WeatherState `json:"weather_state"`
+	Weather      WeatherState `json:"weather"`
 	Crops        []Crop       `json:"crops"`
 	LastUpdate   time.Time    `json:"last_update"`
+	NutrientBuff float32      `json:"nutrient_buff"` // 0.0 - 1.0
 }
 
 // Crop reprezintă o cultură plantată
@@ -60,14 +60,14 @@ type FarmingEngine struct {
 }
 
 func NewFarmingEngine(dbPath string) (*FarmingEngine, error) {
-	// Optimized for 16GB RAM / 8vCPU
+	// Optimized for 8vCPU / 16GB RAM
 	opts := badger.DefaultOptions(dbPath).
 		WithNumMemtables(4).
 		WithValueLogFileSize(64 << 20).
 		WithMemTableSize(64 << 20).
+		WithLogger(nil).
 		WithBlockCacheSize(256 << 20).
-		WithIndexCacheSize(128 << 20).
-		WithLogger(nil)
+		WithIndexCacheSize(128 << 20)
 
 	db, err := badger.Open(opts)
 	if err != nil {
@@ -234,79 +234,62 @@ func (e *FarmingEngine) simulateLand(land *Land) {
 		return
 	}
 
-	// Stochastic Weather Volatility Model (Markov-state transitions)
-	r := rand.Float64()
-	switch land.WeatherState {
+	// Update Weather State (Stochastic transition)
+	randVal := float32(now.UnixNano()%1000) / 1000.0
+	switch land.Weather {
 	case WeatherNormal:
-		if r < 0.05 {
-			land.WeatherState = WeatherDrought
-		} else if r > 0.95 {
-			land.WeatherState = WeatherFlood
+		if randVal < 0.05 {
+			land.Weather = WeatherDrought
+		} else if randVal > 0.95 {
+			land.Weather = WeatherFlood
 		}
 	case WeatherDrought:
-		if r < 0.15 {
-			land.WeatherState = WeatherNormal
+		if randVal > 0.85 {
+			land.Weather = WeatherNormal
 		}
 	case WeatherFlood:
-		if r < 0.15 {
-			land.WeatherState = WeatherNormal
+		if randVal > 0.85 {
+			land.Weather = WeatherNormal
 		}
 	}
 
-	// Weather impact on resources
-	switch land.WeatherState {
+	// Dynamic factors based on weather
+	waterMod := float32(1.0)
+	sunMod := float32(1.0)
+	healthPenalty := float32(0.0)
+
+	switch land.Weather {
 	case WeatherDrought:
-		land.WaterLevel -= float32(delta * 0.15)
-		land.SunExposure += float32(delta * 0.1)
+		waterMod = 0.4
+		sunMod = 1.2
+		healthPenalty = 0.05
 	case WeatherFlood:
-		land.WaterLevel += float32(delta * 0.2)
-		land.SunExposure -= float32(delta * 0.15)
-	default:
-		// Evaporation and absorption
-		land.WaterLevel -= float32(delta * 0.05)
+		waterMod = 1.5
+		sunMod = 0.5
+		healthPenalty = 0.08
 	}
 
-	// Clamp resource levels
-	if land.WaterLevel < 0 {
-		land.WaterLevel = 0
-	} else if land.WaterLevel > 1.0 {
-		land.WaterLevel = 1.0
+	growthRate := land.SoilQuality * 0.85 * (land.WaterLevel*waterMod*0.6 + land.SunExposure*sunMod*0.4)
+	if land.NutrientBuff > 0 {
+		growthRate *= (1.0 + land.NutrientBuff*0.3)
 	}
-	if land.SunExposure < 0 {
-		land.SunExposure = 0
-	} else if land.SunExposure > 1.0 {
-		land.SunExposure = 1.0
-	}
-
-	// Logistic growth mechanics
-	// Capacity K=1.0, growth rate r influenced by soil and ideal resources
-	waterOptimality := 1.0 - math.Abs(float64(land.WaterLevel)-0.5)*2.0
-	sunOptimality := 1.0 - math.Abs(float64(land.SunExposure)-0.6)*2.0
-	intrinsicGrowthRate := float64(land.SoilQuality) * (0.4*waterOptimality + 0.6*sunOptimality)
 
 	for i := range land.Crops {
 		crop := &land.Crops[i]
-
-		// Logistic growth: dG/dt = r * G * (1 - G/K)
-		if crop.Growth < 1.0 {
-			growthStep := intrinsicGrowthRate * float64(crop.Growth) * (1.0 - float64(crop.Growth)) * delta
-			if crop.Growth < 0.05 {
-				growthStep = intrinsicGrowthRate * 0.05 * delta // Minimal base growth for sprouts
-			}
-			crop.Growth += float32(growthStep)
-		}
+		// Non-linear logistic growth approximation
+		growthIncrement := float32(float64(growthRate) * delta * (1.0 - float64(crop.Growth)*0.8))
+		crop.Growth += growthIncrement
 
 		if crop.Growth > 1.0 {
 			crop.Growth = 1.0
 		}
 
-		// Health dynamics based on weather stress
-		healthDelta := 0.03 // base recovery
-		if land.WeatherState != WeatherNormal {
-			healthDelta = -0.12 // stress penalty
-		}
-		if land.WaterLevel < 0.1 || land.WaterLevel > 0.9 {
-			healthDelta -= 0.05
+		// Health management
+		crop.Health -= healthPenalty * float32(delta)
+		if land.WaterLevel*waterMod < 0.2 || land.SunExposure*sunMod < 0.2 {
+			crop.Health -= float32(delta * 0.1)
+		} else {
+			crop.Health += float32(delta * 0.05)
 		}
 
 		crop.Health += float32(healthDelta * delta)
@@ -315,6 +298,12 @@ func (e *FarmingEngine) simulateLand(land *Land) {
 		} else if crop.Health < 0 {
 			crop.Health = 0
 		}
+	}
+
+	// Nutrient depletion
+	land.NutrientBuff -= float32(delta * 0.01)
+	if land.NutrientBuff < 0 {
+		land.NutrientBuff = 0
 	}
 
 	land.LastUpdate = now
