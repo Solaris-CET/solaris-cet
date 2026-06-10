@@ -657,7 +657,7 @@ class ResponseCache {
     this.cache.set(key, value);
   }
 }
-const apiResponseCache = new ResponseCache();
+const apiResponseCache = new ResponseCache(8192);
 
 function getRequestUrl(req) {
   const proto = String(req.headers['x-forwarded-proto'] ?? 'http').split(',')[0].trim();

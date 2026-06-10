@@ -365,7 +365,7 @@ export default async function handler(req: Request): Promise<Response> {
             '1) Localitate/județ',
             '2) Tip proiect: fotovoltaice / acoperiș / TPO / construcții / reparații',
             '3) Date tehnice (ex: consum lunar, suprafață acoperiș, tip structură, infiltratii)',
-            '4) Când vrei să începi',
+            '4) Data de început dorită',
             '',
             `Contact direct: +40 769 889 721 · solaris-cet@protonmail.com`,
           ].join('\n')
@@ -373,10 +373,10 @@ export default async function handler(req: Request): Promise<Response> {
             intro,
             '',
             'Share 4 details and I will suggest the right package:',
-            '1) City/county',
-            '2) Project type: PV / roof / TPO / construction / repairs',
-            '3) Key details (usage, roof area, structure type, leaks)',
-            '4) Timeline',
+            '1) Location (City/County)',
+            '2) Project Type: PV / roof / TPO / construction / repairs',
+            '3) Technical Data (usage, roof area, structure type, leaks)',
+            '4) Start Date',
             '',
             'Direct contact: +40 769 889 721 · solaris-cet@protonmail.com',
           ].join('\n')
