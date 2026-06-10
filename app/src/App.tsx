@@ -33,7 +33,7 @@ const ProjectsPage = lazy(() => import('./pages_legacy/ProjectsPage'));
 const SolarCalculatorPage = lazy(() => import('./pages_legacy/SolarCalculatorPage'));
 const ThankYouPage = lazy(() => import('./pages_legacy/ThankYouPage'));
 const LegalDocPage = lazy(() => import('./pages_legacy/LegalDocPage'));
-const CookieSettingsPage = lazy(() => import('./pages_legacy/CookieSettingsPage'));
+const PrivacySettingsPage = lazy(() => import('./pages_legacy/PrivacySettingsPage'));
 const LocationPage = lazy(() => import('./pages_legacy/LocationPage'));
 const SolarisChatWidget = lazy(() =>
   import('@/components/company/SolarisChatWidget').then((m) => ({ default: m.SolarisChatWidget })),
@@ -827,7 +827,7 @@ function App() {
         ) : routePath === '/termeni-si-conditii' ? (
           <LegalDocPage doc="terms" />
         ) : routePath === '/privacy-settings' ? (
-          <CookieSettingsPage />
+          <PrivacySettingsPage />
         ) : (
           <NotFoundPage attemptedPath={routePath} />
         )}

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 import { useLanguage } from '@/hooks/useLanguage';
 import { localizePathname, parseUrlLocaleFromPathname, urlLocaleFromLang } from '@/i18n/urlRouting';
-import { type CookieConsentState,readStoredConsent, writeStoredConsent } from '@/lib/consent';
+import { type CookieConsentState, hasStoredConsentDecision, readStoredConsent, writeStoredConsent } from '@/lib/consent';
 import { recordConsentProof } from '@/lib/consentProof';
 
 function injectAnalyticsScript(src: string) {
@@ -33,7 +33,7 @@ const CookieConsentBanner: React.FC = () => {
   useEffect(() => {
     const consent = readStoredConsent();
     let timer: ReturnType<typeof setTimeout> | undefined;
-    const hadDecision = Boolean(localStorage.getItem('solaris_cookie_consent'));
+    const hadDecision = hasStoredConsentDecision();
     if (!hadDecision) {
       // Animate in after page load to not block LCP
       timer = setTimeout(() => setIsVisible(true), 2500);

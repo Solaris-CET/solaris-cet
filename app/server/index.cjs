@@ -973,6 +973,45 @@ async function serveApi(req, res, reqUrl) {
   return true;
 }
 
+function buildConsentCookieHeader(reqUrl, analytics, marketing) {
+  const payload = encodeURIComponent(
+    JSON.stringify({
+      essential: true,
+      analytics: Boolean(analytics),
+      marketing: Boolean(marketing),
+      updatedAt: new Date().toISOString(),
+    }),
+  );
+  return `solaris_cookie_consent=${payload}; Path=/; Max-Age=31536000; SameSite=Lax${reqUrl.protocol === 'https:' ? '; Secure' : ''}`;
+}
+
+async function handlePrivacySettingsSave(req, res, reqUrl) {
+  const preset = String(reqUrl.searchParams.get('preset') || '').trim();
+  const analyticsRaw = String(reqUrl.searchParams.get('analytics') || '').trim();
+  const marketingRaw = String(reqUrl.searchParams.get('marketing') || '').trim();
+
+  let analytics = false;
+  let marketing = false;
+
+  if (preset === 'accept_all') {
+    analytics = true;
+    marketing = true;
+  } else if (preset === 'essential_only') {
+    analytics = false;
+    marketing = false;
+  } else {
+    analytics = analyticsRaw === '1' || analyticsRaw === 'true' || analyticsRaw === 'on';
+    marketing = marketingRaw === '1' || marketingRaw === 'true' || marketingRaw === 'on';
+  }
+
+  res.statusCode = 303;
+  setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Set-Cookie', buildConsentCookieHeader(reqUrl, analytics, marketing));
+  res.setHeader('Location', '/privacy-settings/?saved=1');
+  res.end('');
+}
+
 async function main() {
   await otelReady;
 
@@ -1469,6 +1508,10 @@ async function main() {
       res.setHeader('Cache-Control', 'no-store');
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
       res.end(JSON.stringify({ error: 'Not found' }));
+      return;
+    }
+    if (reqUrl.pathname === '/privacy-settings/save') {
+      await handlePrivacySettingsSave(req, res, reqUrl);
       return;
     }
     if (await tryServeStatic(req, reqUrl, res)) return;

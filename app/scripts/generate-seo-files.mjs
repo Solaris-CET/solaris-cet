@@ -201,6 +201,166 @@ async function writeStaticPages() {
     `
   })()
 
+  const contactDetailsHtml = `
+          ${contactFormHtml}
+          <div style="margin-top: 14px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Program și zonă de deplasare</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li><strong>Program:</strong> Luni–Vineri 08:00–18:00 · Sâmbătă 09:00–14:00</li>
+              <li><strong>Adresă operațională:</strong> Cetățuia, Vaslui, 737429, România</li>
+              <li><strong>Acoperire:</strong> Vaslui, Moldova și proiecte selectate la nivel național</li>
+              <li><strong>Canale rapide:</strong> telefon, WhatsApp și email direct, chiar dacă browserul blochează formularul</li>
+            </ul>
+          </div>
+  `
+
+  const servicesOverviewHtml = `
+          <div style="margin-top: 14px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Servicii disponibile</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li><a href="/servicii/fotovoltaice-rezidentiale/">Fotovoltaice rezidențiale</a> — consum casă, orientare acoperiș, invertor, protecții, punere în funcțiune.</li>
+              <li><a href="/servicii/fotovoltaice-industriale/">Fotovoltaice industriale</a> — hale, clădiri comerciale, execuție etapizată și ROI.</li>
+              <li><a href="/servicii/acoperisuri-tabla-tigla/">Acoperișuri tablă / țiglă</a> — montaj, reparații, dolii, coame, sisteme pluviale.</li>
+              <li><a href="/servicii/acoperisuri-industriale-tpo/">Acoperișuri industriale TPO</a> — membrane, atice, străpungeri, infiltrații.</li>
+              <li><a href="/servicii/atice-si-fatade-tabla/">Atice și fațade tablă</a> — muchii, placări, finisaje metalice și protecție.</li>
+              <li><a href="/servicii/reparatii-si-mentenanta/">Reparații și mentenanță</a> — intervenții rapide, diagnostic și plan preventiv.</li>
+            </ul>
+          </div>
+          <div style="margin-top: 14px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Cum cerem corect o ofertă</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Localitatea proiectului și dacă este casă, hală sau clădire comercială.</li>
+              <li>2–5 poze relevante cu acoperișul sau zona afectată.</li>
+              <li>Consum estimat sau factură pentru fotovoltaice; suprafață și problemă principală pentru acoperișuri.</li>
+              <li>Termenul dorit și dacă există urgență (infiltrație, acoperiș avariat, consum mare).</li>
+            </ul>
+          </div>
+  `
+
+  const projectsOverviewHtml = `
+          <div style="margin-top: 14px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Repere de lucrări</h2>
+            <div style="display:grid; gap:10px;">
+              <div style="border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; background:rgba(255,255,255,.03);">
+                <strong>Prosumator 5.2 kW — Vaslui</strong>
+                <p style="margin:8px 0 0;">Sistem rezidențial pentru autoconsum, montaj pe acoperiș înclinat, monitorizare și protecții AC/DC.</p>
+              </div>
+              <div style="border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; background:rgba(255,255,255,.03);">
+                <strong>PV industrial — Iași</strong>
+                <p style="margin:8px 0 0;">Execuție etapizată pentru hală logistică, cu acces controlat și verificări finale înainte de predare.</p>
+              </div>
+              <div style="border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; background:rgba(255,255,255,.03);">
+                <strong>Membrană TPO — Bacău</strong>
+                <p style="margin:8px 0 0;">Reparație și refacere detalii la atice, scurgeri și străpungeri pentru eliminarea infiltrațiilor recurente.</p>
+              </div>
+              <div style="border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; background:rgba(255,255,255,.03);">
+                <strong>Tablă click — Suceava</strong>
+                <p style="margin:8px 0 0;">Acoperiș cu geometrie complexă, finisaje curate și drenaj corect la muchii și racorduri.</p>
+              </div>
+            </div>
+            <p style="margin-top:12px; font-size:13px; color:rgba(255,255,255,.68);">Pentru portofoliul complet, varianta interactivă cu galerie și filtre rămâne disponibilă când JavaScript este activ.</p>
+          </div>
+  `
+
+  const privacyOverviewHtml = `
+          <div style="margin-top: 14px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Ce date prelucrăm</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Date de contact: nume, email, telefon.</li>
+              <li>Date din solicitare: tip lucrare, localitate, mesaj, urgență.</li>
+              <li>Date tehnice minime: browser, pagini vizitate, evenimente tehnice și preferințe cookie.</li>
+            </ul>
+          </div>
+          <div style="margin-top: 14px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Temeiuri legale și retenție</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li><strong>Art. 6(1)(b)</strong> — demersuri precontractuale și răspuns la cereri de ofertă.</li>
+              <li><strong>Art. 6(1)(f)</strong> — securitate, prevenirea abuzului și continuitatea serviciului.</li>
+              <li><strong>Art. 6(1)(a)</strong> — cookie-uri analitice și marketing, numai după consimțământ.</li>
+              <li>Datele sunt păstrate atât cât este necesar pentru ofertare, conformitate și apărarea drepturilor.</li>
+            </ul>
+          </div>
+          <div style="margin-top: 14px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Drepturile tale</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Acces, rectificare, ștergere, restricționare, opoziție și portabilitate.</li>
+              <li>Pentru cereri GDPR scrie la <a href="mailto:solaris-cet@protonmail.com">solaris-cet@protonmail.com</a>.</li>
+              <li>Poți depune plângere la <a href="https://www.dataprotection.ro/" target="_blank" rel="noopener noreferrer">ANSPDCP</a>.</li>
+            </ul>
+          </div>
+  `
+
+  const cookieSettingsStaticHtml = `
+          <div style="margin-top: 14px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Salvează preferințele cookie fără JavaScript</h2>
+            <p style="margin:0 0 10px; color: rgba(255,255,255,.82);">Formularele de mai jos salvează preferințele în browser printr-un cookie de consimțământ.</p>
+            <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;">
+              <form action="/privacy-settings/save" method="get" style="margin:0;">
+                <input type="hidden" name="preset" value="accept_all" />
+                <button type="submit" style="cursor:pointer; border-radius:12px; border:1px solid rgba(245,158,11,.45); background:rgba(245,158,11,.14); color:#fbbf24; font-weight:900; padding:12px 14px;">Acceptă tot</button>
+              </form>
+              <form action="/privacy-settings/save" method="get" style="margin:0;">
+                <input type="hidden" name="preset" value="essential_only" />
+                <button type="submit" style="cursor:pointer; border-radius:12px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#fff; font-weight:800; padding:12px 14px;">Doar necesare</button>
+              </form>
+            </div>
+            <form action="/privacy-settings/save" method="get" style="margin-top:12px; display:grid; gap:10px;">
+              <label style="display:flex; gap:10px; align-items:flex-start;">
+                <input type="checkbox" name="analytics" value="1" style="margin-top:4px;" />
+                <span><strong>Cookie-uri analitice</strong><br /><span style="color:rgba(255,255,255,.7);">Măsoară vizite și comportament pentru îmbunătățirea site-ului.</span></span>
+              </label>
+              <label style="display:flex; gap:10px; align-items:flex-start;">
+                <input type="checkbox" name="marketing" value="1" style="margin-top:4px;" />
+                <span><strong>Cookie-uri marketing</strong><br /><span style="color:rgba(255,255,255,.7);">Folosite doar dacă decidem să măsurăm campanii sau surse comerciale.</span></span>
+              </label>
+              <button type="submit" style="cursor:pointer; border-radius:12px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#fff; font-weight:800; padding:12px 14px;">Salvează selecția</button>
+            </form>
+          </div>
+  `
+
+  const cookiesOverviewHtml = `
+          <div style="margin-top: 14px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Categorii de cookie-uri</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li><strong>Strict necesare</strong> — țin site-ul funcțional și sigur; nu pot fi dezactivate din produs.</li>
+              <li><strong>Analitice</strong> — active doar dacă îți dai acordul.</li>
+              <li><strong>Marketing</strong> — active doar dacă îți dai acordul.</li>
+            </ul>
+          </div>
+          <div style="margin-top: 14px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Durată și control</h2>
+            <p style="margin:0; color: rgba(255,255,255,.82);">Consimțământul este reținut local în browser pentru a nu te întreba la fiecare vizită. Îl poți modifica oricând din Setări cookie.</p>
+          </div>
+          ${cookieSettingsStaticHtml}
+  `
+
+  const termsOverviewHtml = `
+          <div style="margin-top: 14px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Reguli principale</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Informațiile de pe site sunt informative; oferta finală se stabilește după evaluarea tehnică.</li>
+              <li>Utilizatorul trebuie să furnizeze date corecte și să nu transmită conținut abuziv sau ilegal.</li>
+              <li>Nu este permis accesul neautorizat, supraîncărcarea serviciului sau transmiterea de malware.</li>
+              <li>Legea aplicabilă este cea din România, cu respectarea normelor de protecție a consumatorilor.</li>
+            </ul>
+          </div>
+  `
+
+  const privacySettingsOverviewHtml = `
+          <div style="margin-top: 14px;">
+            <p style="margin:0 0 10px; color: rgba(255,255,255,.82);">Această pagină oferă două lucruri: controlul consimțământului pentru cookie-uri și puncte clare pentru cereri GDPR.</p>
+          </div>
+          ${cookieSettingsStaticHtml}
+          <div style="margin-top: 14px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Cereri GDPR</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Pentru acces, rectificare, ștergere sau portabilitate: <a href="mailto:solaris-cet@protonmail.com?subject=Cerere%20GDPR%20%E2%80%94%20Solaris%20CET">trimite email</a>.</li>
+              <li>Poți menționa numele, emailul, telefonul și tipul cererii pentru identificare rapidă.</li>
+              <li>Detaliile complete sunt în <a href="/privacy/">Politica de confidențialitate</a> și <a href="/cookies/">Politica de cookie-uri</a>.</li>
+            </ul>
+          </div>
+  `
+
   const localBusiness = {
     '@type': 'LocalBusiness',
     name: 'Solaris CET',
@@ -256,7 +416,7 @@ async function writeStaticPages() {
       description: 'Contact Solaris CET pentru fotovoltaice, acoperișuri, reparații și mentenanță.',
       h1: 'Contact Solaris CET',
       bodyLines: ['Instalații fotovoltaice, acoperișuri (tablă/țiglă/TPO), reparații și mentenanță în Vaslui și în toată România.'],
-      extraHtml: contactFormHtml,
+      extraHtml: contactDetailsHtml,
       jsonLd: wrapJsonLd([
         localBusiness,
         {
@@ -302,6 +462,7 @@ async function writeStaticPages() {
         'Nu trimitem clientul într-un formular generic fără context: pentru fotovoltaice există calculator, iar pentru restul lucrărilor cerem datele minime utile.',
         'Pentru ofertă bună: localitate, poze, consum sau suprafață aproximativă și termenul dorit.',
       ],
+      extraHtml: servicesOverviewHtml,
       jsonLd: wrapJsonLd([
         {
           '@type': 'ItemList',
@@ -589,6 +750,28 @@ async function writeStaticPages() {
       ]),
     },
     {
+      path: '/proiecte',
+      title: 'Proiecte și portofoliu — Solaris CET',
+      description: 'Repere de proiecte Solaris CET: fotovoltaice, acoperișuri și intervenții TPO, plus pași clari pentru ofertare.',
+      h1: 'Proiecte Solaris CET',
+      bodyLines: [
+        'Portofoliul arată tipuri de lucrări, contexte reale și genul de execuție pe care îl livrăm: fotovoltaice, acoperișuri și intervenții industriale.',
+        'Dacă vrei o ofertă, nu trimite doar “vreau preț”: spune localitatea, tipul proiectului și atașează câteva poze relevante.',
+      ],
+      extraHtml: projectsOverviewHtml,
+      jsonLd: wrapJsonLd([
+        {
+          '@type': 'CollectionPage',
+          name: 'Proiecte Solaris CET',
+          url: `${origin}/proiecte/`,
+        },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Proiecte', path: '/proiecte' },
+        ]),
+      ]),
+    },
+    {
       path: '/portofoliu',
       title: 'Portofoliu — Solaris CET',
       description: 'Pagina s-a mutat.',
@@ -816,6 +999,7 @@ async function writeStaticPages() {
         'Folosim datele de contact doar pentru a răspunde solicitărilor (ofertare / suport) și pentru a putea livra serviciile cerute.',
         'Nu vindem datele către terți. Pentru cereri GDPR (acces/ștergere), scrie-ne pe email.',
       ],
+      extraHtml: privacyOverviewHtml,
       jsonLd: wrapJsonLd([
         { '@type': 'WebPage', name: 'Politica de confidențialitate', url: `${origin}/privacy/` },
         breadcrumb([
@@ -833,11 +1017,7 @@ async function writeStaticPages() {
         'Cookie-urile ne ajută să îmbunătățim experiența și să înțelegem cum este folosit site-ul (după consimțământ).',
         'Poți schimba preferințele din Setări cookie.',
       ],
-      extraHtml: `
-          <div style="margin-top: 12px;">
-            <p><a href="/privacy-settings/">Setări cookie →</a></p>
-          </div>
-      `,
+      extraHtml: cookiesOverviewHtml,
       jsonLd: wrapJsonLd([
         { '@type': 'WebPage', name: 'Politica de cookie-uri', url: `${origin}/cookies/` },
         breadcrumb([
@@ -855,11 +1035,30 @@ async function writeStaticPages() {
         'Conținutul site-ului are rol informativ. Oferta finală se face după evaluarea tehnică și confirmarea condițiilor proiectului.',
         'Pentru întrebări, contactează-ne.',
       ],
+      extraHtml: termsOverviewHtml,
       jsonLd: wrapJsonLd([
         { '@type': 'WebPage', name: 'Termeni și condiții', url: `${origin}/terms/` },
         breadcrumb([
           { name: 'Acasă', path: '/' },
           { name: 'Termeni', path: '/terms' },
+        ]),
+      ]),
+    },
+    {
+      path: '/privacy-settings',
+      title: 'Setări cookie și cereri GDPR — Solaris CET',
+      description: 'Controlează preferințele cookie și vezi pașii clari pentru cereri GDPR, inclusiv fără JavaScript.',
+      h1: 'Setări cookie și confidențialitate',
+      bodyLines: [
+        'Poți salva preferințele pentru cookie-uri și poți găsi aici pașii pentru cereri GDPR chiar și în modul fără JavaScript.',
+        'Cookie-urile strict necesare rămân active pentru funcționarea de bază a site-ului.',
+      ],
+      extraHtml: privacySettingsOverviewHtml,
+      jsonLd: wrapJsonLd([
+        { '@type': 'WebPage', name: 'Setări cookie și confidențialitate', url: `${origin}/privacy-settings/` },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Setări confidențialitate', path: '/privacy-settings' },
         ]),
       ]),
     },
@@ -964,6 +1163,7 @@ async function writeSitemap() {
   const staticPages = [
     '/',
     '/servicii',
+    '/proiecte',
     '/servicii/fotovoltaice-rezidentiale',
     '/servicii/fotovoltaice-industriale',
     '/servicii/acoperisuri-tabla-tigla',
@@ -971,6 +1171,7 @@ async function writeSitemap() {
     '/servicii/atice-si-fatade-tabla',
     '/servicii/reparatii-si-mentenanta',
     '/contact',
+    '/privacy-settings',
     '/calculator',
     '/despre',
     '/portofoliu',

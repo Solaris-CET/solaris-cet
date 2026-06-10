@@ -7,9 +7,53 @@ export type CookieConsentState = {
 
 const STORAGE_KEY = 'solaris_cookie_consent';
 const EVENT_NAME = 'solaris:cookie-consent';
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 function isRecord(v: unknown): v is Record<string, unknown> {
   return Boolean(v) && typeof v === 'object';
+}
+
+function normalizeConsent(input: unknown): CookieConsentState {
+  if (!isRecord(input)) return defaultConsent();
+  const updatedAt = typeof input.updatedAt === 'string' && input.updatedAt ? input.updatedAt : new Date().toISOString();
+  return {
+    essential: true,
+    analytics: Boolean(input.analytics),
+    marketing: Boolean(input.marketing),
+    updatedAt,
+  };
+}
+
+function readCookieConsent(): CookieConsentState | null {
+  if (typeof document === 'undefined') return null;
+  try {
+    const pairs = document.cookie.split(';').map((part) => part.trim());
+    const raw = pairs.find((part) => part.startsWith(`${STORAGE_KEY}=`));
+    if (!raw) return null;
+    const encoded = raw.slice(STORAGE_KEY.length + 1);
+    if (!encoded) return null;
+    return normalizeConsent(JSON.parse(decodeURIComponent(encoded)));
+  } catch {
+    return null;
+  }
+}
+
+function writeCookieConsent(value: CookieConsentState) {
+  if (typeof document === 'undefined') return;
+  try {
+    document.cookie = `${STORAGE_KEY}=${encodeURIComponent(JSON.stringify(value))}; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax`;
+  } catch {
+    void 0;
+  }
+}
+
+function clearCookieConsent() {
+  if (typeof document === 'undefined') return;
+  try {
+    document.cookie = `${STORAGE_KEY}=; Path=/; Max-Age=0; SameSite=Lax`;
+  } catch {
+    void 0;
+  }
 }
 
 export function defaultConsent(): CookieConsentState {
@@ -20,19 +64,11 @@ export function readStoredConsent(): CookieConsentState {
   if (typeof window === 'undefined') return defaultConsent();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultConsent();
-    const parsed: unknown = JSON.parse(raw);
-    if (!isRecord(parsed)) return defaultConsent();
-    const updatedAt = typeof parsed.updatedAt === 'string' && parsed.updatedAt ? parsed.updatedAt : new Date().toISOString();
-    return {
-      essential: true,
-      analytics: Boolean(parsed.analytics),
-      marketing: Boolean(parsed.marketing),
-      updatedAt,
-    };
+    if (raw) return normalizeConsent(JSON.parse(raw));
   } catch {
-    return defaultConsent();
+    void 0;
   }
+  return readCookieConsent() ?? defaultConsent();
 }
 
 export function writeStoredConsent(next: Omit<CookieConsentState, 'essential' | 'updatedAt'> & { updatedAt?: string }): CookieConsentState {
@@ -48,6 +84,7 @@ export function writeStoredConsent(next: Omit<CookieConsentState, 'essential' | 
   } catch {
     void 0;
   }
+  writeCookieConsent(value);
   try {
     window.dispatchEvent(new CustomEvent(EVENT_NAME, { detail: value }));
   } catch {
@@ -64,12 +101,23 @@ export function clearStoredConsent(): CookieConsentState {
   } catch {
     void 0;
   }
+  clearCookieConsent();
   try {
     window.dispatchEvent(new CustomEvent(EVENT_NAME, { detail: value }));
   } catch {
     void 0;
   }
   return value;
+}
+
+export function hasStoredConsentDecision(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    if (localStorage.getItem(STORAGE_KEY)) return true;
+  } catch {
+    void 0;
+  }
+  return readCookieConsent() !== null;
 }
 
 export function onConsentChange(cb: (consent: CookieConsentState) => void): () => void {
