@@ -47,16 +47,28 @@ type Crop struct {
 	YieldBonus float32 `json:"yield_bonus"`
 }
 
-// Engine-ul principal - ultra optimizat
+// WeatherState reprezintă starea vremii (Markov)
+type WeatherState int
+
+const (
+	WeatherNormal WeatherState = iota
+	WeatherDrought
+	WeatherFlood
+)
+
+// Engine-ul principal - ultra optimizat pentru 16GB RAM / 8vCPU
 type FarmingEngine struct {
-	db     *badger.DB
-	mu     sync.RWMutex
-	lands  map[uint64]*Land // cache în memorie (hot data)
-	ticker *time.Ticker
-	ctx    context.Context
-	cancel context.CancelFunc
-	saveCh chan *Land
-	wg     sync.WaitGroup
+	db           *badger.DB
+	mu           sync.RWMutex
+	lands        map[uint64]*Land // cache în memorie (hot data)
+	weather      WeatherState
+	weatherMu    sync.RWMutex
+	ticker       *time.Ticker
+	weatherTicks int
+	ctx          context.Context
+	cancel       context.CancelFunc
+	saveCh       chan *Land
+	wg           sync.WaitGroup
 }
 
 func NewFarmingEngine(dbPath string) (*FarmingEngine, error) {
@@ -179,12 +191,40 @@ func (e *FarmingEngine) saveLand(land *Land) {
 	}
 }
 
+func (e *FarmingEngine) updateWeather() {
+	e.weatherMu.Lock()
+	defer e.weatherMu.Unlock()
+
+	// Markov transition logic
+	r := float64(time.Now().UnixNano()%100) / 100.0
+	switch e.weather {
+	case WeatherNormal:
+		if r < 0.05 {
+			e.weather = WeatherDrought
+		} else if r < 0.10 {
+			e.weather = WeatherFlood
+		}
+	case WeatherDrought:
+		if r < 0.20 {
+			e.weather = WeatherNormal
+		}
+	case WeatherFlood:
+		if r < 0.25 {
+			e.weather = WeatherNormal
+		}
+	}
+}
+
 func (e *FarmingEngine) simulationLoop() {
 	for {
 		select {
 		case <-e.ctx.Done():
 			return
 		case <-e.ticker.C:
+			e.weatherTicks++
+			if e.weatherTicks%10 == 0 {
+				e.updateWeather()
+			}
 			e.simulateAllLands()
 		}
 	}

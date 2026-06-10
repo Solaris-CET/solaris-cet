@@ -354,8 +354,8 @@ export default async function handler(req: Request): Promise<Response> {
     const isRo = /[ăâîșț]/i.test(trimmedQuery) || /\b(ce|cat|cât|vreau|ofert[ăa]|acoperiș|fotovoltaic|reparații|mentenanță|montaj)\b/i.test(trimmedQuery);
     const isCompany = isCompanyMode || /\b(fotovoltaic|panouri|acoperiș|tpo|șarpantă|țiglă|tablă|atice|fațade|ofert[ăa])\b/i.test(trimmedQuery);
     const intro = isRo
-      ? 'Asistentul AI avansat este dezactivat (nu sunt configurate chei). Totuși, pot să te ajut să obții rapid o ofertă.'
-      : 'Advanced AI is disabled (no provider keys configured). I can still help you get a quote quickly.';
+      ? 'Sistemul Solaris Engineering (BETA) este pregătit. Deoarece suntem în regim de mentenanță AI, te pot ajuta manual să obții o ofertă.'
+      : 'Solaris Engineering (BETA) system is ready. As we are in AI maintenance mode, I can help you manually to get a quote.';
     const reply = isCompany
       ? isRo
         ? [
@@ -367,7 +367,7 @@ export default async function handler(req: Request): Promise<Response> {
             '3) Date tehnice (ex: consum lunar, suprafață acoperiș, tip structură, infiltratii)',
             '4) Data de început dorită',
             '',
-            `Contact direct: +40 769 889 721 · solaris-cet@protonmail.com`,
+            `Inginer de serviciu: +40 769 889 721 · solaris-cet@protonmail.com`,
           ].join('\n')
         : [
             intro,
@@ -378,7 +378,7 @@ export default async function handler(req: Request): Promise<Response> {
             '3) Technical Data (usage, roof area, structure type, leaks)',
             '4) Start Date',
             '',
-            'Direct contact: +40 769 889 721 · solaris-cet@protonmail.com',
+            'Engineering Support: +40 769 889 721 · solaris-cet@protonmail.com',
           ].join('\n')
       : intro;
 
