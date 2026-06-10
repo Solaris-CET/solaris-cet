@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"math/rand"
 	"runtime"
 	"strconv"
 	"sync"
@@ -291,10 +292,10 @@ func (e *FarmingEngine) simulateLand(land *Land) {
 			crop.Health += float32(delta * 0.05)
 		}
 
+		crop.Health += float32(healthDelta * delta)
 		if crop.Health > 1.0 {
 			crop.Health = 1.0
-		}
-		if crop.Health < 0 {
+		} else if crop.Health < 0 {
 			crop.Health = 0
 		}
 	}

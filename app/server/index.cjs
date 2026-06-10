@@ -850,7 +850,7 @@ async function serveSpaIndex(req, res, nonce, isHttps, origin) {
   res.statusCode = 200;
   setSecurityHeaders(res, { nonce, isHttps, origin });
   res.setHeader('Content-Type', contentTypes['.html']);
-  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Cache-Control', 'public, max-age=600');
   const raw = Buffer.from(withNonce, 'utf8');
   if (raw.length >= 1024 && shouldServeBrotli(req)) {
     const br = zlib.brotliCompressSync(raw, {
@@ -878,7 +878,7 @@ async function serveIndex(req, res, reqUrl) {
   res.statusCode = 200;
   setSecurityHeaders(res, { nonce, isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
   res.setHeader('Content-Type', contentTypes['.html']);
-  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
   if (distIndexHtml == null) {
     distIndexHtml = String(await readFileStable(distIndexPath));
   }

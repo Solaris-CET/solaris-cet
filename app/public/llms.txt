@@ -25,4 +25,5 @@ Solaris CET is a Romania-based engineering and construction firm specializing in
 ## Website invariants (do not contradict)
 - Contact phone: +40 769 889 721
 - Contact email: solaris-cet@protonmail.com
-- No “test” / “testnet” messaging on the public site
+- Use "BETA" instead of "TESTNET" or "vibe coding" if referring to active development.
+- No “testnet” messaging on the public firm site.
