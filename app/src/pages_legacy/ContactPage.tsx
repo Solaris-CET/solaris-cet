@@ -333,7 +333,7 @@ export default function ContactPage() {
                 </a>
                 <div className="mt-1">
                   <a
-                    href={`https://wa.me/40769889721?text=${encodeURIComponent('Bună! Aș dori o ofertă pentru: ')}`}
+                    href={`https://wa.me/40769889721?text=${encodeURIComponent('Bună ziua Solaris Engineering! Aș dori o ofertă pentru servicii de: ')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-solaris-muted hover:text-solar-yellow transition-colors"

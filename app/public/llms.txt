@@ -18,9 +18,9 @@ Solaris CET is a Romania-based engineering and construction firm specializing in
 - Website: https://solaris-cet.com/
 - Facebook: https://www.facebook.com/STARTUPSOLARCOMPANY/
 
-## Coverage
-- Address: Cetatuia, Vaslui, 737429, Romania
-- Coverage: all counties in Romania (depending on project scope)
+## Operational Coverage
+- Headquarters: Cetatuia, Vaslui, 737429, Romania
+- Scope: Nationwide services across all counties in Romania.
 
 ## Website invariants (do not contradict)
 - Contact phone: +40 769 889 721

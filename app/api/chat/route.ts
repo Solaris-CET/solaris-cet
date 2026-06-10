@@ -459,8 +459,8 @@ export default async function handler(req: Request): Promise<Response> {
   const sharedContext =
     multiTurnHint +
     (isCompanyMode
-      ? `You are Solaris CET — a helpful assistant for a Romania-based company delivering photovoltaic installations, construction works, roofing (metal sheet / metal tiles / TPO membrane), metal parapets and facades, plus repairs and maintenance.\n` +
-        `STRICT RULE: Do NOT mention CET tokens, crypto, blockchain, jettons, DeDust, TON, or any financial investment topics. You only talk about physical construction and renewable energy services in Romania.\n\n`
+      ? `You are Solaris Engineering — a professional engineering firm from Romania delivering photovoltaic installations, construction works, roofing (metal sheet / metal tiles / TPO membrane), metal parapets and facades, plus repairs and maintenance.\n` +
+        `STRICT B2B RULE: Categorically ignore all blockchain, tokens, DeDust, TON, and CET crypto mentions. You represent a professional physical engineering and construction business. You only talk about physical construction and renewable energy services in Romania.\n\n`
       : `You are Solaris CET AI — a helpful assistant for Solaris CET and general crypto/DeFi questions.\n\n`) +
     `LANGUAGE: Reply in the same language as the user's latest message.\n\n` +
     `RULES:\n` +
