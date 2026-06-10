@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"math/rand"
 	"runtime"
 	"strconv"
 	"sync"
@@ -16,16 +17,26 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+// WeatherState definește starea vremii
+type WeatherState int
+
+const (
+	WeatherNormal WeatherState = iota
+	WeatherDrought
+	WeatherFlood
+)
+
 // Land reprezintă un teren virtual
 type Land struct {
-	mu          sync.Mutex
-	ID          uint64    `json:"id"`
-	Owner       string    `json:"owner"`        // TON address
-	SoilQuality float32   `json:"soil_quality"` // 0.0 - 1.0
-	WaterLevel  float32   `json:"water"`
-	SunExposure float32   `json:"sun"`
-	Crops       []Crop    `json:"crops"`
-	LastUpdate  time.Time `json:"last_update"`
+	mu           sync.Mutex
+	ID           uint64       `json:"id"`
+	Owner        string       `json:"owner"`        // TON address
+	SoilQuality  float32      `json:"soil_quality"` // 0.0 - 1.0
+	WaterLevel   float32      `json:"water"`
+	SunExposure  float32      `json:"sun"`
+	WeatherState WeatherState `json:"weather_state"`
+	Crops        []Crop       `json:"crops"`
+	LastUpdate   time.Time    `json:"last_update"`
 }
 
 // Crop reprezintă o cultură plantată
@@ -49,10 +60,13 @@ type FarmingEngine struct {
 }
 
 func NewFarmingEngine(dbPath string) (*FarmingEngine, error) {
+	// Optimized for 16GB RAM / 8vCPU
 	opts := badger.DefaultOptions(dbPath).
-		WithNumMemtables(2).
-		WithValueLogFileSize(32 << 20).
-		WithMemTableSize(32 << 20).
+		WithNumMemtables(4).
+		WithValueLogFileSize(64 << 20).
+		WithMemTableSize(64 << 20).
+		WithBlockCacheSize(256 << 20).
+		WithIndexCacheSize(128 << 20).
 		WithLogger(nil)
 
 	db, err := badger.Open(opts)
@@ -64,7 +78,7 @@ func NewFarmingEngine(dbPath string) (*FarmingEngine, error) {
 
 	engine := &FarmingEngine{
 		db:     db,
-		lands:  make(map[uint64]*Land, 10000),
+		lands:  make(map[uint64]*Land, 50000),
 		ticker: time.NewTicker(30 * time.Second),
 		ctx:    ctx,
 		cancel: cancel,
@@ -214,35 +228,96 @@ func (e *FarmingEngine) simulateLand(land *Land) {
 	land.mu.Lock()
 	defer land.mu.Unlock()
 
-	delta := time.Since(land.LastUpdate).Hours()
+	now := time.Now()
+	delta := now.Sub(land.LastUpdate).Hours()
 	if delta < 0.008 { // ~30 secunde
 		return
 	}
 
-	growthRate := land.SoilQuality * 0.85 * (land.WaterLevel*0.6 + land.SunExposure*0.4)
+	// Stochastic Weather Volatility Model (Markov-state transitions)
+	r := rand.Float64()
+	switch land.WeatherState {
+	case WeatherNormal:
+		if r < 0.05 {
+			land.WeatherState = WeatherDrought
+		} else if r > 0.95 {
+			land.WeatherState = WeatherFlood
+		}
+	case WeatherDrought:
+		if r < 0.15 {
+			land.WeatherState = WeatherNormal
+		}
+	case WeatherFlood:
+		if r < 0.15 {
+			land.WeatherState = WeatherNormal
+		}
+	}
+
+	// Weather impact on resources
+	switch land.WeatherState {
+	case WeatherDrought:
+		land.WaterLevel -= float32(delta * 0.15)
+		land.SunExposure += float32(delta * 0.1)
+	case WeatherFlood:
+		land.WaterLevel += float32(delta * 0.2)
+		land.SunExposure -= float32(delta * 0.15)
+	default:
+		// Evaporation and absorption
+		land.WaterLevel -= float32(delta * 0.05)
+	}
+
+	// Clamp resource levels
+	if land.WaterLevel < 0 {
+		land.WaterLevel = 0
+	} else if land.WaterLevel > 1.0 {
+		land.WaterLevel = 1.0
+	}
+	if land.SunExposure < 0 {
+		land.SunExposure = 0
+	} else if land.SunExposure > 1.0 {
+		land.SunExposure = 1.0
+	}
+
+	// Logistic growth mechanics
+	// Capacity K=1.0, growth rate r influenced by soil and ideal resources
+	waterOptimality := 1.0 - math.Abs(float64(land.WaterLevel)-0.5)*2.0
+	sunOptimality := 1.0 - math.Abs(float64(land.SunExposure)-0.6)*2.0
+	intrinsicGrowthRate := float64(land.SoilQuality) * (0.4*waterOptimality + 0.6*sunOptimality)
 
 	for i := range land.Crops {
 		crop := &land.Crops[i]
-		crop.Growth += float32(float64(growthRate) * delta * (1.0 - float64(crop.Growth)*0.7))
+
+		// Logistic growth: dG/dt = r * G * (1 - G/K)
+		if crop.Growth < 1.0 {
+			growthStep := intrinsicGrowthRate * float64(crop.Growth) * (1.0 - float64(crop.Growth)) * delta
+			if crop.Growth < 0.05 {
+				growthStep = intrinsicGrowthRate * 0.05 * delta // Minimal base growth for sprouts
+			}
+			crop.Growth += float32(growthStep)
+		}
+
 		if crop.Growth > 1.0 {
 			crop.Growth = 1.0
 		}
 
-		if land.WaterLevel < 0.3 || land.SunExposure < 0.25 {
-			crop.Health -= float32(delta * 0.08)
-		} else {
-			crop.Health += float32(delta * 0.03)
+		// Health dynamics based on weather stress
+		healthDelta := 0.03 // base recovery
+		if land.WeatherState != WeatherNormal {
+			healthDelta = -0.12 // stress penalty
+		}
+		if land.WaterLevel < 0.1 || land.WaterLevel > 0.9 {
+			healthDelta -= 0.05
 		}
 
+		crop.Health += float32(healthDelta * delta)
 		if crop.Health > 1.0 {
 			crop.Health = 1.0
-		}
-		if crop.Health < 0 {
+		} else if crop.Health < 0 {
 			crop.Health = 0
 		}
 	}
 
-	land.LastUpdate = time.Now()
+	land.LastUpdate = now
 
 	// Queue for persistence (non-blocking)
 	select {

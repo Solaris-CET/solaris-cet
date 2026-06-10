@@ -104,7 +104,7 @@ export function SolarisChatWidget() {
           'text-solaris-text hover:bg-black/65 transition-colors inline-flex items-center gap-2',
         )}
         onClick={() => setOpen(true)}
-        aria-label="Deschide chatbot Solaris CET"
+        aria-label="Deschide chatbot Solaris Engineering"
       >
         <Bot className="h-4 w-4 text-solaris-gold" aria-hidden />
         <span className="text-sm font-semibold">Chat</span>
@@ -118,7 +118,7 @@ export function SolarisChatWidget() {
                 <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/5">
                   <Bot className="h-4 w-4 text-solaris-gold" aria-hidden />
                 </span>
-                <span className="text-base">Asistent Solaris CET</span>
+                <span className="text-base">Asistent Solaris Engineering</span>
               </span>
               <button
                 type="button"

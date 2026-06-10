@@ -87,7 +87,7 @@ export default function ServicesPage() {
     <main id="main-content" tabIndex={-1} className="pt-24 pb-0 bg-slate-950 text-white">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="max-w-3xl">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">Servicii Solaris CET</h1>
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">Servicii Solaris Engineering</h1>
           <p className="mt-4 text-lg text-solaris-muted">
             Fotovoltaice, construcții, acoperișuri (tablă/țiglă/TPO), atice și fațade tablă, reparații.
           </p>

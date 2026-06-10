@@ -60,7 +60,7 @@ export function DownloadAppButton({ className }: { className?: string }) {
       <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{lang === 'ro' ? 'Instalează Solaris CET pe dispozitiv' : 'Install Solaris CET on your device'}</DialogTitle>
+            <DialogTitle>{lang === 'ro' ? 'Instalează Solaris Engineering' : 'Install Solaris Engineering'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 text-sm text-solaris-muted leading-relaxed">
             <div>
