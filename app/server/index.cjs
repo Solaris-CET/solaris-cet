@@ -344,18 +344,24 @@ function formatPromMetrics() {
   }
 
   lines.push(
-    '# HELP solaris_business_contact_submissions_total Total contact form submissions.',
+    '# HELP solaris_business_contact_submissions_total Contact submissions total (heuristic).',
     '# TYPE solaris_business_contact_submissions_total counter',
   );
-  const contactTotal = metrics.businessCounters.get('contact_submissions_total') ?? 0;
-  lines.push(`solaris_business_contact_submissions_total ${contactTotal}`);
+  for (const [k, v] of metrics.businessCounters.entries()) {
+    if (k === 'contact_submissions_total') {
+      lines.push(`solaris_business_contact_submissions_total ${v}`);
+    }
+  }
 
   lines.push(
-    '# HELP solaris_business_contact_submissions_failed_total Total failed contact form submissions.',
+    '# HELP solaris_business_contact_submissions_failed_total Contact submissions failed total (heuristic).',
     '# TYPE solaris_business_contact_submissions_failed_total counter',
   );
-  const contactFailed = metrics.businessCounters.get('contact_submissions_failed_total') ?? 0;
-  lines.push(`solaris_business_contact_submissions_failed_total ${contactFailed}`);
+  for (const [k, v] of metrics.businessCounters.entries()) {
+    if (k === 'contact_submissions_failed_total') {
+      lines.push(`solaris_business_contact_submissions_failed_total ${v}`);
+    }
+  }
 
   lines.push('# HELP solaris_log_events_total Log events emitted by the Node server.', '# TYPE solaris_log_events_total counter');
   for (const [k, v] of metrics.logCounters.entries()) {
@@ -709,7 +715,7 @@ async function serveFile(res, absPath) {
   if (baseName === 'sw.js' || /^sw-[a-f0-9]{7}\.js$/i.test(baseName)) {
     res.setHeader('Cache-Control', 'no-store');
   } else if (baseExt === '.html' || baseExt === '.json' || baseExt === '.xml' || baseExt === '.txt') {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', 'public, max-age=600');
   } else if (absPath.includes('/assets/') || absPath.includes('/fonts/')) {
     res.setHeader('Cache-Control', 'public, max-age=31536000, s-maxage=31536000, immutable');
   } else {
@@ -730,7 +736,7 @@ async function serveHtmlFile(req, res, reqUrl, absPath, statusCode = 200) {
   setSecurityHeaders(res, { nonce, isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
   res.statusCode = statusCode;
   res.setHeader('Content-Type', contentTypes['.html']);
-  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.setHeader('Cache-Control', 'public, max-age=600');
   const html = String(await readFileStable(absPath));
   const withNonce = injectCspNonceIntoHtml(html, nonce);
   const raw = Buffer.from(withNonce, 'utf8');
@@ -844,7 +850,7 @@ async function serveSpaIndex(req, res, nonce, isHttps, origin) {
   res.statusCode = 200;
   setSecurityHeaders(res, { nonce, isHttps, origin });
   res.setHeader('Content-Type', contentTypes['.html']);
-  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Cache-Control', 'public, max-age=600');
   const raw = Buffer.from(withNonce, 'utf8');
   if (raw.length >= 1024 && shouldServeBrotli(req)) {
     const br = zlib.brotliCompressSync(raw, {
@@ -872,7 +878,7 @@ async function serveIndex(req, res, reqUrl) {
   res.statusCode = 200;
   setSecurityHeaders(res, { nonce, isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
   res.setHeader('Content-Type', contentTypes['.html']);
-  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
   if (distIndexHtml == null) {
     distIndexHtml = String(await readFileStable(distIndexPath));
   }

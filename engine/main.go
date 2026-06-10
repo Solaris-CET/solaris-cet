@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"math/rand"
 	"runtime"
 	"strconv"
 	"sync"
@@ -16,16 +17,26 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+type WeatherState int
+
+const (
+	WeatherNormal WeatherState = iota
+	WeatherDrought
+	WeatherFlood
+)
+
 // Land reprezintă un teren virtual
 type Land struct {
-	mu          sync.Mutex
-	ID          uint64    `json:"id"`
-	Owner       string    `json:"owner"`        // TON address
-	SoilQuality float32   `json:"soil_quality"` // 0.0 - 1.0
-	WaterLevel  float32   `json:"water"`
-	SunExposure float32   `json:"sun"`
-	Crops       []Crop    `json:"crops"`
-	LastUpdate  time.Time `json:"last_update"`
+	mu           sync.Mutex
+	ID           uint64       `json:"id"`
+	Owner        string       `json:"owner"` // TON address
+	SoilQuality  float32      `json:"soil_quality"`
+	WaterLevel   float32      `json:"water"`
+	SunExposure  float32      `json:"sun"`
+	Weather      WeatherState `json:"weather"`
+	Crops        []Crop       `json:"crops"`
+	LastUpdate   time.Time    `json:"last_update"`
+	NutrientBuff float32      `json:"nutrient_buff"` // 0.0 - 1.0
 }
 
 // Crop reprezintă o cultură plantată
@@ -61,14 +72,14 @@ type FarmingEngine struct {
 }
 
 func NewFarmingEngine(dbPath string) (*FarmingEngine, error) {
-	// Optimizat pentru Hetzner 16GB RAM
+	// Optimized for 8vCPU / 16GB RAM
 	opts := badger.DefaultOptions(dbPath).
 		WithNumMemtables(4).
 		WithValueLogFileSize(64 << 20).
 		WithMemTableSize(64 << 20).
+		WithLogger(nil).
 		WithBlockCacheSize(256 << 20).
-		WithIndexCacheSize(128 << 20).
-		WithLogger(nil)
+		WithIndexCacheSize(128 << 20)
 
 	db, err := badger.Open(opts)
 	if err != nil {
@@ -78,13 +89,12 @@ func NewFarmingEngine(dbPath string) (*FarmingEngine, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	engine := &FarmingEngine{
-		db:      db,
-		lands:   make(map[uint64]*Land, 50000),
-		weather: WeatherNormal,
-		ticker:  time.NewTicker(30 * time.Second),
-		ctx:     ctx,
-		cancel:  cancel,
-		saveCh:  make(chan *Land, 10000), // Buffered channel for persistence
+		db:     db,
+		lands:  make(map[uint64]*Land, 50000),
+		ticker: time.NewTicker(30 * time.Second),
+		ctx:    ctx,
+		cancel: cancel,
+		saveCh: make(chan *Land, 5000), // Buffered channel for persistence
 	}
 
 	// Preîncărcare cache
@@ -258,63 +268,85 @@ func (e *FarmingEngine) simulateLand(land *Land) {
 	land.mu.Lock()
 	defer land.mu.Unlock()
 
-	e.weatherMu.RLock()
-	weather := e.weather
-	e.weatherMu.RUnlock()
-
-	delta := time.Since(land.LastUpdate).Hours()
+	now := time.Now()
+	delta := now.Sub(land.LastUpdate).Hours()
 	if delta < 0.008 { // ~30 secunde
 		return
 	}
 
-	// Stochastic modifiers based on weather state
+	// Update Weather State (Stochastic transition)
+	randVal := float32(now.UnixNano()%1000) / 1000.0
+	switch land.Weather {
+	case WeatherNormal:
+		if randVal < 0.05 {
+			land.Weather = WeatherDrought
+		} else if randVal > 0.95 {
+			land.Weather = WeatherFlood
+		}
+	case WeatherDrought:
+		if randVal > 0.85 {
+			land.Weather = WeatherNormal
+		}
+	case WeatherFlood:
+		if randVal > 0.85 {
+			land.Weather = WeatherNormal
+		}
+	}
+
+	// Dynamic factors based on weather
 	waterMod := float32(1.0)
 	sunMod := float32(1.0)
 	healthPenalty := float32(0.0)
 
-	switch weather {
+	switch land.Weather {
 	case WeatherDrought:
 		waterMod = 0.4
-		sunMod = 1.5
-		healthPenalty = 0.1
+		sunMod = 1.2
+		healthPenalty = 0.05
 	case WeatherFlood:
-		waterMod = 2.0
-		sunMod = 0.3
-		healthPenalty = 0.15
+		waterMod = 1.5
+		sunMod = 0.5
+		healthPenalty = 0.08
 	}
 
-	effectiveWater := land.WaterLevel * waterMod
-	effectiveSun := land.SunExposure * sunMod
-
-	// Logistic growth model: r * N * (1 - N/K)
-	growthRate := land.SoilQuality * 0.85 * (effectiveWater*0.6 + effectiveSun*0.4)
+	growthRate := land.SoilQuality * 0.85 * (land.WaterLevel*waterMod*0.6 + land.SunExposure*sunMod*0.4)
+	if land.NutrientBuff > 0 {
+		growthRate *= (1.0 + land.NutrientBuff*0.3)
+	}
 
 	for i := range land.Crops {
 		crop := &land.Crops[i]
-		// Non-linear logistic-style advancement
-		incrementalGrowth := float64(growthRate) * delta * (1.0 - float64(crop.Growth))
-		crop.Growth += float32(incrementalGrowth)
+		// Non-linear logistic growth approximation
+		growthIncrement := float32(float64(growthRate) * delta * (1.0 - float64(crop.Growth)*0.8))
+		crop.Growth += growthIncrement
 
 		if crop.Growth > 1.0 {
 			crop.Growth = 1.0
 		}
 
-		// Health dynamics
-		if effectiveWater < 0.25 || effectiveSun < 0.2 || healthPenalty > 0 {
-			crop.Health -= float32(delta*0.1) + healthPenalty*float32(delta)
+		// Health management
+		crop.Health -= healthPenalty * float32(delta)
+		if land.WaterLevel*waterMod < 0.2 || land.SunExposure*sunMod < 0.2 {
+			crop.Health -= float32(delta * 0.1)
 		} else {
 			crop.Health += float32(delta * 0.05)
 		}
 
+		crop.Health += float32(healthDelta * delta)
 		if crop.Health > 1.0 {
 			crop.Health = 1.0
-		}
-		if crop.Health < 0 {
+		} else if crop.Health < 0 {
 			crop.Health = 0
 		}
 	}
 
-	land.LastUpdate = time.Now()
+	// Nutrient depletion
+	land.NutrientBuff -= float32(delta * 0.01)
+	if land.NutrientBuff < 0 {
+		land.NutrientBuff = 0
+	}
+
+	land.LastUpdate = now
 
 	// Queue for persistence (non-blocking)
 	select {
