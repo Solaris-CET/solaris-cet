@@ -10,6 +10,7 @@ import EquipmentPartnersSection from '@/sections/EquipmentPartnersSection';
 import HeroSection from '@/sections/HeroSection';
 import ProductsSection from '@/sections/ProductsSection';
 import ServicesSection from '@/sections/ServicesSection';
+import SocialProofSection from '@/sections/SocialProofSection';
 import SolarCompetitionSection from '@/sections/SolarCompetitionSection';
 import SolarIntelligenceSection from '@/sections/SolarIntelligenceSection';
 import SolarSecuritySection from '@/sections/SolarSecuritySection';
@@ -165,6 +166,12 @@ export default function HomePage() {
             })}
           </div>
         </div>
+      </section>
+
+      <section className="relative z-20">
+        <ScrollFadeUp>
+          <SocialProofSection />
+        </ScrollFadeUp>
       </section>
 
       <section className="relative z-20">

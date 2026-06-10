@@ -985,6 +985,73 @@ function buildConsentCookieHeader(reqUrl, analytics, marketing) {
   return `solaris_cookie_consent=${payload}; Path=/; Max-Age=31536000; SameSite=Lax${reqUrl.protocol === 'https:' ? '; Secure' : ''}`;
 }
 
+function renderPrivacySettingsSaveHtml(reqUrl, analytics, marketing) {
+  const preferenceSummary =
+    analytics && marketing
+      ? 'Ai permis cookie-urile analitice si marketing.'
+      : analytics
+        ? 'Ai permis doar cookie-urile analitice.'
+        : marketing
+          ? 'Ai permis doar cookie-urile de marketing.'
+          : 'Au ramas active doar cookie-urile strict necesare.';
+
+  const chips = [
+    { label: 'Necesare', value: 'active permanent' },
+    { label: 'Analitice', value: analytics ? 'permise' : 'oprite' },
+    { label: 'Marketing', value: marketing ? 'permise' : 'oprite' },
+  ];
+
+  return `<!doctype html>
+<html lang="ro">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Preferintele cookie au fost salvate — Solaris CET</title>
+    <meta name="robots" content="noindex,nofollow" />
+    <style>
+      :root { color-scheme: dark; }
+      body { margin:0; background:#05070a; color:#fff; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+      main { max-width:780px; margin:0 auto; padding:32px 18px 48px; }
+      .card { border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.35); border-radius:22px; padding:22px; }
+      .eyebrow { display:inline-flex; padding:6px 10px; border-radius:999px; border:1px solid rgba(245,158,11,.35); background:rgba(245,158,11,.12); color:#fbbf24; font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+      h1 { margin:14px 0 10px; font-size:34px; line-height:1.08; }
+      p { margin:10px 0; color:rgba(255,255,255,.82); line-height:1.6; }
+      .grid { display:grid; gap:12px; margin-top:18px; grid-template-columns:repeat(3,minmax(0,1fr)); }
+      .chip { border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.05); border-radius:16px; padding:14px; }
+      .chip strong { display:block; font-size:12px; letter-spacing:.05em; text-transform:uppercase; color:rgba(255,255,255,.65); margin-bottom:4px; }
+      .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+      .btn { display:inline-flex; align-items:center; justify-content:center; border-radius:14px; padding:12px 16px; text-decoration:none; font-weight:800; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; }
+      .btnPrimary { border-color:rgba(245,158,11,.35); background:rgba(245,158,11,.12); color:#fbbf24; }
+      .help { margin-top:18px; font-size:14px; color:rgba(255,255,255,.7); }
+      @media (max-width: 720px) { .grid { grid-template-columns:1fr; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="card">
+        <div class="eyebrow">Confirmare</div>
+        <h1>Preferintele cookie au fost salvate</h1>
+        <p>${preferenceSummary}</p>
+        <p>Consimtamantul a fost retinut local in browser printr-un cookie, astfel incat pagina de setari si bannerul sa poata respecta alegerea ta chiar si fara JavaScript.</p>
+        <div class="grid">
+          ${chips
+            .map(
+              (chip) => `<div class="chip"><strong>${chip.label}</strong><span>${chip.value}</span></div>`,
+            )
+            .join('')}
+        </div>
+        <div class="actions">
+          <a class="btn btnPrimary" href="/privacy-settings/">Inapoi la setari</a>
+          <a class="btn" href="/cookies/">Politica de cookie-uri</a>
+          <a class="btn" href="/contact/">Contact</a>
+        </div>
+        <p class="help">Daca vrei sa schimbi alegerea, revino pe pagina de setari sau deschide ${reqUrl.origin}/privacy-settings/.</p>
+      </div>
+    </main>
+  </body>
+</html>`;
+}
+
 async function handlePrivacySettingsSave(req, res, reqUrl) {
   const preset = String(reqUrl.searchParams.get('preset') || '').trim();
   const analyticsRaw = String(reqUrl.searchParams.get('analytics') || '').trim();
@@ -1004,12 +1071,12 @@ async function handlePrivacySettingsSave(req, res, reqUrl) {
     marketing = marketingRaw === '1' || marketingRaw === 'true' || marketingRaw === 'on';
   }
 
-  res.statusCode = 303;
+  res.statusCode = 200;
   setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Set-Cookie', buildConsentCookieHeader(reqUrl, analytics, marketing));
-  res.setHeader('Location', '/privacy-settings/?saved=1');
-  res.end('');
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.end(renderPrivacySettingsSaveHtml(reqUrl, analytics, marketing));
 }
 
 async function main() {

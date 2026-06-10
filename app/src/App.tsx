@@ -75,6 +75,34 @@ type RouteSeo = {
   jsonLd?: unknown;
 };
 
+type PortfolioSchemaItem = {
+  name: string;
+  location: string;
+  description: string;
+  image: string;
+};
+
+const portfolioSchemaItems: PortfolioSchemaItem[] = [
+  {
+    name: 'Prosumator 5.2 kW pe acoperiș înclinat',
+    location: 'Vaslui',
+    description: 'Exemplu de sistem fotovoltaic rezidențial dimensionat pentru autoconsum și monitorizare.',
+    image: 'https://solaris-cet.com/images/hero-solaris.svg',
+  },
+  {
+    name: 'Acoperiș industrial cu membrană TPO',
+    location: 'Bacău',
+    description: 'Intervenție orientativă pentru refacerea zonelor critice: atice, scurgeri și străpungeri.',
+    image: 'https://solaris-cet.com/og-image.png',
+  },
+  {
+    name: 'Acoperiș tablă click cu finisaje curate',
+    location: 'Suceava',
+    description: 'Lucrare orientativă pentru acoperiș metalic cu detalii corecte la muchii și racorduri.',
+    image: 'https://solaris-cet.com/images/team-placeholder.svg',
+  },
+];
+
 function buildBreadcrumbJsonLd(origin: string, urlLocale: UrlLocale, pathnameNoLocale: string) {
   const normalized = (pathnameNoLocale || '/').replace(/\/$/, '') || '/';
   const segments = normalized.split('/').filter(Boolean);
@@ -110,6 +138,42 @@ function buildBreadcrumbJsonLd(origin: string, urlLocale: UrlLocale, pathnameNoL
       name: x.name,
       item: x.item,
     })),
+  };
+}
+
+function buildProjectsJsonLd(origin: string, urlLocale: UrlLocale) {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        name: 'Proiecte Solaris CET',
+        url: `${origin}/${urlLocale}/proiecte`,
+        description: 'Portofoliu orientativ cu proiecte de fotovoltaice, acoperișuri și intervenții TPO.',
+      },
+      {
+        '@type': 'ItemList',
+        itemListElement: portfolioSchemaItems.map((item, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          item: {
+            '@type': 'CreativeWork',
+            name: `${item.name} — ${item.location}`,
+            description: item.description,
+            image: item.image,
+            url: `${origin}/${urlLocale}/proiecte`,
+          },
+        })),
+      },
+      ...portfolioSchemaItems.map((item) => ({
+        '@type': 'ImageObject',
+        contentUrl: item.image,
+        url: item.image,
+        name: `${item.name} — ${item.location}`,
+        caption: item.description,
+      })),
+      buildBreadcrumbJsonLd(origin, urlLocale, '/proiecte'),
+    ],
   };
 }
 
@@ -228,6 +292,7 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
       description: 'Galerie proiecte: fotovoltaice, acoperișuri și atice/fațade tablă. Vezi lucrări orientative și cere ofertă.',
       keywords: 'proiecte fotovoltaice, portofoliu, lucrari acoperisuri, tpo, atice, fatade tabla, vaslui',
       ogType: 'website',
+      jsonLd: buildProjectsJsonLd(origin, urlLocale),
     },
     '/portofoliu': {
       title: 'Portofoliu — Solaris CET',

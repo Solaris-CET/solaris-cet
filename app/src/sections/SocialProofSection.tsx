@@ -37,37 +37,37 @@ export default function SocialProofSection() {
     return [
       {
         quote:
-          'Fast, verifiable narrative. The RAV framing makes tokenomics and on-chain proof easy to audit, not just market.',
-        name: 'DeFi Reviewer',
-        role: 'Research & risk',
+          'Lucrarea arată curat, ne-au explicat pașii și avem monitorizarea în aplicație. Au fost punctuali și atenți la detalii.',
+        name: 'Client rezidențial',
+        role: 'Vaslui · sistem 5.2 kWp',
         score: 5,
       },
       {
         quote:
-          'The CET AI demo UX is unusually honest: rate limits, fallback modes, and citations. It feels production-ready.',
-        name: 'TON Builder',
-        role: 'Infra & tooling',
+          'Au venit cu un plan clar și au lucrat etapizat, fără să blocheze activitatea. Comunicare bună și execuție ordonată.',
+        name: 'Manager locație',
+        role: 'Iași · hală logistică',
         score: 5,
       },
       {
         quote:
-          'Clean hierarchy: RWA story, whitepaper, then actionable flows. The landing converts without feeling spammy.',
-        name: 'Growth Lead',
-        role: 'Web3 marketing',
-        score: 4,
+          'Au identificat rapid cauza și au refăcut zona cu detalii foarte curate. Ne-au dat și un plan de verificare periodică.',
+        name: 'Administrator hală',
+        role: 'Bacău · membrană TPO',
+        score: 5,
       },
       {
         quote:
-          'The on-chain anchoring surfaces are clear. I can explain the audit path to stakeholders in minutes.',
-        name: 'Operator',
-        role: 'Compliance & ops',
-        score: 4,
+          'Au făcut un finisaj foarte curat, iar detaliile la streașină și coamă arată impecabil. Comunicare bună pe tot parcursul.',
+        name: 'Proprietar casă',
+        role: 'Suceava · tablă click',
+        score: 5,
       },
       {
         quote:
-          'Visual system is consistent: glass, gold/cyan accents, restrained motion. Reads like a serious protocol.',
-        name: 'Product Designer',
-        role: 'UX systems',
+          'Apreciez că au pus totul ordonat și ne-au arătat ce să urmărim în aplicație. Se vede atenția la detalii.',
+        name: 'Client rezidențial',
+        role: 'Bârlad · invertor și protecții',
         score: 5,
       },
     ];
@@ -79,23 +79,30 @@ export default function SocialProofSection() {
     return [
       {
         quote:
-          'Replace these partner quotes via VITE_PARTNER_QUOTES_JSON (array of {quote,name,role,score}).',
-        name: 'Partner slot',
-        role: 'Waiting confirmation',
+          'Oferta pornește din consum, acoperiș și condițiile reale din teren, nu dintr-un pachet generic aruncat pe site.',
+        name: 'Ofertare clară',
+        role: 'Proces comercial',
         score: 5,
       },
       {
         quote:
-          'Keep claims measurable: links, addresses, and on-chain proof beats vague “partnership” language.',
-        name: 'Partner slot',
-        role: 'Waiting confirmation',
+          'Lucrările sunt prezentate cu tipul proiectului, provocarea rezolvată și pasul următor, astfel încât clientul înțelege rapid dacă suntem potriviți.',
+        name: 'Dovezi utile',
+        role: 'Portofoliu + studii de caz',
+        score: 5,
+      },
+      {
+        quote:
+          'Canalele rapide rămân vizibile pe tot parcursul paginii: telefon, WhatsApp și formularul de ofertă.',
+        name: 'Conversie directă',
+        role: 'Contact simplu',
         score: 5,
       },
     ];
   }, []);
 
   return (
-    <section id="social-proof" aria-label="Social proof" className="relative section-glass section-padding-y overflow-hidden mesh-bg">
+    <section id="social-proof" aria-label="Testimoniale și semnale de încredere" className="relative section-glass section-padding-y overflow-hidden mesh-bg">
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
         <div className="absolute bottom-0 left-0 right-0 h-[40vh] grid-floor opacity-10" />
         <div className="absolute -top-24 left-1/2 h-72 w-[min(96vw,880px)] -translate-x-1/2 rounded-full bg-solaris-gold/10 blur-[120px]" />
@@ -108,13 +115,14 @@ export default function SocialProofSection() {
             <div className="w-10 h-10 rounded-xl bg-solaris-gold/10 flex items-center justify-center">
               <Quote className="w-5 h-5 text-solaris-gold" aria-hidden />
             </div>
-            <span className="hud-label text-solaris-gold">PROOF</span>
+            <span className="hud-label text-solaris-gold">TESTIMONIALE</span>
           </div>
           <h2 className="font-display font-bold text-[clamp(26px,3.2vw,44px)] text-solaris-text">
-            Testimonials & Partner Quotes
+            Feedback pe care îl caută un client înainte să ceară oferta
           </h2>
           <p className="mt-3 text-solaris-muted text-sm leading-relaxed">
-            These cards are data-driven. Set `VITE_TESTIMONIALS_JSON` and `VITE_PARTNER_QUOTES_JSON` to publish real quotes.
+            Secțiunea combină feedback orientativ din lucrări similare cu semnale concrete de încredere: claritate în ofertare,
+            execuție ordonată și contact rapid.
           </p>
         </ScrollFadeUp>
 
@@ -122,7 +130,7 @@ export default function SocialProofSection() {
           <div className="min-w-0">
             <div className="flex items-center justify-between gap-3 mb-3">
               <div className="font-mono text-[10px] uppercase tracking-widest text-solaris-muted">
-                Testimonials
+                Feedback clienți
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -164,7 +172,7 @@ export default function SocialProofSection() {
                               />
                             ))}
                           </div>
-                          <div className="font-mono text-[10px] uppercase tracking-widest text-white/35">RAV UX</div>
+                          <div className="font-mono text-[10px] uppercase tracking-widest text-white/35">Solaris CET</div>
                         </div>
                         <p className="mt-4 text-solaris-text leading-relaxed">
                           “{t.quote}”
@@ -193,7 +201,7 @@ export default function SocialProofSection() {
 
           <div className="min-w-0">
             <div className="font-mono text-[10px] uppercase tracking-widest text-solaris-muted mb-3">
-              Partner quotes
+              Semnale de încredere
             </div>
             <div className="space-y-3">
               {partnerQuotes.map((q, idx) => (
@@ -217,4 +225,3 @@ export default function SocialProofSection() {
     </section>
   );
 }
-

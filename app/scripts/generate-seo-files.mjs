@@ -294,6 +294,7 @@ async function writeStaticPages() {
           <div style="margin-top: 14px;">
             <h2 style="font-size: 18px; margin: 0 0 10px;">Salvează preferințele cookie fără JavaScript</h2>
             <p style="margin:0 0 10px; color: rgba(255,255,255,.82);">Formularele de mai jos salvează preferințele în browser printr-un cookie de consimțământ.</p>
+            <p style="margin:0 0 10px; color: rgba(255,255,255,.68);">După trimitere primești o confirmare HTML simplă, fără dependență de JavaScript.</p>
             <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;">
               <form action="/privacy-settings/save" method="get" style="margin:0;">
                 <input type="hidden" name="preset" value="accept_all" />
@@ -375,6 +376,27 @@ async function writeStaticPages() {
     },
     areaServed: 'RO',
   }
+
+  const portfolioSchemaItems = [
+    {
+      name: 'Prosumator 5.2 kW pe acoperiș înclinat',
+      location: 'Vaslui',
+      description: 'Exemplu de sistem fotovoltaic rezidențial dimensionat pentru autoconsum și monitorizare.',
+      image: `${origin}/images/hero-solaris.svg`,
+    },
+    {
+      name: 'Acoperiș industrial cu membrană TPO',
+      location: 'Bacău',
+      description: 'Intervenție orientativă pentru refacerea zonelor critice: atice, scurgeri și străpungeri.',
+      image: `${origin}/og-image.png`,
+    },
+    {
+      name: 'Acoperiș tablă click cu finisaje curate',
+      location: 'Suceava',
+      description: 'Lucrare orientativă pentru acoperiș metalic cu detalii corecte la muchii și racorduri.',
+      image: `${origin}/images/team-placeholder.svg`,
+    },
+  ]
 
   const serviceFaq = {
     'fotovoltaice-rezidentiale': [
@@ -764,7 +786,29 @@ async function writeStaticPages() {
           '@type': 'CollectionPage',
           name: 'Proiecte Solaris CET',
           url: `${origin}/proiecte/`,
+          description: 'Portofoliu orientativ cu proiecte de fotovoltaice, acoperișuri și intervenții TPO.',
         },
+        {
+          '@type': 'ItemList',
+          itemListElement: portfolioSchemaItems.map((item, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            item: {
+              '@type': 'CreativeWork',
+              name: `${item.name} — ${item.location}`,
+              description: item.description,
+              image: item.image,
+              url: `${origin}/proiecte/`,
+            },
+          })),
+        },
+        ...portfolioSchemaItems.map((item) => ({
+          '@type': 'ImageObject',
+          contentUrl: item.image,
+          url: item.image,
+          name: `${item.name} — ${item.location}`,
+          caption: item.description,
+        })),
         breadcrumb([
           { name: 'Acasă', path: '/' },
           { name: 'Proiecte', path: '/proiecte' },
