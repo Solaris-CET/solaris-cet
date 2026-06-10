@@ -118,7 +118,7 @@ export function SolarisChatWidget() {
                 <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/5">
                   <Bot className="h-4 w-4 text-solaris-gold" aria-hidden />
                 </span>
-                <span className="text-base">Asistent Solaris CET</span>
+                <span className="text-base">Solaris Engineering — Expert AI</span>
               </span>
               <button
                 type="button"

@@ -214,8 +214,12 @@ function recordRequestMetric(method, pathname, statusCode, durationMs) {
   if (methodLabel === 'POST' && statusCode === 200 && pathname === '/api/admin/signup') {
     incMap(metrics.businessCounters, 'users_created_total|admin', 1);
   }
-  if (methodLabel === 'POST' && (statusCode === 200 || statusCode === 201) && pathname === '/api/support/start') {
-    incMap(metrics.businessCounters, 'contact_submissions_total', 1);
+  if (methodLabel === 'POST' && pathname === '/api/support/start') {
+    if (statusCode >= 200 && statusCode < 300) {
+      incMap(metrics.businessCounters, 'contact_submissions_total', 1);
+    } else if (statusCode >= 400) {
+      incMap(metrics.businessCounters, 'contact_submissions_failed_total', 1);
+    }
   }
   if (methodLabel === 'POST' && statusCode >= 400 && pathname === '/api/support/start') {
     incMap(metrics.businessCounters, 'contact_submissions_failed_total', 1);
