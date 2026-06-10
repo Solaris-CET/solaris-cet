@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -15,6 +15,7 @@ export function DownloadAppButton({ className }: { className?: string }) {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const { needRefresh, updateServiceWorker } = useRegisterSW({ immediate: true });
+  const autoUpdatedRef = useRef(false);
 
   useEffect(() => {
     const onBeforeInstall = (e: Event) => {
@@ -25,21 +26,18 @@ export function DownloadAppButton({ className }: { className?: string }) {
     return () => window.removeEventListener('beforeinstallprompt', onBeforeInstall);
   }, []);
 
-  const label = useMemo(
-    () => (needRefresh ? (lang === 'ro' ? 'Actualizează' : 'Update') : t.nav.downloadApp),
-    [lang, needRefresh, t.nav.downloadApp],
-  );
+  useEffect(() => {
+    if (!needRefresh) return;
+    if (autoUpdatedRef.current) return;
+    autoUpdatedRef.current = true;
+    void updateServiceWorker(true);
+  }, [needRefresh, updateServiceWorker]);
 
   return (
     <>
       <button
         type="button"
         onClick={async () => {
-          if (needRefresh) {
-            await updateServiceWorker(true);
-            window.location.reload();
-            return;
-          }
           if (installPrompt) {
             await installPrompt.prompt();
             await installPrompt.userChoice;
@@ -54,7 +52,7 @@ export function DownloadAppButton({ className }: { className?: string }) {
         )}
         aria-label={t.nav.downloadApp}
       >
-        <span>{label}</span>
+        <span>{t.nav.downloadApp}</span>
       </button>
 
       <Dialog open={helpOpen} onOpenChange={setHelpOpen}>

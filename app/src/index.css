@@ -66,19 +66,6 @@
     --solaris-text: rgba(255, 255, 255, 0.92);
     --solaris-muted: rgba(226, 232, 240, 0.68);
 
-    --type-h1: clamp(36px, 4.6vw, 74px);
-    --type-h2: clamp(26px, 3.2vw, 44px);
-    --type-h3: clamp(20px, 2.15vw, 30px);
-    --type-body: clamp(15px, 1.1vw, 18px);
-
-    --text-hero: var(--type-h1);
-    --text-h1: var(--type-h2);
-    --text-h2: var(--type-h3);
-    --text-h3: clamp(18px, 1.7vw, 26px);
-    --text-body: var(--type-body);
-    --text-small: clamp(13px, 0.95vw, 15px);
-    --text-mono: clamp(12px, 0.95vw, 14px);
-
     --z-base: 1;
     --z-ambient: 2;
     --z-content: 10;

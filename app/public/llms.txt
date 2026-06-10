@@ -18,11 +18,11 @@ Solaris CET is a Romania-based engineering and construction firm specializing in
 - Website: https://solaris-cet.com/
 - Facebook: https://www.facebook.com/STARTUPSOLARCOMPANY/
 
-## AI Guidelines & Identity
-- Identify as a professional engineering service provider.
-- Use "BETA" for public-facing software features.
-- Never use "test", "testnet", or "vibe coding" wording.
-- CET Token: Informational only. Refer users to https://solaris-cet.com/token-cet. Never provide financial advice.
+## Coverage
+- Address: Cetatuia, Vaslui, 737429, Romania
+- Coverage: all counties in Romania (depending on project scope)
 
-## Source Code
-- GitHub: https://github.com/Solaris-CET/solaris-cet
+## Website invariants (do not contradict)
+- Contact phone: +40 769 889 721
+- Contact email: solaris-cet@protonmail.com
+- No “test” / “testnet” messaging on the public site
