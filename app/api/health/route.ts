@@ -1,5 +1,5 @@
-import { getAllowedOrigin } from '../lib/cors';
 import { BUILD_DATE, BUILD_GIT_SHA } from '../lib/buildInfo';
+import { getAllowedOrigin } from '../lib/cors';
 
 export const config = { runtime: 'edge' };
 
@@ -54,6 +54,9 @@ export default async function handler(req: Request): Promise<Response> {
   const hasTonApiKey = Boolean(process.env.TONCENTER_API_KEY?.trim());
   const hasUpstashUrl = Boolean(process.env.UPSTASH_REDIS_REST_URL?.trim());
   const hasUpstashToken = Boolean(process.env.UPSTASH_REDIS_REST_TOKEN?.trim());
+  const hasUpstashRateLimit = hasUpstashUrl && hasUpstashToken;
+  // API routes fall back to an in-process limiter when Upstash is absent.
+  const rateLimitMode = hasUpstashRateLimit ? 'upstash' : 'local';
   const hasJwtSecret = Boolean(process.env.JWT_SECRET?.trim());
   const hasJwtSecrets = Boolean(process.env.JWT_SECRETS?.trim());
   const buildGitSha: string = BUILD_GIT_SHA;
@@ -95,7 +98,7 @@ export default async function handler(req: Request): Promise<Response> {
             out.tonRpc = 'error';
           }
         }
-        if (hasUpstashUrl && hasUpstashToken) {
+        if (hasUpstashRateLimit) {
           try {
             const u = String(process.env.UPSTASH_REDIS_REST_URL).replace(/\/+$/, '');
             const ac = new AbortController();
@@ -122,7 +125,7 @@ export default async function handler(req: Request): Promise<Response> {
         db: dbConfigured ? 'configured' : 'missing',
         ai: aiConfigured ? 'configured' : 'missing',
         ton: tonConfigured ? 'configured' : 'missing',
-        rateLimit: hasUpstashUrl && hasUpstashToken ? 'configured' : 'missing',
+        rateLimit: 'configured',
         jwt: hasJwtSecrets || hasJwtSecret ? 'configured' : 'missing',
       },
       ...(deepChecks ? { deepChecks } : {}),
@@ -142,6 +145,10 @@ export default async function handler(req: Request): Promise<Response> {
         upstash: {
           url: hasUpstashUrl,
           token: hasUpstashToken,
+        },
+        rateLimit: {
+          mode: rateLimitMode,
+          sharedStore: hasUpstashRateLimit,
         },
         jwt: {
           secret: hasJwtSecret,
