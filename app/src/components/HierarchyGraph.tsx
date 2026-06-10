@@ -1,18 +1,9 @@
 import { Copy, ExternalLink } from 'lucide-react';
-import { type ComponentType,useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import { Skeleton } from '@/components/ui/skeleton';
 import { useLanguage } from '@/hooks/useLanguage';
 import { cn } from '@/lib/utils';
-
-import MermaidDiagram from './MermaidDiagram';
-
-type MermaidAgentResponse = {
-  format: 'mermaid';
-  graph: string;
-  render: 'client';
-};
 
 type LocalGraphUi = {
   localUserAsks: string;
@@ -28,10 +19,16 @@ function buildLocalGraph(query: string, tx: LocalGraphUi) {
   return [
     'graph TD',
     `  A[${tx.localUserAsks}: "${safe}"] --> B{${tx.localIsWalletConnected}}`,
-    `  B -->|✓| C[${tx.localShowBalance}]`,
-    `  B -->|✕| D[${tx.localShowConnect}]`,
-    `  C --> E[${tx.localNextActions}]`,
-    `  E --> F[${tx.localLinks}]`,
+    `  B -->|Rezidențial| C[${tx.localShowBalance}]`,
+    `  B -->|Business| D[${tx.localShowConnect}]`,
+    '  C --> E{Acoperiș bun și consum clar?}',
+    '  D --> F{Consum stabil ziua și acces tehnic bun?}',
+    `  E -->|Da| G[${tx.localNextActions}]`,
+    '  E -->|Nu| H[Cere evaluare la locație și poze detaliate]',
+    `  F -->|Da| G`,
+    '  F -->|Nu| H',
+    `  G --> I[${tx.localLinks}]`,
+    '  H --> I',
   ].join('\n');
 }
 
@@ -45,74 +42,8 @@ export default function HierarchyGraph({
   const { t } = useLanguage();
   const tx = t.hierarchyGraphUi;
   const resolvedQuery = query ?? t.highIntelligenceUi.neural.defaultQuestion;
-  const rootRef = useRef<HTMLDivElement>(null);
-  const [data, setData] = useState<MermaidAgentResponse | null>(null);
-  const [failed, setFailed] = useState(false);
-  const [isActive, setIsActive] = useState(false);
-  const [renderDiagram] = useState(false);
   const [isSourceOpen, setIsSourceOpen] = useState(false);
-  const Diagram = MermaidDiagram as unknown as ComponentType<{ graph: string }>;
-
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el) return;
-    if (typeof IntersectionObserver === 'undefined') {
-      const id = window.setTimeout(() => setIsActive(true), 0);
-      return () => {
-        window.clearTimeout(id);
-      };
-    }
-    const obs = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setIsActive(true);
-        }
-      },
-      { root: null, threshold: 0.15 },
-    );
-    obs.observe(el);
-    return () => {
-      obs.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isActive) return;
-    let alive = true;
-    const controller = new AbortController();
-
-    const run = async () => {
-      try {
-        const res = await fetch('/api/mermaid/agent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: resolvedQuery }),
-          signal: controller.signal,
-        });
-        if (!res.ok) throw new Error('bad response');
-        const json = (await res.json()) as MermaidAgentResponse;
-        if (!alive) return;
-        setData(json);
-        setFailed(false);
-      } catch {
-        if (!alive) return;
-        setData({ format: 'mermaid', render: 'client', graph: buildLocalGraph(resolvedQuery, tx) });
-        setFailed(false);
-      }
-    };
-
-    void run();
-    return () => {
-      alive = false;
-      controller.abort();
-    };
-  }, [isActive, resolvedQuery, tx]);
-
-  const graph = data?.graph ?? null;
-  const effectiveGraph = useMemo(() => {
-    const g = graph && graph.trim().length > 0 ? graph : null;
-    return g ?? buildLocalGraph(resolvedQuery, tx);
-  }, [graph, resolvedQuery, tx]);
+  const effectiveGraph = useMemo(() => buildLocalGraph(resolvedQuery, tx), [resolvedQuery, tx]);
   const lines = useMemo(() => {
     return effectiveGraph.split('\n').slice(0, 10);
   }, [effectiveGraph]);
@@ -155,7 +86,6 @@ export default function HierarchyGraph({
 
   return (
     <div
-      ref={rootRef}
       data-testid="mermaid-decision-map"
       className={cn('rounded-xl bg-white/5 border border-white/10 p-4', className)}
     >
@@ -192,19 +122,9 @@ export default function HierarchyGraph({
       </div>
 
       <div className="space-y-3">
-        {!isActive || (!data && !failed) ? (
-          <Skeleton className="h-20 w-full bg-white/10" />
-        ) : failed ? (
-          <div className="text-solaris-muted text-xs">
-            {tx.graphUnavailable}
-          </div>
-        ) : graph && renderDiagram ? (
-          <Diagram graph={graph} />
-        ) : (
-          <div className="rounded-xl bg-black/20 border border-white/10 p-3 text-xs text-solaris-muted">
-            {tx.renderOptional}
-          </div>
-        )}
+        <div className="rounded-xl bg-black/20 border border-white/10 p-3 text-xs text-solaris-muted">
+          {tx.renderOptional}
+        </div>
         <details
           className="group"
           onToggle={(e) => {

@@ -433,6 +433,29 @@ export default function ProjectsPage() {
             Studii de caz și imagini orientative pentru a vedea tipul de execuție și atenția la detalii. Fotografiile sunt
             <strong className="text-white/80"> ilustrații reprezentative</strong>, iar studiile de caz sunt exemple realiste (fără date personale).
           </p>
+          <div className="mt-7 grid gap-4 sm:grid-cols-3">
+            {[
+              { label: 'Ce livrează pagina', value: 'Tipuri de lucrări, probleme rezolvate și rezultate așteptate' },
+              { label: 'Ce NU pretindem', value: 'Nu mascăm ilustrațiile AI ca fotografii reale; le marcăm explicit' },
+              { label: 'Pasul următor', value: 'După portofoliu mergi în serviciu, calculator sau contact' },
+            ].map((item) => (
+              <div key={item.label} className="rounded-3xl border border-white/10 bg-white/5 p-5">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-white/50">{item.label}</div>
+                <div className="mt-2 text-sm font-semibold leading-relaxed text-white">{item.value}</div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <a href="/servicii" className="rounded-2xl bg-amber-400 px-6 py-3 text-sm font-black text-black">
+              Vezi serviciile
+            </a>
+            <a href="/calculator" className="rounded-2xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10">
+              Deschide calculatorul
+            </a>
+            <a href="/contact" className="rounded-2xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10">
+              Cere ofertă
+            </a>
+          </div>
         </div>
 
         <div className="mt-8 flex flex-wrap items-center gap-2" data-reveal-stagger>

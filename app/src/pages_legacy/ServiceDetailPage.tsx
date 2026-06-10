@@ -50,6 +50,7 @@ export default function ServiceDetailPage({ slug }: { slug: string }) {
   }
 
   const contactHref = `/contact?service=${encodeURIComponent(service.contactServiceParam)}`;
+  const isSolarService = service.contactServiceParam === 'fotovoltaice';
   const trust = [
     {
       title: 'Evaluare + ofertă clară',
@@ -217,10 +218,10 @@ export default function ServiceDetailPage({ slug }: { slug: string }) {
                 Cere ofertă
               </a>
               <a
-                href="/calculator"
+                href={isSolarService ? '/calculator' : contactHref}
                 className="mt-3 inline-flex w-full items-center justify-center rounded-2xl border border-white/15 bg-white/5 px-6 py-4 text-white font-bold hover:bg-white/10"
               >
-                Calculează economiile <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
+                {isSolarService ? 'Calculează economiile' : 'Trimite detaliile lucrării'} <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
               </a>
               <div className="mt-4 text-xs text-slate-400">Preferi să suni? +40 769 889 721</div>
               <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4">
