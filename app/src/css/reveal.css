@@ -1,0 +1,25 @@
+.js .reveal,
+.js [data-reveal],
+.js [data-reveal-stagger] > * {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  will-change: opacity, transform;
+}
+
+.js .reveal.revealed,
+.js [data-reveal].revealed,
+.js [data-reveal-stagger] > *.revealed {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal,
+  .js [data-reveal],
+  .js [data-reveal-stagger] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}

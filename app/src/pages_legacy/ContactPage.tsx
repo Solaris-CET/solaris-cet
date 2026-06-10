@@ -1,5 +1,5 @@
 import { ArrowRight, Mail, MapPin } from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { DownloadAppButton } from '@/components/company/DownloadAppButton';
 
@@ -92,6 +92,99 @@ export default function ContactPage() {
   const [location, setLocation] = useState('');
   const [urgent, setUrgent] = useState(false);
   const [consent, setConsent] = useState(false);
+  const [hp, setHp] = useState('');
+  const [mathAnswer, setMathAnswer] = useState('');
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const [antiSpam, setAntiSpam] = useState(() => ({ a: 4, b: 7, sum: 11 }));
+
+  const draftKey = 'solaris_offer_draft_v1';
+  const draftTimerRef = useRef<number>(0);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(draftKey);
+      if (!raw) return;
+      const data = JSON.parse(raw) as Partial<{
+        step: number;
+        serviceChoice: string;
+        details: string;
+        location: string;
+        urgent: boolean;
+        name: string;
+        email: string;
+        phone: string;
+        consent: boolean;
+        mathAnswer: string;
+        antiSpamA: number;
+        antiSpamB: number;
+      }>;
+      if (typeof data.step === 'number') setStep(Math.max(0, Math.min(2, data.step)));
+      if (typeof data.serviceChoice === 'string') setServiceChoice(data.serviceChoice);
+      if (typeof data.details === 'string') setDetails(data.details);
+      if (typeof data.location === 'string') setLocation(data.location);
+      if (typeof data.urgent === 'boolean') setUrgent(data.urgent);
+      if (typeof data.name === 'string') setName(data.name);
+      if (typeof data.email === 'string') setEmail(data.email);
+      if (typeof data.phone === 'string') setPhone(data.phone);
+      if (typeof data.consent === 'boolean') setConsent(data.consent);
+      if (typeof data.mathAnswer === 'string') setMathAnswer(data.mathAnswer);
+      if (typeof data.antiSpamA === 'number' && typeof data.antiSpamB === 'number') {
+        const a = Math.max(2, Math.min(9, Math.round(data.antiSpamA)));
+        const b = Math.max(2, Math.min(9, Math.round(data.antiSpamB)));
+        setAntiSpam({ a, b, sum: a + b });
+      }
+    } catch {
+      void 0;
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(draftKey);
+      if (raw) return;
+    } catch {
+      void 0;
+    }
+
+    try {
+      const buf = new Uint32Array(2);
+      window.crypto.getRandomValues(buf);
+      const a = 2 + (buf[0] % 8);
+      const b = 2 + (buf[1] % 8);
+      setAntiSpam({ a, b, sum: a + b });
+    } catch {
+      void 0;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (done) return;
+    window.clearTimeout(draftTimerRef.current);
+    draftTimerRef.current = window.setTimeout(() => {
+      try {
+        window.localStorage.setItem(
+          draftKey,
+          JSON.stringify({
+            step,
+            serviceChoice,
+            details,
+            location,
+            urgent,
+            name,
+            email,
+            phone,
+            consent,
+            mathAnswer,
+            antiSpamA: antiSpam.a,
+            antiSpamB: antiSpam.b,
+          }),
+        );
+      } catch {
+        void 0;
+      }
+    }, 150);
+  }, [antiSpam.a, antiSpam.b, consent, details, done, email, location, mathAnswer, name, phone, serviceChoice, step, urgent]);
 
   const serviceOptions = useMemo<ServiceOption[]>(
     () => [
@@ -191,6 +284,14 @@ export default function ContactPage() {
     setEmail('');
     setPhone('');
     setConsent(false);
+    setHp('');
+    setMathAnswer('');
+    setTouched({});
+    try {
+      window.localStorage.removeItem(draftKey);
+    } catch {
+      void 0;
+    }
   };
 
   const canNextStep1 = Boolean(serviceChoice);
@@ -198,13 +299,18 @@ export default function ContactPage() {
   const phoneDigits = phone.replace(/\D/g, '');
   const isPhoneValid = phone.trim() ? (phoneDigits.startsWith('40') ? phoneDigits.length >= 11 : phoneDigits.length >= 9) : false;
   const emailOk = email.trim() ? isEmailValid(email) : true;
-  const canSubmit = Boolean(name.trim()) && Boolean(phone.trim() || email.trim()) && isPhoneValid && emailOk && consent;
+  const isMathOk = mathAnswer.trim() ? Number(mathAnswer.trim()) === antiSpam.sum : false;
+  const canSubmit = Boolean(name.trim()) && Boolean(phone.trim() || email.trim()) && isPhoneValid && emailOk && consent && isMathOk;
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-solaris-offblack text-white">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-solaris-offblack text-white"
+    >
       <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h1 className="font-display font-bold bg-gradient-to-r from-solar-yellow to-amber-500 bg-clip-text text-transparent text-[length:var(--text-h1)] leading-[var(--lh-display)]">
+        <div className="text-center mb-16" data-reveal>
+          <h1 className="font-display font-bold bg-gradient-to-r from-solar-yellow to-amber-500 bg-clip-text text-transparent text-[length:var(--text-h1)] leading-[var(--lh-display)]">
             Contact Solaris CET
           </h1>
           <p className="mt-4 text-xl text-solaris-muted max-w-2xl mx-auto">
@@ -213,7 +319,7 @@ export default function ContactPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div className="space-y-8 bg-black/40 p-8 rounded-3xl border border-white/10 backdrop-blur-sm">
+          <div className="space-y-8 bg-black/40 p-8 rounded-3xl border border-white/10 backdrop-blur-sm" data-reveal-stagger>
             <h2 className="text-2xl font-semibold mb-6">Informații de Contact</h2>
             
             <div className="flex items-start gap-4">
@@ -227,7 +333,7 @@ export default function ContactPage() {
                 </a>
                 <div className="mt-1">
                   <a
-                    href={`https://wa.me/40769889721?text=${encodeURIComponent('Bună! Aș dori o ofertă pentru: ')}`}
+                    href={`https://wa.me/40769889721?text=${encodeURIComponent('Bună ziua Solaris Engineering! Aș dori o ofertă pentru servicii de: ')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-solaris-muted hover:text-solar-yellow transition-colors"
@@ -302,81 +408,91 @@ export default function ContactPage() {
             </div>
           </div>
 
-            <div className="bg-black/40 p-8 rounded-3xl border border-white/10 backdrop-blur-sm">
-              <div className="flex items-start justify-between gap-4">
-                <h2 className="text-2xl font-semibold mb-2">Cere ofertă</h2>
-                <div className="shrink-0">
-                  <DownloadAppButton />
-                </div>
+          <div className="bg-black/40 p-8 rounded-3xl border border-white/10 backdrop-blur-sm" data-reveal>
+            <div className="flex items-start justify-between gap-4">
+              <h2 className="text-2xl font-semibold mb-2">Cere ofertă</h2>
+              <div className="shrink-0">
+                <DownloadAppButton />
+              </div>
+            </div>
+
+            <div className="mt-2 text-sm text-solaris-muted">Formular rapid în 3 pași. Pentru urgențe: sună sau scrie pe WhatsApp.</div>
+
+            <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 overflow-hidden">
+              <div className="h-[2px] bg-white/10">
+                <div className={`h-[2px] bg-orange-400 ${styles.progressFill}`} style={{ width: `${progressPct}%` }} />
               </div>
 
-              <div className="mt-2 text-sm text-solaris-muted">Formular rapid în 3 pași. Pentru urgențe: sună sau scrie pe WhatsApp.</div>
-
-              <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 overflow-hidden">
-                <div className="h-[2px] bg-white/10">
-                  <div className={`h-[2px] bg-orange-400 ${styles.progressFill}`} style={{ width: `${progressPct}%` }} />
-                </div>
-
-                <div className="px-6 pt-5 pb-4 border-b border-white/10">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm font-bold text-white">Pasul {step + 1} din 3</div>
-                    <div className="flex items-center gap-2" aria-label="Progres">
-                      {[0, 1, 2].map((i) => (
-                        <span
-                          key={i}
-                          className={`h-2.5 w-2.5 rounded-full ${styles.dot} ${
-                            i <= step ? 'bg-orange-400 opacity-100' : 'bg-white/20 opacity-70'
-                          }`}
-                          style={i === step ? { transform: 'scale(1.12)' } : undefined}
-                          aria-hidden
-                        />
-                      ))}
-                    </div>
+              <div className="px-6 pt-5 pb-4 border-b border-white/10">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-bold text-white">Pasul {step + 1} din 3</div>
+                  <div className="flex items-center gap-2" aria-label="Progres">
+                    {[0, 1, 2].map((i) => (
+                      <span
+                        key={i}
+                        className={`h-2.5 w-2.5 rounded-full ${styles.dot} ${
+                          i <= step ? 'bg-orange-400 opacity-100' : 'bg-white/20 opacity-70'
+                        }`}
+                        style={i === step ? { transform: 'scale(1.12)' } : undefined}
+                        aria-hidden
+                      />
+                    ))}
                   </div>
-                  <div className="mt-2 text-sm text-white/70">{step === 0 ? 'Alege serviciul' : step === 1 ? 'Detalii proiect' : 'Date de contact'}</div>
                 </div>
+                <div className="mt-2 text-sm text-white/70">{step === 0 ? 'Alege serviciul' : step === 1 ? 'Detalii proiect' : 'Date de contact'}</div>
+              </div>
 
-                <div className="relative px-6 py-6">
-                  {done ? (
-                    <div className="relative rounded-3xl border border-emerald-400/20 bg-emerald-400/10 p-6 overflow-hidden">
-                      <div className={styles.confetti} aria-hidden>
-                        {Array.from({ length: 40 }).map((_, i) => {
-                          const dx = `${(i % 10) * 20 - 90}px`;
-                          const dy = `${140 + (i % 6) * 26}px`;
-                          const d = `${(i % 8) * 30}ms`;
-                          const r = `${(i * 37) % 360}deg`;
-                          const c = i % 4 === 0 ? '#f97316' : i % 4 === 1 ? '#fbbf24' : i % 4 === 2 ? '#22c55e' : '#60a5fa';
-                          return (
-                            <div
-                              key={i}
-                              className={styles.confettiPiece}
-                              style={{
-                                ['--dx' as never]: dx,
-                                ['--dy' as never]: dy,
-                                ['--d' as never]: d,
-                                ['--r' as never]: r,
-                                ['--c' as never]: c,
-                              }}
-                            />
-                          );
-                        })}
-                      </div>
-                      <div className="text-sm font-black text-white">Solicitare trimisă</div>
-                      <div className="mt-2 text-sm text-white/80">Vă vom contacta în 24h. Pentru urgențe: +40 769 889 721.</div>
-                      <button
-                        type="button"
-                        onClick={resetAll}
-                        className="mt-5 inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-bold text-white hover:bg-white/10"
-                      >
-                        Trimite o altă solicitare
-                      </button>
+              <div className="relative px-6 py-6">
+                {done ? (
+                  <div className="relative rounded-3xl border border-emerald-400/20 bg-emerald-400/10 p-6 overflow-hidden">
+                    <div className={styles.confetti} aria-hidden>
+                      {Array.from({ length: 40 }).map((_, i) => {
+                        const dx = `${(i % 10) * 20 - 90}px`;
+                        const dy = `${140 + (i % 6) * 26}px`;
+                        const d = `${(i % 8) * 30}ms`;
+                        const r = `${(i * 37) % 360}deg`;
+                        const c = i % 4 === 0 ? '#f97316' : i % 4 === 1 ? '#fbbf24' : i % 4 === 2 ? '#22c55e' : '#60a5fa';
+                        return (
+                          <div
+                            key={i}
+                            className={styles.confettiPiece}
+                            style={{
+                              ['--dx' as never]: dx,
+                              ['--dy' as never]: dy,
+                              ['--d' as never]: d,
+                              ['--r' as never]: r,
+                              ['--c' as never]: c,
+                            }}
+                          />
+                        );
+                      })}
                     </div>
-                  ) : (
-                    <form
-                      onSubmit={async (e) => {
+                    <div className="text-sm font-black text-white">Solicitare trimisă</div>
+                    <div className="mt-2 text-sm text-white/80">Vă vom contacta în 24h. Pentru urgențe: +40 769 889 721.</div>
+                    <button
+                      type="button"
+                      onClick={resetAll}
+                      className="mt-5 inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-bold text-white hover:bg-white/10"
+                    >
+                      Trimite o altă solicitare
+                    </button>
+                  </div>
+                ) : (
+                  <form
+                    onSubmit={async (e) => {
                         e.preventDefault();
                         if (busy) return;
                         setError(null);
+
+                        if (hp.trim()) {
+                          setDone(true);
+                          try {
+                            window.localStorage.removeItem(draftKey);
+                          } catch {
+                            void 0;
+                          }
+                          return;
+                        }
 
                         if (!serviceChoice) {
                           setStep(0);
@@ -417,6 +533,12 @@ export default function ContactPage() {
                         if (!consent) {
                           shake('consent');
                           setError('Confirmă acordul pentru prelucrarea datelor, ca să te putem contacta.');
+                          return;
+                        }
+                        if (!isMathOk) {
+                          setStep(2);
+                          shake('math');
+                          setError('Verificare anti-spam: răspuns greșit.');
                           return;
                         }
 
@@ -497,68 +619,73 @@ export default function ContactPage() {
                           }
 
                           setDone(true);
+                          try {
+                            window.localStorage.removeItem(draftKey);
+                          } catch {
+                            void 0;
+                          }
                         } catch {
                           setError('Conexiunea a eșuat. Te rog încearcă din nou.');
                         } finally {
                           setBusy(false);
                         }
                       }}
-                    >
-                      {error ? (
-                        <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3">
-                          <div className="text-sm font-semibold text-white">Verifică</div>
-                          <div className="mt-1 text-sm text-solaris-muted">{error}</div>
-                        </div>
-                      ) : null}
+                  >
+                    {error ? (
+                      <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3">
+                        <div className="text-sm font-semibold text-white">Verifică</div>
+                        <div className="mt-1 text-sm text-solaris-muted">{error}</div>
+                      </div>
+                    ) : null}
 
-                      <div className="overflow-hidden">
-                        <div className={styles.track} style={{ transform: `translateX(-${step * 33.3333}%)` }}>
-                          <section className="w-1/3 pr-4">
-                            <div className={`grid grid-cols-2 gap-3 ${shakeKey === 'service' ? styles.shake : ''}`}>
-                              {serviceOptions.map((o) => {
-                                const Icon = o.icon;
-                                const selected = serviceChoice === o.value;
-                                return (
-                                  <button
-                                    key={o.value}
-                                    type="button"
-                                    onClick={() => setServiceChoice(o.value)}
-                                    className={`group rounded-2xl border px-4 py-4 text-left transition-colors ${
-                                      selected ? 'border-orange-400/70 bg-orange-400/10' : 'border-white/10 bg-black/20 hover:bg-white/5 hover:border-white/20'
-                                    }`}
-                                  >
-                                    <div className="flex items-start gap-3">
-                                      <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-black/20 text-orange-400">
-                                        <Icon className="h-7 w-7" />
-                                      </span>
-                                      <div className="min-w-0">
-                                        <div className="text-sm font-black text-white leading-tight">{o.label}</div>
-                                        <div className="mt-1 text-xs text-white/55">Alege</div>
-                                      </div>
+                    <div className="overflow-hidden">
+                      <div className={styles.track} style={{ transform: `translateX(-${step * 33.3333}%)` }}>
+                        <section className="w-1/3 pr-4">
+                          <div className={`grid grid-cols-2 gap-3 ${shakeKey === 'service' ? styles.shake : ''}`}>
+                            {serviceOptions.map((o) => {
+                              const Icon = o.icon;
+                              const selected = serviceChoice === o.value;
+                              return (
+                                <button
+                                  key={o.value}
+                                  type="button"
+                                  onClick={() => setServiceChoice(o.value)}
+                                  className={`group rounded-2xl border px-4 py-4 text-left transition-colors ${
+                                    selected ? 'border-orange-400/70 bg-orange-400/10' : 'border-white/10 bg-black/20 hover:bg-white/5 hover:border-white/20'
+                                  }`}
+                                >
+                                  <div className="flex items-start gap-3">
+                                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-black/20 text-orange-400">
+                                      <Icon className="h-7 w-7" />
+                                    </span>
+                                    <div className="min-w-0">
+                                      <div className="text-sm font-black text-white leading-tight">{o.label}</div>
+                                      <div className="mt-1 text-xs text-white/55">Alege</div>
                                     </div>
-                                  </button>
-                                );
-                              })}
-                            </div>
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
 
-                            <div className="mt-5 flex items-center justify-between">
-                              <div className="text-xs text-white/55">Selectează un serviciu ca să continui</div>
-                              <button
-                                type="button"
-                                disabled={!canNextStep1}
-                                onClick={() => {
-                                  if (!canNextStep1) {
-                                    shake('service');
-                                    return;
-                                  }
-                                  setStep(1);
-                                }}
-                                className="inline-flex items-center gap-2 rounded-2xl bg-orange-400 px-5 py-3 text-sm font-black text-black disabled:opacity-50"
-                              >
-                                Continuă <ArrowRight className="h-4 w-4" aria-hidden />
-                              </button>
-                            </div>
-                          </section>
+                          <div className="mt-5 flex items-center justify-between">
+                            <div className="text-xs text-white/55">Selectează un serviciu ca să continui</div>
+                            <button
+                              type="button"
+                              disabled={!canNextStep1}
+                              onClick={() => {
+                                if (!canNextStep1) {
+                                  shake('service');
+                                  return;
+                                }
+                                setStep(1);
+                              }}
+                              className="inline-flex items-center gap-2 rounded-2xl bg-orange-400 px-5 py-3 text-sm font-black text-black disabled:opacity-50"
+                            >
+                              Continuă <ArrowRight className="h-4 w-4" aria-hidden />
+                            </button>
+                          </div>
+                        </section>
 
                           <section className="w-1/3 px-2">
                             <div className="text-sm font-bold text-white">Detalii proiect</div>
@@ -642,6 +769,7 @@ export default function ContactPage() {
                                 id="offer-name"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
+                                onBlur={() => setTouched((t) => ({ ...t, name: true }))}
                                 type="text"
                                 className={`w-full bg-white/5 border rounded-2xl px-4 py-3 outline-none transition-colors ${
                                   name.trim() ? 'border-emerald-400/50 focus:border-emerald-400' : 'border-white/10 focus:border-orange-400'
@@ -649,6 +777,9 @@ export default function ContactPage() {
                                 placeholder="Ion Popescu"
                                 autoComplete="name"
                               />
+                              {touched.name && !name.trim() ? (
+                                <div className="mt-2 text-xs text-red-300">Completează numele.</div>
+                              ) : null}
                             </div>
 
                             <div className={`mt-4 ${shakeKey === 'phone' ? styles.shake : ''}`}>
@@ -659,6 +790,7 @@ export default function ContactPage() {
                                 id="offer-phone"
                                 value={phone}
                                 onChange={(e) => setPhone(formatRoPhone(e.target.value))}
+                                onBlur={() => setTouched((t) => ({ ...t, phone: true }))}
                                 type="tel"
                                 className={`w-full bg-white/5 border rounded-2xl px-4 py-3 outline-none transition-colors ${
                                   phone.trim()
@@ -670,6 +802,9 @@ export default function ContactPage() {
                                 placeholder="+40 7xx xxx xxx"
                                 autoComplete="tel"
                               />
+                              {touched.phone && phone.trim() && !isPhoneValid ? (
+                                <div className="mt-2 text-xs text-red-300">Număr invalid. Exemplu: +40 769 889 721</div>
+                              ) : null}
                             </div>
 
                             <div className={`mt-4 ${shakeKey === 'email' ? styles.shake : ''}`}>
@@ -681,6 +816,7 @@ export default function ContactPage() {
                                   id="offer-email"
                                   value={email}
                                   onChange={(e) => setEmail(e.target.value)}
+                                  onBlur={() => setTouched((t) => ({ ...t, email: true }))}
                                   type="email"
                                   className={`w-full bg-white/5 border rounded-2xl px-4 py-3 pr-10 outline-none transition-colors ${
                                     email.trim()
@@ -704,6 +840,51 @@ export default function ContactPage() {
                                   />
                                 </svg>
                               </div>
+                              {touched.email && email.trim() && !emailOk ? (
+                                <div className="mt-2 text-xs text-red-300">Email invalid.</div>
+                              ) : null}
+                            </div>
+
+                            <div className="mt-4">
+                              <label htmlFor="offer-hp" className="sr-only">
+                                Website
+                              </label>
+                              <input
+                                id="offer-hp"
+                                value={hp}
+                                onChange={(e) => setHp(e.target.value)}
+                                type="text"
+                                tabIndex={-1}
+                                autoComplete="off"
+                                className="absolute left-[-9999px] top-auto h-px w-px opacity-0"
+                                aria-hidden
+                              />
+                            </div>
+
+                            <div className={`mt-4 ${shakeKey === 'math' ? styles.shake : ''}`}>
+                              <label htmlFor="offer-math" className="block text-sm font-medium text-white/70 mb-1">
+                                Verificare anti-spam: cât face {antiSpam.a} + {antiSpam.b}?
+                              </label>
+                              <input
+                                id="offer-math"
+                                value={mathAnswer}
+                                onChange={(e) => setMathAnswer(e.target.value.replace(/[^\d]/g, '').slice(0, 3))}
+                                onBlur={() => setTouched((t) => ({ ...t, math: true }))}
+                                inputMode="numeric"
+                                className={`w-full bg-white/5 border rounded-2xl px-4 py-3 outline-none transition-colors ${
+                                  mathAnswer.trim()
+                                    ? isMathOk
+                                      ? 'border-emerald-400/50 focus:border-emerald-400'
+                                      : 'border-red-400/50 focus:border-red-400'
+                                    : 'border-white/10 focus:border-orange-400'
+                                }`}
+                                placeholder="Răspuns"
+                              />
+                              {touched.math && !mathAnswer.trim() ? (
+                                <div className="mt-2 text-xs text-red-300">Completează verificarea anti-spam.</div>
+                              ) : touched.math && mathAnswer.trim() && !isMathOk ? (
+                                <div className="mt-2 text-xs text-red-300">Răspuns greșit.</div>
+                              ) : null}
                             </div>
 
                             <label className={`mt-5 flex items-start gap-3 text-sm text-white/70 ${shakeKey === 'consent' ? styles.shake : ''}`}>
@@ -740,15 +921,15 @@ export default function ContactPage() {
                               Serviciu: <span className="text-white/80">{selectedServiceLabel || '—'}</span>
                             </div>
                           </section>
-                        </div>
                       </div>
-                    </form>
-                  )}
-                </div>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
+          </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

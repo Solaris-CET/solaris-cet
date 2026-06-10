@@ -18,13 +18,13 @@ vi.mock('../hooks/useLanguage', () => ({
       },
       nav: {
         primaryNavigation: 'Primary navigation',
+        businessGroup: 'Business',
         home: 'Home',
         about: 'About',
         portfolio: 'Portfolio',
         services: 'Services',
         financing: 'Financing',
         blog: 'Blog',
-        cetToken: 'CET token',
         contact: 'Contact',
         requestOffer: 'Request offer',
         downloadApp: 'Download app',
@@ -96,6 +96,5 @@ describe('Navigation', () => {
     expect(screen.getAllByText('Financing').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Blog').length).toBeGreaterThan(0);
     expect(screen.getAllByText('About').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('CET token').length).toBeGreaterThan(0);
   });
 });

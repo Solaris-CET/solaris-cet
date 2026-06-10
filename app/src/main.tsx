@@ -2,6 +2,7 @@
 import './polyfills'
 import './index.css'
 import './css/type.css'
+import './css/reveal.css'
 
 const scheduleEditorialFonts = () => {
   const w = window as unknown as {

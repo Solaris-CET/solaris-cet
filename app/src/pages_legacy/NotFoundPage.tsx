@@ -83,9 +83,9 @@ export function NotFoundPage({
         <div className="bento-card p-6 md:p-8 border border-white/10">
           <div className="grid gap-6 md:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] items-start">
             <div className="min-w-0">
-              <h1 className="text-white text-2xl md:text-3xl font-semibold tracking-tight">Page not found</h1>
+              <h1 className="text-white text-2xl md:text-3xl font-semibold tracking-tight">Pagină inexistentă</h1>
               <p className="mt-3 text-white/70 text-sm break-all">
-                Path: <span className="font-mono">{attemptedPath}</span>
+                Rută: <span className="font-mono">{attemptedPath}</span>
               </p>
               <div className="mt-5 flex flex-wrap gap-3">
                 <a
@@ -93,28 +93,28 @@ export function NotFoundPage({
                   className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-solaris-gold text-solaris-dark px-5 text-sm font-semibold hover:bg-solaris-gold/90 transition-colors"
                 >
                   <Home className="w-4 h-4" aria-hidden />
-                  Go home
+                  Acasă
                 </a>
                 <a
-                  href="/cet-ai"
-                  className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
-                >
-                  <MessageSquareText className="w-4 h-4" aria-hidden />
-                  CET AI
-                </a>
-                <a
-                  href="/rwa"
+                  href="/servicii"
                   className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
                 >
                   <Compass className="w-4 h-4" aria-hidden />
-                  RWA
+                  Servicii
                 </a>
                 <a
-                  href="/faq"
+                  href="/proiecte"
                   className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
                 >
                   <ScrollText className="w-4 h-4" aria-hidden />
-                  FAQ
+                  Portofoliu
+                </a>
+                <a
+                  href="/contact"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
+                >
+                  <MessageSquareText className="w-4 h-4" aria-hidden />
+                  Contact
                 </a>
                 {staticRedirectHref ? (
                   <a
@@ -122,12 +122,12 @@ export function NotFoundPage({
                     className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
                   >
                     <ArrowLeft className="w-4 h-4" aria-hidden />
-                    Open static page
+                    Deschide pagina recomandată
                   </a>
                 ) : null}
               </div>
               <p className="mt-5 text-[11px] text-white/55">
-                Tip: Use the navigation or go back to the homepage sections for full context.
+                Dacă ai ajuns aici dintr-un link vechi, deschide pagina recomandată (redirecționare) sau revino la Servicii / Portofoliu.
               </p>
             </div>
             <div className="min-w-0">

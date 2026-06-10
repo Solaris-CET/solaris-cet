@@ -61,14 +61,12 @@ export default function Navigation() {
         { key: 'financing', label: t.nav.financing, href: localizePathname('/finantare', urlLocale) },
         { key: 'blog', label: t.nav.blog, href: localizePathname('/blog', urlLocale) },
         { key: 'about', label: t.nav.about, href: localizePathname('/despre', urlLocale) },
-        { key: 'token', label: t.nav.cetToken, href: localizePathname('/token-cet', urlLocale) },
         { key: 'contact', label: t.nav.contact, href: localizePathname('/contact', urlLocale) },
       ];
     },
     [
       t.nav.about,
       t.nav.blog,
-      t.nav.cetToken,
       t.nav.contact,
       t.nav.equipment,
       t.nav.financing,
@@ -80,8 +78,6 @@ export default function Navigation() {
     ],
   );
 
-  const businessLinks = useMemo(() => navLinks.filter((l) => l.key !== 'token'), [navLinks]);
-  const tokenLinks = useMemo(() => navLinks.filter((l) => l.key === 'token'), [navLinks]);
   const primaryLinks = useMemo(() => {
     const pathnameNoLocale =
       typeof window === 'undefined'
@@ -91,10 +87,11 @@ export default function Navigation() {
     const homePath = localizePathname('/', urlLocale);
     return [
       { key: 'home', label: t.nav.home, href: isHome ? '#hero' : homePath },
+      { key: 'portfolio', label: t.nav.portfolio, href: localizePathname('/proiecte', urlLocale) },
       { key: 'services', label: t.nav.services, href: localizePathname('/servicii', urlLocale) },
       { key: 'contact', label: t.nav.contact, href: localizePathname('/contact', urlLocale) },
     ];
-  }, [t.nav.contact, t.nav.home, t.nav.services, urlLocale]);
+  }, [t.nav.contact, t.nav.home, t.nav.portfolio, t.nav.services, urlLocale]);
 
   const [activeHref, setActiveHref] = useState<string>('/');
   const [indicator, setIndicator] = useState<{ left: number; width: number; visible: boolean }>({
@@ -134,7 +131,13 @@ export default function Navigation() {
     const update = () => {
       const pathname = typeof window !== 'undefined' ? (window.location.pathname || '/') : '/';
       const normalized = pathname !== '/' ? pathname.replace(/\/$/, '') : '/';
-      const best = normalized.startsWith('/servicii') ? '/servicii' : normalized.startsWith('/contact') ? '/contact' : '/';
+      const best = normalized.startsWith('/servicii')
+        ? '/servicii'
+        : normalized.startsWith('/proiecte') || normalized.startsWith('/portofoliu')
+          ? '/proiecte'
+          : normalized.startsWith('/contact')
+            ? '/contact'
+            : '/';
       setActiveHref(best);
     };
     update();
@@ -152,6 +155,7 @@ export default function Navigation() {
       if (!container) return;
       const el =
         (activeHref === '/servicii' ? desktopLinkRefs.current.services : null) ??
+        (activeHref === '/proiecte' ? desktopLinkRefs.current.portfolio : null) ??
         (activeHref === '/contact' ? desktopLinkRefs.current.contact : null) ??
         desktopLinkRefs.current.home;
       if (!el) {
@@ -188,6 +192,7 @@ export default function Navigation() {
 
   return (
     <header
+      data-reveal
       className={cn(
         `fixed top-0 left-0 right-0 z-[1000] max-w-full overflow-x-hidden lg:overflow-x-visible ${styles.bar}`,
         isScrolled
@@ -248,10 +253,21 @@ export default function Navigation() {
                   ref={(el) => {
                     desktopLinkRefs.current[link.key] = el;
                   }}
-                  onClick={() => setActiveHref(link.key === 'services' ? '/servicii' : link.key === 'contact' ? '/contact' : '/')}
+                  onClick={() =>
+                    setActiveHref(
+                      link.key === 'services'
+                        ? '/servicii'
+                        : link.key === 'portfolio'
+                          ? '/proiecte'
+                          : link.key === 'contact'
+                            ? '/contact'
+                            : '/',
+                    )
+                  }
                   className={cn(
                     'relative z-10 px-4 py-2 text-sm font-semibold transition-colors',
                     (activeHref === '/servicii' && link.key === 'services') ||
+                      (activeHref === '/proiecte' && link.key === 'portfolio') ||
                       (activeHref === '/contact' && link.key === 'contact') ||
                       (activeHref === '/' && link.key === 'home')
                       ? 'text-white'
@@ -339,31 +355,14 @@ export default function Navigation() {
             <div className="w-full max-w-[20rem] pb-2 text-center text-xs font-bold uppercase tracking-widest text-white/45">
               {t.nav.businessGroup}
             </div>
-            {businessLinks.map((link) => (
+            {navLinks.map((link) => (
               <a
                 key={link.key}
                 href={link.href}
                 className={cn(
                   `w-full max-w-[20rem] text-center py-4 text-[32px] leading-tight font-semibold text-solaris-muted hover:text-solaris-text transition-colors rounded-2xl hover:bg-white/[0.04] ${styles.overlayItem}`,
                 )}
-                style={{ animationDelay: `${Math.min(900, 120 + businessLinks.indexOf(link) * 70)}ms` }}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {link.label}
-              </a>
-            ))}
-
-            <div className="w-full max-w-[20rem] pt-6 pb-2 text-center text-xs font-bold uppercase tracking-widest text-white/45">
-              {t.nav.tokenGroup}
-            </div>
-            {tokenLinks.map((link) => (
-              <a
-                key={link.key}
-                href={link.href}
-                className={cn(
-                  `w-full max-w-[20rem] text-center py-4 text-[32px] leading-tight font-semibold text-solaris-muted hover:text-solaris-text transition-colors rounded-2xl hover:bg-white/[0.04] ${styles.overlayItem}`,
-                )}
-                style={{ animationDelay: `${Math.min(900, 120 + (businessLinks.length + tokenLinks.indexOf(link)) * 70)}ms` }}
+                style={{ animationDelay: `${Math.min(900, 120 + navLinks.indexOf(link) * 70)}ms` }}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.label}
