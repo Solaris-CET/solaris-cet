@@ -302,6 +302,18 @@ export default function ContactPage() {
   const isMathOk = mathAnswer.trim() ? Number(mathAnswer.trim()) === antiSpam.sum : false;
   const canSubmit = Boolean(name.trim()) && Boolean(phone.trim() || email.trim()) && isPhoneValid && emailOk && consent && isMathOk;
 
+  const dynamicWaText = useMemo(() => {
+    const s = serviceOptions.find((o) => o.value === service);
+    const label = s?.label || 'construcții/fotovoltaice';
+    let extra = '';
+    if (service === 'fotovoltaice') extra = ' Locația este ... și consumul mediu lunar ... kWh.';
+    if (service === 'tpo') extra = ' Suprafața acoperișului este de aprox. ... mp în localitatea ...';
+    if (service === 'acoperisuri') extra = ' Doresc ofertă pentru (tablă/țiglă) în localitatea ...';
+    if (service === 'reparatii') extra = ' Am o problemă cu infiltrațiile în zona ...';
+
+    return `Bună ziua Solaris Engineering! Doresc o ofertă pentru ${label}.${extra}`;
+  }, [service, serviceOptions]);
+
   return (
     <main
       id="main-content"
