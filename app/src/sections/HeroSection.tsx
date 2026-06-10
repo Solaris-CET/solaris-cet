@@ -64,8 +64,7 @@ function useCountUp({
 }
 
 export default function HeroSection() {
-  const mainVisual =
-    'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20a%20Romanian%20house%20with%20a%20clean%20black%20solar%20panel%20installation%20on%20the%20roof%2C%20installer%20team%20working%20neatly%2C%20modern%20gutters%2C%20golden%20hour%20light%2C%20premium%20commercial%20look%2C%20high%20detail%2C%20no%20logos%2C%20no%20text&image_size=portrait_4_3';
+  const mainVisual = '/images/hero-solaris.svg';
 
   const particles = useMemo<Particle[]>(
     () => [
@@ -296,7 +295,7 @@ export default function HeroSection() {
               </div>
               <div className={`inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-black/35 px-4 py-3 font-semibold text-white backdrop-blur ${styles.badgePulse}`}>
                 <BadgeCheck className="h-4 w-4 text-amber-400" aria-hidden />
-                <span>Atestat ANRE · execuție conformă</span>
+                <span>Conformitate, detalii curate, suport după montaj</span>
               </div>
             </div>
 
@@ -337,9 +336,9 @@ export default function HeroSection() {
                 <div className="mt-1 text-xs text-slate-400">fotovoltaice, acoperișuri și intervenții</div>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-4 backdrop-blur">
-                <div className="text-2xl font-black text-white">4.9/5</div>
-                <div className="mt-1 text-sm font-semibold text-slate-200">Google Recenzii</div>
-                <div className="mt-1 text-xs text-slate-400">semnal de încredere pentru lucrări locale</div>
+                <div className="text-2xl font-black text-white">6</div>
+                <div className="mt-1 text-sm font-semibold text-slate-200">tipuri de lucrări</div>
+                <div className="mt-1 text-xs text-slate-400">fotovoltaice, acoperișuri, TPO, atice și intervenții</div>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-4 backdrop-blur">
                 <div className="text-2xl font-black text-white tabular-nums">{years}+</div>

@@ -17,21 +17,16 @@ function Star({ className, style }: { className?: string; style?: React.CSSPrope
 
 export default function TrustSignalsStrip() {
   const reviewLine = useMemo(() => {
-    const rv = companyProfile.reviews?.ratingValue ?? 4.9;
-    const src = companyProfile.reviews?.sourceLabel ?? 'Recenzii';
+    const rv = companyProfile.reviews?.ratingValue;
+    const src = companyProfile.reviews?.sourceLabel;
     const count = companyProfile.reviews?.ratingCount;
-    return count ? `${rv.toFixed(1)}/5 · ${count}+ ${src}` : `${rv.toFixed(1)}/5 · ${src}`;
+    return rv && src ? (count ? `${rv.toFixed(1)}/5 · ${count}+ ${src}` : `${rv.toFixed(1)}/5 · ${src}`) : 'Execuție curată · suport post-proiect';
   }, []);
 
   const tickerText =
     'Fotovoltaice · Acoperișuri tablă/țiglă · TPO industrial · Atice și fațade · Reparații · Mentenanță ·';
 
   const facts = [
-    {
-      value: '4.9/5',
-      label: 'Scor recenzii',
-      note: `${companyProfile.reviews?.ratingCount ?? 50}+ recenzii Google`,
-    },
     {
       value: '6',
       label: 'Tipuri de lucrări',
@@ -40,7 +35,12 @@ export default function TrustSignalsStrip() {
     {
       value: '24h',
       label: 'Răspuns comercial',
-      note: 'Confirmare rapidă pentru cereri și clarificări',
+      note: 'Confirmare rapidă pentru cereri, poze și clarificări',
+    },
+    {
+      value: 'RO',
+      label: 'Arie de lucru',
+      note: 'Vaslui, Moldova și proiecte selectate la nivel național',
     },
   ];
 
@@ -50,7 +50,7 @@ export default function TrustSignalsStrip() {
         <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-sm">
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.2fr)_minmax(0,0.9fr)]">
             <div className="p-6 sm:p-7" data-reveal-stagger>
-              <div className="text-xs font-semibold tracking-[0.18em] uppercase text-amber-300/90">Dovadă socială</div>
+              <div className="text-xs font-semibold tracking-[0.18em] uppercase text-amber-300/90">Repere comerciale</div>
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {facts.map((s) => (
                   <div key={s.label} className="rounded-2xl border border-white/10 bg-black/20 px-5 py-4">
@@ -86,7 +86,7 @@ export default function TrustSignalsStrip() {
               <div className="w-full">
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <div className="text-sm font-black text-white">Clienți mulțumiți</div>
+                    <div className="text-sm font-black text-white">Ce promitem clar</div>
                     <div className="mt-1 text-xs text-white/60">{reviewLine}</div>
                   </div>
                   <div role="img" className="flex items-center gap-1 text-amber-400" aria-label={reviewLine}>

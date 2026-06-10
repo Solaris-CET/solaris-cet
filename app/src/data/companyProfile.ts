@@ -9,10 +9,10 @@ export const companyProfile = {
   location: 'Cetățuia, Vaslui',
   program: 'Luni–Vineri 08:00–18:00',
   urgent: 'Urgențe: 24/7',
-  reviews: {
-    ratingValue: 4.9,
-    ratingCount: 50,
-    sourceLabel: 'Google Recenzii',
+  reviews: null as null | {
+    ratingValue: number;
+    ratingCount: number;
+    sourceLabel: string;
   },
   cui: '',
   regCom: '',

@@ -1,4 +1,4 @@
-import { localizePathname, shouldLocalePrefixPathname,URL_LOCALES, type UrlLocale } from '@/i18n/urlRouting'
+import { localizePathname, shouldLocalePrefixPathname, type UrlLocale } from '@/i18n/urlRouting'
 
 export type SpaSeoConfig = {
   origin: string
@@ -80,13 +80,6 @@ export function applySpaSeo(config: SpaSeoConfig) {
   setMeta('meta[name="twitter:description"]', config.description)
   setLink('link[rel="canonical"]', absoluteUrl)
   upsertMetaRobots(Boolean(config.noindex))
-
-  for (const l of URL_LOCALES) {
-    const localized = prefix ? localizePathname(pathnameNoLocale, l) : pathnameNoLocale
-    setLink(`#hreflang-${l}`, `${config.origin}${localized === '/' ? '' : localized}`)
-  }
-  const xDefault = prefix ? localizePathname(pathnameNoLocale, 'en') : pathnameNoLocale
-  setLink('#hreflang-x-default', `${config.origin}${xDefault === '/' ? '' : xDefault}`)
 
   upsertJsonLd('spa-jsonld', config.jsonLd ?? null)
 }

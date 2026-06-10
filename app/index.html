@@ -29,10 +29,6 @@
     <meta property="og:locale" content="ro_RO" />
     <meta property="og:image:alt" content="Solaris CET — Fotovoltaice, acoperișuri și construcții" />
 
-    <!-- Resource hints for critical third-party endpoints used at runtime -->
-    <link rel="dns-prefetch" href="https://coresg-normal.trae.ai" />
-    <link rel="preconnect" href="https://coresg-normal.trae.ai" crossorigin />
-
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@SolarisCET" />
@@ -44,14 +40,6 @@
 
     <!-- Canonical -->
     <link rel="canonical" href="https://solaris-cet.com" />
-    <link id="hreflang-en" rel="alternate" hreflang="en" href="https://solaris-cet.com/en/" />
-    <link id="hreflang-ro" rel="alternate" hreflang="ro" href="https://solaris-cet.com/ro/" />
-    <link id="hreflang-es" rel="alternate" hreflang="es" href="https://solaris-cet.com/es/" />
-    <link id="hreflang-zh" rel="alternate" hreflang="zh" href="https://solaris-cet.com/zh/" />
-    <link id="hreflang-ru" rel="alternate" hreflang="ru" href="https://solaris-cet.com/ru/" />
-    <link id="hreflang-pt" rel="alternate" hreflang="pt" href="https://solaris-cet.com/pt/" />
-    <link id="hreflang-de" rel="alternate" hreflang="de" href="https://solaris-cet.com/de/" />
-    <link id="hreflang-x-default" rel="alternate" hreflang="x-default" href="https://solaris-cet.com/ro/" />
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
 
     <!-- PWA / Mobile -->
@@ -178,6 +166,11 @@
       .solaris-preload .grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+      .solaris-preload .stack {
+        display: grid;
         gap: 0.75rem;
         margin-top: 1rem;
       }
@@ -435,6 +428,16 @@
             <a class="btn" href="/proiecte">Portofoliu</a>
             <a class="btn" href="/servicii">Servicii</a>
           </div>
+          <div class="stack" role="region" aria-label="Argumente cheie">
+            <div class="card">
+              <h2>Ce primești rapid</h2>
+              <div class="muted">Evaluare inițială, clarificări tehnice, pașii următori și opțiunea de a trimite poze pe WhatsApp.</div>
+            </div>
+            <div class="card">
+              <h2>Lucrări acoperite</h2>
+              <div class="muted">Fotovoltaice rezidențiale și industriale, acoperișuri tablă/țiglă, TPO, reparații și mentenanță.</div>
+            </div>
+          </div>
           <div class="grid" role="region" aria-label="Repere rapide">
             <div class="card">
               <h2>Evaluare + ofertă</h2>
@@ -447,6 +450,20 @@
             <div class="card">
               <h2>Proiecte orientative</h2>
               <div class="muted">Vezi exemple și cere poze reale din lucrări similare pe WhatsApp.</div>
+            </div>
+          </div>
+          <div class="grid" role="region" aria-label="Întrebări frecvente rapide">
+            <div class="card">
+              <h2>Cât durează?</h2>
+              <div class="muted">Depinde de tipul lucrării, acces și complexitate. Discutăm timpul estimat înainte de ofertă.</div>
+            </div>
+            <div class="card">
+              <h2>Ce trimitem prima dată?</h2>
+              <div class="muted">De regulă: consum, localitate, tipul acoperișului și câteva poze din teren.</div>
+            </div>
+            <div class="card">
+              <h2>Unde lucrăm?</h2>
+              <div class="muted">Vaslui, Moldova și proiecte selectate la nivel național, în funcție de lucrare.</div>
             </div>
           </div>
         </div>

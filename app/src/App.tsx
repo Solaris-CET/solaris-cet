@@ -9,6 +9,7 @@ import { parseUrlLocaleFromPathname, type UrlLocale,urlLocaleFromLang } from '@/
 import { refreshScrollReveal } from '@/js/reveal';
 import { getServiceDetail } from '@/lib/serviceDetails';
 import { applySpaSeo } from '@/lib/spaSeo';
+import HomePage from '@/pages_legacy/HomePage';
 import { companyFaqItems } from '@/sections/CompanyFaqSection';
 
 import Navigation from './components/Navigation';
@@ -16,7 +17,6 @@ import { LanguageContext, useLanguageState } from './hooks/useLanguage';
 import { useTelegram } from './hooks/useTelegram';
 import { NotFoundPage } from './pages_legacy/NotFoundPage';
 
-const HomePage = lazy(() => import('./pages_legacy/HomePage'));
 const ServicesPage = lazy(() => import('./pages_legacy/ServicesPage'));
 const ServiceDetailPage = lazy(() => import('./pages_legacy/ServiceDetailPage'));
 const ContactPage = lazy(() => import('./pages_legacy/ContactPage'));
@@ -136,11 +136,15 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
               addressCountry: 'RO',
             },
             areaServed: 'RO',
-            aggregateRating: {
-              '@type': 'AggregateRating',
-              ratingValue: companyProfile.reviews.ratingValue,
-              reviewCount: companyProfile.reviews.ratingCount,
-            },
+            ...(companyProfile.reviews
+              ? {
+                  aggregateRating: {
+                    '@type': 'AggregateRating',
+                    ratingValue: companyProfile.reviews.ratingValue,
+                    reviewCount: companyProfile.reviews.ratingCount,
+                  },
+                }
+              : {}),
           },
           {
             '@type': 'FAQPage',

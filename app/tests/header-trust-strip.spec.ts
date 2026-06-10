@@ -11,23 +11,25 @@ test.describe('Header trust strip', () => {
 
   test('trust signals strip is visible on desktop', async ({ page }) => {
     await openHome(page, 1280, 800);
-    const sectionTitle = page.getByText('Dovadă socială').first();
+    const sectionTitle = page.getByText('Repere comerciale').first();
     await sectionTitle.scrollIntoViewIfNeeded();
     await expect(sectionTitle).toBeVisible();
 
-    await expect(page.getByText('Scor recenzii').first()).toBeVisible();
+    await expect(page.getByText('Răspuns comercial').first()).toBeVisible();
+    await expect(page.getByText('Arie de lucru').first()).toBeVisible();
     await expect(page.getByText('Tipuri de lucrări').first()).toBeVisible();
-    await expect(page.getByText('Clienți mulțumiți').first()).toBeVisible();
+    await expect(page.getByText('Ce promitem clar').first()).toBeVisible();
   });
 
   test('trust signals strip is visible on mobile', async ({ page }) => {
     await openHome(page, 390, 844);
-    const sectionTitle = page.getByText('Dovadă socială').first();
+    const sectionTitle = page.getByText('Repere comerciale').first();
     await sectionTitle.scrollIntoViewIfNeeded();
     await expect(sectionTitle).toBeVisible();
 
-    await expect(page.getByText('Scor recenzii').first()).toBeVisible();
+    await expect(page.getByText('Răspuns comercial').first()).toBeVisible();
+    await expect(page.getByText('Arie de lucru').first()).toBeVisible();
     await expect(page.getByText('Tipuri de lucrări').first()).toBeVisible();
-    await expect(page.getByText('Clienți mulțumiți').first()).toBeVisible();
+    await expect(page.getByText('Ce promitem clar').first()).toBeVisible();
   });
 });

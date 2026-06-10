@@ -36,21 +36,21 @@ const projectCards = [
     title: 'Fotovoltaice rezidențial',
     text: 'Sistem dimensionat pe consum, orientare și umbriri, cu monitorizare și punere în funcțiune.',
     icon: PlugZap,
-    img: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20a%20modern%20Romanian%20house%20roof%20with%20black%20solar%20panels%20installed%2C%20clean%20cabling%2C%20golden%20hour%20light%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
+    img: '/images/hero-solaris.svg',
     alt: 'Panouri fotovoltaice montate pe acoperiș rezidențial',
   },
   {
     title: 'Acoperiș industrial TPO',
     text: 'Detalii corecte la atice și străpungeri, cu etanșare profesionistă și plan de intervenție clar.',
     icon: Building2,
-    img: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20of%20an%20industrial%20flat%20roof%20with%20white%20TPO%20membrane%20installation%2C%20clean%20details%20around%20parapets%20and%20penetrations%2C%20modern%20warehouse%20background%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
+    img: '/images/team-placeholder.svg',
     alt: 'Acoperiș industrial cu folie TPO, detalii de etanșare executate corect',
   },
   {
     title: 'Acoperiș tablă / țiglă metalică',
     text: 'Montaj curat, accesorii corecte și finisaje rezistente pentru proiecte rezidențiale sau comerciale.',
     icon: Home,
-    img: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20professional%20photo%20close-up%20of%20a%20standing%20seam%20metal%20roof%20on%20a%20modern%20house%2C%20clean%20lines%2C%20premium%20finish%2C%20high%20detail%2C%20no%20people%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9',
+    img: '/og-image.png',
     alt: 'Acoperiș din tablă tip standing seam',
   },
 ] as const;
@@ -60,7 +60,7 @@ export default function HomePage() {
     <main
       id="main-content"
       tabIndex={-1}
-      className="relative w-full overflow-x-clip"
+      className="relative w-full overflow-x-clip pb-24 md:pb-0"
     >
       <section id="hero" className="relative z-10">
         <ErrorBoundary>
@@ -214,6 +214,31 @@ export default function HomePage() {
 
       <div data-testid="footer-landmark-section" className="relative z-[113]">
         <SolarisFooter />
+      </div>
+
+      <div className="fixed inset-x-3 bottom-3 z-[140] md:hidden">
+        <div className="grid grid-cols-3 gap-2 rounded-[1.4rem] border border-white/10 bg-[#050914]/90 p-2 shadow-[0_18px_50px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+          <a
+            href="tel:+40769889721"
+            className="inline-flex min-h-[48px] items-center justify-center rounded-2xl bg-white/5 px-3 text-center text-xs font-black text-white"
+            aria-label="Sună acum"
+          >
+            Sună acum
+          </a>
+          <a
+            href="https://wa.me/40769889721?text=Bun%C4%83%20ziua%2C%20vreau%20o%20ofert%C4%83%20pentru%20fotovoltaice%20sau%20acoperi%C8%99.%20V%C4%83%20pot%20trimite%20poze."
+            className="inline-flex min-h-[48px] items-center justify-center rounded-2xl bg-white/5 px-3 text-center text-xs font-black text-white"
+            rel="noopener"
+          >
+            WhatsApp
+          </a>
+          <a
+            href="/contact"
+            className="inline-flex min-h-[48px] items-center justify-center rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-3 text-center text-xs font-black text-black"
+          >
+            Cere ofertă
+          </a>
+        </div>
       </div>
     </main>
   );
