@@ -611,10 +611,10 @@ const handlerCache = new Map();
 
 /**
  * Advanced LRU Response Cache for Hetzner Optimization
- * Capacity: 1000 entries
+ * Capacity: 8192 entries (Optimized for 16GB RAM)
  */
 class ResponseCache {
-  constructor(capacity = 1000) {
+  constructor(capacity = 8192) {
     this.capacity = capacity;
     this.cache = new Map();
   }
@@ -693,7 +693,8 @@ async function serveFile(res, absPath) {
     res.setHeader('Cache-Control', 'no-store');
   } else if (baseExt === '.html' || baseExt === '.json' || baseExt === '.xml' || baseExt === '.txt') {
     res.setHeader('Cache-Control', 'no-store');
-  } else if (absPath.includes('/assets/') || absPath.includes('/fonts/')) {
+  } else if (absPath.includes('/assets/') || absPath.includes('/fonts/') || absPath.includes('/cinematic/')) {
+    // Optimized for Hetzner: long-term caching for immutable hashed assets
     res.setHeader('Cache-Control', 'public, max-age=31536000, s-maxage=31536000, immutable');
   } else {
     res.setHeader('Cache-Control', 'public, max-age=86400');

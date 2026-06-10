@@ -1,8 +1,11 @@
+export type WeatherVolatility = 'Normal' | 'Drought' | 'Flood';
+
 export interface SimulationVariables {
   soilPH: number;
   rainfallMm: number;
   nitrogenLevel: number;
   agentDensity: number;
+  weather?: WeatherVolatility;
 }
 
 export interface SimulationResult {
@@ -29,8 +32,16 @@ export class YieldSimulator {
     // Bell curve centered at 6.5.
     const phFactor = Math.exp(-Math.pow(soilPH - 6.5, 2) / 2.0);
 
-    // 2. Rainfall Factor: Romanian agricultural average ideal is ~700mm/year.
-    const rainFactor = Math.exp(-Math.pow(rainfallMm - 700, 2) / 50000);
+    // 2. Rainfall & Weather Volatility Factor
+    // Romanian agricultural average ideal is ~700mm/year.
+    let rainFactor = Math.exp(-Math.pow(rainfallMm - 700, 2) / 50000);
+
+    // Apply volatility modifiers
+    if (vars.weather === 'Drought') {
+      rainFactor *= 0.4;
+    } else if (vars.weather === 'Flood') {
+      rainFactor *= 0.6; // Too much water is also bad
+    }
 
     // 3. Nitrogen Factor: Normalized 0-100 scale.
     const nFactor = Math.min(1.0, nitrogenLevel / 80) * (1.2 - Math.max(0, (nitrogenLevel - 80) / 100));
