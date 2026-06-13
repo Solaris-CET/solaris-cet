@@ -145,7 +145,7 @@ export default function HeroSection() {
     freezeOnceVisible: true,
   });
 
-  const projects = useCountUp({ to: 200, enabled: isVisible });
+  const projects = useCountUp({ to: 183, enabled: isVisible });
   const years = useCountUp({ to: 5, enabled: isVisible, durationMs: 650 });
 
   const rays = useMemo(
@@ -309,17 +309,17 @@ export default function HeroSection() {
             >
               <div className="solaris-stat rounded-2xl px-4 py-4 backdrop-blur">
                 <div className="solaris-gold-text text-[2rem] font-black leading-none tabular-nums">{projects}+</div>
-                <div className="mt-2 text-sm font-semibold text-white/90">proiecte estimate</div>
+                <div className="mt-2 text-sm font-semibold text-white/90">Proiecte finalizate</div>
                 <div className="mt-1 text-xs text-slate-400">fotovoltaice, acoperișuri și intervenții</div>
               </div>
               <div className="solaris-stat rounded-2xl px-4 py-4 backdrop-blur">
-                <div className="solaris-gold-text text-[2rem] font-black leading-none">6</div>
-                <div className="mt-2 text-sm font-semibold text-white/90">tipuri de lucrări</div>
+                <div className="solaris-gold-text text-[2rem] font-black leading-none">10</div>
+                <div className="mt-2 text-sm font-semibold text-white/90">ani garanție</div>
                 <div className="mt-1 text-xs text-slate-400">PV, acoperișuri, TPO, atice, intervenții</div>
               </div>
               <div className="solaris-stat rounded-2xl px-4 py-4 backdrop-blur">
                 <div className="solaris-gold-text text-[2rem] font-black leading-none tabular-nums">{years}+</div>
-                <div className="mt-2 text-sm font-semibold text-white/90">ani experiență</div>
+                <div className="mt-2 text-sm font-semibold text-white/90">ani pe piață</div>
                 <div className="mt-1 text-xs text-slate-400">execuție curată și suport real</div>
               </div>
               <div className="solaris-stat rounded-2xl px-4 py-4 backdrop-blur">
