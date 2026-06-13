@@ -37,9 +37,6 @@ const ThankYouPage = lazy(() => import('./pages_legacy/ThankYouPage'));
 const LegalDocPage = lazy(() => import('./pages_legacy/LegalDocPage'));
 const PrivacySettingsPage = lazy(() => import('./pages_legacy/PrivacySettingsPage'));
 const LocationPage = lazy(() => import('./pages_legacy/LocationPage'));
-import Cookies from '@/pages/Cookies';
-import GDPR from '@/pages/GDPR';
-import Termeni from '@/pages/Termeni';
 const SolarisChatWidget = lazy(() =>
   import('@/components/company/SolarisChatWidget').then((m) => ({ default: m.SolarisChatWidget })),
 );
