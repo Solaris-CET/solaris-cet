@@ -9,7 +9,6 @@ services:
       - PORT=3000
       - DATABASE_URL=postgres://solaris:solaris@postgres:5432/solaris_cet
       - JWT_SECRET=dev-only-change-me
-      - DEEPSEEK_CHATBOT_API_KEY=your-deepseek-api-key
     ports:
       - "3000:3000"
     depends_on:
