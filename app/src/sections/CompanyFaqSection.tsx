@@ -2,6 +2,11 @@ import { FaqAccordion, type FaqItem } from '@/components/FaqAccordion';
 
 const items: FaqItem[] = [
   {
+    question: 'Cât costă un sistem fotovoltaic pentru o casă?',
+    answer:
+      'Prețul variază în funcție de puterea instalată și configurație. Orientativ, un sistem de 5 kWp costă între 4.500 și 6.500 EUR cu montaj inclus. Solaris CET oferă evaluare gratuită și ofertă personalizată.',
+  },
+  {
     question: 'Cât durează instalarea unui sistem fotovoltaic?',
     answer:
       'În funcție de complexitate și acces, montajul poate dura de la 1–3 zile pentru rezidențial. Pentru industrial, durata se stabilește după evaluare și planificare.',

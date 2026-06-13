@@ -1,51 +1,44 @@
 ---
-title: "Termeni și Condiții"
-description: "Reguli pentru utilizarea site-ului Solaris CET și pentru trimiterea solicitărilor de ofertă."
-lastUpdated: 2026-04-26
+title: "Termeni și condiții — Solaris CET"
+description: "Termenii de utilizare ai site-ului Solaris CET privind scopul informativ, proprietatea intelectuală, răspunderea și legea aplicabilă."
+lastUpdated: ""
 ---
 
-## 1. Acord
+# Termeni și condiții — Solaris CET
 
-Acești Termeni și Condiții („Termeni”) reglementează accesul și utilizarea site-ului și aplicației Solaris CET („Serviciul”). Prin utilizarea Serviciului, accepți acești Termeni.
+Ultima actualizare: 2026-06-10
 
-Dacă nu ești de acord, nu utiliza Serviciul.
+## 1. Operatorul site-ului
 
-## 2. Scopul informațiilor de pe site
+Solaris CET, [formă juridică], CUI: [COMPLETEAZĂ], Vaslui, România.  
+Email: solaris-cet@protonmail.com · Tel: +40 769 889 721
 
-Informațiile de pe site sunt prezentate cu scop informativ (servicii, exemple, pași de lucru). O ofertă finală se stabilește după colectarea cerințelor și, după caz, evaluarea la locație.
+## 2. Scopul site-ului
 
-## 3. Solicitări de ofertă și comunicări
+Site-ul solaris-cet.com are rol exclusiv informativ și de generare de contacte comerciale.  
+Informațiile prezentate (prețuri orientative, specificații tehnice, termene)  
+nu constituie ofertă fermă. Oferta fermă se emite în scris, separat,  
+după evaluarea tehnică a proiectului.
 
-Când trimiți un mesaj sau o solicitare de ofertă, ești responsabil ca datele furnizate să fie corecte și să nu includă informații sensibile. Putem folosi datele de contact pentru a răspunde solicitării și pentru a programa o evaluare.
+## 3. Proprietatea intelectuală
 
-## 4. Utilizare acceptabilă
+Conținutul site-ului (texte, imagini, logo, structură) este proprietatea  
+Solaris CET sau utilizat cu drepturi de licență.  
+Reproducerea parțială sau totală fără acordul scris al Solaris CET este interzisă.
 
-Ești de acord să nu:
+## 4. Limitarea răspunderii
 
-- folosești Serviciul pentru activități ilegale,
-- încerci acces neautorizat sau să afectezi securitatea,
-- transmiți malware sau conținut abuziv,
-- supraîncarci Serviciul.
+Solaris CET nu răspunde pentru: decizii luate exclusiv pe baza informațiilor  
+orientative de pe site; întreruperi tehnice temporare; erori în datele furnizate  
+de utilizator; pierderi indirecte sau de profit.
 
-Putem restricționa accesul pentru încălcări.
+## 5. Legea aplicabilă și jurisdicția
 
-## 5. Proprietate intelectuală
+Prezentele condiții sunt guvernate de legislația română în vigoare.  
+Orice litigiu se soluționează pe cale amiabilă sau, în caz de eșec,  
+la instanțele judecătorești competente din România.
 
-Serviciul și conținutul sunt deținute de Companie sau licențiatori și sunt protejate de legi privind proprietatea intelectuală. Nu ai dreptul să copiezi/modifici/distribui conținutul decât dacă legea permite sau ai acordul Companiei.
+## 6. Modificarea termenilor
 
-## 6. Linkuri către terți
-
-Serviciul poate include linkuri către terți (de ex. hărți, platforme de comunicare). Nu controlăm aceste servicii și nu suntem responsabili pentru practicile lor.
-
-## 7. Disponibilitate și limitarea răspunderii
-
-În măsura maximă permisă de lege, Compania nu garantează că Serviciul va fi disponibil fără întreruperi sau fără erori. Informațiile de pe site pot fi actualizate oricând.
-
-## 8. Lege aplicabilă
-
-Acești Termeni sunt guvernați de legea aplicabilă în România, sub rezerva normelor obligatorii de protecție a consumatorilor (dacă se aplică).
-
-## 9. Contact
-
-Pentru întrebări: solaris-cet@protonmail.com · +40 769 889 721  
-Date identificare: CUI: *********** · Cetatuia, Vaslui, 737429, România
+Solaris CET poate modifica acești termeni oricând, cu efect de la publicare.  
+Data ultimei actualizări este menționată în antetul documentului.

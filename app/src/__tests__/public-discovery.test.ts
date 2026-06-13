@@ -12,15 +12,18 @@ describe('Public discovery — sitemap, security.txt, humans.txt', () => {
   it('static assets ship with expected content', () => {
     const robots = readFileSync(path.join(publicDir, 'robots.txt'), 'utf8');
     expect(robots).toContain(`Sitemap: ${PRODUCTION_SITE_ORIGIN}/sitemap.xml`);
-    expect(robots).toContain('llms.txt');
+    expect(robots).toContain('Disallow: /privacy-settings/');
+    expect(robots).toContain('Disallow: /multumim/');
+    expect(robots).toContain('Disallow: /cdn-cgi/');
 
     const xml = readFileSync(path.join(publicDir, 'sitemap.xml'), 'utf8');
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/servicii`);
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/contact`);
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/servicii/fotovoltaice-rezidentiale`);
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/llms.txt`);
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/humans.txt`);
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/.well-known/security.txt`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/servicii/`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/proiecte/`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/contact/`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/servicii/fotovoltaice-rezidentiale/`);
+    expect(xml).toContain('<priority>1.0</priority>');
+    expect(xml).not.toContain(`${PRODUCTION_SITE_ORIGIN}/privacy-settings/`);
+    expect(xml).not.toContain(`${PRODUCTION_SITE_ORIGIN}/llms.txt`);
 
     const sec = path.join(publicDir, '.well-known/security.txt');
     expect(existsSync(sec), 'public/.well-known/security.txt must ship').toBe(true);

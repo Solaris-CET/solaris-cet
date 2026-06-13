@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 
 import { SolarisFooter } from '@/components/company/SolarisFooter';
 import { FaqAccordion } from '@/components/FaqAccordion';
+import { companyProfile } from '@/data/companyProfile';
 import { getServiceDetail } from '@/lib/serviceDetails';
 
 function MiniBarChart({ title, labels, values }: { title: string; labels: string[]; values: number[] }) {
@@ -51,6 +52,7 @@ export default function ServiceDetailPage({ slug }: { slug: string }) {
 
   const contactHref = `/contact?service=${encodeURIComponent(service.contactServiceParam)}`;
   const isSolarService = service.contactServiceParam === 'fotovoltaice';
+  const whatsappUrl = `https://wa.me/40769889721?text=${encodeURIComponent(`Bună! Aș dori o ofertă pentru ${service.title}.`)}`;
   const trust = [
     {
       title: 'Evaluare + ofertă clară',
@@ -146,7 +148,7 @@ export default function ServiceDetailPage({ slug }: { slug: string }) {
 
             {service.steps?.length ? (
               <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-7" data-reveal-stagger>
-                <h2 className="text-2xl font-bold">Pași de lucru</h2>
+                <h2 className="text-2xl font-bold">Pași următori</h2>
                 <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {service.steps.map((s) => (
                     <div key={s.title} className="rounded-2xl border border-white/10 bg-black/20 p-4">
@@ -206,6 +208,29 @@ export default function ServiceDetailPage({ slug }: { slug: string }) {
               <h2 className="text-2xl font-bold">FAQ</h2>
               <div className="mt-5">
                 <FaqAccordion items={service.faq} />
+              </div>
+            </div>
+
+            <div className="mt-8 rounded-3xl border border-amber-400/30 bg-amber-400/10 p-7" data-reveal-stagger>
+              <h2 className="text-2xl font-bold text-white">Vrei ofertă clară pentru {service.title}?</h2>
+              <p className="mt-3 max-w-3xl text-sm leading-relaxed text-slate-200">
+                Trimite-ne localitatea, câteva poze și contextul lucrării. Îți răspundem cu pașii corecți: telefon pentru urgențe, WhatsApp pentru mesaje rapide și formular pentru cereri complete.
+              </p>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <a href={`tel:${companyProfile.phone}`} className="inline-flex items-center justify-center rounded-2xl bg-amber-400 px-6 py-4 font-black text-black">
+                  Sună: {companyProfile.phoneDisplay}
+                </a>
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center rounded-2xl border border-white/20 px-6 py-4 font-semibold text-white hover:bg-white/5"
+                >
+                  Scrie pe WhatsApp
+                </a>
+                <a href={contactHref} className="inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white/5 px-6 py-4 font-semibold text-white hover:bg-white/10">
+                  Deschide formularul
+                </a>
               </div>
             </div>
           </div>

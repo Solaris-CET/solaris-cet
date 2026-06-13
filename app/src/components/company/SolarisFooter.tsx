@@ -1,8 +1,9 @@
-import { ArrowRight, Globe, Mail, MapPin, MessageCircle, Phone } from 'lucide-react';
+import { ArrowRight, Globe, MapPin, MessageCircle, Phone } from 'lucide-react';
 import type { ReactElement } from 'react';
 import { useMemo } from 'react';
 
 import AppImage from '@/components/AppImage';
+import { SafeEmailLink } from '@/components/SafeEmailLink';
 import { companyProfile } from '@/data/companyProfile';
 import { useLanguage } from '@/hooks/useLanguage';
 import { localizePathname, parseUrlLocaleFromPathname, urlLocaleFromLang } from '@/i18n/urlRouting';
@@ -42,12 +43,10 @@ export function SolarisFooter({ className }: { className?: string }) {
   ];
 
   const whatsappUrl = `https://wa.me/40769889721?text=${encodeURIComponent('Bună! Aș dori o ofertă pentru: ')}`;
-  const emailUrl = `mailto:${companyProfile.email}`;
   const recomUrl = companyProfile.cui ? `https://www.recom.ro/?cui=${encodeURIComponent(companyProfile.cui)}` : null;
   const socialLinks = [
     companyProfile.social.facebook ? { label: 'Facebook', href: companyProfile.social.facebook, icon: <Globe className="h-7 w-7" aria-hidden /> } : null,
     { label: 'WhatsApp', href: whatsappUrl, icon: <MessageCircle className="h-7 w-7" aria-hidden /> },
-    { label: 'Email', href: emailUrl, icon: <Mail className="h-7 w-7" aria-hidden /> },
   ].filter(Boolean) as Array<{ label: string; href: string; icon: ReactElement }>;
 
   return (
@@ -124,9 +123,10 @@ export function SolarisFooter({ className }: { className?: string }) {
                 <Phone className="h-5 w-5 text-white/70 group-hover:text-orange-300 transition-colors" aria-hidden />
                 {companyProfile.phoneDisplay}
               </a>
-              <a className="block text-sm font-semibold text-white/60 hover:text-orange-300 transition-colors" href={emailUrl}>
-                {companyProfile.email}
-              </a>
+              <SafeEmailLink
+                wrapperClassName="block"
+                anchorClassName="text-sm font-semibold text-white/60 hover:text-orange-300 transition-colors"
+              />
               <div className="text-sm text-white/55">Vaslui, Moldova & proiecte selectate la nivel național</div>
               <div className="text-xs text-white/45">Program: {companyProfile.program} · {companyProfile.urgent}</div>
             </div>

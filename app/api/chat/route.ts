@@ -27,6 +27,7 @@ import { getAiChatCache, getCacheTtlSeconds, setAiChatCache, sha256Hex } from '.
 import { recordAiChatMetrics } from '../lib/aiMetrics';
 import { estimateCostUsd } from '../lib/aiPricing';
 import { buildCetAiRetrievalBlock } from '../lib/cetAiRetrieval';
+import { answerFromKnowledgeBase } from '../lib/cetCompanyKnowledge';
 import { circuitAllows, circuitReportFailure, circuitReportSuccess } from '../lib/circuitBreaker';
 import { clientIp } from '../lib/clientIp';
 import { acquireConcurrencySlot } from '../lib/concurrencyLimit';
@@ -276,9 +277,11 @@ export default async function handler(req: Request): Promise<Response> {
     return ipSlot;
   }
 
+  let extractedQueryForFallback = '';
   try {
-  const body = (await req.json()) as { query?: unknown; conversation?: unknown; context?: unknown };
-  const userQuery = body.query;
+  const body = (await req.json()) as { query?: unknown; message?: unknown; conversation?: unknown; context?: unknown };
+  const userQuery = typeof body.query === 'string' && body.query.trim() ? body.query : body.message;
+  if (typeof userQuery === 'string') extractedQueryForFallback = userQuery;
   const conversation = normalizeConversation(body.conversation);
   const context =
     typeof body.context === 'object' && body.context !== null ? (body.context as Record<string, unknown>) : null;
@@ -351,36 +354,7 @@ export default async function handler(req: Request): Promise<Response> {
   ]);
 
   if (!grokKey && !geminiKey && !claudeKey) {
-    const isRo = /[ăâîșț]/i.test(trimmedQuery) || /\b(ce|cat|cât|vreau|ofert[ăa]|acoperiș|fotovoltaic|reparații|mentenanță|montaj)\b/i.test(trimmedQuery);
-    const isCompany = isCompanyMode || /\b(fotovoltaic|panouri|acoperiș|tpo|șarpantă|țiglă|tablă|atice|fațade|ofert[ăa])\b/i.test(trimmedQuery);
-    const intro = isRo
-      ? 'Asistentul AI avansat este dezactivat (nu sunt configurate chei). Totuși, pot să te ajut să obții rapid o ofertă.'
-      : 'Advanced AI is disabled (no provider keys configured). I can still help you get a quote quickly.';
-    const reply = isCompany
-      ? isRo
-        ? [
-            intro,
-            '',
-            'Spune-mi 4 detalii și îți recomand pachetul potrivit:',
-            '1) Localitate/județ',
-            '2) Tip proiect: fotovoltaice / acoperiș / TPO / construcții / reparații',
-            '3) Date tehnice (ex: consum lunar, suprafață acoperiș, tip structură, infiltratii)',
-            '4) Când vrei să începi',
-            '',
-            `Contact direct: +40 769 889 721 · solaris-cet@protonmail.com`,
-          ].join('\n')
-        : [
-            intro,
-            '',
-            'Share 4 details and I will suggest the right package:',
-            '1) City/county',
-            '2) Project type: PV / roof / TPO / construction / repairs',
-            '3) Key details (usage, roof area, structure type, leaks)',
-            '4) Timeline',
-            '',
-            'Direct contact: +40 769 889 721 · solaris-cet@protonmail.com',
-          ].join('\n')
-      : intro;
+    const reply = answerFromKnowledgeBase(trimmedQuery);
 
     const durationMs = Math.max(0, Date.now() - startedAt);
     const payload = {
@@ -633,7 +607,9 @@ export default async function handler(req: Request): Promise<Response> {
       });
       reply = fallback.choices[0]?.message?.content ?? 'CET AI is silent.';
     } else {
-      throw new Error('All AI providers failed to respond.');
+      circuitReportFailure('cet-ai:gemini');
+      circuitReportFailure('cet-ai:grok');
+      reply = answerFromKnowledgeBase(trimmedQuery);
     }
   } else {
     if (plan.providers.singleProvider === 'grok') {
@@ -662,21 +638,29 @@ export default async function handler(req: Request): Promise<Response> {
               completionTokens: u?.completion_tokens,
             }) ?? undefined,
         });
-        reply = res.choices[0]?.message?.content ?? 'CET AI is silent.';
-      } catch (e) {
+        reply = res.choices[0]?.message?.content ?? answerFromKnowledgeBase(trimmedQuery);
+      } catch {
         circuitReportFailure('cet-ai:grok');
-        throw e;
+        reply = answerFromKnowledgeBase(trimmedQuery);
       }
     } else if (plan.providers.singleProvider === 'claude') {
-      if (!claudeKey) throw new Error('Claude API key missing.');
-      reply = await claudeComplete({
-        apiKey: claudeKey,
-        model: CLAUDE_MODEL,
-        system: fullFallbackPrompt,
-        conversation,
-        userQuery: trimmedQuery,
-        temperature: plan.temperature,
-      });
+      if (!claudeKey) {
+        reply = answerFromKnowledgeBase(trimmedQuery);
+      } else {
+        try {
+          reply = await claudeComplete({
+            apiKey: claudeKey,
+            model: CLAUDE_MODEL,
+            system: fullFallbackPrompt,
+            conversation,
+            userQuery: trimmedQuery,
+            temperature: plan.temperature,
+          });
+          if (!reply || !reply.trim()) reply = answerFromKnowledgeBase(trimmedQuery);
+        } catch {
+          reply = answerFromKnowledgeBase(trimmedQuery);
+        }
+      }
     } else {
       const client = new OpenAI({
         apiKey: geminiKey!,
@@ -706,10 +690,10 @@ export default async function handler(req: Request): Promise<Response> {
               completionTokens: u?.completion_tokens,
             }) ?? undefined,
         });
-        reply = res.choices[0]?.message?.content ?? 'CET AI is silent.';
-      } catch (e) {
+        reply = res.choices[0]?.message?.content ?? answerFromKnowledgeBase(trimmedQuery);
+      } catch {
         circuitReportFailure('cet-ai:gemini');
-        throw e;
+        reply = answerFromKnowledgeBase(trimmedQuery);
       }
     }
   }
@@ -757,25 +741,43 @@ export default async function handler(req: Request): Promise<Response> {
   });
   } catch (error: unknown) {
     console.error('API Route Error:', error);
+    const durationMs = Math.max(0, Date.now() - startedAt);
     recordAiChatMetrics({
       outcome: 'error',
       cache: 'miss',
       providers: [],
-      durationMs: Math.max(0, Date.now() - startedAt),
+      durationMs,
     });
-    const message =
-      error instanceof Error
-        ? error.message
-        : 'An unexpected error occurred in the CET AI core.';
-    return new Response(JSON.stringify({ message }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Request-Id': requestId,
-        'Access-Control-Allow-Origin': allowedOrigin,
-        'Vary': 'Origin',
+    const reply = answerFromKnowledgeBase(extractedQueryForFallback);
+    return new Response(
+      JSON.stringify({
+        response: reply,
+        sources: [],
+        plan: {
+          agentCount: 0,
+          providers: { strategy: 'fallback', useGemini: false, useGrok: false, useClaude: false, singleProvider: null },
+          useOnChain: false,
+          useWebRetrieval: false,
+          temperature: 0,
+          budget: { budgetMs: 0, maxParallel: 0 },
+        },
+        usage: {},
+        costUsd: 0,
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Cet-Ai-Source': 'fallback',
+          'X-Cet-Ai-Plan': 'fallback',
+          'X-Request-Id': requestId,
+          'X-Cet-Ai-Duration-Ms': String(durationMs),
+          'Access-Control-Allow-Origin': allowedOrigin,
+          'Vary': 'Origin',
+          'Cache-Control': 'no-store',
+        },
       },
-    });
+    );
   } finally {
     await ipSlot.release();
     await globalSlot.release();

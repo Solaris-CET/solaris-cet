@@ -28,10 +28,18 @@ const FORBIDDEN_CDN_PATTERNS = [
 
 describe("Public discovery — sitemap, security.txt, humans.txt", () => {
   it("static assets ship with expected content", () => {
+    const robots = readFileSync(join(appPublic, "robots.txt"), "utf8");
+    expect(robots).toContain(`Sitemap: ${PRODUCTION_SITE_ORIGIN}/sitemap.xml`);
+    expect(robots).toContain("Disallow: /privacy-settings/");
+    expect(robots).toContain("Disallow: /multumim/");
+
     const xml = readFileSync(join(appPublic, "sitemap.xml"), "utf8");
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/servicii`);
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/contact`);
-    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/servicii/fotovoltaice-rezidentiale`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/servicii/`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/contact/`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/proiecte/`);
+    expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/servicii/fotovoltaice-rezidentiale/`);
+    expect(xml).toContain("<changefreq>monthly</changefreq>");
+    expect(xml).not.toContain(`${PRODUCTION_SITE_ORIGIN}/privacy-settings/`);
 
     const sec = join(appPublic, ".well-known/security.txt");
     expect(existsSync(sec), "public/.well-known/security.txt must ship").toBe(true);

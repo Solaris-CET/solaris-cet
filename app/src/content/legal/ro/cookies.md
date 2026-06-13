@@ -1,47 +1,78 @@
 ---
-title: "Politică de Cookie-uri"
-description: "Informații despre cookie-uri, local storage și gestionarea preferințelor."
-lastUpdated: 2026-04-26
+title: "Politica de cookie-uri"
+description: "Ce cookie-uri și tehnologii similare folosește Solaris CET și cum îți poți gestiona preferințele."
+lastUpdated: 2026-06-10
 ---
 
-## 1. Ce sunt cookie-urile?
+## Ce sunt cookie-urile
 
-Cookie-urile sunt fișiere text mici stocate pe dispozitivul tău. Putem folosi și tehnologii similare (local storage, pixeli, SDK-uri) pentru funcționarea Serviciului.
+Cookie-urile sunt fișiere text mici stocate în browser-ul tău când vizitezi un site.
+Ele ajută site-ul să funcționeze corect, să îți rețină preferințele și, doar dacă îți dai acordul, să măsoare utilizarea sau performanța.
 
-## 2. Ce categorii folosim
+Pe lângă cookie-uri, Solaris CET poate folosi și tehnologii similare, cum ar fi `localStorage`, identificatori de sesiune sau scripturi de analiză/marketing încărcate doar în condițiile descrise mai jos.
 
-- **Strict necesare** — necesare funcționării și securității (nu pot fi dezactivate).
-- **Analitice** — pentru a înțelege utilizarea și a îmbunătăți performanța (opțional).
-- **Marketing** — pentru măsurarea campaniilor și eventual retargeting (opțional).
+## Ce cookie-uri și tehnologii similare folosim
 
-## 3. Opțiunile tale
+### Cookie-uri strict necesare
 
-Poți alege ce categorii opționale permiți și îți poți modifica preferințele oricând din pagina Setări cookie.
+Acestea sunt necesare pentru funcționarea de bază a site-ului și nu cer consimțământ.
 
-Dezactivarea analiticelor/marketingului nu ar trebui să blocheze funcțiile esențiale.
+- `solaris_cookie_consent` - reține alegerea ta privind cookie-urile; durată: 1 an
+- `solaris_lang` - poate reține limba preferată când serverul sau browserul trebuie să o păstreze între vizite; durată: până la 1 an
 
-Preferințele sunt stocate pe dispozitivul tău (local storage) pentru a fi reținute între vizite.
+### Cookie-uri și tehnologii de analiză
 
-## 4. Ce date pot fi prelucrate
+Le încărcăm numai dacă accepți categoria "Analitice".
 
-În funcție de consimțământ, cookie-urile pot prelucra:
+În implementarea actuală, Solaris CET poate folosi:
 
-- informații despre browser/dispozitiv,
-- locație aproximativă (derivată din IP),
-- vizualizări de pagină și interacțiuni,
-- atribuirea campaniilor (UTM).
+- identificatori first-party în browser pentru măsurarea traficului și a sesiunilor, precum `solaris_analytics_anon_id` și `solaris_analytics_session_id`, stocați în `localStorage`
+- un identificator de sesiune internă, reînnoit dacă rămâi activ pe site; fereastră de sesiune: aproximativ 30 de minute de inactivitate
+- integrări opționale de analiză activate doar dacă sunt configurate în mediul de rulare, cum ar fi Google Analytics / Google Tag Manager, Mixpanel, Amplitude sau Hotjar; aceste servicii pot seta propriile cookie-uri conform politicilor lor
 
-Nu folosim intenționat cookie-uri pentru a colecta date sensibile.
+Scopul lor este să ne arate ce pagini sunt vizitate, cât durează o sesiune, de unde vine traficul și ce zone ale site-ului trebuie îmbunătățite. Nu le folosim pentru a identifica direct o persoană după nume.
 
-## 5. Retenție
+### Cookie-uri și tehnologii de marketing
 
-Durata cookie-urilor variază. Stocăm consimțământul pentru a reține preferințele.
+Nu pornim marketing cookies în mod implicit.
 
-## 6. Actualizări
+Codul site-ului suportă încărcarea unor integrări de marketing, cum ar fi Meta Pixel (Facebook) sau LinkedIn Insight Tag, dar numai dacă:
 
-Putem actualiza această Politică. Data „last updated” indică ultima versiune.
+1. aceste integrări sunt configurate efectiv în mediul de producție;
+2. îți dai consimțământul pentru categoria "Marketing".
 
-## 7. Contact
+Dacă aceste integrări nu sunt active la momentul vizitei tale, nu se setează cookie-uri de marketing.
 
-Pentru întrebări: solaris-cet@protonmail.com · +40 769 889 721  
-Date identificare: CUI: *********** · Cetatuia, Vaslui, 737429, România
+## Cum îți gestionezi preferințele
+
+Poți modifica oricând alegerea ta din pagina de setări:
+
+- [Setări cookie](/privacy-settings/)
+
+Poți controla și din browser ce cookie-uri păstrezi sau ștergi:
+
+- Chrome, Firefox, Safari, Edge -> Setări -> Confidențialitate
+
+Blocarea cookie-urilor strict necesare poate afecta funcționarea site-ului.
+
+## Durată și retenție
+
+Durata diferă în funcție de tipul de cookie sau tehnologie:
+
+- consimțământul pentru cookie-uri se păstrează până la 1 an
+- preferințele de limbă pot fi păstrate până la 1 an
+- identificatorii locali pentru analiză pot rămâne în browser până îi ștergi tu sau până sunt înlocuiți de o nouă sesiune/politică
+- serviciile terțe de analiză sau marketing pot avea propriile perioade de retenție, stabilite de furnizorii respectivi
+
+## Actualizări
+
+Putem actualiza această politică atunci când schimbăm modul în care folosim cookie-urile, adăugăm integrații noi sau apar modificări legale ori tehnice.
+
+Data de mai sus arată ultima actualizare a documentului.
+
+## Contact
+
+Pentru întrebări despre cookie-uri și confidențialitate:
+
+- email: solaris-cet@protonmail.com
+- telefon: +40 769 889 721

@@ -6,6 +6,47 @@ const appRoot = process.cwd()
 const publicDir = path.join(appRoot, 'public')
 
 const origin = String(process.env.VITE_PUBLIC_SITE_URL || 'https://solaris-cet.com').replace(/\/$/, '')
+const businessId = `${origin}/#business`
+const websiteId = `${origin}/#website`
+const globalBusinessSchema = {
+  '@type': 'LocalBusiness',
+  '@id': businessId,
+  name: 'Solaris CET',
+  url: origin,
+  telephone: '+40769889721',
+  email: 'solaris-cet@protonmail.com',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Vaslui',
+    addressRegion: 'Vaslui',
+    addressCountry: 'RO',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: 46.6407,
+    longitude: 27.7276,
+  },
+  areaServed: [
+    { '@type': 'State', name: 'Vaslui' },
+    { '@type': 'State', name: 'Iași' },
+    { '@type': 'State', name: 'Bacău' },
+    { '@type': 'State', name: 'Galați' },
+    { '@type': 'Country', name: 'Romania' },
+  ],
+  priceRange: '$$',
+  description:
+    'Instalații fotovoltaice rezidențiale și industriale, acoperișuri tablă/TPO, atice, fațade și mentenanță în Vaslui și România.',
+  sameAs: ['https://wa.me/40769889721'],
+}
+const globalWebsiteSchema = {
+  '@type': 'WebSite',
+  '@id': websiteId,
+  url: origin,
+  name: 'Solaris CET',
+  inLanguage: 'ro-RO',
+  publisher: { '@id': businessId },
+}
+const serviceProviderRef = { '@id': businessId }
 
 function normalizePath(p) {
   if (!p) return '/'
@@ -58,6 +99,27 @@ function wrapJsonLd(graph) {
   return { '@context': 'https://schema.org', '@graph': graph }
 }
 
+function buildServiceJsonLd(name, url) {
+  return {
+    '@type': 'Service',
+    name,
+    provider: serviceProviderRef,
+    areaServed: { '@type': 'Country', name: 'Romania' },
+    url,
+  }
+}
+
+function graphNodesFromJsonLd(payload) {
+  if (!payload || typeof payload !== 'object') return []
+  if (Array.isArray(payload['@graph'])) return payload['@graph'].filter((item) => item && typeof item === 'object')
+  const { ['@context']: _context, ...node } = payload
+  return Object.keys(node).length ? [node] : []
+}
+
+function withGlobalJsonLd(pageJsonLd) {
+  return wrapJsonLd([globalBusinessSchema, globalWebsiteSchema, ...graphNodesFromJsonLd(pageJsonLd)])
+}
+
 function breadcrumb(items) {
   return {
     '@type': 'BreadcrumbList',
@@ -70,22 +132,51 @@ function breadcrumb(items) {
   }
 }
 
-function renderStaticPageHtml({ title, description, canonicalPath, h1, bodyLines, jsonLd, noindex, redirectTo, extraHtml }) {
+function emailAnchorHtml(label = 'solaris-cet@protonmail.com', subject = '') {
+  const href = subject ? `mailto:solaris-cet@protonmail.com?subject=${encodeURIComponent(subject)}` : 'mailto:solaris-cet@protonmail.com'
+  return `<!--email_off--><a href="${escapeHtml(href)}">${escapeHtml(label)}</a><!--/email_off-->`
+}
+
+function renderStaticPageHtml({
+  title,
+  description,
+  canonicalPath,
+  h1,
+  bodyLines,
+  jsonLd,
+  noindex,
+  redirectTo,
+  redirectDelaySeconds,
+  extraHtml,
+  footerCtaHtml,
+}) {
   const canonical = `${origin}${normalizePath(canonicalPath)}`
   const metaDesc = escapeHtml(description)
   const metaTitle = escapeHtml(title)
   const metaH1 = escapeHtml(h1)
   const body = bodyLines.map((l) => `<p>${escapeHtml(l)}</p>`).join('\n')
   const extra = typeof extraHtml === 'string' && extraHtml.trim() ? `\n${extraHtml.trim()}\n` : '\n'
-  const jsonLdBlock = jsonLd
-    ? `\n    <script type="application/ld+json">${safeJsonLd(jsonLd)}</script>\n`
+  const footerCta =
+    typeof footerCtaHtml === 'string'
+      ? footerCtaHtml
+      : '<p><a href="/contact/">Solicită ofertă →</a></p>'
+  const mergedJsonLd = withGlobalJsonLd(jsonLd)
+  const jsonLdBlock = mergedJsonLd
+    ? `\n    <script type="application/ld+json">${safeJsonLd(mergedJsonLd)}</script>\n`
     : '\n'
-  const robotsMeta = noindex ? `    <meta name="robots" content="noindex,follow" />\n` : ''
-  const redirectMeta = redirectTo ? `    <meta http-equiv="refresh" content="0; url=${escapeHtml(redirectTo)}" />\n` : ''
+  const robotsMeta = noindex ? `    <meta name="robots" content="noindex,nofollow" />\n` : ''
+  const redirectSeconds = Number.isFinite(redirectDelaySeconds) ? Math.max(0, redirectDelaySeconds) : 0
+  const redirectMeta = redirectTo
+    ? `    <meta http-equiv="refresh" content="${redirectSeconds};url=${escapeHtml(redirectTo)}" />\n`
+    : ''
   const redirectBody = redirectTo
-    ? `<p><strong>Redirecționare:</strong> această pagină s-a mutat la <a href="${escapeHtml(redirectTo)}">${escapeHtml(
-        redirectTo,
-      )}</a>.</p>`
+    ? redirectSeconds > 0
+      ? `<p><strong>Redirecționare:</strong> vei fi trimis către <a href="${escapeHtml(redirectTo)}">${escapeHtml(
+          redirectTo,
+        )}</a> în ${redirectSeconds} secunde.</p>`
+      : `<p><strong>Redirecționare:</strong> această pagină s-a mutat la <a href="${escapeHtml(redirectTo)}">${escapeHtml(
+          redirectTo,
+        )}</a>.</p>`
     : ''
 
   return `<!doctype html>
@@ -112,9 +203,13 @@ ${jsonLdBlock}
       .wrap { max-width: 860px; margin: 0 auto; padding: 28px 18px; }
       .card { border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.35); border-radius: 18px; padding: 18px; }
       h1 { font-size: 34px; line-height: 1.1; margin: 0 0 10px; }
+      h2 { font-size: 18px; margin: 0 0 10px; }
       p { margin: 10px 0; color: rgba(255,255,255,.82); }
       .nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
       .nav a { border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06); padding: 10px 12px; border-radius: 12px; font-weight: 700; }
+      details { margin-top: 10px; border: 1px solid rgba(255,255,255,.12); border-radius: 14px; background: rgba(255,255,255,.04); overflow: hidden; }
+      summary { cursor: pointer; list-style: none; padding: 14px 16px; font-weight: 700; }
+      details p { margin: 0; padding: 0 16px 16px; }
     </style>
   </head>
   <body>
@@ -132,85 +227,79 @@ ${jsonLdBlock}
           ${redirectBody}
           ${body}
           ${extra}
-          <p><strong>Telefon:</strong> <a href="tel:+40769889721">+40 769 889 721</a> · <strong>Email:</strong> <a href="mailto:solaris-cet@protonmail.com">solaris-cet@protonmail.com</a></p>
-          <p><a href="/contact/">Solicită ofertă →</a></p>
+          <p><strong>Telefon:</strong> <a href="tel:+40769889721">+40 769 889 721</a> · <strong>Email:</strong> ${emailAnchorHtml()}</p>
+          ${footerCta}
         </div>
       </main>
     </div>
+    <script defer src="/cookie-consent.js"></script>
   </body>
 </html>
 `
 }
 
 async function writeStaticPages() {
-  const formspreeEndpoint = String(process.env.VITE_FORMSPREE_ENDPOINT || '').trim()
+  const supportEndpoint = '/api/support/start'
 
   const contactFormHtml = (() => {
-    const action = formspreeEndpoint || '/api/support/start'
-    const enctype = 'application/x-www-form-urlencoded'
-    const method = formspreeEndpoint ? 'POST' : 'POST'
-    const hidden = formspreeEndpoint
-      ? `<input type="hidden" name="_subject" value="Solicitare ofertă — Solaris CET" />`
-      : `<input type="hidden" name="pageUrl" value="/contact" />
-                 <input type="hidden" name="consent_version" value="2026-06" />
-                 <input type="text" name="company" tabindex="-1" autocomplete="off" style="position:absolute; left:-9999px; width:1px; height:1px; opacity:0;" aria-hidden="true" />`
-
     return `
           <div style="margin-top: 14px;">
             <h2 style="font-size: 18px; margin: 0 0 10px;">Cere ofertă (formular)</h2>
-            <form action="${escapeHtml(action)}" method="${method}" enctype="${enctype}">
-              ${hidden}
+            <p style="margin: 0 0 12px; color: rgba(255,255,255,.72);">Formular HTML nativ care funcționează și fără JavaScript.</p>
+            <form action="${supportEndpoint}" method="POST" id="form-oferta">
+              <input type="hidden" name="pageUrl" value="/contact" />
+              <input type="hidden" name="utm" value="" />
+              <input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" />
               <div style="display:grid; gap:10px;">
                 <label>
-                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Nume</div>
-                  <input name="name" required style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Nume și prenume *</div>
+                  <input name="name" required placeholder="Ion Popescu" autocomplete="name" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
                 </label>
                 <label>
-                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Telefon</div>
-                  <input name="phone" inputmode="tel" required style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Telefon *</div>
+                  <input name="phone" type="tel" required placeholder="07XX XXX XXX" pattern="[0-9+\\s\\-]{10,15}" autocomplete="tel" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
                 </label>
                 <label>
-                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Email (opțional)</div>
-                  <input name="email" inputmode="email" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Email</div>
+                  <input name="email" type="email" placeholder="email@exemplu.ro" autocomplete="email" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
                 </label>
                 <label>
-                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Serviciu</div>
-                  <select name="service" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;">
-                    <option value="fotovoltaice">Fotovoltaice</option>
-                    <option value="acoperisuri">Acoperișuri tablă/țiglă</option>
-                    <option value="tpo">Acoperișuri industriale TPO</option>
-                    <option value="atice-fatade">Atice & fațade tablă</option>
-                    <option value="reparatii">Reparații & mentenanță</option>
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Serviciu dorit *</div>
+                  <select name="service" required style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;">
+                    <option value="">— Alege —</option>
+                    <option value="fotovoltaice">Fotovoltaice rezidențiale (casă)</option>
+                    <option value="fotovoltaice">Fotovoltaice industriale/comerciale</option>
+                    <option value="acoperisuri">Acoperiș tablă / țiglă metalică</option>
+                    <option value="tpo">Acoperiș industrial folie TPO</option>
+                    <option value="atice-fatade">Atice și fațade tablă</option>
+                    <option value="reparatii">Reparații și mentenanță</option>
                   </select>
                 </label>
                 <label>
-                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Localitate / județ</div>
-                  <input name="location" placeholder="Ex: Vaslui, Iași, Galați" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Localitate / județ *</div>
+                  <input name="location" required placeholder="Ex: Vaslui, jud. Vaslui" autocomplete="address-level2" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
                 </label>
                 <label>
-                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Detalii</div>
-                  <textarea name="message" rows="5" required style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;"></textarea>
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Descriere scurtă</div>
+                  <textarea name="message" rows="4" placeholder="Ex: casă 150mp, consum 400 kWh/lună, acoperiș orientat sud..." style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;"></textarea>
                 </label>
-                <label style="display:flex; gap:10px; align-items:flex-start;">
-                  <input type="checkbox" name="urgent" value="yes" />
-                  <span style="font-size:13px; color: rgba(255,255,255,.82);">Bifează dacă proiectul este urgent și vrei apel prioritar.</span>
+                <label style="display:flex; gap:10px; align-items:flex-start; color: rgba(255,255,255,.82); font-size:13px; line-height:1.45;">
+                  <input name="consent" type="checkbox" value="yes" required style="margin-top:2px;" />
+                  <span>Sunt de acord ca datele trimise să fie folosite pentru a primi răspuns la cererea mea de ofertă.</span>
                 </label>
-                <label style="display:flex; gap:10px; align-items:flex-start;">
-                  <input type="checkbox" name="consent" value="yes" required />
-                  <span style="font-size:13px; color: rgba(255,255,255,.82);">Sunt de acord ca Solaris CET să folosească datele trimise pentru a mă contacta privind oferta cerută, conform <a href="/privacy">politicii de confidențialitate</a>.</span>
-                </label>
-                <button type="submit" style="cursor:pointer; border-radius:12px; border:1px solid rgba(245,158,11,.45); background:rgba(245,158,11,.14); color:#fbbf24; font-weight:900; padding:12px 12px;">Trimite</button>
+                <button type="submit" style="cursor:pointer; border-radius:12px; border:1px solid rgba(245,158,11,.45); background:rgba(245,158,11,.14); color:#fbbf24; font-weight:900; padding:12px 12px;">Trimite cererea →</button>
               </div>
               <div style="margin-top:10px; font-size:12px; color: rgba(255,255,255,.65);">
-                Solicitarea ajunge direct în sistemul nostru intern de ofertare. Dacă trimiterea nu funcționează, folosește <a href="mailto:solaris-cet@protonmail.com">email</a> sau <a href="tel:+40769889721">telefon</a>.
+                După trimitere primești imediat confirmarea direct din sistemul nostru intern, fără dependență de JavaScript.
               </div>
             </form>
           </div>
           <div style="margin-top: 14px;">
-            <h2 style="font-size: 18px; margin: 0 0 10px;">Hartă</h2>
-            <div style="border-radius: 14px; overflow:hidden; border:1px solid rgba(255,255,255,.12);">
-              <iframe title="Hartă Vaslui, România" src="https://www.openstreetmap.org/export/embed.html?bbox=27.68%2C46.59%2C27.78%2C46.67&layer=mapnik&marker=46.63%2C27.73" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:260px; border:0;"></iframe>
+            <h2 id="titlu-harta" style="font-size: 18px; margin: 0 0 10px;">Zona de activitate</h2>
+            <div style="border-radius: 8px; overflow:hidden; border:1px solid #334155;">
+              <iframe title="Localizare Solaris CET - Vaslui, Romania" src="https://www.openstreetmap.org/export/embed.html?bbox=27.6276%2C46.5407%2C27.8276%2C46.7407&amp;layer=mapnik&amp;marker=46.6407%2C27.7276" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="width:100%; height:300px; border:0; display:block;"></iframe>
             </div>
+            <p style="font-size:.8rem; margin-top:.5rem;"><a href="https://www.openstreetmap.org/?mlat=46.6407&amp;mlon=27.7276#map=12/46.6407/27.7276" target="_blank" rel="noopener noreferrer">Deschide harta completă →</a></p>
           </div>
     `
   })()
@@ -218,13 +307,14 @@ async function writeStaticPages() {
   const contactDetailsHtml = `
           ${contactFormHtml}
           <div style="margin-top: 14px;">
-            <h2 style="font-size: 18px; margin: 0 0 10px;">Program și zonă de deplasare</h2>
-            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
-              <li><strong>Program:</strong> Luni–Vineri 08:00–18:00 · Sâmbătă 09:00–14:00</li>
-              <li><strong>Adresă operațională:</strong> Cetățuia, Vaslui, 737429, România</li>
-              <li><strong>Acoperire:</strong> Vaslui, Moldova și proiecte selectate la nivel național</li>
-              <li><strong>Canale rapide:</strong> telefon, WhatsApp și email direct, chiar dacă browserul blochează formularul</li>
-            </ul>
+            <address style="font-style:normal; color: rgba(255,255,255,.82);">
+              <strong>Solaris CET</strong><br />
+              Vaslui, județul Vaslui, România<br />
+              <abbr title="Program de lucru">L-V:</abbr> 08:00 - 18:00<br />
+              <a href="tel:+40769889721">+40 769 889 721</a><br />
+              ${emailAnchorHtml()}
+            </address>
+            <p style="margin-top:10px; color: rgba(255,255,255,.72);">Acoperire: Vaslui, Moldova și proiecte selectate la nivel național.</p>
           </div>
   `
 
@@ -258,23 +348,165 @@ async function writeStaticPages() {
               <div style="border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; background:rgba(255,255,255,.03);">
                 <strong>Prosumator 5.2 kW — Vaslui</strong>
                 <p style="margin:8px 0 0;">Sistem rezidențial pentru autoconsum, montaj pe acoperiș înclinat, monitorizare și protecții AC/DC.</p>
+                <ul style="margin:8px 0 0; padding-left:18px; color:rgba(255,255,255,.8);">
+                  <li>Potrivit pentru case cu consum stabil și interes pentru amortizare clară.</li>
+                  <li>Include dimensionare, structură, protecții, punere în funcțiune și explicații de utilizare.</li>
+                </ul>
               </div>
               <div style="border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; background:rgba(255,255,255,.03);">
                 <strong>PV industrial — Iași</strong>
                 <p style="margin:8px 0 0;">Execuție etapizată pentru hală logistică, cu acces controlat și verificări finale înainte de predare.</p>
+                <ul style="margin:8px 0 0; padding-left:18px; color:rgba(255,255,255,.8);">
+                  <li>Focus pe autoconsum, monitorizare și compatibilitate cu activitatea zilnică a halei.</li>
+                  <li>Planul de lucru urmărește să nu blocheze operațiunea și să păstreze accesul în zonele critice.</li>
+                </ul>
               </div>
               <div style="border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; background:rgba(255,255,255,.03);">
                 <strong>Membrană TPO — Bacău</strong>
                 <p style="margin:8px 0 0;">Reparație și refacere detalii la atice, scurgeri și străpungeri pentru eliminarea infiltrațiilor recurente.</p>
+                <ul style="margin:8px 0 0; padding-left:18px; color:rgba(255,255,255,.8);">
+                  <li>Intervenție pe zone critice unde apar cele mai multe infiltrații: atice, scurgeri și racorduri.</li>
+                  <li>Predare cu recomandări de mentenanță și prioritizare a următoarelor verificări.</li>
+                </ul>
               </div>
               <div style="border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; background:rgba(255,255,255,.03);">
                 <strong>Tablă click — Suceava</strong>
                 <p style="margin:8px 0 0;">Acoperiș cu geometrie complexă, finisaje curate și drenaj corect la muchii și racorduri.</p>
+                <ul style="margin:8px 0 0; padding-left:18px; color:rgba(255,255,255,.8);">
+                  <li>Lucrare orientată pe aliniere, detalii curate și protejarea zonelor sensibile.</li>
+                  <li>Potrivit pentru clienți care compară finisajul și durabilitatea, nu doar prețul pe metru pătrat.</li>
+                </ul>
+              </div>
+              <div style="border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; background:rgba(255,255,255,.03);">
+                <strong>Atice tablă — Galați</strong>
+                <p style="margin:8px 0 0;">Muchii, colțuri și închideri metalice pentru protecția anvelopei și un aspect coerent al clădirii.</p>
+              </div>
+              <div style="border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; background:rgba(255,255,255,.03);">
+                <strong>Diagnostic & mentenanță — Bârlad</strong>
+                <p style="margin:8px 0 0;">Verificări, curățare, corectarea detaliilor și plan de mentenanță pentru sisteme existente.</p>
               </div>
             </div>
-            <p style="margin-top:12px; font-size:13px; color:rgba(255,255,255,.68);">Pentru portofoliul complet, varianta interactivă cu galerie și filtre rămâne disponibilă când JavaScript este activ.</p>
+            <p style="margin-top:12px; font-size:13px; color:rgba(255,255,255,.68);">Portofoliul este orientativ și nu expune date personale sau adrese exacte. Pentru exemple similare cu proiectul tău, trimite-ne pe WhatsApp localitatea și tipul lucrării.</p>
           </div>
   `
+
+  const servicePageBlocks = {
+    'fotovoltaice-rezidentiale': `
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Potrivit pentru</h2>
+            <p style="margin:0; color: rgba(255,255,255,.82);">Case cu consum lunar stabil, familii care vor să reducă factura și proprietari care vor să înțeleagă clar raportul dintre buget, producție și amortizare.</p>
+          </div>
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Ce includem</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Dimensionare pe consum, orientare, umbriri și tipul acoperișului.</li>
+              <li>Structură de montaj, invertor, protecții DC/AC, tablou și trasee ordonate.</li>
+              <li>Punere în funcțiune, configurare aplicație și recomandări de mentenanță.</li>
+            </ul>
+          </div>
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Repere utile înainte de ofertă</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Execuție frecventă: 1–3 zile, în funcție de acces și complexitate.</li>
+              <li>Puteri frecvente: 3–12 kW pentru case și vile.</li>
+              <li>Poți cere și opțiuni cu baterie sau încărcător EV, dacă urmărești autoconsum seara.</li>
+            </ul>
+          </div>
+    `,
+    'fotovoltaice-industriale': `
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Unde aduce valoare</h2>
+            <p style="margin:0; color: rgba(255,255,255,.82);">Hale, depozite, spații comerciale și producție unde consumul zilnic constant face ca autoconsumul să conteze mai mult decât o simplă “instalare de panouri”.</p>
+          </div>
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Ce urmărim la ofertare</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Profilul de consum și intervalele orare în care se folosește energia.</li>
+              <li>Tipul acoperișului și impactul asupra detaliilor tehnice de montaj.</li>
+              <li>Execuție etapizată, astfel încât lucrarea să nu blocheze activitatea locației.</li>
+            </ul>
+          </div>
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Repere orientative</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Scenarii uzuale: 30–500+ kW, în funcție de suprafață și consum.</li>
+              <li>ROI-ul real se judecă după autoconsum, nu după puterea “maximă” instalată.</li>
+              <li>Livrăm monitorizare și recomandări de mentenanță după punerea în funcțiune.</li>
+            </ul>
+          </div>
+    `,
+    'acoperisuri-tabla-tigla': `
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Ce executăm</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Tablă click / standing seam, tablă cutată și țiglă metalică.</li>
+              <li>Coame, dolii, borduri, sisteme pluviale și racorduri la elemente existente.</li>
+              <li>Reparații pentru infiltrații, muchii slabe și zone afectate de drenaj greșit.</li>
+            </ul>
+          </div>
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Ce contează la evaluare</h2>
+            <p style="margin:0; color: rgba(255,255,255,.82);">Nu doar suprafața. Pentru un acoperiș contează panta, geometria, numărul de străpungeri, zonele cu dolii/coame și starea elementelor existente.</p>
+          </div>
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Repere orientative</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Putem oferta rapid după poze, dimensiuni aproximative și localitate.</li>
+              <li>Diferența reală o fac detaliile curate și etanșările corecte, nu doar învelitoarea.</li>
+            </ul>
+          </div>
+    `,
+    'acoperisuri-industriale-tpo': `
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Zonele critice la TPO</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Străpungeri, atice, scurgeri, colțuri și racorduri unde apar infiltrațiile recurente.</li>
+              <li>Zone cu trafic tehnic, echipamente HVAC sau intervenții mai vechi executate prost.</li>
+            </ul>
+          </div>
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Cum lucrăm</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Diagnostic al cauzei, nu doar “peticire” rapidă.</li>
+              <li>Refacere detaliu, verificare drenaj și recomandări de mentenanță 1–2 ori/an.</li>
+              <li>Compatibilitate cu proiecte fotovoltaice atunci când se montează pe acoperiș plat.</li>
+            </ul>
+          </div>
+    `,
+    'atice-si-fatade-tabla': `
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Unde se vede diferența</h2>
+            <p style="margin:0; color: rgba(255,255,255,.82);">La atice și fațade, diferența se vede în muchii, colțuri, dilatări, racorduri și în cât de curat rămâne finisajul după ploaie și vânt.</p>
+          </div>
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Ce putem livra</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Placări, capace de atic, închideri, elemente de tinichigerie și reparații locale.</li>
+              <li>Fixări discrete, linii curate și protecție reală a anvelopei, nu doar “mascare” vizuală.</li>
+            </ul>
+          </div>
+    `,
+    'reparatii-si-mentenanta': `
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Când ne chemi</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Infiltrații active, elemente desprinse, scurgeri blocate sau detalii slăbite la acoperiș.</li>
+              <li>Scădere de producție, alarme invertor sau suspiciuni privind protecțiile și traseele PV.</li>
+            </ul>
+          </div>
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Ce facem diferit</h2>
+            <p style="margin:0; color: rgba(255,255,255,.82);">Nu schimbăm componente “după ureche”. Pornim de la diagnostic și îți spunem realist dacă problema cere o intervenție punctuală, o reparație pe zonă sau un plan de mentenanță.</p>
+          </div>
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Cum grăbești intervenția</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li>Trimite poze cu zona afectată, localitatea, gravitatea problemei și dacă există urgență.</li>
+              <li>Spune dacă lucrarea a fost executată recent sau dacă au existat intervenții anterioare.</li>
+            </ul>
+          </div>
+    `,
+  }
 
   const privacyOverviewHtml = `
           <div style="margin-top: 14px;">
@@ -298,7 +530,7 @@ async function writeStaticPages() {
             <h2 style="font-size: 18px; margin: 0 0 10px;">Drepturile tale</h2>
             <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
               <li>Acces, rectificare, ștergere, restricționare, opoziție și portabilitate.</li>
-              <li>Pentru cereri GDPR scrie la <a href="mailto:solaris-cet@protonmail.com">solaris-cet@protonmail.com</a>.</li>
+              <li>Pentru cereri GDPR scrie la ${emailAnchorHtml()}.</li>
               <li>Poți depune plângere la <a href="https://www.dataprotection.ro/" target="_blank" rel="noopener noreferrer">ANSPDCP</a>.</li>
             </ul>
           </div>
@@ -306,45 +538,28 @@ async function writeStaticPages() {
 
   const cookieSettingsStaticHtml = `
           <div style="margin-top: 14px;">
-            <h2 style="font-size: 18px; margin: 0 0 10px;">Salvează preferințele cookie fără JavaScript</h2>
-            <p style="margin:0 0 10px; color: rgba(255,255,255,.82);">Formularele de mai jos salvează preferințele în browser printr-un cookie de consimțământ.</p>
-            <p style="margin:0 0 10px; color: rgba(255,255,255,.68);">După trimitere primești o confirmare HTML simplă, fără dependență de JavaScript.</p>
-            <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;">
-              <form action="/privacy-settings/save" method="get" style="margin:0;">
-                <input type="hidden" name="preset" value="accept_all" />
-                <button type="submit" style="cursor:pointer; border-radius:12px; border:1px solid rgba(245,158,11,.45); background:rgba(245,158,11,.14); color:#fbbf24; font-weight:900; padding:12px 14px;">Acceptă tot</button>
-              </form>
-              <form action="/privacy-settings/save" method="get" style="margin:0;">
-                <input type="hidden" name="preset" value="essential_only" />
-                <button type="submit" style="cursor:pointer; border-radius:12px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#fff; font-weight:800; padding:12px 14px;">Doar necesare</button>
-              </form>
-            </div>
-            <form action="/privacy-settings/save" method="get" style="margin-top:12px; display:grid; gap:10px;">
-              <label style="display:flex; gap:10px; align-items:flex-start;">
-                <input type="checkbox" name="analytics" value="1" style="margin-top:4px;" />
-                <span><strong>Cookie-uri analitice</strong><br /><span style="color:rgba(255,255,255,.7);">Măsoară vizite și comportament pentru îmbunătățirea site-ului.</span></span>
-              </label>
-              <label style="display:flex; gap:10px; align-items:flex-start;">
-                <input type="checkbox" name="marketing" value="1" style="margin-top:4px;" />
-                <span><strong>Cookie-uri marketing</strong><br /><span style="color:rgba(255,255,255,.7);">Folosite doar dacă decidem să măsurăm campanii sau surse comerciale.</span></span>
-              </label>
-              <button type="submit" style="cursor:pointer; border-radius:12px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#fff; font-weight:800; padding:12px 14px;">Salvează selecția</button>
-            </form>
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Gestionează preferințele cookie</h2>
+            <p style="margin:0 0 10px; color: rgba(255,255,255,.82);">Poți actualiza alegerile oricând din pagina dedicată pentru confidențialitate.</p>
+            <p style="margin:0;">
+              <a href="/privacy-settings/" style="display:inline-flex;align-items:center;justify-content:center;padding:12px 14px;border-radius:12px;border:1px solid rgba(245,158,11,.45);background:rgba(245,158,11,.14);color:#fbbf24;font-weight:900;">
+                Setări cookie
+              </a>
+            </p>
           </div>
   `
 
   const cookiesOverviewHtml = `
           <div style="margin-top: 14px;">
-            <h2 style="font-size: 18px; margin: 0 0 10px;">Categorii de cookie-uri</h2>
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Ce cookie-uri folosim</h2>
             <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
-              <li><strong>Strict necesare</strong> — țin site-ul funcțional și sigur; nu pot fi dezactivate din produs.</li>
-              <li><strong>Analitice</strong> — active doar dacă îți dai acordul.</li>
-              <li><strong>Marketing</strong> — active doar dacă îți dai acordul.</li>
+              <li><strong>Strict necesare</strong> — <code>solaris_cookie_consent</code> reține alegerea ta privind cookie-urile timp de 1 an.</li>
+              <li><strong>Analitice</strong> — folosim identificatori locali și, doar dacă sunt configurate, integrări precum Google Analytics, GTM, Mixpanel, Amplitude sau Hotjar.</li>
+              <li><strong>Marketing</strong> — Meta Pixel sau LinkedIn Insight Tag pornesc doar cu consimțământ și numai dacă sunt activate în producție.</li>
             </ul>
           </div>
           <div style="margin-top: 14px;">
             <h2 style="font-size: 18px; margin: 0 0 10px;">Durată și control</h2>
-            <p style="margin:0; color: rgba(255,255,255,.82);">Consimțământul este reținut local în browser pentru a nu te întreba la fiecare vizită. Îl poți modifica oricând din Setări cookie.</p>
+            <p style="margin:0; color: rgba(255,255,255,.82);">Consimțământul este reținut local în browser pentru a nu te întreba la fiecare vizită. Dacă integrările de marketing nu sunt configurate la momentul vizitei, nu setăm cookie-uri de marketing.</p>
           </div>
           ${cookieSettingsStaticHtml}
   `
@@ -363,13 +578,65 @@ async function writeStaticPages() {
 
   const privacySettingsOverviewHtml = `
           <div style="margin-top: 14px;">
-            <p style="margin:0 0 10px; color: rgba(255,255,255,.82);">Această pagină oferă două lucruri: controlul consimțământului pentru cookie-uri și puncte clare pentru cereri GDPR.</p>
+            <p style="margin:0 0 10px; color: rgba(255,255,255,.82);">Alege ce cookie-uri accepți. Preferințele sunt salvate în browser-ul tău.</p>
           </div>
-          ${cookieSettingsStaticHtml}
+          <form id="sc-form" novalidate style="margin-top:14px;">
+            <fieldset style="border:1px solid #334155;border-radius:8px;padding:1rem;margin-bottom:1rem">
+              <legend><strong>Cookie-uri necesare</strong></legend>
+              <p style="color:#94a3b8;font-size:.85rem;margin:.25rem 0 .5rem">Necesare pentru funcționarea site-ului. Nu pot fi dezactivate.</p>
+              <input type="checkbox" checked disabled aria-label="Cookie-uri necesare - mereu active" />
+              <label>Mereu active</label>
+            </fieldset>
+
+            <fieldset style="border:1px solid #334155;border-radius:8px;padding:1rem;margin-bottom:1rem">
+              <legend><strong>Cookie-uri de analiză</strong></legend>
+              <p style="color:#94a3b8;font-size:.85rem;margin:.25rem 0 .5rem">Ne ajută să înțelegem cum este folosit site-ul (vizite, pagini vizitate).</p>
+              <input type="checkbox" id="sc-analytics" name="analytics" />
+              <label for="sc-analytics">Accept cookie-uri de analiză</label>
+            </fieldset>
+
+            <fieldset style="border:1px solid #334155;border-radius:8px;padding:1rem;margin-bottom:1.5rem">
+              <legend><strong>Cookie-uri de marketing</strong></legend>
+              <p style="color:#94a3b8;font-size:.85rem;margin:.25rem 0 .5rem">Permit afișarea de reclame relevante pe alte platforme.</p>
+              <input type="checkbox" id="sc-marketing" name="marketing" />
+              <label for="sc-marketing">Accept cookie-uri de marketing</label>
+            </fieldset>
+
+            <button type="submit" style="padding:.75rem 1.5rem;background:#f97316;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:1rem;font-weight:600">
+              Salvează preferințele
+            </button>
+          </form>
+
+          <p style="margin-top:1.5rem;font-size:.8rem;color:#94a3b8">
+            <a href="/cookies/">Politica de cookie-uri</a> · <a href="/privacy/">Politica de confidențialitate</a>
+          </p>
+
+          <script>
+            window.addEventListener('load', function () {
+              var consent = window.SolarisCookieConsent && window.SolarisCookieConsent.get();
+              if (consent) {
+                var analytics = document.getElementById('sc-analytics');
+                var marketing = document.getElementById('sc-marketing');
+                if (analytics) analytics.checked = !!consent.analytics;
+                if (marketing) marketing.checked = !!consent.marketing;
+              }
+
+              var form = document.getElementById('sc-form');
+              if (!form || !window.SolarisCookieConsent) return;
+              form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                window.SolarisCookieConsent.save(
+                  document.getElementById('sc-analytics').checked,
+                  document.getElementById('sc-marketing').checked
+                );
+                window.location.href = '/';
+              });
+            });
+          </script>
           <div style="margin-top: 14px;">
             <h2 style="font-size: 18px; margin: 0 0 10px;">Cereri GDPR</h2>
             <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
-              <li>Pentru acces, rectificare, ștergere sau portabilitate: <a href="mailto:solaris-cet@protonmail.com?subject=Cerere%20GDPR%20%E2%80%94%20Solaris%20CET">trimite email</a>.</li>
+              <li>Pentru acces, rectificare, ștergere sau portabilitate: ${emailAnchorHtml('trimite email', 'Cerere GDPR — Solaris CET')}.</li>
               <li>Poți menționa numele, emailul, telefonul și tipul cererii pentru identificare rapidă.</li>
               <li>Detaliile complete sunt în <a href="/privacy/">Politica de confidențialitate</a> și <a href="/cookies/">Politica de cookie-uri</a>.</li>
             </ul>
@@ -388,7 +655,7 @@ async function writeStaticPages() {
       addressRegion: 'Vaslui',
       addressCountry: 'RO',
     },
-    areaServed: 'RO',
+    areaServed: { '@type': 'Country', name: 'Romania' },
   }
 
   const portfolioSchemaItems = [
@@ -414,34 +681,46 @@ async function writeStaticPages() {
 
   const serviceFaq = {
     'fotovoltaice-rezidentiale': [
-      { q: 'Cât durează montajul pentru o casă?', a: 'De obicei 1–3 zile, în funcție de acces, tip acoperiș și complexitate.' },
-      { q: 'Funcționează sistemul și iarna?', a: 'Da. Producția diferă sezonier, dar sistemul generează energie și pe vreme rece/înnorată.' },
-      { q: 'E nevoie de baterie?', a: 'Nu obligatoriu. Bateria ajută la autoconsum seara și backup (parțial), dar depinde de obiectiv și buget.' },
+      { q: 'Cât costă?', a: 'Costul depinde de puterea aleasă, tipul invertorului, acoperiș și dacă dorești baterie. Îți dăm un buget realist după factura de consum, poze și evaluarea tehnică.' },
+      { q: 'Cât durează racordul?', a: 'Montajul propriu-zis durează de regulă 1-3 zile, iar partea de prosumator și racordare poate dura în medie 4-8 săptămâni, în funcție de distribuitor și de documentele disponibile.' },
+      { q: 'Am nevoie de aprobare de la primărie?', a: 'Depinde de particularitățile imobilului și de reglementările locale. În majoritatea cazurilor rezidențiale discutăm de la început ce acte sunt necesare, ca să nu apară blocaje târziu.' },
+      { q: 'Ce se întâmplă când curentul se întrerupe?', a: 'Un sistem on-grid standard se oprește pentru siguranța rețelei. Dacă vrei alimentare pe circuite selectate la pană de curent, discutăm o soluție hibridă sau cu baterie și back-up.' },
+      { q: 'Pot adăuga baterie mai târziu?', a: 'Da, de multe ori se poate, dacă alegem de la început o arhitectură compatibilă. De aceea discutăm din faza de ofertare dacă vrei doar pregătire sau instalare imediată.' },
     ],
     'fotovoltaice-industriale': [
-      { q: 'Se poate monta pe TPO?', a: 'Da, cu detalii și proceduri corecte pentru etanșare și protecție.' },
-      { q: 'Aveți soluții de monitorizare?', a: 'Da. Configurăm monitorizare și alerte pentru performanță.' },
-      { q: 'Se poate face pe etape?', a: 'Da. Planificăm în funcție de operațiunile locației.' },
+      { q: 'Pot instala pe acoperiș TPO?', a: 'Da, dar soluția trebuie proiectată corect pentru membrană, treceri și zonele cu trafic tehnic. Nu tratăm TPO ca pe un acoperiș industrial generic.' },
+      { q: 'Cât durează amortizarea?', a: 'Amortizarea depinde de autoconsum, prețul energiei, programul de lucru și configurația finală. Îți prezentăm scenarii prudente, nu doar cea mai optimistă variantă.' },
+      { q: 'Afectează instalarea activitatea firmei?', a: 'Planificăm execuția etapizat și stabilim zonele de lucru ca să reducem la minim impactul asupra operațiunilor curente.' },
+      { q: 'Ce se întâmplă la oprire planificată de rețea?', a: 'Monitorizarea și parametrizarea invertorului ne ajută să vedem clar evenimentele din rețea. Discutăm din faza de proiect și dacă sunt necesare măsuri suplimentare pentru continuitate sau reluare controlată.' },
+      { q: 'Pot extinde sistemul ulterior?', a: 'Da, în multe cazuri se poate, dacă proiectăm de la început cu spațiu, putere de invertor și trasee compatibile pentru o etapă următoare.' },
     ],
     'acoperisuri-tabla-tigla': [
-      { q: 'Tablă click sau țiglă metalică?', a: 'Depinde de arhitectură, buget și geometria acoperișului; recomandăm după evaluare.' },
-      { q: 'Includeți și jgheaburi/burlane?', a: 'Da, dacă sunt necesare pentru drenaj corect.' },
-      { q: 'Cât durează o reparație?', a: 'De la intervenții punctuale până la reparații mai ample, în funcție de situație.' },
+      { q: 'Ce tablă rezistă mai bine la grindină?', a: 'Rezistența este influențată de grosime, profilare și sistemul complet, nu doar de denumirea comercială. De regulă, o grosime mai mare și un profil corect ales oferă un comportament mai bun la solicitări mecanice.' },
+      { q: 'Pot monta panouri fotovoltaice pe tablă click?', a: 'Da. Tablă click este una dintre cele mai bune opțiuni pentru montaj fotovoltaic, dacă folosim prinderi și accesorii compatibile și pregătim corect traseele și zonele de etanșare.' },
+      { q: 'Cât durează montajul pentru o casă obișnuită?', a: 'Durata depinde de suprafață, geometrie, numărul de accesorii și starea suportului, dar îți comunicăm de la ofertare un calendar realist de execuție.' },
+      { q: 'Pot schimba culoarea după 5 ani?', a: 'Tehnic se poate interveni, dar cea mai bună soluție este alegerea corectă a culorii și a tipului de vopsire de la început. Recolorarea ulterioară trebuie evaluată separat, în funcție de starea învelitorii.' },
+      { q: 'Ce se face cu tabla veche?', a: 'Stabilim de la început dacă demontarea, evacuarea și valorificarea materialului vechi sunt incluse sau ofertate separat, ca să nu existe costuri neclare la final.' },
     ],
     'acoperisuri-industriale-tpo': [
-      { q: 'Ce este TPO?', a: 'O membrană termoplastică folosită frecvent la acoperișuri plate industriale.' },
-      { q: 'Cât de des e nevoie de inspecție?', a: 'Recomandăm minim 1–2 inspecții/an pentru acoperișuri industriale.' },
-      { q: 'Se poate monta PV peste TPO?', a: 'Da, cu soluții compatibile și detalii corecte de fixare/etanșare.' },
+      { q: 'Pot monta panouri fotovoltaice pe membrană TPO?', a: 'Da, dar sistemul trebuie gândit împreună cu soluția de acoperiș. Alegem suporturi, trasee și detalii care protejează membrana și permit mentenanța ulterioară.' },
+      { q: 'Cum depistez o infiltrație pe acoperiș plat?', a: 'De multe ori semnul vizibil apare departe de cauza reală. Analizăm scurgerile, străpungerile, aticele și zonele cu intervenții anterioare înainte să confirmăm punctul critic.' },
+      { q: 'Pot aplica membrană TPO peste asfalt existent?', a: 'Depinde de starea suportului și de soluția tehnică admisă de sistemul ales. În unele cazuri este posibil, în altele recomandăm decopertare sau strat intermediar.' },
+      { q: 'Cât costă per mp orientativ?', a: 'Prețul pe metru pătrat variază în funcție de grosimea membranei, metoda de fixare, numărul de detalii și condițiile de șantier. De aceea preferăm o ofertă completă, nu un tarif scos din context.' },
+      { q: 'Câtă greutate adaugă membrana TPO?', a: 'Membrana în sine este o soluție ușoară; greutatea totală depinde însă de stratificație și de modul de fixare, mai ales în variantele balastate. Validăm acest aspect în faza de evaluare.' },
     ],
     'atice-si-fatade-tabla': [
-      { q: 'Se pot repara doar zonele afectate?', a: 'Da. Facem reparații locale sau înlocuiri punctuale unde este realist.' },
-      { q: 'Includeți și etanșări?', a: 'Da, acolo unde sunt necesare pentru protecția anvelopei.' },
-      { q: 'Cum arată finisajul?', a: 'Punem accent pe linii curate, muchii și elemente de fixare discrete.' },
+      { q: 'Pot schimba fațada fără a afecta structura?', a: 'În multe cazuri da, dacă sistemul ales este compatibil cu suportul existent. Validăm însă întotdeauna soluția de fixare și stratificația înainte de ofertă finală.' },
+      { q: 'Ce culori RAL sunt disponibile stoc?', a: 'Cele mai comune culori RAL standard sunt de obicei mai accesibile și cu termen mai scurt. Pentru nuanțe speciale verificăm disponibilitatea și termenul de comandă înainte de lansare.' },
+      { q: 'Cât durează montajul pentru o fațadă de 200 mp?', a: 'Durata depinde de geometrie, înălțime, acces și de tipul produsului ales. Îți dăm un grafic realist de execuție după evaluarea suprafeței și a detaliilor.' },
+      { q: 'Se poate aplica pe clădiri vechi?', a: 'Da, în multe situații se poate, dar trebuie verificat suportul și modul în care noua placare se leagă de structura și detaliile existente.' },
+      { q: 'Include și izolația termică?', a: 'Poate include, dar nu presupunem automat acest lucru. În ofertă separăm clar varianta doar cu placare de varianta cu termoizolație sau panouri sandwich.' },
     ],
     'reparatii-si-mentenanta': [
-      { q: 'În cât timp interveniți?', a: 'Depinde de locație și urgență; confirmăm rapid disponibilitatea.' },
-      { q: 'Reparați și lucrări făcute de alții?', a: 'Da, după evaluare și dacă soluția este tehnic corectă.' },
-      { q: 'Ce include un plan de mentenanță?', a: 'Inspecții periodice, checklist, recomandări și intervenții prioritizate.' },
+      { q: 'Cum știu dacă am o infiltrație?', a: 'Semnele cele mai comune sunt pete umede, miros persistent, apă care apare după ploaie sau condens neobișnuit în zonele critice. Uneori cauza reală este mai sus sau mai departe decât locul unde vezi efectul.' },
+      { q: 'Cât costă o inspecție?', a: 'Costul depinde de localitate, suprafață și complexitatea acoperișului sau a sistemului. Îți spunem de la început dacă vorbim despre o simplă triere, o inspecție dedicată sau o intervenție cu deplasare rapidă.' },
+      { q: 'Cât de des trebuie curățate panourile fotovoltaice?', a: 'Nu există un interval fix universal. Depinde de praf, polen, trafic, păsări și panta acoperișului, dar când murdărirea este serioasă, curățarea profesională poate recupera 10-25% din producția pierdută.' },
+      { q: 'Interveniți și în weekend pentru urgențe?', a: 'Pentru cazurile urgente încercăm să răspundem cât mai rapid, inclusiv în afara programului, dar confirmăm telefonic disponibilitatea în funcție de localitate, vreme și gradul de risc.' },
+      { q: 'Faceți și reparații la acoperișuri pe care nu le-ați montat voi?', a: 'Da, după evaluare. Intervenim și pe lucrări executate de alții dacă putem propune o soluție tehnic corectă și dacă problema este clar identificată.' },
     ],
   }
 
@@ -453,8 +732,8 @@ async function writeStaticPages() {
       h1: 'Contact Solaris CET',
       bodyLines: ['Instalații fotovoltaice, acoperișuri (tablă/țiglă/TPO), reparații și mentenanță în Vaslui și în toată România.'],
       extraHtml: contactDetailsHtml,
+      footerCtaHtml: '<p><a href="#form-oferta">Completează formularul ↓</a></p>',
       jsonLd: wrapJsonLd([
-        localBusiness,
         {
           '@type': 'ContactPage',
           name: 'Contact Solaris CET',
@@ -463,6 +742,29 @@ async function writeStaticPages() {
         breadcrumb([
           { name: 'Acasă', path: '/' },
           { name: 'Contact', path: '/contact' },
+        ]),
+      ]),
+    },
+    {
+      path: '/multumim',
+      title: 'Cerere trimisă — Solaris CET',
+      description: 'Cererea a fost trimisă. Revenim în maximum 24 de ore.',
+      h1: 'Cererea a fost trimisă!',
+      bodyLines: ['Te contactăm în maxim 24 de ore pe numărul de telefon furnizat.'],
+      extraHtml: `
+        <p>Sau sună direct: <a href="tel:+40769889721">+40 769 889 721</a></p>
+        <p style="color:#94a3b8;font-size:.85rem">Ești redirecționat automat în 5 secunde...</p>
+        <p><a href="/">← Înapoi acasă</a></p>
+      `,
+      footerCtaHtml: '',
+      noindex: true,
+      redirectTo: '/',
+      redirectDelaySeconds: 5,
+      jsonLd: wrapJsonLd([
+        { '@type': 'WebPage', name: 'Cerere trimisă — Solaris CET', url: `${origin}/multumim/` },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Mulțumim', path: '/multumim' },
         ]),
       ]),
     },
@@ -500,6 +802,7 @@ async function writeStaticPages() {
       ],
       extraHtml: servicesOverviewHtml,
       jsonLd: wrapJsonLd([
+        buildServiceJsonLd('Servicii Solaris CET', `${origin}/servicii/`),
         {
           '@type': 'ItemList',
           name: 'Servicii Solaris CET',
@@ -520,31 +823,21 @@ async function writeStaticPages() {
     },
     {
       path: '/servicii/fotovoltaice-rezidentiale',
-      title: 'Instalații Fotovoltaice Rezidențiale — Solaris CET',
-      description: 'Instalații fotovoltaice pentru case: panouri, invertor, baterii, monitorizare.',
-      h1: 'Instalații Fotovoltaice Rezidențiale — Vaslui și împrejurimi',
+      title: 'Fotovoltaice Rezidențiale în Vaslui, Iași și Bacău — Solaris CET',
+      description: 'Sisteme fotovoltaice rezidențiale 3-15 kWp pentru case, cu dosar prosumator, baterii opționale și montaj curat.',
+      h1: 'Fotovoltaice Rezidențiale în Vaslui, Iași, Bacău și județele limitrofe',
       bodyLines: [
-        'Instalăm sisteme fotovoltaice pentru case (3–12 kW și peste), optimizate pentru autoconsum și economie pe termen lung.',
-        'Folosim proiectare orientată pe siguranță: protecții DC/AC, împământare, trasee corecte și etanșări curate pe acoperiș.',
-        'Opțional: baterii de stocare, încărcător EV, monitorizare și optimizare consum.',
-        'Pentru o ofertă rapidă: trimite consumul (factură), locația și câteva poze cu acoperișul.',
+        'Dimensionăm sisteme fotovoltaice rezidențiale în intervalul 3-15 kWp pentru case și vile, pornind de la consumul real, orientarea acoperișului, umbriri și obiectivul de autoconsum. Pachetul poate include soluții on-grid pentru prosumator, variante hibride sau configurații cu baterie, în funcție de cum folosești energia în cursul zilei și al serii.',
+        'În ofertă clarificăm ce primești concret: panouri, structură, invertor, cablare DC/AC, protecții, contorizare, punere în funcțiune, instruire și suport pentru dosarul de prosumator. Dacă urmărești Casa Verde AFM sau o finanțare disponibilă prin PNRR, îți spunem din start ce documente și condiții practice trebuie pregătite.',
+        'Montajul durează de regulă 1-3 zile, iar parcursul administrativ pentru dosarul de prosumator se întinde frecvent pe 4-8 săptămâni, în funcție de distribuitor. Discutăm transparent și despre garanții: produs 10-15 ani, performanță 25 ani și execuție 2 ani, conform contractului și echipamentelor alese.',
       ],
-      extraHtml: `
-          <div style="margin-top: 12px;">
-            <h2 style="font-size: 18px; margin: 0 0 10px;">Ce includem</h2>
-            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
-              <li>Dimensionare orientată pe consum + opțiuni (autoconsum vs baterie).</li>
-              <li>Montaj structură + cablare + protecții + etanșări.</li>
-              <li>Testare, punere în funcțiune și instruire utilizare.</li>
-            </ul>
-          </div>
-      `,
+      extraHtml: servicePageBlocks['fotovoltaice-rezidentiale'],
       jsonLd: wrapJsonLd([
         {
           '@type': 'Service',
           name: 'Instalații fotovoltaice rezidențiale',
-          provider: localBusiness,
-          areaServed: 'RO',
+          provider: serviceProviderRef,
+          areaServed: { '@type': 'Country', name: 'Romania' },
           url: `${origin}/servicii/fotovoltaice-rezidentiale/`,
         },
         {
@@ -564,21 +857,21 @@ async function writeStaticPages() {
     },
     {
       path: '/servicii/fotovoltaice-industriale',
-      title: 'Sisteme Fotovoltaice Industriale — Solaris CET',
-      description: 'Sisteme fotovoltaice pentru hale și clădiri comerciale: proiectare, montaj, optimizare ROI.',
-      h1: 'Sisteme Fotovoltaice Industriale — Hale și clădiri comerciale',
+      title: 'Fotovoltaice Industriale în Vaslui și Moldova — Solaris CET',
+      description: 'Sisteme fotovoltaice industriale de la 20+ kWp pentru hale și spații comerciale, cu monitorizare și scenarii de ROI.',
+      h1: 'Fotovoltaice Industriale în Vaslui, Iași, Bacău și toată Moldova',
       bodyLines: [
-        'Sisteme fotovoltaice pentru hale și clădiri comerciale: proiectare, montaj, punere în funcțiune și monitorizare.',
-        'Planificăm execuția ca să nu afecteze operațiunile: lucrări pe etape, programare, zone de siguranță și documentație.',
-        'Optimizăm ROI: profil de consum, orientare, limitări de rețea și scenarii de extindere.',
-        'Lucrăm și pe acoperișuri industriale cu membrană TPO, cu detalii corecte pentru durabilitate.',
+        'Pentru hale, depozite și spații comerciale proiectăm sisteme fotovoltaice de la 20+ kWp, pornind de la profilul de consum, facturile de energie, orientarea acoperișului și tipul de rețea mono sau trifazată. Scopul este autoconsumul real și amortizarea calculată prudent, nu doar instalarea unei puteri mari care nu este folosită eficient.',
+        'Analizăm și partea de execuție: tipul acoperișului, eventualele membrane TPO, încărcările admise, căile de acces și modul în care putem lucra etapizat fără să blocăm activitatea firmei. Putem integra monitorizare live, alerte și rapoarte lunare, utile pentru managementul energetic și pentru urmărirea performanței în exploatare.',
+        'Când proiectul o permite, discutăm și avantajele fiscale, inclusiv amortizarea accelerată și posibilitatea deducerii de până la 50% din investiție în primul an, conform cadrului aplicabil. La predare primești parametri de referință, recomandări de mentenanță și scenarii pentru extindere ulterioară, dacă planul energetic al firmei evoluează.',
       ],
+      extraHtml: servicePageBlocks['fotovoltaice-industriale'],
       jsonLd: wrapJsonLd([
         {
           '@type': 'Service',
           name: 'Sisteme fotovoltaice industriale',
-          provider: localBusiness,
-          areaServed: 'RO',
+          provider: serviceProviderRef,
+          areaServed: { '@type': 'Country', name: 'Romania' },
           url: `${origin}/servicii/fotovoltaice-industriale/`,
         },
         {
@@ -598,20 +891,21 @@ async function writeStaticPages() {
     },
     {
       path: '/servicii/acoperisuri-tabla-tigla',
-      title: 'Montaj Acoperișuri Tablă și Țiglă Metalică — Solaris CET',
-      description: 'Montaj acoperișuri tablă/țiglă metalică: sisteme pluviale, parazăpezi, etanșări.',
-      h1: 'Montaj Acoperișuri Tablă și Țiglă Metalică — Vaslui, Bacău, Iași',
+      title: 'Acoperișuri din Tablă și Țiglă Metalică în Vaslui — Solaris CET',
+      description: 'Montaj și reparații pentru acoperișuri din tablă click, profilată sau țiglă metalică, cu accesorii și etanșări corecte.',
+      h1: 'Acoperișuri din Tablă și Țiglă Metalică în Vaslui și județele din jur',
       bodyLines: [
-        'Montaj și reparații acoperișuri din tablă click/falțuită și țiglă metalică, cu detalii de finisaj curate.',
-        'Rezolvăm zone critice: coame, dolii, străpungeri, atice, jgheaburi/burlane și etanșări.',
-        'Lucrăm pe evaluare la fața locului (după caz) și îți recomandăm varianta potrivită pentru geometria acoperișului.',
+        'Pentru case și anexe din Vaslui și județele limitrofe montăm și refacem acoperișuri din tablă click, tablă profilată, tablă cutată și țiglă metalică, alegând soluția după geometria acoperișului, expunere și obiectivul proiectului. În evaluare contează nu doar suprafața, ci și panta, numărul de dolii, străpungerile, mansarda și modul în care se evacuează apa.',
+        'Îți explicăm clar diferențele dintre grosimi de 0.45 mm, 0.5 mm și 0.6 mm și dintre acoperirile polyester 25 μm și PVDF sau Pural Matt 35 μm, astfel încât să știi ce plătești și de ce. Pachetul poate include sisteme pluviale din PVC, oțel vopsit sau aluminiu, plus accesorii precum parazăpezi, aeratoare, ferestre de mansardă și coamă aerisită.',
+        'Ne concentrăm pe detaliile care fac diferența în timp: coame, dolii, racorduri, borduri și etanșări curate. În contract putem specifica o garanție de execuție pentru etanșeitate de 5-10 ani, iar dacă vrei panouri fotovoltaice pe tablă click, pregătim montajul încă din această etapă ca să eviți intervenții costisitoare ulterior.',
       ],
+      extraHtml: servicePageBlocks['acoperisuri-tabla-tigla'],
       jsonLd: wrapJsonLd([
         {
           '@type': 'Service',
           name: 'Acoperișuri tablă / țiglă',
-          provider: localBusiness,
-          areaServed: 'RO',
+          provider: serviceProviderRef,
+          areaServed: { '@type': 'Country', name: 'Romania' },
           url: `${origin}/servicii/acoperisuri-tabla-tigla/`,
         },
         {
@@ -631,20 +925,21 @@ async function writeStaticPages() {
     },
     {
       path: '/servicii/acoperisuri-industriale-tpo',
-      title: 'Acoperișuri Industriale Folie TPO — Solaris CET',
-      description: 'Membrană TPO pentru hale și depozite: detalii tehnice, durabilitate, execuție.',
-      h1: 'Acoperișuri Industriale Folie TPO — Hale și Depozite',
+      title: 'Acoperișuri Industriale TPO în Vaslui și Moldova — Solaris CET',
+      description: 'Membrană TPO pentru hale și depozite, cu grosimi 1.2-2.0 mm, fixare corectă și compatibilitate cu fotovoltaice pe acoperiș plat.',
+      h1: 'Acoperișuri Industriale TPO în Vaslui, Bacău, Iași și toată Moldova',
       bodyLines: [
-        'Montaj și reparații pentru membrane TPO la hale, depozite și clădiri comerciale.',
-        'Atenție la detalii: îmbinări, colțuri, atice, scurgeri, străpungeri și treceri de instalații.',
-        'Oferim inspecții periodice și intervenții rapide pentru infiltrații.',
+        'Membrana TPO este o soluție eficientă pentru acoperișuri plate industriale, dar performanța ei depinde de alegerea grosimii corecte și de execuția impecabilă a detaliilor. Recomandăm 1.2 mm, 1.5 mm sau 2.0 mm în funcție de trafic pietonal, climat, stratificație și nivelul de solicitare al clădirii.',
+        'Stabilim metoda de fixare mecanică, adezivă sau balastată după suport, încărcări și modul de exploatare al clădirii. Zonele critice sunt colțurile, aticele, străpungerile, trecerile de cablu și gurile de scurgere, iar aici tratăm cauzele infiltrațiilor înainte de a propune reparația sau sistemul nou.',
+        'Dacă pe acoperișul plat există sau urmează un sistem fotovoltaic, pregătim soluții compatibile pentru suporturi și trasee. Garanția fabricantului pentru membrană este, de regulă, 15-20 ani, iar garanția de execuție pentru lucrarea noastră este 5 ani, completată de recomandări clare pentru inspecții periodice și mentenanță preventivă.',
       ],
+      extraHtml: servicePageBlocks['acoperisuri-industriale-tpo'],
       jsonLd: wrapJsonLd([
         {
           '@type': 'Service',
           name: 'Acoperișuri industriale TPO',
-          provider: localBusiness,
-          areaServed: 'RO',
+          provider: serviceProviderRef,
+          areaServed: { '@type': 'Country', name: 'Romania' },
           url: `${origin}/servicii/acoperisuri-industriale-tpo/`,
         },
         {
@@ -664,20 +959,21 @@ async function writeStaticPages() {
     },
     {
       path: '/servicii/atice-si-fatade-tabla',
-      title: 'Atice și Fațade din Tablă — Solaris CET',
-      description: 'Atice și fațade din tablă: finisaje moderne, culori RAL, execuție curată.',
-      h1: 'Atice și Fațade din Tablă — Finisaje moderne',
+      title: 'Atice și Fațade din Tablă în Vaslui și Moldova — Solaris CET',
+      description: 'Placări metalice pentru atice și fațade, cu culori RAL, opțiuni de termoizolație și diferențe clare între polyester și PVDF.',
+      h1: 'Atice și Fațade din Tablă în Vaslui, Iași, Bacău și proiecte selectate la nivel național',
       bodyLines: [
-        'Executăm atice și fațade din tablă pentru un aspect modern și protecție durabilă a anvelopei.',
-        'Ne concentrăm pe muchii, îmbinări și fixări discrete, cu finisaje curate.',
-        'Reparații punctuale sau refacere completă, în funcție de starea existentă.',
+        'Aticele și fațadele din tablă trebuie gândite ca parte a anvelopei clădirii, nu doar ca elemente de aspect. Pentru proiectele din Vaslui, Iași, Bacău și alte zone selectate lucrăm cu tablă cutată, tablă nervurată, casete de fațadă și tablă lisă cu prindere ascunsă, în funcție de imaginea dorită, expunere și ritmul de execuție necesar pe șantier.',
+        'La ofertare clarificăm dacă lucrarea include doar placarea metalică sau și un sistem de termoizolație, de exemplu panouri sandwich cu vată minerală. Discutăm și paleta de culori RAL standard sau speciale și diferențele reale dintre vopsirea polyester, unde garanția tipică este 10-15 ani, și PVDF, unde intervalul poate urca la 20-30 ani în funcție de produs.',
+        'Execuția corectă se vede în muchii, în colțuri, în racorduri și în felul în care apa este evacuată. De aceea tratăm aticele și fațadele împreună cu acoperișul, drenajul și restul elementelor de anvelopă, astfel încât finisajul să fie coerent vizual și corect tehnic pe termen lung.',
       ],
+      extraHtml: servicePageBlocks['atice-si-fatade-tabla'],
       jsonLd: wrapJsonLd([
         {
           '@type': 'Service',
           name: 'Atice și fațade tablă',
-          provider: localBusiness,
-          areaServed: 'RO',
+          provider: serviceProviderRef,
+          areaServed: { '@type': 'Country', name: 'Romania' },
           url: `${origin}/servicii/atice-si-fatade-tabla/`,
         },
         {
@@ -714,20 +1010,21 @@ async function writeStaticPages() {
     },
     {
       path: '/servicii/reparatii-si-mentenanta',
-      title: 'Reparații și Mentenanță Acoperiș — Solaris CET',
-      description: 'Reparații acoperiș: infiltrații, jgheaburi, curățare și inspecție anuală.',
-      h1: 'Reparații și Mentenanță Acoperiș — Intervenții rapide',
+      title: 'Reparații și Mentenanță în Vaslui și Moldova — Solaris CET',
+      description: 'Intervenții urgente și mentenanță preventivă pentru acoperișuri, TPO și sisteme fotovoltaice, cu răspuns rapid în Vaslui și județele limitrofe.',
+      h1: 'Reparații și Mentenanță în Vaslui și județele limitrofe',
       bodyLines: [
-        'Intervenții pentru infiltrații, reparații la acoperiș, jgheaburi/burlane și mentenanță preventivă.',
-        'Facem diagnostic, identificăm cauza și propunem soluții realiste (local sau etapizat).',
-        'Recomandăm inspecții periodice pentru acoperișuri industriale și zonele critice (atice, scurgeri, străpungeri).',
+        'Serviciul nostru de reparații și mentenanță acoperă atât urgențele reale, cum sunt infiltrațiile active și elementele desprinse, cât și intervențiile planificate menite să prevină costuri mai mari pe termen lung. Pentru Vaslui și județele limitrofe încercăm să răspundem în aceeași zi sau în următoarea zi lucrătoare, în funcție de localitate, vreme și gradul de risc.',
+        'La inspecție verificăm starea membranei sau a tablei, etanșeitatea la coame, dolii, atice și străpungeri, starea jgheaburilor, fixările și prezența mușchiului sau a vegetației. Pentru fotovoltaice facem curățare profesională, inspecție vizuală a modulelor, verificarea conexiunilor accesibile și curățarea invertorului, iar în multe cazuri se poate recupera 10-25% din producția pierdută prin murdărire severă.',
+        'Intervenim și pe acoperișuri sau sisteme pe care nu le-am montat noi, dacă soluția propusă este tehnic corectă. Scopul nu este doar să reparăm rapid, ci să îți spunem clar dacă merită o intervenție punctuală, o refacere pe zonă sau un plan de mentenanță preventivă pentru a reduce riscul de reapariție.',
       ],
+      extraHtml: servicePageBlocks['reparatii-si-mentenanta'],
       jsonLd: wrapJsonLd([
         {
           '@type': 'Service',
           name: 'Reparații și mentenanță',
-          provider: localBusiness,
-          areaServed: 'RO',
+          provider: serviceProviderRef,
+          areaServed: { '@type': 'Country', name: 'Romania' },
           url: `${origin}/servicii/reparatii-si-mentenanta/`,
         },
         {
@@ -763,6 +1060,28 @@ async function writeStaticPages() {
       ]),
     },
     {
+      path: '/finantare',
+      title: 'Finanțare fotovoltaice — Casa Verde, RePowerEU și credite verzi — Solaris CET',
+      description: 'Programe de finanțare pentru sisteme fotovoltaice: Casa Verde 2025, Casa Verde Baterii 2026, RePowerEU, plus credite verzi prin BCR, Raiffeisen, BT și ProCredit.',
+      h1: 'Finanțare pentru sisteme fotovoltaice și baterii',
+      bodyLines: [
+        'Te ajutăm să găsești soluția de finanțare potrivită pentru sistemul tău fotovoltaic — fie că este vorba de subvenție prin Casa Verde, finanțare europeană RePowerEU sau credit verde clasic prin băncile partenere.',
+        'Pregătim dosarul tehnic (devize, fișe tehnice, schiță), iar tu deschizi contul AFM și depui aplicația. Plata se face în avans (30%) și restul după montaj și punere în funcțiune.',
+        'Pentru detalii despre fiecare program și plafoanele actuale, vezi paginile dedicate sau sună-ne direct la +40 769 889 721.',
+      ],
+      jsonLd: wrapJsonLd([
+        {
+          '@type': 'WebPage',
+          name: 'Finanțare fotovoltaice Solaris CET',
+          url: `${origin}/finantare/`,
+        },
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: 'Finanțare', path: '/finantare' },
+        ]),
+      ]),
+    },
+    {
       path: '/despre',
       title: 'Despre — Solaris CET',
       description: 'Echipă locală pentru fotovoltaice, acoperișuri, reparații și mentenanță.',
@@ -778,7 +1097,6 @@ async function writeStaticPages() {
           name: 'Despre Solaris CET',
           url: `${origin}/despre/`,
         },
-        localBusiness,
         breadcrumb([
           { name: 'Acasă', path: '/' },
           { name: 'Despre', path: '/despre' },
@@ -853,6 +1171,7 @@ async function writeStaticPages() {
           <div style="margin-top: 12px;">
             <h2 style="font-size: 18px; margin: 0 0 10px;">FAQ rapid</h2>
             <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li><strong>Cât costă un sistem fotovoltaic pentru o casă?</strong> Orientativ, un sistem de 5 kWp costă între 4.500 și 6.500 EUR cu montaj inclus.</li>
               <li><strong>Cât durează o instalare fotovoltaică?</strong> Depinde de complexitate; după evaluare îți spunem pașii și termenele realiste.</li>
               <li><strong>Ce vă trebuie pentru ofertă?</strong> Locație, consum (facturi), tip acoperiș/structură, orientare/umbriri și obiectiv.</li>
               <li><strong>Faceți reparații la infiltrații?</strong> Da. Facem diagnostic și intervenții punctuale (tablă/țiglă/TPO).</li>
@@ -864,6 +1183,14 @@ async function writeStaticPages() {
         {
           '@type': 'FAQPage',
           mainEntity: [
+            {
+              '@type': 'Question',
+              name: 'Cât costă un sistem fotovoltaic pentru o casă?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Prețul variază în funcție de puterea instalată și configurație. Orientativ, un sistem de 5 kWp costă între 4.500 și 6.500 EUR cu montaj inclus. Solaris CET oferă evaluare gratuită și ofertă personalizată.',
+              },
+            },
             {
               '@type': 'Question',
               name: 'Cât durează o instalare fotovoltaică?',
@@ -1104,11 +1431,12 @@ async function writeStaticPages() {
     },
     {
       path: '/privacy-settings',
-      title: 'Setări cookie și cereri GDPR — Solaris CET',
-      description: 'Controlează preferințele cookie și vezi pașii clari pentru cereri GDPR, inclusiv fără JavaScript.',
-      h1: 'Setări cookie și confidențialitate',
+      title: 'Setări cookie-uri — Solaris CET',
+      description: 'Controlează preferințele cookie și gestionează consimțământul direct din browser.',
+      h1: 'Setări cookie-uri',
+      noindex: true,
       bodyLines: [
-        'Poți salva preferințele pentru cookie-uri și poți găsi aici pașii pentru cereri GDPR chiar și în modul fără JavaScript.',
+        'Alege ce cookie-uri accepți și salvează preferințele direct în browser.',
         'Cookie-urile strict necesare rămân active pentru funcționarea de bază a site-ului.',
       ],
       extraHtml: privacySettingsOverviewHtml,
@@ -1185,7 +1513,7 @@ async function writeStaticPages() {
           '@type': 'Service',
           name: 'Servicii Solaris CET',
           areaServed: { '@type': 'City', name: x.city, addressCountry: 'RO' },
-          provider: localBusiness,
+          provider: serviceProviderRef,
           url: `${origin}/${x.slug}/`,
         },
         breadcrumb([
@@ -1206,66 +1534,50 @@ async function writeStaticPages() {
       h1: p.h1,
       bodyLines: p.bodyLines,
       extraHtml: p.extraHtml,
+      footerCtaHtml: p.footerCtaHtml,
       jsonLd: p.jsonLd,
       noindex: Boolean(p.noindex),
       redirectTo: p.redirectTo,
+      redirectDelaySeconds: p.redirectDelaySeconds,
     })
     await fs.writeFile(outDir, html, 'utf8')
   }
 }
 
 async function writeSitemap() {
-  const today = stableBuildDate()
-  const urls = []
-
-  const staticPages = [
-    '/',
-    '/servicii',
-    '/proiecte',
-    '/servicii/fotovoltaice-rezidentiale',
-    '/servicii/fotovoltaice-industriale',
-    '/servicii/acoperisuri-tabla-tigla',
-    '/servicii/acoperisuri-industriale-tpo',
-    '/servicii/atice-si-fatade-tabla',
-    '/servicii/reparatii-si-mentenanta',
-    '/contact',
-    '/privacy-settings',
-    '/calculator',
-    '/despre',
-    '/portofoliu',
-    '/faq',
-    '/blog',
-    '/blog/cat-costa-un-sistem-fotovoltaic-2026',
-    '/blog/mentenanta-panouri-fotovoltaice',
-    '/blog/tabla-click-vs-tigla-metalica',
-    '/blog/tpo-vs-membrana-clasica',
-    '/blog/cum-accesezi-programul-casa-verde',
-    '/privacy',
-    '/terms',
-    '/cookies',
-    '/vaslui',
-    '/bacau',
-    '/iasi',
-    '/galati',
-  ]
-  for (const p of staticPages) {
-    urls.push({ loc: `${origin}${normalizePath(p)}`, lastmod: today })
+  const toAbsoluteUrl = (pathname) => {
+    const normalized = normalizePath(pathname)
+    if (normalized === '/') return `${origin}/`
+    return `${origin}${normalized}/`
   }
 
-  const staticGlobal = [
-    { path: '/llms.txt', lastmod: today },
-    { path: '/humans.txt', lastmod: today },
-    { path: '/.well-known/security.txt', lastmod: today },
+  const urls = [
+    { loc: `${origin}/`, priority: '1.0', changefreq: 'monthly' },
+    { loc: toAbsoluteUrl('/servicii'), priority: '0.9', changefreq: 'monthly' },
+    { loc: toAbsoluteUrl('/servicii/fotovoltaice-rezidentiale'), priority: '0.8' },
+    { loc: toAbsoluteUrl('/servicii/fotovoltaice-industriale'), priority: '0.8' },
+    { loc: toAbsoluteUrl('/servicii/acoperisuri-tabla-tigla'), priority: '0.8' },
+    { loc: toAbsoluteUrl('/servicii/acoperisuri-industriale-tpo'), priority: '0.8' },
+    { loc: toAbsoluteUrl('/servicii/atice-si-fatade-tabla'), priority: '0.8' },
+    { loc: toAbsoluteUrl('/servicii/reparatii-si-mentenanta'), priority: '0.8' },
+    { loc: toAbsoluteUrl('/proiecte'), priority: '0.8', changefreq: 'monthly' },
+    { loc: toAbsoluteUrl('/contact'), priority: '0.8', changefreq: 'yearly' },
+    { loc: toAbsoluteUrl('/privacy'), priority: '0.3', changefreq: 'yearly' },
+    { loc: toAbsoluteUrl('/cookies'), priority: '0.3', changefreq: 'yearly' },
+    { loc: toAbsoluteUrl('/terms'), priority: '0.3', changefreq: 'yearly' },
   ]
-  for (const u of staticGlobal) {
-    urls.push({ loc: `${origin}${normalizePath(u.path)}`, lastmod: u.lastmod })
-  }
 
   const xml =
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     urls
-      .map((u) => `  <url><loc>${u.loc}</loc><lastmod>${u.lastmod}</lastmod></url>`)
+      .map((u) => {
+        const extra = [
+          u.priority ? `<priority>${u.priority}</priority>` : '',
+          u.changefreq ? `<changefreq>${u.changefreq}</changefreq>` : '',
+        ].join('')
+        return `  <url><loc>${u.loc}</loc>${extra}</url>`
+      })
       .join('\n') +
     `\n</urlset>\n`
 
@@ -1274,16 +1586,12 @@ async function writeSitemap() {
 }
 
 async function writeRobots() {
-  const disallowLines = [`Disallow: /api/`, `Disallow: /_next/`]
-
   const txt = [
     `User-agent: *`,
     `Allow: /`,
-    ...disallowLines,
-    ``,
-    `# llms.txt: ${origin}/llms.txt`,
-    `# humans.txt: ${origin}/humans.txt`,
-    `# security.txt: ${origin}/.well-known/security.txt`,
+    `Disallow: /privacy-settings/`,
+    `Disallow: /multumim/`,
+    `Disallow: /cdn-cgi/`,
     ``,
     `Sitemap: ${origin}/sitemap.xml`,
     ``,

@@ -1,104 +1,60 @@
 ---
-title: "Politică de Confidențialitate"
-description: "Cum Solaris CET prelucrează datele tale de contact și datele tehnice (cookie-uri) pentru a răspunde solicitărilor."
-lastUpdated: 2026-04-26
+title: "Politica de confidențialitate — Solaris CET"
+description: "Politica GDPR Solaris CET privind categoriile de date, scopurile prelucrării, retenția și drepturile persoanelor vizate."
+lastUpdated: ""
 ---
 
-## 1. Cine suntem
+# Politica de confidențialitate — Solaris CET
 
-Această Politică de Confidențialitate explică modul în care site-ul și aplicația Solaris CET (denumite împreună „Serviciul”) prelucrează date cu caracter personal atunci când ceri o ofertă, trimiți un mesaj sau navighezi pe site.
+Ultima actualizare: 2026-06-10
 
-**Operator:** Solaris CET (denumită „Compania”).  
-**Contact:** solaris-cet@protonmail.com · +40 769 889 721
-**Date identificare:** CUI: *********** · Cetatuia, Vaslui, 737429, România
+## 1. Operatorul de date
 
-Dacă desemnăm un DPO (Responsabil cu Protecția Datelor), vom publica aici datele de contact.
+Solaris CET, [formă juridică: SRL/PFA/II], CUI: [COMPLETEAZĂ],  
+sediu: [ADRESĂ], Vaslui, România.  
+Contact GDPR: solaris-cet@protonmail.com · +40 769 889 721
 
-## 2. Ce date prelucrăm
+## 2. Date colectate și mijloace
 
-Putem prelucra următoarele categorii:
+Prin formularul de ofertă: nume, telefon, email (opțional), județ, descriere nevoie.  
+Prin email sau WhatsApp: datele pe care le trimiți direct.  
+Automat (cu consimțământ): adresa IP, browser, pagini vizitate.
 
-- **Date de contact:** nume, email și/sau telefon (dacă ni le furnizezi).
-- **Date din mesaj:** conținutul solicitării tale (ex. tipul lucrării, locație, termene).
-- **Date tehnice:** date despre browser/dispozitiv (ex. user agent), timestamp-uri, pagini vizitate și evenimente tehnice necesare funcționării.
-- **Preferințe:** consimțământ pentru cookie-uri (analitice/marketing), unde este cazul.
+## 3. Scopuri și temei juridic (art. 6 GDPR)
 
-Nu solicităm date sensibile (categorii speciale în GDPR). Te rugăm să nu trimiți astfel de date prin formulare.
+- Răspuns la cereri de ofertă -> art. 6.1.b (executarea unui contract)
+- Livrarea serviciilor contractate -> art. 6.1.b
+- Obligații fiscale/contabile -> art. 6.1.c (obligație legală)
+- Cookie-uri de analiză -> art. 6.1.a (consimțământul tău)
 
-## 3. Scopuri
+## 4. Durata de retenție
 
-Prelucrăm date personale pentru:
+- Date de ofertare (fără contract): max. 2 ani de la ultimul contact
+- Date contractuale: 10 ani (obligație legală contabilitate RO)
+- Cookie-uri analiză: max. 13 luni (sau conform serviciului utilizat)
 
-- **Răspuns la solicitări și ofertare** (contactare, clarificări, ofertă, programare evaluare).
-- **Furnizarea și securizarea Serviciului** (prevenirea abuzului, funcționare corectă).
-- **Analitice și performanță** (îmbunătățirea experienței, doar cu consimțământ).
-- **Marketing** (măsurarea campaniilor, doar cu consimțământ).
-- **Conformitate legală** (răspuns la solicitări legale, păstrarea evidențelor obligatorii).
-- **Apărarea drepturilor** (gestionarea disputelor/cererilor).
+## 5. Destinatari
 
-## 4. Temeiuri legale (GDPR)
+Nu vindem datele. Transmitem exclusiv către:
 
-În funcție de context, prelucrarea poate avea ca temei:
+- Web3Forms (procesare formulare de contact) — stocare temporară pentru livrarea notificării
+- Servicii de analiză trafic (dacă ai acordat consimțământul)
 
-- **Contract / demersuri la cererea ta** (Art. 6(1)(b)).
-- **Interes legitim** (Art. 6(1)(f)) — securitate, prevenire fraudă, îmbunătățiri.
-- **Consimțământ** (Art. 6(1)(a)) — cookie-uri neesențiale, marketing.
-- **Obligație legală** (Art. 6(1)(c)).
+Nu efectuăm transferuri de date în afara UE/SEE.
 
-Poți retrage consimțământul oricând din setările de cookie-uri.
+## 6. Drepturile tale
 
-## 5. Cookie-uri și tehnologii similare
+Ai dreptul la: acces · rectificare · ștergere · portabilitate ·  
+opoziție · restricționarea prelucrării.  
+Exercitare: solaris-cet@protonmail.com. Răspuns: max. 30 de zile.
 
-Folosim:
+## 7. Plângeri
 
-- **Strict necesare** pentru funcționare și securitate (nu pot fi dezactivate).
-- **Analitice** (opțional).
-- **Marketing** (opțional).
+Poți depune plângere la ANSPDCP:  
+[www.dataprotection.ro](https://www.dataprotection.ro) · [anspdcp@dataprotection.ro](mailto:anspdcp@dataprotection.ro)  
+B-dul Magheru 28-30, sector 1, București
 
-Preferințele pot fi modificate oricând din pagina Setări cookie.
+## 8. Cookie-uri
 
-## 6. Dezvăluiri / destinatari
-
-Putem partaja date cu:
-
-- **Furnizori** (hosting, email, analitice, securitate) în calitate de persoane împuternicite.
-- **Consultanți** (avocați/auditori/contabili) sub confidențialitate.
-- **Autorități** când este cerut de lege sau pentru protecția drepturilor și siguranței.
-
-Nu vindem date personale.
-
-## 7. Transferuri internaționale
-
-Dacă prelucrarea are loc în afara SEE/UK, folosim garanții adecvate (ex. clauze contractuale standard) unde este cazul.
-
-## 8. Perioade de stocare
-
-Păstrăm datele doar cât este necesar pentru scopurile de mai sus (de ex. pentru a răspunde solicitării și a gestiona relația contractuală), incluzând cerințe de conformitate, securitate și soluționare a disputelor. Unde este posibil, agregăm sau ștergem datele.
-
-## 9. Drepturile tale
-
-În funcție de jurisdicție, poți avea dreptul la:
-
-- acces,
-- rectificare,
-- ștergere,
-- restricționare,
-- opoziție,
-- portabilitate,
-- retragerea consimțământului,
-- plângere către autoritatea competentă.
-
-Pentru solicitări legate de drepturile tale (acces, ștergere, rectificare), ne poți contacta la solaris-cet@protonmail.com.
-Poți depune o plângere la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (ANSPDCP), dacă consideri că drepturile tale au fost încălcate.
-
-## 10. Securitate
-
-Aplicăm măsuri rezonabile de securitate. Niciun sistem nu este perfect. Dacă identifici o problemă, contactează-ne la solaris-cet@protonmail.com.
-
-## 11. Copii
-
-Serviciul nu este destinat copiilor. Nu colectăm intenționat date de la copii.
-
-## 12. Actualizări
-
-Putem actualiza această Politică. Data „last updated” indică ultima versiune. Pentru schimbări materiale, informăm utilizatorii în Serviciu și, unde e cazul, prin email.
+Detalii în [Politica de cookie-uri](/cookies/).  
+Setările tale: [Setări cookie](/privacy-settings/).

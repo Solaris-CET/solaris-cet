@@ -14,7 +14,7 @@
     <meta name="twitter:title" content="Politica de cookie-uri — Solaris CET" />
     <meta name="twitter:description" content="Politica de cookie-uri Solaris CET." />
 
-    <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","name":"Politica de cookie-uri","url":"https://solaris-cet.com/cookies/"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Acasă","item":"https://solaris-cet.com/"},{"@type":"ListItem","position":2,"name":"Cookie-uri","item":"https://solaris-cet.com/cookies"}]}]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"LocalBusiness","@id":"https://solaris-cet.com/#business","name":"Solaris CET","url":"https://solaris-cet.com","telephone":"+40769889721","email":"solaris-cet@protonmail.com","address":{"@type":"PostalAddress","addressLocality":"Vaslui","addressRegion":"Vaslui","addressCountry":"RO"},"geo":{"@type":"GeoCoordinates","latitude":46.6407,"longitude":27.7276},"areaServed":[{"@type":"State","name":"Vaslui"},{"@type":"State","name":"Iași"},{"@type":"State","name":"Bacău"},{"@type":"State","name":"Galați"},{"@type":"Country","name":"Romania"}],"priceRange":"$$","description":"Instalații fotovoltaice rezidențiale și industriale, acoperișuri tablă/TPO, atice, fațade și mentenanță în Vaslui și România.","sameAs":["https://wa.me/40769889721"]},{"@type":"WebSite","@id":"https://solaris-cet.com/#website","url":"https://solaris-cet.com","name":"Solaris CET","inLanguage":"ro-RO","publisher":{"@id":"https://solaris-cet.com/#business"}},{"@type":"WebPage","name":"Politica de cookie-uri","url":"https://solaris-cet.com/cookies/"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Acasă","item":"https://solaris-cet.com/"},{"@type":"ListItem","position":2,"name":"Cookie-uri","item":"https://solaris-cet.com/cookies"}]}]}</script>
 
     <style>
       :root { color-scheme: dark; }
@@ -24,9 +24,13 @@
       .wrap { max-width: 860px; margin: 0 auto; padding: 28px 18px; }
       .card { border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.35); border-radius: 18px; padding: 18px; }
       h1 { font-size: 34px; line-height: 1.1; margin: 0 0 10px; }
+      h2 { font-size: 18px; margin: 0 0 10px; }
       p { margin: 10px 0; color: rgba(255,255,255,.82); }
       .nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
       .nav a { border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06); padding: 10px 12px; border-radius: 12px; font-weight: 700; }
+      details { margin-top: 10px; border: 1px solid rgba(255,255,255,.12); border-radius: 14px; background: rgba(255,255,255,.04); overflow: hidden; }
+      summary { cursor: pointer; list-style: none; padding: 14px 16px; font-weight: 700; }
+      details p { margin: 0; padding: 0 16px 16px; }
     </style>
   </head>
   <body>
@@ -46,49 +50,33 @@
 <p>Poți schimba preferințele din Setări cookie.</p>
           
 <div style="margin-top: 14px;">
-            <h2 style="font-size: 18px; margin: 0 0 10px;">Categorii de cookie-uri</h2>
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Ce cookie-uri folosim</h2>
             <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
-              <li><strong>Strict necesare</strong> — țin site-ul funcțional și sigur; nu pot fi dezactivate din produs.</li>
-              <li><strong>Analitice</strong> — active doar dacă îți dai acordul.</li>
-              <li><strong>Marketing</strong> — active doar dacă îți dai acordul.</li>
+              <li><strong>Strict necesare</strong> — <code>solaris_cookie_consent</code> reține alegerea ta privind cookie-urile timp de 1 an.</li>
+              <li><strong>Analitice</strong> — folosim identificatori locali și, doar dacă sunt configurate, integrări precum Google Analytics, GTM, Mixpanel, Amplitude sau Hotjar.</li>
+              <li><strong>Marketing</strong> — Meta Pixel sau LinkedIn Insight Tag pornesc doar cu consimțământ și numai dacă sunt activate în producție.</li>
             </ul>
           </div>
           <div style="margin-top: 14px;">
             <h2 style="font-size: 18px; margin: 0 0 10px;">Durată și control</h2>
-            <p style="margin:0; color: rgba(255,255,255,.82);">Consimțământul este reținut local în browser pentru a nu te întreba la fiecare vizită. Îl poți modifica oricând din Setări cookie.</p>
+            <p style="margin:0; color: rgba(255,255,255,.82);">Consimțământul este reținut local în browser pentru a nu te întreba la fiecare vizită. Dacă integrările de marketing nu sunt configurate la momentul vizitei, nu setăm cookie-uri de marketing.</p>
           </div>
           
           <div style="margin-top: 14px;">
-            <h2 style="font-size: 18px; margin: 0 0 10px;">Salvează preferințele cookie fără JavaScript</h2>
-            <p style="margin:0 0 10px; color: rgba(255,255,255,.82);">Formularele de mai jos salvează preferințele în browser printr-un cookie de consimțământ.</p>
-            <p style="margin:0 0 10px; color: rgba(255,255,255,.68);">După trimitere primești o confirmare HTML simplă, fără dependență de JavaScript.</p>
-            <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;">
-              <form action="/privacy-settings/save" method="get" style="margin:0;">
-                <input type="hidden" name="preset" value="accept_all" />
-                <button type="submit" style="cursor:pointer; border-radius:12px; border:1px solid rgba(245,158,11,.45); background:rgba(245,158,11,.14); color:#fbbf24; font-weight:900; padding:12px 14px;">Acceptă tot</button>
-              </form>
-              <form action="/privacy-settings/save" method="get" style="margin:0;">
-                <input type="hidden" name="preset" value="essential_only" />
-                <button type="submit" style="cursor:pointer; border-radius:12px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#fff; font-weight:800; padding:12px 14px;">Doar necesare</button>
-              </form>
-            </div>
-            <form action="/privacy-settings/save" method="get" style="margin-top:12px; display:grid; gap:10px;">
-              <label style="display:flex; gap:10px; align-items:flex-start;">
-                <input type="checkbox" name="analytics" value="1" style="margin-top:4px;" />
-                <span><strong>Cookie-uri analitice</strong><br /><span style="color:rgba(255,255,255,.7);">Măsoară vizite și comportament pentru îmbunătățirea site-ului.</span></span>
-              </label>
-              <label style="display:flex; gap:10px; align-items:flex-start;">
-                <input type="checkbox" name="marketing" value="1" style="margin-top:4px;" />
-                <span><strong>Cookie-uri marketing</strong><br /><span style="color:rgba(255,255,255,.7);">Folosite doar dacă decidem să măsurăm campanii sau surse comerciale.</span></span>
-              </label>
-              <button type="submit" style="cursor:pointer; border-radius:12px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#fff; font-weight:800; padding:12px 14px;">Salvează selecția</button>
-            </form>
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Gestionează preferințele cookie</h2>
+            <p style="margin:0 0 10px; color: rgba(255,255,255,.82);">Poți actualiza alegerile oricând din pagina dedicată pentru confidențialitate.</p>
+            <p style="margin:0;">
+              <a href="/privacy-settings/" style="display:inline-flex;align-items:center;justify-content:center;padding:12px 14px;border-radius:12px;border:1px solid rgba(245,158,11,.45);background:rgba(245,158,11,.14);color:#fbbf24;font-weight:900;">
+                Setări cookie
+              </a>
+            </p>
           </div>
 
-          <p><strong>Telefon:</strong> <a href="tel:+40769889721">+40 769 889 721</a> · <strong>Email:</strong> <a href="mailto:solaris-cet@protonmail.com">solaris-cet@protonmail.com</a></p>
+          <p><strong>Telefon:</strong> <a href="tel:+40769889721">+40 769 889 721</a> · <strong>Email:</strong> <!--email_off--><a href="mailto:solaris-cet@protonmail.com">solaris-cet@protonmail.com</a><!--/email_off--></p>
           <p><a href="/contact/">Solicită ofertă →</a></p>
         </div>
       </main>
     </div>
+    <script defer src="/cookie-consent.js"></script>
   </body>
 </html>

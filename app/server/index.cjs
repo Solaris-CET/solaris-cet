@@ -548,6 +548,7 @@ const apiRoutes = new Map([
   ['/api/push/subscribe', 'api/push/subscribe/route.js'],
   ['/api/push/unsubscribe', 'api/push/unsubscribe/route.js'],
   ['/api/push/test', 'api/push/test/route.js'],
+  ['/api/lead', 'api/lead/route.js'],
   ['/api/support/start', 'api/support/start/route.js'],
   ['/api/support/messages', 'api/support/messages/route.js'],
   ['/api/support/message', 'api/support/message/route.js'],
@@ -1154,13 +1155,7 @@ async function main() {
       setSecurityHeaders(res, { isHttps: reqUrl.protocol === 'https:', origin: reqUrl.origin });
       res.setHeader('Cache-Control', 'no-store');
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.end(
-        JSON.stringify({
-          ok: true,
-          uptime_s: Math.round(process.uptime()),
-          ts: new Date().toISOString(),
-        }),
-      );
+      res.end(JSON.stringify({ status: 'ok', time: new Date().toISOString() }));
       return;
     }
 
@@ -1580,6 +1575,35 @@ async function main() {
     if (reqUrl.pathname === '/privacy-settings/save') {
       await handlePrivacySettingsSave(req, res, reqUrl);
       return;
+    }
+    {
+      const normalizedForAlias = (reqUrl.pathname || '/').replace(/\/+$/, '') || '/';
+      const SERVICE_SLUG_ALIASES = {
+        '/servicii/fotovoltaice': '/servicii/fotovoltaice-rezidentiale/',
+        '/servicii/fotovoltaic-rezidential': '/servicii/fotovoltaice-rezidentiale/',
+        '/servicii/fotovoltaic-industrial': '/servicii/fotovoltaice-industriale/',
+        '/servicii/panouri': '/servicii/fotovoltaice-rezidentiale/',
+        '/servicii/panouri-fotovoltaice': '/servicii/fotovoltaice-rezidentiale/',
+        '/servicii/acoperisuri': '/servicii/acoperisuri-tabla-tigla/',
+        '/servicii/acoperisuri-tabla': '/servicii/acoperisuri-tabla-tigla/',
+        '/servicii/tabla-click': '/servicii/acoperisuri-tabla-tigla/',
+        '/servicii/tigla-metalica': '/servicii/acoperisuri-tabla-tigla/',
+        '/servicii/acoperisuri-industriale': '/servicii/acoperisuri-industriale-tpo/',
+        '/servicii/tpo': '/servicii/acoperisuri-industriale-tpo/',
+        '/servicii/acoperis-tpo': '/servicii/acoperisuri-industriale-tpo/',
+        '/servicii/atice': '/servicii/atice-si-fatade-tabla/',
+        '/servicii/fatade': '/servicii/atice-si-fatade-tabla/',
+        '/servicii/atice-fatade': '/servicii/atice-si-fatade-tabla/',
+        '/servicii/reparatii': '/servicii/reparatii-si-mentenanta/',
+        '/servicii/mentenanta': '/servicii/reparatii-si-mentenanta/',
+        '/cere-oferta': '/contact',
+        '/about': '/despre',
+      };
+      const target = SERVICE_SLUG_ALIASES[normalizedForAlias];
+      if (target) {
+        sendRedirect(target, 301);
+        return;
+      }
     }
     if (await tryServeStatic(req, reqUrl, res)) return;
     if (reqUrl.pathname.startsWith('/api/')) {

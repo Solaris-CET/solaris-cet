@@ -4,7 +4,7 @@ slug: "tpo-vs-membrana-clasica"
 date: "2026-06-06"
 categoria: "acoperisuri"
 descriere: "Comparație practică pentru hale/depozite: TPO vs membrane clasice. Detalii de execuție, zone critice (atice, scurgeri, străpungeri) și checklist de mentenanță."
-coverImageUrl: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20documentary%20photo%20of%20an%20industrial%20flat%20roof%20with%20white%20TPO%20membrane%2C%20worker%20in%20PPE%20welding%20a%20seam%2C%20natural%20light%2C%20slight%20imperfections%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9"
+coverImageUrl: "/proiecte/acoperis-tpo-industrial.svg"
 autor: "Solaris CET"
 timp_citire: 9
 tags:

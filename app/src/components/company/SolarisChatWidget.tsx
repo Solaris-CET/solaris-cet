@@ -1,6 +1,7 @@
 import { Bot, ChevronDown, Send, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { SafeEmailLink } from '@/components/SafeEmailLink';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { type CompanyDepartmentId,companyDepartments } from '@/data/companyDepartments';
 import { cn } from '@/lib/utils';
@@ -249,7 +250,7 @@ export function SolarisChatWidget() {
             </form>
             <div className="px-4 pb-3 text-[11px] text-solaris-muted">
               Pentru ofertă rapidă: <a className="text-solaris-text hover:underline" href="tel:+40769889721">+40 769 889 721</a> ·{' '}
-              <a className="text-solaris-text hover:underline" href="mailto:solaris-cet@protonmail.com">solaris-cet@protonmail.com</a>
+              <SafeEmailLink anchorClassName="text-solaris-text hover:underline" />
             </div>
           </div>
         </DialogContent>

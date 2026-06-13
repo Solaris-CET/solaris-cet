@@ -14,7 +14,7 @@
     <meta name="twitter:title" content="Contact — Solaris CET" />
     <meta name="twitter:description" content="Contact Solaris CET pentru fotovoltaice, acoperișuri, reparații și mentenanță." />
 
-    <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"LocalBusiness","name":"Solaris CET","url":"https://solaris-cet.com","telephone":"+40769889721","email":"solaris-cet@protonmail.com","address":{"@type":"PostalAddress","addressLocality":"Cetățuia","addressRegion":"Vaslui","addressCountry":"RO"},"areaServed":"RO"},{"@type":"ContactPage","name":"Contact Solaris CET","url":"https://solaris-cet.com/contact/"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Acasă","item":"https://solaris-cet.com/"},{"@type":"ListItem","position":2,"name":"Contact","item":"https://solaris-cet.com/contact"}]}]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"LocalBusiness","@id":"https://solaris-cet.com/#business","name":"Solaris CET","url":"https://solaris-cet.com","telephone":"+40769889721","email":"solaris-cet@protonmail.com","address":{"@type":"PostalAddress","addressLocality":"Vaslui","addressRegion":"Vaslui","addressCountry":"RO"},"geo":{"@type":"GeoCoordinates","latitude":46.6407,"longitude":27.7276},"areaServed":[{"@type":"State","name":"Vaslui"},{"@type":"State","name":"Iași"},{"@type":"State","name":"Bacău"},{"@type":"State","name":"Galați"},{"@type":"Country","name":"Romania"}],"priceRange":"$$","description":"Instalații fotovoltaice rezidențiale și industriale, acoperișuri tablă/TPO, atice, fațade și mentenanță în Vaslui și România.","sameAs":["https://wa.me/40769889721"]},{"@type":"WebSite","@id":"https://solaris-cet.com/#website","url":"https://solaris-cet.com","name":"Solaris CET","inLanguage":"ro-RO","publisher":{"@id":"https://solaris-cet.com/#business"}},{"@type":"ContactPage","name":"Contact Solaris CET","url":"https://solaris-cet.com/contact/"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Acasă","item":"https://solaris-cet.com/"},{"@type":"ListItem","position":2,"name":"Contact","item":"https://solaris-cet.com/contact"}]}]}</script>
 
     <style>
       :root { color-scheme: dark; }
@@ -24,9 +24,13 @@
       .wrap { max-width: 860px; margin: 0 auto; padding: 28px 18px; }
       .card { border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.35); border-radius: 18px; padding: 18px; }
       h1 { font-size: 34px; line-height: 1.1; margin: 0 0 10px; }
+      h2 { font-size: 18px; margin: 0 0 10px; }
       p { margin: 10px 0; color: rgba(255,255,255,.82); }
       .nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
       .nav a { border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06); padding: 10px 12px; border-radius: 12px; font-weight: 700; }
+      details { margin-top: 10px; border: 1px solid rgba(255,255,255,.12); border-radius: 14px; background: rgba(255,255,255,.04); overflow: hidden; }
+      summary { cursor: pointer; list-style: none; padding: 14px 16px; font-weight: 700; }
+      details p { margin: 0; padding: 0 16px 16px; }
     </style>
   </head>
   <body>
@@ -46,77 +50,79 @@
           
 <div style="margin-top: 14px;">
             <h2 style="font-size: 18px; margin: 0 0 10px;">Cere ofertă (formular)</h2>
-            <form action="/api/support/start" method="POST" enctype="application/x-www-form-urlencoded">
+            <p style="margin: 0 0 12px; color: rgba(255,255,255,.72);">Formular HTML nativ care funcționează și fără JavaScript.</p>
+            <form action="/api/support/start" method="POST" id="form-oferta">
               <input type="hidden" name="pageUrl" value="/contact" />
-                 <input type="hidden" name="consent_version" value="2026-06" />
-                 <input type="text" name="company" tabindex="-1" autocomplete="off" style="position:absolute; left:-9999px; width:1px; height:1px; opacity:0;" aria-hidden="true" />
+              <input type="hidden" name="utm" value="" />
+              <input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" />
               <div style="display:grid; gap:10px;">
                 <label>
-                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Nume</div>
-                  <input name="name" required style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Nume și prenume *</div>
+                  <input name="name" required placeholder="Ion Popescu" autocomplete="name" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
                 </label>
                 <label>
-                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Telefon</div>
-                  <input name="phone" inputmode="tel" required style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Telefon *</div>
+                  <input name="phone" type="tel" required placeholder="07XX XXX XXX" pattern="[0-9+\s\-]{10,15}" autocomplete="tel" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
                 </label>
                 <label>
-                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Email (opțional)</div>
-                  <input name="email" inputmode="email" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Email</div>
+                  <input name="email" type="email" placeholder="email@exemplu.ro" autocomplete="email" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
                 </label>
                 <label>
-                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Serviciu</div>
-                  <select name="service" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;">
-                    <option value="fotovoltaice">Fotovoltaice</option>
-                    <option value="acoperisuri">Acoperișuri tablă/țiglă</option>
-                    <option value="tpo">Acoperișuri industriale TPO</option>
-                    <option value="atice-fatade">Atice & fațade tablă</option>
-                    <option value="reparatii">Reparații & mentenanță</option>
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Serviciu dorit *</div>
+                  <select name="service" required style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;">
+                    <option value="">— Alege —</option>
+                    <option value="fotovoltaice">Fotovoltaice rezidențiale (casă)</option>
+                    <option value="fotovoltaice">Fotovoltaice industriale/comerciale</option>
+                    <option value="acoperisuri">Acoperiș tablă / țiglă metalică</option>
+                    <option value="tpo">Acoperiș industrial folie TPO</option>
+                    <option value="atice-fatade">Atice și fațade tablă</option>
+                    <option value="reparatii">Reparații și mentenanță</option>
                   </select>
                 </label>
                 <label>
-                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Localitate / județ</div>
-                  <input name="location" placeholder="Ex: Vaslui, Iași, Galați" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Localitate / județ *</div>
+                  <input name="location" required placeholder="Ex: Vaslui, jud. Vaslui" autocomplete="address-level2" style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;" />
                 </label>
                 <label>
-                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Detalii</div>
-                  <textarea name="message" rows="5" required style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;"></textarea>
+                  <div style="font-size:12px; color: rgba(255,255,255,.72); font-weight:700; margin-bottom:6px;">Descriere scurtă</div>
+                  <textarea name="message" rows="4" placeholder="Ex: casă 150mp, consum 400 kWh/lună, acoperiș orientat sud..." style="width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; padding:12px 12px;"></textarea>
                 </label>
-                <label style="display:flex; gap:10px; align-items:flex-start;">
-                  <input type="checkbox" name="urgent" value="yes" />
-                  <span style="font-size:13px; color: rgba(255,255,255,.82);">Bifează dacă proiectul este urgent și vrei apel prioritar.</span>
+                <label style="display:flex; gap:10px; align-items:flex-start; color: rgba(255,255,255,.82); font-size:13px; line-height:1.45;">
+                  <input name="consent" type="checkbox" value="yes" required style="margin-top:2px;" />
+                  <span>Sunt de acord ca datele trimise să fie folosite pentru a primi răspuns la cererea mea de ofertă.</span>
                 </label>
-                <label style="display:flex; gap:10px; align-items:flex-start;">
-                  <input type="checkbox" name="consent" value="yes" required />
-                  <span style="font-size:13px; color: rgba(255,255,255,.82);">Sunt de acord ca Solaris CET să folosească datele trimise pentru a mă contacta privind oferta cerută, conform <a href="/privacy">politicii de confidențialitate</a>.</span>
-                </label>
-                <button type="submit" style="cursor:pointer; border-radius:12px; border:1px solid rgba(245,158,11,.45); background:rgba(245,158,11,.14); color:#fbbf24; font-weight:900; padding:12px 12px;">Trimite</button>
+                <button type="submit" style="cursor:pointer; border-radius:12px; border:1px solid rgba(245,158,11,.45); background:rgba(245,158,11,.14); color:#fbbf24; font-weight:900; padding:12px 12px;">Trimite cererea →</button>
               </div>
               <div style="margin-top:10px; font-size:12px; color: rgba(255,255,255,.65);">
-                Solicitarea ajunge direct în sistemul nostru intern de ofertare. Dacă trimiterea nu funcționează, folosește <a href="mailto:solaris-cet@protonmail.com">email</a> sau <a href="tel:+40769889721">telefon</a>.
+                După trimitere primești imediat confirmarea direct din sistemul nostru intern, fără dependență de JavaScript.
               </div>
             </form>
           </div>
           <div style="margin-top: 14px;">
-            <h2 style="font-size: 18px; margin: 0 0 10px;">Hartă</h2>
-            <div style="border-radius: 14px; overflow:hidden; border:1px solid rgba(255,255,255,.12);">
-              <iframe title="Hartă Vaslui, România" src="https://www.openstreetmap.org/export/embed.html?bbox=27.68%2C46.59%2C27.78%2C46.67&layer=mapnik&marker=46.63%2C27.73" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:260px; border:0;"></iframe>
+            <h2 id="titlu-harta" style="font-size: 18px; margin: 0 0 10px;">Zona de activitate</h2>
+            <div style="border-radius: 8px; overflow:hidden; border:1px solid #334155;">
+              <iframe title="Localizare Solaris CET - Vaslui, Romania" src="https://www.openstreetmap.org/export/embed.html?bbox=27.6276%2C46.5407%2C27.8276%2C46.7407&amp;layer=mapnik&amp;marker=46.6407%2C27.7276" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="width:100%; height:300px; border:0; display:block;"></iframe>
             </div>
+            <p style="font-size:.8rem; margin-top:.5rem;"><a href="https://www.openstreetmap.org/?mlat=46.6407&amp;mlon=27.7276#map=12/46.6407/27.7276" target="_blank" rel="noopener noreferrer">Deschide harta completă →</a></p>
           </div>
     
           <div style="margin-top: 14px;">
-            <h2 style="font-size: 18px; margin: 0 0 10px;">Program și zonă de deplasare</h2>
-            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
-              <li><strong>Program:</strong> Luni–Vineri 08:00–18:00 · Sâmbătă 09:00–14:00</li>
-              <li><strong>Adresă operațională:</strong> Cetățuia, Vaslui, 737429, România</li>
-              <li><strong>Acoperire:</strong> Vaslui, Moldova și proiecte selectate la nivel național</li>
-              <li><strong>Canale rapide:</strong> telefon, WhatsApp și email direct, chiar dacă browserul blochează formularul</li>
-            </ul>
+            <address style="font-style:normal; color: rgba(255,255,255,.82);">
+              <strong>Solaris CET</strong><br />
+              Vaslui, județul Vaslui, România<br />
+              <abbr title="Program de lucru">L-V:</abbr> 08:00 - 18:00<br />
+              <a href="tel:+40769889721">+40 769 889 721</a><br />
+              <!--email_off--><a href="mailto:solaris-cet@protonmail.com">solaris-cet@protonmail.com</a><!--/email_off-->
+            </address>
+            <p style="margin-top:10px; color: rgba(255,255,255,.72);">Acoperire: Vaslui, Moldova și proiecte selectate la nivel național.</p>
           </div>
 
-          <p><strong>Telefon:</strong> <a href="tel:+40769889721">+40 769 889 721</a> · <strong>Email:</strong> <a href="mailto:solaris-cet@protonmail.com">solaris-cet@protonmail.com</a></p>
-          <p><a href="/contact/">Solicită ofertă →</a></p>
+          <p><strong>Telefon:</strong> <a href="tel:+40769889721">+40 769 889 721</a> · <strong>Email:</strong> <!--email_off--><a href="mailto:solaris-cet@protonmail.com">solaris-cet@protonmail.com</a><!--/email_off--></p>
+          <p><a href="#form-oferta">Completează formularul ↓</a></p>
         </div>
       </main>
     </div>
+    <script defer src="/cookie-consent.js"></script>
   </body>
 </html>

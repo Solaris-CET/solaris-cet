@@ -118,48 +118,62 @@ export default async function handler(req: Request): Promise<Response> {
       })()
     : null;
 
+  const adminToken = (process.env.HEALTH_ADMIN_TOKEN || process.env.JWT_SECRET || '').trim();
+  const providedToken = (url?.searchParams.get('token') || req.headers.get('x-admin-token') || '').trim();
+  const isAdmin = adminToken.length >= 16 && providedToken !== '' && providedToken === adminToken;
+
+  if (isAdmin) {
+    return jsonResponse(
+      {
+        status: 'ok',
+        checks: {
+          db: dbConfigured ? 'configured' : 'missing',
+          ai: aiConfigured ? 'configured' : 'missing',
+          ton: tonConfigured ? 'configured' : 'missing',
+          rateLimit: 'configured',
+          jwt: hasJwtSecrets || hasJwtSecret ? 'configured' : 'missing',
+        },
+        ...(deepChecks ? { deepChecks } : {}),
+        env: {
+          db: { databaseUrl: hasDbUrl },
+          ai: {
+            grokKey: hasGrokPlain,
+            grokKeyEnc: hasGrokEnc,
+            geminiKey: hasGeminiPlain,
+            geminiKeyEnc: hasGeminiEnc,
+            encryptionSecret: hasEncSecret,
+          },
+          ton: {
+            rpcUrl: hasTonRpcUrl,
+            apiKey: hasTonApiKey,
+          },
+          upstash: {
+            url: hasUpstashUrl,
+            token: hasUpstashToken,
+          },
+          rateLimit: {
+            mode: rateLimitMode,
+            sharedStore: hasUpstashRateLimit,
+          },
+          jwt: {
+            secret: hasJwtSecret,
+            secrets: hasJwtSecrets,
+          },
+        },
+        build: {
+          gitSha,
+          date: buildDate === 'unknown' ? null : buildDate,
+          node: typeof process !== 'undefined' ? process.version : null,
+        },
+        time: new Date().toISOString(),
+      },
+      allowedOrigin,
+    );
+  }
+
   return jsonResponse(
     {
       status: 'ok',
-      checks: {
-        db: dbConfigured ? 'configured' : 'missing',
-        ai: aiConfigured ? 'configured' : 'missing',
-        ton: tonConfigured ? 'configured' : 'missing',
-        rateLimit: 'configured',
-        jwt: hasJwtSecrets || hasJwtSecret ? 'configured' : 'missing',
-      },
-      ...(deepChecks ? { deepChecks } : {}),
-      env: {
-        db: { databaseUrl: hasDbUrl },
-        ai: {
-          grokKey: hasGrokPlain,
-          grokKeyEnc: hasGrokEnc,
-          geminiKey: hasGeminiPlain,
-          geminiKeyEnc: hasGeminiEnc,
-          encryptionSecret: hasEncSecret,
-        },
-        ton: {
-          rpcUrl: hasTonRpcUrl,
-          apiKey: hasTonApiKey,
-        },
-        upstash: {
-          url: hasUpstashUrl,
-          token: hasUpstashToken,
-        },
-        rateLimit: {
-          mode: rateLimitMode,
-          sharedStore: hasUpstashRateLimit,
-        },
-        jwt: {
-          secret: hasJwtSecret,
-          secrets: hasJwtSecrets,
-        },
-      },
-      build: {
-        gitSha,
-        date: buildDate === 'unknown' ? null : buildDate,
-        node: typeof process !== 'undefined' ? process.version : null,
-      },
       time: new Date().toISOString(),
     },
     allowedOrigin,

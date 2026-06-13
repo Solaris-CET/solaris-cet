@@ -301,6 +301,7 @@ export default defineConfig({
   define: {
     "import.meta.env.VITE_GIT_COMMIT_HASH": JSON.stringify(gitShort()),
     "import.meta.env.VITE_BUILD_TIMESTAMP": JSON.stringify(buildTimestamp()),
+    "import.meta.env.VITE_WEB3FORMS_KEY": JSON.stringify(process.env.WEB3FORMS_KEY || process.env.VITE_WEB3FORMS_KEY || ''),
   },
   plugins,
   preview: {

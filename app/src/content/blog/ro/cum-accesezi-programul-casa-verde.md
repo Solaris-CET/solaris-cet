@@ -4,7 +4,7 @@ slug: "cum-accesezi-programul-casa-verde"
 date: "2026-06-06"
 categoria: "finantare"
 descriere: "Ghid practic: ce pregătești înainte de înscriere, cum alegi echipamentele și instalatorul, și cum eviți greșelile care întârzie dosarul."
-coverImageUrl: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=realistic%20documentary%20photo%20of%20a%20Romanian%20home%20solar%20installation%20site%2C%20installer%20in%20PPE%20holding%20clipboard%2C%20natural%20light%2C%20slight%20imperfections%2C%20no%20logos%2C%20no%20text&image_size=landscape_16_9"
+coverImageUrl: "/proiecte/fotovoltaic-rezidential.svg"
 autor: "Solaris CET"
 timp_citire: 10
 tags:
