@@ -1,230 +1,36 @@
 /**
  * Edge runtime — POST `/api/chat`
  *
- * Solaris CET AI: combines Grok (xAI) and Google Gemini to power the
- * Solaris RAV Protocol (Reason-Act-Verify).
+ * Solaris CET AI: uses DeepSeek API for streaming chat responses.
  *
- * - REASON phase → Google Gemini (`GEMINI_API_KEY_ENC` / `GEMINI_API_KEY`):
- *   analytical context, on-chain data synthesis, and structured diagnostic thought.
- * - ACT + VERIFY phases → Grok (`GROK_API_KEY_ENC` / `GROK_API_KEY`):
- *   decisive action directive and final observation anchored to DeDust live data.
+ * Expects JSON body:
+ *   { messages: [{ role: 'user' | 'assistant' | 'system', content: string }] }
  *
- * API keys are resolved from AES-256-GCM encrypted env vars when available.
- * See `app/api/lib/crypto.ts` and `scripts/encrypt-key.mjs` for details.
- *
- * If one provider is unavailable the other generates the full 3-part
- * RAV response so CET AI never goes silent.
+ * Returns a streaming response (text/event-stream) with the DeepSeek output.
  *
  * `runtime: 'edge'` matches edge-style adapters and compatible hosts (e.g. Coolify).
- */
-import OpenAI from 'openai';
+ */import OpenAI from 'openai';
 
-import { TOKEN_DECIMALS } from '../../src/constants/token';
-import { CET_AI_MAX_QUERY_CHARS } from '../../src/lib/cetAiConstants';
-import { CET_CONTRACT_ADDRESS } from '../../src/lib/cetContract';
-import { DEDUST_POOL_ADDRESS } from '../../src/lib/dedustUrls';
-import { getAiChatCache, getCacheTtlSeconds, setAiChatCache, sha256Hex } from '../lib/aiCache';
-import { recordAiChatMetrics } from '../lib/aiMetrics';
-import { estimateCostUsd } from '../lib/aiPricing';
-import { buildCetAiRetrievalBlock } from '../lib/cetAiRetrieval';
-import { answerFromKnowledgeBase } from '../lib/cetCompanyKnowledge';
-import { circuitAllows, circuitReportFailure, circuitReportSuccess } from '../lib/circuitBreaker';
-import { clientIp } from '../lib/clientIp';
-import { acquireConcurrencySlot } from '../lib/concurrencyLimit';
 import { getAllowedOrigin } from '../lib/cors';
-import { resolveApiKey } from '../lib/crypto';
-import { withRateLimit } from '../lib/rateLimit';
-import { decideCetAiRavPlan, deriveCetAiResourceBudget, synthesizeConsensus } from '../lib/reactBrain';
 
 export const config = { runtime: 'edge' };
 
-/** AI model identifiers — update here to change versions across all call sites. */
-const GEMINI_MODEL = 'gemini-2.0-flash';
-const GROK_MODEL = 'grok-3-mini-beta';
-const CLAUDE_MODEL = (process.env.CET_AI_CLAUDE_MODEL ?? 'claude-3-5-sonnet-20241022').trim() || 'claude-3-5-sonnet-20241022';
+const DEEPSEEK_MODEL = 'deepseek-chat';
+const SYSTEM_PROMPT = `You are Solaris CET AI — a helpful assistant for Solaris CET, a Romania‑based company delivering photovoltaic installations, construction works, roofing (metal sheet / metal tiles / TPO membrane), metal parapets and facades, plus repairs and maintenance.
 
-interface DeDustAsset {
-  type: 'native' | 'jetton';
-  address?: string;
-}
+You also answer general crypto/DeFi questions related to the Solaris CET token (CET) and the TON blockchain.
 
-interface DeDustPoolStats {
-  volume_24h?: string;
-}
-
-interface DeDustPool {
-  address: string;
-  assets: [DeDustAsset, DeDustAsset];
-  reserves: [string, string];
-  stats?: DeDustPoolStats;
-}
-
-interface DeDustPrice {
-  address: string;
-  price: string;
-}
-
-interface OnChainContext {
-  cetPriceUsd: string;
-  tonPriceUsd: string;
-  tvlUsd: string;
-  volume24hUsd: string;
-}
-
-/** Prior turns for multi-turn follow-ups (Claude-style chat context). Max 24 messages. */
-interface ConversationTurn {
-  role: 'user' | 'assistant';
-  content: string;
-}
-
-function normalizeConversation(raw: unknown): ConversationTurn[] {
-  if (!Array.isArray(raw)) return [];
-  const out: ConversationTurn[] = [];
-  for (const item of raw) {
-    if (out.length >= 24) break;
-    if (!item || typeof item !== 'object') continue;
-    const role = (item as { role?: unknown }).role;
-    const content = (item as { content?: unknown }).content;
-    if (role !== 'user' && role !== 'assistant') continue;
-    if (typeof content !== 'string') continue;
-    const c = content.trim();
-    if (!c) continue;
-    out.push({ role, content: c.slice(0, CET_AI_MAX_QUERY_CHARS) });
-  }
-  return out;
-}
-
-function buildChatMessages(
-  systemPrompt: string,
-  userQuery: string,
-  conversation: ConversationTurn[],
-): { role: 'system' | 'user' | 'assistant'; content: string }[] {
-  const msgs: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
-    { role: 'system', content: systemPrompt },
-  ];
-  for (const t of conversation) {
-    msgs.push({ role: t.role, content: t.content });
-  }
-  msgs.push({ role: 'user', content: userQuery.trim() });
-  return msgs;
-}
-
-async function claudeComplete(opts: {
-  apiKey: string;
-  model: string;
-  system: string;
-  conversation: ConversationTurn[];
-  userQuery: string;
-  temperature: number;
-}): Promise<string> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 12000);
-  try {
-    const messages: Array<{ role: 'user' | 'assistant'; content: string }> = [];
-    for (const t of opts.conversation) messages.push({ role: t.role, content: t.content });
-    messages.push({ role: 'user', content: opts.userQuery.trim() });
-
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': opts.apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: opts.model,
-        max_tokens: 1200,
-        temperature: Math.max(0, Math.min(1, opts.temperature)),
-        system: opts.system,
-        messages,
-      }),
-      signal: controller.signal,
-    });
-    if (!res.ok) throw new Error(`Claude request failed (${res.status}).`);
-    const payload = (await res.json()) as { content?: Array<{ type?: unknown; text?: unknown }> };
-    return (
-      payload?.content
-        ?.map((c) => (c && c.type === 'text' && typeof c.text === 'string' ? c.text : ''))
-        .filter(Boolean)
-        .join('') ?? ''
-    );
-  } finally {
-    clearTimeout(timeoutId);
-  }
-}
-
-/**
- * Fetch live on-chain data from the DeDust V2 API.
- * Returns null on any error so the handler can degrade gracefully.
- */
-async function fetchOnChainContext(): Promise<OnChainContext | null> {
-  try {
-    const controller = new AbortController();
-    // Increase timeout for the 23MB pools JSON
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
-
-    const [poolsRes, pricesRes] = await Promise.all([
-      fetch('https://api.dedust.io/v2/pools', { signal: controller.signal }),
-      fetch('https://api.dedust.io/v2/prices', { signal: controller.signal }),
-    ]);
-
-    clearTimeout(timeoutId);
-
-    if (!poolsRes.ok || !pricesRes.ok) return null;
-
-    const pools = (await poolsRes.json()) as DeDustPool[];
-    const prices = (await pricesRes.json()) as DeDustPrice[];
-
-    const tonEntry = prices.find((p) => p.address === 'native');
-    const tonPriceUsd = tonEntry ? parseFloat(tonEntry.price) : null;
-    if (!tonPriceUsd) return null;
-
-    const cetPool = pools.find((p) => p.address === DEDUST_POOL_ADDRESS);
-
-    const cetAddressLower = CET_CONTRACT_ADDRESS.toLowerCase();
-    const cetEntry = prices.find((p) => p.address.toLowerCase() === cetAddressLower);
-    let cetPriceUsd: number | null = cetEntry ? parseFloat(cetEntry.price) : null;
-
-    let tvlUsd: number | null = null;
-    let volume24hUsd: number | null = null;
-
-    if (cetPool) {
-      const tonIndex = cetPool.assets[0].type === 'native' ? 0 : 1;
-      const cetIndex = tonIndex === 0 ? 1 : 0;
-
-      const tonReserve = parseFloat(cetPool.reserves[tonIndex]) / 1e9;
-      const cetReserve = parseFloat(cetPool.reserves[cetIndex]) / Math.pow(10, TOKEN_DECIMALS);
-
-      if (cetPriceUsd === null && cetReserve > 0) {
-        cetPriceUsd = (tonReserve / cetReserve) * tonPriceUsd;
-      }
-
-      tvlUsd = tonReserve * tonPriceUsd * 2;
-
-      if (cetPool.stats?.volume_24h) {
-        const volumeTon = parseFloat(cetPool.stats.volume_24h) / 1e9;
-        volume24hUsd = volumeTon * tonPriceUsd;
-      }
-    }
-
-    return {
-      cetPriceUsd: cetPriceUsd !== null ? cetPriceUsd.toFixed(4) : 'N/A',
-      tonPriceUsd: tonPriceUsd.toFixed(4),
-      tvlUsd: tvlUsd !== null ? tvlUsd.toFixed(2) : 'N/A',
-      volume24hUsd: volume24hUsd !== null ? volume24hUsd.toFixed(2) : 'N/A',
-    };
-  } catch {
-    return null;
-  }
-}
+Rules:
+- Be accurate and explicit about uncertainty.
+- Never invent URLs or claims.
+- If the question is ambiguous, ask 1‑2 clarifying questions.
+- Reply in the same language as the user's latest message.`;
 
 export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
   const allowedOrigin = getAllowedOrigin(origin);
-  const requestId = globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : `req-${Date.now()}`;
-  const startedAt = Date.now();
 
-  // Handle CORS preflight
+  // CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, {
       status: 204,
@@ -248,538 +54,122 @@ export default async function handler(req: Request): Promise<Response> {
     });
   }
 
-  const limited = await withRateLimit(req, allowedOrigin, {
-    keyPrefix: 'cet-ai-chat',
-    limit: 10,
-    windowSeconds: 10,
-  });
-  if (limited) return limited;
-
-  const globalSlot = await acquireConcurrencySlot(req, {
-    keyPrefix: 'cet-ai-chat:global',
-    keyPart: 'global',
-    limit: process.env.CET_AI_CHAT_MAX_CONCURRENT_GLOBAL ?? 40,
-    ttlSeconds: 45,
-    allowedOrigin,
-    retryAfterSeconds: 2,
-  });
-  if (globalSlot instanceof Response) return globalSlot;
-
-  const ipSlot = await acquireConcurrencySlot(req, {
-    keyPrefix: 'cet-ai-chat:ip',
-    limit: process.env.CET_AI_CHAT_MAX_CONCURRENT_PER_IP ?? 2,
-    ttlSeconds: 45,
-    allowedOrigin,
-    retryAfterSeconds: 2,
-  });
-  if (ipSlot instanceof Response) {
-    await globalSlot.release();
-    return ipSlot;
-  }
-
-  let extractedQueryForFallback = '';
+  // Parse body
+  let body: { messages?: Array<{ role: string; content: string }> };
   try {
-  const body = (await req.json()) as { query?: unknown; message?: unknown; conversation?: unknown; context?: unknown };
-  const userQuery = typeof body.query === 'string' && body.query.trim() ? body.query : body.message;
-  if (typeof userQuery === 'string') extractedQueryForFallback = userQuery;
-  const conversation = normalizeConversation(body.conversation);
-  const context =
-    typeof body.context === 'object' && body.context !== null ? (body.context as Record<string, unknown>) : null;
-  const contextMode = typeof context?.mode === 'string' ? context.mode : '';
-  const isCompanyMode = contextMode === 'company';
-  const contextDepartment = typeof context?.department === 'string' ? context.department : '';
-
-  if (!userQuery || typeof userQuery !== 'string' || !userQuery.trim()) {
-    return new Response(
-      JSON.stringify({ message: 'Query parameter is missing.' }),
-      {
-        status: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': allowedOrigin,
-          'Vary': 'Origin',
-        },
-      },
-    );
-  }
-
-  const trimmedQuery = userQuery.trim();
-  if (trimmedQuery.length > CET_AI_MAX_QUERY_CHARS) {
-    return new Response(
-      JSON.stringify({ message: `Query must be at most ${CET_AI_MAX_QUERY_CHARS} characters.` }),
-      {
-        status: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': allowedOrigin,
-          'Vary': 'Origin',
-        },
-      },
-    );
-  }
-
-  const cacheTtlSeconds = getCacheTtlSeconds();
-  const ip = clientIp(req);
-  const cacheKey =
-    cacheTtlSeconds > 0 && conversation.length === 0
-      ? await sha256Hex(JSON.stringify({ v: 1, ip, origin: allowedOrigin, q: trimmedQuery.toLowerCase() }))
-      : null;
-
-  if (cacheKey) {
-    const cached = getAiChatCache(cacheKey);
-    if (cached) {
-      recordAiChatMetrics({ outcome: 'ok', cache: 'hit', providers: [] });
-      return new Response(JSON.stringify({ ...cached, usage: cached.usage ?? {} }), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Cet-Ai-Source': 'cache',
-          'X-Cet-Ai-Plan': 'cached',
-          'X-Cet-Ai-Cache': 'hit',
-          'X-Cet-Ai-Cache-Ttl': String(cacheTtlSeconds),
-          'X-Request-Id': requestId,
-          'Access-Control-Allow-Origin': allowedOrigin,
-          'Vary': 'Origin, X-Forwarded-For',
-          'Cache-Control': 'no-store',
-        },
-      });
-    }
-  }
-
-  const encryptionSecret = process.env.ENCRYPTION_SECRET;
-  const [grokKey, geminiKey, claudeKey] = await Promise.all([
-    resolveApiKey(process.env.GROK_API_KEY_ENC, process.env.GROK_API_KEY, encryptionSecret),
-    resolveApiKey(process.env.GEMINI_API_KEY_ENC, process.env.GEMINI_API_KEY, encryptionSecret),
-    resolveApiKey(process.env.ANTHROPIC_API_KEY_ENC, process.env.ANTHROPIC_API_KEY, encryptionSecret),
-  ]);
-
-  if (!grokKey && !geminiKey && !claudeKey) {
-    const reply = answerFromKnowledgeBase(trimmedQuery);
-
-    const durationMs = Math.max(0, Date.now() - startedAt);
-    const payload = {
-      response: reply,
-      sources: [],
-      plan: {
-        agentCount: 0,
-        providers: { strategy: 'none' as const, useGemini: false, useGrok: false, useClaude: false, singleProvider: null },
-        useOnChain: false,
-        useWebRetrieval: false,
-        temperature: 0,
-        budget: { budgetMs: 0, maxParallel: 0 },
-        context: { mode: contextMode, department: contextDepartment },
-      },
-      usage: {},
-      costUsd: 0,
-    };
-    if (cacheKey) setAiChatCache(cacheKey, payload as any, cacheTtlSeconds);
-    recordAiChatMetrics({ outcome: 'ok', cache: 'miss', providers: [], durationMs, providerUsage: [], totalCostUsd: 0 });
-    return new Response(JSON.stringify(payload), {
-      status: 200,
+    body = (await req.json()) as { messages?: Array<{ role: string; content: string }> };
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
+      status: 400,
       headers: {
         'Content-Type': 'application/json',
-        'X-Cet-Ai-Source': 'offline',
-        'X-Cet-Ai-Plan': 'agents=0;providers=none;onchain=0;web=0;budget_ms=0;parallel=0',
-        'X-Cet-Ai-Cache': cacheKey ? 'miss' : 'skip',
-        'X-Request-Id': requestId,
-        'X-Cet-Ai-Duration-Ms': String(durationMs),
         'Access-Control-Allow-Origin': allowedOrigin,
-        'Vary': 'Origin, X-Forwarded-For',
-        'Cache-Control': 'no-store',
+        'Vary': 'Origin',
       },
     });
   }
 
-  const budget = deriveCetAiResourceBudget(req);
-  let plan = decideCetAiRavPlan({
-    query: trimmedQuery,
-    conversationTurns: conversation.length,
-    hasGemini: Boolean(geminiKey),
-    hasGrok: Boolean(grokKey),
-    hasClaude: Boolean(claudeKey),
-    budget,
-  });
-
-  if (isCompanyMode) {
-    plan = { ...plan, useOnChain: false, useWebRetrieval: false };
-  }
-
-  const allowGemini = Boolean(geminiKey) && circuitAllows('cet-ai:gemini');
-  const allowGrok = Boolean(grokKey) && circuitAllows('cet-ai:grok');
-  if (plan.providers.strategy === 'dual' && (!allowGemini || !allowGrok)) {
-    plan = allowGrok
-      ? { ...plan, providers: { strategy: 'single' as const, useGemini: false, useGrok: true, useClaude: false, singleProvider: 'grok' as const } }
-      : { ...plan, providers: { strategy: 'single' as const, useGemini: true, useGrok: false, useClaude: false, singleProvider: 'gemini' as const } };
-  }
-
-  const onChain = plan.useOnChain ? await fetchOnChainContext() : null;
-  const onChainBlock = onChain
-    ? `\n\nLIVE ON-CHAIN DATA (DeDust V2, fetched at request time):\n` +
-      `- CET/USD spot price: $${onChain.cetPriceUsd}\n` +
-      `- TON/USD price: $${onChain.tonPriceUsd}\n` +
-      `- Pool TVL: $${onChain.tvlUsd}\n` +
-      `- 24h volume: $${onChain.volume24hUsd}`
-    : '';
-
-  const retrieval = await buildCetAiRetrievalBlock(trimmedQuery, { enableWeb: plan.useWebRetrieval });
-
-  const multiTurnHint =
-    conversation.length > 0
-      ? `MULTI-TURN: Prior user/assistant messages are included below. Answer the **latest** user message ` +
-        `in full; use earlier turns only for follow-up context, pronouns, and consistency.\n\n`
-      : '';
-
-  // ── SHARED SYSTEM CONTEXT ─────────────────────────────────────────────────
-  const sharedContext =
-    multiTurnHint +
-    (isCompanyMode
-      ? `You are Solaris CET — a helpful assistant for a Romania-based company delivering photovoltaic installations, construction works, roofing (metal sheet / metal tiles / TPO membrane), metal parapets and facades, plus repairs and maintenance.\n` +
-        `STRICT RULE: Do NOT mention CET tokens, crypto, blockchain, jettons, DeDust, TON, or any financial investment topics. You only talk about physical construction and renewable energy services in Romania.\n\n`
-      : `You are Solaris CET AI — a helpful assistant for Solaris CET and general crypto/DeFi questions.\n\n`) +
-    `LANGUAGE: Reply in the same language as the user's latest message.\n\n` +
-    `RULES:\n` +
-    `- Be accurate and explicit about uncertainty.\n` +
-    `- Never invent URLs or claims.` +
-    (isCompanyMode ? '' : '\n- Never invent on-chain prices.') +
-    `\n- If the question is ambiguous, ask 1-2 clarifying questions.` +
-    (isCompanyMode ? '' : '\n- If LIVE ON-CHAIN DATA is missing, say so briefly.') +
-    `\n\n` +
-    onChainBlock +
-    retrieval.block +
-    (retrieval.sources.length > 0
-      ? `\n\nCITATIONS:\n` +
-        `- If RETRIEVAL SOURCES are present, end with:\n` +
-        `  Sources: <up to 5 URLs you used>\n` +
-        `- Never invent URLs. If you did not use any, write: Sources: none.\n`
-      : '');
-
-  const geminiSystemPrompt =
-    sharedContext +
-    `\n\nAnswer the user directly. Prefer a concise, technical answer when possible.\n`;
-
-  const grokSystemPrompt =
-    sharedContext +
-    `\n\nAnswer the user directly. Prefer a clear structure (short paragraphs or bullets) when helpful.\n`;
-
-  const fullFallbackPrompt =
-    sharedContext +
-    `\n\nAnswer the user directly. Prefer a clear structure (short paragraphs or bullets) when helpful.\n`;
-
-  const geminiMessages = buildChatMessages(geminiSystemPrompt, trimmedQuery, conversation);
-  const grokMessages = buildChatMessages(grokSystemPrompt, trimmedQuery, conversation);
-  const fullFallbackMessages = buildChatMessages(fullFallbackPrompt, trimmedQuery, conversation);
-
-  let reply: string;
-  let usage: { gemini?: unknown; grok?: unknown } | null = null;
-  const providerUsage: Array<{
-    provider: 'gemini' | 'grok';
-    model: string;
-    promptTokens?: number;
-    completionTokens?: number;
-    totalTokens?: number;
-    costUsd?: number;
-  }> = [];
-
-  if (plan.providers.strategy === 'dual') {
-    const [geminiResult, grokResult] = await Promise.allSettled([
-      new OpenAI({
-        apiKey: geminiKey!,
-        baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
-      }).chat.completions.create({
-        model: GEMINI_MODEL,
-        messages: geminiMessages,
-        temperature: plan.temperature,
-      }),
-      new OpenAI({
-        apiKey: grokKey!,
-        baseURL: 'https://api.x.ai/v1',
-      }).chat.completions.create({
-        model: GROK_MODEL,
-        messages: grokMessages,
-        temperature: plan.temperature,
-      }),
-    ]);
-
-    const geminiOk = geminiResult.status === 'fulfilled';
-    const grokOk = grokResult.status === 'fulfilled';
-    if (geminiOk) circuitReportSuccess('cet-ai:gemini');
-    else circuitReportFailure('cet-ai:gemini');
-    if (grokOk) circuitReportSuccess('cet-ai:grok');
-    else circuitReportFailure('cet-ai:grok');
-
-    if (geminiOk && grokOk) {
-      const geminiText = geminiResult.value.choices[0]?.message?.content ?? '';
-      const grokText = grokResult.value.choices[0]?.message?.content ?? '';
-      const gUsage = geminiResult.value.usage as
-        | { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number }
-        | undefined;
-      const xUsage = grokResult.value.usage as
-        | { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number }
-        | undefined;
-      usage = { gemini: gUsage ?? null, grok: xUsage ?? null };
-      providerUsage.push({
-        provider: 'gemini',
-        model: GEMINI_MODEL,
-        promptTokens: gUsage?.prompt_tokens,
-        completionTokens: gUsage?.completion_tokens,
-        totalTokens: gUsage?.total_tokens,
-        costUsd:
-          estimateCostUsd({
-            provider: 'gemini',
-            promptTokens: gUsage?.prompt_tokens,
-            completionTokens: gUsage?.completion_tokens,
-          }) ?? undefined,
-      });
-      providerUsage.push({
-        provider: 'grok',
-        model: GROK_MODEL,
-        promptTokens: xUsage?.prompt_tokens,
-        completionTokens: xUsage?.completion_tokens,
-        totalTokens: xUsage?.total_tokens,
-        costUsd:
-          estimateCostUsd({
-            provider: 'grok',
-            promptTokens: xUsage?.prompt_tokens,
-            completionTokens: xUsage?.completion_tokens,
-          }) ?? undefined,
-      });
-      reply = synthesizeConsensus({
-        geminiReply: geminiText,
-        grokReply: grokText,
-        onChainContext: onChain,
-      });
-    } else if (geminiOk) {
-      const fallbackClient = new OpenAI({
-        apiKey: geminiKey!,
-        baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
-      });
-      const fallback = await fallbackClient.chat.completions.create({
-        model: GEMINI_MODEL,
-        messages: fullFallbackMessages,
-        temperature: plan.temperature,
-      });
-      circuitReportSuccess('cet-ai:gemini');
-      const u = fallback.usage as
-        | { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number }
-        | undefined;
-      usage = { gemini: u ?? null };
-      providerUsage.push({
-        provider: 'gemini',
-        model: GEMINI_MODEL,
-        promptTokens: u?.prompt_tokens,
-        completionTokens: u?.completion_tokens,
-        totalTokens: u?.total_tokens,
-        costUsd:
-          estimateCostUsd({
-            provider: 'gemini',
-            promptTokens: u?.prompt_tokens,
-            completionTokens: u?.completion_tokens,
-          }) ?? undefined,
-      });
-      reply = fallback.choices[0]?.message?.content ?? 'CET AI is silent.';
-    } else if (grokOk) {
-      const fallbackClient = new OpenAI({
-        apiKey: grokKey!,
-        baseURL: 'https://api.x.ai/v1',
-      });
-      const fallback = await fallbackClient.chat.completions.create({
-        model: GROK_MODEL,
-        messages: fullFallbackMessages,
-        temperature: plan.temperature,
-      });
-      circuitReportSuccess('cet-ai:grok');
-      const u = fallback.usage as
-        | { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number }
-        | undefined;
-      usage = { grok: u ?? null };
-      providerUsage.push({
-        provider: 'grok',
-        model: GROK_MODEL,
-        promptTokens: u?.prompt_tokens,
-        completionTokens: u?.completion_tokens,
-        totalTokens: u?.total_tokens,
-        costUsd:
-          estimateCostUsd({
-            provider: 'grok',
-            promptTokens: u?.prompt_tokens,
-            completionTokens: u?.completion_tokens,
-          }) ?? undefined,
-      });
-      reply = fallback.choices[0]?.message?.content ?? 'CET AI is silent.';
-    } else {
-      circuitReportFailure('cet-ai:gemini');
-      circuitReportFailure('cet-ai:grok');
-      reply = answerFromKnowledgeBase(trimmedQuery);
-    }
-  } else {
-    if (plan.providers.singleProvider === 'grok') {
-      const client = new OpenAI({ apiKey: grokKey!, baseURL: 'https://api.x.ai/v1' });
-      try {
-        const res = await client.chat.completions.create({
-          model: GROK_MODEL,
-          messages: fullFallbackMessages,
-          temperature: plan.temperature,
-        });
-        circuitReportSuccess('cet-ai:grok');
-        const u = res.usage as
-          | { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number }
-          | undefined;
-        usage = { grok: u ?? null };
-        providerUsage.push({
-          provider: 'grok',
-          model: GROK_MODEL,
-          promptTokens: u?.prompt_tokens,
-          completionTokens: u?.completion_tokens,
-          totalTokens: u?.total_tokens,
-          costUsd:
-            estimateCostUsd({
-              provider: 'grok',
-              promptTokens: u?.prompt_tokens,
-              completionTokens: u?.completion_tokens,
-            }) ?? undefined,
-        });
-        reply = res.choices[0]?.message?.content ?? answerFromKnowledgeBase(trimmedQuery);
-      } catch {
-        circuitReportFailure('cet-ai:grok');
-        reply = answerFromKnowledgeBase(trimmedQuery);
-      }
-    } else if (plan.providers.singleProvider === 'claude') {
-      if (!claudeKey) {
-        reply = answerFromKnowledgeBase(trimmedQuery);
-      } else {
-        try {
-          reply = await claudeComplete({
-            apiKey: claudeKey,
-            model: CLAUDE_MODEL,
-            system: fullFallbackPrompt,
-            conversation,
-            userQuery: trimmedQuery,
-            temperature: plan.temperature,
-          });
-          if (!reply || !reply.trim()) reply = answerFromKnowledgeBase(trimmedQuery);
-        } catch {
-          reply = answerFromKnowledgeBase(trimmedQuery);
-        }
-      }
-    } else {
-      const client = new OpenAI({
-        apiKey: geminiKey!,
-        baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
-      });
-      try {
-        const res = await client.chat.completions.create({
-          model: GEMINI_MODEL,
-          messages: fullFallbackMessages,
-          temperature: plan.temperature,
-        });
-        circuitReportSuccess('cet-ai:gemini');
-        const u = res.usage as
-          | { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number }
-          | undefined;
-        usage = { gemini: u ?? null };
-        providerUsage.push({
-          provider: 'gemini',
-          model: GEMINI_MODEL,
-          promptTokens: u?.prompt_tokens,
-          completionTokens: u?.completion_tokens,
-          totalTokens: u?.total_tokens,
-          costUsd:
-            estimateCostUsd({
-              provider: 'gemini',
-              promptTokens: u?.prompt_tokens,
-              completionTokens: u?.completion_tokens,
-            }) ?? undefined,
-        });
-        reply = res.choices[0]?.message?.content ?? answerFromKnowledgeBase(trimmedQuery);
-      } catch {
-        circuitReportFailure('cet-ai:gemini');
-        reply = answerFromKnowledgeBase(trimmedQuery);
-      }
-    }
-  }
-
-  // 6. Return EXACT format expected by frontend ({ response: string })
-  const planHeader =
-    `agents=${plan.agentCount};` +
-    `providers=${plan.providers.strategy};` +
-    `onchain=${plan.useOnChain ? 1 : 0};` +
-    `web=${plan.useWebRetrieval ? 1 : 0};` +
-    `budget_ms=${plan.budget.budgetMs};` +
-    `parallel=${plan.budget.maxParallel}`;
-
-  const durationMs = Math.max(0, Date.now() - startedAt);
-  const totalTokens = providerUsage.reduce((a, p) => a + (p.totalTokens ?? 0), 0) || undefined;
-  const totalCostUsd = providerUsage.reduce((a, p) => a + (p.costUsd ?? 0), 0) || undefined;
-
-  const payload = { response: reply, sources: retrieval.sources, plan, usage: usage ?? {}, costUsd: totalCostUsd };
-  if (cacheKey) setAiChatCache(cacheKey, payload as any, cacheTtlSeconds);
-
-  recordAiChatMetrics({
-    outcome: 'ok',
-    cache: 'miss',
-    providers: providerUsage.map((p) => ({ provider: p.provider, model: p.model })),
-    durationMs,
-    providerUsage,
-    totalCostUsd,
-  });
-
-  return new Response(JSON.stringify(payload), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Cet-Ai-Source': 'live',
-      'X-Cet-Ai-Plan': planHeader,
-      'X-Cet-Ai-Cache': 'miss',
-      'X-Request-Id': requestId,
-      'X-Cet-Ai-Duration-Ms': String(durationMs),
-      ...(typeof totalTokens === 'number' ? { 'X-Cet-Ai-Total-Tokens': String(totalTokens) } : {}),
-      ...(typeof totalCostUsd === 'number' ? { 'X-Cet-Ai-Cost-Usd': totalCostUsd.toFixed(6) } : {}),
-      'Access-Control-Allow-Origin': allowedOrigin,
-      'Vary': 'Origin, X-Forwarded-For',
-      'Cache-Control': 'no-store',
-    },
-  });
-  } catch (error: unknown) {
-    console.error('API Route Error:', error);
-    const durationMs = Math.max(0, Date.now() - startedAt);
-    recordAiChatMetrics({
-      outcome: 'error',
-      cache: 'miss',
-      providers: [],
-      durationMs,
+  const messages = body.messages;
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return new Response(JSON.stringify({ error: 'messages array is required and must be non‑empty' }), {
+      status: 400,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Vary': 'Origin',
+      },
     });
-    const reply = answerFromKnowledgeBase(extractedQueryForFallback);
-    return new Response(
-      JSON.stringify({
-        response: reply,
-        sources: [],
-        plan: {
-          agentCount: 0,
-          providers: { strategy: 'fallback', useGemini: false, useGrok: false, useClaude: false, singleProvider: null },
-          useOnChain: false,
-          useWebRetrieval: false,
-          temperature: 0,
-          budget: { budgetMs: 0, maxParallel: 0 },
-        },
-        usage: {},
-        costUsd: 0,
-      }),
-      {
-        status: 200,
+  }
+
+  // Validate each message
+  for (const msg of messages) {
+    if (typeof msg.role !== 'string' || typeof msg.content !== 'string') {
+      return new Response(JSON.stringify({ error: 'Each message must have role (string) and content (string)' }), {
+        status: 400,
         headers: {
           'Content-Type': 'application/json',
-          'X-Cet-Ai-Source': 'fallback',
-          'X-Cet-Ai-Plan': 'fallback',
-          'X-Request-Id': requestId,
-          'X-Cet-Ai-Duration-Ms': String(durationMs),
           'Access-Control-Allow-Origin': allowedOrigin,
           'Vary': 'Origin',
-          'Cache-Control': 'no-store',
         },
+      });
+    }
+  }
+
+  const apiKey = process.env.DEEPSEEK_CHATBOT_API_KEY;
+  if (!apiKey) {
+    return new Response(JSON.stringify({ error: 'DeepSeek API key not configured' }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Vary': 'Origin',
       },
-    );
-  } finally {
-    await ipSlot.release();
-    await globalSlot.release();
+    });
+  }
+
+  // Prepend system prompt
+  const fullMessages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+    { role: 'system', content: SYSTEM_PROMPT },
+    ...messages.map((m) => ({
+      role: m.role as 'user' | 'assistant',
+      content: m.content,
+    })),
+  ];
+
+  const client = new OpenAI({
+    apiKey,
+    baseURL: 'https://api.deepseek.com',
+  });
+
+  try {
+    const stream = await client.chat.completions.create({
+      model: DEEPSEEK_MODEL,
+      messages: fullMessages,
+      stream: true,
+    });
+
+    // Build a ReadableStream that emits SSE‑formatted data
+    const encoder = new TextEncoder();
+    const readable = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of stream) {
+            const delta = chunk.choices?.[0]?.delta?.content;
+            if (delta) {
+              const data = `data: ${JSON.stringify({ content: delta })}\n\n`;
+              controller.enqueue(encoder.encode(data));
+            }
+          }
+          controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+          controller.close();
+        } catch (err) {
+          // If the stream errors, send an error event and close
+          const errorData = `data: ${JSON.stringify({ error: 'Stream error' })}\n\n`;
+          controller.enqueue(encoder.encode(errorData));
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(readable, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-store',
+        'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Vary': 'Origin',
+      },
+    });
+  } catch (err) {
+    console.error('DeepSeek API error:', err);
+    return new Response(JSON.stringify({ error: 'Failed to get response from DeepSeek' }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Vary': 'Origin',
+      },
+    });
   }
 }
