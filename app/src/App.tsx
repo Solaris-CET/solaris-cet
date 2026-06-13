@@ -4,7 +4,6 @@ import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 
 import CookieConsentBanner from '@/components/CookieConsentBanner';
 import { Toaster } from '@/components/ui/sonner';
-import { companyProfile } from '@/data/companyProfile';
 import { parseUrlLocaleFromPathname, type UrlLocale,urlLocaleFromLang } from '@/i18n/urlRouting';
 import { refreshScrollReveal } from '@/js/reveal';
 import { getServiceDetail } from '@/lib/serviceDetails';
@@ -82,26 +81,120 @@ type PortfolioSchemaItem = {
   image: string;
 };
 
+type JsonLdGraphNode = Record<string, unknown>;
+
 const portfolioSchemaItems: PortfolioSchemaItem[] = [
   {
-    name: 'Prosumator 5.2 kW pe acoperiș înclinat',
-    location: 'Vaslui',
-    description: 'Exemplu de sistem fotovoltaic rezidențial dimensionat pentru autoconsum și monitorizare.',
-    image: 'https://solaris-cet.com/images/hero-solaris.svg',
-  },
-  {
-    name: 'Acoperiș industrial cu membrană TPO',
-    location: 'Bacău',
-    description: 'Intervenție orientativă pentru refacerea zonelor critice: atice, scurgeri și străpungeri.',
+    name: 'Sistem fotovoltaic 8 kWp - Casa familiala',
+    location: 'Vaslui, jud. Vaslui',
+    description: 'Sistem on-grid 8 kWp cu 16 panouri monocristaline 500W si productie estimata la 9.200 kWh/an.',
     image: 'https://solaris-cet.com/og-image.png',
   },
   {
-    name: 'Acoperiș tablă click cu finisaje curate',
-    location: 'Suceava',
-    description: 'Lucrare orientativă pentru acoperiș metalic cu detalii corecte la muchii și racorduri.',
-    image: 'https://solaris-cet.com/images/team-placeholder.svg',
+    name: 'Sistem fotovoltaic 50 kWp - Hala productie',
+    location: 'Barlad, jud. Vaslui',
+    description: 'Sistem trifazat 50 kWp cu monitorizare online si executie in 5 zile fara oprirea productiei.',
+    image: 'https://solaris-cet.com/og-image.png',
+  },
+  {
+    name: 'Acoperis tabla click - Hala depozitare',
+    location: 'Barlad, jud. Vaslui',
+    description: 'Montaj acoperis tabla click 0.6mm, 800 mp, cu sistem complet de jgheaburi si burlane.',
+    image: 'https://solaris-cet.com/og-image.png',
+  },
+  {
+    name: 'Membrana TPO - Depozit logistic',
+    location: 'Iasi, jud. Iasi',
+    description: 'Hidroizolatie pentru acoperis plat cu membrana TPO 1.5mm si detalii complete la atice si scurgeri.',
+    image: 'https://solaris-cet.com/og-image.png',
+  },
+  {
+    name: 'Fatada tabla cutata - Cladire birouri',
+    location: 'Vaslui, jud. Vaslui',
+    description: 'Reabilitare fatada 300 mp cu tabla cutata RAL 7016 si termoizolatie inclusa.',
+    image: 'https://solaris-cet.com/og-image.png',
+  },
+  {
+    name: 'Mentenanta sistem fotovoltaic',
+    location: 'Negresti, jud. Vaslui',
+    description: 'Inspectie, curatare panouri si inlocuire module pentru recuperarea productiei.',
+    image: 'https://solaris-cet.com/og-image.png',
   },
 ];
+
+function buildGlobalJsonLd(origin: string) {
+  const businessId = `${origin}/#business`;
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'LocalBusiness',
+        '@id': businessId,
+        name: 'Solaris CET',
+        url: origin,
+        telephone: '+40769889721',
+        email: 'solaris-cet@protonmail.com',
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Vaslui',
+          addressRegion: 'Vaslui',
+          addressCountry: 'RO',
+        },
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: 46.6407,
+          longitude: 27.7276,
+        },
+        areaServed: [
+          { '@type': 'State', name: 'Vaslui' },
+          { '@type': 'State', name: 'Iași' },
+          { '@type': 'State', name: 'Bacău' },
+          { '@type': 'State', name: 'Galați' },
+          { '@type': 'Country', name: 'Romania' },
+        ],
+        priceRange: '$$',
+        description:
+          'Instalații fotovoltaice rezidențiale și industriale, acoperișuri tablă/TPO, atice, fațade și mentenanță în Vaslui și România.',
+        sameAs: ['https://wa.me/40769889721'],
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${origin}/#website`,
+        url: origin,
+        name: 'Solaris CET',
+        inLanguage: 'ro-RO',
+        publisher: { '@id': businessId },
+      },
+    ],
+  };
+}
+
+function buildServiceJsonLd(origin: string, name: string, url: string) {
+  return {
+    '@type': 'Service',
+    name,
+    provider: { '@id': `${origin}/#business` },
+    areaServed: { '@type': 'Country', name: 'Romania' },
+    url,
+  };
+}
+
+function graphNodesFromJsonLd(payload: unknown): JsonLdGraphNode[] {
+  if (!payload || typeof payload !== 'object') return [];
+  const record = payload as Record<string, unknown>;
+  const graph = record['@graph'];
+  if (Array.isArray(graph)) {
+    return graph.filter((item): item is JsonLdGraphNode => Boolean(item) && typeof item === 'object');
+  }
+  const { ['@context']: _context, ...node } = record;
+  return Object.keys(node).length ? [node] : [];
+}
+
+function mergeJsonLd(...payloads: Array<unknown>): RouteSeo['jsonLd'] {
+  const graph = payloads.flatMap((payload) => graphNodesFromJsonLd(payload));
+  if (!graph.length) return undefined;
+  return { '@context': 'https://schema.org', '@graph': graph };
+}
 
 function buildBreadcrumbJsonLd(origin: string, urlLocale: UrlLocale, pathnameNoLocale: string) {
   const normalized = (pathnameNoLocale || '/').replace(/\/$/, '') || '/';
@@ -189,28 +282,6 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
         '@context': 'https://schema.org',
         '@graph': [
           {
-            '@type': 'LocalBusiness',
-            name: companyProfile.name,
-            url: `${origin}/${urlLocale}/`,
-            telephone: companyProfile.phoneDisplay,
-            email: companyProfile.email,
-            address: {
-              '@type': 'PostalAddress',
-              addressLocality: 'Vaslui',
-              addressCountry: 'RO',
-            },
-            areaServed: 'RO',
-            ...(companyProfile.reviews
-              ? {
-                  aggregateRating: {
-                    '@type': 'AggregateRating',
-                    ratingValue: companyProfile.reviews.ratingValue,
-                    reviewCount: companyProfile.reviews.ratingCount,
-                  },
-                }
-              : {}),
-          },
-          {
             '@type': 'FAQPage',
             mainEntity: companyFaqItems.map((x) => ({
               '@type': 'Question',
@@ -234,6 +305,7 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
       jsonLd: {
         '@context': 'https://schema.org',
         '@graph': [
+          buildServiceJsonLd(origin, 'Servicii Solaris CET', `${origin}/servicii/`),
           {
             '@type': 'ItemList',
             itemListElement: [
@@ -288,9 +360,9 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
       ogType: 'website',
     },
     '/proiecte': {
-      title: 'Proiecte — Solaris CET',
-      description: 'Galerie proiecte: fotovoltaice, acoperișuri și atice/fațade tablă. Vezi lucrări orientative și cere ofertă.',
-      keywords: 'proiecte fotovoltaice, portofoliu, lucrari acoperisuri, tpo, atice, fatade tabla, vaslui',
+      title: 'Proiecte realizate - Solaris CET | Fotovoltaice si Acoperisuri Vaslui',
+      description: 'Portofoliu Solaris CET: proiecte fotovoltaice si acoperisuri executate in Vaslui si Moldova. Cere poze reale pe WhatsApp.',
+      keywords: 'proiecte realizate, portofoliu solaris cet, fotovoltaice vaslui, acoperisuri vaslui, fatade tabla, mentenanta fotovoltaice',
       ogType: 'website',
       jsonLd: buildProjectsJsonLd(origin, urlLocale),
     },
@@ -453,6 +525,7 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
         jsonLd: {
           '@context': 'https://schema.org',
           '@graph': [
+            buildServiceJsonLd(origin, service.title, `${origin}${path}/`),
             {
               '@type': 'FAQPage',
               mainEntity: service.faq.map((x) => ({
@@ -485,60 +558,10 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
   const breadcrumb = buildBreadcrumbJsonLd(origin, urlLocale, path);
 
   if (path === '/faq') {
-    const faqs =
-      urlLocale === 'ro'
-        ? [
-            {
-              q: 'Cât durează o instalare fotovoltaică?',
-              a: 'Depinde de complexitate și de condițiile din teren. După evaluare, îți spunem pașii și termenele realiste (montaj + punere în funcțiune).',
-            },
-            {
-              q: 'Ce informații vă trebuie pentru ofertă?',
-              a: 'Locația, consumul (facturi), tipul acoperișului/structurii, orientare/umbriri și ce obiectiv ai (autoconsum, baterie, EV, industrial).',
-            },
-            {
-              q: 'Faceți reparații la acoperiș și infiltrații?',
-              a: 'Da. Facem diagnostic și intervenții punctuale (tablă/țiglă/TPO) și putem propune un plan de mentenanță preventivă.',
-            },
-            {
-              q: 'Lucrați și la acoperișuri industriale tip supermarket (folie TPO)?',
-              a: 'Da. Montăm și reparăm membrane TPO și acordăm atenție zonelor critice: atice, scurgeri, străpungeri și îmbinări.',
-            },
-            {
-              q: 'Oferiți mentenanță pentru fotovoltaice?',
-              a: 'Da. Putem face verificări periodice, monitorizare și intervenții atunci când apar probleme (în funcție de proiect).',
-            },
-            {
-              q: 'Acoperiți toată România?',
-              a: 'Da. Suntem în Cetatuia, Vaslui, dar putem lucra în toate județele, în funcție de proiect.',
-            },
-          ]
-        : [
-            {
-              q: 'How long does a PV installation take?',
-              a: 'It depends on complexity and site conditions. After a survey, we provide clear steps and realistic timelines (installation + commissioning).',
-            },
-            {
-              q: 'What do you need for an offer?',
-              a: 'Location, consumption (bills), roof/structure type, orientation/shading, and your goal (self-consumption, battery, EV, industrial).',
-            },
-            {
-              q: 'Do you handle roof repairs and leaks?',
-              a: 'Yes. We diagnose and fix targeted issues (metal/tiles/TPO) and can propose a preventive maintenance plan.',
-            },
-            {
-              q: 'Do you work on industrial roofs (TPO membrane)?',
-              a: 'Yes. We install and repair TPO membranes and focus on critical details: parapets, drains, penetrations, and seams.',
-            },
-            {
-              q: 'Do you provide PV maintenance?',
-              a: 'Yes. We can do periodic checks, monitoring, and interventions when issues occur (depending on the project).',
-            },
-            {
-              q: 'Do you work nationwide in Romania?',
-              a: 'Yes. We are based in Cetatuia, Vaslui, and we can work nationwide depending on the project.',
-            },
-          ];
+    const faqs = companyFaqItems.map((item) => ({
+      q: item.question,
+      a: item.answer,
+    }));
 
     return {
       ...found,
@@ -696,19 +719,9 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
         '@context': 'https://schema.org',
         '@graph': [
           {
-            '@type': 'LocalBusiness',
-            name: 'Solaris CET',
+            '@type': 'ContactPage',
+            name: 'Contact Solaris CET',
             url: `${origin}/${urlLocale}/contact`,
-            telephone: '+40 769 889 721',
-            email: 'solaris-cet@protonmail.com',
-            address: {
-              '@type': 'PostalAddress',
-              streetAddress: 'Cetatuia',
-              addressLocality: 'Vaslui',
-              postalCode: '737429',
-              addressCountry: 'RO',
-            },
-            areaServed: 'RO',
           },
           breadcrumb,
         ],
@@ -744,6 +757,7 @@ function App() {
         : parseUrlLocaleFromPathname(window.location.pathname).locale ?? urlLocaleFromLang(langState.lang);
 
     const seo = getRouteSeo(origin, urlLocale, routePath);
+    const jsonLd = mergeJsonLd(buildGlobalJsonLd(origin), seo.jsonLd);
     applySpaSeo({
       origin,
       pathnameNoLocale: routePath,
@@ -753,7 +767,7 @@ function App() {
       keywords: seo.keywords,
       ogType: seo.ogType,
       noindex: seo.noindex,
-      jsonLd: seo.jsonLd,
+      jsonLd,
     });
   }, [langState.lang, routePath]);
 
