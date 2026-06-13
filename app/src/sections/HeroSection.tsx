@@ -64,7 +64,8 @@ function useCountUp({
 }
 
 export default function HeroSection() {
-  const mainVisual = '/images/hero-solaris.svg';
+  const mainVisual =
+    'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1600&q=80&auto=format&fit=crop';
 
   const particles = useMemo<Particle[]>(
     () => [
@@ -352,10 +353,6 @@ export default function HeroSection() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#04050a] via-[#04050a]/40 to-transparent" aria-hidden />
                 <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/55 to-transparent" aria-hidden />
-                <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-black/55 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.22em] text-amber-100 backdrop-blur">
-                  <span className="h-1.5 w-1.5 rounded-full bg-amber-300 shadow-[0_0_10px_rgba(245,215,110,0.85)]" />
-                  Vizual orientativ
-                </div>
                 <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
                   <div className="solaris-glass rounded-[1.4rem] p-5">
                     <div className="solaris-eyebrow text-amber-200">Ce vede clientul</div>

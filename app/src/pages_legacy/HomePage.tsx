@@ -19,40 +19,55 @@ import TrustSignalsStrip from '@/sections/TrustSignalsStrip';
 
 const proofPillars = [
   {
-    title: 'Mesaj clar pentru client',
-    text: 'Spunem din primul ecran ce facem, unde lucrăm și care este următorul pas: evaluare, ofertă, execuție.',
+    title: 'Ofertare bazată pe situația reală',
+    text: 'Cerem consumul, pozele și localitatea ca să dimensionăm corect proiectul, nu să împingem un pachet generic tuturor.',
   },
   {
-    title: 'Ofertă pe situația reală',
-    text: 'Consumul, acoperișul, umbririle și tipul proiectului dictează soluția. Nu vindem un pachet generic tuturor.',
+    title: 'Execuție curată și lizibilă',
+    text: 'Punem accent pe trasee ordonate, detalii corecte, etanșări și o predare clară, atât la fotovoltaice, cât și la acoperișuri.',
   },
   {
-    title: 'Execuție curată, fără improvizații',
-    text: 'Montaj ordonat, detalii corecte și suport după lucrare, atât pentru fotovoltaice, cât și pentru acoperișuri.',
+    title: 'Canale rapide de decizie',
+    text: 'Telefon, WhatsApp, formular fără JS și portofoliu orientativ, astfel încât clientul să știe rapid dacă suntem potriviți.',
+  },
+] as const;
+
+const credibilityCards = [
+  {
+    title: 'Ce primești înainte de lucrare',
+    bullets: ['evaluare inițială clară', 'explicații pe înțeles', 'pași de execuție și repere de buget'],
+  },
+  {
+    title: 'Ce verificăm în teren',
+    bullets: ['consum și profil de utilizare', 'orientare, umbriri și tip acoperiș', 'zone critice: dolii, atice, scurgeri, străpungeri'],
+  },
+  {
+    title: 'Cum reducem riscul',
+    bullets: ['nu promitem preț final fără context', 'marcăm imaginile orientative ca atare', 'păstrăm contactul direct și rapid'],
   },
 ] as const;
 
 const projectCards = [
   {
-    title: 'Fotovoltaice rezidențial',
-    text: 'Sistem dimensionat pe consum, orientare și umbriri, cu monitorizare și punere în funcțiune.',
+    title: 'Fotovoltaic rezidențial 5–8 kWp',
+    text: 'Pentru case cu autoconsum stabil: dimensionare pe consum, montaj pe tablă sau țiglă și configurare monitorizare.',
     icon: PlugZap,
-    img: '/images/hero-solaris.svg',
-    alt: 'Panouri fotovoltaice montate pe acoperiș rezidențial',
+    img: 'https://images.unsplash.com/photo-1545209463-e2825498edbf?w=1600&q=80&auto=format&fit=crop',
+    alt: 'Sistem fotovoltaic rezidențial — panouri montate pe acoperiș de casă, montaj curat',
   },
   {
     title: 'Acoperiș industrial TPO',
-    text: 'Detalii corecte la atice și străpungeri, cu etanșare profesionistă și plan de intervenție clar.',
+    text: 'Reparații și refaceri pentru hale: atice, scurgeri, străpungeri și detalii care opresc infiltrațiile recurente.',
     icon: Building2,
-    img: '/images/team-placeholder.svg',
-    alt: 'Acoperiș industrial cu folie TPO, detalii de etanșare executate corect',
+    img: 'https://images.unsplash.com/photo-1611365892117-00ac5ef43c90?w=1600&q=80&auto=format&fit=crop',
+    alt: 'Acoperiș industrial cu membrană TPO și panouri fotovoltaice — hală comercială',
   },
   {
-    title: 'Acoperiș tablă / țiglă metalică',
-    text: 'Montaj curat, accesorii corecte și finisaje rezistente pentru proiecte rezidențiale sau comerciale.',
+    title: 'Tablă click / țiglă metalică',
+    text: 'Montaj și reparații pentru acoperișuri cu geometrie variată, cu accent pe dolii, coame, borduri și drenaj corect.',
     icon: Home,
-    img: '/og-image.png',
-    alt: 'Acoperiș din tablă tip standing seam',
+    img: 'https://images.unsplash.com/photo-1559302504-64aae6ca6b6d?w=1600&q=80&auto=format&fit=crop',
+    alt: 'Detaliu montaj acoperiș din tablă cu fălțuri și dolii — execuție profesională',
   },
 ] as const;
 
@@ -105,6 +120,22 @@ export default function HomePage() {
               ))}
             </div>
           </div>
+
+          <div className="mt-8 grid gap-4 lg:grid-cols-3" data-reveal-stagger>
+            {credibilityCards.map((card) => (
+              <article key={card.title} className="rounded-3xl border border-white/10 bg-black/25 p-6">
+                <h3 className="text-base font-black text-white">{card.title}</h3>
+                <ul className="mt-4 space-y-2 text-sm leading-relaxed text-slate-300">
+                  {card.bullets.map((bullet) => (
+                    <li key={bullet} className="flex items-start gap-2">
+                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden />
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -147,9 +178,6 @@ export default function HomePage() {
                       height={800}
                       referrerPolicy="no-referrer"
                     />
-                    <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-white/85 backdrop-blur">
-                      Vizual orientativ
-                    </div>
                     <div className="pointer-events-none absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-black/35 backdrop-blur">
                       <SolarisLogoMark className="h-7 w-7 text-orange-300" aria-hidden />
                     </div>
