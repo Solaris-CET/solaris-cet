@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - .env
     environment:
       - PORT=3000
       - DATABASE_URL=postgres://solaris:solaris@postgres:5432/solaris_cet
