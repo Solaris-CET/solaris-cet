@@ -45,18 +45,26 @@ export default function TrustSignalsStrip() {
   ];
 
   return (
-    <section data-reveal className="relative z-20 bg-[#0d1421] text-white">
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-10">
-        <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-sm">
+    <section data-reveal className="relative z-20 bg-[#0a0f1c] text-white">
+      <div
+        className="absolute inset-x-0 top-0 h-px"
+        aria-hidden
+        style={{
+          background:
+            'linear-gradient(90deg, transparent, rgba(245,215,110,0.55) 30%, rgba(245,215,110,0.85) 50%, rgba(245,215,110,0.55) 70%, transparent)',
+        }}
+      />
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-12">
+        <div className="solaris-card-gold rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-sm">
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.2fr)_minmax(0,0.9fr)]">
             <div className="p-6 sm:p-7" data-reveal-stagger>
-              <div className="text-xs font-semibold tracking-[0.18em] uppercase text-amber-300/90">Repere comerciale</div>
-              <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="solaris-eyebrow">Repere comerciale</div>
+              <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {facts.map((s) => (
-                  <div key={s.label} className="rounded-2xl border border-white/10 bg-black/20 px-5 py-4">
-                    <div className="text-2xl sm:text-3xl font-black tabular-nums">{s.value}</div>
-                    <div className="mt-1 text-sm font-semibold text-white/70">{s.label}</div>
-                    <div className="mt-2 text-xs leading-relaxed text-white/45">{s.note}</div>
+                  <div key={s.label} className="solaris-stat rounded-2xl px-5 py-4">
+                    <div className="solaris-gold-text text-2xl sm:text-3xl font-black tabular-nums leading-none">{s.value}</div>
+                    <div className="mt-2 text-sm font-semibold text-white/85">{s.label}</div>
+                    <div className="mt-2 text-xs leading-relaxed text-white/50">{s.note}</div>
                   </div>
                 ))}
               </div>

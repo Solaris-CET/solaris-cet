@@ -162,26 +162,55 @@ export default function ServicesSection() {
   );
 
   return (
-    <section id="servicii" className="py-24 relative overflow-hidden bg-[#05060B]">
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 relative z-10">
-        <div className="text-center mb-16" data-reveal>
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Serviciile noastre</h2>
-          <p className="text-slate-400 max-w-2xl mx-auto text-lg">Soluții complete pentru energie și construcții</p>
+    <section id="servicii" className="relative overflow-hidden bg-[#05060B] py-28">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-[420px] opacity-70"
+        aria-hidden
+        style={{
+          background:
+            'radial-gradient(ellipse 80% 100% at 50% 0%, rgba(245,158,11,0.10) 0%, rgba(245,158,11,0) 65%)',
+        }}
+      />
+      <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8 xl:px-12">
+        <div className="mx-auto mb-16 max-w-2xl text-center" data-reveal>
+          <div className="solaris-eyebrow justify-center" style={{ justifyContent: 'center' }}>
+            Servicii
+          </div>
+          <h2 className="solaris-headline mt-4 text-white" style={{ fontSize: 'clamp(2rem, 4.4vw, 3.5rem)' }}>
+            Soluții <em>complete</em> pentru energie<br className="hidden sm:inline" /> și construcții.
+          </h2>
+          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-slate-400 sm:text-lg">
+            Șase tipuri de lucrări într-un singur flux — proiectare, execuție și suport, sub același standard.
+          </p>
+          <div className="mx-auto mt-7 h-px w-32 solaris-rule" aria-hidden />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-reveal-stagger>
-          {services.map((service) => (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" data-reveal-stagger>
+          {services.map((service, idx) => (
             <a
               key={service.id}
               href={service.href}
-              className="group rounded-3xl border border-[#1e293b] bg-[#0d1117] p-7 transition-all duration-300 hover:scale-[1.02] hover:border-amber-400 hover:bg-[#101826] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 motion-reduce:transform-none"
+              className="solaris-card-gold group relative overflow-hidden rounded-3xl border border-[#1e293b] bg-[#0a0e17] p-7 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
             >
-              <IconFrame>{service.icon}</IconFrame>
-              <h3 className="mt-5 text-xl font-medium text-white">{service.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-slate-400">{service.description}</p>
-              <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-amber-300 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-1 motion-reduce:opacity-100 motion-reduce:translate-x-0">
+              <div
+                className="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-amber-400/0 blur-2xl transition-all duration-500 group-hover:bg-amber-400/25"
+                aria-hidden
+              />
+              <div className="relative flex items-start justify-between">
+                <IconFrame>{service.icon}</IconFrame>
+                <span className="text-[10px] font-extrabold tracking-[0.22em] text-white/30 tabular-nums">
+                  {String(idx + 1).padStart(2, '0')}
+                </span>
+              </div>
+              <h3 className="relative mt-6 text-xl font-bold tracking-tight text-white transition-colors duration-300 group-hover:text-amber-50">
+                {service.title}
+              </h3>
+              <p className="relative mt-3 text-sm leading-relaxed text-slate-400 transition-colors duration-300 group-hover:text-slate-300">
+                {service.description}
+              </p>
+              <div className="relative mt-6 inline-flex items-center gap-2 text-sm font-semibold text-amber-300 transition-all duration-300 group-hover:gap-3 motion-reduce:gap-2">
                 Află mai mult
-                <ArrowRight className="h-4 w-4" aria-hidden />
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transform-none" aria-hidden />
               </div>
             </a>
           ))}

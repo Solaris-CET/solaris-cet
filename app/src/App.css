@@ -395,3 +395,314 @@ html[data-lang="de"] .font-display {
 html[data-lang="zh"] .font-mono {
   letter-spacing: 0.03em;
 }
+
+/* ----------------------------------------------------------------------- */
+/* Solaris CET — Editorial polish layer (dramatic dark & gold)             */
+/* Utilities consumed by HeroSection, ServicesSection, TrustSignalsStrip.   */
+/* Self-contained: no Tailwind v4 @apply, only standard CSS.                */
+/* ----------------------------------------------------------------------- */
+
+:root {
+  --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-snap: cubic-bezier(0.32, 0.72, 0, 1);
+  --gold-bright: linear-gradient(108deg, #ffe7a8 0%, #f5c761 32%, #e0a929 62%, #f4d57a 100%);
+  --gold-soft: linear-gradient(120deg, rgba(255, 224, 160, 0.95) 0%, rgba(232, 184, 74, 0.98) 40%, rgba(201, 162, 39, 1) 100%);
+  --shadow-dramatic: 0 30px 100px -30px rgba(245, 158, 11, 0.45), 0 18px 60px -30px rgba(0, 0, 0, 0.6);
+  --shadow-card-hover: 0 36px 90px -36px rgba(0, 0, 0, 0.85), 0 16px 40px -20px rgba(245, 158, 11, 0.22);
+}
+
+/* Editorial gold text — used on hero word + section eyebrows */
+.solaris-gold-text {
+  background: var(--gold-bright);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Section eyebrow — small caps gold label above a heading */
+.solaris-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(245, 215, 110, 0.92);
+}
+.solaris-eyebrow::before {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.75));
+}
+
+/* Hover lift — cards/buttons */
+.solaris-hover-lift {
+  transition:
+    transform 380ms var(--ease-editorial),
+    box-shadow 380ms var(--ease-editorial),
+    border-color 380ms var(--ease-editorial),
+    background-color 380ms var(--ease-editorial);
+  will-change: transform, box-shadow;
+}
+.solaris-hover-lift:hover {
+  transform: translateY(-3px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .solaris-hover-lift {
+    transition: none;
+  }
+  .solaris-hover-lift:hover {
+    transform: none;
+  }
+}
+
+/* Animated thin gold rule — used as decorative arc/divider */
+.solaris-rule {
+  position: relative;
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(245, 158, 11, 0.55) 25%,
+    rgba(245, 215, 110, 0.85) 50%,
+    rgba(245, 158, 11, 0.55) 75%,
+    transparent 100%
+  );
+  overflow: hidden;
+}
+.solaris-rule::after {
+  content: "";
+  position: absolute;
+  inset: -1px 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 230, 140, 0.95), transparent);
+  width: 30%;
+  animation: solarisRuleShimmer 4.5s var(--ease-editorial) infinite;
+}
+@keyframes solarisRuleShimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(420%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .solaris-rule::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* Premium CTA — used on hero primary button */
+.solaris-cta-primary {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--gold-bright);
+  background-size: 220% 100%;
+  background-position: 0% 50%;
+  color: #0a0a0b;
+  transition:
+    transform 320ms var(--ease-snap),
+    box-shadow 320ms var(--ease-snap),
+    background-position 700ms var(--ease-editorial);
+  box-shadow:
+    0 18px 50px -18px rgba(245, 158, 11, 0.55),
+    0 8px 24px -12px rgba(245, 215, 110, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  will-change: transform, box-shadow, background-position;
+}
+.solaris-cta-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 70%
+  );
+  transform: translateX(-110%);
+  transition: transform 900ms var(--ease-editorial);
+  pointer-events: none;
+}
+.solaris-cta-primary:hover {
+  transform: translateY(-2px);
+  background-position: 100% 50%;
+  box-shadow:
+    0 28px 70px -18px rgba(245, 158, 11, 0.7),
+    0 12px 30px -10px rgba(245, 215, 110, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.solaris-cta-primary:hover::before {
+  transform: translateX(110%);
+}
+.solaris-cta-primary:active {
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .solaris-cta-primary,
+  .solaris-cta-primary::before {
+    transition: none;
+  }
+  .solaris-cta-primary:hover {
+    transform: none;
+  }
+}
+
+/* Glass card — refined frosted surface */
+.solaris-glass {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.025) 50%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+}
+
+/* Stat card — used by hero + trust strip */
+.solaris-stat {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015));
+  transition:
+    border-color 380ms var(--ease-editorial),
+    transform 380ms var(--ease-editorial),
+    background-color 380ms var(--ease-editorial);
+}
+.solaris-stat::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 2px;
+  background: var(--gold-bright);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 600ms var(--ease-editorial);
+}
+.solaris-stat:hover {
+  border-color: rgba(245, 215, 110, 0.35);
+  transform: translateY(-2px);
+}
+.solaris-stat:hover::before {
+  transform: scaleX(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .solaris-stat,
+  .solaris-stat::before {
+    transition: none;
+  }
+  .solaris-stat:hover {
+    transform: none;
+  }
+}
+
+/* Card with subtle gold gradient border on hover */
+.solaris-card-gold {
+  position: relative;
+  isolation: isolate;
+  transition:
+    border-color 380ms var(--ease-editorial),
+    transform 380ms var(--ease-editorial),
+    background-color 380ms var(--ease-editorial),
+    box-shadow 380ms var(--ease-editorial);
+}
+.solaris-card-gold::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(245, 215, 110, 0.55),
+    rgba(245, 158, 11, 0.15) 35%,
+    transparent 65%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 380ms var(--ease-editorial);
+  pointer-events: none;
+}
+.solaris-card-gold:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+}
+.solaris-card-gold:hover::before {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .solaris-card-gold,
+  .solaris-card-gold::before {
+    transition: none;
+  }
+  .solaris-card-gold:hover {
+    transform: none;
+  }
+}
+
+/* Headline — heavyweight serif drop */
+.solaris-headline {
+  font-family: "Playfair Display", ui-serif, Georgia, serif;
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 0.93;
+}
+.solaris-headline em {
+  font-style: italic;
+  font-weight: 900;
+  background: var(--gold-bright);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Slow drift used for backdrop ambient layers */
+@keyframes solarisDrift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, -1%, 0) scale(1.04);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+.solaris-drift {
+  animation: solarisDrift 28s ease-in-out infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .solaris-drift {
+    animation: none;
+  }
+}
+
+/* Subtle reveal on view — pairs with the existing reveal observer */
+.solaris-fade-in {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 700ms var(--ease-editorial),
+    transform 700ms var(--ease-editorial);
+}
+[data-reveal-visible="1"] .solaris-fade-in,
+.solaris-fade-in.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
