@@ -1,5 +1,7 @@
 import { ArrowRight, BadgeCheck, CheckCircle2, ClipboardList, Clock, ShieldCheck } from 'lucide-react';
 import { useMemo } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { generateServiceSchema, generateFAQSchema } from '@/lib/serviceDetails';
 
 import { SolarisFooter } from '@/components/company/SolarisFooter';
 import { FaqAccordion } from '@/components/FaqAccordion';
@@ -34,6 +36,27 @@ function MiniBarChart({ title, labels, values }: { title: string; labels: string
 
 export default function ServiceDetailPage({ slug }: { slug: string }) {
   const service = useMemo(() => getServiceDetail(slug), [slug]);
+
+  const serviceSchema = useMemo(() => {
+    if (!service) return null;
+    return generateServiceSchema({
+      name: service.title,
+      description: service.subtitle,
+      serviceType: service.contactServiceParam,
+      image: service.image ?? undefined,
+    });
+  }, [service]);
+
+  const faqSchema = useMemo(() => {
+    if (!service?.faq?.length) return null;
+    return generateFAQSchema(service.faq.map((f: { question: string; answer: string }) => ({ question: f.question, answer: f.answer })));
+  }, [service]);
+
+  const metaDescription = useMemo(() => {
+    if (!service) return '';
+    const desc = service.subtitle || service.title;
+    return desc.length > 155 ? desc.slice(0, 152) + '...' : desc;
+  }, [service]);
 
   if (!service) {
     return (
@@ -73,6 +96,24 @@ export default function ServiceDetailPage({ slug }: { slug: string }) {
 
   return (
     <main id="main-content" tabIndex={-1} className="pt-24 pb-0 bg-slate-950 text-white">
+      {service && (
+        <Helmet>
+          <title>{service.title} — Solaris CET</title>
+          <meta name="description" content={metaDescription} />
+          <meta property="og:title" content={`${service.title} — Solaris CET`} />
+          <meta property="og:description" content={metaDescription} />
+          <meta property="og:image" content={service.image || '/og-image.png'} />
+          <meta property="og:type" content="website" />
+          <script type="application/ld+json">
+            {JSON.stringify(serviceSchema)}
+          </script>
+          {faqSchema && (
+            <script type="application/ld+json">
+              {JSON.stringify(faqSchema)}
+            </script>
+          )}
+        </Helmet>
+      )}
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <section className="rounded-3xl border border-white/10 bg-black/30 p-8 sm:p-10" data-reveal-stagger>
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/25 bg-amber-400/10 px-4 py-2 text-[11px] font-bold tracking-wider text-amber-300">

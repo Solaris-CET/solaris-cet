@@ -743,6 +743,26 @@ async function writeStaticPages() {
           { name: 'Acasă', path: '/' },
           { name: 'Contact', path: '/contact' },
         ]),
+        {
+          '@type': ['RoofingContractor', 'ElectricalContractor'],
+          name: 'Solaris CET',
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: 'Cetățuia',
+            addressRegion: 'Vaslui',
+            addressCountry: 'RO',
+          },
+          telephone: '+40769889721',
+          email: 'solaris-cet@protonmail.com',
+          geo: {
+            '@type': 'GeoCoordinates',
+            latitude: 46.7195,
+            longitude: 27.7398,
+          },
+          openingHours: ['Mo-Fr 08:00-18:00', 'Sa 09:00-14:00'],
+          priceRange: 'RON',
+          sameAs: ['https://wa.me/40769889721'],
+        },
       ]),
     },
     {
@@ -833,13 +853,12 @@ async function writeStaticPages() {
       ],
       extraHtml: servicePageBlocks['fotovoltaice-rezidentiale'],
       jsonLd: wrapJsonLd([
-        {
-          '@type': 'Service',
-          name: 'Instalații fotovoltaice rezidențiale',
-          provider: serviceProviderRef,
-          areaServed: { '@type': 'Country', name: 'Romania' },
-          url: `${origin}/servicii/fotovoltaice-rezidentiale/`,
-        },
+        buildServiceSchema(
+          'Instalații fotovoltaice rezidențiale',
+          'Sisteme fotovoltaice rezidențiale 3-15 kWp pentru case, cu dosar prosumator, baterii opționale și montaj curat.',
+          'fotovoltaic-rezidential',
+          `${origin}/images/hero-solaris.svg`
+        ),
         {
           '@type': 'FAQPage',
           mainEntity: serviceFaq['fotovoltaice-rezidentiale'].map((x) => ({
@@ -867,13 +886,12 @@ async function writeStaticPages() {
       ],
       extraHtml: servicePageBlocks['fotovoltaice-industriale'],
       jsonLd: wrapJsonLd([
-        {
-          '@type': 'Service',
-          name: 'Sisteme fotovoltaice industriale',
-          provider: serviceProviderRef,
-          areaServed: { '@type': 'Country', name: 'Romania' },
-          url: `${origin}/servicii/fotovoltaice-industriale/`,
-        },
+        buildServiceSchema(
+          'Sisteme fotovoltaice industriale',
+          'Sisteme fotovoltaice industriale de la 20+ kWp pentru hale și spații comerciale, cu monitorizare și scenarii de ROI.',
+          'fotovoltaic-industrial',
+          `${origin}/images/hero-solaris.svg`
+        ),
         {
           '@type': 'FAQPage',
           mainEntity: serviceFaq['fotovoltaice-industriale'].map((x) => ({
@@ -901,13 +919,12 @@ async function writeStaticPages() {
       ],
       extraHtml: servicePageBlocks['acoperisuri-tabla-tigla'],
       jsonLd: wrapJsonLd([
-        {
-          '@type': 'Service',
-          name: 'Acoperișuri tablă / țiglă',
-          provider: serviceProviderRef,
-          areaServed: { '@type': 'Country', name: 'Romania' },
-          url: `${origin}/servicii/acoperisuri-tabla-tigla/`,
-        },
+        buildServiceSchema(
+          'Acoperișuri tablă / țiglă',
+          'Montaj și reparații pentru acoperișuri din tablă click, profilată sau țiglă metalică, cu accesorii și etanșări corecte.',
+          'acoperis-tabla',
+          `${origin}/images/hero-solaris.svg`
+        ),
         {
           '@type': 'FAQPage',
           mainEntity: serviceFaq['acoperisuri-tabla-tigla'].map((x) => ({
@@ -935,13 +952,12 @@ async function writeStaticPages() {
       ],
       extraHtml: servicePageBlocks['acoperisuri-industriale-tpo'],
       jsonLd: wrapJsonLd([
-        {
-          '@type': 'Service',
-          name: 'Acoperișuri industriale TPO',
-          provider: serviceProviderRef,
-          areaServed: { '@type': 'Country', name: 'Romania' },
-          url: `${origin}/servicii/acoperisuri-industriale-tpo/`,
-        },
+        buildServiceSchema(
+          'Acoperișuri industriale TPO',
+          'Membrană TPO pentru hale și depozite, cu grosimi 1.2-2.0 mm, fixare corectă și compatibilitate cu fotovoltaice pe acoperiș plat.',
+          'acoperis-tpo',
+          `${origin}/images/hero-solaris.svg`
+        ),
         {
           '@type': 'FAQPage',
           mainEntity: serviceFaq['acoperisuri-industriale-tpo'].map((x) => ({
@@ -969,13 +985,12 @@ async function writeStaticPages() {
       ],
       extraHtml: servicePageBlocks['atice-si-fatade-tabla'],
       jsonLd: wrapJsonLd([
-        {
-          '@type': 'Service',
-          name: 'Atice și fațade tablă',
-          provider: serviceProviderRef,
-          areaServed: { '@type': 'Country', name: 'Romania' },
-          url: `${origin}/servicii/atice-si-fatade-tabla/`,
-        },
+        buildServiceSchema(
+          'Atice și fațade tablă',
+          'Placări metalice pentru atice și fațade, cu culori RAL, opțiuni de termoizolație și diferențe clare între polyester și PVDF.',
+          'atice-fatade',
+          `${origin}/images/hero-solaris.svg`
+        ),
         {
           '@type': 'FAQPage',
           mainEntity: serviceFaq['atice-si-fatade-tabla'].map((x) => ({
@@ -1020,13 +1035,12 @@ async function writeStaticPages() {
       ],
       extraHtml: servicePageBlocks['reparatii-si-mentenanta'],
       jsonLd: wrapJsonLd([
-        {
-          '@type': 'Service',
-          name: 'Reparații și mentenanță',
-          provider: serviceProviderRef,
-          areaServed: { '@type': 'Country', name: 'Romania' },
-          url: `${origin}/servicii/reparatii-si-mentenanta/`,
-        },
+        buildServiceSchema(
+          'Reparații și mentenanță',
+          'Intervenții urgente și mentenanță preventivă pentru acoperișuri, TPO și sisteme fotovoltaice, cu răspuns rapid în Vaslui și județele limitrofe.',
+          'reparatii',
+          `${origin}/images/hero-solaris.svg`
+        ),
         {
           '@type': 'FAQPage',
           mainEntity: serviceFaq['reparatii-si-mentenanta'].map((x) => ({
