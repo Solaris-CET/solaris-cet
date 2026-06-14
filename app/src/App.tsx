@@ -18,6 +18,7 @@ import Cookies from './pages/Cookies';
 import GDPR from './pages/GDPR';
 import Termeni from './pages/Termeni';
 import { NotFoundPage } from './pages_legacy/NotFoundPage';
+import ChatWidget from './components/ChatWidget';
 
 const ServicesPage = lazy(() => import('./pages_legacy/ServicesPage'));
 const ServiceDetailPage = lazy(() => import('./pages_legacy/ServiceDetailPage'));
@@ -843,6 +844,7 @@ function App() {
     <LanguageContext.Provider value={langState}>
       <Navigation />
       <Toaster />
+      <ChatWidget />
       <Suspense fallback={null}>
         {routePath === '/' ? (
           <HomePage />
