@@ -24,6 +24,7 @@
     },
     "jsx": "react-jsx",
     "moduleResolution": "bundler",
+    "skipLibCheck": true,
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true
