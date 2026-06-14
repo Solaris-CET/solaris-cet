@@ -124,6 +124,15 @@ export default function ArticlePage({ slug }: { slug: string }) {
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-10">
         <article className="lg:col-span-8">
           <header data-reveal-stagger>
+            <nav aria-label="Breadcrumb" className="mb-4">
+              <ol className="flex flex-wrap items-center gap-2 text-sm text-solaris-muted">
+                <li><a href="/" className="hover:text-solar-yellow">Acasă</a></li>
+                <li aria-hidden="true">/</li>
+                <li><a href="/blog" className="hover:text-solar-yellow">Blog</a></li>
+                <li aria-hidden="true">/</li>
+                <li className="text-white/80" aria-current="page">{post.frontmatter.title}</li>
+              </ol>
+            </nav>
             <h1 className="font-display text-4xl md:text-5xl text-solaris-text tracking-tight">{post.frontmatter.title}</h1>
             <p className="mt-3 text-solaris-muted">{post.frontmatter.description}</p>
 
@@ -133,8 +142,8 @@ export default function ArticlePage({ slug }: { slug: string }) {
                 <span>{post.frontmatter.date}</span>
               </div>
               {post.frontmatter.category ? <Badge variant="secondary">{post.frontmatter.category}</Badge> : null}
-              {post.frontmatter.readingTimeMinutes ? (
-                <span className="text-[11px] font-mono text-solaris-muted">• {post.frontmatter.readingTimeMinutes} min</span>
+              {post.readingTime ? (
+                <span className="text-[11px] font-mono text-solaris-muted">⏱️ {post.readingTime} min citit</span>
               ) : null}
               {post.frontmatter.author ? (
                 <span className="text-[11px] font-mono text-solaris-muted">• {post.frontmatter.author}</span>
@@ -211,6 +220,31 @@ export default function ArticlePage({ slug }: { slug: string }) {
                 })}
               </div>
             ) : null}
+
+            {/* Share buttons */}
+            <div className="mt-6 flex flex-wrap items-center gap-2">
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(`${post.frontmatter.title} — ${window.location.href}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-solaris-muted hover:text-solaris-text hover:border-white/20 transition-colors"
+                aria-label="Share pe WhatsApp"
+              >
+                <MessageCircle className="h-4 w-4" aria-hidden />
+                WhatsApp
+              </a>
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-solaris-muted hover:text-solaris-text hover:border-white/20 transition-colors"
+                aria-label="Share pe Facebook"
+              >
+                <Share2 className="h-4 w-4" aria-hidden />
+                Facebook
+              </a>
+              <CopyButton text={window.location.href} ariaLabel="Copiază link" />
+            </div>
           </header>
 
           <div className="mt-10" data-reveal>
@@ -226,6 +260,26 @@ export default function ArticlePage({ slug }: { slug: string }) {
             />
           </div>
         </article>
+
+        {/* Related articles */}
+        {otherPosts.length > 0 && (
+          <div className="mt-12" data-reveal>
+            <h2 className="text-2xl font-bold text-white mb-6">Articole similare</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {otherPosts.map((p) => (
+                <a
+                  key={`${p.locale}:${p.slug}`}
+                  href={localizePathname(`/blog/${p.slug}`, locale)}
+                  className="rounded-2xl border border-white/10 bg-black/20 p-5 hover:border-solaris-gold/30 transition-colors"
+                >
+                  <div className="text-[11px] font-mono text-solaris-muted">{p.frontmatter.date}</div>
+                  <div className="mt-2 text-sm font-semibold text-solaris-text leading-snug">{p.frontmatter.title}</div>
+                  <p className="mt-2 text-xs text-solaris-muted line-clamp-2">{p.excerpt}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
 
         <aside className="lg:col-span-4">
           <div className="sticky top-24 space-y-4" data-reveal-stagger>
