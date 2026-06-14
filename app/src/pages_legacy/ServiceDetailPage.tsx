@@ -253,6 +253,9 @@ export default function ServiceDetailPage({ slug }: { slug: string }) {
             </div>
 
             <div className="mt-8 rounded-3xl border border-amber-400/30 bg-amber-400/10 p-7" data-reveal-stagger>
+              <p className="text-sm text-amber-200 mb-4">
+                Ai întrebări? Consultă <a href="/faq" className="text-amber-400 underline hover:text-amber-300">secțiunea noastră FAQ →</a>
+              </p>
               <h2 className="text-2xl font-bold text-white">Vrei ofertă clară pentru {service.title}?</h2>
               <p className="mt-3 max-w-3xl text-sm leading-relaxed text-slate-200">
                 Trimite-ne localitatea, câteva poze și contextul lucrării. Îți răspundem cu pașii corecți: telefon pentru urgențe, WhatsApp pentru mesaje rapide și formular pentru cereri complete.
