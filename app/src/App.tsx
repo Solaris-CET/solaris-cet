@@ -39,6 +39,22 @@ const ThankYouPage = lazy(() => import('./pages_legacy/ThankYouPage'));
 const LegalDocPage = lazy(() => import('./pages_legacy/LegalDocPage'));
 const PrivacySettingsPage = lazy(() => import('./pages_legacy/PrivacySettingsPage'));
 const LocationPage = lazy(() => import('./pages_legacy/LocationPage'));
+const LighthousePage = lazy(() => import('./pages_legacy/LighthousePage'));
+const DevelopersPage = lazy(() => import('./pages_legacy/DevelopersPage'));
+const DocsPage = lazy(() => import('./pages_legacy/DocsPage'));
+const DeveloperConsolePage = lazy(() => import('./pages_legacy/DeveloperConsolePage'));
+const CommunityPage = lazy(() => import('./pages_legacy/CommunityPage'));
+const ForumPage = lazy(() => import('./pages_legacy/ForumPage'));
+const ForumPostPage = lazy(() => import('./pages_legacy/ForumPostPage'));
+const RewardsPage = lazy(() => import('./pages_legacy/RewardsPage'));
+const LoginPage = lazy(() => import('./pages_legacy/LoginPage'));
+const AccountPage = lazy(() => import('./pages_legacy/AccountPage'));
+const WalletPage = lazy(() => import('./pages_legacy/WalletPage'));
+const SettingsPage = lazy(() => import('./pages_legacy/SettingsPage'));
+const TechnicalAnalysisPage = lazy(() => import('./pages_legacy/TechnicalAnalysisPage'));
+const AirdropPage = lazy(() => import('./pages_legacy/AirdropPage'));
+const NftsPage = lazy(() => import('./pages_legacy/NftsPage'));
+const TxHistoryPage = lazy(() => import('./pages_legacy/TxHistoryPage'));
 const SolarisChatWidget = lazy(() =>
   import('@/components/company/SolarisChatWidget').then((m) => ({ default: m.SolarisChatWidget })),
 );
@@ -900,6 +916,38 @@ function App() {
           <ThankYouPage />
         ) : routePath === '/faq' ? (
           <FaqPage />
+        ) : routePath === '/lighthouse' ? (
+          <LighthousePage />
+        ) : routePath === '/developers' ? (
+          <DevelopersPage />
+        ) : routePath === '/docs' ? (
+          <DocsPage />
+        ) : routePath === '/console' ? (
+          <DeveloperConsolePage />
+        ) : routePath === '/comunitate' ? (
+          <CommunityPage />
+        ) : routePath === '/forum' ? (
+          <ForumPage />
+        ) : routePath.startsWith('/forum/') ? (
+          <ForumPostPage postId={routePath.replace(/^\/forum\//, '')} />
+        ) : routePath === '/recompense' ? (
+          <RewardsPage />
+        ) : routePath === '/login' ? (
+          <LoginPage />
+        ) : routePath === '/app' ? (
+          <AccountPage />
+        ) : routePath === '/wallet' ? (
+          <WalletPage />
+        ) : routePath === '/settings' ? (
+          <SettingsPage />
+        ) : routePath === '/analysis' ? (
+          <TechnicalAnalysisPage />
+        ) : routePath === '/airdrop' ? (
+          <AirdropPage />
+        ) : routePath === '/nfts' ? (
+          <NftsPage />
+        ) : routePath === '/tx-history' ? (
+          <TxHistoryPage />
         ) : routePath === '/privacy' ? (
           <LegalDocPage doc="privacy" />
         ) : routePath === '/terms' ? (
