@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { localizePathname } from '@/i18n/urlRouting';
 import { useLanguage } from '@/hooks/useLanguage';
+import AnimatedLogo from './brand/AnimatedLogo';
 
 export default function MobileAppNav() {
   const { t, lang } = useLanguage();
@@ -21,6 +22,9 @@ export default function MobileAppNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-white/10 bg-gray-900/95 backdrop-blur-md md:hidden" aria-label="Navigație mobilă">
+      <div className="absolute left-4 bottom-2 w-8 h-8">
+        <AnimatedLogo />
+      </div>
       {navItems.map((item) => (
         <a
           key={item.label}
