@@ -176,6 +176,19 @@ export default function Navigation() {
   }, [activeHref]);
 
   useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      if (wasMobileMenuOpenRef.current) mobileMenuToggleRef.current?.focus();
+      wasMobileMenuOpenRef.current = false;
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
     if (!isMobileMenuOpen) {
       if (wasMobileMenuOpenRef.current) mobileMenuToggleRef.current?.focus();
       wasMobileMenuOpenRef.current = false;
@@ -191,13 +204,16 @@ export default function Navigation() {
   const barHeightClass = isScrolled ? 'h-12' : 'h-16';
 
   return (
+    <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-[100] bg-amber-500 text-black px-4 py-2 rounded">
+      Sari la conținut principal
+    </a>
     <header
       data-reveal
       className={cn(
-        `fixed top-0 left-0 right-0 z-[1000] max-w-full overflow-x-hidden lg:overflow-x-visible ${styles.bar}`,
+        `fixed top-0 left-0 right-0 z-[1000] max-w-full overflow-x-hidden lg:overflow-x-visible ${styles.bar} transition-all duration-300`,
         isScrolled
-          ? 'bg-[rgba(5,6,11,0.85)] backdrop-blur-[20px] border-b border-white/10 shadow-[0_1px_0_rgba(251,146,60,0.10),0_16px_50px_rgba(0,0,0,0.55)]'
-          : 'bg-[rgba(5,6,11,0.55)] backdrop-blur-[16px] border-b border-white/0',
+          ? 'bg-gray-900/95 backdrop-blur-md shadow-lg border-b border-white/10'
+          : 'bg-transparent',
       )}
       style={{ top: 'var(--solaris-announcement-offset, 0px)' }}
     >
@@ -246,37 +262,42 @@ export default function Navigation() {
             aria-label={t.nav.primaryNavigation}
           >
             <div ref={desktopNavRef} className="relative flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-1 backdrop-blur">
-              {primaryLinks.map((link) => (
-                <a
-                  key={link.key}
-                  href={link.href}
-                  ref={(el) => {
-                    desktopLinkRefs.current[link.key] = el;
-                  }}
-                  onClick={() =>
-                    setActiveHref(
-                      link.key === 'services'
-                        ? '/servicii'
-                        : link.key === 'portfolio'
-                          ? '/proiecte'
-                          : link.key === 'contact'
-                            ? '/contact'
-                            : '/',
-                    )
-                  }
-                  className={cn(
-                    'relative z-10 px-4 py-2 text-sm font-semibold transition-colors',
-                    (activeHref === '/servicii' && link.key === 'services') ||
-                      (activeHref === '/proiecte' && link.key === 'portfolio') ||
-                      (activeHref === '/contact' && link.key === 'contact') ||
-                      (activeHref === '/' && link.key === 'home')
-                      ? 'text-white'
-                      : 'text-white/70 hover:text-white',
-                  )}
-                >
-                  {link.label}
-                </a>
-              ))}
+              {primaryLinks.map((link) => {
+                const isActive =
+                  (activeHref === '/servicii' && link.key === 'services') ||
+                  (activeHref === '/proiecte' && link.key === 'portfolio') ||
+                  (activeHref === '/contact' && link.key === 'contact') ||
+                  (activeHref === '/' && link.key === 'home');
+                return (
+                  <a
+                    key={link.key}
+                    href={link.href}
+                    ref={(el) => {
+                      desktopLinkRefs.current[link.key] = el;
+                    }}
+                    onClick={() =>
+                      setActiveHref(
+                        link.key === 'services'
+                          ? '/servicii'
+                          : link.key === 'portfolio'
+                            ? '/proiecte'
+                            : link.key === 'contact'
+                              ? '/contact'
+                              : '/',
+                      )
+                    }
+                    className={cn(
+                      'relative z-10 px-4 py-2 text-sm font-semibold transition-colors',
+                      isActive ? 'text-white' : 'text-white/70 hover:text-white',
+                    )}
+                  >
+                    {link.label}
+                    {isActive && (
+                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-6 rounded-full bg-amber-400" />
+                    )}
+                  </a>
+                );
+              })}
               <span
                 aria-hidden
                 className={cn(

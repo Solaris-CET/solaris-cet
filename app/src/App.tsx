@@ -12,6 +12,7 @@ import HomePage from '@/pages_legacy/HomePage';
 import { companyFaqItems } from '@/sections/CompanyFaqSection';
 
 import Navigation from './components/Navigation';
+import MobileAppNav from './components/MobileAppNav';
 import { LanguageContext, useLanguageState } from './hooks/useLanguage';
 import { useTelegram } from './hooks/useTelegram';
 import Cookies from './pages/Cookies';
@@ -843,6 +844,7 @@ function App() {
   return (
     <LanguageContext.Provider value={langState}>
       <Navigation />
+      <MobileAppNav />
       <Toaster />
       <ChatWidget />
       <Suspense fallback={null}>
