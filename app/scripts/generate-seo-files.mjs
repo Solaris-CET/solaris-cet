@@ -1661,32 +1661,73 @@ async function writeSitemap() {
     return `${origin}${normalized}/`
   }
 
+  const today = new Date().toISOString().slice(0, 10)
+
   const urls = [
-    { loc: `${origin}/`, priority: '1.0', changefreq: 'monthly' },
-    { loc: toAbsoluteUrl('/servicii'), priority: '0.9', changefreq: 'monthly' },
-    { loc: toAbsoluteUrl('/servicii/fotovoltaice-rezidentiale'), priority: '0.8' },
-    { loc: toAbsoluteUrl('/servicii/fotovoltaice-industriale'), priority: '0.8' },
-    { loc: toAbsoluteUrl('/servicii/acoperisuri-tabla-tigla'), priority: '0.8' },
-    { loc: toAbsoluteUrl('/servicii/acoperisuri-industriale-tpo'), priority: '0.8' },
-    { loc: toAbsoluteUrl('/servicii/atice-si-fatade-tabla'), priority: '0.8' },
-    { loc: toAbsoluteUrl('/servicii/reparatii-si-mentenanta'), priority: '0.8' },
-    { loc: toAbsoluteUrl('/proiecte'), priority: '0.8', changefreq: 'monthly' },
-    { loc: toAbsoluteUrl('/contact'), priority: '0.8', changefreq: 'yearly' },
-    { loc: toAbsoluteUrl('/privacy'), priority: '0.3', changefreq: 'yearly' },
-    { loc: toAbsoluteUrl('/cookies'), priority: '0.3', changefreq: 'yearly' },
-    { loc: toAbsoluteUrl('/terms'), priority: '0.3', changefreq: 'yearly' },
+    { loc: `${origin}/`, priority: '1.0', changefreq: 'daily', lastmod: today },
+    { loc: toAbsoluteUrl('/servicii'), priority: '0.8', changefreq: 'weekly', lastmod: today },
+    { loc: toAbsoluteUrl('/servicii/fotovoltaice-rezidentiale'), priority: '0.9', changefreq: 'weekly', lastmod: today },
+    { loc: toAbsoluteUrl('/servicii/fotovoltaice-industriale'), priority: '0.9', changefreq: 'weekly', lastmod: today },
+    { loc: toAbsoluteUrl('/servicii/acoperisuri-tabla-tigla'), priority: '0.9', changefreq: 'weekly', lastmod: today },
+    { loc: toAbsoluteUrl('/servicii/acoperisuri-industriale-tpo'), priority: '0.9', changefreq: 'weekly', lastmod: today },
+    { loc: toAbsoluteUrl('/servicii/atice-si-fatade-tabla'), priority: '0.9', changefreq: 'weekly', lastmod: today },
+    { loc: toAbsoluteUrl('/servicii/reparatii-si-mentenanta'), priority: '0.9', changefreq: 'weekly', lastmod: today },
+    { loc: toAbsoluteUrl('/despre'), priority: '0.7', changefreq: 'monthly', lastmod: today },
+    { loc: toAbsoluteUrl('/contact'), priority: '0.9', changefreq: 'monthly', lastmod: today },
+    { loc: toAbsoluteUrl('/calculator'), priority: '0.8', changefreq: 'monthly', lastmod: today },
+    { loc: toAbsoluteUrl('/finantare'), priority: '0.8', changefreq: 'monthly', lastmod: today },
+    { loc: toAbsoluteUrl('/proiecte'), priority: '0.7', changefreq: 'weekly', lastmod: today },
+    { loc: toAbsoluteUrl('/blog'), priority: '0.7', changefreq: 'weekly', lastmod: today },
+    { loc: toAbsoluteUrl('/faq'), priority: '0.6', changefreq: 'monthly', lastmod: today },
+    { loc: toAbsoluteUrl('/privacy'), priority: '0.3', changefreq: 'yearly', lastmod: today },
+    { loc: toAbsoluteUrl('/cookies'), priority: '0.3', changefreq: 'yearly', lastmod: today },
+    { loc: toAbsoluteUrl('/terms'), priority: '0.3', changefreq: 'yearly', lastmod: today },
+    // County pages
+    { loc: toAbsoluteUrl('/vaslui'), priority: '0.8', changefreq: 'monthly', lastmod: today },
+    { loc: toAbsoluteUrl('/iasi'), priority: '0.8', changefreq: 'monthly', lastmod: today },
+    { loc: toAbsoluteUrl('/bacau'), priority: '0.8', changefreq: 'monthly', lastmod: today },
+    { loc: toAbsoluteUrl('/galati'), priority: '0.8', changefreq: 'monthly', lastmod: today },
+    { loc: toAbsoluteUrl('/neamt'), priority: '0.8', changefreq: 'monthly', lastmod: today },
+    { loc: toAbsoluteUrl('/suceava'), priority: '0.8', changefreq: 'monthly', lastmod: today },
+    { loc: toAbsoluteUrl('/botosani'), priority: '0.8', changefreq: 'monthly', lastmod: today },
+    { loc: toAbsoluteUrl('/vrancea'), priority: '0.8', changefreq: 'monthly', lastmod: today },
   ]
+
+  // Add blog article pages from locationData (simulated)
+  const blogSlugs = [
+    'cat-costa-un-sistem-fotovoltaic-2026',
+    'cum-accesezi-programul-casa-verde',
+    'tabla-click-vs-tigla-metalica',
+    'tpo-vs-membrana-clasica',
+    'mentenanta-panouri-fotovoltaice',
+    'panouri-bifaciale-vs-monocristaline',
+    'mentenanta-acoperis-tpo-checklist',
+    'invertor-hibrid-baterie-cand-merita',
+    'beneficii-panouri-fotovoltaice-romania-2026',
+    'ghid-complet-instalare-acoperis-tabla',
+  ]
+  for (const slug of blogSlugs) {
+    urls.push({
+      loc: toAbsoluteUrl(`/blog/${slug}`),
+      priority: '0.6',
+      changefreq: 'monthly',
+      lastmod: today,
+    })
+  }
 
   const xml =
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
-    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n` +
+    `        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n` +
     urls
       .map((u) => {
         const extra = [
-          u.priority ? `<priority>${u.priority}</priority>` : '',
+          u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : '',
           u.changefreq ? `<changefreq>${u.changefreq}</changefreq>` : '',
-        ].join('')
-        return `  <url><loc>${u.loc}</loc>${extra}</url>`
+          u.priority ? `<priority>${u.priority}</priority>` : '',
+          `<xhtml:link rel="alternate" hreflang="ro" href="${u.loc}"/>`,
+        ].join('\n      ')
+        return `  <url>\n      <loc>${u.loc}</loc>\n      ${extra}\n    </url>`
       })
       .join('\n') +
     `\n</urlset>\n`
@@ -1699,15 +1740,45 @@ async function writeRobots() {
   const txt = [
     `User-agent: *`,
     `Allow: /`,
-    `Disallow: /privacy-settings/`,
-    `Disallow: /multumim/`,
-    `Disallow: /cdn-cgi/`,
+    `Disallow: /api/`,
+    `Disallow: /admin/`,
+    `Disallow: /.well-known/`,
+    `Disallow: /push/`,
+    ``,
+    `User-agent: Googlebot`,
+    `Allow: /api/openapi/`,
+    `Crawl-delay: 1`,
     ``,
     `Sitemap: ${origin}/sitemap.xml`,
+    ``,
+    `Host: https://solaris-cet.com`,
     ``,
   ].join('\n')
   await fs.mkdir(publicDir, { recursive: true })
   await fs.writeFile(path.join(publicDir, 'robots.txt'), txt, 'utf8')
 }
 
+async function pingSearchEngines() {
+  const sitemapUrl = `${origin}/sitemap.xml`
+  const googleUrl = `https://www.google.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`
+  const bingUrl = `https://www.bing.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`
+
+  try {
+    const googleRes = await fetch(googleUrl, { method: 'GET' })
+    console.log(`✅ Google ping: ${googleRes.status}`)
+  } catch (err) {
+    console.error('❌ Google ping failed:', err.message)
+  }
+
+  try {
+    const bingRes = await fetch(bingUrl, { method: 'GET' })
+    console.log(`✅ Bing ping: ${bingRes.status}`)
+  } catch (err) {
+    console.error('❌ Bing ping failed:', err.message)
+  }
+
+  console.log('✅ Sitemap submitted to Google and Bing')
+}
+
 await Promise.all([writeStaticPages(), writeSitemap(), writeRobots()])
+await pingSearchEngines()
