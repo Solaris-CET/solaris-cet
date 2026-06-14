@@ -3,6 +3,7 @@ import { type CSSProperties, useEffect, useMemo, useState } from 'react';
 
 import AppImage from '@/components/AppImage';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
+import SolarPanelAnimation from '@/components/animations/SolarPanelAnimation';
 
 import styles from './HeroSolaris.module.css';
 
@@ -214,6 +215,9 @@ export default function HeroSection() {
         ))}
       </svg>
 
+      <div className="absolute inset-0 z-0 opacity-30">
+        <SolarPanelAnimation />
+      </div>
       <div className={styles.heroVignette} aria-hidden />
 
       <div className="relative mx-auto max-w-7xl px-5 pb-16 pt-24 sm:px-8 sm:pt-32 xl:px-12">
