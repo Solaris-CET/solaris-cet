@@ -1,295 +1,292 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { Send, X, MessageCircle, Loader2 } from 'lucide-react';
 
-type Message = {
-  role: 'user' | 'assistant' | 'error';
+interface Message {
+  id: string;
+  role: 'user' | 'assistant';
   content: string;
-};
+}
 
 const QUICK_BUTTONS = [
-  { label: '💰 Prețuri', message: 'Care sunt prețurile pentru panouri fotovoltaice?' },
-  { label: '🏠 Finanțări', message: 'Ce opțiuni de finanțare aveți?' },
+  { label: '💰 Preturi', message: 'Care sunt preturile pentru panouri fotovoltaice?' },
+  { label: '🏠 Finantari', message: 'Ce optiuni de finantare aveti?' },
   { label: '📞 Contact', message: 'Care sunt datele de contact?' },
-  { label: '📋 Ofertă', message: 'Aș dori o ofertă personalizată.' },
+  { label: '📋 Oferta', message: 'As dori o oferta personalizata.' },
 ];
 
-function ChatWidget() {
-  const [messages, setMessages] = useState<Message[]>([]);
+export default function ChatWidget() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: 'welcome',
+      role: 'assistant',
+      content: 'Bună! Sunt asistentul virtual Solaris CET. Cu ce te pot ajuta? Întreabă-mă despre panouri fotovoltaice, finanțări sau serviciile noastre.',
+    },
+  ]);
   const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
+    scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-  const sendMessage = useCallback(async (text: string) => {
-    if (!text.trim()) return;
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
-    const userMsg: Message = { role: 'user', content: text.trim() };
-    setMessages((prev) => [...prev, userMsg]);
-    setInput('');
-    setIsTyping(true);
+  async function handleQuickButtonClick(quickMessage: string) {
+    if (isLoading) return;
+
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = new AbortController();
+    setError(null);
+
+    const userMessage: Message = {
+      id: crypto.randomUUID(),
+      role: 'user',
+      content: quickMessage,
+    };
+
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    setIsLoading(true);
 
     try {
-      const res = await fetch('/api/chat', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...messages, userMsg].map((m) => ({
-            role: m.role === 'error' ? 'assistant' : m.role,
-            content: m.content,
-          })),
+          messages: updatedMessages.map(({ role, content }) => ({ role, content })),
         }),
+        signal: abortControllerRef.current.signal,
       });
 
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        const errMsg = errData?.content || 'Momentan asistentul AI nu este disponibil. Pentru ofertă rapidă, sună la +40 769 889 721 sau scrie pe solaris-cet@protonmail.com';
-        setMessages((prev) => [...prev, { role: 'error', content: errMsg }]);
-        setIsTyping(false);
+      if (!response.ok || !response.body) {
+        const data = await response.json().catch(() => ({}));
+        setError(data.error ?? 'Eroare la comunicarea cu serverul. Încearcă din nou.');
         return;
       }
 
-      // Try to parse as JSON (non-streaming fallback)
-      const contentType = res.headers.get('content-type') || '';
-      if (contentType.includes('application/json')) {
-        const data = await res.json();
-        const content = data?.content || '';
-        if (content) {
-          setMessages((prev) => [...prev, { role: 'assistant', content }]);
-        }
-        setIsTyping(false);
-        return;
-      }
-
-      // Streaming response
-      const reader = res.body?.getReader();
-      if (!reader) {
-        setMessages((prev) => [
-          ...prev,
-          { role: 'error', content: 'Eroare la conectare. Încearcă din nou.' },
-        ]);
-        setIsTyping(false);
-        return;
-      }
-
+      const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      let buffer = '';
-      let fullContent = '';
+      let assistantContent = '';
+      const assistantId = crypto.randomUUID();
+
+      setMessages((prev) => [
+        ...prev,
+        { id: assistantId, role: 'assistant', content: '' },
+      ]);
 
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const dataStr = line.slice(6);
-            if (dataStr === '[DONE]') continue;
-            try {
-              const parsed = JSON.parse(dataStr);
-              if (parsed.content) {
-                fullContent += parsed.content;
-                setMessages((prev) => {
-                  const last = prev[prev.length - 1];
-                  if (last?.role === 'assistant') {
-                    return [...prev.slice(0, -1), { role: 'assistant', content: fullContent }];
-                  }
-                  return [...prev, { role: 'assistant', content: fullContent }];
-                });
-              }
-              if (parsed.error) {
-                setMessages((prev) => [
-                  ...prev,
-                  { role: 'error', content: parsed.error },
-                ]);
-              }
-            } catch {
-              // ignore parse errors
-            }
-          } else if (line.startsWith('event: error')) {
-            setMessages((prev) => [
-              ...prev,
-              { role: 'error', content: 'Eroare la procesarea răspunsului.' },
-            ]);
+        if (done) {
+          const remaining = decoder.decode();
+          if (remaining) {
+            assistantContent += remaining;
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantId ? { ...m, content: assistantContent } : m
+              )
+            );
           }
+          break;
         }
+        assistantContent += decoder.decode(value, { stream: true });
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId ? { ...m, content: assistantContent } : m
+          )
+        );
       }
     } catch (err) {
-      console.error('Chat fetch error:', err);
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      setError('A apărut o eroare neașteptată. Încearcă din nou.');
+      console.error('Chat error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = new AbortController();
+    setError(null);
+
+    const userMessage: Message = {
+      id: crypto.randomUUID(),
+      role: 'user',
+      content: input.trim(),
+    };
+
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    setInput('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: updatedMessages.map(({ role, content }) => ({ role, content })),
+        }),
+        signal: abortControllerRef.current.signal,
+      });
+
+      if (!response.ok || !response.body) {
+        const data = await response.json().catch(() => ({}));
+        setError(data.error ?? 'Eroare la comunicarea cu serverul. Încearcă din nou.');
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let assistantContent = '';
+      const assistantId = crypto.randomUUID();
+
       setMessages((prev) => [
         ...prev,
-        { role: 'error', content: 'Momentan asistentul AI nu e disponibil. Pentru ofertă rapidă, sună la +40 769 889 721 sau scrie pe solaris-cet@protonmail.com' },
+        { id: assistantId, role: 'assistant', content: '' },
       ]);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          const remaining = decoder.decode();
+          if (remaining) {
+            assistantContent += remaining;
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantId ? { ...m, content: assistantContent } : m
+              )
+            );
+          }
+          break;
+        }
+        assistantContent += decoder.decode(value, { stream: true });
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId ? { ...m, content: assistantContent } : m
+          )
+        );
+      }
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      setError('A apărut o eroare neașteptată. Încearcă din nou.');
+      console.error('Chat error:', err);
     } finally {
-      setIsTyping(false);
+      setIsLoading(false);
     }
-  }, [messages]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    sendMessage(input);
-  };
-
-  const handleQuickButton = (msg: string) => {
-    sendMessage(msg);
-  };
-
-  // Helper to render clickable links in message content
-  const renderContent = (content: string) => {
-    // Replace phone numbers and emails with clickable links
-    const phoneRegex = /(\+40\s?\d{3}\s?\d{3}\s?\d{3})/g;
-    const emailRegex = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
-
-    const parts: React.ReactNode[] = [];
-    let lastIndex = 0;
-
-    // Combine both regex matches
-    const combinedRegex = /(\+40\s?\d{3}\s?\d{3}\s?\d{3})|([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
-    let match: RegExpExecArray | null;
-
-    while ((match = combinedRegex.exec(content)) !== null) {
-      const start = match.index;
-      if (start > lastIndex) {
-        parts.push(content.slice(lastIndex, start));
-      }
-
-      const matched = match[0];
-      if (matched.includes('@')) {
-        parts.push(
-          <a
-            key={start}
-            href={`mailto:${matched}`}
-            className="text-blue-400 underline hover:text-blue-300"
-          >
-            {matched}
-          </a>
-        );
-      } else {
-        // Phone number
-        const cleanPhone = matched.replace(/\s/g, '');
-        parts.push(
-          <a
-            key={start}
-            href={`tel:${cleanPhone}`}
-            className="text-blue-400 underline hover:text-blue-300"
-          >
-            {matched}
-          </a>
-        );
-      }
-
-      lastIndex = start + matched.length;
-    }
-
-    if (lastIndex < content.length) {
-      parts.push(content.slice(lastIndex));
-    }
-
-    return parts.length > 0 ? parts : content;
-  };
+  }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col w-80 max-h-[500px] bg-gray-900 border border-gray-700 rounded-lg shadow-xl">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700 bg-gray-800 rounded-t-lg">
-        <span className="text-white font-semibold text-sm">Solaris CET AI</span>
+    <>
+      {!isOpen && (
         <button
-          onClick={() => setMessages([])}
-          className="text-gray-400 hover:text-white text-xs"
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-900 shadow-lg flex items-center justify-center transition-all hover:scale-110"
+          aria-label="Deschide chat"
         >
-          ✕
+          <MessageCircle size={28} />
         </button>
-      </div>
+      )}
 
-      {/* Quick buttons */}
-      <div className="flex flex-wrap gap-1 px-2 py-2 border-b border-gray-700">
-        {QUICK_BUTTONS.map((btn) => (
-          <button
-            key={btn.label}
-            onClick={() => handleQuickButton(btn.message)}
-            className="px-2 py-1 text-xs bg-gray-700 text-gray-200 rounded hover:bg-gray-600 transition-colors"
-          >
-            {btn.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2" style={{ maxHeight: '300px' }}>
-        {messages.length === 0 && (
-          <div className="text-gray-400 text-xs text-center py-4">
-            Bună! Cu ce te pot ajuta?
-          </div>
-        )}
-        {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={`text-sm leading-relaxed ${
-              msg.role === 'user'
-                ? 'text-right'
-                : msg.role === 'error'
-                ? 'text-left'
-                : 'text-left'
-            }`}
-          >
-            <span
-              className={`inline-block px-3 py-2 rounded-lg max-w-[90%] break-words ${
-                msg.role === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : msg.role === 'error'
-                  ? 'bg-red-900/50 text-red-300 border border-red-700'
-                  : 'bg-gray-700 text-gray-100'
-              }`}
+      {isOpen && (
+        <div className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[500px] max-h-[calc(100vh-2rem)] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 bg-slate-800 border-b border-slate-700">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center">
+                <MessageCircle size={18} className="text-slate-900" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-white">Asistent Solaris CET</h3>
+                <p className="text-xs text-slate-400">AI • Online</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-slate-400 hover:text-white transition-colors"
+              aria-label="Închide chat"
             >
-              {msg.role === 'error' ? (
-                <span className="text-red-300">{renderContent(msg.content)}</span>
-              ) : (
-                renderContent(msg.content)
-              )}
-            </span>
+              <X size={20} />
+            </button>
           </div>
-        ))}
 
-        {/* Typing indicator */}
-        {isTyping && (
-          <div className="text-left">
-            <span className="inline-block px-3 py-2 rounded-lg bg-gray-700 text-gray-400 text-sm animate-pulse">
-              Asistentul scrie...
-            </span>
+          {/* Quick buttons */}
+          <div className="flex flex-wrap gap-1 px-3 py-2 border-b border-slate-700 bg-slate-800">
+            {QUICK_BUTTONS.map((btn) => (
+              <button
+                key={btn.label}
+                onClick={() => handleQuickButtonClick(btn.message)}
+                disabled={isLoading}
+                className="px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {btn.label}
+              </button>
+            ))}
           </div>
-        )}
 
-        <div ref={messagesEndRef} />
-      </div>
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[85%] px-4 py-2 rounded-2xl text-sm ${
+                    msg.role === 'user'
+                      ? 'bg-amber-500 text-slate-900 rounded-br-md'
+                      : 'bg-slate-700 text-slate-200 rounded-bl-md'
+                  }`}
+                >
+                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                </div>
+              </div>
+            ))}
+            {isLoading && messages[messages.length - 1]?.role === 'user' && (
+              <div className="flex justify-start">
+                <div className="bg-slate-700 px-4 py-3 rounded-2xl rounded-bl-md">
+                  <Loader2 size={16} className="animate-spin text-amber-400" />
+                </div>
+              </div>
+            )}
+            {error && (
+              <div className="bg-red-900/30 border border-red-500/30 text-red-300 text-xs px-3 py-2 rounded-lg">
+                {error}
+              </div>
+            )}
+            <div ref={scrollRef} />
+          </div>
 
-      {/* Input */}
-      <form onSubmit={handleSubmit} className="flex items-center border-t border-gray-700 px-3 py-2">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Scrie un mesaj..."
-          className="flex-1 bg-gray-800 text-white text-sm px-3 py-2 rounded-l-md border border-gray-600 focus:outline-none focus:border-blue-500"
-          disabled={isTyping}
-        />
-        <button
-          type="submit"
-          disabled={isTyping || !input.trim()}
-          className="px-4 py-2 bg-blue-600 text-white text-sm rounded-r-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Trimite
-        </button>
-      </form>
-    </div>
+          <form onSubmit={handleSubmit} className="p-3 border-t border-slate-700 bg-slate-800">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Scrie un mesaj..."
+                className="flex-1 bg-slate-700 text-white text-sm px-4 py-2 rounded-xl border border-slate-600 focus:border-amber-500 focus:outline-none placeholder:text-slate-500"
+                disabled={isLoading}
+              />
+              <button
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                className="bg-amber-500 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-900 px-3 py-2 rounded-xl transition-colors"
+              >
+                <Send size={18} />
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </>
   );
 }
-
-export default ChatWidget;
