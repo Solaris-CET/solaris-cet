@@ -6,25 +6,38 @@
  * Expects JSON body:
  *   { messages: [{ role: 'user' | 'assistant' | 'system', content: string }] }
  *
- * Returns a streaming response (text/event-stream) with the DeepSeek output.
+ * Returns a JSON response with:
+ *   { content: string, source: 'deepseek' | 'fallback', suggestedQuestions: string[] }
  *
  * `runtime: 'edge'` matches edge-style adapters and compatible hosts (e.g. Coolify).
- */import OpenAI from 'openai';
-
+ */
+import OpenAI from 'openai';
 import { getAllowedOrigin } from '../lib/cors';
 
 export const config = { runtime: 'edge' };
 
 const DEEPSEEK_MODEL = 'deepseek-chat';
-const SYSTEM_PROMPT = `You are Solaris CET AI — a helpful assistant for Solaris CET, a Romania‑based company delivering photovoltaic installations, construction works, roofing (metal sheet / metal tiles / TPO membrane), metal parapets and facades, plus repairs and maintenance.
+const SYSTEM_PROMPT = `Ești Solarix, asistentul digital al Solaris CET din Cetățuia, Vaslui. 
+Ești cald, profesionist și vorbești în română naturală, ca un consultant.
+Firma se ocupă cu: panouri fotovoltaice rezidențiale și industriale, 
+acoperișuri (tablă, țiglă metalică, membrane TPO), atice și fațade tablă,
+reparații și mentenanță.
 
-You also answer general crypto/DeFi questions related to the Solaris CET token (CET) and the TON blockchain.
+INFORMAȚII FERME:
+- Panouri 3kW: 15.000-25.000 RON (include montaj, fără TVA)
+- Panouri 5kW: 20.000-35.000 RON
+- Panouri 10kW: 35.000-60.000 RON
+- Casa Verde: până la 20.000 RON finanțare AFM
+- RePowerEU: până la 60% din costuri
+- Garanție: 10 ani panouri, 5 ani invertor, 2 ani montaj
+- Montaj: 1-3 zile rezidențial, 3-7 zile industrial
+- Contact: +40 769 889 721 | solaris-cet@protonmail.com
+- Program: L-V 8:00-18:00, S 9:00-14:00
+- Adresă: Cetățuia, Vaslui, România
 
-Rules:
-- Be accurate and explicit about uncertainty.
-- Never invent URLs or claims.
-- If the question is ambiguous, ask 1‑2 clarifying questions.
-- Reply in the same language as the user's latest message.`;
+Răspunde CONCIS (max 150 cuvinte). Dacă nu știi prețul exact, 
+oferă să trimiți o ofertă personalizată. Niciodată nu inventa informații.
+Dacă cineva întreabă de servicii care NU sunt ale noastre, spune politicos că nu oferim acel serviciu.`;
 
 // ── Knowledge base ──────────────────────────────────────────────────────────
 const KNOWLEDGE_BASE: Record<string, string> = {
@@ -111,6 +124,25 @@ function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Respo
   });
 }
 
+// ── Rate limiter (in‑memory fallback, prefer Redis) ─────────────────────────
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 20; // requests per hour
+const RATE_WINDOW_MS = 60 * 60 * 1000;
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= RATE_LIMIT) {
+    return false;
+  }
+  entry.count++;
+  return true;
+}
+
 // ── Main handler ────────────────────────────────────────────────────────────
 export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
@@ -131,6 +163,12 @@ export default async function handler(req: Request): Promise<Response> {
 
   if (req.method !== 'POST') {
     return jsonResponse({ error: 'Method not allowed' }, allowedOrigin, 405);
+  }
+
+  // Rate limiting
+  const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'unknown';
+  if (!checkRateLimit(ip)) {
+    return jsonResponse({ error: 'Prea multe cereri. Încearcă mai târziu.' }, allowedOrigin, 429);
   }
 
   // Parse body
@@ -159,7 +197,15 @@ export default async function handler(req: Request): Promise<Response> {
 
   // If we have a direct knowledge‑base hit, return it immediately (non‑streaming)
   if (intentKey && KNOWLEDGE_BASE[intentKey]) {
-    return jsonResponse({ content: KNOWLEDGE_BASE[intentKey] }, allowedOrigin);
+    return jsonResponse({
+      content: KNOWLEDGE_BASE[intentKey],
+      source: 'fallback',
+      suggestedQuestions: [
+        'Cât costă un sistem de 5kW?',
+        'Ce include prețul?',
+        'Cum pot obține o ofertă personalizată?',
+      ],
+    }, allowedOrigin);
   }
 
   // ── Try DeepSeek API ──────────────────────────────────────────────────────
@@ -167,15 +213,24 @@ export default async function handler(req: Request): Promise<Response> {
   if (!apiKey) {
     // No API key configured – fallback to knowledge base if we have a match
     if (intentKey && KNOWLEDGE_BASE[intentKey]) {
-      return jsonResponse({ content: KNOWLEDGE_BASE[intentKey] }, allowedOrigin);
+      return jsonResponse({
+        content: KNOWLEDGE_BASE[intentKey],
+        source: 'fallback',
+        suggestedQuestions: [
+          'Cât costă un sistem de 5kW?',
+          'Ce include prețul?',
+          'Cum pot obține o ofertă personalizată?',
+        ],
+      }, allowedOrigin);
     }
     return jsonResponse({ error: 'DeepSeek API key not configured' }, allowedOrigin, 500);
   }
 
-  // Prepend system prompt
+  // Prepend system prompt and keep only last 6 messages
+  const recentMessages = messages.slice(-6);
   const fullMessages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
     { role: 'system', content: SYSTEM_PROMPT },
-    ...messages.map((m) => ({
+    ...recentMessages.map((m) => ({
       role: m.role as 'user' | 'assistant',
       content: m.content,
     })),
@@ -186,61 +241,62 @@ export default async function handler(req: Request): Promise<Response> {
     baseURL: 'https://api.deepseek.com',
   });
 
+  const startTime = performance.now();
+  let usedFallback = false;
+  let responseContent = '';
+  let suggestedQuestions: string[] = [];
+
   try {
-    const stream = await client.chat.completions.create({
+    const completion = await client.chat.completions.create({
       model: DEEPSEEK_MODEL,
       messages: fullMessages,
-      stream: true,
+      temperature: 0.7,
+      max_tokens: 400,
+      stream: false,
     });
 
-    // Build a ReadableStream that emits SSE‑formatted data
-    const encoder = new TextEncoder();
-    const readable = new ReadableStream({
-      async start(controller) {
-        try {
-          for await (const chunk of stream) {
-            const delta = chunk.choices?.[0]?.delta?.content;
-            if (delta) {
-              const data = `data: ${JSON.stringify({ content: delta })}\n\n`;
-              controller.enqueue(encoder.encode(data));
-            }
-          }
-          controller.enqueue(encoder.encode('data: [DONE]\n\n'));
-          controller.close();
-        } catch (err) {
-          // If the stream errors, send an error event and close
-          const errorData = `data: ${JSON.stringify({ error: 'Stream error' })}\n\n`;
-          controller.enqueue(encoder.encode(errorData));
-          controller.close();
-        }
-      },
-    });
-
-    return new Response(readable, {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-store',
-        'Connection': 'keep-alive',
-        'Access-Control-Allow-Origin': allowedOrigin,
-        'Vary': 'Origin',
-      },
-    });
+    responseContent = completion.choices?.[0]?.message?.content ?? '';
+    suggestedQuestions = [
+      'Cât costă un sistem de 5kW?',
+      'Ce include prețul?',
+      'Cum pot obține o ofertă personalizată?',
+    ];
   } catch (err) {
     console.error('DeepSeek API error:', err);
+    usedFallback = true;
 
     // ── Fallback to knowledge base on API failure ──────────────────────────
     if (intentKey && KNOWLEDGE_BASE[intentKey]) {
-      return jsonResponse({ content: KNOWLEDGE_BASE[intentKey] }, allowedOrigin);
+      responseContent = KNOWLEDGE_BASE[intentKey];
+    } else {
+      responseContent =
+        'Momentan asistentul AI nu e disponibil. Pentru ofertă rapidă, sună la +40 769 889 721 sau scrie pe solaris-cet@protonmail.com';
     }
-
-    // Generic fallback message
-    return jsonResponse(
-      {
-        content:
-          'Momentan asistentul AI nu e disponibil. Pentru ofertă rapidă, sună la +40 769 889 721 sau scrie pe solaris-cet@protonmail.com',
-      },
-      allowedOrigin,
-    );
+    suggestedQuestions = [
+      'Cât costă un sistem de 5kW?',
+      'Ce include prețul?',
+      'Cum pot obține o ofertă personalizată?',
+    ];
   }
+
+  const elapsedMs = performance.now() - startTime;
+  // Log metric (could be sent to external service)
+  console.log(
+    JSON.stringify({
+      metric: 'chat_response',
+      model: DEEPSEEK_MODEL,
+      fallback: usedFallback,
+      responseTimeMs: Math.round(elapsedMs),
+      intentKey: intentKey ?? 'none',
+    }),
+  );
+
+  return jsonResponse(
+    {
+      content: responseContent,
+      source: usedFallback ? 'fallback' : 'deepseek',
+      suggestedQuestions,
+    },
+    allowedOrigin,
+  );
 }
