@@ -2,13 +2,13 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 COPY app/package*.json ./
-RUN npm ci --only=production --ignore-scripts
+RUN npm install --omit=dev --ignore-scripts
 
 # Stage 2: build
 FROM node:20-alpine AS builder  
 WORKDIR /app
 COPY app/package*.json ./
-RUN npm ci --ignore-scripts
+RUN npm install --ignore-scripts
 COPY app/ .
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN npm run build
