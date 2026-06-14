@@ -205,10 +205,11 @@ export default function Navigation() {
   const barHeightClass = isScrolled ? 'h-12' : 'h-16';
 
   return (
-    <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-[100] bg-amber-500 text-black px-4 py-2 rounded">
-      Sari la conținut principal
-    </a>
-    <header
+    <>
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-[100] bg-amber-500 text-black px-4 py-2 rounded">
+        Sari la conținut principal
+      </a>
+      <header
       data-reveal
       className={cn(
         `fixed top-0 left-0 right-0 z-[1000] max-w-full overflow-x-hidden lg:overflow-x-visible ${styles.bar} transition-all duration-300`,
@@ -389,5 +390,6 @@ export default function Navigation() {
         </SheetContent>
       </Sheet>
     </header>
+    </>
   );
 }
