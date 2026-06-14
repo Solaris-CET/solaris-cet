@@ -93,6 +93,24 @@ export default function ArticlePage({ slug }: { slug: string }) {
   return (
     <>
     <main id="main-content" className="relative z-10 w-full px-5 sm:px-8 xl:px-12 pt-28 pb-20">
+      {post && (
+        <>
+          <script type="application/ld+json">
+            {JSON.stringify(post.schema)}
+          </script>
+          <script type="application/ld+json">
+            {JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Acasă', item: 'https://solaris-cet.com/' },
+                { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://solaris-cet.com/blog/' },
+                { '@type': 'ListItem', position: 3, name: post.frontmatter.title, item: `https://solaris-cet.com/blog/${post.slug}` },
+              ],
+            })}
+          </script>
+        </>
+      )}
       <div className="max-w-7xl mx-auto">
       <div className="mb-6" data-reveal>
         <Breadcrumb>
