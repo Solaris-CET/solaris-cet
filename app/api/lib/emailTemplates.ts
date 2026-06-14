@@ -1,5 +1,7 @@
 import { publicOrigin } from './publicOrigin';
 
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'solaris-cet@protonmail.com';
+
 type VerifyEmailTemplate = {
   verifyUrl: string;
   unsubscribeUrl: string;
@@ -85,6 +87,68 @@ export function priceAlertEmail(req: Request, input: { direction: 'above' | 'bel
      <p style="margin:0;"><a href="${origin}/app" style="display:inline-block;padding:12px 16px;border-radius:14px;background:rgba(255,220,165,0.12);border:1px solid rgba(255,220,165,0.35);color:rgba(255,220,165,0.95);font-weight:700;text-decoration:none;">Gestionează alertele</a></p>`,
   );
   const text = `$CET este acum la $${input.priceUsd} și a trecut ${input.direction === 'above' ? 'peste' : 'sub'} pragul $${input.targetUsd}.`;
+  return { subject, html, text };
+}
+
+// ── Internal lead notification (sent to ADMIN_EMAIL) ─────────────────────────
+export function internalLeadNotification(input: {
+  name: string;
+  phone: string;
+  email?: string | null;
+  location: string;
+  serviceType: string;
+  message?: string | null;
+  powerNeeded?: string | null;
+  roofType?: string | null;
+  receivedAt: string;
+}): { subject: string; html: string; text: string } {
+  const subject = `🌞 Lead nou: ${input.serviceType} - ${input.name} din ${input.location}`;
+  const rows = [
+    ['Nume', input.name],
+    ['Telefon', input.phone],
+    ['Email', input.email || '—'],
+    ['Localitate', input.location],
+    ['Serviciu', input.serviceType],
+    ['Putere necesară', input.powerNeeded || '—'],
+    ['Tip acoperiș', input.roofType || '—'],
+    ['Mesaj', input.message || '—'],
+    ['Primit la', input.receivedAt],
+  ];
+  const tableRows = rows.map(([label, value]) => `<tr><td style="padding:6px 10px;border:1px solid rgba(255,255,255,.12);font-weight:700;color:rgba(255,255,255,.82);">${label}</td><td style="padding:6px 10px;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.82);">${value}</td></tr>`).join('');
+  const html = shell(
+    subject,
+    `<h1 style="margin:0 0 10px;font-size:20px;letter-spacing:-0.02em;">🌞 Lead nou</h1>
+     <p style="margin:0 0 14px;color:rgba(234,234,240,0.78);font-size:14px;line-height:1.55;">Un nou lead a fost înregistrat:</p>
+     <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">${tableRows}</table>
+     <p style="margin:0 0 14px;"><a href="tel:+40769889721" style="display:inline-block;padding:12px 16px;border-radius:14px;background:rgba(255,220,165,0.12);border:1px solid rgba(255,220,165,0.35);color:rgba(255,220,165,0.95);font-weight:700;text-decoration:none;">Sună acum: +40 769 889 721</a></p>
+     <p style="margin:0;color:rgba(234,234,240,0.62);font-size:12px;line-height:1.55;">Solaris CET CRM — răspunde în 24h</p>`,
+  );
+  const text = `Lead nou: ${input.name} (${input.phone}) din ${input.location} pentru ${input.serviceType}. Primit la ${input.receivedAt}.`;
+  return { subject, html, text };
+}
+
+// ── Client confirmation email ────────────────────────────────────────────────
+export function clientConfirmationEmail(input: {
+  name: string;
+  phone: string;
+  serviceType: string;
+  location: string;
+}): { subject: string; html: string; text: string } {
+  const subject = `Am primit cererea ta — Solaris CET 🌞`;
+  const html = shell(
+    subject,
+    `<h1 style="margin:0 0 10px;font-size:20px;letter-spacing:-0.02em;">Bună ziua, ${input.name}!</h1>
+     <p style="margin:0 0 14px;color:rgba(234,234,240,0.78);font-size:14px;line-height:1.55;">Cererea ta a fost înregistrată pentru <strong>${input.serviceType}</strong> în <strong>${input.location}</strong>.</p>
+     <p style="margin:0 0 14px;color:rgba(234,234,240,0.78);font-size:14px;line-height:1.55;">Te contactăm telefonic în maxim 24 ore la numărul <strong>${input.phone}</strong>.</p>
+     <p style="margin:0 0 14px;color:rgba(234,234,240,0.78);font-size:14px;line-height:1.55;">Între timp, poți vizita <a href="https://solaris-cet.com" style="color:rgba(255,220,165,0.95);">solaris-cet.com</a> pentru mai multe informații.</p>
+     <hr style="border:none;border-top:1px solid rgba(255,255,255,.12);margin:16px 0;" />
+     <p style="margin:0;color:rgba(234,234,240,0.62);font-size:12px;line-height:1.55;">
+       Solaris CET · Cetățuia, Vaslui, România<br />
+       <a href="tel:+40769889721" style="color:rgba(255,220,165,0.95);">+40 769 889 721</a> · 
+       <a href="mailto:solaris-cet@protonmail.com" style="color:rgba(255,220,165,0.95);">solaris-cet@protonmail.com</a>
+     </p>`,
+  );
+  const text = `Bună ziua, ${input.name}! Cererea ta pentru ${input.serviceType} în ${input.location} a fost înregistrată. Te contactăm la ${input.phone} în maxim 24 ore.`;
   return { subject, html, text };
 }
 

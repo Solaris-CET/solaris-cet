@@ -22,6 +22,8 @@ import { getDb } from '../../db/client';
 import { quotes } from '../../db/schema';
 
 import { getAllowedOrigin } from '../lib/cors';
+import { sendEmail } from '../lib/emailProvider';
+import { internalLeadNotification, clientConfirmationEmail } from '../lib/emailTemplates';
 
 function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -132,6 +134,34 @@ export default async function handler(req: Request): Promise<Response> {
       console.log('Quote email would be sent to solaris-cet@protonmail.com with body:\n', emailBody);
     } catch (emailErr) {
       console.error('Email fallback also failed:', emailErr);
+    }
+  }
+
+  // ── Send email notifications ──────────────────────────────────────────────
+  try {
+    const adminEmail = process.env.ADMIN_EMAIL || 'solaris-cet@protonmail.com';
+    const internal = internalLeadNotification({
+      name,
+      phone,
+      email: email || null,
+      location,
+      serviceType,
+      message: message || null,
+      powerNeeded: powerNeeded || null,
+      roofType: roofType || null,
+      receivedAt: new Date().toISOString(),
+    });
+    await sendEmail({ to: adminEmail, subject: internal.subject, html: internal.html, text: internal.text });
+  } catch (emailErr) {
+    console.error('Failed to send internal email for quote:', emailErr);
+  }
+
+  if (email) {
+    try {
+      const client = clientConfirmationEmail({ name, phone, serviceType, location });
+      await sendEmail({ to: email, subject: client.subject, html: client.html, text: client.text });
+    } catch (emailErr) {
+      console.error('Failed to send client confirmation email for quote:', emailErr);
     }
   }
 

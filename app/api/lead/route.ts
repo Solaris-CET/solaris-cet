@@ -8,6 +8,8 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
 import { getAllowedOrigin } from '../lib/cors';
+import { sendEmail } from '../lib/emailProvider';
+import { internalLeadNotification, clientConfirmationEmail } from '../lib/emailTemplates';
 
 export const config = { runtime: 'nodejs' };
 
@@ -210,6 +212,37 @@ export default async function handler(req: Request): Promise<Response> {
     // The lead is logged to stdout below so it's recoverable from container logs.
   }
   console.log('[lead]', JSON.stringify(lead));
+
+  // ── Send email notifications ──────────────────────────────────────────────
+  try {
+    const adminEmail = process.env.ADMIN_EMAIL || 'solaris-cet@protonmail.com';
+    const internal = internalLeadNotification({
+      name: lead.name,
+      phone: lead.telefon,
+      email: lead.email || null,
+      location: lead.judet,
+      serviceType: lead.serviciu,
+      message: lead.detalii || null,
+      receivedAt: lead.receivedAt,
+    });
+    await sendEmail({ to: adminEmail, subject: internal.subject, html: internal.html, text: internal.text });
+  } catch (emailErr) {
+    console.error('Failed to send internal email for lead:', emailErr);
+  }
+
+  if (lead.email) {
+    try {
+      const client = clientConfirmationEmail({
+        name: lead.name,
+        phone: lead.telefon,
+        serviceType: lead.serviciu,
+        location: lead.judet,
+      });
+      await sendEmail({ to: lead.email, subject: client.subject, html: client.html, text: client.text });
+    } catch (emailErr) {
+      console.error('Failed to send client confirmation email for lead:', emailErr);
+    }
+  }
 
   if (wantsHtml) {
     return new Response(null, {
