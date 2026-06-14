@@ -30,13 +30,14 @@ export default async function handler(req: Request): Promise<Response> {
   const keys = (body as { keys?: unknown })?.keys as { p256dh?: unknown; auth?: unknown } | undefined;
   const p256dh = typeof keys?.p256dh === 'string' ? keys.p256dh.trim() : '';
   const auth = typeof keys?.auth === 'string' ? keys.auth.trim() : '';
+  const userType = typeof (body as { user_type?: unknown })?.user_type === 'string' ? (body as { user_type: string }).user_type.trim() : 'user';
   if (!endpoint || !p256dh || !auth) return corsJson(req, 400, { error: 'Invalid subscription' });
 
   const db = getDb();
   await db
     .insert(schema.pushSubscriptions)
-    .values({ userId: user.id, endpoint, p256dh, auth })
-    .onConflictDoUpdate({ target: schema.pushSubscriptions.endpoint, set: { userId: user.id, p256dh, auth } });
+    .values({ userId: user.id, endpoint, p256dh, auth, userType })
+    .onConflictDoUpdate({ target: schema.pushSubscriptions.endpoint, set: { userId: user.id, p256dh, auth, userType } });
   await db
     .insert(schema.notificationPreferences)
     .values({ userId: user.id, pushEnabled: true, updatedAt: new Date() })

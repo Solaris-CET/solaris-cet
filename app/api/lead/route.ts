@@ -198,6 +198,7 @@ export default async function handler(req: Request): Promise<Response> {
     ip: clientIp(req),
   };
 
+  let newLeadId: string | null = null;
   try {
     await fs.mkdir(LEAD_DIR, { recursive: true });
     const stamp = lead.receivedAt.replace(/[:.]/g, '-');
@@ -206,12 +207,31 @@ export default async function handler(req: Request): Promise<Response> {
     await fs.writeFile(file, JSON.stringify(lead, null, 2), 'utf8');
     const ledger = path.join(LEAD_DIR, 'leads.jsonl');
     await fs.appendFile(ledger, JSON.stringify(lead) + '\n', 'utf8');
+    newLeadId = `${stamp}-${rand}`;
   } catch (err) {
     console.error('lead persist failed', err);
     // We still return success to the visitor; they shouldn't see infra issues.
     // The lead is logged to stdout below so it's recoverable from container logs.
   }
   console.log('[lead]', JSON.stringify(lead));
+
+  // ── Notify admins via push ──────────────────────────────────────────────
+  if (newLeadId) {
+    try {
+      const internalUrl = process.env.INTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`;
+      await fetch(`${internalUrl}/api/push/notify-admin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: `🌞 Lead nou: ${lead.serviciu}`,
+          body: `${lead.name} din ${lead.judet} — ${lead.telefon}`,
+          data: { leadId: newLeadId, leadType: 'lead' },
+        }),
+      });
+    } catch (pushErr) {
+      console.error('Failed to notify admins via push:', pushErr);
+    }
+  }
 
   // ── Send email notifications ──────────────────────────────────────────────
   try {

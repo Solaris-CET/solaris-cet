@@ -101,9 +101,10 @@ export default async function handler(req: Request): Promise<Response> {
   const message = typeof body.message === 'string' ? body.message.trim() : null;
 
   // ── Save to database ────────────────────────────────────────────────────
+  let newLeadId: string | null = null;
   try {
     const db = getDb();
-    await db.insert(quotes).values({
+    const [inserted] = await db.insert(quotes).values({
       name,
       phone,
       email: email || null,
@@ -112,7 +113,8 @@ export default async function handler(req: Request): Promise<Response> {
       powerNeeded,
       roofType,
       message,
-    });
+    }).returning({ id: quotes.id });
+    newLeadId = inserted?.id ?? null;
   } catch (dbErr) {
     console.error('DB insert error for quote:', dbErr);
     // Fallback: try to send email
@@ -134,6 +136,24 @@ export default async function handler(req: Request): Promise<Response> {
       console.log('Quote email would be sent to solaris-cet@protonmail.com with body:\n', emailBody);
     } catch (emailErr) {
       console.error('Email fallback also failed:', emailErr);
+    }
+  }
+
+  // ── Notify admins via push ──────────────────────────────────────────────
+  if (newLeadId) {
+    try {
+      const internalUrl = process.env.INTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`;
+      await fetch(`${internalUrl}/api/push/notify-admin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: `🌞 Lead nou: ${serviceType}`,
+          body: `${name} din ${location} — ${phone}`,
+          data: { leadId: newLeadId, leadType: 'quote' },
+        }),
+      });
+    } catch (pushErr) {
+      console.error('Failed to notify admins via push:', pushErr);
     }
   }
 

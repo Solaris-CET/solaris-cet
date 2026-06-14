@@ -95,3 +95,28 @@ export async function testPush(authToken: string): Promise<number> {
   const json = (await res.json()) as { delivered?: unknown };
   return typeof json.delivered === 'number' ? json.delivered : 0;
 }
+
+export async function subscribeAsAdmin(authToken: string): Promise<PushSubscription> {
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') throw new Error('Permission denied');
+
+  const reg = await ensurePushRegistration();
+  const existing = await reg.pushManager.getSubscription();
+  if (existing) return existing;
+
+  const vapid = await getVapidPublicKey();
+  const appKey = urlBase64ToUint8Array(vapid);
+  const sub = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: appKey.buffer as ArrayBuffer,
+  });
+  const json = sub.toJSON() as { endpoint?: unknown; keys?: unknown };
+
+  await fetch('/api/push/subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
+    body: JSON.stringify({ endpoint: json.endpoint, keys: json.keys, user_type: 'admin' }),
+  });
+
+  return sub;
+}

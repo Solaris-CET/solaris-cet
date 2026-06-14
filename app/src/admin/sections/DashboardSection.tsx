@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, GripVertical } from 'lucide-react';
+import { ArrowDown, ArrowUp, Bell, BellOff, GripVertical } from 'lucide-react';
 import { type DragEvent,useEffect, useMemo, useState } from 'react';
 import {
   Bar,
@@ -13,6 +13,7 @@ import {
 import { Card } from '@/components/ui/card';
 
 import { adminApi } from '../adminClient';
+import { subscribeAsAdmin } from '@/lib/pushClient';
 
 type Stats = {
   usersTotal: number;
@@ -38,6 +39,8 @@ export function DashboardSection({ token }: { token: string }) {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [order, setOrder] = useState<string[] | null>(null);
+  const [pushSubscribed, setPushSubscribed] = useState(false);
+  const [pushLoading, setPushLoading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -152,7 +155,41 @@ export function DashboardSection({ token }: { token: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="text-white text-lg font-semibold">Statistici rapide</div>
+      <div className="flex items-center justify-between">
+        <div className="text-white text-lg font-semibold">Statistici rapide</div>
+        <button
+          type="button"
+          disabled={pushLoading}
+          onClick={async () => {
+            setPushLoading(true);
+            try {
+              await subscribeAsAdmin(token);
+              setPushSubscribed(true);
+            } catch (err) {
+              console.error('Push subscription failed:', err);
+            } finally {
+              setPushLoading(false);
+            }
+          }}
+          className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${
+            pushSubscribed
+              ? 'border-green-500/30 bg-green-500/10 text-green-300'
+              : 'border-white/10 bg-white/5 text-white hover:bg-white/10'
+          }`}
+        >
+          {pushSubscribed ? (
+            <>
+              <Bell className="h-4 w-4" aria-hidden />
+              ✅ Notificări active
+            </>
+          ) : (
+            <>
+              <BellOff className="h-4 w-4" aria-hidden />
+              {pushLoading ? 'Se activează...' : '🔔 Activează notificări pentru lead-uri'}
+            </>
+          )}
+        </button>
+      </div>
       {error ? <div className="text-sm text-red-300">{error}</div> : null}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {effectiveOrder.map((id) => {
