@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { SolarisFooter } from '@/components/company/SolarisFooter';
+import SolarPanelAnimation from '@/components/animations/SolarPanelAnimation';
+import RoofMetalAnimation from '@/components/animations/RoofMetalAnimation';
 
 type ProjectCategory = 'fotovoltaic-rezidential' | 'fotovoltaic-industrial' | 'acoperis-tabla' | 'acoperis-tpo' | 'atice-fatade' | 'reparatii';
 type ProjectFilter = 'toate' | 'fotovoltaic' | 'acoperis' | 'industrial' | 'mentenanta';
@@ -345,11 +347,17 @@ export default function ProjectsPage() {
             </button>
 
             <div className="aspect-video rounded-2xl bg-gradient-to-br from-amber-400/20 to-orange-500/20 flex items-center justify-center overflow-hidden mb-6">
-              <img
-                src={currentProject.image}
-                alt={currentProject.title}
-                className="w-full h-full object-cover"
-              />
+              {currentProject.category === 'fotovoltaic-rezidential' || currentProject.category === 'fotovoltaic-industrial' ? (
+                <SolarPanelAnimation />
+              ) : currentProject.category === 'acoperis-tabla' || currentProject.category === 'acoperis-tpo' ? (
+                <RoofMetalAnimation />
+              ) : (
+                <img
+                  src={currentProject.image}
+                  alt={currentProject.title}
+                  className="w-full h-full object-cover"
+                />
+              )}
             </div>
 
             <h2 className="text-2xl font-bold text-white">{currentProject.title}</h2>
