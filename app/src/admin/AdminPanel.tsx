@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import type { AdminRole, AdminSession } from './adminClient';
 import { adminApi } from './adminClient';
 import { AuditSection } from './sections/AuditSection';
+import LeadsSection from './sections/LeadsSection';
 import { BlocksSection } from './sections/BlocksSection';
 import { CetuiaSection } from './sections/CetuiaSection';
 import { ConversationsSection } from './sections/ConversationsSection';
@@ -35,6 +36,7 @@ const NAV: NavItem[] = [
   { key: 'conversations', label: 'Conversații AI', minRole: 'admin' },
   { key: 'i18n', label: 'Traduceri', minRole: 'editor' },
   { key: 'settings', label: 'Setări', minRole: 'admin' },
+  { key: 'leads', label: `Leads & Oferte${newLeadsCount > 0 ? ` (${newLeadsCount})` : ''}`, minRole: 'viewer' },
   { key: 'audit', label: 'Audit', minRole: 'viewer' },
 ];
 
@@ -89,6 +91,17 @@ function useSectionState() {
 }
 
 export function AdminPanel() {
+  const [newLeadsCount, setNewLeadsCount] = useState(0);
+
+  useEffect(() => {
+    if (!token) return;
+    fetch('/api/admin/leads?status=nou&limit=1', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setNewLeadsCount(data.total ?? 0))
+      .catch(() => {});
+  }, [token]);
   const { token, setToken, admin, setAdmin, isAuthenticated, logout } = useAdminSession();
   const { section, navigate } = useSectionState();
   const [bootError, setBootError] = useState<string | null>(null);
@@ -177,6 +190,7 @@ export function AdminPanel() {
           {active === 'conversations' ? <ConversationsSection token={token} /> : null}
           {active === 'i18n' ? <I18nSection token={token} /> : null}
           {active === 'settings' ? <SettingsSection token={token} /> : null}
+          {active === 'leads' ? <LeadsSection /> : null}
           {active === 'audit' ? <AuditSection token={token} /> : null}
         </div>
       </div>
