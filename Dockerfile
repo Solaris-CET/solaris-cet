@@ -3,6 +3,7 @@ WORKDIR /app
 COPY app/package*.json ./
 RUN npm install --ignore-scripts
 COPY app/ .
+COPY scripts/ /scripts/
 RUN npm run build
 
 FROM node:20-alpine
