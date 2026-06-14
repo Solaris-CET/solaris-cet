@@ -1,99 +1,92 @@
 import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft, ChevronRight, Quote, Star } from 'lucide-react';
-import { useMemo } from 'react';
+import { ChevronLeft, ChevronRight, Quote, Star, Users, Award, ThumbsUp, Shield } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { ScrollFadeUp } from '@/components/ScrollFadeUp';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
-type QuoteCard = {
-  quote: string;
+type Testimonial = {
   name: string;
-  role: string;
-  score?: number;
+  location: string;
+  service: string;
+  rating: number;
+  text: string;
+  date: string;
 };
 
-function clampScore(v: number | undefined): number {
-  if (typeof v !== 'number' || !Number.isFinite(v)) return 5;
+function clampScore(v: number): number {
   return Math.max(1, Math.min(5, Math.round(v)));
 }
 
-function readJsonEnv<T>(key: string): T | null {
-  try {
-    const raw = String((import.meta.env as Record<string, unknown>)[key] ?? '').trim();
-    if (!raw) return null;
-    return JSON.parse(raw) as T;
-  } catch {
-    return null;
-  }
+function useCountUp(target: number, duration: number, triggerRef: React.RefObject<HTMLDivElement | null>): number {
+  const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const el = triggerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started) {
+          setStarted(true);
+        }
+      },
+      { threshold: 0.3 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [triggerRef, started]);
+
+  useEffect(() => {
+    if (!started) return;
+    let startTime: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min(1, (timestamp - startTime) / duration);
+      setCount(Math.floor(progress * target));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [started, target, duration]);
+
+  return count;
 }
 
 export default function SocialProofSection() {
   const prefersReducedMotion = useReducedMotion();
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, duration: prefersReducedMotion ? 0 : 25 });
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
 
-  const testimonials = useMemo<QuoteCard[]>(() => {
-    const fromEnv = readJsonEnv<QuoteCard[]>('VITE_TESTIMONIALS_JSON');
-    if (Array.isArray(fromEnv) && fromEnv.length > 0) return fromEnv.slice(0, 10);
-    return [
-      {
-        quote:
-          'Lucrarea arată curat, ne-au explicat pașii și avem monitorizarea în aplicație. Au fost punctuali și atenți la detalii.',
-        name: 'Client rezidențial',
-        role: 'Vaslui · sistem 5.2 kWp',
-        score: 5,
-      },
-      {
-        quote:
-          'Au venit cu un plan clar și au lucrat etapizat, fără să blocheze activitatea. Comunicare bună și execuție ordonată.',
-        name: 'Manager locație',
-        role: 'Iași · hală logistică',
-        score: 5,
-      },
-      {
-        quote:
-          'Au identificat rapid cauza și au refăcut zona cu detalii foarte curate. Ne-au dat și un plan de verificare periodică.',
-        name: 'Administrator hală',
-        role: 'Bacău · membrană TPO',
-        score: 5,
-      },
-      {
-        quote:
-          'Au făcut un finisaj foarte curat, iar detaliile la streașină și coamă arată impecabil. Comunicare bună pe tot parcursul.',
-        name: 'Proprietar casă',
-        role: 'Suceava · tablă click',
-        score: 5,
-      },
-      {
-        quote:
-          'Apreciez că au pus totul ordonat și ne-au arătat ce să urmărim în aplicație. Se vede atenția la detalii.',
-        name: 'Client rezidențial',
-        role: 'Bârlad · invertor și protecții',
-        score: 5,
-      },
-    ];
+  const yearsCount = useCountUp(8, 1500, statsRef);
+  const projectsCount = useCountUp(200, 2000, statsRef);
+  const ratingCount = useCountUp(49, 1200, statsRef);
+  const warrantyCount = useCountUp(10, 1000, statsRef);
+
+  useEffect(() => {
+    fetch('/api/testimonials')
+      .then((res) => res.json())
+      .then((data) => setTestimonials(data.testimonials ?? []))
+      .catch(() => {});
   }, []);
 
-  const partnerQuotes = useMemo<QuoteCard[]>(() => {
-    const fromEnv = readJsonEnv<QuoteCard[]>('VITE_PARTNER_QUOTES_JSON');
-    if (Array.isArray(fromEnv) && fromEnv.length > 0) return fromEnv.slice(0, 8);
+  const partnerQuotes = useMemo(() => {
     return [
       {
-        quote:
-          'Oferta pornește din consum, acoperiș și condițiile reale din teren, nu dintr-un pachet generic aruncat pe site.',
+        quote: 'Oferta pornește din consum, acoperiș și condițiile reale din teren, nu dintr-un pachet generic aruncat pe site.',
         name: 'Ofertare clară',
         role: 'Proces comercial',
         score: 5,
       },
       {
-        quote:
-          'Lucrările sunt prezentate cu tipul proiectului, provocarea rezolvată și pasul următor, astfel încât clientul înțelege rapid dacă suntem potriviți.',
+        quote: 'Lucrările sunt prezentate cu tipul proiectului, provocarea rezolvată și pasul următor, astfel încât clientul înțelege rapid dacă suntem potriviți.',
         name: 'Dovezi utile',
         role: 'Portofoliu + studii de caz',
         score: 5,
       },
       {
-        quote:
-          'Canalele rapide rămân vizibile pe tot parcursul paginii: telefon, WhatsApp și formularul de ofertă.',
+        quote: 'Canalele rapide rămân vizibile pe tot parcursul paginii: telefon, WhatsApp și formularul de ofertă.',
         name: 'Conversie directă',
         role: 'Contact simplu',
         score: 5,
@@ -126,11 +119,35 @@ export default function SocialProofSection() {
           </p>
         </ScrollFadeUp>
 
+        {/* Trust statistics */}
+        <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-center">
+            <Award className="h-8 w-8 text-amber-400 mx-auto mb-2" aria-hidden />
+            <div className="text-3xl font-black text-white">{yearsCount}+</div>
+            <div className="text-xs text-solaris-muted mt-1">ani experiență</div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-center">
+            <Users className="h-8 w-8 text-amber-400 mx-auto mb-2" aria-hidden />
+            <div className="text-3xl font-black text-white">{projectsCount}+</div>
+            <div className="text-xs text-solaris-muted mt-1">proiecte finalizate</div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-center">
+            <ThumbsUp className="h-8 w-8 text-amber-400 mx-auto mb-2" aria-hidden />
+            <div className="text-3xl font-black text-white">{ratingCount / 10}.{ratingCount % 10}/5</div>
+            <div className="text-xs text-solaris-muted mt-1">rating clienți</div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-center">
+            <Shield className="h-8 w-8 text-amber-400 mx-auto mb-2" aria-hidden />
+            <div className="text-3xl font-black text-white">{warrantyCount} ani</div>
+            <div className="text-xs text-solaris-muted mt-1">garanție</div>
+          </div>
+        </div>
+
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
           <div className="min-w-0">
             <div className="flex items-center justify-between gap-3 mb-3">
               <div className="font-mono text-[10px] uppercase tracking-widest text-solaris-muted">
-                Feedback clienți
+                Feedback clienți ({testimonials.length})
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -155,7 +172,10 @@ export default function SocialProofSection() {
             <div ref={emblaRef} className="overflow-hidden">
               <div className="flex">
                 {testimonials.map((t, idx) => {
-                  const score = clampScore(t.score);
+                  const score = clampScore(t.rating);
+                  const isExpanded = expandedIndex === idx;
+                  const truncated = t.text.length > 120 && !isExpanded;
+                  const displayText = truncated ? t.text.slice(0, 120) + '...' : t.text;
                   return (
                     <div
                       key={`${t.name}-${idx}`}
@@ -175,12 +195,21 @@ export default function SocialProofSection() {
                           <div className="font-mono text-[10px] uppercase tracking-widest text-white/35">Solaris CET</div>
                         </div>
                         <p className="mt-4 text-solaris-text leading-relaxed">
-                          “{t.quote}”
+                          “{displayText}”
                         </p>
+                        {t.text.length > 120 && (
+                          <button
+                            type="button"
+                            onClick={() => setExpandedIndex(isExpanded ? null : idx)}
+                            className="mt-2 text-xs text-amber-400 hover:text-amber-300 transition-colors"
+                          >
+                            {isExpanded ? 'Citește mai puțin' : 'Citește mai mult'}
+                          </button>
+                        )}
                         <div className="mt-5 flex items-center justify-between gap-3">
                           <div className="min-w-0">
                             <div className="font-semibold text-solaris-text truncate">{t.name}</div>
-                            <div className="text-xs text-solaris-muted truncate">{t.role}</div>
+                            <div className="text-xs text-solaris-muted truncate">{t.location} · {t.service}</div>
                           </div>
                           <div className="h-10 w-10 shrink-0 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center text-solaris-gold font-mono">
                             {t.name
@@ -218,6 +247,24 @@ export default function SocialProofSection() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Google Reviews badge */}
+            <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-amber-400/20 flex items-center justify-center">
+                  <span className="text-lg font-bold text-amber-400">G</span>
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-white">Google Reviews</div>
+                  <div className="flex items-center gap-1 text-xs text-solaris-muted">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className="w-3 h-3 text-amber-400" aria-hidden />
+                    ))}
+                    <span className="ml-1">4.9</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
