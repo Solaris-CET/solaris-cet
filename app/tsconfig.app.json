@@ -33,9 +33,12 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
 
     /* Linting */
     "strict": false,
+    "noImplicitAny": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noImplicitReturns": false,
