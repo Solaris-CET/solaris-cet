@@ -1,7 +1,10 @@
-import { BUILD_DATE, BUILD_GIT_SHA } from '../lib/buildInfo';
+import { getDb } from '../../db/client';
+import { sql } from 'drizzle-orm';
 import { getAllowedOrigin } from '../lib/cors';
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'nodejs' };
+
+const startTime = Date.now();
 
 function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -19,15 +22,6 @@ export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
   const allowedOrigin = getAllowedOrigin(origin);
 
-  const url = (() => {
-    try {
-      return new URL(req.url);
-    } catch {
-      return null;
-    }
-  })();
-  const deep = url?.searchParams.get('deep') === '1';
-
   if (req.method === 'OPTIONS') {
     return new Response(null, {
       status: 204,
@@ -44,138 +38,102 @@ export default async function handler(req: Request): Promise<Response> {
     return jsonResponse({ error: 'Method not allowed' }, allowedOrigin, 405);
   }
 
-  const hasDbUrl = Boolean(process.env.DATABASE_URL?.trim());
-  const hasEncSecret = Boolean(process.env.ENCRYPTION_SECRET?.trim());
-  const hasGrokPlain = Boolean(process.env.GROK_API_KEY?.trim());
-  const hasGrokEnc = Boolean(process.env.GROK_API_KEY_ENC?.trim());
-  const hasGeminiPlain = Boolean(process.env.GEMINI_API_KEY?.trim());
-  const hasGeminiEnc = Boolean(process.env.GEMINI_API_KEY_ENC?.trim());
-  const hasTonRpcUrl = Boolean(process.env.TONCENTER_RPC_URL?.trim());
-  const hasTonApiKey = Boolean(process.env.TONCENTER_API_KEY?.trim());
-  const hasUpstashUrl = Boolean(process.env.UPSTASH_REDIS_REST_URL?.trim());
-  const hasUpstashToken = Boolean(process.env.UPSTASH_REDIS_REST_TOKEN?.trim());
-  const hasUpstashRateLimit = hasUpstashUrl && hasUpstashToken;
-  // API routes fall back to an in-process limiter when Upstash is absent.
-  const rateLimitMode = hasUpstashRateLimit ? 'upstash' : 'local';
-  const hasJwtSecret = Boolean(process.env.JWT_SECRET?.trim());
-  const hasJwtSecrets = Boolean(process.env.JWT_SECRETS?.trim());
-  const buildGitSha: string = BUILD_GIT_SHA;
-  const buildDate: string = BUILD_DATE;
-  const gitSha =
-    process.env.GIT_SHA?.trim() ||
-    process.env.GIT_COMMIT?.trim() ||
-    process.env.SOURCE_VERSION?.trim() ||
-    process.env.VERCEL_GIT_COMMIT_SHA?.trim() ||
-    process.env.CF_PAGES_COMMIT_SHA?.trim() ||
-    process.env.GITHUB_SHA?.trim() ||
-    (buildGitSha === 'unknown' ? null : buildGitSha);
+  const uptime = Math.floor((Date.now() - startTime) / 1000);
+  const version = process.env.BUILD_SHA || process.env.GIT_SHA || process.env.VITE_GIT_COMMIT_HASH || 'unknown';
 
-  const dbConfigured = hasDbUrl;
-  const aiConfigured = Boolean(
-    (hasGrokPlain || (hasGrokEnc && hasEncSecret)) && (hasGeminiPlain || (hasGeminiEnc && hasEncSecret)),
-  );
-  const tonConfigured = hasTonRpcUrl;
-
-  const deepChecks = deep
-    ? await (async () => {
-        const out: Record<string, unknown> = {};
-        if (hasTonRpcUrl) {
-          try {
-            const ac = new AbortController();
-            const id = setTimeout(() => ac.abort(), 2500);
-            const res = await fetch(process.env.TONCENTER_RPC_URL as string, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                ...(hasTonApiKey ? { 'X-API-Key': String(process.env.TONCENTER_API_KEY) } : {}),
-              },
-              body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'getMasterchainInfo', params: {} }),
-              signal: ac.signal,
-            });
-            clearTimeout(id);
-            out.tonRpc = res.ok ? 'ok' : `http_${res.status}`;
-          } catch {
-            out.tonRpc = 'error';
-          }
-        }
-        if (hasUpstashRateLimit) {
-          try {
-            const u = String(process.env.UPSTASH_REDIS_REST_URL).replace(/\/+$/, '');
-            const ac = new AbortController();
-            const id = setTimeout(() => ac.abort(), 2500);
-            const res = await fetch(`${u}/ping`, {
-              method: 'GET',
-              headers: { Authorization: `Bearer ${String(process.env.UPSTASH_REDIS_REST_TOKEN)}` },
-              signal: ac.signal,
-            });
-            clearTimeout(id);
-            out.upstash = res.ok ? 'ok' : `http_${res.status}`;
-          } catch {
-            out.upstash = 'error';
-          }
-        }
-        return out;
-      })()
-    : null;
-
-  const adminToken = (process.env.HEALTH_ADMIN_TOKEN || process.env.JWT_SECRET || '').trim();
-  const providedToken = (url?.searchParams.get('token') || req.headers.get('x-admin-token') || '').trim();
-  const isAdmin = adminToken.length >= 16 && providedToken !== '' && providedToken === adminToken;
-
-  if (isAdmin) {
-    return jsonResponse(
-      {
-        status: 'ok',
-        checks: {
-          db: dbConfigured ? 'configured' : 'missing',
-          ai: aiConfigured ? 'configured' : 'missing',
-          ton: tonConfigured ? 'configured' : 'missing',
-          rateLimit: 'configured',
-          jwt: hasJwtSecrets || hasJwtSecret ? 'configured' : 'missing',
-        },
-        ...(deepChecks ? { deepChecks } : {}),
-        env: {
-          db: { databaseUrl: hasDbUrl },
-          ai: {
-            grokKey: hasGrokPlain,
-            grokKeyEnc: hasGrokEnc,
-            geminiKey: hasGeminiPlain,
-            geminiKeyEnc: hasGeminiEnc,
-            encryptionSecret: hasEncSecret,
-          },
-          ton: {
-            rpcUrl: hasTonRpcUrl,
-            apiKey: hasTonApiKey,
-          },
-          upstash: {
-            url: hasUpstashUrl,
-            token: hasUpstashToken,
-          },
-          rateLimit: {
-            mode: rateLimitMode,
-            sharedStore: hasUpstashRateLimit,
-          },
-          jwt: {
-            secret: hasJwtSecret,
-            secrets: hasJwtSecrets,
-          },
-        },
-        build: {
-          gitSha,
-          date: buildDate === 'unknown' ? null : buildDate,
-          node: typeof process !== 'undefined' ? process.version : null,
-        },
-        time: new Date().toISOString(),
-      },
-      allowedOrigin,
-    );
+  // Database check
+  let dbStatus = 'error';
+  let dbLatency = 0;
+  try {
+    const db = getDb();
+    const dbStart = Date.now();
+    await db.execute(sql`SELECT 1`);
+    dbLatency = Date.now() - dbStart;
+    dbStatus = 'ok';
+  } catch (err) {
+    console.error('Health check DB error:', err);
+    dbStatus = 'error';
   }
+
+  // Redis check
+  let redisStatus = 'error';
+  let redisLatency = 0;
+  try {
+    const redisUrl = process.env.REDIS_URL || process.env.UPSTASH_REDIS_REST_URL;
+    if (redisUrl) {
+      const redisStart = Date.now();
+      // Try to ping Redis via Upstash REST API or direct Redis
+      if (redisUrl.includes('upstash') || redisUrl.includes('rest')) {
+        const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+        if (token) {
+          const res = await fetch(`${redisUrl.replace(/\/+$/, '')}/ping`, {
+            headers: { Authorization: `Bearer ${token}` },
+            signal: AbortSignal.timeout(3000),
+          });
+          redisLatency = Date.now() - redisStart;
+          redisStatus = res.ok ? 'ok' : 'error';
+        } else {
+          redisStatus = 'skipped';
+        }
+      } else {
+        // Direct Redis connection not available in edge runtime, skip
+        redisStatus = 'skipped';
+      }
+    } else {
+      redisStatus = 'skipped';
+    }
+  } catch (err) {
+    console.error('Health check Redis error:', err);
+    redisStatus = 'error';
+  }
+
+  // DeepSeek check (optional)
+  let deepseekStatus = 'skipped';
+  try {
+    const apiKey = process.env.DEEPSEEK_CHATBOT_API_KEY;
+    if (apiKey) {
+      const res = await fetch('https://api.deepseek.com/v1/models', {
+        headers: { Authorization: `Bearer ${apiKey}` },
+        signal: AbortSignal.timeout(5000),
+      });
+      deepseekStatus = res.ok ? 'ok' : 'error';
+    }
+  } catch {
+    deepseekStatus = 'error';
+  }
+
+  // Memory usage
+  const memoryUsage = process.memoryUsage();
+  const memory = {
+    heapUsedMb: Math.round(memoryUsage.heapUsed / 1024 / 1024 * 100) / 100,
+    heapTotalMb: Math.round(memoryUsage.heapTotal / 1024 / 1024 * 100) / 100,
+    rssMb: Math.round(memoryUsage.rss / 1024 / 1024 * 100) / 100,
+  };
+
+  // Overall status
+  let overallStatus: 'ok' | 'degraded' | 'down';
+  if (dbStatus === 'ok') {
+    overallStatus = redisStatus === 'error' ? 'degraded' : 'ok';
+  } else {
+    overallStatus = 'down';
+  }
+
+  const httpStatus = overallStatus === 'down' ? 503 : 200;
 
   return jsonResponse(
     {
-      status: 'ok',
-      time: new Date().toISOString(),
+      status: overallStatus,
+      timestamp: new Date().toISOString(),
+      uptime,
+      version,
+      checks: {
+        database: { status: dbStatus, latencyMs: dbLatency },
+        redis: { status: redisStatus, latencyMs: redisLatency },
+        deepseek: { status: deepseekStatus },
+        memory,
+      },
     },
     allowedOrigin,
+    httpStatus,
   );
 }
