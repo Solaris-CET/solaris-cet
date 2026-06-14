@@ -183,6 +183,166 @@ function emailAnchorHtml(label = 'solaris-cet@protonmail.com', subject = '') {
   return `<!--email_off--><a href="${escapeHtml(href)}">${escapeHtml(label)}</a><!--/email_off-->`
 }
 
+// ── SEO Config ──────────────────────────────────────────────────────────────
+const SEO_PAGES = {
+  '/': {
+    title: 'Solaris CET — Panouri Fotovoltaice și Acoperișuri în Vaslui, Moldova',
+    description: 'Instalare panouri fotovoltaice, acoperișuri tablă și TPO în Moldova. Experiență 8+ ani, garanție 10 ani, finanțare Casa Verde. Ofertă gratuită: +40 769 889 721',
+    keywords: 'panouri fotovoltaice Vaslui, acoperiș tablă Moldova, instalare sisteme solare',
+  },
+  '/servicii': {
+    title: 'Servicii — Solaris CET | Fotovoltaice, Acoperișuri, TPO, Mentenanță',
+    description: 'Servicii complete Solaris CET: panouri fotovoltaice rezidențiale și industriale, acoperișuri tablă/țiglă/TPO, atice/fațade tablă, reparații și mentenanță.',
+    keywords: 'servicii fotovoltaice, montaj acoperiș, reparații acoperiș, mentenanță panouri',
+  },
+  '/servicii/fotovoltaice-rezidentiale': {
+    title: 'Panouri Fotovoltaice Rezidențiale — Prețuri și Ofertă | Solaris CET',
+    description: 'Sisteme fotovoltaice rezidențiale 3-15kW. Preț 15.000-60.000 RON, include montaj. Casa Verde disponibil. Garanție 10 ani panouri.',
+    keywords: 'panouri fotovoltaice rezidentiale pret, sisteme solare casa, fotovoltaice 5kw',
+  },
+  '/servicii/fotovoltaice-industriale': {
+    title: 'Fotovoltaice Industriale — Sisteme 20+ kW pentru Hale | Solaris CET',
+    description: 'Sisteme fotovoltaice industriale de la 20 kWp pentru hale și spații comerciale. Monitorizare, ROI calculat, execuție etapizată.',
+    keywords: 'fotovoltaice industriale, panouri hale, energie solară firme',
+  },
+  '/servicii/acoperisuri-tabla-tigla': {
+    title: 'Acoperișuri Tablă și Țiglă Metalică — Montaj Profesionist | Solaris CET',
+    description: 'Montaj acoperișuri tablă click, țiglă metalică, tablă cutată. Garanție 10 ani. Prețuri orientative și ofertă gratuită.',
+    keywords: 'acoperiș tablă, țiglă metalică, montaj acoperiș, preț acoperiș',
+  },
+  '/servicii/acoperisuri-industriale-tpo': {
+    title: 'Acoperișuri Industriale TPO — Membrană și Hidroizolații | Solaris CET',
+    description: 'Membrană TPO pentru acoperișuri plate industriale. Grosimi 1.2-2.0mm, garanție 15-20 ani. Compatibil cu sisteme fotovoltaice.',
+    keywords: 'membrană TPO, acoperiș industrial, hidroizolație TPO',
+  },
+  '/servicii/atice-si-fatade-tabla': {
+    title: 'Atice și Fațade Tablă — Placări Metalice Profesionale | Solaris CET',
+    description: 'Placări metalice pentru atice și fațade. Culori RAL, termoizolație opțională, garanție 10-30 ani. Ofertă gratuită.',
+    keywords: 'atice tablă, fațadă metalică, placări fațade',
+  },
+  '/servicii/reparatii-si-mentenanta': {
+    title: 'Reparații și Mentenanță Acoperișuri și Panouri | Solaris CET',
+    description: 'Intervenții rapide pentru infiltrații, reparații acoperiș, mentenanță panouri fotovoltaice. Răspuns în 24h în Moldova.',
+    keywords: 'reparații acoperiș, mentenanță panouri, infiltrații acoperiș',
+  },
+  '/contact': {
+    title: 'Contact — Solaris CET | Ofertă Gratuită pentru Fotovoltaice și Acoperișuri',
+    description: 'Contactează Solaris CET pentru ofertă gratuită. Telefon: +40 769 889 721, Email: solaris-cet@protonmail.com. Răspundem în 24h.',
+    keywords: 'contact solaris cet, ofertă fotovoltaice, telefon acoperiș',
+  },
+  '/despre': {
+    title: 'Despre Solaris CET — Experiență în Fotovoltaice și Construcții',
+    description: 'Echipă locală cu 8+ ani experiență în fotovoltaice, acoperișuri și construcții în Moldova. Garanție 10 ani, finanțare disponibilă.',
+    keywords: 'despre solaris cet, echipă fotovoltaice, experiență construcții',
+  },
+  '/calculator': {
+    title: 'Calculator Solar — Estimare Costuri și Economii | Solaris CET',
+    description: 'Calculează rapid sistemul fotovoltaic potrivit pentru tine. Estimare putere, preț, economii și amortizare. Gratuit, fără obligații.',
+    keywords: 'calculator solar, estimare fotovoltaice, cost panouri',
+  },
+  '/finantare': {
+    title: 'Finanțare Fotovoltaice — Casa Verde, RePowerEU, Credite Verzi | Solaris CET',
+    description: 'Programe de finanțare pentru sisteme fotovoltaice: Casa Verde până la 20.000 RON, RePowerEU până la 60%. Consultanță gratuită.',
+    keywords: 'finanțare fotovoltaice, casa verde, repowereu, credite verzi',
+  },
+  '/proiecte': {
+    title: 'Proiecte Realizate — Portofoliu Solaris CET | Fotovoltaice și Acoperișuri',
+    description: 'Vezi proiectele noastre: sisteme fotovoltaice, acoperișuri tablă/TPO, atice și fațade. Peste 200 de proiecte finalizate în Moldova.',
+    keywords: 'proiecte fotovoltaice, portofoliu acoperișuri, lucrări realizate',
+  },
+  '/blog': {
+    title: 'Blog — Solaris CET | Ghiduri și Articole despre Fotovoltaice și Acoperișuri',
+    description: 'Articole utile despre costuri, finanțare, mentenanță și alegerea sistemului potrivit. Ghiduri practice pentru proprietari și firme.',
+    keywords: 'blog fotovoltaice, ghid acoperiș, articole energie solară',
+  },
+  '/faq': {
+    title: 'Întrebări Frecvente — Solaris CET | Fotovoltaice, Acoperișuri, Finanțare',
+    description: 'Răspunsuri la cele mai comune întrebări despre panouri fotovoltaice, acoperișuri, finanțare și servicii Solaris CET.',
+    keywords: 'întrebări frecvente, faq fotovoltaice, întrebări acoperiș',
+  },
+  '/privacy': {
+    title: 'Politica de Confidențialitate — Solaris CET',
+    description: 'Politica de confidențialitate Solaris CET conform GDPR. Află cum prelucrăm datele tale personale.',
+    keywords: 'politica confidențialitate, gdpr, date personale',
+  },
+  '/cookies': {
+    title: 'Politica de Cookie-uri — Solaris CET',
+    description: 'Politica de cookie-uri Solaris CET. Află ce cookie-uri folosim și cum poți controla preferințele.',
+    keywords: 'politica cookie-uri, cookie-uri site',
+  },
+  '/terms': {
+    title: 'Termeni și Condiții — Solaris CET',
+    description: 'Termeni și condiții de utilizare a site-ului Solaris CET.',
+    keywords: 'termeni și condiții, termeni site',
+  },
+  '/vaslui': {
+    title: 'Panouri Fotovoltaice și Acoperișuri în Vaslui — Solaris CET',
+    description: 'Servicii Solaris CET în Vaslui: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță. Ofertă gratuită.',
+    keywords: 'fotovoltaice Vaslui, acoperiș Vaslui, panouri solare Vaslui',
+  },
+  '/iasi': {
+    title: 'Panouri Fotovoltaice și Acoperișuri în Iași — Solaris CET',
+    description: 'Servicii Solaris CET în Iași: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță. Ofertă gratuită.',
+    keywords: 'fotovoltaice Iași, acoperiș Iași, panouri solare Iași',
+  },
+  '/bacau': {
+    title: 'Panouri Fotovoltaice și Acoperișuri în Bacău — Solaris CET',
+    description: 'Servicii Solaris CET în Bacău: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță. Ofertă gratuită.',
+    keywords: 'fotovoltaice Bacău, acoperiș Bacău, panouri solare Bacău',
+  },
+  '/galati': {
+    title: 'Panouri Fotovoltaice și Acoperișuri în Galați — Solaris CET',
+    description: 'Servicii Solaris CET în Galați: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță. Ofertă gratuită.',
+    keywords: 'fotovoltaice Galați, acoperiș Galați, panouri solare Galați',
+  },
+  '/neamt': {
+    title: 'Panouri Fotovoltaice și Acoperișuri în Neamț — Solaris CET',
+    description: 'Servicii Solaris CET în Neamț: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță. Ofertă gratuită.',
+    keywords: 'fotovoltaice Neamț, acoperiș Neamț, panouri solare Neamț',
+  },
+  '/suceava': {
+    title: 'Panouri Fotovoltaice și Acoperișuri în Suceava — Solaris CET',
+    description: 'Servicii Solaris CET în Suceava: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță. Ofertă gratuită.',
+    keywords: 'fotovoltaice Suceava, acoperiș Suceava, panouri solare Suceava',
+  },
+  '/botosani': {
+    title: 'Panouri Fotovoltaice și Acoperișuri în Botoșani — Solaris CET',
+    description: 'Servicii Solaris CET în Botoșani: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță. Ofertă gratuită.',
+    keywords: 'fotovoltaice Botoșani, acoperiș Botoșani, panouri solare Botoșani',
+  },
+  '/vrancea': {
+    title: 'Panouri Fotovoltaice și Acoperișuri în Vrancea — Solaris CET',
+    description: 'Servicii Solaris CET în Vrancea: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, mentenanță. Ofertă gratuită.',
+    keywords: 'fotovoltaice Vrancea, acoperiș Vrancea, panouri solare Vrancea',
+  },
+};
+
+function getSeoConfig(pathname) {
+  if (SEO_PAGES[pathname]) return SEO_PAGES[pathname];
+  if (pathname.startsWith('/blog/')) {
+    return {
+      title: 'Articol — Blog Solaris CET | Fotovoltaice și Acoperișuri',
+      description: 'Citește articole utile despre panouri fotovoltaice, acoperișuri, finanțare și mentenanță de la Solaris CET.',
+      keywords: 'blog fotovoltaice, articole acoperiș, ghid energie solară',
+    };
+  }
+  if (pathname.startsWith('/servicii/')) {
+    return {
+      title: 'Servicii — Solaris CET | Fotovoltaice, Acoperișuri, TPO',
+      description: 'Detalii servicii Solaris CET: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, reparații și mentenanță.',
+      keywords: 'servicii fotovoltaice, acoperișuri, TPO',
+    };
+  }
+  if (pathname.startsWith('/finantare/')) {
+    return {
+      title: 'Finanțare — Solaris CET | Casa Verde, RePowerEU, Credite',
+      description: 'Informații despre programele de finanțare pentru sisteme fotovoltaice: Casa Verde, RePowerEU, credite verzi.',
+      keywords: 'finanțare fotovoltaice, casa verde, repowereu',
+    };
+  }
+  return null;
+}
+
 function renderStaticPageHtml({
   title,
   description,
@@ -197,8 +357,11 @@ function renderStaticPageHtml({
   footerCtaHtml,
 }) {
   const canonical = `${origin}${normalizePath(canonicalPath)}`
-  const metaDesc = escapeHtml(description)
-  const metaTitle = escapeHtml(title)
+  const path = normalizePath(canonicalPath)
+  const seoConfig = getSeoConfig(path)
+  const metaTitle = escapeHtml(seoConfig?.title || title || 'Solaris CET — Energie Solară și Construcții | Vaslui, România')
+  const metaDesc = escapeHtml(seoConfig?.description || description || 'Instalare panouri fotovoltaice, acoperișuri tablă și TPO în Moldova. Experiență 8+ ani, garanție 10 ani, finanțare Casa Verde. Ofertă gratuită: +40 769 889 721')
+  const metaKeywords = seoConfig?.keywords ? escapeHtml(seoConfig.keywords) : ''
   const metaH1 = escapeHtml(h1)
   const body = bodyLines.map((l) => `<p>${escapeHtml(l)}</p>`).join('\n')
   const extra = typeof extraHtml === 'string' && extraHtml.trim() ? `\n${extraHtml.trim()}\n` : '\n'
@@ -232,6 +395,7 @@ function renderStaticPageHtml({
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>${metaTitle}</title>
     <meta name="description" content="${metaDesc}" />
+    ${metaKeywords ? `    <meta name="keywords" content="${metaKeywords}" />\n` : ''}
     <link rel="canonical" href="${canonical}" />
 ${robotsMeta}${redirectMeta}    <meta property="og:type" content="website" />
     <meta property="og:title" content="${metaTitle}" />
@@ -1781,4 +1945,32 @@ async function pingSearchEngines() {
 }
 
 await Promise.all([writeStaticPages(), writeSitemap(), writeRobots()])
+
+// ── SEO Audit ───────────────────────────────────────────────────────────────
+const allPages = pages.map((p) => ({
+  path: normalizePath(p.path),
+  title: p.title,
+  description: p.description,
+  hasDescription: Boolean(p.description && p.description.length > 0),
+}))
+
+const titles = allPages.map((p) => p.title)
+const duplicateTitles = titles.filter((t, i) => titles.indexOf(t) !== i)
+const pagesWithoutDescription = allPages.filter((p) => !p.hasDescription)
+
+console.log('\n📊 SEO Audit Report')
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+console.log(`Total pages: ${allPages.length}`)
+console.log(`Pages without description: ${pagesWithoutDescription.length}`)
+if (pagesWithoutDescription.length > 0) {
+  console.log('  Missing descriptions:')
+  pagesWithoutDescription.forEach((p) => console.log(`  - ${p.path}`))
+}
+console.log(`Duplicate titles: ${duplicateTitles.length}`)
+if (duplicateTitles.length > 0) {
+  console.log('  Duplicate titles:')
+  duplicateTitles.forEach((t) => console.log(`  - "${t}"`))
+}
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n')
+
 await pingSearchEngines()
