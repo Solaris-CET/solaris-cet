@@ -7,8 +7,17 @@ const RAY_COUNT = 16;
 const RAY_LENGTH = 1.4;
 const RAY_WIDTH = 0.025;
 
-function SunRays() {
+type Intensity = 'low' | 'medium' | 'high';
+
+const intensityConfig: Record<Intensity, { rotationSpeed: number; opacity: number }> = {
+  low: { rotationSpeed: 0.2, opacity: 0.5 },
+  medium: { rotationSpeed: 0.6, opacity: 0.85 },
+  high: { rotationSpeed: 1.2, opacity: 1.0 },
+};
+
+function SunRays({ intensity }: { intensity: Intensity }) {
   const groupRef = useRef<THREE.Group>(null!);
+  const config = intensityConfig[intensity];
 
   const positions = useMemo(() => {
     const pos: number[] = [];
@@ -30,14 +39,14 @@ function SunRays() {
 
   useFrame((_, delta) => {
     if (groupRef.current) {
-      groupRef.current.rotation.z += delta * 0.6;
+      groupRef.current.rotation.z += delta * config.rotationSpeed;
     }
   });
 
   return (
     <group ref={groupRef}>
       <lineSegments geometry={geometry}>
-        <lineBasicMaterial color="#ffaa33" linewidth={RAY_WIDTH} transparent opacity={0.85} />
+        <lineBasicMaterial color="#ffaa33" linewidth={RAY_WIDTH} transparent opacity={config.opacity} />
       </lineSegments>
     </group>
   );
@@ -59,7 +68,7 @@ function LogoText() {
   );
 }
 
-export default function AnimatedLogo() {
+export default function AnimatedLogo({ intensity = 'medium' }: { intensity?: Intensity }) {
   return (
     <div
       style={{
@@ -78,7 +87,7 @@ export default function AnimatedLogo() {
       >
         <ambientLight intensity={0.6} />
         <pointLight position={[8, 8, 8]} />
-        <SunRays />
+        <SunRays intensity={intensity} />
         <LogoText />
       </Canvas>
     </div>
