@@ -1,9 +1,11 @@
 FROM node:20-alpine AS builder
-WORKDIR /app
-COPY app/package*.json ./
+WORKDIR /
+COPY package*.json ./
+COPY tsconfig*.json ./
 RUN npm install --ignore-scripts
-COPY app/ .
+COPY app/ /app/
 COPY scripts/ /scripts/
+WORKDIR /app
 RUN npm run build
 
 FROM node:20-alpine
