@@ -704,6 +704,17 @@ async function writeStaticPages() {
     areaServed: { '@type': 'Country', name: 'Romania' },
   }
 
+  const locationData = {
+    vaslui: { county: 'Vaslui', distanceKm: 0, travelTime: '0 ore (sediu)', mainLocalities: ['Vaslui', 'Bârlad', 'Huși', 'Negrești'], testimonial: { name: 'Ion Popescu', locality: 'Vaslui', text: 'Am apelat la Solaris CET pentru un sistem fotovoltaic de 5 kW. Montajul a durat doar 2 zile, iar acum factura la curent e cu 70% mai mică. Recomand cu încredere!' }, projectsCount: 18 },
+    iasi: { county: 'Iași', distanceKm: 65, travelTime: '1 oră', mainLocalities: ['Iași', 'Pașcani', 'Târgu Frumos', 'Hârlău'], testimonial: { name: 'Maria Ionescu', locality: 'Iași', text: 'Echipa Solaris CET a venit la Iași și a montat panourile pe acoperișul casei noastre. Profesioniști, rapid și curat. Acum producem propria energie!' }, projectsCount: 12 },
+    bacau: { county: 'Bacău', distanceKm: 90, travelTime: '1 oră 15 minute', mainLocalities: ['Bacău', 'Onești', 'Moinești', 'Comănești'], testimonial: { name: 'Gheorghe Radu', locality: 'Bacău', text: 'Am avut nevoie de reparații la acoperișul TPO al halei. Solaris CET a diagnosticat corect problema și a rezolvat-o în aceeași zi. Mulțumesc!' }, projectsCount: 8 },
+    galati: { county: 'Galați', distanceKm: 110, travelTime: '1 oră 30 minute', mainLocalities: ['Galați', 'Tecuci', 'Târgu Bujor', 'Pechea'], testimonial: { name: 'Elena Dumitrescu', locality: 'Galați', text: 'Am ales Solaris CET pentru montajul unui sistem fotovoltaic de 10 kW pe acoperișul firmei. Proiectul a fost gândit eficient, iar amortizarea e mai rapidă decât estimam.' }, projectsCount: 6 },
+    neamt: { county: 'Neamț', distanceKm: 120, travelTime: '1 oră 45 minute', mainLocalities: ['Piatra Neamț', 'Roman', 'Târgu Neamț', 'Bicaz'], testimonial: { name: 'Andrei Munteanu', locality: 'Piatra Neamț', text: 'Solaris CET a venit la Piatra Neamț pentru un acoperiș din tablă click. Lucrarea e impecabilă, iar garanția de 10 ani ne dă liniște.' }, projectsCount: 5 },
+    suceava: { county: 'Suceava', distanceKm: 170, travelTime: '2 ore 30 minute', mainLocalities: ['Suceava', 'Fălticeni', 'Rădăuți', 'Câmpulung Moldovenesc'], testimonial: { name: 'Cristina Popa', locality: 'Suceava', text: 'Am apelat la Solaris CET pentru mentenanța panourilor fotovoltaice. Au venit la Suceava, au curățat și verificat tot sistemul. Producția a crescut cu 20%!' }, projectsCount: 4 },
+    botosani: { county: 'Botoșani', distanceKm: 140, travelTime: '2 ore', mainLocalities: ['Botoșani', 'Dorohoi', 'Săveni', 'Darabani'], testimonial: { name: 'Vasile Apetrei', locality: 'Botoșani', text: 'Solaris CET a montat un sistem fotovoltaic de 3 kW la casa părintească din Botoșani. Profesioniști, preț corect și suport după montaj.' }, projectsCount: 3 },
+    vrancea: { county: 'Vrancea', distanceKm: 130, travelTime: '1 oră 50 minute', mainLocalities: ['Focșani', 'Adjud', 'Panciu', 'Odobești'], testimonial: { name: 'Mihai Stan', locality: 'Focșani', text: 'Am chemat Solaris CET pentru reparații la acoperișul din țiglă metalică. Au venit rapid la Focșani, au identificat problema și au rezolvat-o în aceeași zi.' }, projectsCount: 4 },
+  };
+
   const portfolioSchemaItems = [
     {
       name: 'Prosumator 5.2 kW pe acoperiș înclinat',
@@ -1579,6 +1590,45 @@ async function writeStaticPages() {
         breadcrumb([
           { name: 'Acasă', path: '/' },
           { name: x.city, path: `/${x.slug}` },
+        ]),
+      ]),
+    })),
+    ...Object.entries(locationData).map(([slug, loc]) => ({
+      path: `/${slug}`,
+      title: `Panouri Fotovoltaice și Acoperișuri în ${loc.county} — Solaris CET`,
+      description: `Panouri fotovoltaice și acoperișuri în ${loc.county}. Solaris CET — experiență, garanție 10 ani, finanțare disponibilă. Ofertă gratuită: +40 769 889 721`,
+      h1: `Panouri Fotovoltaice și Acoperișuri în ${loc.county} — Solaris CET`,
+      bodyLines: [
+        `Servim zona ${loc.county} cu instalări profesionale de sisteme fotovoltaice, acoperișuri (tablă, țiglă metalică, TPO), atice, fațade tablă și reparații.`,
+        `Am realizat ${loc.projectsCount} proiecte în ${loc.county} în 2024, în localități precum ${loc.mainLocalities.join(', ')}.`,
+        `Distanța de la sediul nostru din Cetățuia, Vaslui: ${loc.distanceKm} km. Ajungem în ${loc.travelTime}.`,
+      ],
+      extraHtml: `
+        <div style="margin-top: 12px;">
+          <h2 style="font-size: 18px; margin: 0 0 10px;">Ce spun clienții noștri din ${loc.county}</h2>
+          <blockquote style="border-left: 3px solid #f59e0b; padding-left: 12px; margin: 0; color: rgba(255,255,255,.82);">
+            <p>"${loc.testimonial.text}"</p>
+            <footer style="margin-top: 8px; font-size: 13px; color: rgba(255,255,255,.6);">— ${loc.testimonial.name}, ${loc.testimonial.locality}, ${loc.county}</footer>
+          </blockquote>
+        </div>
+        <div style="margin-top: 12px;">
+          <h2 style="font-size: 18px; margin: 0 0 10px;">Localizare</h2>
+          <div style="border-radius: 8px; overflow:hidden; border:1px solid #334155;">
+            <iframe title="Hartă ${loc.county}" src="https://www.openstreetmap.org/export/embed.html?bbox=27.0%2C46.0%2C28.0%2C47.0&amp;layer=mapnik&amp;marker=46.6407%2C27.7276" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="width:100%; height:300px; border:0; display:block;"></iframe>
+          </div>
+          <p style="font-size:.8rem; margin-top:.5rem;"><a href="https://www.openstreetmap.org/?mlat=46.6407&amp;mlon=27.7276#map=12/46.6407/27.7276" target="_blank" rel="noopener noreferrer">Deschide harta completă →</a></p>
+        </div>
+      `,
+      jsonLd: wrapJsonLd([
+        buildServiceSchema(
+          `Servicii Solaris CET în ${loc.county}`,
+          `Panouri fotovoltaice și acoperișuri în ${loc.county}. Solaris CET — experiență, garanție 10 ani, finanțare disponibilă.`,
+          'fotovoltaic-rezidential',
+          `${origin}/images/hero-solaris.svg`
+        ),
+        breadcrumb([
+          { name: 'Acasă', path: '/' },
+          { name: loc.county, path: `/${slug}` },
         ]),
       ]),
     })),
