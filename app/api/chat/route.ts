@@ -33,12 +33,14 @@ const KNOWLEDGE_BASE: Record<string, string> = {
 - Sistem 5 kW: ~20.000 – 35.000 RON
 - Sistem 10 kW: ~35.000 – 60.000 RON
 
-Prețurile pot varia în funcție de specificațiile tehnice și complexitatea montajului. Pentru o ofertă personalizată, contactați-ne la +40 769 889 721 sau solaris-cet@protonmail.com.`,
+Prețurile pot varia în funcție de tipul acoperișului, cablaj existent, distanță. Pentru o ofertă personalizată gratuită, contactați-ne la +40 769 889 721 sau solaris-cet@protonmail.com.`,
   finantari: `**Programe de finanțare disponibile:**
 
 **Casa Verde** – finanțare de până la 20.000 RON, aprobare în 30–60 de zile.
 
 **RePowerEU** – fonduri europene care acoperă până la 60% din costurile eligibile.
+
+**Rate fără dobândă** prin parteneri bancari.
 
 Vă putem ajuta cu întocmirea dosarului. Contactați-ne pentru detalii.`,
   acoperisuri: `**Servicii de acoperișuri:**
@@ -50,7 +52,7 @@ Prețurile se stabilesc la cerere, în funcție de suprafață și complexitate.
   contact: `**Date de contact Solaris CET:**
 - Telefon: +40 769 889 721
 - Email: solaris-cet@protonmail.com
-- Adresă: Cetățuia, Vaslui
+- Adresă: Cetățuia, Vaslui, România
 
 **Program:**
 - Luni – Vineri: 08:00 – 18:00
@@ -67,16 +69,24 @@ Toate echipamentele respectă standardele europene de calitate.`,
 - Sisteme comerciale/industriale: în funcție de complexitate
 
 Echipa noastră asigură o execuție rapidă și profesionistă.`,
+  servicii: `**Servicii oferite de Solaris CET:**
+- Panouri fotovoltaice (monocristaline, policristaline)
+- Construcții și renovări acoperișuri
+- Tablă zincată, țiglă metalică, membrane hidroizolante
+- Proiectare, montaj, autorizații, punere în funcțiune
+
+Pentru detalii, contactați-ne la +40 769 889 721.`,
 };
 
 // ── Intent detection ────────────────────────────────────────────────────────
 const INTENT_PATTERNS: Array<{ pattern: RegExp; key: string }> = [
-  { pattern: /\b(pret|preturi|cost|cat costa|tarif|ofert[ăa])\b/i, key: 'preturi' },
-  { pattern: /\b(finanțare|finantare|casa verde|repowereu|fonduri|subvenții|subventii)\b/i, key: 'finantari' },
+  { pattern: /\b(pret|preturi|cost|cat costa|cat face|tarif|ofert[ăa])\b/i, key: 'preturi' },
+  { pattern: /\b(finanțare|finantare|casa verde|repowereu|fonduri|subvenții|subventii|rate|dobândă|dobanda)\b/i, key: 'finantari' },
   { pattern: /\b(acoperiș|acoperis|tabl[ăa]|țigl[ăa]|tigla|membran[ăa]|hidroizolație|hidroizolatie)\b/i, key: 'acoperisuri' },
   { pattern: /\b(contact|telefon|email|adres[ăa]|program|orar|locație|locatie)\b/i, key: 'contact' },
   { pattern: /\b(garanție|garantie|garanţie)\b/i, key: 'garantie' },
   { pattern: /\b(durat[ăa]|montaj|instalare|timp|zile)\b/i, key: 'montaj' },
+  { pattern: /\b(servicii|monocristalin|policristalin|proiectare|autorizații|autorizatii|punere în funcțiune|punere in functiune)\b/i, key: 'servicii' },
 ];
 
 function detectIntent(userMessage: string): string | null {
@@ -228,7 +238,7 @@ export default async function handler(req: Request): Promise<Response> {
     return jsonResponse(
       {
         content:
-          'Momentan asistentul AI nu este disponibil. Te rugăm să ne contactezi la +40 769 889 721 sau solaris-cet@protonmail.com.',
+          'Momentan asistentul AI nu e disponibil. Pentru ofertă rapidă, sună la +40 769 889 721 sau scrie pe solaris-cet@protonmail.com',
       },
       allowedOrigin,
     );

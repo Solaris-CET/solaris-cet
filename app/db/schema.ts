@@ -1086,6 +1086,23 @@ export const cetuiaTokens = pgTable(
   (t) => [index('cetuia_tokens_status_idx').on(t.status), index('cetuia_tokens_owner_idx').on(t.ownerWalletAddress)],
 );
 
+export const quotes = pgTable(
+  'quotes',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    name: text('name').notNull(),
+    phone: text('phone').notNull(),
+    email: text('email'),
+    location: text('location').notNull(),
+    serviceType: text('service_type').notNull(),
+    powerNeeded: text('power_needed'),
+    roofType: text('roof_type'),
+    message: text('message'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('quotes_created_at_idx').on(t.createdAt)],
+);
+
 export const adminAuditLogs = pgTable(
   'admin_audit_logs',
   {
