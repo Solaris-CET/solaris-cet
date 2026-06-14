@@ -2,6 +2,7 @@ FROM node:20-alpine AS builder
 WORKDIR /
 COPY package*.json ./
 COPY tsconfig*.json ./
+COPY api/ /api/
 RUN npm install --ignore-scripts
 COPY app/ /app/
 COPY scripts/ /scripts/
