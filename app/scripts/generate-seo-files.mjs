@@ -109,6 +109,52 @@ function buildServiceJsonLd(name, url) {
   }
 }
 
+function buildServiceSchema(name, description, serviceType, image) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name,
+    description,
+    provider: {
+      '@type': ['RoofingContractor', 'ElectricalContractor'],
+      name: 'Solaris CET',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Cetățuia',
+        addressRegion: 'Vaslui',
+        addressCountry: 'RO',
+      },
+      telephone: '+40769889721',
+      email: 'solaris-cet@protonmail.com',
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: 46.7195,
+        longitude: 27.7398,
+      },
+      openingHours: ['Mo-Fr 08:00-18:00', 'Sa 09:00-14:00'],
+      priceRange: 'RON',
+      sameAs: ['https://wa.me/40769889721'],
+    },
+    areaServed: ['România', 'Moldova', 'Vaslui', 'Iași', 'Bacău', 'Galați'].map((a) => ({ '@type': 'State', name: a })),
+    serviceType,
+    image: image || undefined,
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'RON',
+      priceSpecification: {
+        '@type': 'PriceSpecification',
+        price: '0',
+        priceCurrency: 'RON',
+      },
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: 4.9,
+      reviewCount: 47,
+    },
+  }
+}
+
 function graphNodesFromJsonLd(payload) {
   if (!payload || typeof payload !== 'object') return []
   if (Array.isArray(payload['@graph'])) return payload['@graph'].filter((item) => item && typeof item === 'object')
