@@ -26,6 +26,82 @@ Rules:
 - If the question is ambiguous, ask 1‑2 clarifying questions.
 - Reply in the same language as the user's latest message.`;
 
+// ── Knowledge base ──────────────────────────────────────────────────────────
+const KNOWLEDGE_BASE: Record<string, string> = {
+  preturi: `**Prețuri orientative sisteme fotovoltaice** (fără TVA, include montaj):
+- Sistem 3 kW: ~15.000 – 25.000 RON
+- Sistem 5 kW: ~20.000 – 35.000 RON
+- Sistem 10 kW: ~35.000 – 60.000 RON
+
+Prețurile pot varia în funcție de specificațiile tehnice și complexitatea montajului. Pentru o ofertă personalizată, contactați-ne la +40 769 889 721 sau solaris-cet@protonmail.com.`,
+  finantari: `**Programe de finanțare disponibile:**
+
+**Casa Verde** – finanțare de până la 20.000 RON, aprobare în 30–60 de zile.
+
+**RePowerEU** – fonduri europene care acoperă până la 60% din costurile eligibile.
+
+Vă putem ajuta cu întocmirea dosarului. Contactați-ne pentru detalii.`,
+  acoperisuri: `**Servicii de acoperișuri:**
+- Tablă zincată
+- Țiglă metalică
+- Membrane hidroizolante (TPO, PVC)
+
+Prețurile se stabilesc la cerere, în funcție de suprafață și complexitate. Solicitați o ofertă la +40 769 889 721.`,
+  contact: `**Date de contact Solaris CET:**
+- Telefon: +40 769 889 721
+- Email: solaris-cet@protonmail.com
+- Adresă: Cetățuia, Vaslui
+
+**Program:**
+- Luni – Vineri: 08:00 – 18:00
+- Sâmbătă: 09:00 – 14:00
+- Duminică: închis`,
+  garantie: `**Garanție oferită:**
+- Panouri fotovoltaice: 10 ani
+- Invertor: 5 ani
+- Montaj: 2 ani
+
+Toate echipamentele respectă standardele europene de calitate.`,
+  montaj: `**Durata montajului:**
+- Sisteme rezidențiale: 1–3 zile
+- Sisteme comerciale/industriale: în funcție de complexitate
+
+Echipa noastră asigură o execuție rapidă și profesionistă.`,
+};
+
+// ── Intent detection ────────────────────────────────────────────────────────
+const INTENT_PATTERNS: Array<{ pattern: RegExp; key: string }> = [
+  { pattern: /\b(pret|preturi|cost|cat costa|tarif|ofert[ăa])\b/i, key: 'preturi' },
+  { pattern: /\b(finanțare|finantare|casa verde|repowereu|fonduri|subvenții|subventii)\b/i, key: 'finantari' },
+  { pattern: /\b(acoperiș|acoperis|tabl[ăa]|țigl[ăa]|tigla|membran[ăa]|hidroizolație|hidroizolatie)\b/i, key: 'acoperisuri' },
+  { pattern: /\b(contact|telefon|email|adres[ăa]|program|orar|locație|locatie)\b/i, key: 'contact' },
+  { pattern: /\b(garanție|garantie|garanţie)\b/i, key: 'garantie' },
+  { pattern: /\b(durat[ăa]|montaj|instalare|timp|zile)\b/i, key: 'montaj' },
+];
+
+function detectIntent(userMessage: string): string | null {
+  for (const { pattern, key } of INTENT_PATTERNS) {
+    if (pattern.test(userMessage)) {
+      return key;
+    }
+  }
+  return null;
+}
+
+// ── Helper: return a non‑streaming JSON response ────────────────────────────
+function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': allowedOrigin,
+      'Vary': 'Origin',
+      'Cache-Control': 'no-store',
+    },
+  });
+}
+
+// ── Main handler ────────────────────────────────────────────────────────────
 export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
   const allowedOrigin = getAllowedOrigin(origin);
@@ -44,14 +120,7 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': allowedOrigin,
-        'Vary': 'Origin',
-      },
-    });
+    return jsonResponse({ error: 'Method not allowed' }, allowedOrigin, 405);
   }
 
   // Parse body
@@ -59,52 +128,38 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     body = (await req.json()) as { messages?: Array<{ role: string; content: string }> };
   } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
-      status: 400,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': allowedOrigin,
-        'Vary': 'Origin',
-      },
-    });
+    return jsonResponse({ error: 'Invalid JSON body' }, allowedOrigin, 400);
   }
 
   const messages = body.messages;
   if (!Array.isArray(messages) || messages.length === 0) {
-    return new Response(JSON.stringify({ error: 'messages array is required and must be non‑empty' }), {
-      status: 400,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': allowedOrigin,
-        'Vary': 'Origin',
-      },
-    });
+    return jsonResponse({ error: 'messages array is required and must be non‑empty' }, allowedOrigin, 400);
   }
 
   // Validate each message
   for (const msg of messages) {
     if (typeof msg.role !== 'string' || typeof msg.content !== 'string') {
-      return new Response(JSON.stringify({ error: 'Each message must have role (string) and content (string)' }), {
-        status: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': allowedOrigin,
-          'Vary': 'Origin',
-        },
-      });
+      return jsonResponse({ error: 'Each message must have role (string) and content (string)' }, allowedOrigin, 400);
     }
   }
 
+  // ── Intent detection on the last user message ──────────────────────────────
+  const lastUserMsg = [...messages].reverse().find((m) => m.role === 'user');
+  const intentKey = lastUserMsg ? detectIntent(lastUserMsg.content) : null;
+
+  // If we have a direct knowledge‑base hit, return it immediately (non‑streaming)
+  if (intentKey && KNOWLEDGE_BASE[intentKey]) {
+    return jsonResponse({ content: KNOWLEDGE_BASE[intentKey] }, allowedOrigin);
+  }
+
+  // ── Try DeepSeek API ──────────────────────────────────────────────────────
   const apiKey = process.env.DEEPSEEK_CHATBOT_API_KEY;
   if (!apiKey) {
-    return new Response(JSON.stringify({ error: 'DeepSeek API key not configured' }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': allowedOrigin,
-        'Vary': 'Origin',
-      },
-    });
+    // No API key configured – fallback to knowledge base if we have a match
+    if (intentKey && KNOWLEDGE_BASE[intentKey]) {
+      return jsonResponse({ content: KNOWLEDGE_BASE[intentKey] }, allowedOrigin);
+    }
+    return jsonResponse({ error: 'DeepSeek API key not configured' }, allowedOrigin, 500);
   }
 
   // Prepend system prompt
@@ -163,13 +218,19 @@ export default async function handler(req: Request): Promise<Response> {
     });
   } catch (err) {
     console.error('DeepSeek API error:', err);
-    return new Response(JSON.stringify({ error: 'Failed to get response from DeepSeek' }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': allowedOrigin,
-        'Vary': 'Origin',
+
+    // ── Fallback to knowledge base on API failure ──────────────────────────
+    if (intentKey && KNOWLEDGE_BASE[intentKey]) {
+      return jsonResponse({ content: KNOWLEDGE_BASE[intentKey] }, allowedOrigin);
+    }
+
+    // Generic fallback message
+    return jsonResponse(
+      {
+        content:
+          'Momentan asistentul AI nu este disponibil. Te rugăm să ne contactezi la +40 769 889 721 sau solaris-cet@protonmail.com.',
       },
-    });
+      allowedOrigin,
+    );
   }
 }
