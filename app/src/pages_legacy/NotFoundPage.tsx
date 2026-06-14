@@ -1,140 +1,103 @@
-import { ArrowLeft, Compass, Home, MessageSquareText, ScrollText } from 'lucide-react';
-import { useEffect } from 'react';
+import { ArrowLeft, Home, Search, Wrench, MessageCircle } from 'lucide-react';
+import { useMemo } from 'react';
 
-import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { SolarisFooter } from '@/components/company/SolarisFooter';
+import { useLanguage } from '@/hooks/useLanguage';
+import { localizePathname } from '@/i18n/urlRouting';
 
-function LostLatticeIllustration({ reduced }: { reduced: boolean }) {
-  return (
-    <svg
-      viewBox="0 0 560 220"
-      className="w-full h-auto"
-      role="img"
-      aria-label="Lost in the lattice"
-    >
-      <defs>
-        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="rgba(242,201,76,0.55)" />
-          <stop offset="1" stopColor="rgba(46,231,255,0.35)" />
-        </linearGradient>
-        <filter id="b" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="10" />
-        </filter>
-      </defs>
+export default function NotFoundPage({ attemptedPath, staticRedirectHref }: { attemptedPath?: string; staticRedirectHref?: string }) {
+  const { t, lang } = useLanguage();
 
-      <rect x="0" y="0" width="560" height="220" rx="18" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" />
-      <circle cx="120" cy="110" r="54" fill="url(#g)" opacity="0.28" filter="url(#b)" />
-      <circle cx="430" cy="90" r="62" fill="rgba(46,231,255,0.22)" filter="url(#b)" />
+  const homeHref = localizePathname('/', lang);
+  const servicesHref = localizePathname('/servicii', lang);
+  const contactHref = localizePathname('/contact', lang);
 
-      <g opacity="0.35" stroke="rgba(255,255,255,0.18)" strokeWidth="1">
-        {Array.from({ length: 9 }).map((_, i) => (
-          <line key={i} x1={80 + i * 45} y1={34} x2={80 + i * 45} y2={186} />
-        ))}
-        {Array.from({ length: 5 }).map((_, i) => (
-          <line key={i} x1={60} y1={54 + i * 34} x2={500} y2={54 + i * 34} />
-        ))}
-      </g>
-
-      <g>
-        <text x="42" y="86" fill="rgba(255,255,255,0.9)" fontSize="42" fontFamily="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas">
-          404
-        </text>
-        <text x="42" y="118" fill="rgba(255,255,255,0.55)" fontSize="12" fontFamily="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas">
-          ROUTE_NOT_FOUND · LATTICE_DESYNC
-        </text>
-      </g>
-
-      {!reduced ? (
-        <g>
-          <circle cx="310" cy="126" r="3" fill="rgba(242,201,76,0.9)">
-            <animate attributeName="cx" values="130; 420; 130" dur="6s" repeatCount="indefinite" />
-            <animate attributeName="cy" values="156; 68; 156" dur="6s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.2; 1; 0.2" dur="6s" repeatCount="indefinite" />
-          </circle>
-        </g>
-      ) : null}
-    </svg>
+  const popularServices = useMemo(
+    () => [
+      { label: 'Fotovoltaice rezidențiale', href: localizePathname('/servicii/fotovoltaice-rezidentiale', lang) },
+      { label: 'Acoperișuri tablă / țiglă', href: localizePathname('/servicii/acoperisuri-tabla-tigla', lang) },
+      { label: 'Reparații și mentenanță', href: localizePathname('/servicii/reparatii-si-mentenanta', lang) },
+    ],
+    [lang],
   );
-}
-
-export function NotFoundPage({
-  attemptedPath,
-  staticRedirectHref,
-}: {
-  attemptedPath: string;
-  staticRedirectHref?: string;
-}) {
-  const prefersReducedMotion = useReducedMotion();
-
-  useEffect(() => {
-    if (!staticRedirectHref) return;
-    const id = window.setTimeout(() => {
-      window.location.assign(staticRedirectHref);
-    }, 150);
-    return () => window.clearTimeout(id);
-  }, [staticRedirectHref]);
 
   return (
-    <main
-      id="main-content"
-      tabIndex={-1}
-      className="min-h-[70vh] flex items-center justify-center px-6 py-20"
-    >
-      <div className="max-w-3xl w-full">
-        <div className="bento-card p-6 md:p-8 border border-white/10">
-          <div className="grid gap-6 md:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] items-start">
-            <div className="min-w-0">
-              <h1 className="text-white text-2xl md:text-3xl font-semibold tracking-tight">Pagină inexistentă</h1>
-              <p className="mt-3 text-white/70 text-sm break-all">
-                Rută: <span className="font-mono">{attemptedPath}</span>
-              </p>
-              <div className="mt-5 flex flex-wrap gap-3">
-                <a
-                  href="/"
-                  className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-solaris-gold text-solaris-dark px-5 text-sm font-semibold hover:bg-solaris-gold/90 transition-colors"
-                >
-                  <Home className="w-4 h-4" aria-hidden />
-                  Acasă
-                </a>
-                <a
-                  href="/servicii"
-                  className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
-                >
-                  <Compass className="w-4 h-4" aria-hidden />
-                  Servicii
-                </a>
-                <a
-                  href="/proiecte"
-                  className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
-                >
-                  <ScrollText className="w-4 h-4" aria-hidden />
-                  Portofoliu
-                </a>
-                <a
-                  href="/contact"
-                  className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
-                >
-                  <MessageSquareText className="w-4 h-4" aria-hidden />
-                  Contact
-                </a>
-                {staticRedirectHref ? (
-                  <a
-                    href={staticRedirectHref}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
-                  >
-                    <ArrowLeft className="w-4 h-4" aria-hidden />
-                    Deschide pagina recomandată
-                  </a>
-                ) : null}
-              </div>
-              <p className="mt-5 text-[11px] text-white/55">
-                Dacă ai ajuns aici dintr-un link vechi, deschide pagina recomandată (redirecționare) sau revino la Servicii / Portofoliu.
-              </p>
-            </div>
-            <div className="min-w-0">
-              <LostLatticeIllustration reduced={prefersReducedMotion} />
+    <main id="main-content" tabIndex={-1} className="min-h-screen bg-slate-950 pt-24 pb-0 text-white">
+      <div className="mx-auto max-w-4xl px-5 sm:px-8 xl:px-12">
+        <div className="rounded-3xl border border-white/10 bg-black/30 p-8 sm:p-12 text-center" data-reveal>
+          <div className="text-8xl font-black text-amber-400 animate-pulse">404</div>
+          <h1 className="mt-4 text-3xl font-bold text-white">Oops! Această pagină s-a dus la soare ☀️</h1>
+          <p className="mt-3 text-lg text-slate-300">Pagina nu există sau a fost mutată.</p>
+
+          {staticRedirectHref ? (
+            <p className="mt-4 text-sm text-slate-400">
+              Încearcă <a href={staticRedirectHref} className="text-amber-400 underline">noua adresă</a>.
+            </p>
+          ) : null}
+
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <a href={homeHref} className="inline-flex items-center gap-2 rounded-2xl bg-amber-400 px-6 py-3 text-sm font-black text-black">
+              <Home className="h-4 w-4" aria-hidden />
+              🏠 Acasă
+            </a>
+            <a href={servicesHref} className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10">
+              <Wrench className="h-4 w-4" aria-hidden />
+              🔧 Servicii
+            </a>
+            <a href={contactHref} className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10">
+              <ArrowLeft className="h-4 w-4" aria-hidden />
+              📞 Contact
+            </a>
+          </div>
+
+          <div className="mt-8">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" aria-hidden />
+              <input
+                type="text"
+                placeholder="Caută pe site..."
+                className="w-full rounded-2xl border border-white/10 bg-white/5 pl-12 pr-4 py-4 text-white outline-none transition-colors placeholder:text-white/35 focus:border-amber-400"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                    window.location.href = `/search?q=${encodeURIComponent(e.currentTarget.value.trim())}`;
+                  }
+                }}
+              />
             </div>
           </div>
+
+          <div className="mt-8">
+            <p className="text-sm text-slate-400 mb-4">Servicii populare:</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {popularServices.map((s) => (
+                <a
+                  key={s.href}
+                  href={s.href}
+                  className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
+                >
+                  {s.label}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-8">
+            <a
+              href="#chat-widget"
+              className="inline-flex items-center gap-2 rounded-2xl border border-amber-400/30 bg-amber-400/10 px-6 py-3 text-sm font-semibold text-amber-200 hover:bg-amber-400/15"
+              onClick={(e) => {
+                e.preventDefault();
+                window.dispatchEvent(new CustomEvent('open-chat-widget'));
+              }}
+            >
+              <MessageCircle className="h-4 w-4" aria-hidden />
+              Sau întreabă Solarix: 💬
+            </a>
+          </div>
         </div>
+      </div>
+      <div className="mt-16">
+        <SolarisFooter />
       </div>
     </main>
   );
