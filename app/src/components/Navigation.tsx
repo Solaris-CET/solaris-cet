@@ -8,6 +8,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import { DownloadAppButton } from './company/DownloadAppButton';
 import styles from './NavigationFloating.module.css';
 import { SolarisLogoMark } from './SolarisLogoMark';
+import AnimatedLogo from './brand/AnimatedLogo';
 
 const MOBILE_MENU_FOCUSABLE_SELECTOR =
   'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -224,37 +225,7 @@ export default function Navigation() {
             className="group relative z-20 flex shrink-0 items-center gap-2"
             aria-label="Solaris CET"
           >
-            <span className="relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur">
-              <svg viewBox="0 0 24 24" className="h-5 w-5 text-orange-300" aria-hidden>
-                <circle cx="12" cy="12" r="4.2" fill="currentColor" opacity="0.85" />
-                {Array.from({ length: 8 }).map((_, i) => {
-                  const a = (i / 8) * Math.PI * 2;
-                  const x1 = 12 + Math.cos(a) * 7.2;
-                  const y1 = 12 + Math.sin(a) * 7.2;
-                  const x2 = 12 + Math.cos(a) * 10.4;
-                  const y2 = 12 + Math.sin(a) * 10.4;
-                  return (
-                    <line
-                      key={i}
-                      x1={x1}
-                      y1={y1}
-                      x2={x2}
-                      y2={y2}
-                      stroke="currentColor"
-                      strokeWidth="1"
-                      opacity="0.55"
-                      strokeLinecap="round"
-                    />
-                  );
-                })}
-              </svg>
-            </span>
-            <span className="leading-none">
-              <span className="block text-sm font-black tracking-tight text-white">
-                S<span className="text-orange-300">·</span>CET
-              </span>
-              <span className="block text-[11px] font-semibold tracking-widest text-white/55">SOLARIS</span>
-            </span>
+            <AnimatedLogo />
           </a>
 
           <nav
