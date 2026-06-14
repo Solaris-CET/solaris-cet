@@ -1,36 +1,21 @@
-import { ArrowRight, Download, Leaf, LineChart, Zap } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { ArrowRight, Download, Leaf, LineChart, Zap, Brain, TreePine, TrendingUp, Home, Building2, Factory, Sun, Battery, MapPin, DollarSign, Percent, BarChart3 } from 'lucide-react';
+import { useMemo, useState, useCallback } from 'react';
 
 import { SolarisFooter } from '@/components/company/SolarisFooter';
 
-type CountyKey = 'vaslui' | 'iasi' | 'bacau' | 'galati' | 'vrancea' | 'bucuresti' | 'other';
-type OrientationKey = 'south' | 'east_west' | 'north';
-type RoofKey = 'pitched' | 'flat' | 'ground';
-type ClientTypeKey = 'residential' | 'business';
-type PhaseKey = 'single' | 'three';
-type BatteryKey = 'no' | 'yes';
+// ── Romanian counties ───────────────────────────────────────────────────────
+const ALL_COUNTIES = [
+  'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brașov',
+  'Brăila', 'Buzău', 'Caraș-Severin', 'Călărași', 'Cluj', 'Constanța', 'Covasna',
+  'Dâmbovița', 'Dolj', 'Galați', 'Giurgiu', 'Gorj', 'Harghita', 'Hunedoara',
+  'Ialomița', 'Iași', 'Ilfov', 'Maramureș', 'Mehedinți', 'Mureș', 'Neamț', 'Olt',
+  'Prahova', 'Satu Mare', 'Sălaj', 'Sibiu', 'Suceava', 'Teleorman', 'Timiș',
+  'Tulcea', 'Vaslui', 'Vâlcea', 'Vrancea', 'București',
+] as const;
 
-const counties: Array<{ key: CountyKey; label: string; factor: number }> = [
-  { key: 'vaslui', label: 'Vaslui', factor: 1.13 },
-  { key: 'iasi', label: 'Iași', factor: 1.11 },
-  { key: 'bacau', label: 'Bacău', factor: 1.06 },
-  { key: 'galati', label: 'Galați', factor: 1.16 },
-  { key: 'vrancea', label: 'Vrancea', factor: 1.08 },
-  { key: 'bucuresti', label: 'București/Ilfov', factor: 1.14 },
-  { key: 'other', label: 'Alt județ', factor: 1.1 },
-];
-
-const orientations: Array<{ key: OrientationKey; label: string; factor: number }> = [
-  { key: 'south', label: 'Sud (ideal)', factor: 1.0 },
-  { key: 'east_west', label: 'Est/Vest (bun)', factor: 0.88 },
-  { key: 'north', label: 'Nord (slab)', factor: 0.65 },
-];
-
-const roofs: Array<{ key: RoofKey; label: string; factor: number }> = [
-  { key: 'pitched', label: 'Acoperiș înclinat', factor: 1.0 },
-  { key: 'flat', label: 'Acoperiș plat', factor: 0.98 },
-  { key: 'ground', label: 'La sol', factor: 1.03 },
-];
+type RoofType = 'plan' | 'inclinat' | 'terasa';
+type PropertyType = 'casa' | 'bloc' | 'firma';
+type BatteryToggle = 'da' | 'nu';
 
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
@@ -44,358 +29,415 @@ function formatNumber(n: number) {
   return new Intl.NumberFormat('ro-RO', { maximumFractionDigits: 0 }).format(n);
 }
 
-function formatEuroRange(low: number, high: number) {
-  return `${formatNumber(low)}–${formatNumber(high)} EUR`;
-}
-
 export default function SolarCalculatorPage() {
-  const [monthlyKwh, setMonthlyKwh] = useState('350');
-  const [clientType, setClientType] = useState<ClientTypeKey>('residential');
-  const [phase, setPhase] = useState<PhaseKey>('single');
-  const [battery, setBattery] = useState<BatteryKey>('no');
-  const [county, setCounty] = useState<CountyKey>('vaslui');
-  const [roof, setRoof] = useState<RoofKey>('pitched');
-  const [orientation, setOrientation] = useState<OrientationKey>('south');
+  const [monthlyKwh, setMonthlyKwh] = useState(350);
+  const [county, setCounty] = useState('Vaslui');
+  const [roof, setRoof] = useState<RoofType>('inclinat');
+  const [propertyType, setPropertyType] = useState<PropertyType>('casa');
+  const [budget, setBudget] = useState(50000);
+  const [battery, setBattery] = useState<BatteryToggle>('nu');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResponse, setAiResponse] = useState<string | null>(null);
+  const [aiExpanded, setAiExpanded] = useState(false);
 
   const model = useMemo(() => {
-    const m = clamp(Number(monthlyKwh || 0), 50, 6000);
-    const annualConsumption = m * 12;
-    const countyFactor = counties.find((c) => c.key === county)?.factor ?? 1.1;
-    const roofFactor = roofs.find((r) => r.key === roof)?.factor ?? 1.0;
-    const orientationFactor = orientations.find((o) => o.key === orientation)?.factor ?? 1.0;
-    const clientFactor = clientType === 'business' ? 1.04 : 1.0;
-    const phaseFactor = phase === 'three' ? 1.04 : 0.97;
-    const batteryFactor = battery === 'yes' ? 1.02 : 1.0;
-
-    const baselineYield = 1200;
-    const yieldKwhPerKw = baselineYield * countyFactor * roofFactor * orientationFactor;
-    const neededKw = annualConsumption / Math.max(600, yieldKwhPerKw);
-    const adjustedKw = neededKw * clientFactor * phaseFactor * batteryFactor;
-    const kwRounded = Math.max(clientType === 'business' ? 5.0 : 2.0, Math.round(adjustedKw * 10) / 10);
-
-    const panelW = 0.45;
-    const panels = Math.max(6, Math.ceil(kwRounded / panelW));
-    const kwFinal = Math.round(panels * panelW * 10) / 10;
-
-    const pricePerKw =
-      clientType === 'business' ? (kwFinal <= 30 ? 4600 : 4200) : kwFinal <= 6 ? 5200 : kwFinal <= 12 ? 4800 : 4500;
-    const batteryAdder = battery === 'yes' ? (clientType === 'business' ? 24000 : 18000) : 0;
-    const estimatePrice = Math.round(kwFinal * pricePerKw + batteryAdder);
-    const estimateLow = Math.round(estimatePrice * 0.92);
-    const estimateHigh = Math.round(estimatePrice * 1.1);
-
-    const energyPrice = 1.1;
-    const selfConsumptionBase = clientType === 'business' ? 0.72 : kwFinal <= 6 ? 0.62 : 0.55;
-    const selfConsumption = clamp(selfConsumptionBase + (battery === 'yes' ? 0.12 : 0), 0.45, 0.88);
-    const annualSavings = Math.round(annualConsumption * energyPrice * selfConsumption);
-    const paybackYears = clamp(estimatePrice / Math.max(1, annualSavings), 2.5, 14);
-    const co2Kg = Math.round(annualConsumption * 0.35);
-
-    const monthlyShape = [0.36, 0.46, 0.62, 0.8, 0.96, 1.05, 1.08, 1.0, 0.82, 0.62, 0.45, 0.34];
-    const annualProd = Math.round(kwFinal * yieldKwhPerKw);
-    const raw = monthlyShape.map((x) => x / monthlyShape.reduce((a, b) => a + b, 0));
-    const monthlyProd = raw.map((x) => Math.round(x * annualProd));
+    const m = clamp(monthlyKwh, 100, 5000);
+    const kw = Math.round((m / 120) * 10) / 10;
+    const pricePerKw = battery === 'da' ? 11000 : 7500;
+    const price = Math.round(kw * pricePerKw);
+    const annualSavings = Math.round(kw * 120 * 0.9);
+    const paybackYears = price / Math.max(1, annualSavings);
+    const co2Kg = Math.round(kw * 120 * 0.35 * 12);
+    const casaVerde = Math.min(kw * 7500, 20000);
+    const treesEquivalent = Math.round(co2Kg / 21);
+    const tenYearSavings = Math.round(annualSavings * 10 - price);
+    const currentCost10y = Math.round(m * 12 * 0.9 * 10);
+    const solarCost10y = Math.round(price + m * 12 * 0.9 * 10 * 0.3);
+    const paybackPercent = Math.min(100, Math.round((paybackYears / 25) * 100));
 
     return {
-      annualConsumption,
-      kwFinal,
-      panels,
-      estimatePrice,
-      estimateLow,
-      estimateHigh,
+      kw,
+      price,
       annualSavings,
       paybackYears,
       co2Kg,
-      yieldKwhPerKw,
-      annualProd,
-      monthlyProd,
-      recommendation:
-        clientType === 'business'
-          ? 'Merită evaluare la locație și verificarea profilului de consum înainte de ofertă finală.'
-          : battery === 'yes'
-            ? 'Merită să compari scenariul cu și fără baterie; bateria crește autoconsumul, dar și investiția.'
-            : 'Scenariul fără baterie este bun pentru primul pas; poți adăuga baterie doar dacă vrei consum mai mare seara.',
+      casaVerde,
+      treesEquivalent,
+      tenYearSavings,
+      currentCost10y,
+      solarCost10y,
+      paybackPercent,
     };
-  }, [battery, clientType, county, monthlyKwh, orientation, phase, roof]);
+  }, [monthlyKwh, battery]);
 
-  const maxMonthly = Math.max(1, ...model.monthlyProd);
+  const handleAiExplain = useCallback(async () => {
+    setAiLoading(true);
+    setAiResponse(null);
+    setAiExpanded(true);
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: 'user',
+              content: `Bazat pe: consum ${monthlyKwh}kWh/lună, județ ${county}, tip proprietate ${propertyType === 'casa' ? 'casă' : propertyType === 'bloc' ? 'bloc' : 'firmă'}, sistem recomandat ${model.kw}kW, preț ${model.price}RON, recuperare ${model.paybackYears.toFixed(1)} ani. Explică în română simplu, max 200 cuvinte, de ce acest sistem e potrivit și care sunt pașii următori pentru clientul nostru.`,
+            },
+          ],
+        }),
+      });
+      const data = await res.json();
+      setAiResponse(data.content || 'Ne pare rău, nu am putut genera explicația.');
+    } catch {
+      setAiResponse('Momentan serviciul AI nu e disponibil. Încearcă mai târziu.');
+    } finally {
+      setAiLoading(false);
+    }
+  }, [monthlyKwh, county, propertyType, model]);
+
+  const contactUrl = useMemo(() => {
+    const params = new URLSearchParams({
+      service: 'fotovoltaice',
+      consum: String(monthlyKwh),
+      judet: county,
+      tip: propertyType,
+      baterie: battery,
+      putere: String(model.kw),
+      pret: String(model.price),
+    });
+    return `/contact?${params.toString()}`;
+  }, [monthlyKwh, county, propertyType, battery, model]);
 
   return (
     <main id="main-content" tabIndex={-1} className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-solaris-offblack text-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12" data-reveal>
           <h1 className="font-display font-bold bg-gradient-to-r from-solar-yellow to-amber-500 bg-clip-text text-transparent text-[length:var(--text-h1)] leading-[var(--lh-display)]">
-            Calculator fotovoltaic (estimare)
+            Calculator solar avansat
           </h1>
           <p className="mt-4 text-lg text-solaris-muted max-w-3xl mx-auto">
-            Estimare orientativă pe baza consumului și a condițiilor. Pagina aceasta există ca să vezi rapid ordinul de mărime pentru sistem,
-            buget și amortizare înainte să intri în cererea de ofertă.
+            Estimează rapid sistemul potrivit pentru tine. Rezultatele se actualizează în timp real.
           </p>
         </div>
 
-        <div className="mb-8 grid gap-4 md:grid-cols-3" data-reveal-stagger>
-          {[
-            { label: 'Ce afli aici', value: 'Putere recomandată, buget orientativ, economie anuală și amortizare' },
-            { label: 'Ce nu este', value: 'Nu este ofertă finală; evaluarea exactă ține cont de poze, acoperiș și tabloul electric' },
-            { label: 'Cum îl folosești corect', value: 'Introdu consumul real mediu și tratează rezultatul ca reper pentru decizia inițială' },
-          ].map((item) => (
-            <div key={item.label} className="rounded-3xl border border-white/10 bg-white/5 p-5">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-white/50">{item.label}</div>
-              <div className="mt-2 text-base font-semibold text-white">{item.value}</div>
-            </div>
-          ))}
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* ── Inputs column ─────────────────────────────────────────────── */}
           <section className="lg:col-span-5 rounded-3xl border border-white/10 bg-black/40 p-7" data-reveal-stagger>
-            <div className="text-sm font-black text-white">Date de intrare</div>
-            <div className="mt-5 grid gap-4">
+            <div className="text-sm font-black text-white flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-amber-400" aria-hidden />
+              Date de intrare
+            </div>
+            <div className="mt-5 space-y-6">
+              {/* Consum lunar */}
               <div>
-                <label htmlFor="clientType" className="block text-sm font-semibold text-white/70">
-                  Tip client
-                </label>
-                <select
-                  id="clientType"
-                  value={clientType}
-                  onChange={(e) => setClientType(e.target.value as ClientTypeKey)}
-                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-orange-400"
-                >
-                  <option value="residential">Rezidențial</option>
-                  <option value="business">Business / comercial</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="kwh" className="block text-sm font-semibold text-white/70">
-                  Consum lunar (kWh)
+                <label htmlFor="consum-slider" className="flex items-center justify-between text-sm font-semibold text-white/70">
+                  <span>Consum lunar (kWh)</span>
+                  <span className="text-amber-400 font-bold">{monthlyKwh} kWh</span>
                 </label>
                 <input
-                  id="kwh"
+                  id="consum-slider"
+                  type="range"
+                  min={100}
+                  max={5000}
+                  step={50}
                   value={monthlyKwh}
-                  onChange={(e) => setMonthlyKwh(e.target.value.replace(/[^\d]/g, '').slice(0, 4))}
-                  inputMode="numeric"
-                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-orange-400"
-                  placeholder="Ex: 350"
+                  onChange={(e) => setMonthlyKwh(Number(e.target.value))}
+                  className="mt-2 w-full accent-amber-400"
                 />
+                <div className="flex justify-between text-xs text-white/40 mt-1">
+                  <span>100</span>
+                  <span>5000</span>
+                </div>
               </div>
 
+              {/* Județ */}
               <div>
-                <label htmlFor="phase" className="block text-sm font-semibold text-white/70">
-                  Faze disponibile
-                </label>
-                <select
-                  id="phase"
-                  value={phase}
-                  onChange={(e) => setPhase(e.target.value as PhaseKey)}
-                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-orange-400"
-                >
-                  <option value="single">Monofazat</option>
-                  <option value="three">Trifazat</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="county" className="block text-sm font-semibold text-white/70">
+                <label htmlFor="county-select" className="flex items-center gap-2 text-sm font-semibold text-white/70">
+                  <MapPin className="h-4 w-4 text-amber-400" aria-hidden />
                   Județ
                 </label>
                 <select
-                  id="county"
+                  id="county-select"
                   value={county}
-                  onChange={(e) => setCounty(e.target.value as CountyKey)}
-                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-orange-400"
+                  onChange={(e) => setCounty(e.target.value)}
+                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-amber-400"
                 >
-                  {counties.map((c) => (
-                    <option key={c.key} value={c.key}>
-                      {c.label}
+                  {ALL_COUNTIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
                     </option>
                   ))}
                 </select>
               </div>
 
+              {/* Tip acoperiș */}
               <div>
-                <label htmlFor="roof" className="block text-sm font-semibold text-white/70">
-                  Tip montaj
+                <label htmlFor="roof-select" className="flex items-center gap-2 text-sm font-semibold text-white/70">
+                  <Home className="h-4 w-4 text-amber-400" aria-hidden />
+                  Tip acoperiș
                 </label>
                 <select
-                  id="roof"
+                  id="roof-select"
                   value={roof}
-                  onChange={(e) => setRoof(e.target.value as RoofKey)}
-                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-orange-400"
+                  onChange={(e) => setRoof(e.target.value as RoofType)}
+                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-amber-400"
                 >
-                  {roofs.map((r) => (
-                    <option key={r.key} value={r.key}>
-                      {r.label}
-                    </option>
-                  ))}
+                  <option value="plan">Plan</option>
+                  <option value="inclinat">Înclinat</option>
+                  <option value="terasa">Terasă</option>
                 </select>
               </div>
 
+              {/* Tip proprietate */}
               <div>
-                <label htmlFor="orientation" className="block text-sm font-semibold text-white/70">
-                  Orientare
+                <label className="flex items-center gap-2 text-sm font-semibold text-white/70 mb-2">
+                  <Building2 className="h-4 w-4 text-amber-400" aria-hidden />
+                  Tip proprietate
                 </label>
-                <select
-                  id="orientation"
-                  value={orientation}
-                  onChange={(e) => setOrientation(e.target.value as OrientationKey)}
-                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-orange-400"
-                >
-                  {orientations.map((o) => (
-                    <option key={o.key} value={o.key}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="flex gap-3">
+                  {[
+                    { value: 'casa' as const, label: 'Casă', icon: Home },
+                    { value: 'bloc' as const, label: 'Bloc', icon: Building2 },
+                    { value: 'firma' as const, label: 'Firmă', icon: Factory },
+                  ].map((opt) => {
+                    const Icon = opt.icon;
+                    const selected = propertyType === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setPropertyType(opt.value)}
+                        className={`flex-1 flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors ${
+                          selected
+                            ? 'border-amber-400 bg-amber-400/20 text-amber-300'
+                            : 'border-white/10 bg-white/5 text-white/70 hover:bg-white/10'
+                        }`}
+                      >
+                        <Icon className="h-4 w-4" aria-hidden />
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
+              {/* Buget */}
               <div>
-                <label htmlFor="battery" className="block text-sm font-semibold text-white/70">
-                  Baterie
+                <label htmlFor="budget-slider" className="flex items-center justify-between text-sm font-semibold text-white/70">
+                  <span className="flex items-center gap-1">
+                    <DollarSign className="h-4 w-4 text-amber-400" aria-hidden />
+                    Buget aproximativ
+                  </span>
+                  <span className="text-amber-400 font-bold">{formatRon(budget)}</span>
                 </label>
-                <select
-                  id="battery"
-                  value={battery}
-                  onChange={(e) => setBattery(e.target.value as BatteryKey)}
-                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-orange-400"
-                >
-                  <option value="no">Fără baterie</option>
-                  <option value="yes">Cu baterie</option>
-                </select>
+                <input
+                  id="budget-slider"
+                  type="range"
+                  min={5000}
+                  max={200000}
+                  step={1000}
+                  value={budget}
+                  onChange={(e) => setBudget(Number(e.target.value))}
+                  className="mt-2 w-full accent-amber-400"
+                />
+                <div className="flex justify-between text-xs text-white/40 mt-1">
+                  <span>5.000 RON</span>
+                  <span>200.000 RON</span>
+                </div>
+              </div>
+
+              {/* Baterie toggle */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-semibold text-white/70 mb-2">
+                  <Battery className="h-4 w-4 text-amber-400" aria-hidden />
+                  Dorești baterie?
+                </label>
+                <div className="flex gap-3">
+                  {(['nu', 'da'] as BatteryToggle[]).map((val) => (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => setBattery(val)}
+                      className={`flex-1 rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors ${
+                        battery === val
+                          ? 'border-amber-400 bg-amber-400/20 text-amber-300'
+                          : 'border-white/10 bg-white/5 text-white/70 hover:bg-white/10'
+                      }`}
+                    >
+                      {val === 'da' ? 'Da' : 'Nu'}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <a
-                href={`/contact?service=fotovoltaice&client=${clientType}&consum=${encodeURIComponent(monthlyKwh)}&judet=${county}&faze=${phase}&baterie=${battery}`}
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-orange-400 px-6 py-3 text-sm font-black text-black"
+                href={contactUrl}
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-amber-400 px-6 py-3 text-sm font-black text-black"
               >
-                Cere ofertă <ArrowRight className="h-4 w-4" aria-hidden />
+                Cere ofertă cu aceste date <ArrowRight className="h-4 w-4" aria-hidden />
               </a>
               <button
                 type="button"
                 onClick={() => window.print()}
                 className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-bold text-white hover:bg-white/10"
               >
-                Descarcă PDF <Download className="h-4 w-4" aria-hidden />
+                <Download className="h-4 w-4" aria-hidden />
+                Descarcă
               </button>
             </div>
           </section>
 
+          {/* ── Results column ────────────────────────────────────────────── */}
           <section className="lg:col-span-7 space-y-6">
+            {/* Main result card */}
             <div className="rounded-3xl border border-white/10 bg-white/5 p-7" data-reveal-stagger>
-              <div className="text-sm font-black text-white">Rezultat</div>
+              <div className="text-sm font-black text-white flex items-center gap-2">
+                <Sun className="h-5 w-5 text-amber-400" aria-hidden />
+                Rezultat
+              </div>
               <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
                   <div className="text-[10px] font-bold uppercase tracking-widest text-white/55">Sistem recomandat</div>
-                  <div className="mt-1 text-sm font-black text-white">
-                    {model.kwFinal} kW
-                  </div>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-white/55">Panouri</div>
-                  <div className="mt-1 text-sm font-black text-white">{model.panels} × 450W</div>
+                  <div className="mt-1 text-lg font-black text-amber-400">{model.kw} kW</div>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
                   <div className="text-[10px] font-bold uppercase tracking-widest text-white/55">Preț estimat</div>
-                  <div className="mt-1 text-sm font-black text-white">{formatEuroRange(model.estimateLow / 5, model.estimateHigh / 5)}</div>
-                  <div className="mt-1 text-[11px] text-white/55">{formatRon(model.estimatePrice)} orientativ</div>
+                  <div className="mt-1 text-lg font-black text-white">{formatRon(model.price)}</div>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-white/55">Amortizare</div>
-                  <div className="mt-1 text-sm font-black text-white">{model.paybackYears.toFixed(1)} ani</div>
-                </div>
-              </div>
-
-              <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-white/70">
-                    <Zap className="h-4 w-4 text-orange-300" aria-hidden />
-                    Economie anuală (estimare)
-                  </div>
-                  <div className="mt-2 text-lg font-black text-white">{formatRon(model.annualSavings)}</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-white/55">Economie anuală</div>
+                  <div className="mt-1 text-lg font-black text-emerald-400">{formatRon(model.annualSavings)}</div>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-white/70">
-                    <LineChart className="h-4 w-4 text-orange-300" aria-hidden />
-                    Producție anuală (estimare)
-                  </div>
-                  <div className="mt-2 text-lg font-black text-white">{formatNumber(model.annualProd)} kWh</div>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                  <div className="flex items-center gap-2 text-xs font-bold text-white/70">
-                    <Leaf className="h-4 w-4 text-emerald-300" aria-hidden />
-                    CO₂ evitat (estimare)
-                  </div>
-                  <div className="mt-2 text-lg font-black text-white">{formatNumber(model.co2Kg)} kg/an</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-white/55">Recuperare</div>
+                  <div className="mt-1 text-lg font-black text-white">{model.paybackYears.toFixed(1)} ani</div>
                 </div>
               </div>
 
-              <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-5">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-white/60">Producție lunară (estimare)</div>
-                <div className="mt-4">
-                  <svg viewBox="0 0 264 72" className="w-full h-16" role="img" aria-label="Producție lunară estimată" preserveAspectRatio="none">
-                    {model.monthlyProd.map((v, i) => {
-                      const h = Math.max(2, Math.round((v / maxMonthly) * 64));
-                      const x = i * 22 + 6;
-                      const y = 70 - h;
-                      return <rect key={i} x={x} y={y} width={12} height={h} rx={4} fill="rgba(245,158,11,0.65)" />;
-                    })}
-                  </svg>
-                  <div className="mt-2 grid grid-cols-6 sm:grid-cols-12 gap-2 text-[10px] text-white/55 font-mono">
-                    {['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun', 'Iul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m) => (
-                      <div key={m} className="text-center">
-                        {m}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-5 text-xs text-white/55 leading-relaxed">
-                Estimare orientativă. Prețul final depinde de evaluare (acoperiș/structură, distanțe cabluri, protecții, acces, configurație), iar economia depinde de autoconsum și tarifele de energie.
-              </div>
-
-              <div className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-400/10 p-5">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-amber-200/75">Recomandare de pas următor</div>
-                <div className="mt-2 text-sm leading-relaxed text-white/90">{model.recommendation}</div>
-              </div>
-            </div>
-
-            <div className="rounded-3xl border border-white/10 bg-black/30 p-7" data-reveal>
-              <div className="text-sm font-black text-white">Ce ne trimiți pentru ofertă exactă</div>
-              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {[
-                  'Consumul (facturi sau kWh/lună)',
-                  'Poze acoperiș (față + detalii)',
-                  'Poze tablou electric / spațiu tehnic',
-                  'Locația și eventualele umbre',
-                ].map((x) => (
-                  <div key={x} className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/75">
-                    {x}
-                  </div>
-                ))}
-              </div>
+              {/* Payback progress bar */}
               <div className="mt-5">
-                <a
-                  href={`https://wa.me/40769889721?text=${encodeURIComponent(
-                    `Bună! Vreau ofertă fotovoltaic. Tip client: ${clientType === 'business' ? 'business' : 'rezidențial'}, consum ~${monthlyKwh || '—'} kWh/lună, județ: ${counties.find((c) => c.key === county)?.label ?? '—'}, faze: ${phase === 'three' ? 'trifazat' : 'monofazat'}, baterie: ${battery === 'yes' ? 'da' : 'nu'}.`,
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-bold text-white hover:bg-white/10"
-                >
-                  Trimite pe WhatsApp <ArrowRight className="h-4 w-4" aria-hidden />
-                </a>
+                <div className="flex justify-between text-xs text-white/50 mb-1">
+                  <span>Recuperare investiție</span>
+                  <span>{model.paybackYears.toFixed(1)} / 25 ani</span>
+                </div>
+                <div className="h-3 rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-amber-400 transition-all duration-300"
+                    style={{ width: `${Math.min(100, model.paybackPercent)}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* 10-year comparison bar chart */}
+              <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-5">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-white/60 flex items-center gap-1">
+                  <TrendingUp className="h-3 w-3 text-amber-400" aria-hidden />
+                  Cost curent vs. Cu panouri (10 ani)
+                </div>
+                <div className="mt-4 flex items-end gap-4 h-24">
+                  <div className="flex-1 flex flex-col items-center">
+                    <div className="text-xs font-bold text-white/70 mb-1">{formatRon(model.currentCost10y)}</div>
+                    <div
+                      className="w-full rounded-t-lg bg-red-500/60 transition-all duration-300"
+                      style={{ height: `${Math.min(100, (model.currentCost10y / Math.max(model.currentCost10y, model.solarCost10y)) * 100)}%` }}
+                    />
+                    <div className="text-[10px] text-white/50 mt-1">Fără panouri</div>
+                  </div>
+                  <div className="flex-1 flex flex-col items-center">
+                    <div className="text-xs font-bold text-amber-400 mb-1">{formatRon(model.solarCost10y)}</div>
+                    <div
+                      className="w-full rounded-t-lg bg-amber-400/60 transition-all duration-300"
+                      style={{ height: `${Math.min(100, (model.solarCost10y / Math.max(model.currentCost10y, model.solarCost10y)) * 100)}%` }}
+                    />
+                    <div className="text-[10px] text-white/50 mt-1">Cu panouri</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Badges */}
+              <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 flex items-center gap-3">
+                  <Zap className="h-6 w-6 text-emerald-400" aria-hidden />
+                  <div>
+                    <div className="text-xs text-emerald-300">Economisești</div>
+                    <div className="text-sm font-bold text-white">{formatRon(model.tenYearSavings)} în 10 ani</div>
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 flex items-center gap-3">
+                  <TreePine className="h-6 w-6 text-emerald-400" aria-hidden />
+                  <div>
+                    <div className="text-xs text-emerald-300">CO₂ echivalent</div>
+                    <div className="text-sm font-bold text-white">{model.treesEquivalent} copaci plantați/an</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Casa Verde */}
+              <div className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4 flex items-center gap-3">
+                <Percent className="h-6 w-6 text-amber-400" aria-hidden />
+                <div>
+                  <div className="text-xs text-amber-300">Finanțare disponibilă</div>
+                  <div className="text-sm font-bold text-white">Casa Verde: {formatRon(model.casaVerde)}</div>
+                </div>
               </div>
             </div>
 
+            {/* AI Explanation */}
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-7" data-reveal>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!aiResponse && !aiLoading) {
+                    handleAiExplain();
+                  } else {
+                    setAiExpanded(!aiExpanded);
+                  }
+                }}
+                className="w-full flex items-center justify-between gap-2 text-sm font-black text-white"
+              >
+                <span className="flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-amber-400" aria-hidden />
+                  {aiLoading ? 'Se generează explicația...' : aiResponse ? '🤖 Explicația AI' : '🤖 Explică-mi rezultatele (AI)'}
+                </span>
+                <span className="text-amber-400">{aiExpanded ? '▲' : '▼'}</span>
+              </button>
+              {aiLoading && (
+                <div className="mt-4 flex items-center gap-2 text-sm text-white/60">
+                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Se analizează datele...
+                </div>
+              )}
+              {aiExpanded && aiResponse && (
+                <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4 text-sm leading-relaxed text-white/80">
+                  {aiResponse}
+                </div>
+              )}
+              {aiResponse && (
+                <div className="mt-4">
+                  <a
+                    href={contactUrl}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-amber-400 px-6 py-3 text-sm font-black text-black"
+                  >
+                    Cere ofertă cu aceste date <ArrowRight className="h-4 w-4" aria-hidden />
+                  </a>
+                </div>
+              )}
+            </div>
+
+            {/* Quick budget references */}
             <div className="rounded-3xl border border-white/10 bg-white/5 p-7" data-reveal-stagger>
               <div className="text-sm font-black text-white">Repere rapide de buget (2026)</div>
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
                 {[
-                  { title: '3–4 kW', body: 'Potrivit pentru consum mic / casă eficientă', price: 'aprox. 3.200–4.500 EUR' },
-                  { title: '5–6 kW', body: 'Cel mai comun pachet rezidențial', price: 'aprox. 4.500–6.000 EUR' },
-                  { title: '8–10 kW', body: 'Consum mare / pompă de căldură / extindere', price: 'aprox. 6.800–9.500 EUR' },
+                  { title: '3–4 kW', body: 'Potrivit pentru consum mic / casă eficientă', price: 'aprox. 22.500–30.000 RON' },
+                  { title: '5–6 kW', body: 'Cel mai comun pachet rezidențial', price: 'aprox. 37.500–45.000 RON' },
+                  { title: '8–10 kW', body: 'Consum mare / pompă de căldură / extindere', price: 'aprox. 60.000–75.000 RON' },
                 ].map((pack) => (
                   <div key={pack.title} className="rounded-2xl border border-white/10 bg-black/20 p-4">
                     <div className="text-sm font-bold text-white">{pack.title}</div>
