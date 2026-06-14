@@ -58,6 +58,19 @@ const TxHistoryPage = lazy(() => import('./pages_legacy/TxHistoryPage'));
 const SolarisChatWidget = lazy(() =>
   import('@/components/company/SolarisChatWidget').then((m) => ({ default: m.SolarisChatWidget })),
 );
+const AuthPage = lazy(() => import('@/pages_legacy/AuthPage'));
+const DefiHubPage = lazy(() => import('@/pages_legacy/DefiHubPage'));
+const EventsPage = lazy(() => import('@/pages_legacy/EventsPage'));
+const PaidLandingPage = lazy(() => import('@/pages_legacy/PaidLandingPage'));
+const PrelaunchPage = lazy(() => import('@/pages_legacy/PrelaunchPage'));
+const ThanksPage = lazy(() => import('@/pages_legacy/ThanksPage'));
+const CetAiPage = lazy(() => import('@/pages_legacy/CetAiPage'));
+const ContractPage = lazy(() => import('@/pages_legacy/ContractPage'));
+const RwaPage = lazy(() => import('@/pages_legacy/RwaPage'));
+const BrandAssetsPage = lazy(() => import('@/pages_legacy/BrandAssetsPage'));
+const ResponsibleDisclosurePage = lazy(() => import('@/pages_legacy/ResponsibleDisclosurePage'));
+const BugBountyPage = lazy(() => import('@/pages_legacy/BugBountyPage'));
+const ReleaseNotesPage = lazy(() => import('@/pages_legacy/ReleaseNotesPage'));
 
 function normalizePathname(pathname: string): string {
   const clean = (pathname || '/').replace(/\/$/, '') || '/';
@@ -968,6 +981,32 @@ function App() {
           <Termeni />
         ) : routePath === '/cookies' ? (
           <Cookies />
+        ) : routePath === '/auth' ? (
+          <AuthPage />
+        ) : routePath === '/defi' ? (
+          <DefiHubPage />
+        ) : routePath === '/evenimente' ? (
+          <EventsPage />
+        ) : routePath === '/lp/paid' ? (
+          <PaidLandingPage />
+        ) : routePath === '/prelaunch' ? (
+          <PrelaunchPage />
+        ) : routePath === '/thanks' ? (
+          <ThanksPage />
+        ) : routePath === '/cet-ai' ? (
+          <CetAiPage />
+        ) : routePath === '/contract' ? (
+          <ContractPage />
+        ) : routePath === '/rwa' ? (
+          <RwaPage />
+        ) : routePath === '/brand-assets' ? (
+          <BrandAssetsPage />
+        ) : routePath === '/responsible-disclosure' ? (
+          <ResponsibleDisclosurePage />
+        ) : routePath === '/bug-bounty' ? (
+          <BugBountyPage />
+        ) : routePath === '/release-notes' ? (
+          <ReleaseNotesPage />
         ) : (
           <NotFoundPage attemptedPath={routePath} />
         )}
