@@ -558,6 +558,7 @@ const apiRoutes = new Map([
   ['/api/ai/pins', 'api/ai/pins/route.js'],
   ['/api/ai/report', 'api/ai/report/route.js'],
   ['/api/ai/feedback', 'api/ai/feedback/route.js'],
+  ['/api/testimonials', 'api/testimonials/route.js'],
   ['/api/ai/admin/queries', 'api/ai/admin/queries/route.js'],
   ['/api/ai/admin/feedback', 'api/ai/admin/feedback/route.js'],
   ['/api/admin/conversations', 'api/admin/conversations/route.js'],
