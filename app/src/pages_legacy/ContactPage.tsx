@@ -1,48 +1,338 @@
 import { Mail, MapPin } from 'lucide-react';
-import { useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import { SafeEmailLink } from '@/components/SafeEmailLink';
 
-const SERVICE_OPTIONS = [
-  { value: 'fotovoltaic-rezidential', label: 'Fotovoltaice rezidențiale (casă)' },
-  { value: 'fotovoltaic-industrial', label: 'Fotovoltaice industriale/comerciale' },
-  { value: 'acoperis-tabla', label: 'Acoperiș tablă / țiglă metalică' },
-  { value: 'acoperis-tpo', label: 'Acoperiș industrial folie TPO' },
-  { value: 'atice-fatade', label: 'Atice și fațade tablă' },
+
+// ── QuoteForm component ─────────────────────────────────────────────────────
+const SERVICE_TYPES = [
+  { value: 'fotovoltaic-rezidential', label: 'Panouri fotovoltaice rezidențiale' },
+  { value: 'fotovoltaic-industrial', label: 'Panouri fotovoltaice industriale' },
+  { value: 'acoperis-tabla', label: 'Acoperiș tablă/țiglă metalică' },
+  { value: 'acoperis-tpo', label: 'Acoperiș industrial TPO' },
   { value: 'reparatii', label: 'Reparații și mentenanță' },
+  { value: 'atice-fatade', label: 'Atice și fațade tablă' },
 ] as const;
 
-const COUNTY_OPTIONS = ['Vaslui', 'Iași', 'Bacău', 'Galați', 'Vrancea', 'Neamț', 'Botoșani', 'Suceava', 'Alt județ'] as const;
+const POWER_OPTIONS = [
+  { value: 'sub-5kw', label: 'Sub 5 kW (rezidențial mic)' },
+  { value: '5-10kw', label: '5-10 kW (rezidențial mare)' },
+  { value: '10-50kw', label: '10-50 kW (semi-industrial)' },
+  { value: 'peste-50kw', label: 'Peste 50 kW (industrial)' },
+] as const;
 
-const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
-const LEAD_ENDPOINT = '/api/lead';
-const THANK_YOU_URL = 'https://solaris-cet.com/multumim/';
+const ROOF_OPTIONS = [
+  { value: 'tabla-plata', label: 'Tablă plată' },
+  { value: 'tigla', label: 'Țiglă' },
+  { value: 'bitum', label: 'Bitum' },
+  { value: 'membrana', label: 'Membrană existentă' },
+  { value: 'altul', label: 'Altul' },
+] as const;
 
-function mapInitialService(value: string) {
-  const normalized = value.trim();
-  if (!normalized) return '';
-  if (normalized === 'fotovoltaice') return 'fotovoltaic-rezidential';
-  if (normalized === 'acoperisuri') return 'acoperis-tabla';
-  if (normalized === 'tpo') return 'acoperis-tpo';
-  if (normalized === 'atice-si-fatade-tabla') return 'atice-fatade';
-  if (normalized === 'atice-fatade') return 'atice-fatade';
-  if (normalized === 'reparatii-si-mentenanta') return 'reparatii';
-  return SERVICE_OPTIONS.some((option) => option.value === normalized) ? normalized : '';
+function QuoteForm() {
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [locality, setLocality] = useState('');
+  const [serviceType, setServiceType] = useState('');
+  const [power, setPower] = useState('');
+  const [roofType, setRoofType] = useState('');
+  const [message, setMessage] = useState('');
+  const [gdpr, setGdpr] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const isFotovoltaic = serviceType === 'fotovoltaic-rezidential' || serviceType === 'fotovoltaic-industrial';
+  const isAcoperis = serviceType === 'acoperis-tabla' || serviceType === 'acoperis-tpo';
+
+  const validate = (): boolean => {
+    const errors: Record<string, string> = {};
+    if (name.trim().length < 2) errors.name = 'Minim 2 caractere';
+    const phoneClean = phone.replace(/[\s\-]/g, '');
+    if (!/^(07\d{8}|\+407\d{8})$/.test(phoneClean)) errors.phone = 'Format: 07xx xxx xxx sau +407xx xxx xxx';
+    if (locality.trim().length < 2) errors.locality = 'Introdu localitatea';
+    if (!serviceType) errors.serviceType = 'Alege un serviciu';
+    if (!gdpr) errors.gdpr = 'Trebuie să fii de acord';
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+    setSubmitting(true);
+    setError('');
+    setSuccess(false);
+
+    try {
+      const res = await fetch('/api/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name.trim(),
+          phone: phone.trim(),
+          email: email.trim() || undefined,
+          locality: locality.trim(),
+          serviceType,
+          power: isFotovoltaic ? power : undefined,
+          roofType: isAcoperis ? roofType : undefined,
+          message: message.trim() || undefined,
+          gdpr,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Eroare la trimitere');
+      }
+
+      setSuccess(true);
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setName('');
+        setPhone('');
+        setEmail('');
+        setLocality('');
+        setServiceType('');
+        setPower('');
+        setRoofType('');
+        setMessage('');
+        setGdpr(false);
+        setSuccess(false);
+      }, 3000);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Eroare necunoscută';
+      setError(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-5 rounded-3xl border border-white/10 bg-white/5 p-6">
+      {success && (
+        <div className="rounded-xl bg-green-600/20 px-4 py-3 text-sm text-green-300">
+          ✅ Oferta a fost trimisă! Vă contactăm în maxim 24 ore.
+        </div>
+      )}
+      {error && (
+        <div className="rounded-xl bg-red-600/20 px-4 py-3 text-sm text-red-300">
+          {error}
+        </div>
+      )}
+
+      {/* Nume */}
+      <div>
+        <label htmlFor="qf-nume" className="mb-2 block text-sm font-medium text-white/80">
+          Nume complet *
+        </label>
+        <input
+          type="text"
+          id="qf-nume"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Ion Popescu"
+          autoComplete="name"
+          className={`w-full rounded-2xl border bg-white/5 px-4 py-3 text-white outline-none transition-colors placeholder:text-white/35 focus:border-amber-400 ${
+            validationErrors.name ? 'border-red-500' : 'border-white/10'
+          }`}
+        />
+        {validationErrors.name && <p className="mt-1 text-xs text-red-400">{validationErrors.name}</p>}
+      </div>
+
+      {/* Telefon */}
+      <div>
+        <label htmlFor="qf-tel" className="mb-2 block text-sm font-medium text-white/80">
+          Telefon *
+        </label>
+        <input
+          type="tel"
+          id="qf-tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="07XX XXX XXX"
+          autoComplete="tel"
+          className={`w-full rounded-2xl border bg-white/5 px-4 py-3 text-white outline-none transition-colors placeholder:text-white/35 focus:border-amber-400 ${
+            validationErrors.phone ? 'border-red-500' : 'border-white/10'
+          }`}
+        />
+        {validationErrors.phone && <p className="mt-1 text-xs text-red-400">{validationErrors.phone}</p>}
+      </div>
+
+      {/* Email */}
+      <div>
+        <label htmlFor="qf-email" className="mb-2 block text-sm font-medium text-white/80">
+          Email
+        </label>
+        <input
+          type="email"
+          id="qf-email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="email@exemplu.ro"
+          autoComplete="email"
+          className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition-colors placeholder:text-white/35 focus:border-amber-400"
+        />
+      </div>
+
+      {/* Localitate */}
+      <div>
+        <label htmlFor="qf-localitate" className="mb-2 block text-sm font-medium text-white/80">
+          Localitate *
+        </label>
+        <input
+          type="text"
+          id="qf-localitate"
+          value={locality}
+          onChange={(e) => setLocality(e.target.value)}
+          placeholder="Vaslui"
+          className={`w-full rounded-2xl border bg-white/5 px-4 py-3 text-white outline-none transition-colors placeholder:text-white/35 focus:border-amber-400 ${
+            validationErrors.locality ? 'border-red-500' : 'border-white/10'
+          }`}
+        />
+        {validationErrors.locality && <p className="mt-1 text-xs text-red-400">{validationErrors.locality}</p>}
+      </div>
+
+      {/* Tip serviciu */}
+      <div>
+        <label htmlFor="qf-serviciu" className="mb-2 block text-sm font-medium text-white/80">
+          Tip serviciu *
+        </label>
+        <select
+          id="qf-serviciu"
+          value={serviceType}
+          onChange={(e) => {
+            setServiceType(e.target.value);
+            setPower('');
+            setRoofType('');
+          }}
+          className={`w-full rounded-2xl border bg-slate-950 px-4 py-3 text-white outline-none transition-colors focus:border-amber-400 ${
+            validationErrors.serviceType ? 'border-red-500' : 'border-white/10'
+          }`}
+        >
+          <option value="">— Alege —</option>
+          {SERVICE_TYPES.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        {validationErrors.serviceType && <p className="mt-1 text-xs text-red-400">{validationErrors.serviceType}</p>}
+      </div>
+
+      {/* Putere estimată (doar fotovoltaic) */}
+      {isFotovoltaic && (
+        <div>
+          <label htmlFor="qf-putere" className="mb-2 block text-sm font-medium text-white/80">
+            Putere estimată
+          </label>
+          <select
+            id="qf-putere"
+            value={power}
+            onChange={(e) => setPower(e.target.value)}
+            className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none transition-colors focus:border-amber-400"
+          >
+            <option value="">— Alege —</option>
+            {POWER_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Tip acoperiș (doar acoperiș) */}
+      {isAcoperis && (
+        <div>
+          <label htmlFor="qf-acoperis" className="mb-2 block text-sm font-medium text-white/80">
+            Tip acoperiș
+          </label>
+          <select
+            id="qf-acoperis"
+            value={roofType}
+            onChange={(e) => setRoofType(e.target.value)}
+            className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none transition-colors focus:border-amber-400"
+          >
+            <option value="">— Alege —</option>
+            {ROOF_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Mesaj */}
+      <div>
+        <label htmlFor="qf-mesaj" className="mb-2 block text-sm font-medium text-white/80">
+          Mesaj (max 500 caractere)
+        </label>
+        <textarea
+          id="qf-mesaj"
+          value={message}
+          onChange={(e) => {
+            if (e.target.value.length <= 500) setMessage(e.target.value);
+          }}
+          rows={4}
+          placeholder="Ex: casă 150mp, consum 400 kWh/lună, acoperiș orientat sud..."
+          className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition-colors placeholder:text-white/35 focus:border-amber-400"
+        />
+        <p className="mt-1 text-right text-xs text-solaris-muted">{message.length}/500</p>
+      </div>
+
+      {/* GDPR */}
+      <div>
+        <label className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            checked={gdpr}
+            onChange={(e) => setGdpr(e.target.checked)}
+            className="mt-1 h-4 w-4 rounded border-white/10 bg-white/5 text-amber-400 focus:ring-amber-400"
+          />
+          <span className="text-sm text-white/80">
+            Sunt de acord cu prelucrarea datelor personale *
+          </span>
+        </label>
+        {validationErrors.gdpr && <p className="mt-1 text-xs text-red-400">{validationErrors.gdpr}</p>}
+      </div>
+
+      {/* Submit */}
+      <button
+        type="submit"
+        disabled={submitting}
+        className="inline-flex w-full items-center justify-center rounded-2xl bg-amber-400 px-6 py-3 text-sm font-black text-black transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+      >
+        {submitting ? (
+          <>
+            <svg
+              className="-ml-1 mr-2 h-4 w-4 animate-spin"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              />
+            </svg>
+            Se trimite...
+          </>
+        ) : (
+          'Trimite Cererea →'
+        )}
+      </button>
+    </form>
+  );
 }
 
 export default function ContactPage() {
-  const accessKey = String(import.meta.env.VITE_WEB3FORMS_KEY ?? '').trim();
-  const useInternalEndpoint = accessKey.length === 0;
-  const formEndpoint = useInternalEndpoint ? LEAD_ENDPOINT : WEB3FORMS_ENDPOINT;
-  const initialService = useMemo(() => {
-    if (typeof window === 'undefined') return '';
-    try {
-      const url = new URL(window.location.href);
-      return mapInitialService(url.searchParams.get('service') ?? '');
-    } catch {
-      return '';
-    }
-  }, []);
 
   return (
     <main
@@ -169,137 +459,56 @@ export default function ContactPage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <h2 id="offer-form-title" className="text-2xl font-semibold">
-                  Cere ofertă
+                  Calculează și Cere Oferta Ta
                 </h2>
                 <p className="mt-2 text-sm text-solaris-muted">
-                  Completează datele esențiale și te contactăm în maxim 24 de ore.
+                  Gratuit, fără obligații
                 </p>
               </div>
-              <a
-                href="#form-oferta"
-                className="inline-flex items-center justify-center rounded-full border border-amber-400/30 bg-amber-400/10 px-5 py-2.5 text-sm font-semibold text-amber-200 transition-colors hover:bg-amber-400/15"
-              >
-                Completează formularul ↓
-              </a>
+              <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-1.5 text-sm font-medium text-amber-200">
+                🌞 Răspundem în 24 ore
+              </span>
             </div>
 
-            <form
-              action={formEndpoint}
-              method="POST"
-              id="form-oferta"
-              className="mt-6 space-y-5 rounded-3xl border border-white/10 bg-white/5 p-6"
-            >
-              {!useInternalEndpoint ? <input type="hidden" name="access_key" value={accessKey} /> : null}
-              <input type="hidden" name="subject" value="Cerere ofertă nouă — Solaris CET" />
-              <input type="hidden" name="from_name" value="Site Solaris CET" />
-              <input type="hidden" name="redirect" value={THANK_YOU_URL} />
-              <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" />
+            <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-2">
+              {/* Formular */}
+              <QuoteForm />
 
-              <div>
-                <label htmlFor="f-nume" className="mb-2 block text-sm font-medium text-white/80">
-                  Nume și prenume *
-                </label>
-                <input
-                  type="text"
-                  id="f-nume"
-                  name="name"
-                  required
-                  placeholder="Ion Popescu"
-                  autoComplete="name"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition-colors placeholder:text-white/35 focus:border-amber-400"
-                />
+              {/* Card "De ce Solaris CET?" */}
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+                <h3 className="mb-4 text-lg font-semibold text-white">De ce Solaris CET?</h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3">
+                    <span className="mt-0.5 text-amber-400">✅</span>
+                    <div>
+                      <p className="font-medium text-white">Experiență locală</p>
+                      <p className="text-sm text-solaris-muted">Peste 10 ani în construcții și fotovoltaice în Moldova.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-0.5 text-amber-400">🔧</span>
+                    <div>
+                      <p className="font-medium text-white">Montaj rapid</p>
+                      <p className="text-sm text-solaris-muted">1-3 zile pentru sisteme rezidențiale, 3-7 zile industriale.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-0.5 text-amber-400">💰</span>
+                    <div>
+                      <p className="font-medium text-white">Finanțare garantată</p>
+                      <p className="text-sm text-solaris-muted">Te ajutăm cu dosarul Casa Verde și RePowerEU.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-0.5 text-amber-400">🛡️</span>
+                    <div>
+                      <p className="font-medium text-white">Garanție completă</p>
+                      <p className="text-sm text-solaris-muted">10 ani panouri, 5 ani invertor, 2 ani montaj.</p>
+                    </div>
+                  </li>
+                </ul>
               </div>
-
-              <div>
-                <label htmlFor="f-tel" className="mb-2 block text-sm font-medium text-white/80">
-                  Telefon *
-                </label>
-                <input
-                  type="tel"
-                  id="f-tel"
-                  name="telefon"
-                  required
-                  placeholder="07XX XXX XXX"
-                  pattern="[0-9+\s\-]{10,15}"
-                  autoComplete="tel"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition-colors placeholder:text-white/35 focus:border-amber-400"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="f-email" className="mb-2 block text-sm font-medium text-white/80">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="f-email"
-                  name="email"
-                  placeholder="email@exemplu.ro"
-                  autoComplete="email"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition-colors placeholder:text-white/35 focus:border-amber-400"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="f-serviciu" className="mb-2 block text-sm font-medium text-white/80">
-                  Serviciu dorit *
-                </label>
-                <select
-                  id="f-serviciu"
-                  name="serviciu"
-                  required
-                  defaultValue={initialService}
-                  className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none transition-colors focus:border-amber-400"
-                >
-                  <option value="">— Alege —</option>
-                  {SERVICE_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="f-judet" className="mb-2 block text-sm font-medium text-white/80">
-                  Județ *
-                </label>
-                <select
-                  id="f-judet"
-                  name="judet"
-                  required
-                  defaultValue=""
-                  className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none transition-colors focus:border-amber-400"
-                >
-                  <option value="">— Județ —</option>
-                  {COUNTY_OPTIONS.map((county) => (
-                    <option key={county} value={county}>
-                      {county}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="f-detalii" className="mb-2 block text-sm font-medium text-white/80">
-                  Descriere scurtă
-                </label>
-                <textarea
-                  id="f-detalii"
-                  name="detalii"
-                  rows={4}
-                  placeholder="Ex: casă 150mp, consum 400 kWh/lună, acoperiș orientat sud..."
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition-colors placeholder:text-white/35 focus:border-amber-400"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="inline-flex items-center justify-center rounded-2xl bg-amber-400 px-6 py-3 text-sm font-black text-black transition-transform hover:scale-[1.01]"
-              >
-                Trimite cererea →
-              </button>
-            </form>
+            </div>
           </section>
         </div>
       </div>
