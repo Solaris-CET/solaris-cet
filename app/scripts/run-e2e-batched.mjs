@@ -161,6 +161,10 @@ const defaultBatches = [
   ['tests/conversion-ui.spec.ts'],
   ['tests/competition-section.spec.ts'],
   ['tests/security-section.spec.ts'],
+  ['tests/chunk-recovery.spec.ts'],
+  ['tests/mobile-overflow.spec.ts'],
+  ['tests/telegram-miniapp.spec.ts'],
+  ['tests/ai-model.spec.ts'],
   ['tests/mermaid-decision-map.spec.ts'],
 ];
 

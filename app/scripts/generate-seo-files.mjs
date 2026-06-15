@@ -1589,6 +1589,14 @@ async function writeStaticPages() {
         slug: 'invertor-hibrid-baterie-cand-merita',
         title: 'Invertor hibrid + baterie',
       },
+      {
+        slug: 'beneficii-panouri-fotovoltaice-romania-2026',
+        title: 'Beneficii panouri fotovoltaice Romania 2026',
+      },
+      {
+        slug: 'ghid-complet-instalare-acoperis-tabla',
+        title: 'Ghid complet instalare acoperis tabla',
+      },
     ].map((x) => ({
       path: `/blog/${x.slug}`,
       title: `${x.title} — Solaris CET`,
@@ -1600,7 +1608,6 @@ async function writeStaticPages() {
             <p><a href="/blog/${x.slug}">Deschide articolul →</a></p>
           </div>
       `,
-      noindex: true,
       jsonLd: wrapJsonLd([
         { '@type': 'WebPage', name: x.title, url: `${origin}/blog/${x.slug}/` },
         breadcrumb([
