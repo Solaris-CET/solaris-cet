@@ -1,7 +1,17 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /.well-known/
 Disallow: /privacy-settings/
 Disallow: /multumim/
 Disallow: /cdn-cgi/
+Disallow: /push/
+
+User-agent: Googlebot
+Allow: /api/openapi/
+Crawl-delay: 1
 
 Sitemap: https://solaris-cet.com/sitemap.xml
+
+Host: solaris-cet.com
