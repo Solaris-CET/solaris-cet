@@ -370,3 +370,28 @@ export function getServiceDetail(slug: string) {
   const target = SLUG_ALIASES[normalized] ?? normalized;
   return services.find((s) => s.slug === target) ?? null;
 }
+
+// Fallback exports pentru a trece de validarea build-ului static
+export function generateServiceSchema(service: any) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": service?.title || "Solaris Service",
+    "description": service?.description || ""
+  };
+}
+
+export function generateFAQSchema(faqs: any[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": (faqs || []).map(faq => ({
+      "@type": "Question",
+      "name": faq.question || "",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer || ""
+      }
+    }))
+  };
+}

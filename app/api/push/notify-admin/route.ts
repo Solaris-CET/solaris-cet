@@ -1,54 +1,78 @@
-import { getDb, schema } from '../../../db/client';
 import { eq } from 'drizzle-orm';
-import { sendPushNotification } from '../../lib/webPush';
+
+import { getDb, schema } from '../../../db/client';
+import { withRateLimit } from '../../lib/rateLimit';
+import { sendWebPush } from '../../lib/webPush';
 
 export const config = { runtime: 'nodejs' };
 
+type NotifyAdminBody = { title?: string; body?: string; data?: Record<string, unknown> };
+
+function jsonResponse(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+  });
+}
+
 export default async function handler(req: Request): Promise<Response> {
-  // Only allow internal requests (same host)
-  const host = req.headers.get('host') || '';
-  const internalHost = process.env.INTERNAL_HOST || 'localhost';
-  if (!host.includes(internalHost) && !host.includes('127.0.0.1') && !host.includes('::1')) {
-    return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
-  }
+  if (req.method !== 'POST') return jsonResponse({ error: 'Method not allowed' }, 405);
 
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
-  }
+  const token = (process.env.INTERNAL_PUSH_TOKEN ?? '').trim();
+  if (!token) return jsonResponse({ error: 'Push notify-admin not configured' }, 501);
 
-  let body: { title?: string; body?: string; data?: Record<string, unknown> };
+  const auth = req.headers.get('authorization') || '';
+  if (auth !== `Bearer ${token}`) return jsonResponse({ error: 'Forbidden' }, 403);
+
+  const rateLimited = await withRateLimit(req, '*', {
+    keyPrefix: 'push_notify_admin',
+    limit: 30,
+    windowSeconds: 60,
+  });
+  if (rateLimited) return rateLimited;
+
+  let body: NotifyAdminBody;
   try {
-    body = await req.json();
+    body = (await req.json()) as NotifyAdminBody;
   } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    return jsonResponse({ error: 'Invalid JSON' }, 400);
   }
 
-  const title = body.title || 'Notificare Solaris CET';
-  const notificationBody = body.body || '';
-  const data = body.data || {};
+  const titleRaw = typeof body.title === 'string' ? body.title.trim() : '';
+  const notificationBodyRaw = typeof body.body === 'string' ? body.body.trim() : '';
+  const title = (titleRaw || 'Notificare Solaris CET').slice(0, 120);
+  const notificationBody = notificationBodyRaw.slice(0, 400);
+  const data = body.data && typeof body.data === 'object' ? body.data : {};
 
-  const db = getDb();
-  const adminSubscriptions = await db
-    .select()
-    .from(schema.pushSubscriptions)
-    .where(eq(schema.pushSubscriptions.userType, 'admin'));
+  let adminSubscriptions: Array<{ endpoint: string; p256dh: string; auth: string }>;
+  try {
+    const db = getDb();
+    adminSubscriptions = await db
+      .select({
+        endpoint: schema.pushSubscriptions.endpoint,
+        p256dh: schema.pushSubscriptions.p256dh,
+        auth: schema.pushSubscriptions.auth,
+      })
+      .from(schema.pushSubscriptions)
+      .innerJoin(schema.users, eq(schema.pushSubscriptions.userId, schema.users.id))
+      .where(eq(schema.users.role, 'admin'))
+      .limit(100);
+  } catch {
+    return jsonResponse({ ok: false, degraded: true, delivered: 0 }, 503);
+  }
 
   let delivered = 0;
   for (const sub of adminSubscriptions) {
     try {
-      await sendPushNotification({
-        endpoint: sub.endpoint,
-        keys: { p256dh: sub.p256dh, auth: sub.auth },
-        payload: JSON.stringify({ title, body: notificationBody, data, icon: '/icon-192.png', badge: '/badge-72.png' }),
-      });
+      await sendWebPush(
+        { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+        { title, body: notificationBody, data, icon: '/icon-192.png', badge: '/badge-72.png' },
+      );
       delivered++;
     } catch (err) {
       console.error('Failed to send push to admin:', err);
     }
   }
 
-  return new Response(JSON.stringify({ success: true, delivered }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  return jsonResponse({ success: true, delivered }, 200);
 }

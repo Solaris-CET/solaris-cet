@@ -1,9 +1,10 @@
-import { getDb } from '../../../db/client';
-import { chatConversations, chatAnalytics } from '../../../db/schema';
+import type { SQL } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, inArray, lte, sql } from 'drizzle-orm';
+
+import { getDb, schema } from '../../../db/client';
 import { requireAdminAuth, requireAdminRole } from '../../lib/adminAuth';
 import { getAllowedOrigin } from '../../lib/cors';
 import { corsJson, corsOptions } from '../../lib/http';
-import { eq, desc, sql, and, gte, lte } from 'drizzle-orm';
 
 export const config = { runtime: 'nodejs' };
 
@@ -23,49 +24,123 @@ export default async function handler(req: Request): Promise<Response> {
   const page = Math.max(1, Number(url.searchParams.get('page')) || 1);
   const limit = Math.min(100, Math.max(1, Number(url.searchParams.get('limit')) || 20));
   const offset = (page - 1) * limit;
+  const sessionId = String(url.searchParams.get('session_id') ?? '').trim();
   const filterResolved = url.searchParams.get('resolved');
   const filterDateFrom = url.searchParams.get('date_from') || '';
   const filterDateTo = url.searchParams.get('date_to') || '';
 
   const db = getDb();
 
-  const conditions: ReturnType<typeof and>[] = [];
+  if (sessionId) {
+    const [conversation] = await db
+      .select()
+      .from(schema.crmConversations)
+      .where(eq(schema.crmConversations.id, sessionId))
+      .limit(1);
+    if (!conversation) return corsJson(req, 404, { error: 'Conversation not found' });
 
-  if (filterResolved === 'true') conditions.push(eq(chatConversations.resolved, true));
-  if (filterResolved === 'false') conditions.push(eq(chatConversations.resolved, false));
-  if (filterDateFrom) conditions.push(gte(chatConversations.createdAt, new Date(filterDateFrom)));
-  if (filterDateTo) conditions.push(lte(chatConversations.createdAt, new Date(filterDateTo)));
+    const messages = await db
+      .select()
+      .from(schema.crmMessages)
+      .where(eq(schema.crmMessages.conversationId, conversation.id))
+      .orderBy(asc(schema.crmMessages.createdAt));
+
+    return corsJson(req, 200, {
+      messages: messages.map((message) => ({
+        role: message.sender === 'user' ? 'user' : 'assistant',
+        content: message.body,
+        timestamp: message.createdAt.toISOString(),
+      })),
+    });
+  }
+
+  const conditions: SQL<unknown>[] = [];
+
+  if (filterResolved === 'true') conditions.push(eq(schema.crmConversations.status, 'resolved'));
+  if (filterResolved === 'false') conditions.push(eq(schema.crmConversations.status, 'open'));
+  if (filterDateFrom) conditions.push(gte(schema.crmConversations.createdAt, new Date(filterDateFrom)));
+  if (filterDateTo) conditions.push(lte(schema.crmConversations.createdAt, new Date(filterDateTo)));
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-  const [totalResult, items] = await Promise.all([
-    db.select({ count: sql<number>`count(*)` }).from(chatConversations).where(whereClause),
-    db.select().from(chatConversations).where(whereClause).orderBy(desc(chatConversations.updatedAt)).limit(limit).offset(offset),
+  const [totalResult, items, resolvedCount, totalCount] = await Promise.all([
+    db.select({ count: sql<number>`count(*)` }).from(schema.crmConversations).where(whereClause),
+    db
+      .select()
+      .from(schema.crmConversations)
+      .where(whereClause)
+      .orderBy(desc(schema.crmConversations.updatedAt))
+      .limit(limit)
+      .offset(offset),
+    db.select({ count: sql<number>`count(*)` }).from(schema.crmConversations).where(eq(schema.crmConversations.status, 'resolved')),
+    db.select({ count: sql<number>`count(*)` }).from(schema.crmConversations),
   ]);
 
   const total = Number(totalResult[0]?.count ?? 0);
   const totalPages = Math.ceil(total / limit);
 
-  // Get daily analytics for last 30 days
+  const itemIds = items.map((item) => item.id);
+  const itemMessages = itemIds.length
+    ? await db
+        .select()
+        .from(schema.crmMessages)
+        .where(inArray(schema.crmMessages.conversationId, itemIds))
+        .orderBy(asc(schema.crmMessages.createdAt))
+    : [];
+  const messagesByConversation = new Map<string, Array<typeof itemMessages[number]>>();
+  for (const message of itemMessages) {
+    const bucket = messagesByConversation.get(message.conversationId) ?? [];
+    bucket.push(message);
+    messagesByConversation.set(message.conversationId, bucket);
+  }
+
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  const dailyAnalytics = await db.select()
-    .from(chatAnalytics)
-    .where(gte(chatAnalytics.date, thirtyDaysAgo.toISOString().slice(0, 10)))
-    .orderBy(desc(chatAnalytics.date));
+  const [recentConversations, recentMessages] = await Promise.all([
+    db
+      .select({ id: schema.crmConversations.id, createdAt: schema.crmConversations.createdAt })
+      .from(schema.crmConversations)
+      .where(gte(schema.crmConversations.createdAt, thirtyDaysAgo)),
+    db
+      .select({
+        conversationId: schema.crmMessages.conversationId,
+        body: schema.crmMessages.body,
+        createdAt: schema.crmMessages.createdAt,
+      })
+      .from(schema.crmMessages)
+      .where(gte(schema.crmMessages.createdAt, thirtyDaysAgo)),
+  ]);
 
-  // Get top topics across all conversations
-  const allConversations = await db.select({ messages: chatConversations.messages }).from(chatConversations);
+  const dailyBuckets = new Map<string, { totalConversations: number; totalMessages: number }>();
+  for (const conversation of recentConversations) {
+    const day = conversation.createdAt.toISOString().slice(0, 10);
+    const bucket = dailyBuckets.get(day) ?? { totalConversations: 0, totalMessages: 0 };
+    bucket.totalConversations += 1;
+    dailyBuckets.set(day, bucket);
+  }
+  for (const message of recentMessages) {
+    const day = message.createdAt.toISOString().slice(0, 10);
+    const bucket = dailyBuckets.get(day) ?? { totalConversations: 0, totalMessages: 0 };
+    bucket.totalMessages += 1;
+    dailyBuckets.set(day, bucket);
+  }
+  const dailyAnalytics = [...dailyBuckets.entries()]
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([date, stats]) => ({
+      date,
+      totalConversations: stats.totalConversations,
+      totalMessages: stats.totalMessages,
+      avgMessagesPerConv:
+        stats.totalConversations > 0 ? Number((stats.totalMessages / stats.totalConversations).toFixed(2)) : 0,
+    }));
+
   const topicCounts: Record<string, number> = {};
   const topicKeywords = ['pret', 'cost', 'finantare', 'montaj', 'garantie', 'acoperis', 'fotovoltaic', 'contact', 'program', 'casa verde'];
-  for (const conv of allConversations) {
-    const msgs = conv.messages as Array<{ role: string; content: string }>;
-    for (const msg of msgs) {
-      const lower = msg.content.toLowerCase();
-      for (const keyword of topicKeywords) {
-        if (lower.includes(keyword)) {
-          topicCounts[keyword] = (topicCounts[keyword] || 0) + 1;
-        }
+  for (const message of recentMessages) {
+    const lower = message.body.toLowerCase();
+    for (const keyword of topicKeywords) {
+      if (lower.includes(keyword)) {
+        topicCounts[keyword] = (topicCounts[keyword] || 0) + 1;
       }
     }
   }
@@ -74,18 +149,17 @@ export default async function handler(req: Request): Promise<Response> {
     .slice(0, 10)
     .map(([topic, count]) => ({ topic, count }));
 
-  // Resolution rate
-  const resolvedCount = await db.select({ count: sql<number>`count(*)` }).from(chatConversations).where(eq(chatConversations.resolved, true));
-  const totalCount = await db.select({ count: sql<number>`count(*)` }).from(chatConversations);
-  const resolutionRate = totalCount[0]?.count > 0 ? Math.round((resolvedCount[0]?.count / totalCount[0]?.count) * 100) : 0;
+  const totalConversationCount = Number(totalCount[0]?.count ?? 0);
+  const resolvedConversationCount = Number(resolvedCount[0]?.count ?? 0);
+  const resolutionRate = totalConversationCount > 0 ? Math.round((resolvedConversationCount / totalConversationCount) * 100) : 0;
 
   return corsJson(req, 200, {
     conversations: items.map((item) => ({
       id: item.id,
-      sessionId: item.sessionId,
-      firstMessage: item.firstMessage,
-      messageCount: item.messageCount,
-      resolved: item.resolved,
+      sessionId: item.id,
+      firstMessage: (messagesByConversation.get(item.id)?.[0]?.body ?? item.pageUrl ?? 'Fara mesaj').slice(0, 240),
+      messageCount: messagesByConversation.get(item.id)?.length ?? 0,
+      resolved: item.status === 'resolved',
       createdAt: item.createdAt?.toISOString() ?? '',
       updatedAt: item.updatedAt?.toISOString() ?? '',
     })),
