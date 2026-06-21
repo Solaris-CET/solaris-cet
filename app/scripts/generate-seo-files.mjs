@@ -2,6 +2,19 @@ import fs from 'node:fs/promises'
 import { execSync } from 'node:child_process'
 import path from 'node:path'
 
+const BLOG_ARTICLE_SLUGS = [
+  'cat-costa-un-sistem-fotovoltaic-2026',
+  'cum-accesezi-programul-casa-verde',
+  'tabla-click-vs-tigla-metalica',
+  'tpo-vs-membrana-clasica',
+  'mentenanta-panouri-fotovoltaice',
+  'panouri-bifaciale-vs-monocristaline',
+  'mentenanta-acoperis-tpo-checklist',
+  'invertor-hibrid-baterie-cand-merita',
+  'beneficii-panouri-fotovoltaice-romania-2026',
+  'ghid-complet-instalare-acoperis-tabla',
+]
+
 const appRoot = process.cwd()
 const publicDir = path.join(appRoot, 'public')
 
@@ -55,6 +68,14 @@ function normalizePath(p) {
   if (cleaned === '/index.html') return '/'
   return cleaned
 }
+
+function normalizeSeoLookupPath(p) {
+  const normalized = normalizePath(p)
+  if (normalized === '/') return '/'
+  return normalized.replace(/\/+$/, '')
+}
+
+const spaRenderedStaticSkipPaths = new Set(BLOG_ARTICLE_SLUGS.map((slug) => normalizePath(`/blog/${slug}`)))
 
 function yyyyMmDd(d) {
   const dt = d instanceof Date ? d : new Date(d)
@@ -318,22 +339,24 @@ const SEO_PAGES = {
 };
 
 function getSeoConfig(pathname) {
-  if (SEO_PAGES[pathname]) return SEO_PAGES[pathname];
-  if (pathname.startsWith('/blog/')) {
+  const normalizedPath = normalizeSeoLookupPath(pathname)
+
+  if (SEO_PAGES[normalizedPath]) return SEO_PAGES[normalizedPath];
+  if (normalizedPath.startsWith('/blog/')) {
     return {
       title: 'Articol — Blog Solaris CET | Fotovoltaice și Acoperișuri',
       description: 'Citește articole utile despre panouri fotovoltaice, acoperișuri, finanțare și mentenanță de la Solaris CET.',
       keywords: 'blog fotovoltaice, articole acoperiș, ghid energie solară',
     };
   }
-  if (pathname.startsWith('/servicii/')) {
+  if (normalizedPath.startsWith('/servicii/')) {
     return {
       title: 'Servicii — Solaris CET | Fotovoltaice, Acoperișuri, TPO',
       description: 'Detalii servicii Solaris CET: fotovoltaice, acoperișuri, TPO, atice/fațade tablă, reparații și mentenanță.',
       keywords: 'servicii fotovoltaice, acoperișuri, TPO',
     };
   }
-  if (pathname.startsWith('/finantare/')) {
+  if (normalizedPath.startsWith('/finantare/')) {
     return {
       title: 'Finanțare — Solaris CET | Casa Verde, RePowerEU, Credite',
       description: 'Informații despre programele de finanțare pentru sisteme fotovoltaice: Casa Verde, RePowerEU, credite verzi.',
@@ -622,6 +645,14 @@ async function writeStaticPages() {
               <li>Poți cere și opțiuni cu baterie sau încărcător EV, dacă urmărești autoconsum seara.</li>
             </ul>
           </div>
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Pași utili înainte de cererea de ofertă</h2>
+            <p style="margin:0; color: rgba(255,255,255,.82);">
+              Dacă vrei o estimare rapidă, începe cu <a href="/calculator/">calculatorul fotovoltaic</a>, apoi vezi și
+              <a href="/blog/cat-costa-un-sistem-fotovoltaic-2026"> ghidul despre costuri</a> sau mergi direct la
+              <a href="/contact/"> pagina de contact</a> pentru ofertă personalizată.
+            </p>
+          </div>
     `,
     'fotovoltaice-industriale': `
           <div style="margin-top: 12px;">
@@ -643,6 +674,15 @@ async function writeStaticPages() {
               <li>ROI-ul real se judecă după autoconsum, nu după puterea “maximă” instalată.</li>
               <li>Livrăm monitorizare și recomandări de mentenanță după punerea în funcțiune.</li>
             </ul>
+          </div>
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Legături utile pentru evaluare</h2>
+            <p style="margin:0; color: rgba(255,255,255,.82);">
+              Dacă proiectul este pe acoperiș plat, vezi și
+              <a href="/servicii/acoperisuri-industriale-tpo/"> serviciul pentru acoperișuri industriale TPO</a>.
+              Pentru o discuție tehnică și ofertă etapizată, mergi direct la <a href="/contact/">contact</a> sau revino în
+              <a href="/servicii/"> hub-ul de servicii</a>.
+            </p>
           </div>
     `,
     'acoperisuri-tabla-tigla': `
@@ -1463,6 +1503,16 @@ async function writeStaticPages() {
               <li><a href="/blog/mentenanta-panouri-fotovoltaice">Mentenanța panourilor fotovoltaice</a></li>
             </ul>
           </div>
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Continuă către pagina potrivită</h2>
+            <p style="margin:0; color: rgba(255,255,255,.82);">
+              După lectură poți continua spre
+              <a href="/servicii/fotovoltaice-rezidentiale/"> fotovoltaice rezidențiale</a>,
+              <a href="/servicii/fotovoltaice-industriale/"> fotovoltaice industriale</a>,
+              <a href="/calculator/"> calculatorul fotovoltaic</a> sau
+              <a href="/contact/"> contact</a> pentru ofertă.
+            </p>
+          </div>
       `,
       jsonLd: wrapJsonLd([
         {
@@ -1806,7 +1856,10 @@ async function writeStaticPages() {
   ]
 
   for (const p of pages) {
-    const outDir = path.join(publicDir, normalizePath(p.path).replace(/^\//, ''), 'index.html')
+    const normalizedPath = normalizePath(p.path)
+    if (spaRenderedStaticSkipPaths.has(normalizedPath)) continue
+
+    const outDir = path.join(publicDir, normalizedPath.replace(/^\//, ''), 'index.html')
     await fs.mkdir(path.dirname(outDir), { recursive: true })
     const html = renderStaticPageHtml({
       title: p.title,
@@ -1823,6 +1876,12 @@ async function writeStaticPages() {
     })
     await fs.writeFile(outDir, html, 'utf8')
   }
+
+  for (const slug of BLOG_ARTICLE_SLUGS) {
+    await fs.rm(path.join(publicDir, 'blog', slug), { recursive: true, force: true })
+  }
+
+  return pages
 }
 
 async function writeSitemap() {
@@ -1865,19 +1924,7 @@ async function writeSitemap() {
   ]
 
   // Add blog article pages from locationData (simulated)
-  const blogSlugs = [
-    'cat-costa-un-sistem-fotovoltaic-2026',
-    'cum-accesezi-programul-casa-verde',
-    'tabla-click-vs-tigla-metalica',
-    'tpo-vs-membrana-clasica',
-    'mentenanta-panouri-fotovoltaice',
-    'panouri-bifaciale-vs-monocristaline',
-    'mentenanta-acoperis-tpo-checklist',
-    'invertor-hibrid-baterie-cand-merita',
-    'beneficii-panouri-fotovoltaice-romania-2026',
-    'ghid-complet-instalare-acoperis-tabla',
-  ]
-  for (const slug of blogSlugs) {
+  for (const slug of BLOG_ARTICLE_SLUGS) {
     urls.push({
       loc: toAbsoluteUrl(`/blog/${slug}`),
       priority: '0.6',
@@ -1922,7 +1969,7 @@ async function writeRobots() {
     ``,
     `Sitemap: ${origin}/sitemap.xml`,
     ``,
-    `Host: https://solaris-cet.com`,
+    `Host: solaris-cet.com`,
     ``,
   ].join('\n')
   await fs.mkdir(publicDir, { recursive: true })
@@ -1951,7 +1998,7 @@ async function pingSearchEngines() {
   console.log('✅ Sitemap submitted to Google and Bing')
 }
 
-await Promise.all([writeStaticPages(), writeSitemap(), writeRobots()])
+const [pages] = await Promise.all([writeStaticPages(), writeSitemap(), writeRobots()])
 
 // ── SEO Audit ───────────────────────────────────────────────────────────────
 const allPages = pages.map((p) => ({
