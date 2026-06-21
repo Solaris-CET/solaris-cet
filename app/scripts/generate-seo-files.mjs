@@ -653,6 +653,13 @@ async function writeStaticPages() {
               <a href="/contact/"> pagina de contact</a> pentru ofertă personalizată.
             </p>
           </div>
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Vezi și</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li><a href="/servicii/fotovoltaice-industriale/">Fotovoltaice industriale</a> — pentru hale și spații comerciale.</li>
+              <li><a href="/blog/">Blog Solaris CET</a> — ghiduri și articole utile.</li>
+            </ul>
+          </div>
     `,
     'fotovoltaice-industriale': `
           <div style="margin-top: 12px;">
@@ -683,6 +690,13 @@ async function writeStaticPages() {
               Pentru o discuție tehnică și ofertă etapizată, mergi direct la <a href="/contact/">contact</a> sau revino în
               <a href="/servicii/"> hub-ul de servicii</a>.
             </p>
+          </div>
+          <div style="margin-top: 12px;">
+            <h2 style="font-size: 18px; margin: 0 0 10px;">Vezi și</h2>
+            <ul style="margin: 0; padding-left: 18px; color: rgba(255,255,255,.82);">
+              <li><a href="/servicii/fotovoltaice-rezidentiale/">Fotovoltaice rezidențiale</a> — pentru case și vile.</li>
+              <li><a href="/blog/">Blog Solaris CET</a> — ghiduri și articole utile.</li>
+            </ul>
           </div>
     `,
     'acoperisuri-tabla-tigla': `
