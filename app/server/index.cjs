@@ -1580,6 +1580,8 @@ async function main() {
     {
       const normalizedForAlias = (reqUrl.pathname || '/').replace(/\/+$/, '') || '/';
       const SERVICE_SLUG_ALIASES = {
+        '/servicii-fotovoltaice-industriale': '/servicii/fotovoltaice-industriale/',
+        '/servicii-invertor-baterie-and-mentenanta': '/servicii/',
         '/servicii/fotovoltaice': '/servicii/fotovoltaice-rezidentiale/',
         '/servicii/fotovoltaic-rezidential': '/servicii/fotovoltaice-rezidentiale/',
         '/servicii/fotovoltaic-industrial': '/servicii/fotovoltaice-industriale/',

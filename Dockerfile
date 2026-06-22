@@ -12,7 +12,7 @@ ARG VITE_GOOGLE_SITE_VERIFICATION
 ENV VITE_GOOGLE_SITE_VERIFICATION=${VITE_GOOGLE_SITE_VERIFICATION}
 ENV NODE_ENV=production
 ENV NODE_OPTIONS=--max-old-space-size=2048
-RUN npm run build
+RUN npm run app:build
 
 FROM node:${NODE_VERSION}-alpine AS runner
 RUN addgroup -S app && adduser -S app -G app

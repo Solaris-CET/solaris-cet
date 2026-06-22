@@ -3,8 +3,6 @@ import type { ComponentType } from 'react';
 
 import AppImage from '@/components/AppImage';
 import { SolarisLogoMark } from '@/components/SolarisLogoMark';
-import SolarPanelAnimation from '@/components/animations/SolarPanelAnimation';
-import RoofMetalAnimation from '@/components/animations/RoofMetalAnimation';
 
 const UNSPLASH = (id: string) =>
   `https://images.unsplash.com/${id}?w=1600&q=80&auto=format&fit=crop`;
@@ -213,20 +211,14 @@ export default function ProductsSection() {
               >
                 {image ? (
                   <div className="relative aspect-[16/10] w-full overflow-hidden">
-                    {s.id === 'pv-res' || s.id === 'pv-casa-verde' || s.id === 'pv-3ph' || s.id === 'pv-hybrid' || s.id === 'ev' || s.id === 'pv-industrial' ? (
-                      <SolarPanelAnimation />
-                    ) : s.id === 'roof' ? (
-                      <RoofMetalAnimation />
-                    ) : (
-                      <AppImage
-                        src={image.src}
-                        alt={image.alt}
-                        width={image.width}
-                        height={image.height}
-                        className="h-full w-full object-cover"
-                        referrerPolicy="no-referrer"
-                      />
-                    )}
+                    <AppImage
+                      src={image.src}
+                      alt={image.alt}
+                      width={image.width}
+                      height={image.height}
+                      className="h-full w-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" aria-hidden />
                     <div className="pointer-events-none absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-black/35 backdrop-blur">
                       <SolarisLogoMark className="h-7 w-7 text-orange-300" aria-hidden />

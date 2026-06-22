@@ -36,13 +36,72 @@ import { ThemeProvider } from 'next-themes'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import { isChunkLoadFailure, recoverAppOnce } from '@/lib/appRecovery'
+import { isChunkLoadFailure, recoverAppOnce, resetRecoveryState } from '@/lib/appRecovery'
 import { scheduleSentryInit } from '@/lib/sentryClient'
 
 if (import.meta.env.DEV && typeof window !== 'undefined') {
   if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
     void recoverAppOnce('dev_sw_reset')
   }
+}
+
+function setupServiceWorkerRecovery(): void {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return
+
+  let recoveryTriggered = false
+
+  const triggerControllerRecovery = () => {
+    if (recoveryTriggered) return
+    recoveryTriggered = true
+    void recoverAppOnce('sw_controller_change')
+  }
+
+  const activateWaitingWorker = async (registration: ServiceWorkerRegistration | undefined) => {
+    if (!registration?.waiting) return
+    registration.waiting.postMessage({ type: 'SKIP_WAITING' })
+  }
+
+  const watchRegistration = (registration: ServiceWorkerRegistration | undefined) => {
+    if (!registration) return
+
+    const watchInstalling = (worker: ServiceWorker | null) => {
+      if (!worker) return
+      worker.addEventListener('statechange', () => {
+        if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+          void activateWaitingWorker(registration)
+        }
+      })
+    }
+
+    watchInstalling(registration.installing)
+    registration.addEventListener('updatefound', () => {
+      watchInstalling(registration.installing)
+    })
+    void activateWaitingWorker(registration)
+  }
+
+  const checkForUpdates = async () => {
+    try {
+      const registration = await navigator.serviceWorker.getRegistration('/')
+      if (!registration) return
+      watchRegistration(registration)
+      await registration.update()
+      watchRegistration(registration)
+    } catch {
+      void 0
+    }
+  }
+
+  navigator.serviceWorker.addEventListener('controllerchange', triggerControllerRecovery)
+  void checkForUpdates()
+  window.addEventListener('focus', () => {
+    void checkForUpdates()
+  })
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      void checkForUpdates()
+    }
+  })
 }
 
 import App from './App.tsx'
@@ -89,3 +148,19 @@ createRoot(document.getElementById('root')!).render(
     </ThemeProvider>
   </StrictMode>,
 )
+
+setupServiceWorkerRecovery()
+
+if (typeof window !== 'undefined') {
+  const markAppStable = () => {
+    window.setTimeout(() => {
+      resetRecoveryState()
+    }, 1200)
+  }
+
+  if (document.readyState === 'complete') {
+    markAppStable()
+  } else {
+    window.addEventListener('load', markAppStable, { once: true })
+  }
+}

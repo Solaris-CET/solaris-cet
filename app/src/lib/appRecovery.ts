@@ -1,5 +1,12 @@
 const DEFAULT_KEY = 'solaris_recover_once_v1'
 const PENDING_ANALYTICS_KEY = 'solaris_pending_analytics_event_v1'
+const RECOVERY_STATE_KEY = 'solaris_recovery_state_v1'
+
+type RecoveryState = {
+  count: number
+  lastKey: string
+  ts: number
+}
 
 function asString(value: unknown): string {
   if (typeof value === 'string') return value
@@ -26,10 +33,51 @@ export function isChunkLoadFailure(value: unknown): boolean {
   )
 }
 
+function readRecoveryState(): RecoveryState | null {
+  try {
+    const raw = sessionStorage.getItem(RECOVERY_STATE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as Partial<RecoveryState>
+    if (
+      typeof parsed?.count === 'number' &&
+      typeof parsed?.lastKey === 'string' &&
+      typeof parsed?.ts === 'number'
+    ) {
+      return parsed as RecoveryState
+    }
+  } catch {
+    void 0
+  }
+  return null
+}
+
+function writeRecoveryState(state: RecoveryState): void {
+  try {
+    sessionStorage.setItem(RECOVERY_STATE_KEY, JSON.stringify(state))
+  } catch {
+    void 0
+  }
+}
+
+export function resetRecoveryState(): void {
+  if (typeof window === 'undefined') return
+  try {
+    sessionStorage.removeItem(DEFAULT_KEY)
+    sessionStorage.removeItem(RECOVERY_STATE_KEY)
+  } catch {
+    void 0
+  }
+}
+
 export async function recoverAppOnce(key = DEFAULT_KEY): Promise<void> {
   if (typeof window === 'undefined') return
-  if (sessionStorage.getItem(key)) return
-  sessionStorage.setItem(key, '1')
+  const now = Date.now()
+  const current = readRecoveryState()
+  const isSameBurst = current && current.lastKey === key && now - current.ts < 30_000
+  const nextCount = isSameBurst ? current.count + 1 : 1
+  if (nextCount > 2) return
+  sessionStorage.setItem(key, String(nextCount))
+  writeRecoveryState({ count: nextCount, lastKey: key, ts: now })
 
   try {
     if ('serviceWorker' in navigator) {
@@ -46,12 +94,14 @@ export async function recoverAppOnce(key = DEFAULT_KEY): Promise<void> {
   }
 
   const url = new URL(window.location.href)
-  url.searchParams.set('v', String(Date.now()))
+  url.searchParams.set('v', String(now))
+  url.searchParams.set('recovery', String(nextCount))
   try {
     const payload = {
       name: 'pwa_recovery',
-      ts: Date.now(),
+      ts: now,
       key,
+      attempt: nextCount,
       pathname: url.pathname,
     }
     sessionStorage.setItem(PENDING_ANALYTICS_KEY, JSON.stringify(payload))

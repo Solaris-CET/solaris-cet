@@ -3,266 +3,252 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
       <loc>https://solaris-cet.com/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>daily</changefreq>
       <priority>1.0</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/servicii/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>weekly</changefreq>
       <priority>0.8</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/servicii/"/>
     </url>
   <url>
-      <loc>https://solaris-cet.com/servicii-invertor-baterie-and-mentenanta</loc>
-      <lastmod>2026-06-19</lastmod>
-      <changefreq>weekly</changefreq>
-      <priority>0.8</priority>
-      <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/servicii-invertor-baterie-and-mentenanta"/>
-    </url>
-  <url>
       <loc>https://solaris-cet.com/servicii/fotovoltaice-rezidentiale/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>weekly</changefreq>
       <priority>0.9</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/servicii/fotovoltaice-rezidentiale/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/servicii/fotovoltaice-industriale/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>weekly</changefreq>
       <priority>0.9</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/servicii/fotovoltaice-industriale/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/servicii/acoperisuri-tabla-tigla/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>weekly</changefreq>
       <priority>0.9</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/servicii/acoperisuri-tabla-tigla/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/servicii/acoperisuri-industriale-tpo/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>weekly</changefreq>
       <priority>0.9</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/servicii/acoperisuri-industriale-tpo/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/servicii/atice-si-fatade-tabla/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>weekly</changefreq>
       <priority>0.9</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/servicii/atice-si-fatade-tabla/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/servicii/reparatii-si-mentenanta/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>weekly</changefreq>
       <priority>0.9</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/servicii/reparatii-si-mentenanta/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/despre/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.7</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/despre/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/contact/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.9</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/contact/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/calculator/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/calculator/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/finantare/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/finantare/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/proiecte/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>weekly</changefreq>
       <priority>0.7</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/proiecte/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/blog/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>weekly</changefreq>
       <priority>0.7</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/blog/"/>
     </url>
   <url>
-      <loc>https://solaris-cet.com/blog/casa-inteligenta</loc>
-      <lastmod>2026-06-19</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.6</priority>
-      <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/blog/casa-inteligenta"/>
-    </url>
-  <url>
       <loc>https://solaris-cet.com/faq/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.6</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/faq/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/privacy/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>yearly</changefreq>
       <priority>0.3</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/privacy/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/cookies/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>yearly</changefreq>
       <priority>0.3</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/cookies/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/terms/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>yearly</changefreq>
       <priority>0.3</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/terms/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/vaslui/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/vaslui/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/iasi/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/iasi/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/bacau/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/bacau/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/galati/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/galati/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/neamt/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/neamt/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/suceava/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/suceava/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/botosani/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/botosani/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/vrancea/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/vrancea/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/blog/cat-costa-un-sistem-fotovoltaic-2026/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.6</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/blog/cat-costa-un-sistem-fotovoltaic-2026/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/blog/cum-accesezi-programul-casa-verde/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.6</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/blog/cum-accesezi-programul-casa-verde/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/blog/tabla-click-vs-tigla-metalica/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.6</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/blog/tabla-click-vs-tigla-metalica/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/blog/tpo-vs-membrana-clasica/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.6</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/blog/tpo-vs-membrana-clasica/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/blog/mentenanta-panouri-fotovoltaice/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.6</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/blog/mentenanta-panouri-fotovoltaice/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/blog/panouri-bifaciale-vs-monocristaline/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.6</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/blog/panouri-bifaciale-vs-monocristaline/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/blog/mentenanta-acoperis-tpo-checklist/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.6</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/blog/mentenanta-acoperis-tpo-checklist/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/blog/invertor-hibrid-baterie-cand-merita/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.6</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/blog/invertor-hibrid-baterie-cand-merita/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/blog/beneficii-panouri-fotovoltaice-romania-2026/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.6</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/blog/beneficii-panouri-fotovoltaice-romania-2026/"/>
     </url>
   <url>
       <loc>https://solaris-cet.com/blog/ghid-complet-instalare-acoperis-tabla/</loc>
-      <lastmod>2026-06-19</lastmod>
+      <lastmod>2026-06-21</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.6</priority>
       <xhtml:link rel="alternate" hreflang="ro" href="https://solaris-cet.com/blog/ghid-complet-instalare-acoperis-tabla/"/>

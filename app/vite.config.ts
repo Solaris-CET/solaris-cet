@@ -315,11 +315,16 @@ export default defineConfig({
         const blocked = [
           '@react-three/drei',
           '@react-three/postprocessing',
+          '@react-three/fiber',
           '@monogrid/gainmap',
           'gsap',
           '@tonconnect/ui',
           '@tonconnect/sdk',
           '@walletconnect/',
+          '@reown/appkit',
+          '@lit/reactive-element',
+          'base64-js',
+          'buffer',
         ];
         return deps.filter((d) => !blocked.some((b) => d.includes(b)));
       },

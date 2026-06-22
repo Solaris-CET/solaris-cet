@@ -6,13 +6,14 @@ import CookieConsentBanner from '@/components/CookieConsentBanner';
 import { Toaster } from '@/components/ui/sonner';
 import { parseUrlLocaleFromPathname, type UrlLocale,urlLocaleFromLang } from '@/i18n/urlRouting';
 import { refreshScrollReveal } from '@/js/reveal';
+import { type BlogLocale,getBlogPost } from '@/lib/blog';
 import { getServiceDetail } from '@/lib/serviceDetails';
 import { applySpaSeo } from '@/lib/spaSeo';
 import HomePage from '@/pages_legacy/HomePage';
 import { companyFaqItems } from '@/sections/CompanyFaqSection';
 
-import Navigation from './components/Navigation';
 import MobileAppNav from './components/MobileAppNav';
+import Navigation from './components/Navigation';
 import { LanguageContext, useLanguageState } from './hooks/useLanguage';
 import { useTelegram } from './hooks/useTelegram';
 import Cookies from './pages/Cookies';
@@ -105,6 +106,10 @@ type RouteSeo = {
   noindex?: boolean;
   jsonLd?: unknown;
 };
+
+function asBlogLocale(locale: UrlLocale): BlogLocale {
+  return locale === 'ro' || locale === 'es' ? locale : 'en';
+}
 
 type PortfolioSchemaItem = {
   name: string;
@@ -307,9 +312,9 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
 
   const base: Record<string, RouteSeo> = {
     '/': {
-      title: 'Solaris CET — Fotovoltaice, Acoperișuri, Construcții',
+      title: 'Panouri Fotovoltaice și Acoperișuri în Vaslui | Ofertă Rapidă — Solaris CET',
       description:
-        'Servicii complete: instalații fotovoltaice, construcții, acoperișuri tablă/țiglă/TPO, atice și fațade tablă, reparații.',
+        'Panouri fotovoltaice rezidențiale și industriale, acoperișuri tablă și TPO în Vaslui și Moldova. Evaluare inițială, ofertă clară și contact rapid.',
       jsonLd: {
         '@context': 'https://schema.org',
         '@graph': [
@@ -572,6 +577,19 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
       };
     }
     if (path.startsWith('/blog/')) {
+      const slug = path.replace(/^\/blog\//, '').replace(/\/+$/, '');
+      const post = getBlogPost(asBlogLocale(urlLocale), slug);
+      if (post) {
+        return {
+          title: `${post.frontmatter.title} — Solaris CET`,
+          description: post.frontmatter.description || post.excerpt,
+          ogType: 'article',
+          jsonLd: {
+            '@context': 'https://schema.org',
+            '@graph': [post.schema, buildBreadcrumbJsonLd(origin, urlLocale, path)],
+          },
+        };
+      }
       return {
         title: 'Articol — Solaris CET',
         description: 'Articol din blogul Solaris CET.',

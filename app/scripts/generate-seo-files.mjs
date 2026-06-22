@@ -247,8 +247,8 @@ const SEO_PAGES = {
     keywords: 'reparații acoperiș, mentenanță panouri, infiltrații acoperiș',
   },
   '/contact': {
-    title: 'Contact — Solaris CET | Ofertă Gratuită pentru Fotovoltaice și Acoperișuri',
-    description: 'Contactează Solaris CET pentru ofertă gratuită. Telefon: +40 769 889 721, Email: solaris-cet@protonmail.com. Răspundem în 24h.',
+    title: 'Contact Solaris CET — Cere Ofertă pentru Fotovoltaice și Acoperișuri',
+    description: 'Cere ofertă pentru fotovoltaice, acoperișuri sau mentenanță. Telefon, email și formular rapid. Răspundem în maximum 24h lucrătoare.',
     keywords: 'contact solaris cet, ofertă fotovoltaice, telefon acoperiș',
   },
   '/despre': {
@@ -272,8 +272,8 @@ const SEO_PAGES = {
     keywords: 'proiecte fotovoltaice, portofoliu acoperișuri, lucrări realizate',
   },
   '/blog': {
-    title: 'Blog — Solaris CET | Ghiduri și Articole despre Fotovoltaice și Acoperișuri',
-    description: 'Articole utile despre costuri, finanțare, mentenanță și alegerea sistemului potrivit. Ghiduri practice pentru proprietari și firme.',
+    title: 'Blog Fotovoltaice — Costuri, Casa Verde și Mentenanță | Solaris CET',
+    description: 'Ghiduri practice despre costuri, Casa Verde, mentenanță și alegerea sistemului potrivit pentru casă sau firmă.',
     keywords: 'blog fotovoltaice, ghid acoperiș, articole energie solară',
   },
   '/faq': {
@@ -391,7 +391,7 @@ function renderStaticPageHtml({
   const footerCta =
     typeof footerCtaHtml === 'string'
       ? footerCtaHtml
-      : '<p><a href="/contact/">Solicită ofertă →</a></p>'
+      : '<p><a href="/contact/">Cere ofertă și evaluare inițială →</a></p>'
   const mergedJsonLd = withGlobalJsonLd(jsonLd)
   const jsonLdBlock = mergedJsonLd
     ? `\n    <script type="application/ld+json">${safeJsonLd(mergedJsonLd)}</script>\n`
@@ -1004,10 +1004,13 @@ async function writeStaticPages() {
       path: '/contact',
       title: 'Contact — Solaris CET',
       description: 'Contact Solaris CET pentru fotovoltaice, acoperișuri, reparații și mentenanță.',
-      h1: 'Contact Solaris CET',
-      bodyLines: ['Instalații fotovoltaice, acoperișuri (tablă/țiglă/TPO), reparații și mentenanță în Vaslui și în toată România.'],
+      h1: 'Cere ofertă pentru fotovoltaice și acoperișuri',
+      bodyLines: [
+        'Spune-ne localitatea, tipul proiectului și ce vrei să rezolvi: fotovoltaice, acoperiș, TPO, reparații sau mentenanță.',
+        'Îți răspundem rapid prin formular, telefon sau WhatsApp și clarificăm pașii utili înainte de ofertă.',
+      ],
       extraHtml: contactDetailsHtml,
-      footerCtaHtml: '<p><a href="#form-oferta">Completează formularul ↓</a></p>',
+      footerCtaHtml: '<p><a href="#form-oferta">Completează formularul sau sună acum ↓</a></p>',
       jsonLd: wrapJsonLd([
         {
           '@type': 'ContactPage',
@@ -1120,7 +1123,7 @@ async function writeStaticPages() {
       path: '/servicii/fotovoltaice-rezidentiale',
       title: 'Fotovoltaice Rezidențiale în Vaslui, Iași și Bacău — Solaris CET',
       description: 'Sisteme fotovoltaice rezidențiale 3-15 kWp pentru case, cu dosar prosumator, baterii opționale și montaj curat.',
-      h1: 'Fotovoltaice Rezidențiale în Vaslui, Iași, Bacău și județele limitrofe',
+      h1: 'Panouri fotovoltaice rezidențiale pentru case în Vaslui și Moldova',
       bodyLines: [
         'Dimensionăm sisteme fotovoltaice rezidențiale în intervalul 3-15 kWp pentru case și vile, pornind de la consumul real, orientarea acoperișului, umbriri și obiectivul de autoconsum. Pachetul poate include soluții on-grid pentru prosumator, variante hibride sau configurații cu baterie, în funcție de cum folosești energia în cursul zilei și al serii.',
         'În ofertă clarificăm ce primești concret: panouri, structură, invertor, cablare DC/AC, protecții, contorizare, punere în funcțiune, instruire și suport pentru dosarul de prosumator. Dacă urmărești Casa Verde AFM sau o finanțare disponibilă prin PNRR, îți spunem din start ce documente și condiții practice trebuie pregătite.',
@@ -1153,7 +1156,7 @@ async function writeStaticPages() {
       path: '/servicii/fotovoltaice-industriale',
       title: 'Fotovoltaice Industriale în Vaslui și Moldova — Solaris CET',
       description: 'Sisteme fotovoltaice industriale de la 20+ kWp pentru hale și spații comerciale, cu monitorizare și scenarii de ROI.',
-      h1: 'Fotovoltaice Industriale în Vaslui, Iași, Bacău și toată Moldova',
+      h1: 'Fotovoltaice industriale pentru hale și spații comerciale',
       bodyLines: [
         'Pentru hale, depozite și spații comerciale proiectăm sisteme fotovoltaice de la 20+ kWp, pornind de la profilul de consum, facturile de energie, orientarea acoperișului și tipul de rețea mono sau trifazată. Scopul este autoconsumul real și amortizarea calculată prudent, nu doar instalarea unei puteri mari care nu este folosită eficient.',
         'Analizăm și partea de execuție: tipul acoperișului, eventualele membrane TPO, încărcările admise, căile de acces și modul în care putem lucra etapizat fără să blocăm activitatea firmei. Putem integra monitorizare live, alerte și rapoarte lunare, utile pentru managementul energetic și pentru urmărirea performanței în exploatare.',
@@ -1502,10 +1505,10 @@ async function writeStaticPages() {
       path: '/blog',
       title: 'Blog — Solaris CET',
       description: 'Articole reale și ghiduri practice despre costuri, finanțare, mentenanță și alegerea sistemului potrivit.',
-      h1: 'Blog Solaris CET',
+      h1: 'Ghiduri fotovoltaice, costuri și finanțare',
       bodyLines: [
-        'Articole și ghiduri care ajută clientul să ia o decizie mai bună înainte de ofertare.',
-        'Fiecare material trimite spre calculator, serviciul relevant sau contactul scurt, nu rămâne o simplă listă de subiecte.',
+        'Articole și ghiduri pentru clienți care compară costuri, Casa Verde, ROI, mentenanță și alegerea sistemului potrivit.',
+        'Fiecare material te trimite mai departe către calculator, serviciul relevant sau contact, nu rămâne o simplă listă de subiecte.',
       ],
       extraHtml: `
           <div style="margin-top: 12px;">

@@ -12,6 +12,7 @@
  * `runtime: 'edge'` matches edge-style adapters and compatible hosts (e.g. Coolify).
  */
 import OpenAI from 'openai';
+
 import { getAllowedOrigin } from '../lib/cors';
 
 export const config = { runtime: 'edge' };
@@ -112,7 +113,12 @@ function detectIntent(userMessage: string): string | null {
 }
 
 // ── Helper: return a non‑streaming JSON response ────────────────────────────
-function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Response {
+function jsonResponse(
+  body: unknown,
+  allowedOrigin: string,
+  status = 200,
+  extraHeaders?: Record<string, string>,
+): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
@@ -120,6 +126,7 @@ function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Respo
       'Access-Control-Allow-Origin': allowedOrigin,
       'Vary': 'Origin',
       'Cache-Control': 'no-store',
+      ...(extraHeaders ?? {}),
     },
   });
 }
@@ -172,14 +179,47 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   // Parse body
-  let body: { messages?: Array<{ role: string; content: string }> };
+  let body: {
+    messages?: Array<{ role: string; content: string }>;
+    query?: string;
+    conversation?: Array<{ role?: string; content?: string }>;
+  };
   try {
-    body = (await req.json()) as { messages?: Array<{ role: string; content: string }> };
+    body = (await req.json()) as {
+      messages?: Array<{ role: string; content: string }>;
+      query?: string;
+      conversation?: Array<{ role?: string; content?: string }>;
+    };
   } catch {
     return jsonResponse({ error: 'Invalid JSON body' }, allowedOrigin, 400);
   }
 
-  const messages = body.messages;
+  let messages = Array.isArray(body.messages) ? body.messages : null;
+  if ((!messages || messages.length === 0) && typeof body.query === 'string' && body.query.trim()) {
+    const query = body.query.trim().slice(0, 4000);
+    const conversation = Array.isArray(body.conversation)
+      ? body.conversation
+          .filter(
+            (item): item is { role: string; content: string } =>
+              typeof item?.role === 'string' &&
+              (item.role === 'user' || item.role === 'assistant' || item.role === 'system') &&
+              typeof item?.content === 'string' &&
+              item.content.trim().length > 0,
+          )
+          .map((item) => ({
+            role: item.role,
+            content: item.content.trim().slice(0, 4000),
+          }))
+          .slice(-5)
+      : [];
+
+    const lastConversationMessage = conversation[conversation.length - 1];
+    messages =
+      lastConversationMessage?.role === 'user' && lastConversationMessage.content === query
+        ? conversation
+        : [...conversation, { role: 'user', content: query }];
+  }
+
   if (!Array.isArray(messages) || messages.length === 0) {
     return jsonResponse({ error: 'messages array is required and must be non‑empty' }, allowedOrigin, 400);
   }
@@ -197,33 +237,42 @@ export default async function handler(req: Request): Promise<Response> {
 
   // If we have a direct knowledge‑base hit, return it immediately (non‑streaming)
   if (intentKey && KNOWLEDGE_BASE[intentKey]) {
+    const content = KNOWLEDGE_BASE[intentKey];
     return jsonResponse({
-      content: KNOWLEDGE_BASE[intentKey],
+      content,
+      response: content,
+      message: content,
       source: 'fallback',
       suggestedQuestions: [
         'Cât costă un sistem de 5kW?',
         'Ce include prețul?',
         'Cum pot obține o ofertă personalizată?',
       ],
-    }, allowedOrigin);
+    }, allowedOrigin, 200, { 'X-Cet-Ai-Source': 'offline' });
   }
 
   // ── Try DeepSeek API ──────────────────────────────────────────────────────
   const apiKey = process.env.DEEPSEEK_CHATBOT_API_KEY;
   if (!apiKey) {
-    // No API key configured – fallback to knowledge base if we have a match
-    if (intentKey && KNOWLEDGE_BASE[intentKey]) {
-      return jsonResponse({
-        content: KNOWLEDGE_BASE[intentKey],
+    const content =
+      KNOWLEDGE_BASE.contact ||
+      'Momentan asistentul AI live nu este disponibil. Pentru ofertă rapidă, sună la +40 769 889 721 sau scrie la solaris-cet@protonmail.com.';
+    return jsonResponse(
+      {
+        content,
+        response: content,
+        message: content,
         source: 'fallback',
         suggestedQuestions: [
           'Cât costă un sistem de 5kW?',
           'Ce include prețul?',
           'Cum pot obține o ofertă personalizată?',
         ],
-      }, allowedOrigin);
-    }
-    return jsonResponse({ error: 'DeepSeek API key not configured' }, allowedOrigin, 500);
+      },
+      allowedOrigin,
+      200,
+      { 'X-Cet-Ai-Source': 'offline' },
+    );
   }
 
   // Prepend system prompt and keep only last 6 messages
@@ -243,8 +292,8 @@ export default async function handler(req: Request): Promise<Response> {
 
   const startTime = performance.now();
   let usedFallback = false;
-  let responseContent = '';
-  let suggestedQuestions: string[] = [];
+  let responseContent: string;
+  let suggestedQuestions: string[];
 
   try {
     const completion = await client.chat.completions.create({
@@ -294,9 +343,13 @@ export default async function handler(req: Request): Promise<Response> {
   return jsonResponse(
     {
       content: responseContent,
+      response: responseContent,
+      message: responseContent,
       source: usedFallback ? 'fallback' : 'deepseek',
       suggestedQuestions,
     },
     allowedOrigin,
+    200,
+    { 'X-Cet-Ai-Source': usedFallback ? 'offline' : 'live' },
   );
 }

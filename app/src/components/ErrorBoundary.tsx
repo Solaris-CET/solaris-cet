@@ -1,5 +1,30 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 
+import { isChunkLoadFailure, recoverAppOnce } from '../lib/appRecovery';
+
+function asMessage(value: unknown): string {
+  if (typeof value === 'string') return value;
+  if (value && typeof value === 'object' && 'message' in value) {
+    const message = (value as { message?: unknown }).message;
+    if (typeof message === 'string') return message;
+  }
+  try {
+    return String(value);
+  } catch {
+    return '';
+  }
+}
+
+function isStaleRuntimeFailure(value: unknown): boolean {
+  const message = asMessage(value);
+  if (!message) return false;
+  return (
+    /useLocation\(\) may be used only in the context of a <Router> component/i.test(message) ||
+    /useNavigate\(\) may be used only in the context of a <Router> component/i.test(message) ||
+    /useRoutes\(\) may be used only in the context of a <Router> component/i.test(message)
+  );
+}
+
 type Props = { children: ReactNode };
 type State = { hasError: boolean; error: Error | null; countdown: number };
 
@@ -27,6 +52,20 @@ export class ErrorBoundary extends Component<Props, State> {
       }).catch(() => {});
     } catch {
       // ignore
+    }
+
+    if (
+      isChunkLoadFailure(error) ||
+      isChunkLoadFailure(error?.message) ||
+      isStaleRuntimeFailure(error) ||
+      isStaleRuntimeFailure(error?.message)
+    ) {
+      if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = null;
+      }
+      void recoverAppOnce('stale_runtime_recovery');
+      return;
     }
 
     // Start auto-reload countdown

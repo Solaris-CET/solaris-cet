@@ -208,7 +208,6 @@ const filteredManifest = wbManifest.filter((entry) => {
   if (url === 'apple-touch-icon.png') return true
   if (url === 'safari-pinned-tab.svg') return true
 
-  if (url.startsWith('assets/') && (url.endsWith('.js') || url.endsWith('.css'))) return true
   if (url.startsWith('images/')) return true
   if (url.startsWith('fonts/')) return true
 
@@ -371,8 +370,9 @@ sw.addEventListener('unhandledrejection', (event) => {
 registerRoute(
   ({ url }) =>
     url.pathname.startsWith('/assets/') && (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')),
-  new StaleWhileRevalidate({
+  new NetworkFirst({
     cacheName: cache('asset-chunks'),
+    networkTimeoutSeconds: 2,
     plugins: [new ExpirationPlugin({ maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 14 })],
   }),
 )

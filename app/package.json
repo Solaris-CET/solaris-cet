@@ -31,11 +31,12 @@
     "node": ">=22"
   },
   "scripts": {
-    "//predev": "node ../scripts/generate-release-notes.mjs && node scripts/generate-seo-files.mjs && node scripts/generate-legal-digests.mjs",
+    "predev": "node ../scripts/generate-release-notes.mjs && node scripts/generate-seo-files.mjs && node scripts/generate-legal-digests.mjs",
     "dev": "../node_modules/.bin/vite",
-    "//prebuild": "node ../scripts/write-build-info.mjs && node ../scripts/fix-phosphor-webcomponents.mjs && node ../scripts/generate-release-notes.mjs && node scripts/generate-seo-files.mjs && node scripts/generate-legal-digests.mjs",
+    "prebuild": "node ../scripts/write-build-info.mjs && node ../scripts/fix-phosphor-webcomponents.mjs && node ../scripts/generate-release-notes.mjs && node scripts/generate-seo-files.mjs && node scripts/generate-legal-digests.mjs",
     "build": "vite build",
-    "build:ci": "node scripts/generate-legal-digests.mjs && tsc -b --pretty false && vite build --logLevel warn",
+    "prebuild:ci": "node ../scripts/write-build-info.mjs && node ../scripts/fix-phosphor-webcomponents.mjs && node ../scripts/generate-release-notes.mjs && node scripts/generate-seo-files.mjs && node scripts/generate-legal-digests.mjs",
+    "build:ci": "tsc -b --pretty false && vite build --logLevel warn",
     "start": "../node_modules/.bin/vite preview --host 0.0.0.0 --port ${PORT:-4173}",
     "api:build": "../node_modules/.bin/tsc -p tsconfig.api.json",
     "start:node": "node server/index.cjs",

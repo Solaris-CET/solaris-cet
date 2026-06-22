@@ -8,7 +8,6 @@ import { useLanguage } from '../hooks/useLanguage';
 import { DownloadAppButton } from './company/DownloadAppButton';
 import styles from './NavigationFloating.module.css';
 import { SolarisLogoMark } from './SolarisLogoMark';
-import AnimatedLogo from './brand/AnimatedLogo';
 
 const MOBILE_MENU_FOCUSABLE_SELECTOR =
   'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -226,7 +225,7 @@ export default function Navigation() {
             className="group relative z-20 flex shrink-0 items-center gap-2"
             aria-label="Solaris CET"
           >
-            <AnimatedLogo />
+            <SolarisLogoMark className="h-8 w-auto" />
           </a>
 
           <nav

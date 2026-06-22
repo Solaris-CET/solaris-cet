@@ -27,6 +27,20 @@ const COUNTRY_LANG_MAP: Partial<Record<string, LangCode>> = {
   RO: 'ro', MD: 'ro',
 };
 
+function isCanonicalRomanianPath(pathname: string): boolean {
+  const normalized = pathname.replace(/\/+$/, '') || '/';
+  return (
+    normalized === '/' ||
+    normalized === '/blog' ||
+    normalized.startsWith('/blog/') ||
+    normalized === '/despre' ||
+    normalized === '/faq' ||
+    normalized === '/contact' ||
+    normalized === '/politica-confidentialitate' ||
+    normalized === '/politica-cookies'
+  );
+}
+
 /**
  * Fetches the visitor's country via a lightweight public geo-IP service and
  * returns the mapped LangCode, or null when the country is unknown / unmapped.
@@ -50,9 +64,13 @@ async function detectCountryLanguage(): Promise<LangCode | null> {
 const detectLanguage = (): LangCode => {
   try {
     if (typeof window !== 'undefined') {
-      const urlLocale = parseUrlLocaleFromPathname(window.location.pathname).locale;
+      const parsedUrl = parseUrlLocaleFromPathname(window.location.pathname);
+      const urlLocale = parsedUrl.locale;
       if (urlLocale && (SUPPORTED_LANGS as string[]).includes(urlLocale)) {
         return urlLocale as LangCode;
+      }
+      if (isCanonicalRomanianPath(parsedUrl.pathnameNoLocale)) {
+        return 'ro';
       }
     }
     const stored = localStorage.getItem('solaris_lang');

@@ -31,7 +31,8 @@ function asBlogLocale(locale: UrlLocale): BlogLocale {
 function activeLocaleFromUrl(fallback: UrlLocale): BlogLocale {
   if (typeof window === 'undefined') return asBlogLocale(fallback)
   const parsed = parseUrlLocaleFromPathname(window.location.pathname)
-  return asBlogLocale(parsed.locale ?? fallback)
+  if (parsed.locale) return asBlogLocale(parsed.locale)
+  return window.location.pathname.startsWith('/blog') ? 'ro' : asBlogLocale(fallback)
 }
 
 const MARKDOWN_HTML_CONFIG = {

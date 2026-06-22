@@ -1,5 +1,5 @@
 import { Mail, MapPin } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useRef, useState } from 'react';
 
 import { SafeEmailLink } from '@/components/SafeEmailLink';
 
@@ -40,7 +40,6 @@ function QuoteForm() {
   const [message, setMessage] = useState('');
   const [gdpr, setGdpr] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const formRef = useRef<HTMLFormElement>(null);
@@ -51,7 +50,7 @@ function QuoteForm() {
   const validate = (): boolean => {
     const errors: Record<string, string> = {};
     if (name.trim().length < 2) errors.name = 'Minim 2 caractere';
-    const phoneClean = phone.replace(/[\s\-]/g, '');
+    const phoneClean = phone.replace(/[\s-]/g, '');
     if (!/^(07\d{8}|\+407\d{8})$/.test(phoneClean)) errors.phone = 'Format: 07xx xxx xxx sau +407xx xxx xxx';
     if (locality.trim().length < 2) errors.locality = 'Introdu localitatea';
     if (!serviceType) errors.serviceType = 'Alege un serviciu';
@@ -65,7 +64,15 @@ function QuoteForm() {
     if (!validate()) return;
     setSubmitting(true);
     setError('');
-    setSuccess(false);
+
+    // Map the UI service type to the value accepted by the backend.
+    // All non‑photovoltaic services become 'acoperis'.
+    let mappedServiceType: string;
+    if (serviceType.startsWith('fotovoltaic')) {
+      mappedServiceType = 'fotovoltaic';
+    } else {
+      mappedServiceType = 'acoperis';
+    }
 
     try {
       const res = await fetch('/api/quote', {
@@ -75,9 +82,9 @@ function QuoteForm() {
           name: name.trim(),
           phone: phone.trim(),
           email: email.trim() || undefined,
-          locality: locality.trim(),
-          serviceType,
-          power: isFotovoltaic ? power : undefined,
+          location: locality.trim(),
+          serviceType: mappedServiceType,
+          powerNeeded: isFotovoltaic ? power : undefined,
           roofType: isAcoperis ? roofType : undefined,
           message: message.trim() || undefined,
           gdpr,
@@ -89,20 +96,7 @@ function QuoteForm() {
         throw new Error(data.error || 'Eroare la trimitere');
       }
 
-      setSuccess(true);
-      // Reset form after 3 seconds
-      setTimeout(() => {
-        setName('');
-        setPhone('');
-        setEmail('');
-        setLocality('');
-        setServiceType('');
-        setPower('');
-        setRoofType('');
-        setMessage('');
-        setGdpr(false);
-        setSuccess(false);
-      }, 3000);
+      window.location.assign('/multumim');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Eroare necunoscută';
       setError(msg);
@@ -113,11 +107,6 @@ function QuoteForm() {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-5 rounded-3xl border border-white/10 bg-white/5 p-6">
-      {success && (
-        <div className="rounded-xl bg-green-600/20 px-4 py-3 text-sm text-green-300">
-          ✅ Oferta a fost trimisă! Vă contactăm în maxim 24 ore.
-        </div>
-      )}
       {error && (
         <div className="rounded-xl bg-red-600/20 px-4 py-3 text-sm text-red-300">
           {error}

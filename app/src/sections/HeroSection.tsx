@@ -3,7 +3,6 @@ import { type CSSProperties, useEffect, useMemo, useState } from 'react';
 
 import AppImage from '@/components/AppImage';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
-import SolarPanelAnimation from '@/components/animations/SolarPanelAnimation';
 
 import styles from './HeroSolaris.module.css';
 
@@ -215,9 +214,10 @@ export default function HeroSection() {
         ))}
       </svg>
 
-      <div className="absolute inset-0 z-0 opacity-30">
-        <SolarPanelAnimation />
-      </div>
+      <div
+        className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_22%,rgba(245,158,11,0.12),transparent_38%),radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.08),transparent_26%)]"
+        aria-hidden
+      />
       <div className={styles.heroVignette} aria-hidden />
 
       <div className="relative mx-auto max-w-7xl px-5 pb-16 pt-24 sm:px-8 sm:pt-32 xl:px-12">

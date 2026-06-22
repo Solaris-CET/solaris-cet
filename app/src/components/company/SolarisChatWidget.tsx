@@ -2,7 +2,7 @@ import { Bot, ChevronDown, Send, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { SafeEmailLink } from '@/components/SafeEmailLink';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { type CompanyDepartmentId,companyDepartments } from '@/data/companyDepartments';
 import { cn } from '@/lib/utils';
 
@@ -112,15 +112,16 @@ export function SolarisChatWidget() {
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-[min(92vw,520px)] p-0 overflow-hidden">
+        {open ? (
+          <DialogContent showCloseButton={false} className="max-w-[min(92vw,520px)] p-0 overflow-hidden">
           <DialogHeader className="px-4 py-3 border-b border-white/10 bg-slate-950">
-            <DialogTitle className="flex items-center justify-between gap-3">
-              <span className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-3">
+              <DialogTitle className="flex items-center gap-2 text-base">
                 <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/5">
                   <Bot className="h-4 w-4 text-solaris-gold" aria-hidden />
                 </span>
-                <span className="text-base">Asistent Solaris CET</span>
-              </span>
+                <span>Asistent Solaris CET</span>
+              </DialogTitle>
               <button
                 type="button"
                 className="p-2 rounded-xl border border-white/10 bg-white/5 text-solaris-muted hover:text-solaris-text transition-colors"
@@ -129,7 +130,10 @@ export function SolarisChatWidget() {
               >
                 <X className="h-4 w-4" aria-hidden />
               </button>
-            </DialogTitle>
+            </div>
+            <DialogDescription className="sr-only">
+              Chat direct cu Solaris CET pentru oferte, programari si intrebari rapide.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="bg-slate-950">
@@ -253,7 +257,8 @@ export function SolarisChatWidget() {
               <SafeEmailLink anchorClassName="text-solaris-text hover:underline" />
             </div>
           </div>
-        </DialogContent>
+          </DialogContent>
+        ) : null}
       </Dialog>
     </>
   );
