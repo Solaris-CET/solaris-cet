@@ -1,3 +1,4 @@
+import { getAllowedOrigin } from '../lib/cors';
 import { corsJson, corsOptions } from '../lib/http';
 
 export const config = { runtime: 'nodejs' };
@@ -48,7 +49,21 @@ const TESTIMONIALS: Testimonial[] = [
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') {
-    return corsOptions(req, 'GET, OPTIONS');
+    return corsOptions(req, 'GET, HEAD, OPTIONS');
+  }
+
+  if (req.method === 'HEAD') {
+    const origin = req.headers.get('origin');
+    const allowedOrigin = getAllowedOrigin(origin);
+    return new Response(null, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': allowedOrigin,
+        Vary: 'Origin',
+        'Cache-Control': 'no-store',
+      },
+    });
   }
 
   if (req.method !== 'GET') {
