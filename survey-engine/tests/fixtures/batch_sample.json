@@ -1,0 +1,12 @@
+[
+  {
+    "job_id": "site-001",
+    "photos_dir": "./tests/fixtures/photos_site1",
+    "client_name": "Client Demo 1",
+    "client_city": "Cluj-Napoca",
+    "client_address": "Str. Test 1",
+    "roof_orientation": "S",
+    "usable_area_m2": 40,
+    "annual_consumption_kwh": 5000
+  }
+]

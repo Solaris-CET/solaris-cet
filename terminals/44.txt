@@ -1,0 +1,15 @@
+---
+pid: 10172
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx tsc --noEmit -p tsconfig.app.json 2>&1 | Select-String \"SurveyPage|AdminPanel\""
+started_at: 2026-07-05T23:12:12.033Z
+running_for_ms: 5085100  
+---
+
+src/admin/AdminPanel.tsx(123,28): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; e
+rror: string; } | { ok: true; data: { admin: { id: string; email: string; role: AdminRole; }; }; }'.
+src/pages_legacy/SurveyPage.tsx(3,23): error TS2305: Module '"lucide-react"' has no exported member 'Upload'.
+src/pages_legacy/SurveyPage.tsx(3,31): error TS2724: '"lucide-react"' has no exported member named 'User'. Did you mean
+ 'Users'?
+
+

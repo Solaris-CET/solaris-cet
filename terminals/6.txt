@@ -1,0 +1,9 @@
+---
+pid: 15576
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "Set-Location \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\"; python -m pytest tests/ -q --tb=line 2>&1"
+started_at: 2026-07-05T20:11:56.033Z
+running_for_ms: 15894995 
+---
+............................................                             [100%]
+44 passed in 20.26s

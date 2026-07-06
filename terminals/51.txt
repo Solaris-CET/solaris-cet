@@ -1,0 +1,21 @@
+---
+pid: 3024
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npm run test -- src/__tests__/surveyPrefill.test.ts"
+started_at: 2026-07-05T23:24:58.687Z
+running_for_ms: 4315045  
+---
+
+> solaris-cet@1.0.0 test
+> node ../scripts/run-bin.mjs vitest run src/__tests__/surveyPrefill.test.ts
+
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ✓ src/__tests__/surveyPrefill.test.ts (5 tests) 15ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  02:25:05
+   Duration  9.39s (transform 141ms, setup 1.17s, import 70ms, tests 15ms, environment 6.52s)
+

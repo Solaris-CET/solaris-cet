@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'"
+    />
+    <meta
+      name="description"
+      content="Solaris CET sovereign static surface (no JavaScript). 404 node not found — return to /sovereign/ for CET supply facts and project anchors."
+    />
+    <title>404 - Node Not Found | Solaris CET</title>
+    <style>
+      :root {
+        --bg-void: #020617;
+        --bg-elevation-1: #0f172a;
+        --accent-sovereign: #f2c94c;
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-surface: rgba(255, 255, 255, 0.05);
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        background: var(--bg-void);
+        color: var(--text-primary);
+        padding: 1.5rem;
+      }
+
+      .panel {
+        width: min(42rem, 100%);
+        background: var(--glass-surface);
+        border: 1px solid var(--glass-border);
+        border-radius: 0.9rem;
+        padding: clamp(1.25rem, 4vw, 2rem);
+        box-shadow:
+          0 25px 50px -12px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+      }
+
+      .code {
+        margin: 0;
+        font-size: clamp(3.2rem, 13vw, 6rem);
+        line-height: 1;
+        color: rgba(242, 201, 76, 0.3);
+        letter-spacing: 0.04em;
+      }
+
+      .code-glitch {
+        animation: glitch-skew 4s infinite;
+      }
+
+      @keyframes glitch-skew {
+        0%, 100% { transform: skew(0deg); }
+        25% { transform: skew(-2deg); }
+        50% { transform: skew(2deg); }
+        75% { transform: skew(-1deg); }
+      }
+
+      h1 {
+        margin: 0.5rem 0 0.75rem;
+        font-size: clamp(1.3rem, 3vw, 1.8rem);
+        font-weight: 400;
+      }
+
+      p {
+        margin: 0.4rem 0;
+        color: var(--text-secondary);
+      }
+
+      .diag {
+        margin-top: 1rem;
+        padding: 0.85rem;
+        border: 1px solid var(--glass-border);
+        border-radius: 0.6rem;
+        background: rgba(15, 23, 42, 0.7);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.78rem;
+        color: #cbd5e1;
+      }
+
+      .diag span {
+        color: var(--accent-sovereign);
+      }
+
+      .back {
+        display: inline-block;
+        margin-top: 1.1rem;
+        border: 1px solid rgba(242, 201, 76, 0.45);
+        border-radius: 0.5rem;
+        color: var(--accent-sovereign);
+        text-decoration: none;
+        padding: 0.65rem 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="panel">
+      <p class="code code-glitch" aria-label="404">404</p>
+      <h1>Node Not Found</h1>
+      <p>The requested resource is not available in the Solaris network.</p>
+      <p>The node may be offline or the hash may be invalid.</p>
+
+      <div class="diag" role="status" aria-live="polite">
+        Error: <span>RESOURCE_NOT_FOUND</span><br />
+        Request ID: SOL-ERR-404-OMEGA
+      </div>
+
+      <a class="back" href="/sovereign/">Return to Sovereign Node</a>
+    </main>
+  </body>
+</html>

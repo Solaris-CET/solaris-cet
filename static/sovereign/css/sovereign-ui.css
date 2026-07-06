@@ -1,0 +1,1010 @@
+/**
+ * Solaris CET — OMEGA sovereign surface (100% CSS, no JS).
+ * Innovation Sprint 3: holographic depth, living gold, CRT scan, magnetic buttons.
+ * Phase 5–6: phi, seal, CRT/LED, ley grid, kinetic shadow, impossible border.
+ * All animations respect prefers-reduced-motion.
+ */
+
+/* ─── Golden ratio scale (φ) — layout rhythm ─── */
+:root {
+  --phi: 1.618;
+  --space-unit: 1rem;
+  --space-xs: calc(var(--space-unit) / var(--phi));
+  --space-sm: var(--space-unit);
+  --space-md: calc(var(--space-unit) * var(--phi));
+  --space-lg: calc(var(--space-unit) * var(--phi) * var(--phi));
+  --space-xl: calc(var(--space-unit) * var(--phi) * var(--phi) * var(--phi));
+  --space-xxl: calc(var(--space-unit) * 6.854); /* φ⁴ */
+}
+
+main.section-padding {
+  padding-top: var(--space-xxl);
+  padding-bottom: var(--space-xxl);
+}
+
+.solaris-panel.grid-gap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* ─── Micro-typography: .data-mono base lives in index.html (loads after this file) ─── */
+
+/* ─── Sovereign seal (CSS-only, institutional) ─── */
+.sovereign-seal-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-md);
+}
+
+.sovereign-seal {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border: 2px solid rgba(242, 201, 76, 0.3);
+  border-radius: 50%;
+  animation: seal-appear 2s ease-out forwards;
+  opacity: 0;
+  transform: scale(0.8) rotate(-180deg);
+}
+
+.sovereign-seal::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px dashed rgba(242, 201, 76, 0.6);
+  border-radius: 50%;
+  animation: seal-rotate 20s linear infinite;
+}
+
+.sovereign-seal__label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: #f2c94c;
+  z-index: 1;
+}
+
+@keyframes seal-appear {
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    border-color: rgba(242, 201, 76, 0.8);
+  }
+}
+
+@keyframes seal-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Continuity line (honest facts only — no fabricated chain hashes) ─── */
+.sovereign-eternity-line {
+  margin: 0 0 var(--space-sm);
+  font-size: 0.5rem;
+  line-height: 1.5;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.55);
+  max-width: 42rem;
+  overflow-wrap: anywhere;
+}
+
+/* ─── Heavy CTA (3D press, gold mass) ─── */
+.solaris-button--heavy {
+  position: relative;
+  background: linear-gradient(145deg, rgba(242, 201, 76, 0.14), rgba(242, 201, 76, 0.06));
+  border-color: rgba(242, 201, 76, 0.5);
+  box-shadow:
+    0 4px 0 rgba(242, 201, 76, 0.22),
+    0 8px 10px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transform: translateY(0);
+  transition:
+    transform 0.1s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.solaris-button--heavy:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 5px 0 rgba(242, 201, 76, 0.28),
+    0 10px 14px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.solaris-button--heavy:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 0 0 rgba(242, 201, 76, 0),
+    0 2px 4px rgba(0, 0, 0, 0.35),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sovereign-seal {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  .sovereign-seal::before {
+    animation: none !important;
+  }
+
+  .solaris-button--heavy:hover,
+  .solaris-button--heavy:active {
+    transform: none;
+  }
+}
+
+/* ─── Task 9 — Hologram depth (static page) ─── */
+.solaris-hologram {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .solaris-hologram:hover {
+    transform: perspective(960px) rotateX(2deg) rotateY(-2deg) translateZ(12px);
+  }
+}
+
+.solaris-hologram::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(242, 201, 76, 0.12);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent 55%);
+  opacity: 0;
+  transition: opacity 0.55s ease;
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: screen;
+}
+
+@media (hover: hover) {
+  .solaris-hologram:hover::after {
+    opacity: 1;
+  }
+}
+
+/* ─── Task 10 — Living gold (text) ─── */
+.living-gold-text {
+  background: linear-gradient(
+    110deg,
+    #f2c94c 0%,
+    #fff6cc 22%,
+    #f2c94c 48%,
+    #b7860b 72%,
+    #f2c94c 100%
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .living-gold-text {
+    animation: sovereign-shine 10s linear infinite;
+  }
+}
+
+@keyframes sovereign-shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* ─── Task 11 — Breathing data (JetBrains Mono: opacity + glow, not variable wght) ─── */
+.breathing-mono {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .breathing-mono {
+    animation: sovereign-breathe-mono 3.5s ease-in-out infinite;
+  }
+}
+
+@keyframes sovereign-breathe-mono {
+  0%,
+  100% {
+    opacity: 0.94;
+    text-shadow: none;
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 14px rgba(242, 201, 76, 0.35);
+  }
+}
+
+/* ─── Task 12 — CRT / terminal strip (sovereign demo block) ─── */
+.crt-terminal {
+  position: relative;
+  margin-top: 1.25rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.5rem;
+  background: rgba(2, 6, 23, 0.92);
+  border: 1px solid rgba(242, 201, 76, 0.22);
+  box-shadow:
+    inset 0 0 32px rgba(242, 201, 76, 0.04),
+    0 0 0 1px rgba(242, 201, 76, 0.08);
+  overflow: hidden;
+}
+
+.crt-terminal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.11) 2px,
+    rgba(0, 0, 0, 0.11) 4px
+  );
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .crt-terminal::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -40%;
+    height: 28%;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      rgba(242, 201, 76, 0.04),
+      transparent
+    );
+    animation: sovereign-crt-scan 5.5s steps(24) infinite;
+    pointer-events: none;
+    opacity: 0.55;
+  }
+}
+
+@keyframes sovereign-crt-scan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(420%);
+  }
+}
+
+.crt-terminal > * {
+  position: relative;
+  z-index: 1;
+}
+
+.terminal-cursor::after {
+  content: "█";
+  margin-left: 0.15em;
+  color: #f2c94c;
+  animation: sovereign-blink 1s step-end infinite;
+}
+
+@keyframes sovereign-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ─── Task 14 — Magnetic-style button (CSS-only) ─── */
+.solaris-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 1rem;
+  padding: 0.65rem 1.35rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #f2c94c;
+  background: transparent;
+  border: 1px solid rgba(242, 201, 76, 0.45);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    transform 0.45s cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 0.45s ease,
+    border-color 0.35s ease,
+    letter-spacing 0.45s ease;
+}
+
+.solaris-button:hover {
+  transform: scale(1.04);
+  border-color: #f2c94c;
+  box-shadow:
+    0 0 22px rgba(242, 201, 76, 0.28),
+    inset 0 0 12px rgba(242, 201, 76, 0.08);
+  letter-spacing: 0.16em;
+}
+
+.solaris-button:active {
+  transform: scale(0.98);
+  transition-duration: 0.1s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .solaris-button:hover,
+  .solaris-button:active {
+    transform: none;
+  }
+}
+
+.solaris-button--primary {
+  background: #f2c94c;
+  color: #020617;
+  border-color: #f2c94c;
+}
+
+.solaris-button--primary:hover {
+  background: #fff6cc;
+  box-shadow: 0 0 28px rgba(242, 201, 76, 0.45);
+}
+
+.solaris-button--primary.solaris-button--heavy {
+  background: linear-gradient(145deg, #fff6cc 0%, #f2c94c 48%, #c9a321 100%);
+  border-color: rgba(183, 134, 11, 0.95);
+  box-shadow:
+    0 4px 0 rgba(183, 134, 11, 0.55),
+    0 8px 12px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transform: translateY(0);
+}
+
+.solaris-button--primary.solaris-button--heavy:hover {
+  background: linear-gradient(145deg, #fffdf5 0%, #fff6cc 42%, #f2c94c 100%);
+  transform: translateY(-1px);
+  box-shadow:
+    0 5px 0 rgba(183, 134, 11, 0.6),
+    0 10px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.solaris-button--primary.solaris-button--heavy:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 0 0 rgba(183, 134, 11, 0),
+    0 2px 5px rgba(0, 0, 0, 0.4),
+    inset 0 2px 5px rgba(0, 0, 0, 0.18);
+}
+
+/* Ambient body wash (optional, very subtle) */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes sovereign-ambient {
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 0.72;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .living-gold-text {
+    animation: none !important;
+    background: none !important;
+    -webkit-text-fill-color: #f2c94c !important;
+    color: #f2c94c !important;
+  }
+
+  .breathing-mono {
+    animation: none !important;
+  }
+
+  .solaris-hologram:hover {
+    transform: none !important;
+  }
+
+  .crt-terminal::after {
+    display: none !important;
+  }
+
+  .terminal-cursor::after {
+    animation: none !important;
+    opacity: 0.65;
+  }
+}
+
+/* ─── Phase 5b — Optical type (U), isometric depth (V), weight metaphor (W), chromatic (X) ─── */
+
+.optical-align {
+  hanging-punctuation: first last;
+  text-indent: -0.04em;
+}
+
+@supports not (hanging-punctuation: first) {
+  .optical-align {
+    padding-left: 0.06em;
+    text-indent: 0;
+  }
+}
+
+.headline-balance {
+  text-wrap: balance;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+@supports (hyphenate-limit-chars: 6 3 2) {
+  .headline-balance {
+    hyphenate-limit-chars: 6 3 2;
+  }
+}
+
+.text-align-perfect {
+  text-align: start;
+  padding-inline-start: 0.12em;
+}
+
+/* Isometric data block — desktop + hover only; inner counter-rotates for legibility */
+.isometric-stage {
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+.isometric-card {
+  position: relative;
+  border-radius: 0.75rem;
+  padding: 0;
+  transform-style: preserve-3d;
+  background: linear-gradient(
+    155deg,
+    rgba(15, 23, 42, 0.95) 0%,
+    rgba(15, 23, 42, 0.65) 100%
+  );
+  border: 1px solid rgba(242, 201, 76, 0.18);
+  box-shadow:
+    -10px 16px 36px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 0.55s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.55s ease;
+}
+
+.isometric-card__inner {
+  padding: clamp(1rem, 3vw, 1.35rem);
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 48rem) and (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .isometric-stage {
+    perspective: 1200px;
+    padding-bottom: 0.35rem;
+  }
+
+  /* Mild angles so content stays inside .solaris-panel (overflow: hidden) */
+  .isometric-card {
+    transform: perspective(1000px) rotateX(7deg) rotateZ(-4deg);
+    transform-origin: center bottom;
+  }
+
+  .isometric-card__inner {
+    transform: rotateZ(4deg) rotateX(-7deg);
+    transform-origin: center center;
+  }
+
+  .isometric-card:hover {
+    transform: perspective(1000px) rotateX(5deg) rotateZ(-2deg) translateZ(12px);
+    box-shadow:
+      -14px 20px 44px rgba(0, 0, 0, 0.48),
+      -1px 1px 0 rgba(255, 255, 255, 0.05),
+      0 0 32px rgba(242, 201, 76, 0.05);
+  }
+
+  .isometric-card:hover .isometric-card__inner {
+    transform: rotateZ(2deg) rotateX(-5deg);
+  }
+}
+
+.weight-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem 1rem;
+  margin-top: var(--space-md);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.85);
+}
+
+.weight-row__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+}
+
+.weight-row__icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.weight-row__sep {
+  width: 1px;
+  height: 1rem;
+  background: rgba(148, 163, 184, 0.35);
+}
+
+.weight-row__text {
+  font-size: 0.62rem;
+}
+
+.weight-indicator {
+  position: relative;
+  display: inline-block;
+}
+
+.weight-indicator::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #f2c94c, transparent);
+  opacity: 0.45;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .weight-indicator::after {
+    animation: weigh-pulse 4s ease-in-out infinite;
+  }
+}
+
+@keyframes weigh-pulse {
+  0%,
+  100% {
+    transform: scaleX(1);
+    opacity: 0.45;
+  }
+
+  50% {
+    transform: scaleX(1.06);
+    opacity: 0.75;
+  }
+}
+
+/* Chromatic aberration — subtle text-shadow only (no duplicate DOM text) */
+.chromatic-hover {
+  transition:
+    text-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .chromatic-hover:hover {
+    text-shadow:
+      0.5px 0 0 rgba(255, 90, 90, 0.28),
+      -0.5px 0 0 rgba(0, 210, 255, 0.24);
+  }
+
+  .crt-rav-line:hover {
+    text-shadow:
+      0.4px 0 0 rgba(255, 80, 80, 0.22),
+      -0.4px 0 0 rgba(0, 200, 255, 0.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .isometric-card,
+  .isometric-card__inner {
+    transform: none !important;
+  }
+
+  .isometric-card:hover {
+    box-shadow:
+      -10px 16px 36px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .weight-indicator::after {
+    animation: none !important;
+    opacity: 0.5;
+  }
+
+  .chromatic-hover:hover,
+  .crt-rav-line:hover {
+    text-shadow: none !important;
+  }
+}
+
+/* ─── Phase 6 — Phosphor / LED (Y), ley grid (Z), kinetic shadow (AA), checksum (AB), impossible border (AC) ─── */
+
+.main-ley {
+  position: relative;
+  z-index: 1;
+}
+
+main.ley-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(242, 201, 76, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(242, 201, 76, 0.035) 1px, transparent 1px);
+  background-size: 6.25rem 6.25rem;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.9;
+}
+
+main.ley-grid > * {
+  position: relative;
+  z-index: 1;
+}
+
+.sacred-asymmetric {
+  display: grid;
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+@media (min-width: 48rem) {
+  .sacred-asymmetric {
+    grid-template-columns: 1fr 1.618fr;
+    gap: calc(var(--phi) * 1rem);
+  }
+}
+
+.ley-item--seal {
+  display: flex;
+  justify-content: center;
+}
+
+@media (min-width: 48rem) {
+  .ley-item--seal {
+    justify-content: flex-end;
+    padding-top: var(--space-sm);
+  }
+}
+
+.sovereign-card-wrap {
+  position: relative;
+  border-radius: 0.85rem;
+  isolation: isolate;
+}
+
+.sovereign-card-wrap > .solaris-panel {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+}
+
+/* Rotating conic “energy” rim — pseudos live on wrapper (panel keeps scan ::before) */
+.impossible-border {
+  padding: 1px;
+  background: rgba(2, 6, 23, 0.55);
+}
+
+.impossible-border::before {
+  content: "";
+  position: absolute;
+  border-radius: inherit;
+  pointer-events: none;
+  inset: -1px;
+  z-index: 0;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(242, 201, 76, 0.55) 70deg,
+    rgba(255, 255, 255, 0.35) 130deg,
+    rgba(242, 201, 76, 0.45) 200deg,
+    transparent 260deg,
+    transparent 360deg
+  );
+  opacity: 0.45;
+  filter: blur(3px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .impossible-border::before {
+    animation: border-rotate 14s linear infinite;
+  }
+}
+
+@keyframes border-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.kinetic-shadow {
+  box-shadow:
+    0 12px 42px -12px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(242, 201, 76, 0.1);
+  transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .kinetic-shadow {
+    animation: shadow-breathe 8s ease-in-out infinite;
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .kinetic-shadow:hover {
+    transform: translateY(-3px);
+    animation: shadow-active 2.5s ease-in-out infinite;
+  }
+}
+
+@keyframes shadow-breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 12px 42px -12px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(242, 201, 76, 0.1),
+      0 0 22px rgba(242, 201, 76, 0.06);
+  }
+
+  50% {
+    box-shadow:
+      0 18px 52px -10px rgba(0, 0, 0, 0.62),
+      0 0 0 1px rgba(242, 201, 76, 0.16),
+      0 0 38px rgba(242, 201, 76, 0.1);
+  }
+}
+
+@keyframes shadow-active {
+  0%,
+  100% {
+    box-shadow:
+      0 18px 56px -10px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(242, 201, 76, 0.2),
+      0 0 36px rgba(242, 201, 76, 0.12);
+  }
+
+  50% {
+    box-shadow:
+      0 22px 64px -8px rgba(0, 0, 0, 0.58),
+      0 0 0 1px rgba(242, 201, 76, 0.26),
+      0 0 48px rgba(242, 201, 76, 0.16);
+  }
+}
+
+.phosphor-bloom {
+  color: #f2c94c;
+  text-shadow:
+    0 0 2px rgba(242, 201, 76, 0.45),
+    0 0 6px rgba(242, 201, 76, 0.22),
+    0 0 14px rgba(242, 201, 76, 0.1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
+}
+
+.led-display {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15em 0.35em;
+  margin: 0.5rem 0 0.35rem;
+  font-size: clamp(1.35rem, 4.5vw, 1.75rem);
+  z-index: 1;
+}
+
+.led-display::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.12) 2px,
+    rgba(0, 0, 0, 0.12) 4px
+  );
+  pointer-events: none;
+  opacity: 0.28;
+  mix-blend-mode: multiply;
+  border-radius: 0.25rem;
+  z-index: 1;
+}
+
+.led-main {
+  position: relative;
+  z-index: 3;
+}
+
+.led-main.weight-indicator::after {
+  z-index: 4;
+}
+
+.led-fraction {
+  font-size: 0.55em;
+  opacity: 0.55;
+  color: rgba(242, 201, 76, 0.75);
+}
+
+.led-unit {
+  font-size: 0.55em;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.95);
+}
+
+.scanlines-subtle {
+  position: relative;
+}
+
+.scanlines-subtle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 1px,
+    rgba(0, 0, 0, 0.045) 1px,
+    rgba(0, 0, 0, 0.045) 2px
+  );
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.65;
+  border-radius: 0.2rem;
+}
+
+.checksum-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.15rem 0 0;
+  opacity: 0.5;
+  transition: opacity 0.25s ease;
+}
+
+.checksum-group:hover,
+.checksum-group:focus-within {
+  opacity: 1;
+}
+
+.checksum-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .checksum-dot {
+    animation: checksum-pulse 2.8s ease-in-out infinite;
+  }
+}
+
+@keyframes checksum-pulse {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+.checksum-line {
+  font-size: 0.5rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.9);
+}
+
+.checksum-separator {
+  color: rgba(242, 201, 76, 0.28);
+  margin: 0 0.12em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .impossible-border::before {
+    animation: none !important;
+    opacity: 0.28;
+  }
+
+  .kinetic-shadow {
+    animation: none !important;
+    box-shadow:
+      0 12px 40px -12px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(242, 201, 76, 0.12);
+  }
+
+  .kinetic-shadow:hover {
+    transform: none;
+  }
+
+  .checksum-dot {
+    animation: none !important;
+  }
+
+  .led-display::after {
+    opacity: 0.15;
+  }
+}
+
+/* Keyboard / accessibility — visible focus without JS */
+.skip:focus,
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent-sovereign);
+  outline-offset: 2px;
+}
+
+/* Screen-reader-only (static surface has no Tailwind) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Build-time artifact seal (injected before </body>; no JS) */
+.sovereign-build-seal {
+  position: fixed;
+  bottom: 0.65rem;
+  right: 0.65rem;
+  z-index: 50;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.55);
+  opacity: 0.35;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.sovereign-build-seal:hover {
+  opacity: 1;
+}

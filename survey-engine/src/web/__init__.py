@@ -1,0 +1,1 @@
+"""SOLARIS CET web interface."""

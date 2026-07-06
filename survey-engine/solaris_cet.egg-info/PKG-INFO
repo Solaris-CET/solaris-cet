@@ -1,0 +1,54 @@
+Metadata-Version: 2.4
+Name: solaris-cet
+Version: 0.1.0
+Summary: AI-Powered Solar Site Survey & Professional Report System
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: pydantic>=2.5
+Requires-Dist: reportlab>=4.0
+Requires-Dist: pillow>=10.0
+Requires-Dist: click>=8.1
+Requires-Dist: httpx>=0.27
+Requires-Dist: python-dotenv>=1.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4; extra == "dev"
+Provides-Extra: ui
+Requires-Dist: gradio>=4.44; extra == "ui"
+Provides-Extra: api
+Requires-Dist: fastapi>=0.115; extra == "api"
+Requires-Dist: uvicorn[standard]>=0.32; extra == "api"
+Requires-Dist: python-multipart>=0.0.9; extra == "api"
+
+# SOLARIS CET — Survey Engine (Python)
+
+Motorul AI pentru evaluare șantier fotovoltaic: analiză poze, checklist, raport PDF, export AHJ.
+
+**Parte din monorepo-ul Solaris CET** (`app/` = platformă web, `survey-engine/` = tool tehnicieni).
+
+## Comenzi
+
+```bash
+cd survey-engine
+pip install -e ".[ui,dev]"
+python -m src.cli demo
+python -m src.cli web
+python -m src.cli batch -m tests/fixtures/batch_sample.json
+python -m src.cli dashboard
+python -m uvicorn src.server:app --port 8000
+pytest tests/ -q
+```
+
+## API (FastAPI)
+
+| Endpoint | Descriere |
+|---|---|
+| `GET /health` | Status engine |
+| `GET /dashboard` | Istoric + costuri |
+| `POST /demo` | Generează raport demo |
+
+Variabilă pentru platformă Node: `SURVEY_ENGINE_URL=http://127.0.0.1:8000`
+
+## Faze livrate
+
+- v0.1–v0.3: PDF design v6, DeepSeek vision, Gradio UI, AHJ export, batch, dashboard
+- v1.0 (Faza 5): integrare în `app/` React + CRM

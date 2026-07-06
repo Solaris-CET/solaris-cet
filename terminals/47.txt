@@ -1,0 +1,21 @@
+---
+pid: 11596
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npm run test -- src/__tests__/surveyRoutes.integration.test.ts --reporter=dot"
+started_at: 2026-07-05T23:13:52.480Z
+running_for_ms: 4980008  
+---
+
+> solaris-cet@1.0.0 test
+> node ../scripts/run-bin.mjs vitest run src/__tests__/surveyRoutes.integration.test.ts --reporter=dot
+
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+····
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  02:14:02
+   Duration  5.04s (transform 383ms, setup 1.69s, import 250ms, tests 216ms, environment 0ms)
+

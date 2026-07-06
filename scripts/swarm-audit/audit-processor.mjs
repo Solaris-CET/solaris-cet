@@ -1,0 +1,157 @@
+#!/usr/bin/env node
+/**
+ * Swarm audit — automated repo scans (static patterns). Not a substitute for
+ * penetration testing; output is for developer visibility and CI-style hygiene.
+ */
+import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const root = join(__dirname, "../..");
+
+const auditChecks = {
+  security: [
+    "CSP bypass potential in img src",
+    "Inline style injection vectors",
+    "DOM clobbering via id conflicts",
+    "Prototype pollution in JSON.parse",
+  ],
+  performance: [
+    "Unused CSS selectors (dead code)",
+    "Render-blocking resource chains",
+    "Memory leak in event listeners",
+    "Layout thrashing potential",
+  ],
+  accessibility: [
+    "Missing aria-live regions for dynamic content",
+    "Color contrast edge cases (alpha transparency)",
+    "Focus trap failures in nested modals",
+    'Screen reader pronunciation of "CET"',
+  ],
+};
+
+function walkFiles(dir, acc = [], depth = 0) {
+  if (depth > 20) return acc;
+  let entries;
+  try {
+    entries = readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return acc;
+  }
+  for (const e of entries) {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) {
+      if (["node_modules", "dist", ".git", "coverage", "playwright-report"].includes(e.name)) continue;
+      walkFiles(p, acc, depth + 1);
+    } else if (/\.(tsx?|jsx?|vue|css|html|md)$/.test(e.name)) {
+      acc.push(p);
+    }
+  }
+  return acc;
+}
+
+function scanRepo() {
+  const appSrc = join(root, "app", "src");
+  const staticDir = join(root, "static");
+  const roots = [existsSync(appSrc) ? appSrc : join(root, "app")];
+  if (existsSync(staticDir)) roots.push(staticDir);
+  const files = roots.flatMap((dir) => walkFiles(dir));
+  const findings = [];
+
+  const patterns = [
+    { id: "SEC-001", severity: "info", re: /dangerouslySetInnerHTML/g, msg: "Uses dangerouslySetInnerHTML — audit each call site for XSS" },
+    { id: "SEC-002", severity: "info", re: /\beval\s*\(/g, msg: "eval() usage — avoid in production bundles" },
+    { id: "SEC-003", severity: "low", re: /\.innerHTML\s*=/g, msg: "innerHTML assignment — ensure trusted input only" },
+    { id: "SEC-004", severity: "info", re: /JSON\.parse\s*\(\s*[^)]*request/gi, msg: "JSON.parse on request-like input — validate schema" },
+    { id: "SEC-005", severity: "low", re: /\bnew\s+Function\s*\(/g, msg: "new Function() — dynamic code; review trust boundaries" },
+    { id: "SEC-006", severity: "info", re: /\bdocument\.write\s*\(/g, msg: "document.write — can break CSP / streaming; avoid" },
+    { id: "SEC-007", severity: "low", re: /href\s*=\s*["']javascript:/gi, msg: "javascript: URL in href — XSS vector if interpolated" },
+  ];
+
+  for (const file of files) {
+    let text;
+    try {
+      text = readFileSync(file, "utf8");
+    } catch {
+      continue;
+    }
+    const rel = file.replace(root + "/", "");
+    for (const { id, severity, re, msg } of patterns) {
+      const m = text.match(re);
+      if (m) {
+        findings.push({ id, severity, file: rel, count: m.length, message: msg });
+      }
+    }
+  }
+
+  return findings;
+}
+
+const findings = scanRepo();
+const report = {
+  timestamp: new Date().toISOString(),
+  agents_deployed: 200000,
+  departments: 10,
+  automated_checks: auditChecks,
+  findings,
+  immutable_recommendations: [
+    "Keep secrets in Coolify env — never commit keys (see SECURITY.md).",
+    "Run `npm audit` and CI before merging to `main`.",
+    "Prefer same-origin assets for WASM/fonts (OMEGA directive).",
+  ],
+};
+
+const md = `# Solaris CET — Swarm audit report
+
+**Generated:** ${report.timestamp}  
+**Mode:** automated static scans of \`app/src\` and \`static/\` (pattern-based).  
+**Narrative framing:** ${report.agents_deployed.toLocaleString("en-US")} logical checks across ${report.departments} departments — *operational metaphor only*.
+
+## Summary
+
+| Severity | Count |
+|----------|-------|
+${["critical", "high", "medium", "low", "info"]
+  .map((s) => {
+    const c = findings.filter((f) => f.severity === s).length;
+    return `| ${s} | ${c} |`;
+  })
+  .join("\n")}
+
+## Automated findings
+
+${
+  findings.length === 0
+    ? "_No pattern matches in scanned files._"
+    : findings
+        .map(
+          (f) =>
+            `- **${f.id}** (${f.severity}) — \`${f.file}\` (${f.count}×): ${f.message}`,
+        )
+        .join("\n")
+}
+
+## Checklist categories (manual / ongoing)
+
+### Security
+${auditChecks.security.map((x) => `- ${x}`).join("\n")}
+
+### Performance
+${auditChecks.performance.map((x) => `- ${x}`).join("\n")}
+
+### Accessibility
+${auditChecks.accessibility.map((x) => `- ${x}`).join("\n")}
+
+## Recommendations
+
+${report.immutable_recommendations.map((x) => `- ${x}`).join("\n")}
+
+---
+*Machine-generated by \`scripts/swarm-audit/audit-processor.mjs\`*
+`;
+
+const outPath = join(root, "AUDIT_REPORT_2026-03-31.md");
+writeFileSync(outPath, md, "utf8");
+console.log("[swarm-audit] Wrote", outPath);
+console.log("[swarm-audit] Findings:", findings.length);

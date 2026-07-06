@@ -1,0 +1,31 @@
+name: Deploy Staging (PR)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: staging-pr
+  cancel-in-progress: true
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    if: ${{ secrets.STAGING_DEPLOY_HOOK_URL != '' }}
+    environment:
+      name: staging
+    steps:
+      - name: Trigger staging deploy hook
+        env:
+          STAGING_DEPLOY_HOOK_URL: ${{ secrets.STAGING_DEPLOY_HOOK_URL }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -X POST \
+            -H 'Content-Type: application/json' \
+            -d "{\"repo\":\"${PR_REPO}\",\"pr\":${PR_NUMBER},\"ref\":\"${PR_HEAD_REF}\",\"sha\":\"${PR_HEAD_SHA}\"}" \
+            "${STAGING_DEPLOY_HOOK_URL}"
+

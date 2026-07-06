@@ -1,0 +1,15 @@
+---
+pid: 4036
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "winget install --id Git.Git -e --accept-source-agreements --accept-package-agreements 2>&1"
+started_at: 2026-07-06T00:23:17.755Z
+running_for_ms: 814998   
+---
+Found Git [Git.Git] Version 2.55.0.2
+This application is licensed to you by its owner.
+Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
+Downloading https://github.com/git-for-windows/git/releases/download/v2.55.0.windows.2/Git-2.55.0.2-64-bit.exe
+Successfully verified installer hash
+Starting package install...
+The installer will request to run as administrator. Expect a prompt.
+Successfully installed

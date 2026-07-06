@@ -1,0 +1,46 @@
+name: Multi-Sig Contract CI
+
+on:
+  push:
+    paths:
+      - "contracts/**"
+      - ".github/workflows/multisig-ci.yml"
+  pull_request:
+    paths:
+      - "contracts/**"
+      - ".github/workflows/multisig-ci.yml"
+
+jobs:
+  build-and-test:
+    name: Build & Test MultiSigWrapper
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --include=optional --legacy-peer-deps
+
+      - name: Typecheck (build + tsc)
+        run: npm run typecheck --workspace=contracts
+
+      - name: Run test suite
+        run: npm run test:ci --workspace=contracts
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: multisig-build
+          path: contracts/build/
+          retention-days: 7

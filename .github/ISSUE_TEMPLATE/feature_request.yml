@@ -1,0 +1,126 @@
+name: "✨ Cerere de Funcționalitate"
+description: "Propune o funcționalitate nouă sau o îmbunătățire pentru Solaris CET"
+title: "[FEATURE] "
+labels: ["enhancement", "triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Propune o funcționalitate nouă! 💡
+        Descrie în detaliu ce vrei să implementezi și de ce ar aduce valoare proiectului Solaris CET.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: "✅ Verificări preliminare"
+      description: "Confirmă că ai efectuat verificările de mai jos înainte de a deschide un issue."
+      options:
+        - label: "Am căutat în issue-urile existente și nu există o propunere similară."
+          required: true
+        - label: "Funcționalitatea propusă este aliniată cu scopul proiectului Solaris CET."
+          required: true
+        - label: "Am citit CONTRIBUTING.md și înțeleg procesul de contribuție."
+          required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: "🏷️ Categoria funcționalității"
+      description: "Selectează categoria care descrie cel mai bine propunerea ta."
+      options:
+        - "UI / UX — îmbunătățire vizuală sau de experiență utilizator"
+        - "Performanță — optimizare viteză sau consum de resurse"
+        - "Securitate — îmbunătățire a securității aplicației"
+        - "Integrare blockchain — funcționalitate legată de TON"
+        - "Quantum AI / Agent — funcționalitate AI nouă"
+        - "Tokenomics — modificare a mecanismelor de token"
+        - "SEO / Marketing — optimizare pentru motoare de căutare"
+        - "Documentație — îmbunătățire documentație"
+        - "DevOps / CI-CD — îmbunătățire pipeline sau deployment"
+        - "Altul (specifică în descriere)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: "📊 Prioritatea estimată"
+      description: "Cât de importantă consideri această funcționalitate?"
+      options:
+        - "Critică — fără ea, un flux principal nu poate funcționa"
+        - "Înaltă — aduce valoare semnificativă utilizatorilor"
+        - "Medie — îmbunătățire utilă dar nu urgentă"
+        - "Scăzută — nice-to-have, îmbunătățire minoră"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: "🔍 Problema sau nevoia identificată"
+      description: "Ce problemă rezolvă această funcționalitate? De ce este necesară?"
+      placeholder: |
+        În prezent, utilizatorii nu pot... / Aplicația nu suportă...
+        Asta cauzează... / Impactul este...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: "💡 Soluția propusă"
+      description: "Descrie în detaliu funcționalitatea pe care vrei să o implementezi."
+      placeholder: |
+        Propun implementarea... care va permite utilizatorilor să...
+        Arhitectura propusă: ...
+        Fișierele care ar fi afectate: ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "🔄 Alternative considerate"
+      description: "Ai luat în considerare alte abordări? De ce ai ales soluția propusă?"
+      placeholder: |
+        Am considerat și... dar am respins-o deoarece...
+
+  - type: dropdown
+    id: breaking_change
+    attributes:
+      label: "⚠️ Conține breaking changes?"
+      description: "Funcționalitatea propusă ar putea afecta comportamentul existent?"
+      options:
+        - "Nu — este complet backward-compatible"
+        - "Da — necesită migrare sau adaptări"
+        - "Nu știu — necesită analiză suplimentară"
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: "✔️ Criterii de acceptare"
+      description: "Cum vom ști că funcționalitatea este implementată corect?"
+      placeholder: |
+        - [ ] Utilizatorul poate...
+        - [ ] Sistemul răspunde în mai puțin de X ms
+        - [ ] Toate testele existente trec
+        - [ ] Documentația este actualizată
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: "🤝 Contribuție"
+      options:
+        - label: "Sunt dispus să implementez această funcționalitate și să trimit un Pull Request."
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: "ℹ️ Informații suplimentare"
+      description: "Mockup-uri, referințe, link-uri utile sau orice alt context relevant."
+      placeholder: "Adaugă imagini, link-uri sau orice alt context util..."

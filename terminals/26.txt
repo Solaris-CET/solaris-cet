@@ -1,0 +1,15 @@
+---
+pid: 5208
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\"; npm install --package-lock-only --ignore-scripts 2>&1 | Select-Object -Last 8"
+started_at: 2026-07-05T21:41:25.810Z
+running_for_ms: 10530034 
+---
+
+To address all issues possible (including breaking changes), run:
+  npm audit fix --force
+
+Some issues need review, and may require choosing
+a different dependency.
+
+Run `npm audit` for details.

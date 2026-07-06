@@ -1,0 +1,3 @@
+[console_scripts]
+solaris = src.cli:main
+solaris-web = src.web.app:launch

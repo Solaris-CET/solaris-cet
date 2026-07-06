@@ -1,0 +1,56 @@
+---
+pid: 12048
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npm run test -- src/__tests__/surveyPrefill.test.ts src/__tests__/surveyRoutes.integration.test.ts"
+started_at: 2026-07-05T23:24:22.824Z
+running_for_ms: 4350059  
+---
+
+> solaris-cet@1.0.0 test
+> node ../scripts/run-bin.mjs vitest run src/__tests__/surveyPrefill.test.ts src/__tests__/surveyRoutes.integration.test.ts
+
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ✓ src/__tests__/surveyRoutes.integration.test.ts (5 tests) 183ms
+ ❯ src/__tests__/surveyPrefill.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/surveyPrefill.test.ts [ src/__tests__/surveyPrefill.test.ts ]
+Error: Transform failed with 1 error:
+
+[PARSE_ERROR] Error: Expected `,` or `}` but found `-`
+    ╭─[ src/lib/surveyPrefill.ts:16:10 ]
+    │
+ 13 │   const map: Record<string, string> = {
+    │                                       ┬  
+    │                                       ╰── Opened here
+    │ 
+ 16 │     tabla-plata: 'metal',
+    │          ┬  
+    │          ╰── `,` or `}` expected
+────╯
+
+  Plugin: vite:oxc
+  File: C:/Users/CCons/Desktop/SOLARIS CET/app/src/lib/surveyPrefill.ts
+ ❯ transformWithOxc ../../SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:3340:19
+ ❯ TransformPluginContext.transform ../../SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:3408:26
+ ❯ EnvironmentPluginContainer.transform ../../SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:30179:51
+ ❯ loadAndTransform ../../SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:24509:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  5 passed (5)
+   Start at  02:24:31
+   Duration  16.71s (transform 443ms, setup 3.26s, import 260ms, tests 183ms, environment 8.58s)
+
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path C:\Users\CCons\Desktop\SOLARIS CET\app
+npm error workspace solaris-cet@1.0.0
+npm error location C:\Users\CCons\Desktop\SOLARIS CET\app
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c node ../scripts/run-bin.mjs vitest run src/__tests__/surveyPrefill.test.ts src/__tests__/surveyRoutes.integration.test.ts

@@ -1,0 +1,10 @@
+---
+pid: 4160
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\survey-engine\"; python -m pytest tests/ -q --tb=no 2>&1 | Select-Object -Last 3"
+started_at: 2026-07-05T22:05:06.072Z
+running_for_ms: 9110034  
+---
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+48 passed, 1 warning in 23.02s

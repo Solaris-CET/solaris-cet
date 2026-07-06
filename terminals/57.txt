@@ -1,0 +1,11 @@
+---
+pid: 4912
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\survey-engine\"; python -m uvicorn src.server:app --host 127.0.0.1 --port 8001"
+started_at: 2026-07-05T23:47:23.257Z
+running_for_ms: 2985046  
+---
+INFO:     Started server process [16840]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8001 (Press CTRL+C to quit)

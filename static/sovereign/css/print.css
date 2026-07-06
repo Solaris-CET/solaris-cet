@@ -1,0 +1,129 @@
+@media print {
+  @page {
+    margin: 14mm;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 12pt;
+    line-height: 1.45;
+  }
+
+  .skip,
+  .pulse,
+  .sovereign-build-seal,
+  details {
+    display: none !important;
+  }
+
+  .solaris-panel {
+    background: #fff !important;
+    border: 1px solid #c9c9c9 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .isometric-stage,
+  .isometric-card,
+  .isometric-card__inner {
+    transform: none !important;
+    perspective: none !important;
+    box-shadow: none !important;
+    border: 1px solid #d4d4d4 !important;
+    background: #fafafa !important;
+  }
+
+  .weight-row {
+    color: #333 !important;
+    font-size: 9pt !important;
+  }
+
+  .weight-row__sep {
+    background: #999 !important;
+  }
+
+  .weight-indicator::after {
+    display: none !important;
+  }
+
+  .chromatic-hover,
+  .crt-rav-line {
+    text-shadow: none !important;
+  }
+
+  main.ley-grid::before {
+    display: none !important;
+  }
+
+  .sacred-asymmetric {
+    display: block !important;
+  }
+
+  .ley-item--seal {
+    justify-content: center !important;
+  }
+
+  .sovereign-card-wrap.impossible-border::before {
+    display: none !important;
+  }
+
+  .sovereign-card-wrap.kinetic-shadow {
+    animation: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  .led-display::after,
+  .scanlines-subtle::before {
+    display: none !important;
+  }
+
+  .checksum-dot {
+    animation: none !important;
+  }
+
+  h1,
+  h2,
+  h3 {
+    color: #000 !important;
+    page-break-after: avoid;
+  }
+
+  .data-mono {
+    font-family: "Courier New", Courier, monospace !important;
+    font-size: 11pt !important;
+    color: #111 !important;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 10pt;
+    color: #444;
+    font-family: "Courier New", Courier, monospace;
+  }
+
+  body::before {
+    content: "Solaris CET - Document Valoare RWA (solaris-cet.com)";
+    display: block;
+    text-align: center;
+    font-size: 10pt;
+    color: #666;
+    border-bottom: 1px solid #d0d0d0;
+    padding-bottom: 8pt;
+    margin-bottom: 14pt;
+  }
+
+  body::after {
+    content: "Tiparit la: [completati manual] | Hash Verificare: SOL-CET-2026";
+    display: block;
+    text-align: center;
+    font-size: 9pt;
+    color: #888;
+    border-top: 1px solid #d0d0d0;
+    padding-top: 8pt;
+    margin-top: 14pt;
+  }
+}

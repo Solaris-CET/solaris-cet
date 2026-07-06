@@ -1,0 +1,56 @@
+name: Uptime — External Probes
+
+on:
+  schedule:
+    - cron: "11 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe health.json
+        run: |
+          set -e
+          curl -fsS https://solaris-cet.com/health.json | head -c 200
+
+      - name: Probe API health
+        run: |
+          set -e
+          curl -fsS https://solaris-cet.com/api/health | head -c 400
+
+      - name: Probe key pages
+        run: |
+          set -e
+          for p in / /servicii /contact /token-cet /privacy /terms /cookies; do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" -L "https://solaris-cet.com${p}")
+            if [ "$code" -lt 200 ] || [ "$code" -ge 400 ]; then
+              echo "Unexpected HTTP code for ${p}: $code"
+              exit 1
+            fi
+          done
+
+      - name: Probe sitemap and robots
+        run: |
+          set -e
+          curl -fsS https://solaris-cet.com/robots.txt | head -c 300
+          curl -fsS https://solaris-cet.com/sitemap.xml | head -c 300
+
+      - name: Probe metrics
+        run: |
+          set -e
+          curl -fsS https://solaris-cet.com/api/metrics | head -c 400
+
+      - name: Probe server /metrics
+        env:
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+        run: |
+          set -e
+          if [ -n "${METRICS_TOKEN}" ]; then
+            curl -fsS -H "Authorization: Bearer ${METRICS_TOKEN}" https://solaris-cet.com/metrics | head -c 200
+          else
+            curl -fsS https://solaris-cet.com/metrics | head -c 200
+          fi

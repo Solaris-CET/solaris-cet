@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /_next/
+
+# llms.txt: https://solaris-cet.com/llms.txt
+# humans.txt: https://solaris-cet.com/humans.txt
+# security.txt: https://solaris-cet.com/.well-known/security.txt
+
+Sitemap: https://solaris-cet.com/sitemap.xml

@@ -1,0 +1,67 @@
+---
+pid: 15684
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; node \"..\\node_modules\\vitest\\vitest.mjs\" run src/__tests__/surveyApi.test.ts src/__tests__/surveyRoutes.integration.test.ts"
+started_at: 2026-07-05T20:58:43.919Z
+running_for_ms: 13090051 
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ MISSING DEPENDENCY  Cannot find dependency 'jsdom'
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 2 unhandled errors during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯⎯⎯ Unhandled Error ⎯⎯⎯⎯⎯⎯⎯
+Error: [vitest-pool]: Failed to start forks worker for test files C:/Users/CCons/Desktop/SOLARIS CET/app/src/__tests__/surveyRoutes.integration.test.ts.
+ ❯ ../../SOLARIS%20CET/node_modules/vitest/dist/chunks/cli-api.C6CiCDM3.js:3449:94
+ ❯ processTicksAndRejections node:internal/process/task_queues:103:5
+ ❯ Pool.schedule ../../SOLARIS%20CET/node_modules/vitest/dist/chunks/cli-api.C6CiCDM3.js:3449:5
+
+Caused by: Error: Cannot find package 'C:\Users\CCons\Desktop\SOLARIS CET\node_modules\jsdom\index.js' imported from C:\Users\CCons\Desktop\SOLARIS CET\node_modules\vitest\dist\chunks\index.DC7d2Pf8.js
+ ❯ legacyMainResolve node:internal/modules/esm/resolve:204:26
+ ❯ packageResolve node:internal/modules/esm/resolve:778:12
+ ❯ moduleResolve node:internal/modules/esm/resolve:858:18
+ ❯ defaultResolve node:internal/modules/esm/resolve:990:11
+
+ Test Files  no tests
+      Tests  no tests
+     Errors  2 errors
+   Start at  23:58:53
+   Duration  6.59s (transform 0ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+
+ ❯ #cachedDefaultResolve node:internal/modules/esm/loader:718:20
+ ❯ #resolveAndMaybeBlockOnLoaderThread node:internal/modules/esm/loader:735:38
+ ❯ ModuleLoader.resolveSync node:internal/modules/esm/loader:764:52
+ ❯ #resolve node:internal/modules/esm/loader:700:17
+ ❯ ModuleLoader.getOrCreateModuleJob node:internal/modules/esm/loader:620:35
+ ❯ onImport.tracePromise.__proto__ node:internal/modules/esm/loader:649:32
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'ERR_MODULE_NOT_FOUND' }
+
+⎯⎯⎯⎯⎯⎯ Unhandled Error ⎯⎯⎯⎯⎯⎯⎯
+Error: [vitest-pool]: Failed to start forks worker for test files C:/Users/CCons/Desktop/SOLARIS CET/app/src/__tests__/surveyApi.test.ts.
+ ❯ ../../SOLARIS%20CET/node_modules/vitest/dist/chunks/cli-api.C6CiCDM3.js:3449:94
+ ❯ processTicksAndRejections node:internal/process/task_queues:103:5
+ ❯ Pool.schedule ../../SOLARIS%20CET/node_modules/vitest/dist/chunks/cli-api.C6CiCDM3.js:3449:5
+
+Caused by: Error: Cannot find package 'C:\Users\CCons\Desktop\SOLARIS CET\node_modules\jsdom\index.js' imported from C:\Users\CCons\Desktop\SOLARIS CET\node_modules\vitest\dist\chunks\index.DC7d2Pf8.js
+ ❯ legacyMainResolve node:internal/modules/esm/resolve:204:26
+ ❯ packageResolve node:internal/modules/esm/resolve:778:12
+ ❯ moduleResolve node:internal/modules/esm/resolve:858:18
+ ❯ defaultResolve node:internal/modules/esm/resolve:990:11
+ ❯ #cachedDefaultResolve node:internal/modules/esm/loader:718:20
+ ❯ #resolveAndMaybeBlockOnLoaderThread node:internal/modules/esm/loader:735:38
+ ❯ ModuleLoader.resolveSync node:internal/modules/esm/loader:764:52
+ ❯ #resolve node:internal/modules/esm/loader:700:17
+ ❯ ModuleLoader.getOrCreateModuleJob node:internal/modules/esm/loader:620:35
+ ❯ onImport.tracePromise.__proto__ node:internal/modules/esm/loader:649:32
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'ERR_MODULE_NOT_FOUND' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+

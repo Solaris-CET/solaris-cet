@@ -1,0 +1,23 @@
+---
+pid: 17256
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "$root = \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\"
+$plan = Join-Path $root \"docs\\planning\"
+New-Item -ItemType Directory -Force -Path $plan | Out-Null
+foreach ($f in @(\"PLAN_SOLARIS_CET_FINAL.md\",\"global.md\",\"grok.md\",\"BUGET_FABLE5_API.md\")) {
+  $p = Join-Path $root $f
+  if (Test-Path $p) { Move-Item $p (Join-Path $plan $f) -Force }
+}
+Set-Location (Join-Path $root \"survey-engine\")
+python -m pip install -e \".[api,dev]\" -q
+python -m pytest tests/ -q --tb=line 2>&1"
+started_at: 2026-07-05T20:17:33.024Z
+running_for_ms: 15560179 
+---
+  WARNING: The scripts solaris-web.exe and solaris.exe are installed in 'C:\Users\CCons\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\Scripts' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+
+[notice] A new release of pip is available: 26.0.1 -> 26.1.2
+[notice] To update, run: C:\Users\CCons\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\python.exe -m pip install --upgrade pip
+............................................                             [100%]
+44 passed in 10.25s

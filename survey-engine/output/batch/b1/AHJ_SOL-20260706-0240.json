@@ -1,0 +1,169 @@
+{
+  "schema": "solaris-ahj-v1",
+  "export_version": 3,
+  "generated_at": "2026-07-06T02:40:26.255883",
+  "report_id": "SOL-20260706-0240",
+  "applicant": {
+    "name": "Batch Client",
+    "address": "—",
+    "city": "Cluj",
+    "postal_code": "—",
+    "phone": null,
+    "email": null
+  },
+  "installation": {
+    "capacity_kwp": 3.9,
+    "panel_count": 9,
+    "inverter": "Hibrid monofazat 3kW",
+    "grid_connection": "single-phase",
+    "roof_type": "tile",
+    "orientation": "S",
+    "pitch_degrees": 35.0,
+    "usable_area_m2": 40.0,
+    "existing_solar": false
+  },
+  "production_estimate": {
+    "annual_kwh": 4412,
+    "specific_yield_kwh_per_kwp": 1140.0,
+    "monthly_kwh": {
+      "Ian": 199,
+      "Feb": 243,
+      "Mar": 375,
+      "Apr": 419,
+      "Mai": 485,
+      "Iun": 507,
+      "Iul": 529,
+      "Aug": 507,
+      "Sep": 419,
+      "Oct": 353,
+      "Nov": 221,
+      "Dec": 154
+    },
+    "confidence_range_kwh": [
+      4032,
+      4791
+    ],
+    "derating_factors": {
+      "orientation": 1.0,
+      "pitch": 1.0,
+      "shading": 0.95,
+      "existing_solar": 1.0,
+      "combined": 0.95
+    },
+    "calc_version": 3
+  },
+  "technical_summary": {
+    "suitability_score": 81,
+    "verdict": "Recomandat — instalare fezabilă cu verificări minime suplimentare",
+    "key_findings": [
+      "Imagine P001_roof.jpg înregistrată pentru raport"
+    ],
+    "shading_level": "low",
+    "structural_notes": null
+  },
+  "compliance_checklist": [
+    {
+      "id": "CHK-01",
+      "category": "Structură",
+      "description": "Starea structurală a acoperișului",
+      "status": "pass",
+      "ahj_relevant": true,
+      "notes": null
+    },
+    {
+      "id": "CHK-02",
+      "category": "Electric",
+      "description": "Capacitate tablou electric",
+      "status": "pass",
+      "ahj_relevant": true,
+      "notes": null
+    },
+    {
+      "id": "CHK-03",
+      "category": "Umbrire",
+      "description": "Analiză umbrire statică/dinamică",
+      "status": "warning",
+      "ahj_relevant": false,
+      "notes": null
+    },
+    {
+      "id": "CHK-04",
+      "category": "Acces",
+      "description": "Acces sigur pentru montaj",
+      "status": "pass",
+      "ahj_relevant": false,
+      "notes": null
+    },
+    {
+      "id": "CHK-05",
+      "category": "Documentație",
+      "description": "Acte proprietate și acorduri",
+      "status": "pass",
+      "ahj_relevant": true,
+      "notes": null
+    },
+    {
+      "id": "CHK-06",
+      "category": "Conformitate",
+      "description": "Distanțe coș fum / muchii",
+      "status": "warning",
+      "ahj_relevant": true,
+      "notes": null
+    }
+  ],
+  "documents_required": [
+    "Plan de situație cu amplasarea panourilor",
+    "Schema unifilară electrică",
+    "Declarație de conformitate CE / ANRE",
+    "Certificat de performanță energetică (dacă e cazul)",
+    "Cerere racordare operator rețea",
+    "Dovadă proprietate / acord administrator"
+  ],
+  "recommendations": [
+    {
+      "priority": "high",
+      "title": "Acțiune P001: roof_overview",
+      "description": "Validare manuală recomandată fără API DeepSeek",
+      "estimated_cost_eur": null
+    },
+    {
+      "priority": "medium",
+      "title": "Verificare Umbrire",
+      "description": "Analiză umbrire statică/dinamică",
+      "estimated_cost_eur": null
+    },
+    {
+      "priority": "medium",
+      "title": "Verificare Conformitate",
+      "description": "Distanțe coș fum / muchii",
+      "estimated_cost_eur": null
+    },
+    {
+      "priority": "high",
+      "title": "Dimensionare 3.9 kWp",
+      "description": "Configurație: 9 panouri + Hibrid monofazat 3kW. Autoconsum estimat 65.0%.",
+      "estimated_cost_eur": 5460.0
+    },
+    {
+      "priority": "low",
+      "title": "Documentație autorizație",
+      "description": "Plan situație, schema unifilară, declarație conformitate ANRE.",
+      "estimated_cost_eur": null
+    }
+  ],
+  "technician": "Tehnician SOLARIS",
+  "survey_date": "2026-07-06",
+  "premium_tier": false,
+  "jurisdiction": {
+    "code": "RO-CJ",
+    "name": "Cluj",
+    "grid_operator": "Electrica Distribuție",
+    "ahj_authority": "Primărie / Urbanism local"
+  },
+  "site_location": {
+    "latitude": null,
+    "longitude": null
+  },
+  "validation_errors": [],
+  "validation_passed": true
+}

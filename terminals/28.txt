@@ -1,0 +1,24 @@
+---
+pid: 13896
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 2; cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\"; npm run ci:win 2>&1 | Select-Object -Last 15"
+started_at: 2026-07-05T21:48:01.797Z
+running_for_ms: 10135037 
+---
+
+> ci:win
+> npx --yes rimraf node_modules app/node_modules && npm ci --ignore-scripts && npx husky
+
+node.exe : npm warn EBADENGINE Unsupported engine {
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn EBADENGINE Unsupported engine {:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+npm warn EBADENGINE   package: 'mute-stream@4.0.0',
+npm warn EBADENGINE   required: { node: '^22.22.2 || ^24.15.0 || >=26.0.0' },
+npm warn EBADENGINE   current: { node: 'v24.13.0', npm: '11.6.2' }
+npm warn EBADENGINE }
+npm warn deprecated @safe-global/safe-gateway-typescript-sdk@3.23.1: Package no longer supported. Contact Support at ht
+tps://www.npmjs.com/support for more info.

@@ -1,0 +1,13 @@
+Unattended-Upgrade::Origins-Pattern {
+  "origin=Ubuntu,codename=${distro_codename}-security";
+  "origin=Ubuntu,codename=${distro_codename}-updates";
+};
+
+Unattended-Upgrade::Package-Blacklist {
+};
+
+Unattended-Upgrade::AutoFixInterruptedDpkg "true";
+Unattended-Upgrade::MinimalSteps "true";
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+Unattended-Upgrade::Automatic-Reboot "false";
+

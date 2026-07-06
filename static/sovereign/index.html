@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Solaris CET — RWA on TON. Fixed 9,000 CET. Cetățuia, Romania. Tactical static surface (no JavaScript)."
+    />
+    <meta name="genesis-date" content="2026-03-31T23:23:00Z" />
+    <meta name="cet-supply" content="9000" />
+    <meta name="cet-standard" content="OMEGA-2026" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'"
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+    <link rel="mask-icon" href="./safari-pinned-tab.svg" color="#F2C94C" />
+    <meta name="msapplication-TileColor" content="#020617" />
+    <meta name="theme-color" content="#F2C94C" />
+    <link rel="stylesheet" href="css/sovereign-ui.css" />
+    <link rel="stylesheet" href="css/print.css" media="print" />
+    <title>Solaris CET — Sovereign static node</title>
+    <style>
+      /* JetBrains Mono — SIL Open Font License 1.1 (self-hosted woff2, no CDN) */
+      @font-face {
+        font-family: "JetBrains Mono";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("fonts/jetbrains-mono-400.woff2") format("woff2");
+      }
+
+      :root {
+        --bg-void: #020617;
+        --bg-elevation-1: #0f172a;
+        --accent-sovereign: #f2c94c;
+        --accent-gold-dim: #b7860b;
+        --accent-glow: rgba(242, 201, 76, 0.15);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-surface: rgba(255, 255, 255, 0.05);
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-mono: #cbd5e1;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        position: relative;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        background: var(--bg-void);
+        color: var(--text-primary);
+        line-height: 1.6;
+      }
+
+      /* CSS-only depth layer (no JS) — aligns with main app hero mesh language */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.18;
+        background-image:
+          linear-gradient(rgba(242, 201, 76, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(242, 201, 76, 0.04) 1px, transparent 1px);
+        background-size: 40px 40px;
+        mask-image: radial-gradient(ellipse 80% 60% at 50% 15%, black 0%, transparent 80%);
+      }
+
+      header,
+      main,
+      footer {
+        position: relative;
+        z-index: 1;
+      }
+
+      .skip {
+        position: absolute;
+        left: -9999px;
+      }
+      .skip:focus {
+        left: 1rem;
+        top: 1rem;
+        z-index: 100;
+        padding: 0.5rem 1rem;
+        background: var(--bg-elevation-1);
+        border: 1px solid var(--glass-border);
+        color: var(--text-primary);
+      }
+
+      header {
+        padding: 1.5rem clamp(1rem, 4vw, 2rem);
+        border-bottom: 1px solid var(--glass-border);
+        background: var(--bg-elevation-1);
+      }
+
+      .micro-label {
+        font-size: 0.625rem;
+        text-transform: uppercase;
+        letter-spacing: 0.35em;
+        color: var(--text-secondary);
+        margin: 0 0 0.25rem;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.75rem, 5vw, 2.5rem);
+        font-weight: 200;
+        letter-spacing: -0.02em;
+      }
+
+      main {
+        max-width: min(56rem, 100%);
+        margin: 0 auto;
+        padding-left: clamp(1rem, 4vw, 2rem);
+        padding-right: clamp(1rem, 4vw, 2rem);
+      }
+
+      .solaris-panel {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(1.5rem, 4vw, 2rem);
+        background: var(--glass-surface);
+        backdrop-filter: blur(12px) saturate(180%);
+        border: 1px solid rgba(242, 201, 76, 0.15);
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 0.75rem;
+        box-shadow:
+          0 25px 50px -12px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 0 rgba(255, 255, 255, 0.1),
+          0 0 40px rgba(242, 201, 76, 0.08);
+      }
+
+      .solaris-panel::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          45deg,
+          transparent 30%,
+          rgba(242, 201, 76, 0.03) 50%,
+          transparent 70%
+        );
+        animation: scan 8s linear infinite;
+        pointer-events: none;
+      }
+
+      @keyframes scan {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .solaris-panel > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .data-mono {
+        font-family: "JetBrains Mono", ui-monospace, "Cascadia Code", monospace;
+        font-feature-settings: "liga" 1, "calt" 1, "tnum" 1, "zero" 1;
+        font-variant-numeric: tabular-nums slashed-zero;
+        color: var(--text-mono);
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      .accent {
+        color: var(--accent-sovereign);
+        text-shadow: 0 0 24px var(--accent-glow);
+      }
+
+      details {
+        margin-top: 1.25rem;
+        border: 1px solid var(--glass-border);
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: rgba(15, 23, 42, 0.6);
+      }
+
+      summary {
+        cursor: pointer;
+        color: var(--accent-sovereign);
+        font-weight: 500;
+      }
+
+      details[open] summary {
+        margin-bottom: 0.5rem;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 1.25rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+      }
+
+      footer {
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--glass-border);
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+      }
+
+      .pulse {
+        display: inline-block;
+        margin-top: 0.75rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        border: 1px solid var(--accent-gold-dim);
+        color: var(--accent-sovereign);
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          box-shadow: 0 0 0 0 var(--accent-glow);
+        }
+        50% {
+          opacity: 0.85;
+          box-shadow: 0 0 20px 2px var(--accent-glow);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header role="banner">
+      <p class="micro-label">Solaris CET · TON · RWA</p>
+      <h1 class="living-gold-text optical-align headline-balance">Sovereign static node</h1>
+    </header>
+    <main id="main" class="section-padding ley-grid main-ley" role="main">
+      <div class="sacred-asymmetric">
+        <div class="ley-item ley-item--seal">
+          <div class="sovereign-seal-wrap">
+            <div class="sovereign-seal" role="img" aria-label="Solaris CET seal">
+              <span class="sovereign-seal__label">CET</span>
+            </div>
+          </div>
+        </div>
+        <div class="ley-item ley-item--card">
+          <div class="sovereign-card-wrap impossible-border kinetic-shadow">
+            <article class="solaris-panel solaris-hologram grid-gap" aria-labelledby="panel-title">
+        <div class="isometric-stage">
+          <div class="isometric-card">
+            <div class="isometric-card__inner">
+              <h2
+                id="panel-title"
+                class="micro-label optical-align headline-balance chromatic-hover"
+              >
+                Supply invariant
+              </h2>
+              <div
+                class="led-display scanlines-subtle supply-figure"
+                role="group"
+                aria-label="9,000 CET tokens, fixed supply cap"
+              >
+                <span class="data-mono led-main phosphor-bloom weight-indicator">9,000</span
+                ><span class="data-mono led-fraction" aria-hidden="true">.00</span>
+                <span class="data-mono led-unit">CET</span>
+              </div>
+              <div
+                class="checksum-group"
+                title="Presentational display strip — not an on-chain checksum."
+              >
+                <span class="checksum-dot" aria-hidden="true"></span>
+                <span class="checksum-line data-mono">REF · 9K-CAP · TON · STATIC</span>
+              </div>
+              <p class="text-align-perfect" style="margin: 0; color: var(--text-secondary); font-size: 0.95rem">
+                Fixed supply. Anchor: virtual agricultural land (digital twin), <strong>Cetățuia, Romania</strong>.
+              </p>
+              <div class="weight-row" role="group" aria-label="CET supply metrics (metaphorical)">
+                <div class="weight-row__item">
+                  <svg
+                    class="weight-row__icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
+                    />
+                  </svg>
+                  <span class="data-mono weight-row__text">MASS: 9000.00 CET</span>
+                </div>
+                <div class="weight-row__sep" aria-hidden="true"></div>
+                <div class="weight-row__item">
+                  <svg
+                    class="weight-row__icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                    />
+                  </svg>
+                  <span class="data-mono weight-row__text">DENSITY: IMMUTABLE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="pulse" role="status">No JavaScript · Tor-safe surface</p>
+        <div class="crt-terminal">
+          <p
+            class="data-mono chromatic-hover crt-rav-line"
+            style="margin: 0; font-size: 0.75rem; color: var(--text-secondary)"
+          >
+            RAV · REASON · ACT · VERIFY
+          </p>
+          <p class="data-mono terminal-cursor" style="margin: 0.35rem 0 0; font-size: 0.82rem; color: var(--text-primary)">
+            STATUS: NOMINAL
+          </p>
+        </div>
+        <details>
+          <summary>Visual layer (Tor-safe)</summary>
+          <ul>
+            <li>Fixed CSS grid + radial mask — no scripts, no external assets.</li>
+            <li>Print stylesheet: <span class="data-mono">css/print.css</span> (paper-friendly).</li>
+          </ul>
+        </details>
+        <details>
+          <summary>Operational notes</summary>
+          <ul>
+            <li>Production: <span class="data-mono">npm run build</span> copies this tree into the Vite app as <span class="data-mono">/sovereign/</span>.</li>
+            <li>JetBrains Mono is self-hosted under <span class="data-mono">/sovereign/fonts/</span> (no third-party font CDNs).</li>
+          </ul>
+        </details>
+            </article>
+          </div>
+        </div>
+      </div>
+      <footer role="contentinfo">
+        <p class="sovereign-eternity-line data-mono">
+          GENESIS_ANCHOR: 2026-03-31T23:23:00Z · CET_SUPPLY_CAP: 9000 · GEO_ANCHOR: Cetățuia, Romania · NETWORK: TON
+        </p>
+        <p class="data-mono">solaris-cet.com/sovereign/</p>
+        <p style="margin: 1rem 0 0">
+          <a class="solaris-button solaris-button--primary solaris-button--heavy" href="/">Full Solaris CET experience</a>
+        </p>
+      </footer>
+    </main>
+    <!-- BUILD_SEAL_INJECT -->
+  </body>
+</html>

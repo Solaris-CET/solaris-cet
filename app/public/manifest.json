@@ -1,0 +1,41 @@
+{
+  "name": "Solaris CET",
+  "short_name": "SolarisCET",
+  "description": "Solaris CET — instalații fotovoltaice, construcții și acoperișuri (tablă/țiglă/TPO).",
+  "theme_color": "#F97316",
+  "background_color": "#05060B",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "portrait-primary",
+  "start_url": "/",
+  "scope": "/",
+  "categories": ["business", "utilities"],
+  "lang": "ro",
+  "id": "/",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Cere ofertă", "short_name": "Ofertă", "url": "/contact" },
+    { "name": "Servicii", "short_name": "Servicii", "url": "/servicii" },
+    { "name": "Întrebări frecvente", "short_name": "FAQ", "url": "/faq" },
+    { "name": "Despre", "short_name": "Despre", "url": "/about" }
+  ],
+  "screenshots": [
+    {
+      "src": "phone-mockup.png",
+      "sizes": "1024x1536",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Solaris CET — interfață mobil"
+    },
+    {
+      "src": "og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Solaris CET — prezentare"
+    }
+  ]
+}

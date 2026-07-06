@@ -1,0 +1,24 @@
+---
+pid: 16744
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "Set-Location \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\"; python -m pip install -e \".[ui,dev]\" -q; python -m pytest tests/ -q --tb=line 2>&1"
+started_at: 2026-07-05T20:02:50.995Z
+running_for_ms: 16440019 
+---
+  WARNING: The scripts solaris-web.exe and solaris.exe are installed in 'C:\Users\CCons\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\Scripts' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+  WARNING: The scripts hf.exe, huggingface-cli.exe and tiny-agents.exe are installed in 'C:\Users\CCons\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\Scripts' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+  WARNING: The script fastapi.exe is installed in 'C:\Users\CCons\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\Scripts' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+  WARNING: The script hf-gradio.exe is installed in 'C:\Users\CCons\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\Scripts' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+  WARNING: The scripts gradio.exe and upload_theme.exe are installed in 'C:\Users\CCons\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\Scripts' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+tokenizers 0.20.3 requires huggingface-hub<1.0,>=0.16.4, but you have huggingface-hub 1.22.0 which is incompatible.
+
+[notice] A new release of pip is available: 26.0.1 -> 26.1.2
+[notice] To update, run: C:\Users\CCons\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\python.exe -m pip install --upgrade pip
+.................................                                        [100%]
+33 passed in 20.66s

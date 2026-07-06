@@ -1,0 +1,20 @@
+---
+pid: 6428
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; node \"..\\node_modules\\vitest\\vitest.mjs\" run src/__tests__/surveyApi.test.ts src/__tests__/surveyRoutes.integration.test.ts --environment=node --pool=threads --no-file-parallelism"
+started_at: 2026-07-05T21:02:03.248Z
+running_for_ms: 12890027 
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ✓ src/__tests__/surveyRoutes.integration.test.ts (3 tests) 625ms
+     ✓ /api/survey/health: GET proxies engine health  363ms
+ ✓ src/__tests__/surveyApi.test.ts (1 test) 2177ms
+     ✓ buildGenerateFormData maps fields for multipart upload  2075ms
+
+ Test Files  2 passed (2)
+      Tests  4 passed (4)
+   Start at  00:02:22
+   Duration  58.64s (transform 2.18s, setup 36.23s, import 2.08s, tests 2.80s, environment 3ms)
+

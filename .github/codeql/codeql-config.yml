@@ -1,0 +1,7 @@
+name: "CodeQL config"
+
+paths-ignore:
+  - "app/dist/**"
+  - "app/.api-dist/**"
+  - "**/*.min.js"
+  - "**/*.min.mjs"

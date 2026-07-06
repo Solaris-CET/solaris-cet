@@ -1,0 +1,77 @@
+import { useEffect, useMemo, useState } from 'react';
+
+import { useLanguage } from '@/hooks/useLanguage';
+import { localizePathname } from '@/i18n/urlRouting';
+
+import { SolarisLogoMark } from './SolarisLogoMark';
+
+export default function MobileAppNav() {
+  const { lang } = useLanguage();
+  const [pathname, setPathname] = useState(() =>
+    typeof window === 'undefined' ? '/' : window.location.pathname || '/',
+  );
+
+  useEffect(() => {
+    const syncPathname = () => {
+      setPathname(window.location.pathname || '/');
+    };
+
+    window.addEventListener('popstate', syncPathname);
+    window.addEventListener('hashchange', syncPathname);
+    return () => {
+      window.removeEventListener('popstate', syncPathname);
+      window.removeEventListener('hashchange', syncPathname);
+    };
+  }, []);
+
+  const navItems = useMemo(() => [
+    { label: '🏠 Acasă', href: localizePathname('/', lang) },
+    { label: '🔧 Servicii', href: localizePathname('/servicii', lang) },
+    { label: '📞 Contact', href: localizePathname('/contact', lang) },
+    { label: '💬 Chat', href: '#chat-widget' },
+  ], [lang]);
+
+  const isActive = (href: string) => {
+    if (href === '#chat-widget') return false;
+    return pathname === href;
+  };
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-white/10 bg-gray-900/95 backdrop-blur-md md:hidden" aria-label="Navigație mobilă">
+      <div className="absolute left-4 bottom-2 w-8 h-8">
+        <SolarisLogoMark className="w-full h-full" />
+      </div>
+      {navItems.map((item) => (
+        <a
+          key={item.label}
+          href={item.href}
+          className={`flex flex-col items-center gap-1 px-3 py-2 text-xs font-semibold transition-colors ${
+            isActive(item.href) ? 'text-amber-400' : 'text-white/60 hover:text-white'
+          }`}
+          onClick={(e) => {
+            if (item.href === '#chat-widget') {
+              e.preventDefault();
+              // Try to find existing floating chat trigger button
+              const chatTrigger =
+                document.querySelector<HTMLButtonElement>(
+                  'button[aria-label*="Deschide chatbot Solaris CET"]'
+                ) ??
+                Array.from(document.querySelectorAll<HTMLButtonElement>('button')).find(
+                  (btn) => btn.textContent?.trim() === 'Chat'
+                );
+              if (chatTrigger) {
+                chatTrigger.click();
+              } else {
+                // Fallback: navigate to contact page
+                window.location.href = localizePathname('/contact', lang);
+              }
+            }
+          }}
+        >
+          <span className="text-lg">{item.label.split(' ')[0]}</span>
+          <span>{item.label.split(' ').slice(1).join(' ')}</span>
+        </a>
+      ))}
+    </nav>
+  );
+}

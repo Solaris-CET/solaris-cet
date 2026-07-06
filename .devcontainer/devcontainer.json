@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json.schemastore.org/devcontainer.json",
+  "name": "Solaris CET",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:22-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.12"
+    }
+  },
+  "remoteUser": "node",
+  "workspaceFolder": "/workspaces/solaris-cet",
+  "postCreateCommand": "bash -lc 'npm ci && pip install -e ./survey-engine[api,dev] && cd app && npx playwright install --with-deps chromium'",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ms-playwright.playwright",
+        "vitest.explorer",
+        "ms-vscode.vscode-typescript-next",
+        "ms-python.python",
+        "GitHub.copilot",
+        "GitHub.copilot-chat"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "typescript.preferences.importModuleSpecifier": "relative",
+        "typescript.enablePromptUseWorkspaceTsdk": true,
+        "typescript.tsdk": "node_modules/typescript/lib",
+        "eslint.workingDirectories": ["app"]
+      }
+    }
+  },
+  "forwardPorts": [5173, 4173, 8000, 3000],
+  "portsAttributes": {
+    "5173": {
+      "label": "Vite dev",
+      "onAutoForward": "notify"
+    },
+    "4173": {
+      "label": "Vite preview",
+      "onAutoForward": "silent"
+    },
+    "8000": {
+      "label": "Survey engine API",
+      "onAutoForward": "notify"
+    },
+    "3000": {
+      "label": "Node production server",
+      "onAutoForward": "silent"
+    }
+  },
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "4gb",
+    "storage": "16gb"
+  }
+}

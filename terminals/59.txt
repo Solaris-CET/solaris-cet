@@ -1,0 +1,41 @@
+---
+pid: 5644
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\"; npm run app:dev"
+started_at: 2026-07-06T00:19:47.839Z
+running_for_ms: 1040008  
+---
+
+> app:dev
+> npm --workspace=app run dev --
+
+
+> solaris-cet@1.0.0 predev
+> node ../scripts/generate-release-notes.mjs && node scripts/generate-seo-files.mjs && node scripts/generate-legal-digests.mjs
+
+
+📊 SEO Audit Report
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Total pages: 48
+Pages without description: 0
+Duplicate titles: 4
+  Duplicate titles:
+  - "Politica de confidențialitate — Solaris CET"
+  - "Politica de cookie-uri — Solaris CET"
+  - "Servicii — Solaris CET"
+  - "Portofoliu — Solaris CET"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Google ping: 404
+✅ Bing ping: 410
+✅ Sitemap submitted to Google and Bing
+
+> solaris-cet@1.0.0 dev
+> node ../scripts/run-bin.mjs vite
+
+
+  VITE v8.0.11  ready in 7100 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.1.140:5173/
+03:20:02 [vite] (client) [optimizer] scanning dependencies...

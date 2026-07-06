@@ -1,0 +1,102 @@
+# Path → label mapping for actions/labeler@v6.
+# Labels must exist in the repository (create them once under Issues → Labels).
+
+"area: frontend":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/src/**"
+      - "app/index.html"
+      - "app/public/**"
+
+"area: sections":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/src/sections/**"
+
+"area: components":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/src/components/**"
+
+"area: hooks":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/src/hooks/**"
+
+"area: i18n":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/src/i18n/**"
+
+"area: public":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/public/**"
+
+"area: contracts":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "contracts/**"
+
+"area: tests":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/src/**/*.{test,spec}.{ts,tsx}"
+      - "app/tests/**"
+      - "contracts/tests/**"
+
+"ci":
+  - changed-files:
+    - any-glob-to-any-file:
+      - ".github/workflows/**"
+      - ".github/dependabot.yml"
+      - ".github/labeler.yml"
+
+"config":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/vite.config.ts"
+      - "app/tailwind.config.js"
+      - "app/tsconfig*.json"
+      - "app/eslint.config.js"
+      - "app/vitest.config.ts"
+      - "app/postcss.config.js"
+      - "app/lighthouserc.cjs"
+      - "app/components.json"
+
+"dependencies":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "package-lock.json"
+      - "package.json"
+      - "app/package.json"
+      - "contracts/package.json"
+      - "scripts/package.json"
+
+"documentation":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "**/*.md"
+      - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/PULL_REQUEST_TEMPLATE.md"
+
+"security":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "SECURITY.md"
+      - ".github/workflows/codeql.yml"
+
+"smart-contracts":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "contracts/**"
+
+"testing":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "app/src/**/*.test.ts"
+      - "app/src/**/*.test.tsx"
+      - "app/tests/**/*.spec.ts"
+      - "app/tests/**/*.spec.tsx"
+      - "contracts/tests/**"

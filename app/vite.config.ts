@@ -1,0 +1,397 @@
+import { execSync } from "node:child_process"
+import fs from "node:fs"
+
+import { sentryVitePlugin } from "@sentry/vite-plugin"
+import react from "@vitejs/plugin-react"
+import path from "path"
+import type { Plugin, PluginOption } from "vite"
+import { defineConfig } from "vite"
+import { compression } from "vite-plugin-compression2"
+import { VitePWA } from 'vite-plugin-pwa'
+
+import { OG_IMAGE_FILENAME, SOLARIS_CET_LOGO_FILENAME } from "./src/lib/brandAssetFilenames"
+
+function inlineCriticalCssAndAsyncStyles(): Plugin {
+  const criticalPath = path.resolve(process.cwd(), 'src/critical.css')
+  const criticalCss = fs.existsSync(criticalPath) ? fs.readFileSync(criticalPath, 'utf8') : ''
+
+  const esc = (value: string) => value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')
+  const getAttr = (tag: string, attr: string) => {
+    const re = new RegExp(`${attr}=["']([^"']+)["']`, 'i')
+    return tag.match(re)?.[1]
+  }
+
+  return {
+    name: 'inline-critical-css-and-async-styles',
+    apply: 'build',
+    transformIndexHtml(html) {
+      const styleLinks = html.match(/<link\b[^>]*rel=["']stylesheet["'][^>]*>/gi) ?? []
+      const candidates = styleLinks
+        .map((tag) => ({ tag, href: getAttr(tag, 'href') }))
+        .filter((x): x is { tag: string; href: string } => !!x.href)
+        .filter((x) => /(^|\/)(assets)\/.+\.css($|\?)/i.test(x.href))
+
+      if (candidates.length === 0 && !criticalCss) return html
+
+      let nextHtml = html
+
+      for (const { tag, href } of candidates) {
+        const preload = `<link rel="preload" as="style" href="${esc(href)}" data-async-css="1">`
+        nextHtml = nextHtml.replace(tag, preload)
+      }
+
+      if (candidates.length > 0) {
+        const noscript = candidates
+          .map(({ href }) => `<noscript><link rel="stylesheet" href="${esc(href)}"></noscript>`)
+          .join('')
+
+        const loader = `<script nonce="__CSP_NONCE__">(function(){var links=[].slice.call(document.querySelectorAll('link[data-async-css="1"]'));if(!links.length)return;try{window.__solarisAsyncCssReady=false;}catch(e){}var next=0;function markReady(){try{window.__solarisAsyncCssReady=true;window.dispatchEvent(new Event('solaris:cssReady'));}catch(e){}}function applyInOrder(){while(next<links.length){var l=links[next];if(l.dataset.loaded!=='1')return;l.rel='stylesheet';l.removeAttribute('as');l.removeAttribute('data-async-css');next++;}if(next>=links.length)markReady();}links.forEach(function(l){l.addEventListener('load',function(){l.dataset.loaded='1';applyInOrder();},{once:true});l.addEventListener('error',function(){l.dataset.loaded='1';applyInOrder();},{once:true});});})();</script>`
+
+        nextHtml = nextHtml.replace(/<\/head>/i, `${noscript}${loader}</head>`)
+      }
+
+      if (criticalCss) {
+        nextHtml = nextHtml.replace(/<\/head>/i, `<style nonce="__CSP_NONCE__">${criticalCss}</style></head>`)
+      }
+
+      return nextHtml
+    },
+  }
+}
+
+function fixReownPhosphorImports(): Plugin {
+  const prefix = '../node_modules/@phosphor-icons/webcomponents/dist/icons/'
+  const barePrefix = '@phosphor-icons/webcomponents/'
+  const virtualPrefix = '\0phosphor-missing:'
+  return {
+    name: 'fix-reown-phosphor-imports',
+    enforce: 'pre',
+    resolveId(source) {
+      if (source.startsWith(prefix)) {
+        const rel = source.slice('../node_modules/'.length)
+        return path.resolve(__dirname, '..', 'node_modules', rel)
+      }
+      if (source.startsWith(barePrefix)) {
+        const icon = source.slice(barePrefix.length)
+        return `${virtualPrefix}${icon}`
+      }
+      return null
+    },
+    load(id) {
+      if (!id.startsWith(virtualPrefix)) return null
+      return 'export default undefined;'
+    },
+  }
+}
+
+function fixPhosphorWebcomponentsLitImports(): Plugin {
+  const litPnpmRe = /node_modules\/\.pnpm\/[^/]+\/node_modules\/(@lit\/reactive-element\/.+)$/i
+  const litPkgPnpmRe = /@lit_reactive-element@[^/]+\/node_modules\/(@lit\/reactive-element\/.+)$/i
+  const litMjsRe = /^@lit\/reactive-element\/(.+)\.mjs$/i
+  return {
+    name: 'fix-phosphor-webcomponents-lit-imports',
+    enforce: 'pre',
+    resolveId(source) {
+      const mjs = source.match(litMjsRe)
+      if (mjs) return `@lit/reactive-element/${mjs[1]}.js`
+
+      const m1 = source.match(litPnpmRe)
+      if (m1) {
+        const id = m1[1]
+        if (id.endsWith('.mjs')) return `${id.slice(0, -4)}.js`
+        return id
+      }
+
+      const m2 = source.match(litPkgPnpmRe)
+      if (m2) {
+        const id = m2[1]
+        if (id.endsWith('.mjs')) return `${id.slice(0, -4)}.js`
+        return id
+      }
+
+      return null
+    },
+  }
+}
+
+/**
+ * Coolify/Nixpacks often run `vite preview` instead of nginx. Vite's preview
+ * SPA `htmlFallback` treats paths containing a dot as client routes, so
+ * `/health.json` incorrectly returns `index.html`. Serve the real file first.
+ */
+function previewHealthJson(): PluginOption {
+  return {
+    name: "preview-health-json",
+    configurePreviewServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const pathname = req.url?.split("?")[0]
+        if (pathname !== "/health.json") return next()
+
+        const outDir =
+          server.config.environments?.client?.build?.outDir ??
+          server.config.build?.outDir ??
+          "dist"
+        const file = path.resolve(server.config.root, outDir, "health.json")
+        if (!fs.existsSync(file)) return next()
+
+        if (req.method !== "GET" && req.method !== "HEAD") {
+          res.statusCode = 405
+          res.end()
+          return
+        }
+
+        res.setHeader("Content-Type", "application/json; charset=utf-8")
+        res.setHeader("Cache-Control", "no-store")
+        res.statusCode = 200
+        if (req.method === "HEAD") {
+          res.end()
+          return
+        }
+        fs.createReadStream(file).pipe(res)
+      })
+    },
+  }
+}
+
+/**
+ * Google Search Console: inject real token at build, or drop the meta tag so we never
+ * ship a bogus `YOUR_GOOGLE_SITE_VERIFICATION_CODE` (hurts trust vs. mature competitors).
+ */
+function injectGoogleSiteVerification(): Plugin {
+  return {
+    name: "inject-google-site-verification",
+    transformIndexHtml(html: string) {
+      const raw = process.env.VITE_GOOGLE_SITE_VERIFICATION?.trim()
+      const esc = (s: string) =>
+        s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;")
+      if (raw) {
+        return html.replace(
+          /<!--\s*google-site-verification:[\s\S]*?-->\s*\n\s*<meta name="google-site-verification"[^>]*\/>/,
+          `<meta name="google-site-verification" content="${esc(raw)}" />`,
+        )
+      }
+      return html.replace(
+        /\s*<!--\s*google-site-verification:[\s\S]*?-->\s*\n\s*<meta name="google-site-verification"[^>]*\/>\s*/i,
+        "\n",
+      )
+    },
+  }
+}
+
+/**
+ * Coolify / PaaS often set `PORT`. `0` is valid for Vite (pick a free port);
+ * avoid `||` so `0` is not replaced by the fallback.
+ */
+function resolvePreviewPort(fallback = 4173): number {
+  const raw = process.env.PORT
+  if (raw == null || raw === '') return fallback
+  const n = Number.parseInt(String(raw).trim(), 10)
+  if (!Number.isFinite(n) || n < 0) return fallback
+  return n
+}
+
+/** Build-time artifact seal (Coolify can set VITE_* env). */
+function gitShort(): string {
+  const fromEnv = process.env.VITE_GIT_COMMIT_HASH?.trim()
+  if (fromEnv) return fromEnv.slice(0, 7)
+  try {
+    return execSync("git rev-parse --short HEAD", {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim().slice(0, 7)
+  } catch {
+    return "unknown"
+  }
+}
+
+function buildTimestamp(): string {
+  return process.env.VITE_BUILD_TIMESTAMP?.trim() || new Date().toISOString()
+}
+
+const sentryOrg = process.env.SENTRY_ORG?.trim()
+const sentryProject = process.env.SENTRY_PROJECT?.trim()
+const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN?.trim()
+const sentryUrl = process.env.SENTRY_URL?.trim()
+const sentryEnabled = Boolean(sentryOrg && sentryProject && sentryAuthToken)
+
+const plugins: PluginOption[] = [
+  fixReownPhosphorImports(),
+  fixPhosphorWebcomponentsLitImports(),
+  previewHealthJson(),
+  injectGoogleSiteVerification(),
+  react(),
+  inlineCriticalCssAndAsyncStyles(),
+]
+
+if (sentryEnabled) {
+  plugins.push(
+    sentryVitePlugin({
+      authToken: sentryAuthToken,
+      org: sentryOrg,
+      project: sentryProject,
+      url: sentryUrl,
+      release: gitShort(),
+      sourcemaps: {
+        filesToDeleteAfterUpload: ['dist/**/*.map'],
+      },
+    } as unknown as Record<string, unknown>) as unknown as PluginOption,
+  )
+}
+
+plugins.push(
+  compression({
+    algorithms: ["brotliCompress", "gzip"],
+    exclude: [/\.(br)$/, /\.(gz)$/],
+    threshold: 1024,
+  }) as unknown as PluginOption,
+)
+
+plugins.push(
+  VitePWA({
+    registerType: 'autoUpdate',
+    strategies: 'injectManifest',
+    srcDir: 'src',
+    filename: 'sw.js',
+    includeAssets: [
+      'favicon.svg',
+      'favicon-16x16.png',
+      'favicon-32x32.png',
+      'icon-192.png',
+      'icon-512.png',
+      'apple-touch-icon.png',
+      'safari-pinned-tab.svg',
+      SOLARIS_CET_LOGO_FILENAME,
+      'solaris-cet-logo-emblem-190.jpg',
+      OG_IMAGE_FILENAME,
+      'phone-mockup.png',
+      'hero-coin.png',
+      'cinematic/cosmic-poster-768.webp',
+      'cinematic/cosmic-poster-1024.webp',
+      'cinematic/cosmic-poster-768.jpg',
+      'cinematic/cosmic-poster-1024.jpg',
+      'fonts/jetbrains-mono-400.woff2',
+      'offline.html',
+      'offline-ro.html',
+      'offline-image.svg',
+    ],
+    manifest: false,
+    injectManifest: {
+      globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,jpg,jpeg,webp,json,webmanifest}'],
+      globIgnores: [
+        '**/vendor/onnxruntime/**',
+        '**/assets/mermaid-*.js*',
+        '**/assets/@mermaid-js/**',
+        '**/assets/cytoscape-*.js*',
+        '**/assets/cytoscape-*/*.js*',
+        '**/assets/three-*.js*',
+        '**/assets/three-stdlib-*.js*',
+        '**/assets/@react-three/**',
+        '**/assets/postprocessing-*.js*',
+        '**/assets/@react-three/postprocessing-*.js*',
+      ],
+      maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+      rollupFormat: 'iife',
+    },
+  }) as unknown as PluginOption,
+)
+
+// https://vite.dev/config/
+export default defineConfig({
+  base: '/',
+  define: {
+    "import.meta.env.VITE_GIT_COMMIT_HASH": JSON.stringify(gitShort()),
+    "import.meta.env.VITE_BUILD_TIMESTAMP": JSON.stringify(buildTimestamp()),
+    "import.meta.env.VITE_WEB3FORMS_KEY": JSON.stringify(process.env.WEB3FORMS_KEY || process.env.VITE_WEB3FORMS_KEY || ''),
+  },
+  plugins,
+  preview: {
+    host: '0.0.0.0',
+    port: resolvePreviewPort(),
+  },
+  build: {
+    target: 'esnext',
+    modulePreload: {
+      resolveDependencies(_filename, deps) {
+        const blocked = [
+          '@react-three/drei',
+          '@react-three/postprocessing',
+          '@react-three/fiber',
+          '@monogrid/gainmap',
+          'gsap',
+          '@tonconnect/ui',
+          '@tonconnect/sdk',
+          '@walletconnect/',
+          '@reown/appkit',
+          '@lit/reactive-element',
+          'base64-js',
+          'buffer',
+        ];
+        return deps.filter((d) => !blocked.some((b) => d.includes(b)));
+      },
+    },
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (id.includes('node_modules')) {
+            const pkg = id.split('node_modules/')[1];
+            // Handle scoped packages like @radix-ui/react-dialog
+            if (pkg.startsWith('@')) {
+              return pkg.split('/').slice(0, 2).join('/');
+            }
+            return pkg.split('/')[0];
+          }
+          return undefined;
+        },
+      },
+    },
+    cssCodeSplit: true,
+    sourcemap: sentryEnabled,
+    chunkSizeWarningLimit: 1600,
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+      "@components": path.resolve(__dirname, "./src/components"),
+      "@sections": path.resolve(__dirname, "./src/sections"),
+      "@hooks": path.resolve(__dirname, "./src/hooks"),
+      "@lib": path.resolve(__dirname, "./src/lib"),
+    },
+  },
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+    strictPort: true,
+    // Add cors to allow all origins in dev, though proxy usually handles it.
+    cors: true,
+    // hmr: { overlay: false }, // optional, if the overlay is annoying
+    proxy: {
+      '/api-dedust': {
+        target: 'https://api.dedust.io',
+        changeOrigin: true,
+        rewrite: (path: string) => path.replace(/^\/api-dedust/, ''),
+        // Increase timeouts for slow external APIs to prevent ERR_ABORTED
+        proxyTimeout: 10000,
+        timeout: 10000,
+      },
+      '/api-country': {
+        target: 'https://api.country.is',
+        changeOrigin: true,
+        rewrite: (path: string) => path.replace(/^\/api-country/, ''),
+        proxyTimeout: 5000,
+        timeout: 5000,
+      },
+    },
+  },
+  optimizeDeps: {
+    // Explicitly include heavy dependencies to avoid on-the-fly pre-bundling
+    // which can cause server restarts and aborted requests.
+    include: [
+      'react',
+      'react-dom',
+      'gsap',
+      'lucide-react',
+      '@tonconnect/ui-react',
+      'recharts',
+    ],
+  },
+});

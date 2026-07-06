@@ -1,0 +1,112 @@
+name: Cleanup Stale Branches
+
+# Manually triggered workflow that deletes all merged/closed copilot branches
+# and any other non-essential branches that are no longer associated with open PRs.
+#
+# Run this after a batch of Copilot PRs have been merged or closed, to keep the
+# branch list clean.
+
+on:
+  push:
+    branches:
+      - copilot/delete-unused-branches
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (true = only list branches that would be deleted, false = actually delete)"
+        required: false
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    name: Delete stale branches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete stale branches
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const raw = '${{ github.event.inputs.dry_run }}';
+            const dryRun = raw ? raw === 'true' : true;
+
+            // Branches that must never be deleted
+            const PROTECTED = new Set(['main', 'gh-pages']);
+
+            console.log(`Mode: ${dryRun ? 'DRY RUN (no deletions)' : 'LIVE (will delete)'}`);
+            console.log('Fetching all branches...');
+
+            // Fetch every branch (paginate)
+            const branches = await github.paginate(
+              github.rest.repos.listBranches,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100,
+              }
+            );
+
+            console.log(`Found ${branches.length} branches total.`);
+
+            // Fetch open PRs so we don't delete a branch that still has an open PR
+            const openPRs = await github.paginate(
+              github.rest.pulls.list,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                per_page: 100,
+              }
+            );
+
+            const openPRHeads = new Set(openPRs.map(pr => pr.head.ref));
+            console.log(`Open PR branches (will be kept): ${[...openPRHeads].join(', ') || 'none'}`);
+
+            let deleted = 0;
+            let skipped = 0;
+
+            for (const branch of branches) {
+              const name = branch.name;
+
+              // Skip protected branches
+              if (PROTECTED.has(name)) {
+                console.log(`SKIP (protected): ${name}`);
+                skipped++;
+                continue;
+              }
+
+              // Skip branches that still have open PRs
+              if (openPRHeads.has(name)) {
+                console.log(`SKIP (open PR): ${name}`);
+                skipped++;
+                continue;
+              }
+
+              // Delete everything else (all the stale copilot/* and patch branches)
+              if (dryRun) {
+                console.log(`WOULD DELETE: ${name}`);
+              } else {
+                try {
+                  await github.rest.git.deleteRef({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    ref: `heads/${name}`,
+                  });
+                  console.log(`DELETED: ${name}`);
+                  deleted++;
+                } catch (err) {
+                  console.log(`ERROR deleting ${name}: ${err.message}`);
+                }
+              }
+            }
+
+            console.log(`\nSummary: ${deleted} deleted, ${skipped} skipped.`);
+            if (dryRun) {
+              console.log('This was a DRY RUN. Set dry_run=false to actually delete branches.');
+            }

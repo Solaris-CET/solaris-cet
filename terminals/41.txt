@@ -1,0 +1,493 @@
+---
+pid: 16768
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx tsc --noEmit -p tsconfig.app.json; npx tsc --noEmit -p tsconfig.test.json; npx tsc --noEmit -p tsconfig.node.json; npx tsc --noEmit -p tsconfig.e2e.json"
+started_at: 2026-07-05T23:05:04.234Z
+running_for_ms: 5510170  
+---
+src/admin/AdminPanel.tsx(40,7): error TS2322: Type '"leads"' is not assignable to type '"media" | "token" | "posts" | "invites" | "audit" | "dashboard" | "conversations" | "users" | "blocks" | "cetuia" | "i18n" | "settings"'.
+src/admin/AdminPanel.tsx(69,5): error TS2322: Type '"audit" | "dashboard" | "users" | "invites" | "blocks" | "posts" | "media" | "token" | "cetuia" | "conversations" | "i18n" | "settings" | "leads"' is not assignable to type '"media" | "token" | "posts" | "invites" | "audit" | "dashboard" | "conversations" | "users" | "blocks" | "cetuia" | "i18n" | "settings"'.
+  Type '"leads"' is not assignable to type '"media" | "token" | "posts" | "invites" | "audit" | "dashboard" | "conversations" | "users" | "blocks" | "cetuia" | "i18n" | "settings"'.
+src/admin/AdminPanel.tsx(123,28): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { admin: { id: string; email: string; role: AdminRole; }; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { admin: { id: string; email: string; role: AdminRole; }; }; }'.
+src/admin/AdminPanel.tsx(196,12): error TS2367: This comparison appears to be unintentional because the types '"media" | "token" | "posts" | "invites" | "audit" | "dashboard" | "conversations" | "users" | "blocks" | "cetuia" | "i18n" | "settings"' and '"leads"' have no overlap.
+src/admin/sections/AuditSection.tsx(23,20): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { audit: AuditRow[]; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { audit: AuditRow[]; }; }'.
+src/admin/sections/BlocksSection.tsx(28,38): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { blocks: { key: string; format: string; content: string; }[]; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { blocks: { key: string; format: string; content: string; }[]; }; }'.
+src/admin/sections/BlocksSection.tsx(56,33): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { ok: true; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { ok: true; }; }'.
+src/admin/sections/CetuiaSection.tsx(44,22): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { ok: true; counts: { total: number; available: number; reserved: number; sold: number; }; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { ok: true; counts: { total: number; available: number; reserved: number; sold: number; }; }; }'.
+src/admin/sections/CetuiaSection.tsx(66,22): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { ok: true; before: number; after: number; total: number; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { ok: true; before: number; after: number; total: number; }; }'.
+src/admin/sections/CetuiaSection.tsx(85,22): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { ok: true; token: TokenRow; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { ok: true; token: TokenRow; }; }'.
+src/admin/sections/CetuiaSection.tsx(112,22): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { ok: true; token: TokenRow; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { ok: true; token: TokenRow; }; }'.
+src/admin/sections/ConversationsSection.tsx(51,20): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { conversations: ConversationRow[]; total: number; totalPages: number; dailyAnalytics: DailyAnalytics[]; topTopics: TopicItem[]; resolutionRate: number; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { conversations: ConversationRow[]; total: number; totalPages: number; dailyAnalytics: DailyAnalytics[]; topTopics: TopicItem[]; resolutionRate: number; }; }'.
+src/admin/sections/ConversationsSection.tsx(72,20): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { messages: { role: string; content: string; timestamp: string; }[]; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { messages: { role: string; content: string; timestamp: string; }[]; }; }'.
+src/admin/sections/ConversationsSection.tsx(85,20): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { success: boolean; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { success: boolean; }; }'.
+src/admin/sections/DashboardSection.tsx(1,30): error TS2305: Module '"lucide-react"' has no exported member 'Bell'.
+src/admin/sections/DashboardSection.tsx(1,36): error TS2305: Module '"lucide-react"' has no exported member 'BellOff'.
+src/admin/sections/DashboardSection.tsx(51,38): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: Stats; }'.
+  Property 'error' does not exist on type '{ ok: true; data: Stats; }'.
+src/admin/sections/DashboardSection.tsx(55,38): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: Overview; }'.
+  Property 'error' does not exist on type '{ ok: true; data: Overview; }'.
+src/admin/sections/I18nSection.tsx(38,20): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { translations: Row[]; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { translations: Row[]; }; }'.
+src/admin/sections/I18nSection.tsx(52,20): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { ok: true; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { ok: true; }; }'.
+src/admin/sections/I18nSection.tsx(64,20): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { translations: Record<string, string>; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { translations: Record<string, string>; }; }'.
+src/admin/sections/InvitesSection.tsx(41,20): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { invites: InviteRow[]; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { invites: InviteRow[]; }; }'.
+src/admin/sections/InvitesSection.tsx(61,22): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { token: string; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { token: string; }; }'.
+src/admin/sections/InvitesSection.tsx(75,20): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { ok: true; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { ok: true; }; }'.
+src/admin/sections/LoginView.tsx(31,22): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: AdminSession; }'.
+  Property 'error' does not exist on type '{ ok: true; data: AdminSession; }'.
+src/admin/sections/PostsSection.tsx(25,20): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { posts: PostListRow[]; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { posts: PostListRow[]; }; }'.
+src/admin/sections/PostsSection.tsx(45,38): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { post: PostDoc; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { post: PostDoc; }; }'.
+src/admin/sections/PostsSection.tsx(76,20): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { post: { id: string; }; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { post: { id: string; }; }; }'.
+src/admin/sections/PostsSection.tsx(94,22): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { post: PostDoc; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { post: PostDoc; }; }'.
+src/admin/sections/SettingsSection.tsx(28,20): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { settings: SettingRow[]; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { settings: SettingRow[]; }; }'.
+src/admin/sections/SettingsSection.tsx(58,22): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { setting: SettingRow; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { setting: SettingRow; }; }'.
+src/admin/sections/SettingsSection.tsx(75,22): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { ok: true; deleted: number; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { ok: true; deleted: number; }; }'.
+src/admin/sections/SettingsSection.tsx(90,22): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { secret: string; otpauthUrl: string; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { secret: string; otpauthUrl: string; }; }'.
+src/admin/sections/SettingsSection.tsx(107,22): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { ok: true; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { ok: true; }; }'.
+src/admin/sections/SettingsSection.tsx(126,22): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { ok: true; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { ok: true; }; }'.
+src/admin/sections/TokenSection.tsx(23,38): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { token: { priceUsd: string; totalSupply: string; circulatingSupply: string; }; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { token: { priceUsd: string; totalSupply: string; circulatingSupply: string; }; }; }'.
+src/admin/sections/TokenSection.tsx(48,33): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { token: unknown; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { token: unknown; }; }'.
+src/admin/sections/UsersSection.tsx(21,22): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { users: UserRow[]; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { users: UserRow[]; }; }'.
+src/admin/sections/UsersSection.tsx(38,20): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; error: string; } | { ok: true; data: { ok: true; }; }'.
+  Property 'error' does not exist on type '{ ok: true; data: { ok: true; }; }'.
+src/components/animations/ClientJourneyAnimation.tsx(28,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/ClientJourneyAnimation.tsx(29,7): error TS2339: Property 'ambientLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/ClientJourneyAnimation.tsx(30,7): error TS2339: Property 'directionalLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/ClientJourneyAnimation.tsx(33,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/ClientJourneyAnimation.tsx(34,9): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/ClientJourneyAnimation.tsx(35,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/ClientJourneyAnimation.tsx(36,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/ClientJourneyAnimation.tsx(39,9): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/ClientJourneyAnimation.tsx(40,11): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/ClientJourneyAnimation.tsx(41,13): error TS2339: Property 'sphereGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/ClientJourneyAnimation.tsx(42,13): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/ClientJourneyAnimation.tsx(47,11): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/ClientJourneyAnimation.tsx(57,9): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/ClientJourneyAnimation.tsx(59,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(50,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(51,7): error TS2339: Property 'ambientLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(52,7): error TS2339: Property 'directionalLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(55,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(56,9): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(57,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(58,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(61,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(62,9): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(63,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(64,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(68,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(72,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(73,9): error TS2339: Property 'sphereGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(74,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(75,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(78,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(79,9): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(80,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(81,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(84,7): error TS2339: Property 'points' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(85,9): error TS2339: Property 'bufferGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(86,11): error TS2339: Property 'bufferAttribute' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(92,9): error TS2339: Property 'bufferGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(93,9): error TS2339: Property 'pointsMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(101,7): error TS2339: Property 'points' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/EnergyFlowAnimation.tsx(102,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(24,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(25,7): error TS2339: Property 'ambientLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(26,7): error TS2339: Property 'directionalLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(29,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(30,9): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(31,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(32,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(36,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(37,11): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(38,11): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(39,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(44,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(45,11): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(46,11): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(47,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(51,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(52,9): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(53,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(54,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(55,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(56,9): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(57,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(58,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(61,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(62,9): error TS2339: Property 'planeGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(63,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(64,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FacadeMetalAnimation.tsx(65,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FinancingAnimation.tsx(77,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FinancingAnimation.tsx(78,7): error TS2339: Property 'ambientLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FinancingAnimation.tsx(79,7): error TS2339: Property 'directionalLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FinancingAnimation.tsx(82,7): error TS2339: Property 'points' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FinancingAnimation.tsx(83,9): error TS2339: Property 'bufferGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FinancingAnimation.tsx(84,11): error TS2339: Property 'bufferAttribute' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FinancingAnimation.tsx(90,9): error TS2339: Property 'bufferGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FinancingAnimation.tsx(91,9): error TS2339: Property 'pointsMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FinancingAnimation.tsx(99,7): error TS2339: Property 'points' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FinancingAnimation.tsx(102,7): error TS2339: Property 'points' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FinancingAnimation.tsx(103,9): error TS2339: Property 'bufferGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FinancingAnimation.tsx(104,11): error TS2339: Property 'bufferAttribute' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FinancingAnimation.tsx(110,9): error TS2339: Property 'bufferGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FinancingAnimation.tsx(111,9): error TS2339: Property 'pointsMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FinancingAnimation.tsx(119,7): error TS2339: Property 'points' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/FinancingAnimation.tsx(131,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/IndustrialSolarAnimation.tsx(23,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/IndustrialSolarAnimation.tsx(25,7): error TS2339: Property 'ambientLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/IndustrialSolarAnimation.tsx(26,7): error TS2339: Property 'directionalLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/IndustrialSolarAnimation.tsx(29,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/IndustrialSolarAnimation.tsx(30,9): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/IndustrialSolarAnimation.tsx(31,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/IndustrialSolarAnimation.tsx(32,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/IndustrialSolarAnimation.tsx(37,11): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/IndustrialSolarAnimation.tsx(42,13): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/IndustrialSolarAnimation.tsx(43,13): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/IndustrialSolarAnimation.tsx(49,11): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/IndustrialSolarAnimation.tsx(55,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/IndustrialSolarAnimation.tsx(60,11): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/IndustrialSolarAnimation.tsx(61,11): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/IndustrialSolarAnimation.tsx(62,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/IndustrialSolarAnimation.tsx(64,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(28,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(29,7): error TS2339: Property 'ambientLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(30,7): error TS2339: Property 'directionalLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(33,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(34,9): error TS2339: Property 'planeGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(35,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(36,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(42,13): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(43,15): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(44,15): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(45,13): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(48,13): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(49,15): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(50,15): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(51,13): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(59,11): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(60,13): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(61,13): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(62,11): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(64,13): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(65,15): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(66,15): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(67,13): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(76,13): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(77,15): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(78,15): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(79,13): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/InstallationTimelapse.tsx(83,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/MetalTileRoofAnimation.tsx(22,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/MetalTileRoofAnimation.tsx(23,7): error TS2339: Property 'ambientLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/MetalTileRoofAnimation.tsx(24,7): error TS2339: Property 'directionalLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/MetalTileRoofAnimation.tsx(26,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/MetalTileRoofAnimation.tsx(27,9): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/MetalTileRoofAnimation.tsx(28,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/MetalTileRoofAnimation.tsx(29,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/MetalTileRoofAnimation.tsx(32,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/MetalTileRoofAnimation.tsx(33,11): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/MetalTileRoofAnimation.tsx(34,11): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/MetalTileRoofAnimation.tsx(35,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/MetalTileRoofAnimation.tsx(39,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/MetalTileRoofAnimation.tsx(40,11): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/MetalTileRoofAnimation.tsx(41,11): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/MetalTileRoofAnimation.tsx(42,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/MetalTileRoofAnimation.tsx(44,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofComparisonAnimation.tsx(7,20): error TS2304: Cannot find name 'useRef'.
+src/components/animations/RoofComparisonAnimation.tsx(19,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofComparisonAnimation.tsx(20,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofComparisonAnimation.tsx(21,9): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofComparisonAnimation.tsx(22,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofComparisonAnimation.tsx(23,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofComparisonAnimation.tsx(25,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofComparisonAnimation.tsx(26,11): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofComparisonAnimation.tsx(27,11): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofComparisonAnimation.tsx(28,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofComparisonAnimation.tsx(30,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofComparisonAnimation.tsx(72,9): error TS2339: Property 'ambientLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofComparisonAnimation.tsx(73,9): error TS2339: Property 'directionalLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofCrossSectionAnimation.tsx(24,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofCrossSectionAnimation.tsx(25,7): error TS2339: Property 'ambientLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofCrossSectionAnimation.tsx(26,7): error TS2339: Property 'directionalLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofCrossSectionAnimation.tsx(29,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofCrossSectionAnimation.tsx(35,11): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofCrossSectionAnimation.tsx(36,11): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofCrossSectionAnimation.tsx(43,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofCrossSectionAnimation.tsx(47,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofCrossSectionAnimation.tsx(48,11): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofCrossSectionAnimation.tsx(49,11): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofCrossSectionAnimation.tsx(50,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofCrossSectionAnimation.tsx(52,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofMetalAnimation.tsx(15,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofMetalAnimation.tsx(17,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofMetalAnimation.tsx(18,9): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofMetalAnimation.tsx(19,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofMetalAnimation.tsx(20,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofMetalAnimation.tsx(23,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofMetalAnimation.tsx(24,11): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofMetalAnimation.tsx(25,11): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofMetalAnimation.tsx(26,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofMetalAnimation.tsx(28,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofMetalAnimation.tsx(36,9): error TS2339: Property 'ambientLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofMetalAnimation.tsx(37,9): error TS2339: Property 'directionalLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(23,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(24,7): error TS2339: Property 'ambientLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(25,7): error TS2339: Property 'directionalLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(28,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(29,9): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(30,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(31,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(35,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(36,11): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(37,11): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(38,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(44,11): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(49,13): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(50,13): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(56,11): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(62,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(67,11): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(68,11): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(69,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/RoofWithPanelsAnimation.tsx(71,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(69,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(70,7): error TS2339: Property 'pointLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(71,7): error TS2339: Property 'ambientLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(72,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(73,9): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(74,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(75,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(78,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(79,11): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(80,11): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(81,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(84,7): error TS2339: Property 'points' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(85,9): error TS2339: Property 'bufferGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(86,11): error TS2339: Property 'bufferAttribute' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(92,9): error TS2339: Property 'bufferGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(93,9): error TS2339: Property 'pointsMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(101,7): error TS2339: Property 'points' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/SolarPanelAnimation.tsx(102,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(63,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(64,7): error TS2339: Property 'ambientLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(65,7): error TS2339: Property 'directionalLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(68,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(69,9): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(70,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(71,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(75,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(78,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(83,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(88,11): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(89,11): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(90,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(94,7): error TS2339: Property 'points' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(95,9): error TS2339: Property 'bufferGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(96,11): error TS2339: Property 'bufferAttribute' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(102,9): error TS2339: Property 'bufferGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(103,9): error TS2339: Property 'pointsMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(111,7): error TS2339: Property 'points' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/TPOMembraneAnimation.tsx(112,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/WarrantyShieldAnimation.tsx(17,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/WarrantyShieldAnimation.tsx(18,7): error TS2339: Property 'ambientLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/WarrantyShieldAnimation.tsx(19,7): error TS2339: Property 'directionalLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/WarrantyShieldAnimation.tsx(22,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/WarrantyShieldAnimation.tsx(23,9): error TS2339: Property 'cylinderGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/WarrantyShieldAnimation.tsx(24,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/WarrantyShieldAnimation.tsx(25,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/WarrantyShieldAnimation.tsx(28,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/WarrantyShieldAnimation.tsx(29,9): error TS2339: Property 'cylinderGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/WarrantyShieldAnimation.tsx(30,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/WarrantyShieldAnimation.tsx(31,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/components/animations/WarrantyShieldAnimation.tsx(55,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/brand/AnimatedLogo.tsx(47,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/brand/AnimatedLogo.tsx(48,7): error TS2339: Property 'lineSegments' does not exist on type 'JSX.IntrinsicElements'.
+src/components/brand/AnimatedLogo.tsx(49,9): error TS2339: Property 'lineBasicMaterial' does not exist on type 'JSX.IntrinsicElements'.
+src/components/brand/AnimatedLogo.tsx(50,7): error TS2339: Property 'lineSegments' does not exist on type 'JSX.IntrinsicElements'.
+src/components/brand/AnimatedLogo.tsx(51,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/components/brand/AnimatedLogo.tsx(88,9): error TS2339: Property 'ambientLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/brand/AnimatedLogo.tsx(89,9): error TS2339: Property 'pointLight' does not exist on type 'JSX.IntrinsicElements'.
+src/components/ErrorBoundary.tsx(49,24): error TS2551: Property 'captureException' does not exist on type 'typeof import("C:/Users/CCons/Desktop/SOLARIS CET/app/src/lib/sentryClient")'. Did you mean 'captureExceptionLazy'?
+src/components/ErrorBoundary.tsx(50,15): error TS2551: Property 'captureException' does not exist on type 'typeof import("C:/Users/CCons/Desktop/SOLARIS CET/app/src/lib/sentryClient")'. Did you mean 'captureExceptionLazy'?
+src/components/Navigation.tsx(332,11): error TS2322: Type 'RefObject<HTMLDivElement>' is not assignable to type 'Ref<never>'.
+  Type 'RefObject<HTMLDivElement>' is not assignable to type 'RefObject<never>'.
+    Type 'HTMLDivElement' is not assignable to type 'never'.
+src/components/ui/badge.tsx(38,6): error TS2322: Type '{ ref?: Ref<HTMLSpanElement>; key?: Key; defaultChecked?: boolean; defaultValue?: string | number | readonly string[]; suppressContentEditableWarning?: boolean; suppressHydrationWarning?: boolean; ... 274 more ...; className: string; }' is not assignable to type 'RefAttributes<HTMLElement>'.
+  Types of property 'ref' are incompatible.
+    Type 'Ref<HTMLSpanElement>' is not assignable to type 'Ref<HTMLElement>'.
+      Type '(instance: HTMLSpanElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type 'Ref<HTMLElement>'.
+        Type '(instance: HTMLSpanElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type '(instance: HTMLElement) => void | (() => VoidOrUndefinedOnly)'.
+          Type 'void | (() => VoidOrUndefinedOnly)' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'. Two different types with this name exist, but they are unrelated.
+            Type '() => VoidOrUndefinedOnly' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+              Type '() => VoidOrUndefinedOnly' is not assignable to type '() => VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                Type 'VoidOrUndefinedOnly' is not assignable to type 'VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                  Type '{ [UNDEFINED_VOID_ONLY]: never; }' is not assignable to type 'VoidOrUndefinedOnly'.
+src/components/ui/breadcrumb.tsx(46,6): error TS2322: Type '{ ref?: Ref<HTMLAnchorElement>; key?: Key; download?: any; href?: string; hrefLang?: string; media?: string; ping?: string; target?: HTMLAttributeAnchorTarget; ... 280 more ...; className: string; }' is not assignable to type 'RefAttributes<HTMLElement>'.
+  Types of property 'ref' are incompatible.
+    Type 'Ref<HTMLAnchorElement>' is not assignable to type 'Ref<HTMLElement>'.
+      Type '(instance: HTMLAnchorElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type 'Ref<HTMLElement>'.
+        Type '(instance: HTMLAnchorElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type '(instance: HTMLElement) => void | (() => VoidOrUndefinedOnly)'.
+          Type 'void | (() => VoidOrUndefinedOnly)' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'. Two different types with this name exist, but they are unrelated.
+            Type '() => VoidOrUndefinedOnly' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+              Type '() => VoidOrUndefinedOnly' is not assignable to type '() => VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                Type 'VoidOrUndefinedOnly' is not assignable to type 'VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                  Type '{ [UNDEFINED_VOID_ONLY]: never; }' is not assignable to type 'VoidOrUndefinedOnly'.
+src/components/ui/button-group.tsx(50,6): error TS2322: Type '{ ref?: Ref<HTMLDivElement>; key?: Key; defaultChecked?: boolean; defaultValue?: string | number | readonly string[]; suppressContentEditableWarning?: boolean; suppressHydrationWarning?: boolean; ... 273 more ...; className: string; }' is not assignable to type 'RefAttributes<HTMLElement>'.
+  Types of property 'ref' are incompatible.
+    Type 'Ref<HTMLDivElement>' is not assignable to type 'Ref<HTMLElement>'.
+      Type '(instance: HTMLDivElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type 'Ref<HTMLElement>'.
+        Type '(instance: HTMLDivElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type '(instance: HTMLElement) => void | (() => VoidOrUndefinedOnly)'.
+          Type 'void | (() => VoidOrUndefinedOnly)' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'. Two different types with this name exist, but they are unrelated.
+            Type '() => VoidOrUndefinedOnly' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+              Type '() => VoidOrUndefinedOnly' is not assignable to type '() => VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                Type 'VoidOrUndefinedOnly' is not assignable to type 'VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                  Type '{ [UNDEFINED_VOID_ONLY]: never; }' is not assignable to type 'VoidOrUndefinedOnly'.
+src/components/ui/button.tsx(81,6): error TS2322: Type '{ ref?: Ref<HTMLButtonElement>; key?: Key; disabled?: boolean; form?: string; formAction?: string | ((formData: FormData) => void | Promise<void>); ... 287 more ...; onPointerDown: PointerEventHandler<...>; }' is not assignable to type 'RefAttributes<HTMLElement>'.
+  Types of property 'ref' are incompatible.
+    Type 'Ref<HTMLButtonElement>' is not assignable to type 'Ref<HTMLElement>'.
+      Type '(instance: HTMLButtonElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type 'Ref<HTMLElement>'.
+        Type '(instance: HTMLButtonElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type '(instance: HTMLElement) => void | (() => VoidOrUndefinedOnly)'.
+          Type 'void | (() => VoidOrUndefinedOnly)' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'. Two different types with this name exist, but they are unrelated.
+            Type '() => VoidOrUndefinedOnly' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+              Type '() => VoidOrUndefinedOnly' is not assignable to type '() => VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                Type 'VoidOrUndefinedOnly' is not assignable to type 'VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                  Type '{ [UNDEFINED_VOID_ONLY]: never; }' is not assignable to type 'VoidOrUndefinedOnly'.
+src/components/ui/item.tsx(64,6): error TS2322: Type '{ ref?: Ref<HTMLDivElement>; key?: Key; defaultChecked?: boolean; defaultValue?: string | number | readonly string[]; suppressContentEditableWarning?: boolean; suppressHydrationWarning?: boolean; ... 276 more ...; className: string; }' is not assignable to type 'RefAttributes<HTMLElement>'.
+  Types of property 'ref' are incompatible.
+    Type 'Ref<HTMLDivElement>' is not assignable to type 'Ref<HTMLElement>'.
+      Type '(instance: HTMLDivElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type 'Ref<HTMLElement>'.
+        Type '(instance: HTMLDivElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type '(instance: HTMLElement) => void | (() => VoidOrUndefinedOnly)'.
+          Type 'void | (() => VoidOrUndefinedOnly)' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'. Two different types with this name exist, but they are unrelated.
+            Type '() => VoidOrUndefinedOnly' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+              Type '() => VoidOrUndefinedOnly' is not assignable to type '() => VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                Type 'VoidOrUndefinedOnly' is not assignable to type 'VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                  Type '{ [UNDEFINED_VOID_ONLY]: never; }' is not assignable to type 'VoidOrUndefinedOnly'.
+src/components/ui/sidebar.tsx(407,6): error TS2322: Type '{ ref?: Ref<HTMLDivElement>; key?: Key; defaultChecked?: boolean; defaultValue?: string | number | readonly string[]; suppressContentEditableWarning?: boolean; suppressHydrationWarning?: boolean; ... 275 more ...; className: string; }' is not assignable to type 'RefAttributes<HTMLElement>'.
+  Types of property 'ref' are incompatible.
+    Type 'Ref<HTMLDivElement>' is not assignable to type 'Ref<HTMLElement>'.
+      Type '(instance: HTMLDivElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type 'Ref<HTMLElement>'.
+        Type '(instance: HTMLDivElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type '(instance: HTMLElement) => void | (() => VoidOrUndefinedOnly)'.
+          Type 'void | (() => VoidOrUndefinedOnly)' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'. Two different types with this name exist, but they are unrelated.
+            Type '() => VoidOrUndefinedOnly' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+              Type '() => VoidOrUndefinedOnly' is not assignable to type '() => VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                Type 'VoidOrUndefinedOnly' is not assignable to type 'VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                  Type '{ [UNDEFINED_VOID_ONLY]: never; }' is not assignable to type 'VoidOrUndefinedOnly'.
+src/components/ui/sidebar.tsx(428,6): error TS2322: Type '{ ref?: Ref<HTMLButtonElement>; key?: Key; disabled?: boolean; form?: string; formAction?: string | ((formData: FormData) => void | Promise<void>); ... 286 more ...; className: string; }' is not assignable to type 'RefAttributes<HTMLElement>'.
+  Types of property 'ref' are incompatible.
+    Type 'Ref<HTMLButtonElement>' is not assignable to type 'Ref<HTMLElement>'.
+      Type '(instance: HTMLButtonElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type 'Ref<HTMLElement>'.
+        Type '(instance: HTMLButtonElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type '(instance: HTMLElement) => void | (() => VoidOrUndefinedOnly)'.
+          Type 'void | (() => VoidOrUndefinedOnly)' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'. Two different types with this name exist, but they are unrelated.
+            Type '() => VoidOrUndefinedOnly' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+              Type '() => VoidOrUndefinedOnly' is not assignable to type '() => VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                Type 'VoidOrUndefinedOnly' is not assignable to type 'VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                  Type '{ [UNDEFINED_VOID_ONLY]: never; }' is not assignable to type 'VoidOrUndefinedOnly'.
+src/components/ui/sidebar.tsx(518,6): error TS2322: Type '{ ref?: Ref<HTMLButtonElement>; key?: Key; disabled?: boolean; form?: string; formAction?: string | ((formData: FormData) => void | Promise<void>); ... 288 more ...; className: string; }' is not assignable to type 'RefAttributes<HTMLElement>'.
+  Types of property 'ref' are incompatible.
+    Type 'Ref<HTMLButtonElement>' is not assignable to type 'Ref<HTMLElement>'.
+      Type '(instance: HTMLButtonElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type 'Ref<HTMLElement>'.
+        Type '(instance: HTMLButtonElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type '(instance: HTMLElement) => void | (() => VoidOrUndefinedOnly)'.
+          Type 'void | (() => VoidOrUndefinedOnly)' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'. Two different types with this name exist, but they are unrelated.
+            Type '() => VoidOrUndefinedOnly' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+              Type '() => VoidOrUndefinedOnly' is not assignable to type '() => VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                Type 'VoidOrUndefinedOnly' is not assignable to type 'VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                  Type '{ [UNDEFINED_VOID_ONLY]: never; }' is not assignable to type 'VoidOrUndefinedOnly'.
+src/components/ui/sidebar.tsx(563,6): error TS2322: Type '{ ref?: Ref<HTMLButtonElement>; key?: Key; disabled?: boolean; form?: string; formAction?: string | ((formData: FormData) => void | Promise<void>); ... 286 more ...; className: string; }' is not assignable to type 'RefAttributes<HTMLElement>'.
+  Types of property 'ref' are incompatible.
+    Type 'Ref<HTMLButtonElement>' is not assignable to type 'Ref<HTMLElement>'.
+      Type '(instance: HTMLButtonElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type 'Ref<HTMLElement>'.
+        Type '(instance: HTMLButtonElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type '(instance: HTMLElement) => void | (() => VoidOrUndefinedOnly)'.
+          Type 'void | (() => VoidOrUndefinedOnly)' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'. Two different types with this name exist, but they are unrelated.
+            Type '() => VoidOrUndefinedOnly' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+              Type '() => VoidOrUndefinedOnly' is not assignable to type '() => VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                Type 'VoidOrUndefinedOnly' is not assignable to type 'VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                  Type '{ [UNDEFINED_VOID_ONLY]: never; }' is not assignable to type 'VoidOrUndefinedOnly'.
+src/components/ui/sidebar.tsx(688,6): error TS2322: Type '{ ref?: Ref<HTMLAnchorElement>; key?: Key; download?: any; href?: string; hrefLang?: string; media?: string; ping?: string; target?: HTMLAttributeAnchorTarget; ... 283 more ...; className: string; }' is not assignable to type 'RefAttributes<HTMLElement>'.
+  Types of property 'ref' are incompatible.
+    Type 'Ref<HTMLAnchorElement>' is not assignable to type 'Ref<HTMLElement>'.
+      Type '(instance: HTMLAnchorElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type 'Ref<HTMLElement>'.
+        Type '(instance: HTMLAnchorElement) => void | (() => VoidOrUndefinedOnly)' is not assignable to type '(instance: HTMLElement) => void | (() => VoidOrUndefinedOnly)'.
+          Type 'void | (() => VoidOrUndefinedOnly)' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'. Two different types with this name exist, but they are unrelated.
+            Type '() => VoidOrUndefinedOnly' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+              Type '() => VoidOrUndefinedOnly' is not assignable to type '() => VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                Type 'VoidOrUndefinedOnly' is not assignable to type 'VoidOrUndefinedOnly'. Two different types with this name exist, but they are unrelated.
+                  Type '{ [UNDEFINED_VOID_ONLY]: never; }' is not assignable to type 'VoidOrUndefinedOnly'.
+src/experience/HeroTokenHologram.tsx(285,10): error TS2339: Property 'points' does not exist on type 'JSX.IntrinsicElements'.
+src/experience/HeroTokenHologram.tsx(366,9): error TS2339: Property 'color' does not exist on type 'JSX.IntrinsicElements'.
+src/experience/HeroTokenHologram.tsx(367,9): error TS2339: Property 'ambientLight' does not exist on type 'JSX.IntrinsicElements'.
+src/experience/HeroTokenHologram.tsx(368,9): error TS2339: Property 'directionalLight' does not exist on type 'JSX.IntrinsicElements'.
+src/experience/HeroTokenHologram.tsx(369,9): error TS2339: Property 'directionalLight' does not exist on type 'JSX.IntrinsicElements'.
+src/experience/HeroTokenHologram.tsx(370,9): error TS2339: Property 'fog' does not exist on type 'JSX.IntrinsicElements'.
+src/experience/HologramToken.tsx(165,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/experience/HologramToken.tsx(166,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/experience/HologramToken.tsx(167,9): error TS2339: Property 'torusKnotGeometry' does not exist on type 'JSX.IntrinsicElements'.
+src/experience/HologramToken.tsx(168,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/experience/HologramToken.tsx(169,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/experience/HologramToken.tsx(243,10): error TS2339: Property 'lineSegments' does not exist on type 'JSX.IntrinsicElements'.
+src/lib/spaSeo.ts(89,31): error TS2554: Expected 0 arguments, but got 1.
+src/lib/spaSeo.ts(93,14): error TS2339: Property 'keywords' does not exist on type '{ title: string; description: string; openGraph: { type: string; locale: string; url: string; siteName: string; }; }'.
+src/lib/spaSeo.ts(93,64): error TS2339: Property 'keywords' does not exist on type '{ title: string; description: string; openGraph: { type: string; locale: string; url: string; siteName: string; }; }'.
+src/pages_legacy/ServiceDetailPage.tsx(46,22): error TS2339: Property 'image' does not exist on type 'ServiceDetail'.
+src/pages_legacy/ServiceDetailPage.tsx(105,54): error TS2339: Property 'image' does not exist on type 'ServiceDetail'.
+src/pages_legacy/SolarCalculatorPage.tsx(1,61): error TS2305: Module '"lucide-react"' has no exported member 'TreePine'.
+src/pages_legacy/SolarCalculatorPage.tsx(1,100): error TS2305: Module '"lucide-react"' has no exported member 'Factory'.
+src/pages_legacy/SolarCalculatorPage.tsx(1,131): error TS2305: Module '"lucide-react"' has no exported member 'DollarSign'.
+src/pages_legacy/SolarCalculatorPage.tsx(1,152): error TS2724: '"lucide-react"' has no exported member named 'BarChart3'. Did you mean 'BarChart2'?
+src/pages_legacy/SurveyPage.tsx(3,23): error TS2305: Module '"lucide-react"' has no exported member 'Upload'.
+src/pages_legacy/SurveyPage.tsx(3,31): error TS2724: '"lucide-react"' has no exported member named 'User'. Did you mean 'Users'?
+src/pages_legacy/TokenomicsPage.tsx(9,8): error TS2307: Cannot find module 'chart.js' or its corresponding type declarations.
+src/pages_legacy/TokenomicsPage.tsx(11,30): error TS2307: Cannot find module 'react-chartjs-2' or its corresponding type declarations.
+src/sections/SocialProofSection.tsx(2,57): error TS2305: Module '"lucide-react"' has no exported member 'Award'.
+api/admin/invites/route.ts(41,49): error TS2339: Property 'status' does not exist on type '{ ok: true; } | { ok: false; status: number; error: string; }'.
+  Property 'status' does not exist on type '{ ok: true; }'.
+api/admin/invites/route.ts(41,74): error TS2339: Property 'error' does not exist on type '{ ok: true; } | { ok: false; status: number; error: string; }'.
+  Property 'error' does not exist on type '{ ok: true; }'.
+api/lib/publicApiRateLimit.ts(63,45): error TS2339: Property 'retryAfterSeconds' does not exist on type 'RateLimitDecision'.
+  Property 'retryAfterSeconds' does not exist on type '{ ok: true; limit: number; remaining: number; resetAtEpochSeconds: number; }'.
+src/__tests__/timeout-signal.test.ts(20,5): error TS2578: Unused '@ts-expect-error' directive.
+src/__tests__/useIntersectionObserver.test.ts(46,23): error TS2339: Property 'isVisible' does not exist on type '{ elementRef: RefObject<Element>; }'.
+src/__tests__/useIntersectionObserver.test.ts(48,23): error TS2339: Property 'isVisible' does not exist on type '{ elementRef: RefObject<Element>; }'.
+src/__tests__/useIntersectionObserver.test.ts(55,23): error TS2339: Property 'isVisible' does not exist on type '{ elementRef: RefObject<Element>; }'.
+src/__tests__/useIntersectionObserver.test.ts(62,23): error TS2339: Property 'isVisible' does not exist on type '{ elementRef: RefObject<Element>; }'.
+src/__tests__/useIntersectionObserver.test.ts(64,23): error TS2339: Property 'isVisible' does not exist on type '{ elementRef: RefObject<Element>; }'.
+src/__tests__/useNearScreen.test.ts(46,30): error TS2339: Property 'isNearScreen' does not exist on type '{ fromRef: RefObject<HTMLDivElement>; }'.
+src/__tests__/useNearScreen.test.ts(48,30): error TS2339: Property 'isNearScreen' does not exist on type '{ fromRef: RefObject<HTMLDivElement>; }'.
+src/__tests__/useNearScreen.test.ts(58,23): error TS2339: Property 'isNearScreen' does not exist on type '{ fromRef: RefObject<HTMLDivElement>; }'.
+src/__tests__/useNearScreen.test.ts(60,23): error TS2339: Property 'isNearScreen' does not exist on type '{ fromRef: RefObject<HTMLDivElement>; }'.
+src/components/ErrorBoundary.tsx(49,24): error TS2551: Property 'captureException' does not exist on type 'typeof import("C:/Users/CCons/Desktop/SOLARIS CET/app/src/lib/sentryClient")'. Did you mean 'captureExceptionLazy'?
+src/components/ErrorBoundary.tsx(50,15): error TS2551: Property 'captureException' does not exist on type 'typeof import("C:/Users/CCons/Desktop/SOLARIS CET/app/src/lib/sentryClient")'. Did you mean 'captureExceptionLazy'?
+src/components/Navigation.tsx(332,11): error TS2322: Type 'RefObject<HTMLDivElement>' is not assignable to type 'Ref<never>'.
+  Type 'RefObject<HTMLDivElement>' is not assignable to type 'RefObject<never>'.
+    Type 'HTMLDivElement' is not assignable to type 'never'.
+api/lib/emailTemplates.ts(3,7): error TS6133: 'ADMIN_EMAIL' is declared but its value is never read.

@@ -1,0 +1,16 @@
+{
+  "batch_version": 3,
+  "total": 1,
+  "succeeded": 1,
+  "failed": 0,
+  "results": [
+    {
+      "job_id": "b1",
+      "success": true,
+      "pdf_path": "C:\\Users\\CCons\\Desktop\\SOLARIS CET\\survey-engine\\output\\batch\\b1\\SOLARIS_SOL-20260706-0240_20260706_024026.pdf",
+      "ahj_path": "C:\\Users\\CCons\\Desktop\\SOLARIS CET\\survey-engine\\output\\batch\\b1\\AHJ_SOL-20260706-0240.json",
+      "error": null,
+      "score": 81
+    }
+  ]
+}

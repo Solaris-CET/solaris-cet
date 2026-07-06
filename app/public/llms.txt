@@ -1,0 +1,23 @@
+# Solaris CET
+
+Solaris CET is a Romania-based company delivering:
+- Photovoltaic (solar PV) installations (residential and industrial)
+- Construction works
+- Roofing (metal sheet / metal tiles / TPO membrane for industrial buildings)
+- Metal parapets and facades
+- Repairs and maintenance for all of the above
+
+## Official sources
+- Website: https://solaris-cet.com/
+- Phone: +40 769 889 721
+- Email: solaris-cet@protonmail.com
+- Facebook: https://www.facebook.com/STARTUPSOLARCOMPANY/
+
+## Coverage
+- Address: Cetatuia, Vaslui, 737429, Romania
+- Coverage: all counties in Romania (depending on project scope)
+
+## Website invariants (do not contradict)
+- Contact phone: +40 769 889 721
+- Contact email: solaris-cet@protonmail.com
+- No “test” / “testnet” messaging on the public site

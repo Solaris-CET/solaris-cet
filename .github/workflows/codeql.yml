@@ -1,0 +1,70 @@
+name: CodeQL — Security Analysis
+
+# Runs static application security testing (SAST) on every push and pull
+# request targeting `main`, and on a weekly schedule to catch new advisories
+# in code that has not changed.
+#
+# Scans JavaScript/TypeScript for data-flow vulnerabilities, XSS patterns,
+# prototype pollution, path-traversal, and other insecure code patterns.
+# Runs on every push to `main`, every pull request targeting `main`,
+# and on a weekly schedule to catch newly-disclosed vulnerabilities in
+# unchanged code.
+
+on:
+  pull_request:
+    branches: ["main"]
+  push:
+    branches: ["main"]
+  schedule:
+    - cron: "27 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ["javascript-typescript"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          # Use the default CodeQL query suite plus the security-extended pack
+          # which covers OWASP Top 10 and other high-severity patterns.
+          queries: security-extended
+          config-file: ./.github/codeql/codeql-config.yml
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --include=optional --legacy-peer-deps
+
+      - name: Build application (for CodeQL analysis)
+        run: npm run build --workspace=app
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"

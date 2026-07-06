@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: solaris-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: solaris-frontend
+  template:
+    metadata:
+      labels:
+        app: solaris-frontend
+    spec:
+      containers:
+        - name: solaris-frontend
+          image: yourregistry/solaris-cet-frontend:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: VITE_PUBLIC_SITE_URL
+              value: "https://yourapp.com"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: solaris-frontend-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: solaris-frontend
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
+

@@ -1,0 +1,64 @@
+name: Community Automation
+
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/github-script@v9
+        with:
+          script: |
+            const isPR = !!context.payload.pull_request;
+            const number = isPR
+              ? context.payload.pull_request.number
+              : context.payload.issue.number;
+            const sender = context.payload.sender.login;
+
+            // Check if this contributor has prior comments/interactions
+            const { data: allIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'all',
+              creator: sender,
+              per_page: 5,
+            });
+
+            // Only post a welcome for first-time contributors (this is their first open issue/PR)
+            if (allIssues.length > 1) return;
+
+            const body = isPR
+              ? [
+                  `👋 Thanks for opening your first pull request, @${sender}!`,
+                  '',
+                  '🔍 **Before merging**, please ensure:',
+                  '- `npm run app:build` passes (run from repo root)',
+                  '- `npm run lint --workspace=app` passes (run from repo root)',
+                  '- The PR description follows our checklist template',
+                  '',
+                  '📚 See [CONTRIBUTING.md](../blob/main/CONTRIBUTING.md) for guidelines.',
+                ].join('\n')
+              : [
+                  `👋 Welcome to **Solaris CET**, @${sender}!`,
+                  '',
+                  '🚀 **Quick links:**',
+                  '- [Development Guide](../blob/main/CONTRIBUTING.md)',
+                  '- [Whitepaper (IPFS)](https://ipfs.io/ipfs/bafkreieggm2l7favvjw4amybbobastjo6kcrdi33gzcvtzrur5opoivd3a)',
+                  '- [Live App](https://solaris-cet.com/)',
+                  '',
+                  'Please fill out as much detail as possible so we can help you quickly. Thank you! 🙏',
+                ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: number,
+              body,
+            });

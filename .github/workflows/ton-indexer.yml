@@ -1,0 +1,53 @@
+name: TON Chain Indexer
+
+on:
+  schedule:
+    # Run every 1 hour
+    - cron: "0 * * * *"
+  workflow_dispatch: # Allow manual triggering
+
+permissions:
+  contents: write
+
+jobs:
+  index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --include=optional --legacy-peer-deps
+
+      - name: Run TON indexer (writes app/public/api/state.json)
+        env:
+          TON_RPC_ENDPOINT: "https://toncenter.com/api/v2/jsonRPC"
+          TON_RPC_API_KEY: ${{ secrets.TON_RPC_API_KEY || secrets.TONCENTER_API_KEY || secrets.TON_API_KEY }}
+        run: npm run index --workspace=scripts
+
+      - name: Commit state.json to main
+        run: |
+          set -euo pipefail
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add app/public/api/state.json
+
+          # Only commit when data has actually changed
+          if git diff --cached --quiet; then
+            echo "No changes to state.json — skipping commit."
+          else
+            git commit -m "chore(data): update CET token state"
+            git push origin main
+          fi

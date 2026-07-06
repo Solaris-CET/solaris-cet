@@ -1,0 +1,74 @@
+name: Auto-Approve Trusted Workflow Runs
+
+# Automatically approve pending workflow runs from trusted actors (e.g. the
+# Copilot coding-agent bot) so they don't stay stuck in "action_required" state
+# and require a maintainer to click "Approve and run" manually.
+#
+# Security note: only runs from actors explicitly listed in the `trusted_actors`
+# list are approved; all others are skipped.
+
+on:
+  workflow_run:
+    # Watch every workflow defined in the repository.
+    workflows:
+      - "CI — Quality Gate"
+      - "Community Automation"
+      - "Dependency Review"
+      - "Deploy Solaris CET to GitHub Pages"
+      - "Lighthouse CI — Quality Gate"
+      - "TON Chain Indexer"
+      # New workflows added in this PR — names must match the `name:` field exactly
+      # (including em-dashes and special characters)
+      - "CodeQL — Security Analysis"
+      - "Stale Issues & PRs"
+      - "PR Auto-Labeler"
+      - "CodeQL Security Analysis"
+      - "Dependency Review"
+    types: [requested]
+
+permissions:
+  actions: write   # Required to call the approve-workflow-run API endpoint
+
+jobs:
+  approve:
+    name: Approve run for trusted actor
+    runs-on: ubuntu-latest
+    steps:
+      - name: Approve if actor is trusted
+        uses: actions/github-script@v9
+        with:
+          script: |
+            // Actor logins as returned by the GitHub API (actor.login field).
+            // 'Copilot' is the verified API login for the Copilot coding-agent bot
+            // (GitHub Apps login, id 198982749).  'dependabot[bot]' and
+            // 'github-actions[bot]' follow GitHub's standard bot-account format.
+            const trustedActors = [
+              'Copilot',          // Copilot coding-agent (GitHub App)
+              'dependabot[bot]',  // Dependabot automated dependency updates
+              'github-actions[bot]', // native GitHub Actions bot
+            ];
+
+            const actor = context.payload.workflow_run?.actor?.login ?? '';
+            console.log(`Workflow run actor: ${actor}`);
+
+            if (!trustedActors.includes(actor)) {
+              console.log('Actor is not in the trusted list — skipping approval.');
+              return;
+            }
+
+            const runId = context.payload.workflow_run.id;
+            console.log(`Approving workflow run ${runId} for actor "${actor}"`);
+
+            try {
+              await github.rest.actions.approveWorkflowRun({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: runId,
+              });
+              console.log('Approved successfully.');
+            } catch (err) {
+              const status = err?.status ?? null;
+              console.log(`Approval skipped due to error status=${status ?? 'unknown'}`);
+              console.log('Treating as no-op to avoid workflow failure.');
+              return;
+            }

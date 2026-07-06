@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Project documentation
+    url: https://github.com/Solaris-CET/solaris-cet/blob/main/README.md
+    about: Read the README before opening an issue.
+  - name: Contributing guide
+    url: https://github.com/Solaris-CET/solaris-cet/blob/main/CONTRIBUTING.md
+    about: Contribution process and standards.
+  - name: Security contact
+    url: mailto:security@solaris-cet.io
+    about: Report security issues privately — do not use a public issue.

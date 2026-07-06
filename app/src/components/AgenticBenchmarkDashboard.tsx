@@ -1,0 +1,129 @@
+import { Gauge, Sparkles } from 'lucide-react';
+import type { TooltipContentProps, TooltipPayloadEntry } from 'recharts';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+
+import { skillSeedFromLabel,standardSkillBurst } from '@/lib/meshSkillFeed';
+
+const SERIES_PRETTY: Record<string, string> = {
+  solaris: 'Solaris (200k + RAV)',
+  standard: 'Standard AI app',
+  marketplace: 'Agent marketplace',
+};
+
+function BenchmarkTooltip({ active, payload, label }: TooltipContentProps<number, string>) {
+  if (!active || !payload?.length) return null;
+  const metric = typeof label === 'string' ? label : String(label ?? '');
+  const skill = standardSkillBurst(skillSeedFromLabel(metric));
+  return (
+    <div className="rounded-xl border border-white/12 bg-[color:var(--solaris-panel)] px-3 py-2.5 text-xs shadow-depth w-max max-w-[min(320px,calc(100dvw-1.5rem))]">
+      <div className="font-semibold text-solaris-text mb-1.5">{metric}</div>
+      <ul className="space-y-1 font-mono text-[10px]">
+        {payload.map((entry: TooltipPayloadEntry) => {
+          const key = String(entry.dataKey ?? entry.name ?? '');
+          const seriesName = String(entry.name ?? entry.dataKey ?? '');
+          return (
+            <li key={key} className="flex justify-between gap-4">
+              <span className="text-solaris-muted shrink-0">
+                {SERIES_PRETTY[seriesName] ?? seriesName}
+              </span>
+              <span className="tabular-nums font-bold" style={{ color: entry.color }}>
+                {entry.value}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+      <p
+        className="mt-2 pt-2 border-t border-fuchsia-500/20 font-mono text-[10px] leading-snug text-fuchsia-200/85 line-clamp-3"
+        title={skill}
+      >
+        {skill}
+      </p>
+    </div>
+  );
+}
+
+/** Normalised 0–100 scores for narrative comparison (illustrative). */
+const rows = [
+  { metric: 'Parallel agents', solaris: 100, standard: 4, marketplace: 28 },
+  { metric: 'Dual verification', solaris: 100, standard: 12, marketplace: 42 },
+  { metric: 'Chain + RWA synergy', solaris: 100, standard: 2, marketplace: 18 },
+  { metric: 'Open-web reach', solaris: 100, standard: 22, marketplace: 48 },
+  { metric: 'Recombinant skill depth', solaris: 100, standard: 5, marketplace: 24 },
+  { metric: 'Effective throughput', solaris: 100, standard: 6, marketplace: 10 },
+  { metric: 'Supply scarcity (inv.)', solaris: 100, standard: 8, marketplace: 8 },
+];
+
+const AgenticBenchmarkDashboard = () => (
+  <div className="bento-card border border-white/10 p-5 sm:p-6">
+    <div className="flex items-center gap-2 mb-1">
+      <Gauge className="w-4 h-4 text-solaris-cyan" />
+      <span className="hud-label text-solaris-cyan text-[10px]">VISUAL BENCHMARK · 200K DISTRIBUTED MESH</span>
+    </div>
+    <p className="text-solaris-muted text-xs sm:text-sm leading-relaxed mb-4 max-w-2xl flex flex-wrap items-start gap-2">
+      <Sparkles className="w-3.5 h-3.5 text-solaris-gold shrink-0 mt-0.5" />
+      Normalised scores: Solaris CET vs a typical single-model chat product vs a generic “agent marketplace”
+      stack — same axes, different physics once you add dual-AI RAV, TON settlement, and two hundred thousand
+      concurrent workers.
+    </p>
+
+    <div className="w-full h-[min(380px,55vh)] min-h-[280px]">
+      <ResponsiveContainer width="100%" height="100%" minWidth={320} minHeight={280}>
+        <BarChart
+          data={rows}
+          layout="vertical"
+          margin={{ top: 8, right: 8, left: 4, bottom: 8 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" horizontal={false} />
+          <XAxis type="number" domain={[0, 100]} tick={{ fill: 'var(--solaris-muted)', fontSize: 10 }} axisLine={false} tickLine={false} />
+          <YAxis
+            type="category"
+            dataKey="metric"
+            width={126}
+            tick={{ fill: 'var(--solaris-text)', fontSize: 10 }}
+            axisLine={false}
+            tickLine={false}
+          />
+          <Tooltip
+            content={(props: unknown) => (
+              <BenchmarkTooltip {...(props as TooltipContentProps<number, string>)} />
+            )}
+            cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+          />
+          <Legend
+            wrapperStyle={{ fontSize: 11, paddingTop: 8 }}
+            formatter={(value: unknown) => {
+              const v = typeof value === 'string' ? value : String(value);
+              return (
+                <span className="text-solaris-muted">
+                  {v === 'solaris'
+                    ? 'Solaris (200k + RAV)'
+                    : v === 'standard'
+                      ? 'Standard AI app'
+                      : 'Agent marketplace'}
+                </span>
+              );
+            }}
+          />
+          <Bar dataKey="solaris" name="solaris" fill="var(--solaris-gold)" radius={[0, 4, 4, 0]} maxBarSize={14} />
+          <Bar dataKey="standard" name="standard" fill="rgba(255,255,255,0.18)" radius={[0, 4, 4, 0]} maxBarSize={14} />
+          <Bar dataKey="marketplace" name="marketplace" fill="rgba(46,231,255,0.35)" radius={[0, 4, 4, 0]} maxBarSize={14} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+    <p className="text-[10px] text-solaris-muted/60 font-mono mt-2">
+      Indices are qualitative composites for communication — not a third-party benchmark.
+    </p>
+  </div>
+);
+
+export default AgenticBenchmarkDashboard;
