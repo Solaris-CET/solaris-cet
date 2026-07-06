@@ -36,6 +36,7 @@
     "survey:prod-gate": "node scripts/survey-prod-gate.mjs",
     "survey:bridge-smoke": "node scripts/survey-bridge-smoke.mjs",
     "deploy:status": "node scripts/deploy-status.mjs",
+    "deploy:p0": "node scripts/p0-deploy.mjs",
     "coolify:redeploy-survey": "node scripts/coolify-redeploy-survey.mjs",
     "gitea:push-retry": "node scripts/gitea-push-retry.mjs",
     "survey:deploy": "node scripts/deploy-survey-stack.mjs",

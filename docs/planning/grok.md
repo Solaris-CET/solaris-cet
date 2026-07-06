@@ -439,3 +439,22 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 **Conține:** gol final · stadiu curent · files in flight · timeline sesiuni/agents · failed attempts catalog · next steps · recovery loop R0–R7.
 
 **Next agent Loop 0:** `npm run stash:prime -- handoff` → citește `HANDOFF.md` §1 + §5.
+
+---
+
+## Update 2026-07-06 — P0 deploy executat (parțial)
+
+**Rulat:** `npm run deploy:p0` · `survey:prod-gate` SOFT_FAIL=1 · `gitea:push-retry --github` · `stash:sync`
+
+| Step | Rezultat |
+|---|---|
+| GitHub `main` | ✓ up-to-date |
+| Gitea `origin` | ✗ 504 |
+| Coolify redeploy | ✗ `COOLIFY_*` lipsă în env local |
+| Prod `/` | 200 |
+| Prod `health.json` + `/api/survey/*` | 404 HTML |
+| prod-gate | 5 hard + 6 soft fail |
+
+**Livrat cod:** `deploy:p0` · `coolify-deploy.mjs` (Windows, fără bash) · `coolify-redeploy-survey` refactor
+
+**USER action:** setează `COOLIFY_BASE_URL`, `COOLIFY_API_TOKEN`, `COOLIFY_RESOURCE_UUID` → `npm run deploy:p0`

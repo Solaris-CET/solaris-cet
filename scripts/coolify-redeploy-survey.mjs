@@ -7,6 +7,7 @@
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { triggerCoolifyDeploy } from './coolify-deploy.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = (process.env.SITE_URL || 'https://solaris-cet.com').replace(/\/$/, '');
@@ -28,12 +29,12 @@ async function surveyHealthOk() {
   }
 }
 
-const script = path.join(root, 'scripts', 'coolify-deploy-by-tag.sh');
-const deploy = spawnSync('bash', [script], { cwd: root, stdio: 'inherit', shell: process.platform === 'win32' });
-if (deploy.status !== 0) {
-  console.error('Coolify deploy trigger failed — set COOLIFY_* env vars');
-  process.exit(deploy.status ?? 1);
+const deploy = await triggerCoolifyDeploy();
+if (!deploy.ok) {
+  console.error(`Coolify deploy trigger failed: ${deploy.error}`);
+  process.exit(deploy.status === 2 ? 2 : 1);
 }
+console.log(`✓ Coolify deploy triggered tag=${deploy.tag}`);
 
 console.log(`Polling ${SITE}/api/survey/health every ${POLL_MS}ms…`);
 for (let i = 1; i <= MAX_POLLS; i += 1) {

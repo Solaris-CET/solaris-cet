@@ -9,15 +9,15 @@
 ## 0) Checkpoint instant (citește primul)
 
 ```
-DONE:     10 epics Ralph complete · GTM v3.3 · loops tooling v3.1 · Windows E2E fix
-VERIFIED: Local SHA accd4e1 · loops:status 0 open · npm run test:e2e survey shell PASSED
-LEFT:     Prod deploy · GTM execution · DeepSeek/Aider activation · stash:sync this handoff
-BLOCKED:  Hetzner L002DD869 · Coolify redeploy main · Gitea origin 504 intermittent
+DONE:     P0 scripts (deploy:p0, coolify-deploy.mjs Windows) · stash:sync · GitHub push
+VERIFIED: github main up-to-date · survey:prod-gate documents 5 hard / 6 soft 404 on prod
+LEFT:     COOLIFY_* env + Coolify redeploy · Gitea origin 504 · GTM execution
+BLOCKED:  COOLIFY_API_TOKEN absent locally · Gitea 504 · prod health.json 404
 ```
 
 | Metric | Value |
 |---|---|
-| **Git HEAD (local)** | `accd4e1` |
+| **Git HEAD (local)** | `pending` (post P0 scripts commit) |
 | **GitHub `main`** | `accd4e1` (push OK) |
 | **Gitea `origin/main`** | Poate fi în urmă — 504 la push |
 | **Prod `solaris-cet.com`** | health.json **404** · `/api/survey/health` **404** |
@@ -234,6 +234,8 @@ accd4e1 feat(gtm): v3.3 go-to-market strategy (3x3 loops) + loops tooling + Wind
 | M2 | `stash:sync` upload | 409 conflict | Fix: `edit-page` by ID în `stash-sync.mjs` |
 | M3 | `loops:refine` cu API | No key | Manual mode checklist — OK by design |
 | M4 | `npm run aider` | Not installed | Exit 0 cu instrucțiuni pip |
+| M5 | `coolify:redeploy-survey` pe Windows | `bash` not recognized | `coolify-deploy.mjs` native fetch |
+| M6 | `npm run deploy:p0` | COOLIFY_* empty | User setează env apoi rerun |
 
 ### 5.6 Ce să NU reîncerci (anti-patterns confirmate)
 
@@ -263,14 +265,35 @@ accd4e1 feat(gtm): v3.3 go-to-market strategy (3x3 loops) + loops tooling + Wind
 
 ### 7.1 P0 — Deblocare prod (USER + OPS)
 
-```bash
-# După Hetzner unblock:
-npm run gitea:push-retry              # sync Gitea solaris-clean
-npm run coolify:redeploy-survey       # sau UI Coolify → Redeploy main
-npm run deploy:status                 # Local SHA = Prod version
+**One-shot (2026-07-06):** `npm run deploy:p0` — lanț complet; oprește la Step 2 dacă lipsesc `COOLIFY_*`.
+
+```powershell
+# 1) Setează secrete (sesiune PowerShell — NU commita)
+$env:COOLIFY_BASE_URL="https://<coolify-host>"
+$env:COOLIFY_API_TOKEN="<token>"
+$env:COOLIFY_RESOURCE_UUID="<app-uuid>"
+$env:COOLIFY_TAG="main"
+
+# 2) Rulează P0
+npm run deploy:p0
+
+# Alternativ pas cu pas:
+npm run gitea:push-retry              # origin — 504 retry; github OK via --github
+npm run coolify:redeploy-survey       # Windows-safe (fără bash)
+npm run deploy:status
 npm run survey:prod-gate              # fără SOFT_FAIL
-npm run survey:post-deploy            # SITE_URL=https://solaris-cet.com
+npm run survey:post-deploy
 ```
+
+**Ultima rulare P0 (2026-07-06):**
+| Step | Rezultat |
+|---|---|
+| GitHub push | ✓ up-to-date |
+| Gitea origin | ✗ 504 (retry în curs) |
+| Coolify trigger | ✗ `COOLIFY_*` empty |
+| Prod homepage | 200 OK |
+| Prod health.json | 404 |
+| survey:prod-gate | ✗ 5 hard + 6 soft (toate API 404 HTML) |
 
 ### 7.2 P1 — Loop 7 retro sesiune curentă
 

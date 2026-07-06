@@ -15,6 +15,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const STASH_PAGES = {
   'docs/planning/agent-memory.md': '8f084fff-c19e-4b8d-83b7-6a7e783ee63c',
   'docs/planning/grok.md': '517aca79-0fd7-4ae6-a047-1734fb7ce61c',
+  'docs/planning/HANDOFF.md': null,
   '.claude/skills/solaris-perfect-loops/SKILL.md': '119ed9c3-ab71-43fa-a942-967559793bff',
 };
 
