@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const GITEA = 'https://gitea.com';
 const ORG = 'Solaris-Cet';
-const REPO = 'solaris-cet';
+const REPO = 'solaris-clean';
 const token = String(process.env.GITEA_TOKEN ?? '').trim();
 
 if (!token) {

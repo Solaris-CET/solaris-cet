@@ -394,10 +394,9 @@ function getRouteSeo(origin: string, urlLocale: UrlLocale, pathnameNoLocale: str
     },
     '/survey': {
       title: 'Survey șantier — Solaris CET',
-      description: 'Aplicație tehnicieni: upload poze, checklist structurat, raport PDF permit-ready cu analiză AI.',
+      description: 'Aplicație tehnicieni: upload poze, checklist șantier, raport PDF permit-ready cu analiză AI.',
       keywords: 'survey fotovoltaic, raport santier, documentatie solar, tehnician instalator',
       ogType: 'website',
-      noindex: true,
       jsonLd: {
         '@context': 'https://schema.org',
         '@graph': [

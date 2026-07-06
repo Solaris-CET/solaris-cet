@@ -15,7 +15,6 @@ test.describe('Public assets', () => {
     const body = await res.text();
     expect(body).toContain('https://solaris-cet.com/servicii/');
     expect(body).toContain('https://solaris-cet.com/contact/');
-    expect(body).toContain('https://solaris-cet.com/survey/');
     expect(body).toContain('https://solaris-cet.com/servicii/fotovoltaice-rezidentiale/');
     expect(body).not.toContain('https://solaris-cet.com/privacy-settings/');
     expect(body).not.toContain('https://solaris-cet.com/en/');

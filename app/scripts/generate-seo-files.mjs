@@ -261,11 +261,6 @@ const SEO_PAGES = {
     description: 'Calculează rapid sistemul fotovoltaic potrivit pentru tine. Estimare putere, preț, economii și amortizare. Gratuit, fără obligații.',
     keywords: 'calculator solar, estimare fotovoltaice, cost panouri',
   },
-  '/survey': {
-    title: 'Survey Șantier — Raport PDF în sub 20 min | Solaris CET',
-    description: 'Aplicație pentru tehnicieni: încarcă poze, completează checklist-ul și generează raport PDF permit-ready cu analiză AI.',
-    keywords: 'survey fotovoltaic, raport santier, documentatie solar, tehnician instalator',
-  },
   '/finantare': {
     title: 'Finanțare Fotovoltaice — Casa Verde, RePowerEU, Credite Verzi | Solaris CET',
     description: 'Programe de finanțare pentru sisteme fotovoltaice: Casa Verde până la 20.000 RON, RePowerEU până la 60%. Consultanță gratuită.',
@@ -1927,7 +1922,6 @@ async function writeSitemap() {
     { loc: toAbsoluteUrl('/despre'), priority: '0.7', changefreq: 'monthly', lastmod: today },
     { loc: toAbsoluteUrl('/contact'), priority: '0.9', changefreq: 'monthly', lastmod: today },
     { loc: toAbsoluteUrl('/calculator'), priority: '0.8', changefreq: 'monthly', lastmod: today },
-    { loc: toAbsoluteUrl('/survey'), priority: '0.85', changefreq: 'weekly', lastmod: today },
     { loc: toAbsoluteUrl('/finantare'), priority: '0.8', changefreq: 'monthly', lastmod: today },
     { loc: toAbsoluteUrl('/proiecte'), priority: '0.7', changefreq: 'weekly', lastmod: today },
     { loc: toAbsoluteUrl('/blog'), priority: '0.7', changefreq: 'weekly', lastmod: today },

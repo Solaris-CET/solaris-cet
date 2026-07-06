@@ -2,7 +2,7 @@
 
 Concise instructions for this repository. The main application lives in **`app/`** (Vite, React, TypeScript). CI is defined in `.github/workflows/ci.yml` (Node 22, `npm ci` in `app/`).
 
-**Production:** [https://solaris-cet.com](https://solaris-cet.com) — **Coolify** on the project VPS, branch **`main`**. Repo Git (Coolify): [gitea.com/Solaris-Cet/solaris-cet](https://gitea.com/Solaris-Cet/solaris-cet). Mirror: [GitHub Solaris-CET/solaris-cet](https://github.com/Solaris-CET/solaris-cet).
+**Production:** [https://solaris-cet.com](https://solaris-cet.com) — **Coolify** on the project VPS, branch **`main`**. Repo Git (Coolify): [gitea.com/Solaris-Cet/solaris-clean](https://gitea.com/Solaris-Cet/solaris-clean). Mirror: [GitHub Solaris-CET/solaris-cet](https://github.com/Solaris-CET/solaris-cet).
 
 ## Commands (from repository root)
 

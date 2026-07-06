@@ -98,12 +98,7 @@ export default async function handler(req: Request): Promise<Response> {
 
   const powerNeeded = typeof body.powerNeeded === 'string' ? body.powerNeeded.trim() : null;
   const roofType = typeof body.roofType === 'string' ? body.roofType.trim() : null;
-  const surveyReportId = typeof body.surveyReportId === 'string' ? body.surveyReportId.trim() : '';
-  let message = typeof body.message === 'string' ? body.message.trim() : null;
-  if (surveyReportId && (!message || !message.includes(surveyReportId))) {
-    const tag = `Cerere ofertă din raport survey ${surveyReportId}.`;
-    message = message ? `${tag} ${message}` : tag;
-  }
+  const message = typeof body.message === 'string' ? body.message.trim() : null;
 
   // ── Save to database ────────────────────────────────────────────────────
   let newLeadId: string | null = null;

@@ -1,8 +1,7 @@
 import { Mail, MapPin } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { SafeEmailLink } from '@/components/SafeEmailLink';
-import { type ContactPrefill, parseContactSearchParams } from '@/lib/contactPrefill';
 
 
 // ── QuoteForm component ─────────────────────────────────────────────────────
@@ -30,26 +29,6 @@ const ROOF_OPTIONS = [
   { value: 'altul', label: 'Altul' },
 ] as const;
 
-function applyPrefill(prefill: ContactPrefill, setters: {
-  setName: (v: string) => void;
-  setPhone: (v: string) => void;
-  setEmail: (v: string) => void;
-  setLocality: (v: string) => void;
-  setServiceType: (v: string) => void;
-  setPower: (v: string) => void;
-  setRoofType: (v: string) => void;
-  setMessage: (v: string) => void;
-}) {
-  if (prefill.name) setters.setName(prefill.name);
-  if (prefill.phone) setters.setPhone(prefill.phone);
-  if (prefill.email) setters.setEmail(prefill.email);
-  if (prefill.locality) setters.setLocality(prefill.locality);
-  if (prefill.serviceType) setters.setServiceType(prefill.serviceType);
-  if (prefill.power) setters.setPower(prefill.power);
-  if (prefill.roofType) setters.setRoofType(prefill.roofType);
-  if (prefill.message) setters.setMessage(prefill.message);
-}
-
 function QuoteForm() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -63,19 +42,7 @@ function QuoteForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  const [prefillSource, setPrefillSource] = useState<ContactPrefill['source']>();
-  const [surveyReportId, setSurveyReportId] = useState<string>();
   const formRef = useRef<HTMLFormElement>(null);
-
-  useEffect(() => {
-    const prefill = parseContactSearchParams(window.location.search);
-    if (!prefill.source) return;
-    applyPrefill(prefill, {
-      setName, setPhone, setEmail, setLocality, setServiceType, setPower, setRoofType, setMessage,
-    });
-    setPrefillSource(prefill.source);
-    if (prefill.reportId) setSurveyReportId(prefill.reportId);
-  }, []);
 
   const isFotovoltaic = serviceType === 'fotovoltaic-rezidential' || serviceType === 'fotovoltaic-industrial';
   const isAcoperis = serviceType === 'acoperis-tabla' || serviceType === 'acoperis-tpo';
@@ -120,7 +87,6 @@ function QuoteForm() {
           powerNeeded: isFotovoltaic ? power : undefined,
           roofType: isAcoperis ? roofType : undefined,
           message: message.trim() || undefined,
-          surveyReportId: surveyReportId || undefined,
           gdpr,
         }),
       });
@@ -141,16 +107,6 @@ function QuoteForm() {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-5 rounded-3xl border border-white/10 bg-white/5 p-6">
-      {prefillSource === 'survey' && surveyReportId && (
-        <div className="rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
-          Date precompletate din raport survey <span className="font-mono">{surveyReportId}</span>. Verifică și trimite oferta.
-        </div>
-      )}
-      {prefillSource === 'calculator' && (
-        <div className="rounded-xl border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-sm text-amber-200">
-          Date precompletate din calculatorul solar. Completează telefonul și trimite cererea.
-        </div>
-      )}
       {error && (
         <div className="rounded-xl bg-red-600/20 px-4 py-3 text-sm text-red-300">
           {error}
