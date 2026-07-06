@@ -5,6 +5,7 @@
  *        node scripts/gitea-push-retry.mjs --github   # fallback remote github
  */
 import { spawnSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -18,8 +19,17 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+function resolveGit() {
+  if (process.env.GIT_EXE) return process.env.GIT_EXE;
+  if (process.platform === 'win32') {
+    const candidate = 'C:\\Program Files\\Git\\bin\\git.exe';
+    if (existsSync(candidate)) return candidate;
+  }
+  return 'git';
+}
+
 function gitPush() {
-  const git = process.platform === 'win32' ? 'git' : 'git';
+  const git = resolveGit();
   return spawnSync(git, ['push', remote, 'main'], {
     cwd: root,
     encoding: 'utf8',
