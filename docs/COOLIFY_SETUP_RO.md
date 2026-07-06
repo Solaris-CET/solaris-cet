@@ -108,10 +108,20 @@ Dacă imporți `docker/coolify.yml` ca Compose în Coolify:
 
 ## 5) Webhook Git pentru deploy automat
 
+**Sursă Git producție:** `https://gitea.com/Solaris-Cet/solaris-cet` (nu GitHub).
+
 În Coolify:
 
+- Source: Gitea → `Solaris-Cet/solaris-cet`, branch `main`
 - Activează “Auto Deploy” pentru branch-ul de producție.
-- Dacă folosești GitHub webhooks, folosește URL-ul de webhook generat de Coolify.
+- Webhook: URL-ul generat de Coolify → adaugă în Gitea (repo → Settings → Webhooks).
+
+Push local:
+
+```bash
+git push -u origin main
+# sau, cu PAT: GITEA_TOKEN=xxx npm run gitea:push
+```
 
 Validare: fă un push pe branch-ul de producție și verifică în Coolify că a pornit un nou deployment.
 
