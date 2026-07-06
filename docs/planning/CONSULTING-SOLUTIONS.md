@@ -273,3 +273,7 @@ Skill actualizat: `.claude/skills/solaris-perfect-loops/SKILL.md` (secțiunea Co
 - Gate deploy extins: post-deploy verifică openapi + context + twin-feed
 
 **Următor invent:** integrare Digital Twin runtime (D10) peste același feed — fără schimbare contract OpenAPI.
+
+**Livrat 2026-07-06 (d10-twin-runtime):** SSE stream + event log + UI live — contract `twin-feed` neschimbat; rute additive `twin-events` / `twin-stream`.
+
+**Următor invent:** viewer 3D WebGL + long-poll SSE persistent + integrare CRM twin webhooks bidirecțional.

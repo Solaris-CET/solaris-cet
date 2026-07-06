@@ -1,4 +1,5 @@
 import { getAllowedOrigin } from '../../lib/cors';
+import { dispatchSurveyWebhook } from '../../lib/surveyWebhook';
 
 export const config = { runtime: 'nodejs' };
 
@@ -97,6 +98,12 @@ export default async function handler(req: Request): Promise<Response> {
     if (!res.ok) {
       return json({ error: data.detail || 'Correction failed' }, allowed, res.status === 400 ? 400 : 502);
     }
+    void dispatchSurveyWebhook({
+      event: 'twin_feed_updated',
+      report_id: reportId,
+      field,
+      corrected,
+    });
     return json({ platform: 'solaris-cet', ...data }, allowed, 200);
   } catch {
     return json({ error: 'survey-engine unreachable' }, allowed, 503);

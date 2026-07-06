@@ -156,7 +156,7 @@ test.describe('Survey technician app', () => {
     expect(body.paths?.['/api/survey/installer/me']).toBeTruthy();
   });
 
-  test('twin feed panel visible after demo report', async ({ page }) => {
+  test('twin runtime panel visible after demo report', async ({ page }) => {
     await page.route('**/api/survey/health', async (route) => {
       await route.fulfill({
         status: 200,
@@ -194,30 +194,26 @@ test.describe('Survey technician app', () => {
         }),
       });
     });
-    await page.route('**/api/survey/twin-feed*', async (route) => {
+    await page.route('**/api/survey/twin-stream*', async (route) => {
+      const sse = [
+        'event: snapshot',
+        'data: {"schema":"solaris-twin-feed-v1","feed_version":1,"report_id":"SOL-DEMO-TWIN","site":{"client_name":"Demo","city":"Cluj","latitude":46.77,"longitude":23.59},"system":{"capacity_kwp":6,"annual_kwh":7200,"suitability_score":87,"premium_tier":false},"low_confidence_count":0,"corrections_count":0,"corrections_recent":[]}',
+        '',
+        'event: ready',
+        'data: {"report_id":"SOL-DEMO-TWIN"}',
+        '',
+      ].join('\n');
       await route.fulfill({
         status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          feed: {
-            schema: 'solaris-twin-feed-v1',
-            feed_version: 1,
-            generated_at: '2026-07-06T12:00:00Z',
-            report_id: 'SOL-DEMO-TWIN',
-            site: { client_name: 'Demo', city: 'Cluj', latitude: 46.77, longitude: 23.59 },
-            system: { capacity_kwp: 6, annual_kwh: 7200, suitability_score: 87, premium_tier: false },
-            low_confidence_count: 0,
-            corrections_count: 0,
-            corrections_recent: [],
-          },
-        }),
+        headers: { 'Content-Type': 'text/event-stream' },
+        body: sse,
       });
     });
 
     await page.goto('/survey', { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: /Raport demo/i }).click();
-    await expect(page.getByText(/Digital Twin feed/i)).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText(/solaris-twin-feed-v1/i)).toBeVisible();
+    await expect(page.getByText(/Twin runtime live/i)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/6 kWp/i)).toBeVisible();
   });
 
   test('survey contact prefill via query params', async ({ page }) => {

@@ -13,7 +13,7 @@ from typing import Any, Optional
 
 from fastapi import FastAPI, File, Form, Header, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from src.api_clients.cost_logger import CostLogger
@@ -32,6 +32,7 @@ from src.report_generator import generate_report
 from src.report_registry import ReportRegistry
 from src.survey_agent import batch_orchestration_summary, plan_from_form
 from src.twin_feed import build_twin_feed
+from src.twin_runtime import iter_sse_stream, list_twin_events, publish_twin_event, runtime_status
 
 load_dotenv(project_root() / ".env")
 
@@ -158,6 +159,12 @@ def demo_report():
     pdf = generate_report(survey, out)
     ahj = export_ahj_json(survey, out / f"AHJ_{survey.metadata.report_id}.json")
     ReportRegistry().register(survey, pdf, ahj, cost_usd=0.0, routing="demo", installer_id="demo")
+    publish_twin_event(
+        survey.metadata.report_id,
+        "report_generated",
+        payload={"source": "demo", "score": survey.executive_summary.suitability_score},
+    )
+    publish_twin_event(survey.metadata.report_id, "twin_ready", payload={"source": "demo"})
     return DemoResponse(
         report_id=survey.metadata.report_id,
         pdf_path=str(pdf),
@@ -291,6 +298,16 @@ async def generate_survey(
             site_longitude=site_longitude,
         )
         survey = result.survey
+        publish_twin_event(
+            survey.metadata.report_id,
+            "report_generated",
+            payload={
+                "score": survey.executive_summary.suitability_score,
+                "installer_id": effective_installer,
+                "routing": result.routing_reason,
+            },
+        )
+        publish_twin_event(survey.metadata.report_id, "twin_ready", payload={"installer_id": effective_installer})
         return GenerateResponse(
             report_id=survey.metadata.report_id,
             pdf_filename=result.pdf_path.name,
@@ -430,6 +447,9 @@ def engine_openapi():
             "/context/{report_id}": {"get": {"summary": "Unified context"}},
             "/orchestrate/{report_id}": {"get": {"summary": "OODA plan"}},
             "/twin-feed/{report_id}": {"get": {"summary": "Digital twin feed"}},
+            "/twin-events": {"get": {"summary": "Twin runtime event log"}},
+            "/twin-stream/{report_id}": {"get": {"summary": "Twin SSE snapshot stream"}},
+            "/twin-runtime/status": {"get": {"summary": "Twin runtime status"}},
             "/installers": {"get": {"summary": "Installer aggregate list"}},
             "/installer/me": {"get": {"summary": "Authenticated installer profile"}},
             "/permit-pack/{report_id}": {"get": {"summary": "Permit ZIP"}},
@@ -445,6 +465,26 @@ def twin_feed(report_id: str, request: Request):
         return build_twin_feed(report_id, platform_base_url=base)
     except KeyError as exc:
         raise HTTPException(404, str(exc)) from exc
+
+
+@app.get("/twin-events")
+def twin_events(report_id: Optional[str] = None, limit: int = 50):
+    rows = list_twin_events(report_id.strip() if report_id else None, limit=min(limit, 200))
+    return {"total": len(rows), "events": rows}
+
+
+@app.get("/twin-stream/{report_id}")
+def twin_stream(report_id: str):
+    return StreamingResponse(
+        iter_sse_stream(report_id),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
+    )
+
+
+@app.get("/twin-runtime/status")
+def twin_runtime_health():
+    return runtime_status()
 
 
 @app.get("/corrections")
@@ -535,6 +575,12 @@ def post_correction(body: CorrectionRequest, request: Request, x_installer_key: 
         )
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
+    publish_twin_event(
+        body.report_id,
+        "correction_logged",
+        payload={"field": body.field, "technician": body.technician},
+    )
+    publish_twin_event(body.report_id, "feed_refreshed", payload={"reason": "correction"})
     return {"ok": True, "correction": entry}
 
 

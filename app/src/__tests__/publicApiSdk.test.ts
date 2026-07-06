@@ -33,6 +33,15 @@ describe('publicApiSdk', () => {
     expect(url).toContain('/api/survey/twin-feed?report_id=SOL-1');
   });
 
+  it('survey.twinEvents calls twin-events path', async () => {
+    fetchMock.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ events: [] }) });
+    const client = createSolarisClient({ apiKey: 'cet_sk_test', baseUrl: 'https://example.com' });
+    await client.survey.twinEvents('SOL-1', 5);
+    const [url] = fetchMock.mock.calls[0] as [string];
+    expect(url).toContain('/api/survey/twin-events');
+    expect(url).toContain('report_id=SOL-1');
+  });
+
   it('survey.installerMe forwards X-Installer-Key', async () => {
     fetchMock.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ installer: { installer_id: 'INST-1' } }) });
     const client = createSolarisClient({ apiKey: 'cet_sk_test', baseUrl: 'https://example.com' });

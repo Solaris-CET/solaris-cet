@@ -573,6 +573,8 @@ const apiRoutes = new Map([
   ['/api/survey/permit-pack', 'api/survey/permit-pack/route.js'],
   ['/api/survey/corrections', 'api/survey/corrections/route.js'],
   ['/api/survey/twin-feed', 'api/survey/twin-feed/route.js'],
+  ['/api/survey/twin-events', 'api/survey/twin-events/route.js'],
+  ['/api/survey/twin-stream', 'api/survey/twin-stream/route.js'],
   ['/api/survey/installer/me', 'api/survey/installer/me/route.js'],
   ['/api/openapi/survey', 'api/openapi/survey/route.js'],
   ['/api/admin/surveys', 'api/admin/surveys/route.js'],

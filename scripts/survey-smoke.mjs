@@ -50,6 +50,16 @@ if (hasS6) {
 
   const openapi = await check('/openapi.json');
   console.log('✓ GET /openapi.json', openapi.info?.title ?? 'ok');
+
+  if (openapi.paths?.['/twin-events']) {
+    const events = await check('/twin-events?limit=5');
+    console.log('✓ GET /twin-events', `total=${events.total ?? 0}`);
+    const streamRes = await fetch(`${ENGINE}/twin-stream/${demo.report_id}`, { signal: AbortSignal.timeout(15_000) });
+    if (!streamRes.ok) throw new Error(`/twin-stream → ${streamRes.status}`);
+    const streamText = await streamRes.text();
+    if (!streamText.includes('event: snapshot')) throw new Error('twin-stream missing snapshot event');
+    console.log('✓ GET /twin-stream', 'snapshot ok');
+  }
 } else {
   console.log('⚠ S6 extended checks skipped — repornește survey-engine (cod nou pe :8000)');
 }

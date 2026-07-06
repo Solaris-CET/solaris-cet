@@ -151,3 +151,16 @@
 | OpenAPI + SDK | `/api/survey/installer/me` · `client.survey.installerMe()` |
 
 **VERIFY:** pytest installer_registry · Vitest installerApi + twinFeedMap · E2E twin panel
+
+## Epic d10-twin-runtime (D10 live layer) — 2026-07-06 DONE
+
+| Componentă | Locație |
+|---|---|
+| Event log | `twin_runtime.py` · `twin_events.jsonl` |
+| SSE stream | `GET /twin-stream/{id}` · `/api/survey/twin-stream` |
+| Events API | `GET /twin-events` · `/api/survey/twin-events` |
+| UI live | `TwinRuntimePanel` + `useTwinStream` + `TwinMapViewer` |
+| Admin | `TwinMonitorSection` |
+| Webhook | `twin_feed_updated` pe POST corrections |
+
+**VERIFY:** pytest twin_runtime · Vitest twinRuntimeApi · smoke S7 twin-events/stream

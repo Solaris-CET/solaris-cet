@@ -17,5 +17,7 @@ describe('survey route registry', () => {
     expect(src).toContain('/api/openapi/survey');
     expect(src).toContain('/api/admin/survey-insights');
     expect(src).toContain('/api/admin/installers');
+    expect(src).toContain('/api/survey/twin-events');
+    expect(src).toContain('/api/survey/twin-stream');
   });
 });

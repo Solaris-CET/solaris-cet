@@ -41,6 +41,12 @@ if (!paths['/api/survey/installer/me']) {
 if (!paths['/api/survey/twin-feed']) {
   throw new Error('openapi missing /api/survey/twin-feed');
 }
-console.log('✓ openapi paths include installer/me + twin-feed');
+if (!paths['/api/survey/twin-events']) {
+  throw new Error('openapi missing /api/survey/twin-events');
+}
+if (!paths['/api/survey/twin-stream']) {
+  throw new Error('openapi missing /api/survey/twin-stream');
+}
+console.log('✓ openapi paths include twin runtime routes');
 
 console.log('\n✓ Survey bridge smoke passed');

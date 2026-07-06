@@ -345,3 +345,17 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 - OpenAPI path `/api/survey/installer/me` · SDK `installerMe(installerKey?)`
 
 **VERIFY:** pytest `test_installer_registry` · Vitest installerApi + route · Playwright twin panel
+
+---
+
+## Update 2026-07-06 — D10 Twin Runtime (d10-twin-runtime, 30 task-uri)
+
+**Livrat:**
+- `twin_runtime.py` — JSONL events + SSE snapshot stream (peste `solaris-twin-feed-v1`, contract neschimbat)
+- Hooks generate/demo/correction → `publish_twin_event`
+- Node bridge: `/api/survey/twin-events`, `/api/survey/twin-stream`
+- `TwinRuntimePanel` + `useTwinStream` (fetch SSE) + `TwinMapViewer` OSM embed
+- Admin `TwinMonitorSection` · webhook `twin_feed_updated`
+- Smoke S7: twin-events + twin-stream snapshot
+
+**VERIFY:** pytest `test_twin_runtime` · Vitest twinRuntimeApi · Playwright twin runtime panel

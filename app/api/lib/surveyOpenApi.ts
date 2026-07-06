@@ -18,6 +18,8 @@ export const SURVEY_ROUTE_IDS = [
   'corrections',
   'twin-feed',
   'installer-me',
+  'twin-events',
+  'twin-stream',
 ] as const;
 
 export type SurveyRouteId = (typeof SURVEY_ROUTE_IDS)[number];
@@ -26,6 +28,8 @@ const BRIDGE_PATH_OVERRIDES: Partial<Record<SurveyRouteId, string>> = {
   'permit-pack': '/api/survey/permit-pack',
   'installer-me': '/api/survey/installer/me',
   'twin-feed': '/api/survey/twin-feed',
+  'twin-events': '/api/survey/twin-events',
+  'twin-stream': '/api/survey/twin-stream',
 };
 
 export function surveyBridgePath(id: SurveyRouteId): string {
@@ -139,6 +143,23 @@ export function buildSurveyOpenApiPaths(): Record<string, unknown> {
         summary: 'Authenticated installer SaaS profile',
         parameters: [installerKeyParam],
         responses: { '200': jsonResponse, '401': jsonResponse, '503': jsonResponse },
+      },
+    },
+    '/api/survey/twin-events': {
+      get: {
+        summary: 'Twin runtime event log (D10)',
+        parameters: [
+          { name: 'report_id', in: 'query', schema: { type: 'string' } },
+          { name: 'limit', in: 'query', schema: { type: 'integer' } },
+        ],
+        responses: { '200': jsonResponse },
+      },
+    },
+    '/api/survey/twin-stream': {
+      get: {
+        summary: 'Twin SSE snapshot stream (D10)',
+        parameters: [{ name: 'report_id', in: 'query', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'text/event-stream' }, '404': jsonResponse },
       },
     },
   };

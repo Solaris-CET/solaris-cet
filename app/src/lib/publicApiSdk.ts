@@ -94,6 +94,11 @@ export function createSolarisClient(opts: SolarisClientOptions) {
           path: '/api/survey/installer/me',
           extraHeaders: installerKey ? { 'X-Installer-Key': installerKey } : undefined,
         }),
+      twinEvents: (reportId?: string, limit = 50) =>
+        requestJson<unknown>(opts, {
+          path: '/api/survey/twin-events',
+          query: { report_id: reportId, limit },
+        }),
       openApiSpec: () => requestJson<unknown>(opts, { path: '/api/openapi/survey' }),
     },
   };
