@@ -458,3 +458,17 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 **Livrat cod:** `deploy:p0` · `coolify-deploy.mjs` (Windows, fără bash) · `coolify-redeploy-survey` refactor
 
 **USER action:** setează `COOLIFY_BASE_URL`, `COOLIFY_API_TOKEN`, `COOLIFY_RESOURCE_UUID` → `npm run deploy:p0`
+
+---
+
+## Update 2026-07-06 — Improvement Registry 10_000 (Rule of 3)
+
+**Livrat:**
+- `npm run improve:audit` → **10_000** items în `docs/planning/improvements/registry.jsonl`
+- `improve:status` · `improve:next` · `improve:mark` · `improve:mark-batch`
+- **Pass 2:** Windows `app/package.json` → `run-bin.mjs` (31 script fixes)
+- **Pass 2:** `survey/generate` route tests (16/16 Vitest)
+- **Pass 3:** `WINDOWS_DEV.md`, `API-COVERAGE.md`, epic `tsc-cleanup`
+- **Done:** 78+ items marked in registry
+
+**Rule of 3:** Discover (audit) → Prioritize (P0–P3) → Verify (mark done + tests)

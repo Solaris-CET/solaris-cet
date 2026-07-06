@@ -18,6 +18,8 @@ Synthesized from: [Stash](https://github.com/Fergana-Labs/stash), [superpowers](
 ```bash
 npm run loops:next                    # next unchecked task
 npm run loops:status                  # all epics done/open
+npm run improve:audit                 # 10k improvement registry
+npm run improve:next -- P0            # next improvement item
 npm run loops:refine -- <file> "…"    # DeepSeek doc refine (Loop 4)
 npm run aider -- "…"                  # Aider surgical edits
 npm run stash:prime -- <slug>         # Loop 0 for that feature

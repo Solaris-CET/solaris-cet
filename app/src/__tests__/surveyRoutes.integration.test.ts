@@ -17,6 +17,10 @@ vi.mock('../../api/lib/surveyWebhook', () => ({
   dispatchSurveyWebhook: vi.fn(async () => undefined),
 }));
 
+vi.mock('../../api/lib/twinWebhook', () => ({
+  dispatchTwinWebhook: vi.fn(async () => undefined),
+}));
+
 const fetchMock = vi.fn();
 vi.stubGlobal('fetch', fetchMock);
 
@@ -31,6 +35,7 @@ import surveyOrchestrateRoute from '../../api/survey/orchestrate/route';
 import surveyTwinFeedRoute from '../../api/survey/twin-feed/route';
 import surveyPermitPackRoute from '../../api/survey/permit-pack/route';
 import surveyStatsRoute from '../../api/survey/stats/route';
+import surveyGenerateRoute from '../../api/survey/generate/route';
 import { dispatchSurveyWebhook } from '../../api/lib/surveyWebhook';
 
 function jsonBody(res: Response): Promise<unknown> {
@@ -264,6 +269,47 @@ describe('survey API routes', () => {
     expect(res.status).toBe(200);
     const body = (await jsonBody(res)) as { ok: boolean };
     expect(body.ok).toBe(true);
+  });
+
+  it('/api/survey/generate: POST rejects non-multipart', async () => {
+    const req = new Request('http://test/api/survey/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', origin: 'https://x.test' },
+      body: JSON.stringify({}),
+    });
+    const res = await surveyGenerateRoute(req);
+    expect(res.status).toBe(415);
+  });
+
+  it('/api/survey/generate: POST proxies engine multipart', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          report_id: 'SOL-GEN-1',
+          pdf_filename: 'gen.pdf',
+          ahj_filename: 'ahj.json',
+          score: 80,
+          verdict: 'OK',
+          capacity_kwp: 5,
+          annual_kwh: 6000,
+          routing_reason: 'standard',
+          cost_usd: 0.12,
+        }),
+        { status: 200 },
+      ),
+    );
+    const form = new FormData();
+    form.append('client_name', 'Test Client');
+    const req = new Request('http://test/api/survey/generate', {
+      method: 'POST',
+      headers: { origin: 'https://x.test' },
+      body: form,
+    });
+    const res = await surveyGenerateRoute(req);
+    expect(res.status).toBe(200);
+    const body = (await jsonBody(res)) as { report_id: string; pdf_url: string };
+    expect(body.report_id).toBe('SOL-GEN-1');
+    expect(body.pdf_url).toContain('gen.pdf');
   });
 
   it('/api/survey/crm: POST persists survey lead', async () => {
