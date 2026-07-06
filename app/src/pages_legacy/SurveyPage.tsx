@@ -1,14 +1,15 @@
 import {
   AlertCircle, Camera, CheckCircle2, ClipboardList, Download, FileText,
-  Loader2, MapPin, Send, Sun, Users, WifiOff, ArrowRight,
+  Loader2, MapPin, Send, Sun, Users, ArrowRight,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { SolarisFooter } from '@/components/company/SolarisFooter';
+import { SurveyOfflinePanel } from '@/components/survey/SurveyOfflinePanel';
 import { TwinAgentPanel } from '@/components/survey/TwinAgentPanel';
 import { TwinRuntimePanel } from '@/components/survey/TwinRuntimePanel';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { useSurveyOfflineSync } from '@/hooks/useSurveyOfflineSync';
 import {
   type ChecklistStatus,
   type BatchJobInput,
@@ -30,15 +31,7 @@ import {
   submitSurveyToCrm,
 } from '@/lib/surveyApi';
 import { applySurveyPrefill, parseSurveySearchParams } from '@/lib/surveyPrefill';
-import {
-  clearSurveyDraft,
-  enqueuePendingReport,
-  listPendingReports,
-  loadSurveyDraft,
-  removePendingReport,
-  saveSurveyDraft,
-  storedToPhotos,
-} from '@/lib/surveyDraftStorage';
+import { storedToPhotos } from '@/lib/surveyDraftStorage';
 import { permitHintMessage, shouldAutoCrm, type SurveyOrchestration } from '@/lib/surveyAgent';
 import { buildSurveyContactUrl } from '@/lib/contactPrefill';
 import { cn } from '@/lib/utils';
@@ -120,7 +113,6 @@ function ScoreRing({ score }: { score: number }) {
 }
 
 export default function SurveyPage() {
-  const online = useOnlineStatus();
   const [tab, setTab] = useState<'report' | 'dashboard' | 'batch'>('report');
   const [installer, setInstaller] = useLocalStorage<InstallerProfile>('solaris_installer_profile', DEFAULT_INSTALLER);
   const [form, setForm] = useState<SurveyFormData>(DEFAULT_FORM);
@@ -148,73 +140,29 @@ export default function SurveyPage() {
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [jurisdictions, setJurisdictions] = useState<JurisdictionItem[]>([]);
   const [gpsLoading, setGpsLoading] = useState(false);
-  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
-  const [pendingCount, setPendingCount] = useState(0);
-  const [syncing, setSyncing] = useState(false);
-  const [draftReady, setDraftReady] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const wasOfflineRef = useRef(false);
-  const autoSyncStartedRef = useRef(false);
 
-  const refreshPendingCount = useCallback(async () => {
-    const items = await listPendingReports();
-    setPendingCount(items.length);
-  }, []);
-
-  const handleSyncPending = useCallback(async () => {
-    if (!online || syncing) return;
-    setSyncing(true);
-    setError('');
-    try {
-      const pending = await listPendingReports();
-      if (!pending.length) {
-        setPendingCount(0);
-        return;
-      }
-      setProgress(`Sincronizare ${pending.length} raport(e)...`);
-      for (const item of pending) {
-        const res = await generateSurveyReport(
-          storedToPhotos(item.photos),
-          item.form,
-          item.installer,
-        );
-        await removePendingReport(item.id);
-        setResult(res);
-      }
-      await clearSurveyDraft();
-      setPendingCount(0);
-      setProgress('Sincronizare completă!');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sincronizare eșuată');
-    } finally {
-      setSyncing(false);
-      setProgress('');
-      refreshPendingCount();
-    }
-  }, [online, syncing, refreshPendingCount]);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const draft = await loadSurveyDraft();
-      if (cancelled || !draft) {
-        setDraftReady(true);
-        return;
-      }
+  const {
+    online,
+    draftSavedAt,
+    stats,
+    syncing,
+    enqueueOffline,
+    syncPending,
+  } = useSurveyOfflineSync({
+    form,
+    installer,
+    photos,
+    onDraftLoaded: (draft) => {
       setForm(draft.form);
       setInstaller(draft.installer);
       const restored = storedToPhotos(draft.photos);
       setPhotos(restored);
       setPreviews(restored.map((f) => URL.createObjectURL(f)));
-      setDraftSavedAt(draft.updatedAt);
-      setDraftReady(true);
-    })();
-    refreshPendingCount();
-    return () => {
-      cancelled = true;
-    };
-  }, [refreshPendingCount, setInstaller]);
+    },
+    onSynced: () => setProgress('Sincronizare completă!'),
+    onSyncError: (msg) => setError(msg),
+  });
 
   useEffect(() => {
     const prefill = parseSurveySearchParams(window.location.search);
@@ -224,51 +172,14 @@ export default function SurveyPage() {
   }, []);
 
   useEffect(() => {
-    if (!draftReady) return;
-    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => {
-      void saveSurveyDraft(form, installer, photos)
-        .then(() => setDraftSavedAt(new Date().toISOString()))
-        .catch(() => void 0);
-    }, 600);
-    return () => {
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    };
-  }, [draftReady, form, installer, photos]);
-
-  useEffect(() => {
-    if (!online) {
-      wasOfflineRef.current = true;
-      return;
-    }
+    if (!online) return;
     fetchSurveyHealth()
       .then((h) => {
         setEngineOk(Boolean(h.engine?.ok));
         setCostBudgetAlert(Boolean(h.engine?.cost_budget?.alert || h.engine?.cost_budget?.exceeded));
       })
       .catch(() => setEngineOk(false));
-    refreshPendingCount();
-    if (wasOfflineRef.current && pendingCount > 0 && !autoSyncStartedRef.current) {
-      autoSyncStartedRef.current = true;
-      void handleSyncPending().finally(() => {
-        autoSyncStartedRef.current = false;
-        wasOfflineRef.current = false;
-      });
-    } else if (online) {
-      wasOfflineRef.current = false;
-    }
-  }, [online, pendingCount, refreshPendingCount, handleSyncPending]);
-
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      void navigator.serviceWorker.ready.then((reg) => {
-        reg.active?.postMessage({
-          type: 'PREFETCH_URLS',
-          urls: ['/offline-ro.html', '/offline-image.svg', '/icon-192.png'],
-        });
-      });
-    }
-  }, []);
+  }, [online]);
 
   useEffect(() => {
     if (!online) return;
@@ -413,8 +324,7 @@ export default function SurveyPage() {
     }
     if (!online) {
       try {
-        await enqueuePendingReport(form, installer, photos);
-        await refreshPendingCount();
+        await enqueueOffline();
         setError('');
         setProgress('Offline — raport salvat în coadă. Se sincronizează la reconectare.');
       } catch {
@@ -530,38 +440,18 @@ export default function SurveyPage() {
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-white/60 sm:text-base">
             Încarcă poze, completează checklist-ul și generează raport PDF permit-ready cu analiză AI.
           </p>
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-3 text-xs font-medium">
-            {!online && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1 text-amber-200">
-                <WifiOff className="h-3.5 w-3.5" />
-                Offline — draft salvat local
-              </span>
-            )}
-            {draftSavedAt && (
-              <span className="text-white/40">
-                Draft: {new Date(draftSavedAt).toLocaleString('ro-RO')}
-              </span>
-            )}
-            {engineOk !== null && online && (
-              <span className={engineOk ? 'text-emerald-400' : 'text-amber-400'}>
-                {engineOk ? '● Survey engine conectat' : '● Mod demo — pornește survey-engine pe :8000'}
-              </span>
-            )}
-          </div>
-          {pendingCount > 0 && (
-            <div className="mx-auto mt-4 flex max-w-md flex-col items-center gap-2 rounded-xl border border-amber-400/20 bg-amber-400/5 px-4 py-3 sm:flex-row">
-              <p className="text-sm text-amber-100">
-                {pendingCount} raport(e) în așteptare
-              </p>
-              <button
-                type="button"
-                disabled={!online || syncing}
-                onClick={handleSyncPending}
-                className="rounded-lg bg-amber-400 px-3 py-1.5 text-xs font-bold text-black disabled:opacity-40"
-              >
-                {syncing ? 'Se sincronizează...' : 'Sincronizează acum'}
-              </button>
-            </div>
+          <SurveyOfflinePanel
+            online={online}
+            draftSavedAt={draftSavedAt}
+            stats={stats}
+            syncing={syncing}
+            onSync={() => void syncPending()}
+            className="mt-3"
+          />
+          {engineOk !== null && online && (
+            <p className={cn('mt-2 text-center text-xs', engineOk ? 'text-emerald-400' : 'text-amber-400')}>
+              {engineOk ? '● Survey engine conectat' : '● Mod demo — pornește survey-engine pe :8000'}
+            </p>
           )}
         </header>
 

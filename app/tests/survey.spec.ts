@@ -219,6 +219,32 @@ test.describe('Survey technician app', () => {
     await expect(page.locator('iframe[title="Twin site map"]')).toBeVisible();
   });
 
+  test('offline queue button label when browser offline', async ({ page, context }) => {
+    await page.route('**/api/survey/health', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          platform: 'solaris-cet',
+          engine: { ok: true },
+          engine_url: 'http://127.0.0.1:8000',
+        }),
+      });
+    });
+    await page.route('**/api/survey/jurisdictions', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ jurisdictions: [] }),
+      });
+    });
+
+    await page.goto('/survey', { waitUntil: 'domcontentloaded' });
+    await context.setOffline(true);
+    await expect(page.getByRole('button', { name: /Salvează în coadă/i })).toBeVisible({ timeout: 15000 });
+    await context.setOffline(false);
+  });
+
   test('twin agent panel visible after demo report', async ({ page }) => {
     await page.route('**/api/survey/health', async (route) => {
       await route.fulfill({

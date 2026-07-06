@@ -16,6 +16,7 @@ import { InstallersSection } from './sections/InstallersSection';
 import { TwinMonitorSection } from './sections/TwinMonitorSection';
 import { TwinWebhookSection } from './sections/TwinWebhookSection';
 import { TwinAgentSection } from './sections/TwinAgentSection';
+import { SurveyOfflineSection } from './sections/SurveyOfflineSection';
 import { InvitesSection } from './sections/InvitesSection';
 import { LoginView } from './sections/LoginView';
 import { MediaSection } from './sections/MediaSection';
@@ -46,6 +47,7 @@ function buildNav(newLeadsCount: number): NavItem[] {
     { key: 'twin-monitor', label: 'Twin monitor', minRole: 'viewer' },
     { key: 'twin-webhooks', label: 'Twin webhooks', minRole: 'viewer' },
     { key: 'twin-agent', label: 'Twin agent', minRole: 'viewer' },
+    { key: 'survey-offline', label: 'Survey offline', minRole: 'viewer' },
     { key: 'audit', label: 'Audit', minRole: 'viewer' },
   ];
 }
@@ -76,6 +78,7 @@ function parseSection(v: string | null): AdminSectionKey {
     v === 'twin-monitor' ||
     v === 'twin-webhooks' ||
     v === 'twin-agent' ||
+    v === 'survey-offline' ||
     v === 'audit'
   ) {
     return v;
@@ -210,6 +213,7 @@ export function AdminPanel() {
           {active === 'twin-monitor' ? <TwinMonitorSection /> : null}
           {active === 'twin-webhooks' ? <TwinWebhookSection /> : null}
           {active === 'twin-agent' ? <TwinAgentSection /> : null}
+          {active === 'survey-offline' ? <SurveyOfflineSection /> : null}
           {active === 'audit' ? <AuditSection token={token} /> : null}
         </div>
       </div>

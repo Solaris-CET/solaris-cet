@@ -47,6 +47,7 @@ from src.twin_agent import (
     publish_agent_plan,
     publish_agent_reassess,
 )
+from src.survey_offline import offline_hints, offline_status
 from src.twin_webhook import handle_inbound_webhook, list_deliveries, webhook_status
 
 load_dotenv(project_root() / ".env")
@@ -480,6 +481,8 @@ def engine_openapi():
             "/twin-agent/{report_id}/execute": {"post": {"summary": "Execute twin agent action"}},
             "/twin-agent/decisions": {"get": {"summary": "Twin agent decision log"}},
             "/twin-agent/status": {"get": {"summary": "Twin agent status"}},
+            "/offline-hints": {"get": {"summary": "Survey offline PWA hints"}},
+            "/offline-status": {"get": {"summary": "Survey offline status"}},
             "/installers": {"get": {"summary": "Installer aggregate list"}},
             "/installer/me": {"get": {"summary": "Authenticated installer profile"}},
             "/permit-pack/{report_id}": {"get": {"summary": "Permit ZIP"}},
@@ -552,6 +555,16 @@ def twin_webhook_inbound(body: TwinInboundPayload, x_twin_webhook_secret: Option
 @app.get("/twin-agent/status")
 def twin_agent_health():
     return agent_status()
+
+
+@app.get("/offline-hints")
+def survey_offline_hints():
+    return offline_hints()
+
+
+@app.get("/offline-status")
+def survey_offline_health():
+    return offline_status()
 
 
 @app.get("/twin-agent/decisions")

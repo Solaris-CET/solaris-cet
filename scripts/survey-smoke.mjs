@@ -61,6 +61,12 @@ if (hasS6) {
     console.log('✓ GET /twin-stream', 'snapshot ok');
   }
 
+  if (openapi.paths?.['/offline-hints']) {
+    const hints = await check('/offline-hints');
+    console.log('✓ GET /offline-hints', hints.schema ?? 'ok');
+    console.log('✓ survey offline S10', `queue=${hints.queue_supported ?? false}`);
+  }
+
   if (openapi.paths?.['/twin-agent/{report_id}']) {
     const agent = await check(`/twin-agent/${demo.report_id}`);
     console.log('✓ GET /twin-agent', `actions=${agent.actions_total ?? 0}`);

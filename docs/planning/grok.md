@@ -399,3 +399,16 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 - Webhook `agent_action` pe execute · smoke S9
 
 **VERIFY:** pytest `test_twin_agent` · Vitest twinAgent · Playwright twin agent panel
+
+---
+
+## Update 2026-07-06 — Survey Offline PWA (survey-offline-pwa, 30 task-uri)
+
+**Livrat:**
+- `useSurveyOfflineSync` — draft autosave + coadă + sync la reconectare
+- `SurveyOfflinePanel` — badge offline + sync UI
+- `surveyOfflineManifest` + `GET /api/survey/offline-manifest`
+- Engine `offline-hints` · SW cache `/survey` + `PROBE_SURVEY_SHELL`
+- Admin `SurveyOfflineSection` · smoke S10
+
+**VERIFY:** pytest `test_survey_offline` · Vitest manifest/queue · Playwright offline queue label

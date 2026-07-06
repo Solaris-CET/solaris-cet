@@ -63,6 +63,8 @@ function cacheNameForUrl(url) {
     if (/\.(woff2?|ttf|otf)$/i.test(p)) return cache('fonts-cache')
     if (/\.(png|jpe?g|webp|svg|ico)$/i.test(p)) return cache('images-cache')
 
+    if (p === '/survey' || p.startsWith('/survey/')) return cache('static-sites-pages')
+
     if (p.startsWith('/sovereign/') || p.startsWith('/apocalypse/') || p.startsWith('/audit/')) {
       if (/\.(css|js|png|jpe?g|webp|svg|ico|woff2?|ttf|otf)$/i.test(p)) return cache('static-surfaces-assets')
       return cache('static-sites-pages')
@@ -276,6 +278,24 @@ sw.addEventListener('message', (event) => {
           source?.postMessage?.({ type: 'PREFETCH_DONE', okCount, failCount })
         } catch {
           void 0
+        }
+      })(),
+    )
+  }
+
+  if (data && typeof data === 'object' && data.type === 'PROBE_SURVEY_SHELL') {
+    event.waitUntil(
+      (async () => {
+        try {
+          const res = await matchPrecache('/index.html')
+          const surveyRes = await fetch('/survey', { credentials: 'omit' }).catch(() => null)
+          event.source?.postMessage?.({
+            type: 'PROBE_SURVEY_SHELL_RESULT',
+            ok: Boolean(res) || Boolean(surveyRes?.ok),
+            status: surveyRes?.status ?? res?.status ?? null,
+          })
+        } catch {
+          event.source?.postMessage?.({ type: 'PROBE_SURVEY_SHELL_RESULT', ok: false, status: null })
         }
       })(),
     )

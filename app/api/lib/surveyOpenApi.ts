@@ -25,6 +25,7 @@ export const SURVEY_ROUTE_IDS = [
   'twin-agent',
   'twin-agent-execute',
   'twin-agent-decisions',
+  'offline-manifest',
 ] as const;
 
 export type SurveyRouteId = (typeof SURVEY_ROUTE_IDS)[number];
@@ -40,6 +41,7 @@ const BRIDGE_PATH_OVERRIDES: Partial<Record<SurveyRouteId, string>> = {
   'twin-agent': '/api/survey/twin-agent',
   'twin-agent-execute': '/api/survey/twin-agent/execute',
   'twin-agent-decisions': '/api/survey/twin-agent/decisions',
+  'offline-manifest': '/api/survey/offline-manifest',
 };
 
 export function surveyBridgePath(id: SurveyRouteId): string {
@@ -212,6 +214,12 @@ export function buildSurveyOpenApiPaths(): Record<string, unknown> {
           { name: 'report_id', in: 'query', schema: { type: 'string' } },
           { name: 'limit', in: 'query', schema: { type: 'integer' } },
         ],
+        responses: { '200': jsonResponse },
+      },
+    },
+    '/api/survey/offline-manifest': {
+      get: {
+        summary: 'Survey offline PWA manifest (precache + queue)',
         responses: { '200': jsonResponse },
       },
     },

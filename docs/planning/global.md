@@ -204,3 +204,16 @@
 | SDK | `twinAgent()` · `executeTwinAgentAction()` |
 
 **VERIFY:** pytest `test_twin_agent` · Vitest twinAgent · smoke S9
+
+## Epic survey-offline-pwa (D1 field PWA) — 2026-07-06 DONE
+
+| Componentă | Locație |
+|---|---|
+| IndexedDB queue | `surveyDraftStorage.ts` — status + retry |
+| Sync hook | `useSurveyOfflineSync.ts` |
+| UI panel | `SurveyOfflinePanel.tsx` în SurveyPage |
+| SW precache | `sw.js` `/survey` + `PROBE_SURVEY_SHELL` |
+| Manifest API | `GET /offline-hints` · `/api/survey/offline-manifest` |
+| Admin | `SurveyOfflineSection` |
+
+**VERIFY:** pytest `test_survey_offline` · Vitest manifest/queue · Playwright offline queue · smoke S10

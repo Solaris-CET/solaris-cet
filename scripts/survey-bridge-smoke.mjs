@@ -53,6 +53,9 @@ if (!paths['/api/survey/twin-webhook']) {
 if (!paths['/api/survey/twin-webhook/deliveries']) {
   throw new Error('openapi missing /api/survey/twin-webhook/deliveries');
 }
+if (!paths['/api/survey/offline-manifest']) {
+  throw new Error('openapi missing /api/survey/offline-manifest');
+}
 if (!paths['/api/survey/twin-agent']) {
   throw new Error('openapi missing /api/survey/twin-agent');
 }

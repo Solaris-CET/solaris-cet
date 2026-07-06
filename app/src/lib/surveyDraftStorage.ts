@@ -20,12 +20,17 @@ export type SurveyDraftRecord = {
   updatedAt: string;
 };
 
+export type PendingReportStatus = 'pending' | 'syncing' | 'failed';
+
 export type PendingReportRecord = {
   id: string;
   form: SurveyFormData;
   installer: InstallerProfile;
   photos: StoredPhoto[];
   createdAt: string;
+  status?: PendingReportStatus;
+  retryCount?: number;
+  lastError?: string;
 };
 
 function openDb(): Promise<IDBDatabase> {
@@ -122,9 +127,22 @@ export async function enqueuePendingReport(
     installer,
     photos: photosToStored(photos),
     createdAt: new Date().toISOString(),
+    status: 'pending',
+    retryCount: 0,
   };
   await tx(QUEUE_STORE, 'readwrite', (store) => store.put(record));
   return id;
+}
+
+export async function updatePendingReport(
+  id: string,
+  patch: Partial<Pick<PendingReportRecord, 'status' | 'retryCount' | 'lastError'>>,
+): Promise<void> {
+  const existing = await tx<PendingReportRecord | undefined>(QUEUE_STORE, 'readonly', (store) => store.get(id));
+  if (!existing) return;
+  await tx(QUEUE_STORE, 'readwrite', (store) =>
+    store.put({ ...existing, ...patch }),
+  );
 }
 
 export async function listPendingReports(): Promise<PendingReportRecord[]> {

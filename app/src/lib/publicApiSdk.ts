@@ -127,6 +127,8 @@ export function createSolarisClient(opts: SolarisClientOptions) {
           path: '/api/survey/twin-agent/decisions',
           query: { report_id: reportId, limit },
         }),
+      offlineManifest: () =>
+        requestJson<unknown>(opts, { path: '/api/survey/offline-manifest' }),
       openApiSpec: () => requestJson<unknown>(opts, { path: '/api/openapi/survey' }),
     },
   };

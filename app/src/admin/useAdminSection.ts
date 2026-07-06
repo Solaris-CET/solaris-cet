@@ -17,6 +17,7 @@ const ADMIN_SECTION_KEYS = [
   'twin-monitor',
   'twin-webhooks',
   'twin-agent',
+  'survey-offline',
   'audit',
 ] as const;
 
