@@ -20,6 +20,9 @@
     "stash:sync": "node scripts/stash-sync.mjs",
     "stash:verify": "node scripts/stash-verify.mjs",
     "loops:next": "node scripts/loops-next-task.mjs",
+    "loops:status": "node scripts/loops-status.mjs",
+    "loops:refine": "node scripts/deepseek-refine.mjs",
+    "aider": "node scripts/aider-run.mjs",
     "app:build": "npm run build --workspace=app && npm run api:build --workspace=app",
     "app:build:next": "npm run build --workspace=app",
     "app:verify": "npm run verify --workspace=app",
@@ -67,6 +70,9 @@
     "react-is": "^19.2.6",
     "react-router-dom": "^7.18.0",
     "three": "^0.184.0"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-win32-x64-msvc": "4.60.4"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.0.0",

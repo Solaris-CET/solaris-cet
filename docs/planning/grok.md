@@ -412,3 +412,20 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 - Admin `SurveyOfflineSection` · smoke S10
 
 **VERIFY:** pytest `test_survey_offline` · Vitest manifest/queue · Playwright offline queue label
+
+---
+
+## Update 2026-07-06 — Go-To-Market Strategy (go-to-market, Rule of 3×3)
+
+**Livrat:**
+- `GO-TO-MARKET-STRATEGY.md` v3.3 — 3 passes × 3 loop improvements
+- Dual engine: B2C Solaris Go + B2B Survey SaaS soft-cost compression
+- Pricing, partners, 90/180/365 roadmap, KPI dashboard, risk matrix
+- Loops tooling: `loops:status`, `loops:refine` (DeepSeek), `aider` wrapper
+- Windows: `run-e2e-batched.mjs` fileURLToPath · `gitea-push-retry` git spawn fix
+- `@rollup/rollup-win32-x64-msvc` optionalDependency
+
+**VERIFY:** `npm run loops:status` (10 epics, 0 open) · GTM §0–13
+
+**LEFT:** prod deploy demo B2B public  
+**BLOCKED:** Hetzner `L002DD869` + Coolify redeploy `main`

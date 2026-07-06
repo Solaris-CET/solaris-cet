@@ -58,7 +58,9 @@
 
 **Teste:** 48/48 pytest (`survey-engine`) · Vitest survey + contactPrefill
 
-**Skill agent:** `.claude/skills/solaris-perfect-loops/SKILL.md` — Loops v3 + **v4 consulting** (BCG Field Service, Deploy-Reshape-Invent, OODA). Master: `SOLARIS-LOOPS-MASTER.md` · Soluții piață: `CONSULTING-SOLUTIONS.md`
+**Skill agent:** `.claude/skills/solaris-perfect-loops/SKILL.md` — Loops v3 + **v4 consulting** (BCG Field Service, Deploy-Reshape-Invent, OODA). Master: `SOLARIS-LOOPS-MASTER.md` · Soluții piață: `CONSULTING-SOLUTIONS.md` · **GTM:** `GO-TO-MARKET-STRATEGY.md` (v3.3, Rule of 3×3)
+
+**Loops CLI:** `loops:next` · `loops:status` · `loops:refine` (DeepSeek) · `aider` (Aider wrapper)
 
 **Agent memory (Stash):** `docs/planning/agent-memory.md` + [Fergana Stash](https://github.com/fergana-labs/stash). Comenzi: `npm run stash:prime -- <topic>` (înainte) · `npm run stash:sync` (după) · `npm run stash:verify` (audit).
 

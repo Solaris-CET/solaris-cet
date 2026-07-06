@@ -9,8 +9,14 @@ const HOST = '127.0.0.1';
 const BASE_PORT = 4173;
 const MAX_PORT = BASE_PORT + 15;
 
-function getPlaywrightBin() {
-  return process.platform === 'win32' ? '../node_modules/.bin/playwright.cmd' : '../node_modules/.bin/playwright';
+function getPlaywrightRunner() {
+  const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  const root = path.resolve(appRoot, '..');
+  return {
+    command: process.execPath,
+    argsPrefix: [path.join(root, 'node_modules', 'playwright', 'cli.js')],
+    cwd: appRoot,
+  };
 }
 
 function isPortOpen(host, port) {
@@ -95,6 +101,7 @@ async function waitForDistIndex(timeoutMs) {
 }
 
 function startServer(port) {
+  const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
   const env = {
     ...process.env,
     HOST,
@@ -103,7 +110,7 @@ function startServer(port) {
     NODE_OPTIONS: [process.env.NODE_OPTIONS, '--max-old-space-size=1024'].filter(Boolean).join(' '),
   };
   return spawn(process.execPath, ['server/index.cjs'], {
-    cwd: new URL('../', import.meta.url).pathname,
+    cwd: appRoot,
     env,
     stdio: 'inherit',
   });
@@ -137,9 +144,13 @@ async function stopServer(proc, port) {
 }
 
 async function runPlaywright(files, extraArgs, baseUrl) {
-  const bin = getPlaywrightBin();
-  const args = ['test', '--workers=1', ...files, ...extraArgs];
-  const child = spawn(bin, args, { stdio: 'inherit', env: { ...process.env, E2E_BASE_URL: baseUrl } });
+  const runner = getPlaywrightRunner();
+  const args = [...runner.argsPrefix, 'test', '--workers=1', ...files, ...extraArgs];
+  const child = spawn(runner.command, args, {
+    cwd: runner.cwd,
+    stdio: 'inherit',
+    env: { ...process.env, E2E_BASE_URL: baseUrl },
+  });
   return await new Promise((resolve) => {
     child.on('exit', (code) => resolve(code ?? 1));
   });

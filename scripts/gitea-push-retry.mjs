@@ -33,7 +33,6 @@ function gitPush() {
   return spawnSync(git, ['push', remote, 'main'], {
     cwd: root,
     encoding: 'utf8',
-    shell: process.platform === 'win32',
     stdio: 'pipe',
   });
 }

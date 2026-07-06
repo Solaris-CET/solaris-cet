@@ -76,6 +76,9 @@ Rulează cât timp există task-uri nebifate în `docs/planning/features/<slug>/
 
 ```bash
 npm run loops:next              # afișează următorul task + VERIFY
+npm run loops:status            # status toate epics (done/open %)
+npm run loops:refine -- <file> "<instruction>"  # Loop 4 DeepSeek doc refine
+npm run aider -- "task"         # Aider wrapper (pip install aider-chat)
 npm run stash:prime -- <slug>   # Loop 0 pentru acel feature
 # … inner loops 0-7 …
 npm run stash:sync              # Loop 7
