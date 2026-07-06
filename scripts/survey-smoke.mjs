@@ -36,7 +36,9 @@ const stats = await check('/stats');
 console.log('✓ GET /stats', `reports=${stats.total_reports ?? 0}`);
 
 const probe = await fetch(`${ENGINE}/openapi.json`, { signal: AbortSignal.timeout(5000) }).catch(() => null);
-if (probe?.ok) {
+const probeJson = probe?.ok ? await probe.json().catch(() => null) : null;
+const hasS6 = Boolean(probeJson?.paths?.['/context/{report_id}'] || probeJson?.paths?.['/twin-feed/{report_id}']);
+if (hasS6) {
   const ctx = await check(`/context/${demo.report_id}`);
   console.log('✓ GET /context', ctx.schema ?? 'ok');
 
