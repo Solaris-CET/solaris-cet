@@ -316,3 +316,18 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 - Webhook: `survey_orchestration_complete`
 
 **API:** `GET /api/survey/orchestrate?report_id=`
+
+---
+
+## Update 2026-07-06 — S6 API-First + Twin Feed (30 task-uri batch)
+
+**Livrat:**
+- `surveyOpenApi.ts` — contract stabil 14 rute `/api/survey/*`
+- `GET /api/openapi/survey` + merge OpenAPI v2
+- `twin_feed.py` — schema `solaris-twin-feed-v1` (D10 prep)
+- Admin: `survey-insights` + badge încredere scăzută în LeadsSection
+- `server/index.cjs` — rute lipsă înregistrate (fix prod 404)
+- SDK: `createSolarisClient().survey.health|context|twinFeed|openApiSpec`
+- Batch: `orchestration_summary` în răspuns `/batch`
+
+**VERIFY:** pytest 7/7 · Vitest 21/21 · smoke core OK (S6 extended după restart engine)

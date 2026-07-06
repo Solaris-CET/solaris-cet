@@ -29,6 +29,7 @@ export default function LeadsSection() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [engineStats, setEngineStats] = useState<DashboardData | null>(null);
+  const [insights, setInsights] = useState<Record<string, { low_confidence: boolean; low_confidence_count: number }>>({});
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -67,6 +68,35 @@ export default function LeadsSection() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (!token || surveyLeads.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const next: Record<string, { low_confidence: boolean; low_confidence_count: number }> = {};
+      for (const lead of surveyLeads.slice(0, 8)) {
+        if (!lead.reportId) continue;
+        try {
+          const res = await fetch(
+            `/api/admin/survey-insights?report_id=${encodeURIComponent(lead.reportId)}`,
+            { headers: { Authorization: `Bearer ${token}` } },
+          );
+          if (!res.ok) continue;
+          const data = (await res.json()) as { flags?: { low_confidence?: boolean; low_confidence_count?: number } };
+          if (data.flags) {
+            next[lead.reportId] = {
+              low_confidence: Boolean(data.flags.low_confidence),
+              low_confidence_count: data.flags.low_confidence_count ?? 0,
+            };
+          }
+        } catch {
+          /* optional enrichment */
+        }
+      }
+      if (!cancelled) setInsights(next);
+    })();
+    return () => { cancelled = true; };
+  }, [token, surveyLeads]);
 
   return (
     <div className="space-y-4">
@@ -210,6 +240,11 @@ export default function LeadsSection() {
                     <p className="font-semibold text-white">{l.name} · {l.judet}</p>
                     <p className="text-white/55">{l.telefon}{l.email ? ` · ${l.email}` : ''}</p>
                     <p className="mt-1 font-mono text-xs text-amber-200/80">{l.reportId}</p>
+                    {insights[l.reportId]?.low_confidence ? (
+                      <span className="mt-1 inline-block rounded bg-red-500/15 px-2 py-0.5 text-[10px] font-semibold text-red-300">
+                        Încredere scăzută ({insights[l.reportId].low_confidence_count})
+                      </span>
+                    ) : null}
                   </div>
                   <div className="text-right text-xs text-white/60">
                     {l.score != null ? <p className="font-bold text-amber-200">{l.score}/100</p> : null}
@@ -219,11 +254,21 @@ export default function LeadsSection() {
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-2 text-xs text-white/45">
                   <span>{new Date(l.receivedAt).toLocaleString('ro-RO')}</span>
-                  {l.pdfUrl ? (
-                    <a href={l.pdfUrl} target="_blank" rel="noreferrer" className="text-amber-300 hover:underline">
-                      PDF
+                  <span className="flex gap-2">
+                    {l.pdfUrl ? (
+                      <a href={l.pdfUrl} target="_blank" rel="noreferrer" className="text-amber-300 hover:underline">
+                        PDF
+                      </a>
+                    ) : null}
+                    <a
+                      href={`/api/survey/context?report_id=${encodeURIComponent(l.reportId)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-teal-300 hover:underline"
+                    >
+                      Context
                     </a>
-                  ) : null}
+                  </span>
                 </div>
               </div>
             ))

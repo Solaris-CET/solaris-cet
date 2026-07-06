@@ -33,11 +33,27 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, X-Installer-Key',
         Vary: 'Origin',
       },
     });
+  }
+
+  if (req.method === 'GET') {
+    const url = new URL(req.url);
+    const reportId = (url.searchParams.get('report_id') || '').trim();
+    const qs = reportId ? `?report_id=${encodeURIComponent(reportId)}` : '';
+    try {
+      const res = await fetch(`${ENGINE.replace(/\/$/, '')}/corrections${qs}`, {
+        signal: AbortSignal.timeout(8000),
+      });
+      const data = await res.json();
+      if (!res.ok) return json({ error: 'Corrections unavailable' }, allowed, 502);
+      return json({ platform: 'solaris-cet', ...data }, allowed, 200);
+    } catch {
+      return json({ error: 'survey-engine unreachable' }, allowed, 503);
+    }
   }
 
   if (req.method !== 'POST') {

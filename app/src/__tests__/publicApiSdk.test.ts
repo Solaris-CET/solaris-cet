@@ -25,6 +25,14 @@ describe('publicApiSdk', () => {
     expect(init.headers).toMatchObject({ 'X-API-Key': 'cet_sk_test' });
   });
 
+  it('survey.client calls twin-feed path', async () => {
+    fetchMock.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ feed: { schema: 'solaris-twin-feed-v1' } }) });
+    const client = createSolarisClient({ apiKey: 'cet_sk_test', baseUrl: 'https://example.com' });
+    await client.survey.twinFeed('SOL-1');
+    const [url] = fetchMock.mock.calls[0] as [string];
+    expect(url).toContain('/api/survey/twin-feed?report_id=SOL-1');
+  });
+
   it('throws with message from API error payload', async () => {
     fetchMock.mockResolvedValueOnce({ ok: false, status: 401, json: async () => ({ error: { message: 'Invalid API key' } }) });
     const client = createSolarisClient({ apiKey: 'bad', baseUrl: 'https://example.com' });

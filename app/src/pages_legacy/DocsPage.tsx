@@ -64,6 +64,18 @@ export default function DocsPage() {
               </label>
 
               <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3">
+                <div className="text-xs text-white/70">Survey bridge (S6)</div>
+                <a
+                  href="/api/openapi/survey"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-2 inline-block text-sm text-amber-200 hover:underline"
+                >
+                  OpenAPI Survey — /api/survey/*
+                </a>
+              </div>
+
+              <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3">
                 <div className="text-xs text-white/70">Exemple rapide</div>
                 <pre className="mt-2 text-[12px] leading-relaxed text-slate-200/80 overflow-auto">
 {`curl -H "X-API-Key: ${apiKey ? apiKey : 'YOUR_KEY'}" \\

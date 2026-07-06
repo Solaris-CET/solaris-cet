@@ -28,6 +28,7 @@ import surveyHealthRoute from '../../api/survey/health/route';
 import surveyCrmRoute from '../../api/survey/crm/route';
 import surveyJurisdictionsRoute from '../../api/survey/jurisdictions/route';
 import surveyOrchestrateRoute from '../../api/survey/orchestrate/route';
+import surveyTwinFeedRoute from '../../api/survey/twin-feed/route';
 import surveyPermitPackRoute from '../../api/survey/permit-pack/route';
 import surveyStatsRoute from '../../api/survey/stats/route';
 import { dispatchSurveyWebhook } from '../../api/lib/surveyWebhook';
@@ -152,6 +153,34 @@ describe('survey API routes', () => {
     const body = (await jsonBody(res)) as { platform: string; stats: { total_reports: number } };
     expect(body.platform).toBe('solaris-cet');
     expect(body.stats.total_reports).toBe(3);
+  });
+
+  it('/api/survey/twin-feed: GET proxies twin feed', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ schema: 'solaris-twin-feed-v1', report_id: 'SOL-TWIN-1' }), { status: 200 }),
+    );
+    const req = new Request('http://test/api/survey/twin-feed?report_id=SOL-TWIN-1', {
+      method: 'GET',
+      headers: { origin: 'https://x.test' },
+    });
+    const res = await surveyTwinFeedRoute(req);
+    expect(res.status).toBe(200);
+    const body = (await jsonBody(res)) as { feed: { schema: string } };
+    expect(body.feed.schema).toBe('solaris-twin-feed-v1');
+  });
+
+  it('/api/survey/corrections: GET lists corrections', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ total: 1, corrections: [{ report_id: 'R1', field: 'verdict' }] }), { status: 200 }),
+    );
+    const req = new Request('http://test/api/survey/corrections?report_id=R1', {
+      method: 'GET',
+      headers: { origin: 'https://x.test' },
+    });
+    const res = await surveyCorrectionsRoute(req);
+    expect(res.status).toBe(200);
+    const body = (await jsonBody(res)) as { total: number };
+    expect(body.total).toBe(1);
   });
 
   it('/api/survey/orchestrate: GET proxies OODA plan', async () => {

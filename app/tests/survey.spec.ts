@@ -147,6 +147,14 @@ test.describe('Survey technician app', () => {
     await expect(page.getByText(/Trimite în CRM|Trimis în CRM/i)).toBeVisible();
   });
 
+  test('survey OpenAPI spec is reachable', async ({ request }) => {
+    const res = await request.get('/api/openapi/survey');
+    expect(res.ok()).toBeTruthy();
+    const body = (await res.json()) as { info?: { title?: string }; paths?: Record<string, unknown> };
+    expect(body.info?.title).toContain('Survey');
+    expect(body.paths?.['/api/survey/health']).toBeTruthy();
+  });
+
   test('survey contact prefill via query params', async ({ page }) => {
     await page.goto(
       '/contact?from=survey&report_id=SOL-E2E-001&name=Maria%20Test&city=Vaslui&kwp=6&score=80&phone=0722123456',

@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field
 from src.api_clients.cost_logger import CostLogger
 from src.ahj_export import build_permit_zip_from_registry, export_ahj_json
 from src.context_api import build_report_context
-from src.corrections import log_correction
+from src.corrections import list_corrections, log_correction
 from src.batch_processor import BatchJob, parse_upload_photo_key, run_batch_uploaded
 from src.dashboard import format_dashboard_markdown, get_dashboard_data
 from src.models import get_sample_survey, project_root
@@ -29,7 +29,8 @@ from src.jurisdictions import list_jurisdiction_codes
 from src.rate_limit import check_rate_limit
 from src.report_generator import generate_report
 from src.report_registry import ReportRegistry
-from src.survey_agent import plan_from_form
+from src.survey_agent import batch_orchestration_summary, plan_from_form
+from src.twin_feed import build_twin_feed
 
 load_dotenv(project_root() / ".env")
 
@@ -304,6 +305,7 @@ class BatchResponse(BaseModel):
     succeeded: int
     failed: int
     results: list[BatchResultItem]
+    orchestration_summary: dict[str, Any] = Field(default_factory=dict)
 
 
 @app.post("/batch", response_model=BatchResponse)
@@ -372,14 +374,53 @@ async def batch_surveys(
                 score=r.score or 0,
                 error=r.error or "",
             ))
+        base = str(request.base_url).rstrip("/")
+        orch = batch_orchestration_summary(
+            [{"success": i.success, "score": i.score, "report_id": i.report_id} for i in items],
+            platform_base_url=base,
+        )
         return BatchResponse(
             total=summary.total,
             succeeded=summary.succeeded,
             failed=summary.failed,
             results=items,
+            orchestration_summary=orch,
         )
     finally:
         shutil.rmtree(work_dir, ignore_errors=True)
+
+
+@app.get("/openapi.json")
+def engine_openapi():
+    return {
+        "openapi": "3.1.0",
+        "info": {"title": "SOLARIS Survey Engine", "version": "1.0.0"},
+        "paths": {
+            "/health": {"get": {"summary": "Health"}},
+            "/generate": {"post": {"summary": "Generate report"}},
+            "/demo": {"post": {"summary": "Demo report"}},
+            "/context/{report_id}": {"get": {"summary": "Unified context"}},
+            "/orchestrate/{report_id}": {"get": {"summary": "OODA plan"}},
+            "/twin-feed/{report_id}": {"get": {"summary": "Digital twin feed"}},
+            "/permit-pack/{report_id}": {"get": {"summary": "Permit ZIP"}},
+            "/corrections": {"get": {"summary": "List corrections"}, "post": {"summary": "Log correction"}},
+        },
+    }
+
+
+@app.get("/twin-feed/{report_id}")
+def twin_feed(report_id: str, request: Request):
+    base = str(request.base_url).rstrip("/")
+    try:
+        return build_twin_feed(report_id, platform_base_url=base)
+    except KeyError as exc:
+        raise HTTPException(404, str(exc)) from exc
+
+
+@app.get("/corrections")
+def get_corrections(report_id: Optional[str] = None, limit: int = 50):
+    rows = list_corrections(report_id.strip() if report_id else None, limit=min(limit, 100))
+    return {"total": len(rows), "corrections": rows}
 
 
 @app.get("/orchestrate/{report_id}")

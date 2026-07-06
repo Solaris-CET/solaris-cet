@@ -1,4 +1,5 @@
 import type { SurveyOrchestration } from './surveyAgent';
+import type { TwinFeed } from './twinFeed';
 import type { CorrectionPayload, ReportContext } from './surveyContext';
 import { permitPackUrl } from './surveyContext';
 import type { SoftCostRoi } from './softCostRoi';
@@ -290,6 +291,31 @@ export async function runSurveyBatch(
     throw new Error(data.error || data.detail || 'Batch eșuat');
   }
   return data;
+}
+
+export type SurveyCorrection = {
+  report_id: string;
+  field: string;
+  original: string;
+  corrected: string;
+  technician: string;
+  timestamp: string;
+};
+
+export async function fetchTwinFeed(reportId: string): Promise<TwinFeed> {
+  const res = await fetch(`/api/survey/twin-feed?report_id=${encodeURIComponent(reportId)}`);
+  const data = (await res.json()) as { feed?: TwinFeed; error?: string };
+  if (!res.ok) throw new Error(data.error || 'Twin feed indisponibil');
+  if (!data.feed) throw new Error('Feed lipsă');
+  return data.feed;
+}
+
+export async function fetchCorrections(reportId?: string): Promise<SurveyCorrection[]> {
+  const qs = reportId ? `?report_id=${encodeURIComponent(reportId)}` : '';
+  const res = await fetch(`/api/survey/corrections${qs}`);
+  const data = (await res.json()) as { corrections?: SurveyCorrection[]; error?: string };
+  if (!res.ok) throw new Error(data.error || 'Corecții indisponibile');
+  return data.corrections ?? [];
 }
 
 export async function fetchOrchestration(reportId: string): Promise<SurveyOrchestration> {

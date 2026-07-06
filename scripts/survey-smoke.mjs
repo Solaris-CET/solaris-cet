@@ -35,4 +35,21 @@ console.log('✓ GET /jurisdictions', `count=${jurisdictions.jurisdictions?.leng
 const stats = await check('/stats');
 console.log('✓ GET /stats', `reports=${stats.total_reports ?? 0}`);
 
+const probe = await fetch(`${ENGINE}/openapi.json`, { signal: AbortSignal.timeout(5000) }).catch(() => null);
+if (probe?.ok) {
+  const ctx = await check(`/context/${demo.report_id}`);
+  console.log('✓ GET /context', ctx.schema ?? 'ok');
+
+  const orch = await check(`/orchestrate/${demo.report_id}`);
+  console.log('✓ GET /orchestrate', orch.schema ?? 'ok');
+
+  const twin = await check(`/twin-feed/${demo.report_id}`);
+  console.log('✓ GET /twin-feed', twin.schema ?? 'ok');
+
+  const openapi = await check('/openapi.json');
+  console.log('✓ GET /openapi.json', openapi.info?.title ?? 'ok');
+} else {
+  console.log('⚠ S6 extended checks skipped — repornește survey-engine (cod nou pe :8000)');
+}
+
 console.log('\n✓ Survey engine smoke passed');

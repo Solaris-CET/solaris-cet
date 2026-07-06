@@ -39,6 +39,20 @@ def test_orchestration_plan_steps():
     assert "contact_offer" in ids
 
 
+def test_batch_orchestration_summary():
+    from src.survey_agent import batch_orchestration_summary
+
+    summary = batch_orchestration_summary(
+        [
+            {"success": True, "score": 80, "jurisdiction_code": "RO-CJ"},
+            {"success": True, "score": 55, "jurisdiction_code": ""},
+            {"success": False, "score": 0},
+        ],
+    )
+    assert summary["jobs_succeeded"] == 2
+    assert summary["schema"] == "solaris-batch-orchestration-v1"
+
+
 def test_plan_from_form_checklist_fails():
     plan = plan_from_form(
         report_id="SOL-AG-2",

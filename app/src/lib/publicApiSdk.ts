@@ -78,6 +78,17 @@ export function createSolarisClient(opts: SolarisClientOptions) {
           requestJson<unknown>(opts, { path: '/api/v2/transactions', method: 'POST', body: p }),
       },
     },
+    survey: {
+      health: () => requestJson<unknown>(opts, { path: '/api/survey/health' }),
+      stats: () => requestJson<unknown>(opts, { path: '/api/survey/stats' }),
+      context: (reportId: string) =>
+        requestJson<unknown>(opts, { path: '/api/survey/context', query: { report_id: reportId } }),
+      orchestrate: (reportId: string) =>
+        requestJson<unknown>(opts, { path: '/api/survey/orchestrate', query: { report_id: reportId } }),
+      twinFeed: (reportId: string) =>
+        requestJson<unknown>(opts, { path: '/api/survey/twin-feed', query: { report_id: reportId } }),
+      openApiSpec: () => requestJson<unknown>(opts, { path: '/api/openapi/survey' }),
+    },
   };
 }
 

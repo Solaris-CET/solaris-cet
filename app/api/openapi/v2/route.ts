@@ -1,3 +1,4 @@
+import { buildSurveyOpenApiPaths } from '../../lib/surveyOpenApi';
 import { errorResponsePublic, jsonResponsePublic, optionsResponsePublic } from '../../lib/publicApiResponse';
 
 export const config = { runtime: 'nodejs' };
@@ -117,6 +118,7 @@ function spec() {
           },
         },
       },
+      ...buildSurveyOpenApiPaths(),
     },
   };
 }

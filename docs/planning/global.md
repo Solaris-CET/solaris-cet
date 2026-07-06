@@ -92,6 +92,16 @@
 | Permit risk scorer | `assess_permit_risk()` |
 | OODA plan | `GET /orchestrate/{id}` · `/api/survey/orchestrate` |
 | Auto-CRM post-generare | `SurveyPage` + `orchestration.auto_crm` |
+
+## Epic api-first-platform (S6 + D10 prep) — 2026-07-06 DONE
+
+| Componentă | Locație |
+|---|---|
+| OpenAPI survey spec | `/api/openapi/survey` + merge în v2 |
+| Digital twin feed | `twin_feed.py` · `/api/survey/twin-feed` |
+| Admin insights | `/api/admin/survey-insights` + badge low-confidence |
+| Route registry fix | `server/index.cjs` — context, orchestrate, permit, corrections, twin |
+| SDK | `publicApiSdk.survey.*` |
 | Webhook | `survey_orchestration_complete` |
 
 ## Status livrare Faza 6 (v1.1) — 2026-07-06

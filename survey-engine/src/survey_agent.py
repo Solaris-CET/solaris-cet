@@ -175,3 +175,29 @@ def plan_from_form(
         budget_alert=budget_alert,
         budget_exceeded=budget_exceeded,
     )
+
+
+def batch_orchestration_summary(
+    results: list[dict[str, Any]],
+    *,
+    platform_base_url: str = "",
+) -> dict[str, Any]:
+    """Aggregate permit risk across batch jobs for installer dashboard."""
+    permit_count = 0
+    scores: list[int] = []
+    for r in results:
+        if not r.get("success"):
+            continue
+        score = int(r.get("score") or 0)
+        scores.append(score)
+        risk = assess_permit_risk(score=score, jurisdiction_code=r.get("jurisdiction_code", ""))
+        if risk["permit_recommended"]:
+            permit_count += 1
+    return {
+        "schema": "solaris-batch-orchestration-v1",
+        "jobs_total": len(results),
+        "jobs_succeeded": sum(1 for r in results if r.get("success")),
+        "permit_recommended_count": permit_count,
+        "avg_score": round(sum(scores) / len(scores), 1) if scores else 0,
+        "platform_base_url": platform_base_url,
+    }
