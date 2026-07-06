@@ -1,5 +1,8 @@
 import { spawnSync } from 'node:child_process';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const baseUrl = String(process.env.POST_DEPLOY_BASE_URL ?? '').trim();
 const port = String(process.env.PORT ?? '3000').trim();
 
@@ -56,12 +59,29 @@ const health = await fetchHealth().catch((e) => ({ url: 'unknown', ok: false, st
 let smokeOk = true;
 let smokeOutput = '';
 if (baseUrl) {
-  const smoke = spawnSync('node', ['scripts/smoke-http.mjs', `--base=${baseUrl}`], { encoding: 'utf8' });
+  const smoke = spawnSync(process.execPath, [path.join(root, 'scripts', 'smoke-http.mjs'), `--base=${baseUrl}`], {
+    cwd: root,
+    encoding: 'utf8',
+  });
   smokeOk = smoke.status === 0;
   smokeOutput = smoke.stdout || smoke.stderr;
 }
 
-const statusLine = (health.ok && smokeOk) ? 'HEALTH OK' : `HEALTH BAD (HTTP: ${health.status}, Smoke: ${smokeOk ? 'OK' : 'FAIL'})`;
+let surveyGateOk = true;
+let surveyGateDetail = 'skipped';
+if (baseUrl && String(process.env.POST_DEPLOY_SURVEY_GATE ?? '1') !== '0') {
+  const gate = spawnSync(process.execPath, [path.join(root, 'scripts', 'survey-prod-gate.mjs')], {
+    cwd: root,
+    encoding: 'utf8',
+    env: { ...process.env, SITE_URL: baseUrl, SOFT_FAIL: process.env.SOFT_FAIL || '1' },
+  });
+  surveyGateOk = gate.status === 0;
+  surveyGateDetail = surveyGateOk ? 'OK' : 'FAIL';
+}
+
+const statusLine = (health.ok && smokeOk && surveyGateOk)
+  ? 'HEALTH OK'
+  : `HEALTH BAD (HTTP: ${health.status}, Smoke: ${smokeOk ? 'OK' : 'FAIL'}, SurveyGate: ${surveyGateDetail})`;
 const version = typeof health.json?.version === 'string' ? health.json.version : null;
 
 const origin = baseUrl ? baseUrl.replace(/\/+$/, '') : `http://127.0.0.1:${port}`;
@@ -83,4 +103,4 @@ const msg = [
 process.stdout.write(`${msg}\n`);
 await telegramSend(msg);
 
-if (!health.ok || !pages.ok) process.exit(1);
+if (!health.ok || !pages.ok || !surveyGateOk) process.exit(1);

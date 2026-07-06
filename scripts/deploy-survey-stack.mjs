@@ -24,4 +24,5 @@ if (!smokeOnly) {
 }
 
 run('node', ['scripts/survey-smoke.mjs']);
-console.log('\n✓ Survey stack ready');
+run('node', ['scripts/survey-bridge-smoke.mjs']);
+console.log('\n✓ Survey stack ready (engine + bridge smoke)');

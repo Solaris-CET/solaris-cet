@@ -78,5 +78,7 @@ console.log('0 Memory → 1 Research → 2 Build → 3 Verify → 4 Optimize →
 console.log('\n── Verify commands ──');
 console.log('  npm run dev:local');
 console.log('  npm run survey:smoke');
-console.log('  SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # after VPS up');
+console.log('  SITE_URL=https://solaris-cet.com npm run survey:prod-gate  # after VPS up');
+console.log('  SOFT_FAIL=1 npm run survey:prod-gate  # until Coolify redeploy');
+console.log('  npm run deploy:status');
 console.log('\n✓ Prime complete — proceed to Research Loop\n');

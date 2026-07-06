@@ -2,6 +2,21 @@
 
 Operational notes for the static SPA + Docker/nginx deploy (Coolify → VPS). **Secrets** stay in Coolify env — never in this repo.
 
+## Survey deploy gate (prod)
+
+După redeploy Coolify, rulează gate-ul complet pe bridge-ul Node → survey-engine:
+
+```bash
+npm run deploy:status                    # local SHA vs prod health + survey API
+SITE_URL=https://solaris-cet.com npm run survey:prod-gate
+SOFT_FAIL=1 npm run survey:prod-gate     # toleră rute noi 404 până la redeploy
+npm run gitea:push-retry                 # push Gitea cu retry (504)
+npm run coolify:redeploy-survey          # trigger Coolify + poll + gate (COOLIFY_* env)
+```
+
+**Rute critice:** `/api/survey/health`, `jurisdictions`, `stats`, `/api/openapi/survey`.  
+Dacă `/api/survey/*` returnează **404**, verifică `docker/coolify.yml` include `survey-engine` și `SURVEY_ENGINE_URL=http://survey-engine:8000`, apoi redeploy `main`.
+
 ## Health check
 
 - **URL:** `GET /health.json` (or `HEAD` for probes)

@@ -116,7 +116,9 @@ Calculatorul solar folosește același bridge (`contactPrefill.ts`) pentru `?ser
 | Installer API keys | `INSTALLER_API_KEYS` JSON | Header `X-Installer-Key` pe `/generate` și `/batch` |
 | Rate limit | `SURVEY_RATE_LIMIT_PER_HOUR` | 429 după prag (implicit 60/h) |
 | Webhook CRM | `SURVEY_WEBHOOK_URL` + `SURVEY_WEBHOOK_SECRET` | POST la lead nou din `/api/survey/crm` |
-| Post-deploy smoke | `npm run survey:post-deploy` | Verifică health + jurisdictions + stats în prod |
+| Post-deploy smoke | `npm run survey:post-deploy` | Alias strict pentru `survey:prod-gate` |
+| Prod deploy gate | `npm run survey:prod-gate` | Toate rutele critice + OpenAPI paths + extended flow |
+| Deploy status | `npm run deploy:status` | Local git SHA vs prod health + survey API |
 
 ### UI `/survey` (v1.2)
 
@@ -128,5 +130,8 @@ Calculatorul solar folosește același bridge (`contactPrefill.ts`) pentru `?ser
 
 ```bash
 npm run survey:smoke          # engine local :8000
-npm run survey:post-deploy    # SITE_URL=https://solaris-cet.com
+npm run survey:post-deploy    # SITE_URL=https://solaris-cet.com (strict)
+SOFT_FAIL=1 npm run survey:prod-gate   # warn on optional 404 until redeploy
+npm run deploy:status
+node scripts/survey-route-manifest.test.mjs
 ```

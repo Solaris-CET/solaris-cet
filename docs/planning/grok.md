@@ -359,3 +359,16 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 - Smoke S7: twin-events + twin-stream snapshot
 
 **VERIFY:** pytest `test_twin_runtime` · Vitest twinRuntimeApi · Playwright twin runtime panel
+
+---
+
+## Update 2026-07-06 — Prod Deploy Gate (prod-deploy-gate, 30 task-uri)
+
+**Livrat:**
+- `survey-prod-gate.mjs` — gate complet prod (critice + OpenAPI paths + extended demo flow)
+- `surveyRouteManifest.mjs` — manifest sincron cu OpenAPI
+- `gitea-push-retry.mjs` · `coolify-redeploy-survey.mjs` · `deploy-status.mjs`
+- `post-deploy.mjs` integrează survey gate · `smoke-http` probe `/api/survey/health`
+- `npm run survey:prod-gate` · `deploy:status` · `gitea:push-retry`
+
+**VERIFY:** manifest self-test · Vitest surveyProdGate · SOFT_FAIL=1 pe prod până Coolify redeploy

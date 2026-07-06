@@ -164,3 +164,16 @@
 | Webhook | `twin_feed_updated` pe POST corrections |
 
 **VERIFY:** pytest twin_runtime · Vitest twinRuntimeApi · smoke S7 twin-events/stream
+
+## Epic prod-deploy-gate (D6 deploy) — 2026-07-06 DONE
+
+| Componentă | Locație |
+|---|---|
+| Prod gate | `scripts/survey-prod-gate.mjs` + `surveyRouteManifest.mjs` |
+| Post-deploy | `post-deploy.mjs` + `post-deploy-survey.mjs` → gate |
+| Coolify | `coolify-redeploy-survey.mjs` + `coolify-deploy-by-tag.sh` |
+| Gitea retry | `gitea-push-retry.mjs` |
+| Status | `deploy-status.mjs` |
+| Smoke extins | `smoke-http.mjs` survey health · `stash-verify` prod gate |
+
+**VERIFY:** `survey-route-manifest.test.mjs` · Vitest `surveyProdGate.test.ts`

@@ -106,6 +106,19 @@ checks.push(async () => {
 });
 
 checks.push(async () => {
+  const url = `${args.baseUrl}/api/survey/health`;
+  const res = await fetchWithTimeout(url, { headers: { accept: 'application/json' } }, args.timeoutMs);
+  if (args.skipApi && res.status === 404) {
+    okLine('/api/survey/health (skipped — redeploy needed)');
+    return;
+  }
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const parsed = await readJsonSafe(res);
+  if (!parsed.ok || !parsed.json?.engine) throw new Error('Invalid survey health JSON');
+  okLine('/api/survey/health');
+});
+
+checks.push(async () => {
   const url = `${args.baseUrl}/metrics`;
   const headers = { accept: 'text/plain' };
   if (args.metricsToken) headers.authorization = `Bearer ${args.metricsToken}`;

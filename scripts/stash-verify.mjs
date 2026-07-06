@@ -140,6 +140,21 @@ const prod = await fetchStatus('https://solaris-cet.com/api/survey/health');
 if (prod.ok) pass('prod survey API', '200');
 else warn('prod survey API', `${prod.status} — BLOCKED until VPS redeploy`);
 
+const prodGate = await new Promise((resolvePromise) => {
+  const child = spawn(process.execPath, [join(root, 'scripts', 'survey-prod-gate.mjs')], {
+    cwd: root,
+    stdio: ['ignore', 'pipe', 'pipe'],
+    env: { ...process.env, SOFT_FAIL: '1' },
+    windowsHide: true,
+  });
+  let out = '';
+  child.stdout?.on('data', (d) => { out += d; });
+  child.stderr?.on('data', (d) => { out += d; });
+  child.on('close', (code) => resolvePromise({ ok: code === 0, out }));
+});
+if (prodGate.ok) pass('survey:prod-gate');
+else warn('survey:prod-gate', prodGate.out.trim().slice(-120) || 'BLOCKED until Coolify redeploy');
+
 console.log('\n── Loop checklist ──');
 console.log('0 Memory  → npm run stash:prime -- <topic>');
 console.log('3 Verify  → npm run dev:local + survey:smoke');
