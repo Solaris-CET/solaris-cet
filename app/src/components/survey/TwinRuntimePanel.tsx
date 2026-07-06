@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Activity, Box, Map, Radio, RefreshCw } from 'lucide-react';
+import { Activity, Layers, MapPin, Radio, RefreshCw } from 'lucide-react';
 
 import { useTwinStream } from '@/hooks/useTwinStream';
 import { twinFeedMapLabel } from '@/lib/twinFeedMap';
@@ -39,7 +39,7 @@ export function TwinRuntimePanel({ reportId, className }: Props) {
               view === '3d' ? 'bg-fuchsia-400/20 text-fuchsia-100' : 'text-white/45 hover:text-white/70',
             )}
           >
-            <Box className="h-3 w-3" />
+            <Layers className="h-3 w-3" />
             3D
           </button>
           <button
@@ -50,7 +50,7 @@ export function TwinRuntimePanel({ reportId, className }: Props) {
               view === 'map' ? 'bg-fuchsia-400/20 text-fuchsia-100' : 'text-white/45 hover:text-white/70',
             )}
           >
-            <Map className="h-3 w-3" />
+            <MapPin className="h-3 w-3" />
             Hartă
           </button>
           <button
