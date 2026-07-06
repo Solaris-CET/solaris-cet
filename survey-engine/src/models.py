@@ -82,6 +82,8 @@ class PhotoAnalysis(BaseModel):
     findings: list[str]
     issues: list[str] = Field(default_factory=list)
     confidence: float = Field(ge=0, le=1, default=0.85)
+    evidence_photo_ids: list[str] = Field(default_factory=list)
+    reasoning_short: Optional[str] = None
     actionable_notes: list[str] = Field(default_factory=list)
 
 
@@ -194,6 +196,8 @@ def get_sample_survey() -> SiteSurvey:
                 issues=["Coș de fum pe partea estică — verificare distanță minimă panouri"],
                 actionable_notes=["Marchează zona estică ca exclusă din layout"],
                 confidence=0.92,
+                evidence_photo_ids=["P001"],
+                reasoning_short="Orientare sud și țiglă vizibile în P001",
             ),
             PhotoAnalysis(
                 photo_id="P002",
@@ -206,6 +210,8 @@ def get_sample_survey() -> SiteSurvey:
                 issues=[],
                 actionable_notes=["Propune poziționare invertor la max 8m de tablou"],
                 confidence=0.88,
+                evidence_photo_ids=["P002"],
+                reasoning_short="Tablou monofazat identificat în P002",
             ),
             PhotoAnalysis(
                 photo_id="P003",
@@ -217,6 +223,8 @@ def get_sample_survey() -> SiteSurvey:
                 issues=["Umbrire sezonieră estimată 3–5% pe string-ul vestic"],
                 actionable_notes=["Simulare producție cu obiect de umbrire vestic"],
                 confidence=0.81,
+                evidence_photo_ids=["P003"],
+                reasoning_short="Copac vestic vizibil în P003",
             ),
             PhotoAnalysis(
                 photo_id="P004",
@@ -227,6 +235,8 @@ def get_sample_survey() -> SiteSurvey:
                 ],
                 issues=[],
                 confidence=0.95,
+                evidence_photo_ids=["P004"],
+                reasoning_short="Scară fixă și acces sigur în P004",
             ),
         ],
         checklist=[

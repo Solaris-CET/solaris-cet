@@ -25,6 +25,7 @@ from reportlab.platypus import (
     TableStyle,
 )
 
+from src.explainable import build_explainable_findings, build_basis_narrative
 from src.models import ChecklistStatus, PhotoAnalysis, PhotoCategory, SiteSurvey, project_root
 from src.report_layout import (
     COPPER,
@@ -317,8 +318,29 @@ class ReportGenerator:
         story.append(PageBreak())
         return story
 
+    def _page_basis(self, doc, s: SiteSurvey) -> list:
+        self._set(doc, "04 · Basis of Opinion")
+        findings = build_explainable_findings(s)
+        narrative = build_basis_narrative(findings)
+        low = sum(1 for f in findings if f.get("confidence", 1) < 0.7)
+        subtitle = (
+            f"{len(findings)} constatări documentate"
+            + (f" · {low} sub prag 70% încredere" if low else "")
+        )
+        return [
+            *section_block(self.styles, "04", "Basis of Opinion", subtitle),
+            Paragraph(
+                "Fiecare afirmație este legată de pozele sursă (evidence_photo_ids) "
+                "și de scorul de încredere al modelului vision.",
+                self.styles["body_sm"],
+            ),
+            Spacer(1, 0.3 * cm),
+            insight_panel(self.styles, narrative, columns=1),
+            PageBreak(),
+        ]
+
     def _page_checklist(self, doc, s: SiteSurvey) -> list:
-        self._set(doc, "04 · Checklist")
+        self._set(doc, "05 · Checklist")
         pn = sum(1 for x in s.checklist if x.status == ChecklistStatus.PASS)
         wn = sum(1 for x in s.checklist if x.status == ChecklistStatus.WARNING)
         fn = sum(1 for x in s.checklist if x.status == ChecklistStatus.FAIL)
@@ -341,14 +363,14 @@ class ReportGenerator:
             ("ROWBACKGROUNDS", (0, 1), (-1, -1), [WHITE, PEARL]),
         ]))
         return [
-            *section_block(self.styles, "04", "Checklist Tehnic", "Protocol verificări standardizate SOLARIS CET"),
+            *section_block(self.styles, "05", "Checklist Tehnic", "Protocol verificări standardizate SOLARIS CET"),
             kpi_dashboard(self.styles, [(str(pn), "trecute", TEAL), (str(wn), "atenție", GOLD),
                                         (str(fn), "respinse", RUST), (str(len(s.checklist)), "total", INK)]),
             Spacer(1, 0.4 * cm), tbl, PageBreak(),
         ]
 
     def _page_system(self, doc, s: SiteSurvey) -> list:
-        self._set(doc, "05 · Estimare Sistem")
+        self._set(doc, "06 · Estimare Sistem")
         e = s.system_estimate
         pw = e.recommended_capacity_kwp / e.panel_count * 1000
         rows = [
@@ -362,7 +384,7 @@ class ReportGenerator:
         ]
         cov = e.estimated_annual_production_kwh / s.site.annual_consumption_kwh * 100
         return [
-            *section_block(self.styles, "05", "Estimare Sistem Fotovoltaic", "Dimensionare preliminară — validare inginer necesară"),
+            *section_block(self.styles, "06", "Estimare Sistem Fotovoltaic", "Dimensionare preliminară — validare inginer necesară"),
             spec_table(rows, [3.8 * cm, 4.2 * cm, CW - 8.0 * cm]),
             Spacer(1, 0.45 * cm),
             donut_chart(e.estimated_annual_production_kwh, s.site.annual_consumption_kwh, cov),
@@ -370,16 +392,16 @@ class ReportGenerator:
         ]
 
     def _page_recs(self, doc, s: SiteSurvey) -> list:
-        self._set(doc, "06 · Recomandări")
+        self._set(doc, "07 · Recomandări")
         order = {"high": 0, "medium": 1, "low": 2}
-        story = [*section_block(self.styles, "06", "Recomandări", "Acțiuni prioritizate pentru instalare și conformitate")]
+        story = [*section_block(self.styles, "07", "Recomandări", "Acțiuni prioritizate pentru instalare și conformitate")]
         for i, r in enumerate(sorted(s.recommendations, key=lambda x: order.get(x.priority, 9)), 1):
             story += [self._rec_card(i, r.priority, r.title, r.description, r.estimated_cost_eur), Spacer(1, 0.3 * cm)]
         story.append(PageBreak())
         return story
 
     def _page_close(self, doc, s: SiteSurvey) -> list:
-        self._set(doc, "07 · Concluzii")
+        self._set(doc, "08 · Concluzii")
         pn = sum(1 for x in s.checklist if x.status == ChecklistStatus.PASS)
         wn = sum(1 for x in s.checklist if x.status == ChecklistStatus.WARNING)
         steps = [
@@ -413,7 +435,7 @@ class ReportGenerator:
         footer_row = Table([[signature_block(self.styles, s.metadata.technician_name), meta]], colWidths=[CW * 0.42, CW * 0.58])
         footer_row.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP")]))
         return [
-            *section_block(self.styles, "07", "Concluzii & Următorii Pași"),
+            *section_block(self.styles, "08", "Concluzii & Următorii Pași"),
             Paragraph(
                 f"Șantierul <b>{s.client.name}</b>: <i>{s.executive_summary.suitability_verdict}</i>. "
                 f"<b>{pn}</b> verificări trecute, <b>{wn}</b> cu atenție.",
@@ -441,7 +463,7 @@ class ReportGenerator:
         )
         story = [Spacer(1, 1), NextPageTemplate("content"), PageBreak()]
         for fn in (self._page_toc, self._page_executive, self._page_site, self._page_photos,
-                   self._page_checklist, self._page_system, self._page_recs, self._page_close):
+                   self._page_basis, self._page_checklist, self._page_system, self._page_recs, self._page_close):
             story.extend(fn(doc, survey))
         doc.build(story)
         return output_path

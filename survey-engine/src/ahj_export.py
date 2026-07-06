@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import json
+import zipfile
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
-from src.models import SiteSurvey
+from src.explainable import build_explainable_findings
+from src.models import SiteSurvey, project_root
 from src.solar_calculator import estimate_production
 
 EXPORT_VERSION = 3
@@ -102,6 +104,7 @@ def build_ahj_package(survey: SiteSurvey) -> dict[str, Any]:
             "latitude": survey.metadata.site_latitude,
             "longitude": survey.metadata.site_longitude,
         },
+        "explainable_findings": build_explainable_findings(survey),
     }
 
 
@@ -131,3 +134,81 @@ def export_ahj_json(survey: SiteSurvey, output_path: Path) -> Path:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(package, indent=2, ensure_ascii=False), encoding="utf-8")
     return output_path
+
+
+def _permit_readme(jurisdiction: dict[str, Any], report_id: str) -> str:
+    code = jurisdiction.get("code") or "RO"
+    name = jurisdiction.get("name") or "România"
+    return (
+        f"SOLARIS CET — Pachet autorizație permit-ready\n"
+        f"Raport: {report_id}\n"
+        f"Județ: {name} ({code})\n\n"
+        f"Conținut:\n"
+        f"- AHJ_package.json — date tehnice + conformitate\n"
+        f"- documents_required.txt — listă acte necesare\n"
+        f"- explainable_findings.json — baza opiniei (dovezi + încredere)\n"
+        f"- jurisdiction.json — operator rețea + AHJ\n"
+    )
+
+
+def build_permit_zip(
+    survey: SiteSurvey,
+    output_path: Path,
+    *,
+    pdf_path: Optional[Path] = None,
+) -> Path:
+    """ZIP permit-ready pentru un județ RO — AHJ + documente + dovezi."""
+    package = build_ahj_package(survey)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    jurisdiction = package.get("jurisdiction") or {}
+
+    with zipfile.ZipFile(output_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("AHJ_package.json", json.dumps(package, indent=2, ensure_ascii=False))
+        zf.writestr(
+            "documents_required.txt",
+            "\n".join(f"- {doc}" for doc in package.get("documents_required", [])),
+        )
+        zf.writestr(
+            "explainable_findings.json",
+            json.dumps(package.get("explainable_findings", []), indent=2, ensure_ascii=False),
+        )
+        zf.writestr("jurisdiction.json", json.dumps(jurisdiction, indent=2, ensure_ascii=False))
+        zf.writestr("README_permit.txt", _permit_readme(jurisdiction, survey.metadata.report_id))
+        if pdf_path and pdf_path.exists():
+            zf.write(pdf_path, arcname=f"raport_{survey.metadata.report_id}.pdf")
+    return output_path
+
+
+def build_permit_zip_from_registry(
+    report_id: str,
+    *,
+    pdf_path: Optional[Path] = None,
+    ahj_path: Optional[Path] = None,
+    output_dir: Optional[Path] = None,
+) -> Path:
+    """Build permit ZIP from stored AHJ JSON (no full SiteSurvey required)."""
+    out = output_dir or (project_root() / "output")
+    out.mkdir(parents=True, exist_ok=True)
+    zip_path = out / f"PERMIT_{report_id}.zip"
+
+    ahj_data: dict[str, Any] = {}
+    if ahj_path and ahj_path.exists():
+        ahj_data = json.loads(ahj_path.read_text(encoding="utf-8"))
+
+    jurisdiction = ahj_data.get("jurisdiction") or {}
+    with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        if ahj_data:
+            zf.writestr("AHJ_package.json", json.dumps(ahj_data, indent=2, ensure_ascii=False))
+        zf.writestr(
+            "documents_required.txt",
+            "\n".join(f"- {doc}" for doc in ahj_data.get("documents_required", [])),
+        )
+        zf.writestr(
+            "explainable_findings.json",
+            json.dumps(ahj_data.get("explainable_findings", []), indent=2, ensure_ascii=False),
+        )
+        zf.writestr("jurisdiction.json", json.dumps(jurisdiction, indent=2, ensure_ascii=False))
+        zf.writestr("README_permit.txt", _permit_readme(jurisdiction, report_id))
+        if pdf_path and pdf_path.exists():
+            zf.write(pdf_path, arcname=f"raport_{report_id}.pdf")
+    return zip_path

@@ -281,3 +281,26 @@ npm run stash:sync               # 7 Retro — DUPĂ
 npm run stash:verify             # audit complet (opțional)
 SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 ```
+
+---
+
+## Update 2026-07-06 — Epic soft-cost-platform T2–T6 (30 task-uri batch)
+
+**Livrat (regula de 3: Memory → Build+Verify → Retro):**
+
+| # | Task | DONE | VERIFIED |
+|---|---|---|---|
+| T2 | Context API unificat (report + jurisdiction + CRM + cost) | `context_api.py` + Node proxy | pytest + Vitest |
+| T3 | Explainable findings (`confidence`, `evidence_photo_ids`) | `explainable.py` + PDF secțiune 04 | pytest golden |
+| T4 | Permit export ZIP județ RO | `build_permit_zip` + buton SurveyPage | pytest zip |
+| T5 | Technician correction hook | `corrections.jsonl` + UI corecție | pytest + Vitest |
+| T6 | Retro BCG S1–S6 | `global.md` + `tasks.md` | stash:sync |
+
+**Feedback loop (L-FS-6 factor 3):** tehnicianul poate trimite corecții post-raport → `output/corrections.jsonl` → input pentru loop săptămânal prompt patch.
+
+**API noi stabilite:**
+- `GET /api/survey/context?report_id=`
+- `GET /api/survey/permit-pack?report_id=`
+- `POST /api/survey/corrections`
+
+**LEFT:** prod deploy după deblocare Hetzner + Coolify redeploy `main`.

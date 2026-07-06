@@ -22,6 +22,8 @@ import {
   generateDemoReport,
   generateSurveyReport,
   runSurveyBatch,
+  permitPackUrl,
+  submitSurveyCorrection,
   submitSurveyToCrm,
 } from '@/lib/surveyApi';
 import { applySurveyPrefill, parseSurveySearchParams } from '@/lib/surveyPrefill';
@@ -125,6 +127,10 @@ export default function SurveyPage() {
   const [error, setError] = useState('');
   const [result, setResult] = useState<GenerateReportResult | null>(null);
   const [crmSent, setCrmSent] = useState(false);
+  const [correctionField, setCorrectionField] = useState('verdict');
+  const [correctionText, setCorrectionText] = useState('');
+  const [correctionSent, setCorrectionSent] = useState(false);
+  const [correctionSaving, setCorrectionSaving] = useState(false);
   const [engineOk, setEngineOk] = useState<boolean | null>(null);
   const [costBudgetAlert, setCostBudgetAlert] = useState(false);
   const [batchManifest, setBatchManifest] = useState(
@@ -418,6 +424,30 @@ export default function SurveyPage() {
       setCrmSent(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'CRM eșuat');
+    }
+  };
+
+  const handleCorrection = async () => {
+    if (!result || !correctionText.trim()) return;
+    setCorrectionSaving(true);
+    setError('');
+    try {
+      await submitSurveyCorrection(
+        {
+          report_id: result.report_id,
+          field: correctionField,
+          original: result.verdict,
+          corrected: correctionText.trim(),
+          notes: form.structuralNotes || undefined,
+        },
+        installer,
+      );
+      setCorrectionSent(true);
+      setCorrectionText('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Corecție eșuată');
+    } finally {
+      setCorrectionSaving(false);
     }
   };
 
@@ -895,6 +925,44 @@ export default function SurveyPage() {
                     >
                       Export AHJ JSON
                     </a>
+                    <a
+                      href={permitPackUrl(result.report_id)}
+                      download
+                      className="flex items-center justify-center gap-2 rounded-xl border border-teal-400/20 bg-teal-400/5 px-4 py-2 text-xs font-semibold text-teal-200 transition hover:bg-teal-400/10"
+                    >
+                      <FileText className="h-3.5 w-3.5" />
+                      Pachet autorizație (ZIP)
+                    </a>
+                    <div className="mt-2 rounded-xl border border-white/10 bg-black/20 p-3">
+                      <p className="text-xs font-semibold text-white/70">Corecție tehnician</p>
+                      <select
+                        value={correctionField}
+                        onChange={(e) => setCorrectionField(e.target.value)}
+                        className="mt-2 w-full rounded-lg border border-white/10 bg-black/40 px-2 py-1.5 text-xs text-white"
+                      >
+                        <option value="verdict">Verdict</option>
+                        <option value="capacity_kwp">Capacitate kWp</option>
+                        <option value="shading">Umbrire</option>
+                        <option value="checklist">Checklist</option>
+                        <option value="other">Alt câmp</option>
+                      </select>
+                      <textarea
+                        value={correctionText}
+                        onChange={(e) => setCorrectionText(e.target.value)}
+                        placeholder="Valoare corectată observată pe teren..."
+                        rows={2}
+                        className="mt-2 w-full rounded-lg border border-white/10 bg-black/40 px-2 py-1.5 text-xs text-white placeholder:text-white/30"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleCorrection}
+                        disabled={correctionSaving || correctionSent || !correctionText.trim()}
+                        className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-xs font-semibold text-white/80 transition hover:border-amber-400/30 disabled:opacity-50"
+                      >
+                        {correctionSent ? <CheckCircle2 className="h-3.5 w-3.5" /> : <ClipboardList className="h-3.5 w-3.5" />}
+                        {correctionSent ? 'Corecție înregistrată' : correctionSaving ? 'Se salvează...' : 'Trimite corecție'}
+                      </button>
+                    </div>
                     <button
                       type="button"
                       onClick={handleCrm}

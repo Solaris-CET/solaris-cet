@@ -17,6 +17,9 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from src.api_clients.cost_logger import CostLogger
+from src.ahj_export import build_permit_zip_from_registry, export_ahj_json
+from src.context_api import build_report_context
+from src.corrections import log_correction
 from src.batch_processor import BatchJob, parse_upload_photo_key, run_batch_uploaded
 from src.dashboard import format_dashboard_markdown, get_dashboard_data
 from src.models import get_sample_survey, project_root
@@ -25,6 +28,7 @@ from src.installer_auth import require_key_if_configured
 from src.jurisdictions import list_jurisdiction_codes
 from src.rate_limit import check_rate_limit
 from src.report_generator import generate_report
+from src.report_registry import ReportRegistry
 
 load_dotenv(project_root() / ".env")
 
@@ -120,7 +124,10 @@ class DemoResponse(BaseModel):
 @app.post("/demo", response_model=DemoResponse)
 def demo_report():
     survey = get_sample_survey()
-    pdf = generate_report(survey, project_root() / "output")
+    out = project_root() / "output"
+    pdf = generate_report(survey, out)
+    ahj = export_ahj_json(survey, out / f"AHJ_{survey.metadata.report_id}.json")
+    ReportRegistry().register(survey, pdf, ahj, cost_usd=0.0, routing="demo", installer_id="demo")
     return DemoResponse(
         report_id=survey.metadata.report_id,
         pdf_path=str(pdf),
@@ -335,6 +342,64 @@ async def batch_surveys(
         )
     finally:
         shutil.rmtree(work_dir, ignore_errors=True)
+
+
+@app.get("/context/{report_id}")
+def report_context(report_id: str, request: Request):
+    base = str(request.base_url).rstrip("/")
+    try:
+        return build_report_context(report_id, platform_base_url=base)
+    except KeyError as exc:
+        raise HTTPException(404, str(exc)) from exc
+
+
+@app.get("/permit-pack/{report_id}")
+def permit_pack(report_id: str):
+    reg = ReportRegistry().find_by_report_id(report_id)
+    if not reg:
+        raise HTTPException(404, f"Raport negăsit: {report_id}")
+    pdf_path = Path(reg.pdf_path) if reg.pdf_path else None
+    ahj_path = Path(reg.ahj_path) if reg.ahj_path else None
+    if pdf_path and not pdf_path.is_absolute():
+        pdf_path = project_root() / "output" / pdf_path
+    if ahj_path and not ahj_path.is_absolute():
+        ahj_path = project_root() / "output" / ahj_path
+    zip_path = build_permit_zip_from_registry(
+        report_id,
+        pdf_path=pdf_path if pdf_path and pdf_path.exists() else None,
+        ahj_path=ahj_path if ahj_path and ahj_path.exists() else None,
+    )
+    return FileResponse(
+        zip_path,
+        media_type="application/zip",
+        filename=zip_path.name,
+    )
+
+
+class CorrectionRequest(BaseModel):
+    report_id: str
+    field: str
+    original: str = ""
+    corrected: str
+    technician: str = ""
+    notes: str = ""
+
+
+@app.post("/corrections")
+def post_correction(body: CorrectionRequest, request: Request, x_installer_key: Optional[str] = Header(None)):
+    _guard_api(request, x_installer_key)
+    try:
+        entry = log_correction(
+            report_id=body.report_id,
+            field=body.field,
+            original=body.original,
+            corrected=body.corrected,
+            technician=body.technician,
+            notes=body.notes,
+        )
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    return {"ok": True, "correction": entry}
 
 
 @app.get("/files/{name:path}")

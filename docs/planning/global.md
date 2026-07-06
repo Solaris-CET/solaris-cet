@@ -72,6 +72,19 @@
 
 **Verificare 2026-07-06:** pytest 48/48 · Vitest survey 12/12 · smoke OK · `run-bin.mjs` pentru npm pe Windows (cale cu spații)
 
+## Epic soft-cost-platform (T1–T6) — 2026-07-06 DONE
+
+| Task | Livrabil | API |
+|---|---|---|
+| T1 ROI admin | `soft_cost_roi.py` + LeadsSection | `/stats` |
+| T2 Context unificat | `context_api.py` | `GET /context/{id}` · `/api/survey/context` |
+| T3 Explainable | `explainable.py` + PDF „Basis of opinion” | AHJ `explainable_findings` |
+| T4 Permit ZIP | `build_permit_zip` | `/permit-pack/{id}` · `/api/survey/permit-pack` |
+| T5 Corecții tehnician | `corrections.jsonl` + SurveyPage | `POST /corrections` |
+| T6 Retro BCG | `CONSULTING-SOLUTIONS.md` mapping S1–S6 | `stash:sync` |
+
+**BCG Reshape:** factor 1 (data layer) + factor 3 (adaptive) + factor 4 (explainability) livrate în cod.
+
 ## Status livrare Faza 6 (v1.1) — 2026-07-06
 
 | Componentă | Status | Locație |

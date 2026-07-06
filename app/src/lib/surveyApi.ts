@@ -1,3 +1,5 @@
+import type { CorrectionPayload, ReportContext } from './surveyContext';
+import { permitPackUrl } from './surveyContext';
 import type { SoftCostRoi } from './softCostRoi';
 
 export type ChecklistStatus = 'pass' | 'warning' | 'fail' | 'na';
@@ -287,6 +289,36 @@ export async function runSurveyBatch(
   }
   return data;
 }
+
+export async function fetchReportContext(reportId: string): Promise<ReportContext> {
+  const res = await fetch(`/api/survey/context?report_id=${encodeURIComponent(reportId)}`);
+  const data = (await res.json()) as { context?: ReportContext; error?: string };
+  if (!res.ok) throw new Error(data.error || 'Context indisponibil');
+  if (!data.context) throw new Error('Context lipsă');
+  return data.context;
+}
+
+export async function submitSurveyCorrection(
+  payload: CorrectionPayload,
+  installer: InstallerProfile = { installerId: '', installerName: '', company: '' },
+): Promise<{ ok: boolean }> {
+  const res = await fetch('/api/survey/corrections', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...installerKeyHeaders(installer),
+    },
+    body: JSON.stringify({
+      ...payload,
+      technician: payload.technician || installer.installerName,
+    }),
+  });
+  const data = (await res.json()) as { ok?: boolean; error?: string };
+  if (!res.ok) throw new Error(data.error || 'Corecție eșuată');
+  return { ok: Boolean(data.ok) };
+}
+
+export { permitPackUrl };
 
 export async function submitSurveyToCrm(payload: {
   report_id: string;

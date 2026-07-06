@@ -247,3 +247,18 @@ npm run survey:smoke && npm run stash:sync
 ```
 
 Skill actualizat: `.claude/skills/solaris-perfect-loops/SKILL.md` (secțiunea Consulting Loops v4).
+
+---
+
+## 8. Retro epic `soft-cost-platform` (2026-07-06)
+
+| Soluție | BCG factor | Status cod | Fișiere cheie |
+|---|---|---|---|
+| S1 Unified context | FS-6 #1 data layer | ✅ DONE | `context_api.py`, `/api/survey/context` |
+| S2 Soft Cost ROI | L-SOFT-ROI | ✅ DONE (T1) | `soft_cost_roi.py`, LeadsSection |
+| S3 Adaptive corrections | FS-6 #3 | ✅ DONE | `corrections.py`, SurveyPage hook |
+| S4 Explainable AHJ | FS-6 #4 + L-SUP-GATE | ✅ DONE | `explainable.py`, PDF Basis of opinion |
+| S5 Agentic orchestration | OODA partial | 🟡 IN PROGRESS | pipeline + CRM webhook există |
+| S6 API-first contract | Modular | ✅ DONE | `/api/survey/*` extins (context, permit, corrections) |
+
+**Deploy → Reshape:** epic marcat `done` în `features/soft-cost-platform/tasks.md`. Următorul horizon: S5 complet (agent roles + E2E gate) și Digital Twin feed (D10).

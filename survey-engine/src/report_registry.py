@@ -62,6 +62,19 @@ class ReportRegistry:
             f.write(json.dumps(asdict(record), ensure_ascii=False) + "\n")
         return record
 
+    def find_by_report_id(self, report_id: str) -> Optional[ReportRecord]:
+        """Return the most recent registry entry for report_id."""
+        if not self.index_path.exists():
+            return None
+        match: Optional[ReportRecord] = None
+        for line in self.index_path.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            d = json.loads(line)
+            if d.get("report_id") == report_id:
+                match = ReportRecord(**d)
+        return match
+
     def list_reports(self, limit: int = 50) -> list[ReportRecord]:
         if not self.index_path.exists():
             return []

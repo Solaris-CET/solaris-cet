@@ -21,10 +21,13 @@ const fetchMock = vi.fn();
 vi.stubGlobal('fetch', fetchMock);
 
 import surveyBatchRoute from '../../api/survey/batch/route';
+import surveyContextRoute from '../../api/survey/context/route';
+import surveyCorrectionsRoute from '../../api/survey/corrections/route';
 import surveyDemoRoute from '../../api/survey/demo/route';
 import surveyHealthRoute from '../../api/survey/health/route';
 import surveyCrmRoute from '../../api/survey/crm/route';
 import surveyJurisdictionsRoute from '../../api/survey/jurisdictions/route';
+import surveyPermitPackRoute from '../../api/survey/permit-pack/route';
 import surveyStatsRoute from '../../api/survey/stats/route';
 import { dispatchSurveyWebhook } from '../../api/lib/surveyWebhook';
 
@@ -148,6 +151,67 @@ describe('survey API routes', () => {
     const body = (await jsonBody(res)) as { platform: string; stats: { total_reports: number } };
     expect(body.platform).toBe('solaris-cet');
     expect(body.stats.total_reports).toBe(3);
+  });
+
+  it('/api/survey/context: GET proxies unified context', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          schema: 'solaris-context-v1',
+          report_id: 'SOL-CTX-1',
+          report: { client_name: 'Test', city: 'Cluj' },
+          jurisdiction: { code: 'RO-CJ', name: 'Cluj' },
+          crm: { submit_url: '/api/survey/crm', lead_search_key: 'SOL-CTX-1' },
+          cost: { api_usd: 0.1, routing: 'demo' },
+          files: { pdf: 'x.pdf' },
+        }),
+        { status: 200 },
+      ),
+    );
+    const req = new Request('http://test/api/survey/context?report_id=SOL-CTX-1', {
+      method: 'GET',
+      headers: { origin: 'https://x.test' },
+    });
+    const res = await surveyContextRoute(req);
+    expect(res.status).toBe(200);
+    const body = (await jsonBody(res)) as { context: { report_id: string } };
+    expect(body.context.report_id).toBe('SOL-CTX-1');
+  });
+
+  it('/api/survey/permit-pack: GET proxies ZIP', async () => {
+    fetchMock.mockResolvedValueOnce(new Response(new Uint8Array([0x50, 0x4b, 0x03, 0x04]), { status: 200 }));
+    const req = new Request('http://test/api/survey/permit-pack?report_id=SOL-ZIP-1', {
+      method: 'GET',
+      headers: { origin: 'https://x.test' },
+    });
+    const res = await surveyPermitPackRoute(req);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('Content-Type')).toBe('application/zip');
+  });
+
+  it('/api/survey/corrections: POST validates required fields', async () => {
+    const req = new Request('http://test/api/survey/corrections', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', origin: 'https://x.test' },
+      body: JSON.stringify({ report_id: 'R1' }),
+    });
+    const res = await surveyCorrectionsRoute(req);
+    expect(res.status).toBe(400);
+  });
+
+  it('/api/survey/corrections: POST proxies engine', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ ok: true, correction: { report_id: 'R1', field: 'verdict' } }), { status: 200 }),
+    );
+    const req = new Request('http://test/api/survey/corrections', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', origin: 'https://x.test' },
+      body: JSON.stringify({ report_id: 'R1', field: 'verdict', corrected: 'Condiționat' }),
+    });
+    const res = await surveyCorrectionsRoute(req);
+    expect(res.status).toBe(200);
+    const body = (await jsonBody(res)) as { ok: boolean };
+    expect(body.ok).toBe(true);
   });
 
   it('/api/survey/crm: POST persists survey lead', async () => {

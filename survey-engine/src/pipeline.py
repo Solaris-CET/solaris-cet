@@ -49,6 +49,8 @@ def _mock_photo_analysis(photo_path: Path, photo_id: str) -> PhotoAnalysis:
         issues=[],
         actionable_notes=["Validare manuală recomandată fără API DeepSeek"],
         confidence=0.6,
+        evidence_photo_ids=[photo_id],
+        reasoning_short=f"Analiză demo categorie {cat.value}",
     )
 
 

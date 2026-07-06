@@ -62,14 +62,18 @@ def parse_photo_analysis(data: dict, file_path: Path) -> PhotoAnalysis:
     except ValueError:
         category = guess_category(file_path.name)
 
+    photo_id = data.get("photo_id", file_path.stem)
+    evidence = data.get("evidence_photo_ids") or [photo_id]
     return PhotoAnalysis(
-        photo_id=data.get("photo_id", file_path.stem),
+        photo_id=photo_id,
         category=category,
         file_path=str(file_path),
         findings=data.get("findings", []),
         issues=data.get("issues", []),
         actionable_notes=data.get("actionable_notes", []),
         confidence=float(data.get("confidence", 0.8)),
+        evidence_photo_ids=evidence,
+        reasoning_short=data.get("reasoning_short"),
     )
 
 
