@@ -97,6 +97,7 @@ def public_stats():
         "total_capacity_kwp": data["stats"].get("total_capacity_kwp", 0),
         "total_api_cost_usd": data.get("total_api_cost_usd", 0),
         "by_installer": data["stats"].get("by_installer", {}),
+        "soft_cost_roi": data.get("soft_cost_roi"),
     }
 
 

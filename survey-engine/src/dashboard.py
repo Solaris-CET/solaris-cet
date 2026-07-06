@@ -8,6 +8,7 @@ from typing import Optional
 from src.api_clients.cost_logger import CostLogger
 from src.models import project_root
 from src.report_registry import ReportRegistry
+from src.soft_cost_roi import get_soft_cost_roi
 
 DASHBOARD_VERSION = 3
 
@@ -31,11 +32,13 @@ def get_dashboard_data(
                 prov = rec.get("provider", "unknown")
                 usage_by_provider[prov] = usage_by_provider.get(prov, 0) + rec.get("cost_usd", 0)
 
+    total_api = round(cost.total_cost(), 4)
     return {
         "version": DASHBOARD_VERSION,
         "stats": stats,
         "cost_by_provider": {k: round(v, 4) for k, v in usage_by_provider.items()},
-        "total_api_cost_usd": round(cost.total_cost(), 4),
+        "total_api_cost_usd": total_api,
+        "soft_cost_roi": get_soft_cost_roi(registry=reg, total_api_cost_usd=total_api),
         "recent_reports": [
             {
                 "report_id": r.report_id,

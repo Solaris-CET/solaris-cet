@@ -1,3 +1,5 @@
+import type { SoftCostRoi } from './softCostRoi';
+
 export type ChecklistStatus = 'pass' | 'warning' | 'fail' | 'na';
 
 export type InstallerProfile = {
@@ -122,6 +124,7 @@ export type BatchRunResult = {
 
 export type DashboardData = {
   version: number;
+  soft_cost_roi?: SoftCostRoi;
   stats: {
     total_reports: number;
     total_cost_usd: number;

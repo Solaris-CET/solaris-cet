@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { extractSurveyReportId } from '@/lib/contactPrefill';
+import { formatEur, formatMinutes } from '@/lib/softCostRoi';
 import type { AdminSurveyLead, DashboardData } from '@/lib/surveyApi';
 
 import { useAdminSession } from '../useAdminSession';
@@ -108,21 +109,90 @@ export default function LeadsSection() {
       {error ? <p className="text-sm text-red-300">{error}</p> : null}
 
       {engineStats ? (
-        <div className="rounded-xl border border-white/10 bg-black/25 p-4 text-sm">
-          <p className="font-semibold text-white">Analytics survey-engine</p>
-          <div className="mt-2 grid gap-2 sm:grid-cols-4">
-            <div><span className="text-white/45">Rapoarte</span><p className="font-bold text-amber-200">{engineStats.stats.total_reports}</p></div>
-            <div><span className="text-white/45">Scor mediu</span><p className="font-bold text-amber-200">{engineStats.stats.avg_score}/100</p></div>
-            <div><span className="text-white/45">Capacitate</span><p className="font-bold text-amber-200">{engineStats.stats.total_capacity_kwp} kWp</p></div>
-            <div><span className="text-white/45">Cost API</span><p className="font-bold text-amber-200">${engineStats.total_api_cost_usd.toFixed(2)}</p></div>
+        <div className="space-y-3">
+          <div className="rounded-xl border border-white/10 bg-black/25 p-4 text-sm">
+            <p className="font-semibold text-white">Analytics survey-engine</p>
+            <div className="mt-2 grid gap-2 sm:grid-cols-4">
+              <div><span className="text-white/45">Rapoarte</span><p className="font-bold text-amber-200">{engineStats.stats.total_reports}</p></div>
+              <div><span className="text-white/45">Scor mediu</span><p className="font-bold text-amber-200">{engineStats.stats.avg_score}/100</p></div>
+              <div><span className="text-white/45">Capacitate</span><p className="font-bold text-amber-200">{engineStats.stats.total_capacity_kwp} kWp</p></div>
+              <div><span className="text-white/45">Cost API</span><p className="font-bold text-amber-200">${engineStats.total_api_cost_usd.toFixed(2)}</p></div>
+            </div>
+            {Object.keys(engineStats.cost_by_provider ?? {}).length > 0 ? (
+              <div className="mt-3 flex flex-wrap gap-2 text-xs text-white/60">
+                {Object.entries(engineStats.cost_by_provider).map(([prov, cost]) => (
+                  <span key={prov} className="rounded-full border border-white/10 px-2 py-0.5">
+                    {prov}: <strong className="text-amber-200">${Number(cost).toFixed(4)}</strong>
+                  </span>
+                ))}
+              </div>
+            ) : null}
           </div>
-          {Object.keys(engineStats.cost_by_provider ?? {}).length > 0 ? (
-            <div className="mt-3 flex flex-wrap gap-2 text-xs text-white/60">
-              {Object.entries(engineStats.cost_by_provider).map(([prov, cost]) => (
-                <span key={prov} className="rounded-full border border-white/10 px-2 py-0.5">
-                  {prov}: <strong className="text-amber-200">${Number(cost).toFixed(4)}</strong>
-                </span>
-              ))}
+
+          {engineStats.soft_cost_roi ? (
+            <div className="rounded-xl border border-emerald-500/25 bg-emerald-950/20 p-4 text-sm">
+              <p className="font-semibold text-white">Soft Cost ROI (documentare șantier)</p>
+              <p className="mt-1 text-xs text-white/50">
+                Baseline {engineStats.soft_cost_roi.config.baseline_minutes_manual} min → SOLARIS{' '}
+                {engineStats.soft_cost_roi.config.target_minutes_solaris} min ·{' '}
+                {formatEur(engineStats.soft_cost_roi.config.installer_hourly_rate_eur)}/h instalator
+              </p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                <div>
+                  <span className="text-white/45">Timp salvat total</span>
+                  <p className="font-bold text-emerald-300">
+                    {formatMinutes(engineStats.soft_cost_roi.platform.minutes_saved_total)}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-white/45">€ muncă salvată</span>
+                  <p className="font-bold text-emerald-300">
+                    {formatEur(engineStats.soft_cost_roi.platform.eur_labor_saved_total)}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-white/45">€ / raport (muncă)</span>
+                  <p className="font-bold text-emerald-300">
+                    {formatEur(engineStats.soft_cost_roi.platform.eur_per_report_labor)}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-white/45">Valoare netă (− API)</span>
+                  <p className="font-bold text-emerald-300">
+                    {formatEur(engineStats.soft_cost_roi.platform.eur_net_value_total)}
+                  </p>
+                </div>
+              </div>
+              {engineStats.soft_cost_roi.by_installer.length > 0 ? (
+                <div className="mt-4 overflow-x-auto">
+                  <table className="w-full min-w-[32rem] text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-white/10 text-white/45">
+                        <th className="py-2 pr-3">Instalator</th>
+                        <th className="py-2 pr-3">Rapoarte</th>
+                        <th className="py-2 pr-3">Min salvate</th>
+                        <th className="py-2 pr-3">€ muncă</th>
+                        <th className="py-2">€ / raport</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {engineStats.soft_cost_roi.by_installer.map((row) => (
+                        <tr key={row.installer_id} className="border-b border-white/5 text-white/80">
+                          <td className="py-2 pr-3 font-mono text-amber-200/90">{row.installer_id}</td>
+                          <td className="py-2 pr-3">{row.reports}</td>
+                          <td className="py-2 pr-3">{formatMinutes(row.minutes_saved)}</td>
+                          <td className="py-2 pr-3 text-emerald-300">{formatEur(row.eur_labor_saved)}</td>
+                          <td className="py-2 text-emerald-300/90">
+                            {formatEur(
+                              row.reports > 0 ? row.eur_labor_saved / row.reports : 0,
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : null}
             </div>
           ) : null}
         </div>

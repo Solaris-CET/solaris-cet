@@ -11,7 +11,7 @@
 
 ## Tasks
 
-- [ ] **T1 — Soft Cost ROI dashboard (admin)**
+- [x] **T1 — Soft Cost ROI dashboard (admin)**
   - **Files:** `app/src/.../LeadsSection.tsx`, `survey-engine` stats
   - **MODEL:** DeepSeek (code) · Grok (review)
   - **VERIFY:** Vitest + manual: minutes_saved × rate displayed
@@ -56,3 +56,4 @@
 | Date | Task | DONE | VERIFIED | BLOCKED |
 |---|---|---|---|---|
 | 2026-07-06 | Epic creat din research BCG/DOE | research | — | — |
+| 2026-07-06 | T1 ROI dashboard admin | LeadsSection + soft_cost_roi.py | pytest + Vitest | — |

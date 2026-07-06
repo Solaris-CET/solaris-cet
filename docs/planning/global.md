@@ -99,6 +99,7 @@
 | **10** | Installer API keys | ✅ | `INSTALLER_API_KEYS`, header `X-Installer-Key` |
 | **10** | Rate limiting | ✅ | `survey-engine/src/rate_limit.py` (60/h implicit) |
 | **10** | Statistici publice | ✅ | `GET /stats` → `/api/survey/stats` |
+| **T1** | Soft Cost ROI admin | ✅ | `soft_cost_roi.py` + `LeadsSection` dashboard |
 | **UI** | Dropdown județ + GPS șantier | ✅ | `SurveyPage.tsx` |
 | **UI** | Cheie API instalator (localStorage) | ✅ | Profil tehnician |
 
