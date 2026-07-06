@@ -304,3 +304,15 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 - `POST /api/survey/corrections`
 
 **LEFT:** prod deploy după deblocare Hetzner + Coolify redeploy `main`.
+
+---
+
+## Update 2026-07-06 — S5 Agentic Orchestration DONE
+
+**OODA agent șantier:**
+- `survey_agent.py` — `assess_permit_risk` + `build_orchestration_plan`
+- Generate returnează `orchestration` block
+- SurveyPage: pași vizibili + auto-CRM când `auto_crm` și budget OK
+- Webhook: `survey_orchestration_complete`
+
+**API:** `GET /api/survey/orchestrate?report_id=`

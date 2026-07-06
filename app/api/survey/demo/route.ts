@@ -48,6 +48,19 @@ export default async function handler(req: Request): Promise<Response> {
     const payload = data as { report_id: string; pdf_path: string; score: number };
     const pdfFilename = payload.pdf_path.split(/[/\\]/).pop() || `RAPORT_${payload.report_id}.pdf`;
 
+    let orchestration: Record<string, unknown> | undefined;
+    try {
+      const orchRes = await fetch(
+        `${ENGINE.replace(/\/$/, '')}/orchestrate/${encodeURIComponent(payload.report_id)}`,
+        { signal: AbortSignal.timeout(8000) },
+      );
+      if (orchRes.ok) {
+        orchestration = (await orchRes.json()) as Record<string, unknown>;
+      }
+    } catch {
+      /* orchestration optional */
+    }
+
     return json(
       {
         report_id: payload.report_id,
@@ -55,12 +68,13 @@ export default async function handler(req: Request): Promise<Response> {
         ahj_filename: `AHJ_${payload.report_id}.json`,
         score: payload.score,
         verdict: 'Demo — date sample',
-        capacity_kwp: 0,
-        annual_kwh: 0,
+        capacity_kwp: 6,
+        annual_kwh: 7200,
         routing_reason: 'demo/sample-data',
         cost_usd: 0,
         pdf_url: `/api/survey/files?file=${encodeURIComponent(pdfFilename)}`,
         ahj_url: `/api/survey/files?file=${encodeURIComponent(`AHJ_${payload.report_id}.json`)}`,
+        orchestration,
         demo: true,
       },
       allowed,

@@ -27,6 +27,7 @@ import surveyDemoRoute from '../../api/survey/demo/route';
 import surveyHealthRoute from '../../api/survey/health/route';
 import surveyCrmRoute from '../../api/survey/crm/route';
 import surveyJurisdictionsRoute from '../../api/survey/jurisdictions/route';
+import surveyOrchestrateRoute from '../../api/survey/orchestrate/route';
 import surveyPermitPackRoute from '../../api/survey/permit-pack/route';
 import surveyStatsRoute from '../../api/survey/stats/route';
 import { dispatchSurveyWebhook } from '../../api/lib/surveyWebhook';
@@ -151,6 +152,28 @@ describe('survey API routes', () => {
     const body = (await jsonBody(res)) as { platform: string; stats: { total_reports: number } };
     expect(body.platform).toBe('solaris-cet');
     expect(body.stats.total_reports).toBe(3);
+  });
+
+  it('/api/survey/orchestrate: GET proxies OODA plan', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          schema: 'solaris-orchestration-v1',
+          report_id: 'SOL-ORCH-1',
+          auto_crm: true,
+          steps: [{ id: 'crm', label: 'CRM', status: 'pending' }],
+        }),
+        { status: 200 },
+      ),
+    );
+    const req = new Request('http://test/api/survey/orchestrate?report_id=SOL-ORCH-1', {
+      method: 'GET',
+      headers: { origin: 'https://x.test' },
+    });
+    const res = await surveyOrchestrateRoute(req);
+    expect(res.status).toBe(200);
+    const body = (await jsonBody(res)) as { orchestration: { report_id: string } };
+    expect(body.orchestration.report_id).toBe('SOL-ORCH-1');
   });
 
   it('/api/survey/context: GET proxies unified context', async () => {

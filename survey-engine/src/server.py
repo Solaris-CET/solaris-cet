@@ -9,12 +9,12 @@ import tempfile
 from pathlib import Path
 
 from dotenv import load_dotenv
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import FastAPI, File, Form, Header, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from src.api_clients.cost_logger import CostLogger
 from src.ahj_export import build_permit_zip_from_registry, export_ahj_json
@@ -29,6 +29,7 @@ from src.jurisdictions import list_jurisdiction_codes
 from src.rate_limit import check_rate_limit
 from src.report_generator import generate_report
 from src.report_registry import ReportRegistry
+from src.survey_agent import plan_from_form
 
 load_dotenv(project_root() / ".env")
 
@@ -147,6 +148,37 @@ class GenerateResponse(BaseModel):
     routing_reason: str
     cost_usd: float
     installer_id: str = ""
+    orchestration: dict[str, Any] = Field(default_factory=dict)
+
+
+def _budget_flags() -> tuple[bool, bool]:
+    cost = _cost_budget_status()
+    return cost.get("alert", False), cost.get("exceeded", False)
+
+
+def _orchestration_for_survey(
+    request: Request,
+    survey,
+    *,
+    jurisdiction_code: str,
+    shading_level: str,
+    premium: bool,
+) -> dict[str, Any]:
+    base = str(request.base_url).rstrip("/")
+    alert, exceeded = _budget_flags()
+    return plan_from_form(
+        report_id=survey.metadata.report_id,
+        score=survey.executive_summary.suitability_score,
+        capacity_kwp=survey.system_estimate.recommended_capacity_kwp,
+        verdict=survey.executive_summary.suitability_verdict,
+        jurisdiction_code=jurisdiction_code or (survey.metadata.jurisdiction_code or ""),
+        shading_level=shading_level,
+        premium=premium,
+        checklist_statuses={item.id: item.status.value for item in survey.checklist},
+        platform_base_url=base,
+        budget_alert=alert,
+        budget_exceeded=exceeded,
+    )
 
 
 @app.post("/generate", response_model=GenerateResponse)
@@ -242,6 +274,12 @@ async def generate_survey(
             routing_reason=result.routing_reason,
             cost_usd=round(result.cost_usd, 4),
             installer_id=effective_installer,
+            orchestration=_orchestration_for_survey(
+                request, survey,
+                jurisdiction_code=jurisdiction_code.strip(),
+                shading_level=shading_level,
+                premium=premium,
+            ),
         )
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
@@ -342,6 +380,33 @@ async def batch_surveys(
         )
     finally:
         shutil.rmtree(work_dir, ignore_errors=True)
+
+
+@app.get("/orchestrate/{report_id}")
+def orchestrate_report(report_id: str, request: Request):
+    """OODA plan for an existing report (post-generate or re-fetch)."""
+    from src.context_api import build_report_context
+
+    base = str(request.base_url).rstrip("/")
+    try:
+        ctx = build_report_context(report_id, platform_base_url=base)
+    except KeyError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    r = ctx["report"]
+    alert, exceeded = _budget_flags()
+    return plan_from_form(
+        report_id=report_id,
+        score=r["suitability_score"],
+        capacity_kwp=r["capacity_kwp"],
+        verdict="",
+        jurisdiction_code=(ctx.get("jurisdiction") or {}).get("code") or "",
+        shading_level="low",
+        premium=r.get("premium_tier", False),
+        checklist_statuses={},
+        platform_base_url=base,
+        budget_alert=alert,
+        budget_exceeded=exceeded,
+    )
 
 
 @app.get("/context/{report_id}")

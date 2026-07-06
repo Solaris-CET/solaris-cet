@@ -81,6 +81,72 @@ test.describe('Survey technician app', () => {
     await expect(page.locator('label').filter({ hasText: 'Oraș' }).locator('input')).toHaveValue('Vaslui');
   });
 
+  test('orchestration steps visible after demo report', async ({ page }) => {
+    await page.route('**/api/survey/health', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          platform: 'solaris-cet',
+          engine: { ok: true, cost_budget: { alert: false, exceeded: false } },
+          engine_url: 'http://127.0.0.1:8000',
+        }),
+      });
+    });
+    await page.route('**/api/survey/jurisdictions', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ jurisdictions: [] }),
+      });
+    });
+    await page.route('**/api/survey/demo', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          report_id: 'SOL-DEMO-E2E',
+          pdf_filename: 'demo.pdf',
+          ahj_filename: 'AHJ_demo.json',
+          pdf_url: '/api/survey/files?file=demo.pdf',
+          ahj_url: '/api/survey/files?file=AHJ_demo.json',
+          score: 87,
+          verdict: 'Recomandat',
+          capacity_kwp: 6,
+          annual_kwh: 7200,
+          routing_reason: 'demo',
+          cost_usd: 0,
+          orchestration: {
+            schema: 'solaris-orchestration-v1',
+            report_id: 'SOL-DEMO-E2E',
+            permit_risk: { score: 30, permit_recommended: false, reasons: [], threshold: 50 },
+            auto_crm: true,
+            auto_permit_hint: false,
+            budget_guard: { alert: false, exceeded: false },
+            steps: [
+              { id: 'generate', label: 'Raport PDF generat', status: 'done' },
+              { id: 'crm', label: 'Trimite în CRM', status: 'pending', auto: true },
+            ],
+            contact_url: '/contact?from=survey&report_id=SOL-DEMO-E2E',
+            permit_pack_url: null,
+          },
+        }),
+      });
+    });
+    await page.route('**/api/survey/crm', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true, pdfUrl: '/api/survey/files?file=demo.pdf' }),
+      });
+    });
+
+    await page.goto('/survey', { waitUntil: 'domcontentloaded' });
+    await page.getByRole('button', { name: /Raport demo/i }).click();
+    await expect(page.getByText(/Raport PDF generat/i)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/Trimite în CRM|Trimis în CRM/i)).toBeVisible();
+  });
+
   test('survey contact prefill via query params', async ({ page }) => {
     await page.goto(
       '/contact?from=survey&report_id=SOL-E2E-001&name=Maria%20Test&city=Vaslui&kwp=6&score=80&phone=0722123456',

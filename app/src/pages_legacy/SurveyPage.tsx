@@ -22,6 +22,7 @@ import {
   generateDemoReport,
   generateSurveyReport,
   runSurveyBatch,
+  fetchOrchestration,
   permitPackUrl,
   submitSurveyCorrection,
   submitSurveyToCrm,
@@ -36,6 +37,7 @@ import {
   saveSurveyDraft,
   storedToPhotos,
 } from '@/lib/surveyDraftStorage';
+import { permitHintMessage, shouldAutoCrm, type SurveyOrchestration } from '@/lib/surveyAgent';
 import { buildSurveyContactUrl } from '@/lib/contactPrefill';
 import { cn } from '@/lib/utils';
 
@@ -131,6 +133,7 @@ export default function SurveyPage() {
   const [correctionText, setCorrectionText] = useState('');
   const [correctionSent, setCorrectionSent] = useState(false);
   const [correctionSaving, setCorrectionSaving] = useState(false);
+  const [orchestration, setOrchestration] = useState<SurveyOrchestration | null>(null);
   const [engineOk, setEngineOk] = useState<boolean | null>(null);
   const [costBudgetAlert, setCostBudgetAlert] = useState(false);
   const [batchManifest, setBatchManifest] = useState(
@@ -354,15 +357,45 @@ export default function SurveyPage() {
     });
   }, [result, form]);
 
+  const applyOrchestration = useCallback(async (res: GenerateReportResult) => {
+    const plan = res.orchestration ?? (await fetchOrchestration(res.report_id).catch(() => null));
+    setOrchestration(plan);
+    if (plan && shouldAutoCrm(plan) && form.clientName) {
+      try {
+        await submitSurveyToCrm({
+          report_id: res.report_id,
+          pdf_filename: res.pdf_filename,
+          client_name: form.clientName,
+          client_phone: form.clientPhone || '—',
+          client_email: form.clientEmail || undefined,
+          client_city: form.clientCity,
+          installer_id: installer.installerId || undefined,
+          installer_name: installer.installerName || undefined,
+          score: res.score,
+          capacity_kwp: res.capacity_kwp,
+        });
+        setCrmSent(true);
+      } catch {
+        /* optional */
+      }
+    }
+  }, [form, installer]);
+
   const handleDemo = async () => {
     setGenerating(true);
     setError('');
     setResult(null);
     setCrmSent(false);
+    setOrchestration(null);
     setProgress('Generare raport demo...');
     try {
       const res = await generateDemoReport();
       setResult(res);
+      if (res.orchestration) {
+        setOrchestration(res.orchestration);
+      } else {
+        await applyOrchestration(res);
+      }
       setProgress('Demo gata!');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Demo eșuat');
@@ -391,11 +424,39 @@ export default function SurveyPage() {
     setError('');
     setResult(null);
     setCrmSent(false);
+    setOrchestration(null);
     setProgress('Pregătire upload...');
     try {
       setProgress('Analiză AI + generare PDF...');
       const res = await generateSurveyReport(photos, form, installer);
       setResult(res);
+      setProgress('Agent: planificare pași...');
+      if (res.orchestration) {
+        setOrchestration(res.orchestration);
+        if (shouldAutoCrm(res.orchestration)) {
+          setProgress('Agent: trimitere CRM...');
+          try {
+            await submitSurveyToCrm({
+              report_id: res.report_id,
+              pdf_filename: res.pdf_filename,
+              client_name: form.clientName,
+              client_phone: form.clientPhone || '—',
+              client_email: form.clientEmail || undefined,
+              client_city: form.clientCity,
+              installer_id: installer.installerId || undefined,
+              installer_name: installer.installerName || undefined,
+              score: res.score,
+              capacity_kwp: res.capacity_kwp,
+              notes: form.structuralNotes || undefined,
+            });
+            setCrmSent(true);
+          } catch {
+            /* CRM optional */
+          }
+        }
+      } else {
+        await applyOrchestration(res);
+      }
       await clearSurveyDraft();
       setProgress('Gata!');
     } catch (err) {
@@ -909,6 +970,24 @@ export default function SurveyPage() {
                     </div>
                   </div>
                   <p className="mt-3 text-xs text-white/45">{result.routing_reason} · ~${result.cost_usd.toFixed(4)} API</p>
+                  {orchestration && permitHintMessage(orchestration) && (
+                    <p className="mt-2 rounded-lg border border-teal-400/20 bg-teal-400/5 px-3 py-2 text-xs text-teal-200">
+                      {permitHintMessage(orchestration)}
+                    </p>
+                  )}
+                  {orchestration && (
+                    <ul className="mt-2 space-y-1 text-[11px] text-white/50">
+                      {orchestration.steps.filter((s) => s.status !== 'skipped').map((s) => (
+                        <li key={s.id} className="flex items-center gap-2">
+                          <span className={cn(
+                            'h-1.5 w-1.5 rounded-full',
+                            s.status === 'done' ? 'bg-emerald-400' : s.status === 'blocked' ? 'bg-red-400' : 'bg-amber-400',
+                          )} />
+                          {s.label}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   <div className="mt-4 flex flex-col gap-2">
                     <a
                       href={result.pdf_url}

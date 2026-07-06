@@ -1,4 +1,5 @@
 import { getAllowedOrigin } from '../../lib/cors';
+import { dispatchSurveyWebhook } from '../../lib/surveyWebhook';
 
 export const config = { runtime: 'nodejs' };
 
@@ -71,7 +72,19 @@ export default async function handler(req: Request): Promise<Response> {
       routing_reason: string;
       cost_usd: number;
       installer_id?: string;
+      orchestration?: Record<string, unknown>;
     };
+
+    void dispatchSurveyWebhook({
+      event: 'survey_orchestration_complete',
+      reportId: payload.report_id,
+      score: payload.score,
+      capacityKwp: payload.capacity_kwp,
+      autoCrm: Boolean((payload.orchestration as { auto_crm?: boolean } | undefined)?.auto_crm),
+      permitRecommended: Boolean(
+        (payload.orchestration as { auto_permit_hint?: boolean } | undefined)?.auto_permit_hint,
+      ),
+    });
 
     return json(
       {

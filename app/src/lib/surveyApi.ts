@@ -1,3 +1,4 @@
+import type { SurveyOrchestration } from './surveyAgent';
 import type { CorrectionPayload, ReportContext } from './surveyContext';
 import { permitPackUrl } from './surveyContext';
 import type { SoftCostRoi } from './softCostRoi';
@@ -72,6 +73,7 @@ export type GenerateReportResult = {
   routing_reason: string;
   cost_usd: number;
   installer_id?: string;
+  orchestration?: SurveyOrchestration;
 };
 
 export type SurveyHealth = {
@@ -288,6 +290,14 @@ export async function runSurveyBatch(
     throw new Error(data.error || data.detail || 'Batch eșuat');
   }
   return data;
+}
+
+export async function fetchOrchestration(reportId: string): Promise<SurveyOrchestration> {
+  const res = await fetch(`/api/survey/orchestrate?report_id=${encodeURIComponent(reportId)}`);
+  const data = (await res.json()) as { orchestration?: SurveyOrchestration; error?: string };
+  if (!res.ok) throw new Error(data.error || 'Orchestration indisponibilă');
+  if (!data.orchestration) throw new Error('Plan lipsă');
+  return data.orchestration;
 }
 
 export async function fetchReportContext(reportId: string): Promise<ReportContext> {

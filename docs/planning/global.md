@@ -85,6 +85,15 @@
 
 **BCG Reshape:** factor 1 (data layer) + factor 3 (adaptive) + factor 4 (explainability) livrate în cod.
 
+## Epic agentic-orchestration (S5) — 2026-07-06 DONE
+
+| Componentă | API / fișier |
+|---|---|
+| Permit risk scorer | `assess_permit_risk()` |
+| OODA plan | `GET /orchestrate/{id}` · `/api/survey/orchestrate` |
+| Auto-CRM post-generare | `SurveyPage` + `orchestration.auto_crm` |
+| Webhook | `survey_orchestration_complete` |
+
 ## Status livrare Faza 6 (v1.1) — 2026-07-06
 
 | Componentă | Status | Locație |
