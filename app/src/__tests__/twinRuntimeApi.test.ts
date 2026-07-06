@@ -30,4 +30,9 @@ describe('twinRuntimeApi', () => {
   it('twinStreamUrl encodes report id', () => {
     expect(twinStreamUrl('SOL/X')).toContain('report_id=SOL%2FX');
   });
+
+  it('twinStreamUrl adds persistent by default', () => {
+    expect(twinStreamUrl('SOL-1')).toContain('persistent=1');
+    expect(twinStreamUrl('SOL-1', false)).not.toContain('persistent=1');
+  });
 });

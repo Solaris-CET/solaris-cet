@@ -1,5 +1,6 @@
 import { getAllowedOrigin } from '../../lib/cors';
 import { dispatchSurveyWebhook } from '../../lib/surveyWebhook';
+import { dispatchTwinWebhook } from '../../lib/twinWebhook';
 
 export const config = { runtime: 'nodejs' };
 
@@ -84,6 +85,12 @@ export default async function handler(req: Request): Promise<Response> {
       permitRecommended: Boolean(
         (payload.orchestration as { auto_permit_hint?: boolean } | undefined)?.auto_permit_hint,
       ),
+    });
+    void dispatchTwinWebhook({
+      event: 'report_generated',
+      report_id: payload.report_id,
+      score: payload.score,
+      capacity_kwp: payload.capacity_kwp,
     });
 
     return json(

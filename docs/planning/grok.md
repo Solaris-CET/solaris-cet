@@ -372,3 +372,17 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 - `npm run survey:prod-gate` · `deploy:status` · `gitea:push-retry`
 
 **VERIFY:** manifest self-test · Vitest surveyProdGate · SOFT_FAIL=1 pe prod până Coolify redeploy
+
+---
+
+## Update 2026-07-06 — Twin CRM Webhooks (twin-crm-webhooks, 30 task-uri)
+
+**Livrat:**
+- `twin_webhook.py` — outbound `TWIN_WEBHOOK_URL` + delivery log JSONL + inbound `crm_sync`
+- SSE persistent `iter_sse_persistent_stream()` + heartbeat · `useTwinStream` reconnect
+- `Twin3DViewer.tsx` (@react-three/fiber) · toggle 3D/Hartă în `TwinRuntimePanel`
+- Node bridge: `POST /api/survey/twin-webhook` · `GET /api/survey/twin-webhook/deliveries`
+- Admin `TwinWebhookSection` · OpenAPI + SDK `twinWebhookDeliveries` / `postTwinWebhook`
+- Smoke S8: persistent stream + webhook deliveries/status
+
+**VERIFY:** pytest `test_twin_webhook` · Vitest useTwinStream + twin3dScene · Playwright 3D toggle

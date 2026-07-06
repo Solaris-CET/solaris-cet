@@ -214,6 +214,9 @@ test.describe('Survey technician app', () => {
     await page.getByRole('button', { name: /Raport demo/i }).click();
     await expect(page.getByText(/Twin runtime live/i)).toBeVisible({ timeout: 15000 });
     await expect(page.getByText(/6 kWp/i)).toBeVisible();
+    await expect(page.getByRole('button', { name: '3D' })).toBeVisible();
+    await page.getByRole('button', { name: 'Hartă' }).click();
+    await expect(page.locator('iframe[title="Twin site map"]')).toBeVisible();
   });
 
   test('survey contact prefill via query params', async ({ page }) => {

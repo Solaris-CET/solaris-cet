@@ -35,14 +35,20 @@ export default async function handler(req: Request): Promise<Response> {
 
   const url = new URL(req.url);
   const reportId = (url.searchParams.get('report_id') || '').trim();
+  const persistent = ['1', 'true', 'yes'].includes((url.searchParams.get('persistent') || '').trim().toLowerCase());
   if (!reportId || reportId.length > 80) {
     return json({ error: 'report_id required' }, allowed, 400);
   }
 
+  const engineQs = persistent ? '?persistent=true' : '';
+  const fetchOpts: RequestInit = persistent
+    ? {}
+    : { signal: AbortSignal.timeout(30_000) };
+
   try {
     const res = await fetch(
-      `${ENGINE.replace(/\/$/, '')}/twin-stream/${encodeURIComponent(reportId)}`,
-      { signal: AbortSignal.timeout(30_000) },
+      `${ENGINE.replace(/\/$/, '')}/twin-stream/${encodeURIComponent(reportId)}${engineQs}`,
+      fetchOpts,
     );
     if (!res.ok || !res.body) {
       const data = await res.json().catch(() => ({}));

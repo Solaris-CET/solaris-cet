@@ -11,6 +11,7 @@ export const SURVEY_GATE_ROUTES = [
   { path: '/api/openapi/survey', method: 'GET', label: 'openapi-survey', required: ['paths'], critical: true },
   { path: '/api/survey/dashboard', method: 'GET', label: 'dashboard', required: ['stats'], critical: false },
   { path: '/api/survey/twin-events', method: 'GET', label: 'twin-events', required: ['events'], critical: false },
+  { path: '/api/survey/twin-webhook/deliveries', method: 'GET', label: 'twin-webhook-deliveries', required: ['deliveries'], critical: false },
   { path: '/api/survey/installer/me', method: 'GET', label: 'installer-me', required: ['installer'], critical: false },
 ];
 
@@ -20,6 +21,8 @@ export const OPENAPI_REQUIRED_PATHS = [
   '/api/survey/twin-feed',
   '/api/survey/twin-events',
   '/api/survey/twin-stream',
+  '/api/survey/twin-webhook',
+  '/api/survey/twin-webhook/deliveries',
   '/api/survey/context',
   '/api/survey/orchestrate',
   '/api/survey/installer/me',

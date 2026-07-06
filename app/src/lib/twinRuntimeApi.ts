@@ -25,6 +25,8 @@ export async function fetchTwinRuntimeStatus(): Promise<TwinRuntimeStatus> {
   };
 }
 
-export function twinStreamUrl(reportId: string): string {
-  return `/api/survey/twin-stream?report_id=${encodeURIComponent(reportId)}`;
+export function twinStreamUrl(reportId: string, persistent = true): string {
+  const qs = new URLSearchParams({ report_id: reportId });
+  if (persistent) qs.set('persistent', '1');
+  return `/api/survey/twin-stream?${qs}`;
 }

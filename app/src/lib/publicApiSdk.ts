@@ -99,6 +99,17 @@ export function createSolarisClient(opts: SolarisClientOptions) {
           path: '/api/survey/twin-events',
           query: { report_id: reportId, limit },
         }),
+      twinWebhookDeliveries: (limit = 50, direction?: 'inbound' | 'outbound') =>
+        requestJson<unknown>(opts, {
+          path: '/api/survey/twin-webhook/deliveries',
+          query: { limit, direction },
+        }),
+      postTwinWebhook: (body: Record<string, unknown>) =>
+        requestJson<unknown>(opts, {
+          path: '/api/survey/twin-webhook',
+          method: 'POST',
+          body,
+        }),
       openApiSpec: () => requestJson<unknown>(opts, { path: '/api/openapi/survey' }),
     },
   };

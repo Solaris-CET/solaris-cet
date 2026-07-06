@@ -1,5 +1,6 @@
 import { getAllowedOrigin } from '../../lib/cors';
 import { dispatchSurveyWebhook } from '../../lib/surveyWebhook';
+import { dispatchTwinWebhook } from '../../lib/twinWebhook';
 
 export const config = { runtime: 'nodejs' };
 
@@ -100,6 +101,12 @@ export default async function handler(req: Request): Promise<Response> {
     }
     void dispatchSurveyWebhook({
       event: 'twin_feed_updated',
+      report_id: reportId,
+      field,
+      corrected,
+    });
+    void dispatchTwinWebhook({
+      event: 'correction_logged',
       report_id: reportId,
       field,
       corrected,

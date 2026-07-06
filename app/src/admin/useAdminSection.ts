@@ -15,6 +15,7 @@ const ADMIN_SECTION_KEYS = [
   'leads',
   'installers',
   'twin-monitor',
+  'twin-webhooks',
   'audit',
 ] as const;
 

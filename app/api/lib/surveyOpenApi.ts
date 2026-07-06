@@ -20,6 +20,8 @@ export const SURVEY_ROUTE_IDS = [
   'installer-me',
   'twin-events',
   'twin-stream',
+  'twin-webhook',
+  'twin-webhook-deliveries',
 ] as const;
 
 export type SurveyRouteId = (typeof SURVEY_ROUTE_IDS)[number];
@@ -30,6 +32,8 @@ const BRIDGE_PATH_OVERRIDES: Partial<Record<SurveyRouteId, string>> = {
   'twin-feed': '/api/survey/twin-feed',
   'twin-events': '/api/survey/twin-events',
   'twin-stream': '/api/survey/twin-stream',
+  'twin-webhook': '/api/survey/twin-webhook',
+  'twin-webhook-deliveries': '/api/survey/twin-webhook/deliveries',
 };
 
 export function surveyBridgePath(id: SurveyRouteId): string {
@@ -157,9 +161,28 @@ export function buildSurveyOpenApiPaths(): Record<string, unknown> {
     },
     '/api/survey/twin-stream': {
       get: {
-        summary: 'Twin SSE snapshot stream (D10)',
-        parameters: [{ name: 'report_id', in: 'query', required: true, schema: { type: 'string' } }],
+        summary: 'Twin SSE stream — snapshot or persistent (D10)',
+        parameters: [
+          { name: 'report_id', in: 'query', required: true, schema: { type: 'string' } },
+          { name: 'persistent', in: 'query', schema: { type: 'string', enum: ['0', '1', 'true'] } },
+        ],
         responses: { '200': { description: 'text/event-stream' }, '404': jsonResponse },
+      },
+    },
+    '/api/survey/twin-webhook': {
+      post: {
+        summary: 'Inbound CRM twin webhook',
+        responses: { '200': jsonResponse, '400': jsonResponse, '401': jsonResponse, '503': jsonResponse },
+      },
+    },
+    '/api/survey/twin-webhook/deliveries': {
+      get: {
+        summary: 'Twin webhook delivery log',
+        parameters: [
+          { name: 'limit', in: 'query', schema: { type: 'integer' } },
+          { name: 'direction', in: 'query', schema: { type: 'string', enum: ['inbound', 'outbound'] } },
+        ],
+        responses: { '200': jsonResponse },
       },
     },
   };

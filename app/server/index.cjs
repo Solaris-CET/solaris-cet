@@ -575,6 +575,8 @@ const apiRoutes = new Map([
   ['/api/survey/twin-feed', 'api/survey/twin-feed/route.js'],
   ['/api/survey/twin-events', 'api/survey/twin-events/route.js'],
   ['/api/survey/twin-stream', 'api/survey/twin-stream/route.js'],
+  ['/api/survey/twin-webhook', 'api/survey/twin-webhook/route.js'],
+  ['/api/survey/twin-webhook/deliveries', 'api/survey/twin-webhook/deliveries/route.js'],
   ['/api/survey/installer/me', 'api/survey/installer/me/route.js'],
   ['/api/openapi/survey', 'api/openapi/survey/route.js'],
   ['/api/admin/surveys', 'api/admin/surveys/route.js'],

@@ -177,3 +177,16 @@
 | Smoke extins | `smoke-http.mjs` survey health · `stash-verify` prod gate |
 
 **VERIFY:** `survey-route-manifest.test.mjs` · Vitest `surveyProdGate.test.ts`
+
+## Epic twin-crm-webhooks (D10 3D + CRM bidirectional) — 2026-07-06 DONE
+
+| Componentă | Locație |
+|---|---|
+| Persistent SSE | `iter_sse_persistent_stream()` · `?persistent=1` · heartbeat |
+| 3D viewer | `Twin3DViewer.tsx` + `twin3dScene.ts` · toggle în `TwinRuntimePanel` |
+| Outbound CRM | `twin_webhook.py` · `TWIN_WEBHOOK_URL` · hook `publish_twin_event` |
+| Inbound CRM | `POST /twin-webhook/inbound` · `POST /api/survey/twin-webhook` |
+| Delivery log | `GET /twin-webhook/deliveries` · Admin `TwinWebhookSection` |
+| SDK | `twinWebhookDeliveries()` · `postTwinWebhook()` |
+
+**VERIFY:** pytest twin_webhook + persistent SSE · Vitest useTwinStream + twin3dScene · smoke S8

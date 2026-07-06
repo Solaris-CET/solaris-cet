@@ -62,3 +62,27 @@ def test_sse_stream_snapshot(tmp_path: Path, monkeypatch):
     assert "event: snapshot" in joined
     assert "event: ready" in joined
     assert report_id in joined
+
+
+def test_persistent_stream_initial_burst(tmp_path: Path, monkeypatch):
+    events_file = tmp_path / "output" / "twin_events.jsonl"
+    monkeypatch.setattr("src.twin_runtime.events_path", lambda: events_file)
+    monkeypatch.setattr("src.twin_webhook.deliveries_path", lambda: tmp_path / "output" / "deliveries.jsonl")
+    monkeypatch.setenv("TWIN_WEBHOOK_URL", "")
+    monkeypatch.setattr("src.models.project_root", lambda: tmp_path)
+    report_id = _seed_report(tmp_path)
+    from src.twin_runtime import iter_sse_persistent_stream
+
+    chunks: list[str] = []
+    for i, frame in enumerate(
+        iter_sse_persistent_stream(report_id, poll_seconds=0.05, heartbeat_seconds=0.1),
+    ):
+        chunks.append(frame)
+        joined = "".join(chunks)
+        if "event: ready" in joined:
+            break
+        if i > 80:
+            break
+    joined = "".join(chunks)
+    assert "event: snapshot" in joined
+    assert "event: ready" in joined

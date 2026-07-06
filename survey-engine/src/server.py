@@ -32,7 +32,14 @@ from src.report_generator import generate_report
 from src.report_registry import ReportRegistry
 from src.survey_agent import batch_orchestration_summary, plan_from_form
 from src.twin_feed import build_twin_feed
-from src.twin_runtime import iter_sse_stream, list_twin_events, publish_twin_event, runtime_status
+from src.twin_runtime import (
+    iter_sse_persistent_stream,
+    iter_sse_stream,
+    list_twin_events,
+    publish_twin_event,
+    runtime_status,
+)
+from src.twin_webhook import handle_inbound_webhook, list_deliveries, webhook_status
 
 load_dotenv(project_root() / ".env")
 
@@ -448,8 +455,11 @@ def engine_openapi():
             "/orchestrate/{report_id}": {"get": {"summary": "OODA plan"}},
             "/twin-feed/{report_id}": {"get": {"summary": "Digital twin feed"}},
             "/twin-events": {"get": {"summary": "Twin runtime event log"}},
-            "/twin-stream/{report_id}": {"get": {"summary": "Twin SSE snapshot stream"}},
+            "/twin-stream/{report_id}": {"get": {"summary": "Twin SSE stream (snapshot or persistent)"}},
             "/twin-runtime/status": {"get": {"summary": "Twin runtime status"}},
+            "/twin-webhook/deliveries": {"get": {"summary": "Twin webhook delivery log"}},
+            "/twin-webhook/inbound": {"post": {"summary": "Inbound CRM twin webhook"}},
+            "/twin-webhook/status": {"get": {"summary": "Twin webhook status"}},
             "/installers": {"get": {"summary": "Installer aggregate list"}},
             "/installer/me": {"get": {"summary": "Authenticated installer profile"}},
             "/permit-pack/{report_id}": {"get": {"summary": "Permit ZIP"}},
@@ -474,9 +484,10 @@ def twin_events(report_id: Optional[str] = None, limit: int = 50):
 
 
 @app.get("/twin-stream/{report_id}")
-def twin_stream(report_id: str):
+def twin_stream(report_id: str, persistent: bool = False):
+    stream = iter_sse_persistent_stream(report_id) if persistent else iter_sse_stream(report_id)
     return StreamingResponse(
-        iter_sse_stream(report_id),
+        stream,
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
     )
@@ -484,7 +495,38 @@ def twin_stream(report_id: str):
 
 @app.get("/twin-runtime/status")
 def twin_runtime_health():
-    return runtime_status()
+    status = runtime_status()
+    status["persistent_sse"] = True
+    return status
+
+
+class TwinInboundPayload(BaseModel):
+    report_id: str = Field(..., min_length=1, max_length=80)
+    event: str = Field(default="crm_sync", max_length=80)
+    payload: dict[str, Any] = Field(default_factory=dict)
+
+
+@app.get("/twin-webhook/deliveries")
+def twin_webhook_deliveries(limit: int = 50, direction: Optional[str] = None):
+    rows = list_deliveries(limit=min(limit, 200), direction=direction.strip() if direction else None)
+    return {"total": len(rows), "deliveries": rows}
+
+
+@app.get("/twin-webhook/status")
+def twin_webhook_health():
+    return webhook_status()
+
+
+@app.post("/twin-webhook/inbound")
+def twin_webhook_inbound(body: TwinInboundPayload, x_twin_webhook_secret: Optional[str] = Header(None)):
+    expected = os.getenv("TWIN_WEBHOOK_SECRET", "").strip()
+    if expected and (x_twin_webhook_secret or "").strip() != expected:
+        raise HTTPException(401, "Invalid twin webhook secret")
+    try:
+        merged = {"report_id": body.report_id, "event": body.event, **body.payload}
+        return handle_inbound_webhook(merged)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
 
 
 @app.get("/corrections")

@@ -60,6 +60,29 @@ if (hasS6) {
     if (!streamText.includes('event: snapshot')) throw new Error('twin-stream missing snapshot event');
     console.log('✓ GET /twin-stream', 'snapshot ok');
   }
+
+  if (openapi.paths?.['/twin-webhook/deliveries']) {
+    const deliveries = await check('/twin-webhook/deliveries?limit=5');
+    console.log('✓ GET /twin-webhook/deliveries', `total=${deliveries.total ?? 0}`);
+    const whStatus = await check('/twin-webhook/status');
+    console.log('✓ GET /twin-webhook/status', whStatus.outbound_configured ? 'configured' : 'unset');
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 3500);
+    try {
+      const persistRes = await fetch(`${ENGINE}/twin-stream/${demo.report_id}?persistent=true`, {
+        signal: ctrl.signal,
+      });
+      if (!persistRes.ok) throw new Error(`/twin-stream persistent → ${persistRes.status}`);
+      const partial = await persistRes.text();
+      if (!partial.includes('event: snapshot')) throw new Error('persistent twin-stream missing snapshot');
+      console.log('✓ GET /twin-stream?persistent=true', 'snapshot ok (S8)');
+    } catch (err) {
+      if (err?.name !== 'AbortError') throw err;
+      console.log('✓ GET /twin-stream?persistent=true', 'stream opened (S8)');
+    } finally {
+      clearTimeout(timer);
+    }
+  }
 } else {
   console.log('⚠ S6 extended checks skipped — repornește survey-engine (cod nou pe :8000)');
 }

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterator, Optional
@@ -17,6 +18,7 @@ EVENT_TYPES = frozenset({
     "correction_logged",
     "feed_refreshed",
     "twin_ready",
+    "crm_sync",
 })
 
 
@@ -47,6 +49,12 @@ def publish_twin_event(
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(event, ensure_ascii=False) + "\n")
+    try:
+        from src.twin_webhook import dispatch_outbound_twin_webhook
+
+        dispatch_outbound_twin_webhook(event)
+    except Exception:
+        pass
     return event
 
 
@@ -82,6 +90,7 @@ def runtime_status() -> dict[str, Any]:
         "events_total": total,
         "events_path": str(path),
         "sse_supported": True,
+        "persistent_sse": True,
     }
 
 
@@ -100,6 +109,51 @@ def iter_sse_stream(report_id: str, *, event_limit: int = 30) -> Iterator[str]:
         yield _sse_frame(event["event_type"], event)
 
     yield _sse_frame("ready", {"report_id": report_id, "feed_schema": SCHEMA_ID})
+
+
+def iter_sse_persistent_stream(
+    report_id: str,
+    *,
+    event_limit: int = 30,
+    poll_seconds: float = 2.0,
+    heartbeat_seconds: float = 15.0,
+) -> Iterator[str]:
+    """Long-lived SSE: initial burst then heartbeat + live event polling."""
+    seen: set[str] = set()
+    for frame in iter_sse_stream(report_id, event_limit=event_limit):
+        yield frame
+        if frame.startswith("event: ") and "\ndata: " in frame:
+            event_name = frame.split("\n", 1)[0].removeprefix("event: ").strip()
+            if event_name not in ("snapshot", "ready", "heartbeat", "error"):
+                try:
+                    data_line = next(
+                        ln.removeprefix("data: ").strip()
+                        for ln in frame.split("\n")
+                        if ln.startswith("data:")
+                    )
+                    row = json.loads(data_line)
+                    if row.get("event_id"):
+                        seen.add(str(row["event_id"]))
+                except (StopIteration, json.JSONDecodeError, KeyError):
+                    pass
+
+    last_heartbeat = time.monotonic()
+    while True:
+        for event in list_twin_events(report_id, limit=event_limit):
+            event_id = str(event.get("event_id", ""))
+            if not event_id or event_id in seen:
+                continue
+            seen.add(event_id)
+            yield _sse_frame(event["event_type"], event)
+
+        now = time.monotonic()
+        if now - last_heartbeat >= heartbeat_seconds:
+            yield _sse_frame(
+                "heartbeat",
+                {"report_id": report_id, "ts": datetime.now(timezone.utc).isoformat()},
+            )
+            last_heartbeat = now
+        time.sleep(poll_seconds)
 
 
 def _sse_frame(event_name: str, data: dict[str, Any]) -> str:

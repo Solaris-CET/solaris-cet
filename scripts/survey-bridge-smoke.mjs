@@ -47,6 +47,12 @@ if (!paths['/api/survey/twin-events']) {
 if (!paths['/api/survey/twin-stream']) {
   throw new Error('openapi missing /api/survey/twin-stream');
 }
-console.log('✓ openapi paths include twin runtime routes');
+if (!paths['/api/survey/twin-webhook']) {
+  throw new Error('openapi missing /api/survey/twin-webhook');
+}
+if (!paths['/api/survey/twin-webhook/deliveries']) {
+  throw new Error('openapi missing /api/survey/twin-webhook/deliveries');
+}
+console.log('✓ openapi paths include twin runtime + webhook routes');
 
 console.log('\n✓ Survey bridge smoke passed');

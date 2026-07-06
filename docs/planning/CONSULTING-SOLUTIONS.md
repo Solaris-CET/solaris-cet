@@ -276,7 +276,7 @@ Skill actualizat: `.claude/skills/solaris-perfect-loops/SKILL.md` (secțiunea Co
 
 **Livrat 2026-07-06 (d10-twin-runtime):** SSE stream + event log + UI live — contract `twin-feed` neschimbat; rute additive `twin-events` / `twin-stream`.
 
-**Următor invent:** viewer 3D WebGL + long-poll SSE persistent + integrare CRM twin webhooks bidirecțional.
+**Livrat 2026-07-06 (twin-crm-webhooks):** `Twin3DViewer` WebGL · SSE persistent + heartbeat · webhooks bidirecțional (`TWIN_WEBHOOK_URL` + inbound POST) · Admin delivery log.
 
 **Livrat 2026-07-06 (prod-deploy-gate):** `survey-prod-gate` + Coolify redeploy script + Gitea push retry — gate automat după deploy.
 

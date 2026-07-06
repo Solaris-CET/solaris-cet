@@ -7,8 +7,10 @@ export type TwinEventType =
   | 'correction_logged'
   | 'feed_refreshed'
   | 'twin_ready'
+  | 'crm_sync'
   | 'snapshot'
   | 'ready'
+  | 'heartbeat'
   | 'error';
 
 export type TwinEvent = {
@@ -28,10 +30,12 @@ export type TwinRuntimeStatus = {
   events_total: number;
   events_path: string;
   sse_supported: boolean;
+  persistent_sse?: boolean;
 };
 
 export type TwinStreamMessage =
   | { type: 'snapshot'; feed: TwinFeed }
   | { type: 'event'; event: TwinEvent }
   | { type: 'ready'; reportId: string }
+  | { type: 'heartbeat'; reportId: string }
   | { type: 'error'; message: string };
