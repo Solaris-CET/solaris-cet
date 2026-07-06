@@ -17,8 +17,8 @@ BLOCKED:  COOLIFY_API_TOKEN absent locally · Gitea 504 · prod health.json 404
 
 | Metric | Value |
 |---|---|
-| **Git HEAD (local)** | `pending` (post P0 scripts commit) |
-| **GitHub `main`** | `accd4e1` (push OK) |
+| **Git HEAD (local)** | `a3a4222` |
+| **GitHub `main`** | `a3a4222` (push OK) |
 | **Gitea `origin/main`** | Poate fi în urmă — 504 la push |
 | **Prod `solaris-cet.com`** | health.json **404** · `/api/survey/health` **404** |
 | **Ralph open tasks** | **0** (`npm run loops:next` → none) |
