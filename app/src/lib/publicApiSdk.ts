@@ -8,6 +8,7 @@ type RequestOptions = {
   path: string;
   body?: unknown;
   query?: Record<string, string | number | boolean | null | undefined>;
+  extraHeaders?: Record<string, string>;
 };
 
 function buildUrl(baseUrl: string, path: string, query?: RequestOptions['query']): string {
@@ -27,6 +28,7 @@ async function requestJson<T>(opts: SolarisClientOptions, req: RequestOptions): 
     headers: {
       'Content-Type': 'application/json',
       'X-API-Key': opts.apiKey,
+      ...(req.extraHeaders ?? {}),
     },
     body: req.body === undefined ? undefined : JSON.stringify(req.body),
   });
@@ -87,6 +89,11 @@ export function createSolarisClient(opts: SolarisClientOptions) {
         requestJson<unknown>(opts, { path: '/api/survey/orchestrate', query: { report_id: reportId } }),
       twinFeed: (reportId: string) =>
         requestJson<unknown>(opts, { path: '/api/survey/twin-feed', query: { report_id: reportId } }),
+      installerMe: (installerKey?: string) =>
+        requestJson<unknown>(opts, {
+          path: '/api/survey/installer/me',
+          extraHeaders: installerKey ? { 'X-Installer-Key': installerKey } : undefined,
+        }),
       openApiSpec: () => requestJson<unknown>(opts, { path: '/api/openapi/survey' }),
     },
   };

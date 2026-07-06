@@ -262,3 +262,14 @@ Skill actualizat: `.claude/skills/solaris-perfect-loops/SKILL.md` (secțiunea Co
 | S6 API-first contract | Modular | ✅ DONE | `/api/openapi/survey` + twin-feed + SDK `client.survey` |
 
 **Deploy → Reshape:** epic marcat `done` în `features/soft-cost-platform/tasks.md`. Următorul horizon: S5 complet (agent roles + E2E gate) și Digital Twin feed (D10).
+
+---
+
+## 9. Invent phase — D10 Twin UI live (2026-07-06)
+
+**Ce inventăm acum (nu doar planificăm):**
+- Feed twin consumabil (`solaris-twin-feed-v1`) afișat în UI tehnician după generare
+- Identitate instalator SaaS (`GET /installer/me`) + agregat admin (`GET /installers`)
+- Gate deploy extins: post-deploy verifică openapi + context + twin-feed
+
+**Următor invent:** integrare Digital Twin runtime (D10) peste același feed — fără schimbare contract OpenAPI.

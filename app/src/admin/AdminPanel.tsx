@@ -12,6 +12,7 @@ import { CetuiaSection } from './sections/CetuiaSection';
 import { ConversationsSection } from './sections/ConversationsSection';
 import { DashboardSection } from './sections/DashboardSection';
 import { I18nSection } from './sections/I18nSection';
+import { InstallersSection } from './sections/InstallersSection';
 import { InvitesSection } from './sections/InvitesSection';
 import { LoginView } from './sections/LoginView';
 import { MediaSection } from './sections/MediaSection';
@@ -24,21 +25,24 @@ import { useAdminSession } from './useAdminSession';
 
 type NavItem = { key: AdminSectionKey; label: string; minRole: AdminRole };
 
-const NAV: NavItem[] = [
-  { key: 'dashboard', label: 'Dashboard', minRole: 'viewer' },
-  { key: 'invites', label: 'Invites', minRole: 'admin' },
-  { key: 'blocks', label: 'Texte pagini', minRole: 'editor' },
-  { key: 'posts', label: 'Blog', minRole: 'editor' },
-  { key: 'media', label: 'Media', minRole: 'editor' },
-  { key: 'token', label: 'Token', minRole: 'editor' },
-  { key: 'cetuia', label: 'Cetățuia', minRole: 'editor' },
-  { key: 'users', label: 'Utilizatori', minRole: 'admin' },
-  { key: 'conversations', label: 'Conversații AI', minRole: 'admin' },
-  { key: 'i18n', label: 'Traduceri', minRole: 'editor' },
-  { key: 'settings', label: 'Setări', minRole: 'admin' },
-  { key: 'leads', label: `Leads & Oferte${newLeadsCount > 0 ? ` (${newLeadsCount})` : ''}`, minRole: 'viewer' },
-  { key: 'audit', label: 'Audit', minRole: 'viewer' },
-];
+function buildNav(newLeadsCount: number): NavItem[] {
+  return [
+    { key: 'dashboard', label: 'Dashboard', minRole: 'viewer' },
+    { key: 'invites', label: 'Invites', minRole: 'admin' },
+    { key: 'blocks', label: 'Texte pagini', minRole: 'editor' },
+    { key: 'posts', label: 'Blog', minRole: 'editor' },
+    { key: 'media', label: 'Media', minRole: 'editor' },
+    { key: 'token', label: 'Token', minRole: 'editor' },
+    { key: 'cetuia', label: 'Cetățuia', minRole: 'editor' },
+    { key: 'users', label: 'Utilizatori', minRole: 'admin' },
+    { key: 'conversations', label: 'Conversații AI', minRole: 'admin' },
+    { key: 'i18n', label: 'Traduceri', minRole: 'editor' },
+    { key: 'settings', label: 'Setări', minRole: 'admin' },
+    { key: 'leads', label: `Leads & Oferte${newLeadsCount > 0 ? ` (${newLeadsCount})` : ''}`, minRole: 'viewer' },
+    { key: 'installers', label: 'Instalatori', minRole: 'viewer' },
+    { key: 'audit', label: 'Audit', minRole: 'viewer' },
+  ];
+}
 
 function rank(role: AdminRole) {
   return role === 'admin' ? 3 : role === 'editor' ? 2 : 1;
@@ -61,6 +65,8 @@ function parseSection(v: string | null): AdminSectionKey {
     v === 'conversations' ||
     v === 'i18n' ||
     v === 'settings' ||
+    v === 'leads' ||
+    v === 'installers' ||
     v === 'audit'
   ) {
     return v;
@@ -91,6 +97,9 @@ function useSectionState() {
 }
 
 export function AdminPanel() {
+  const { token, setToken, admin, setAdmin, isAuthenticated, logout } = useAdminSession();
+  const { section, navigate } = useSectionState();
+  const [bootError, setBootError] = useState<string | null>(null);
   const [newLeadsCount, setNewLeadsCount] = useState(0);
 
   useEffect(() => {
@@ -102,12 +111,9 @@ export function AdminPanel() {
       .then((data) => setNewLeadsCount(data.total ?? 0))
       .catch(() => {});
   }, [token]);
-  const { token, setToken, admin, setAdmin, isAuthenticated, logout } = useAdminSession();
-  const { section, navigate } = useSectionState();
-  const [bootError, setBootError] = useState<string | null>(null);
 
   const role = (admin?.role ?? 'viewer') as AdminRole;
-  const items = useMemo(() => NAV.filter((i) => canAccess(role, i.minRole)), [role]);
+  const items = useMemo(() => buildNav(newLeadsCount).filter((i) => canAccess(role, i.minRole)), [role, newLeadsCount]);
   const active = items.some((i) => i.key === section) ? section : 'dashboard';
 
   useEffect(() => {
@@ -191,6 +197,7 @@ export function AdminPanel() {
           {active === 'i18n' ? <I18nSection token={token} /> : null}
           {active === 'settings' ? <SettingsSection token={token} /> : null}
           {active === 'leads' ? <LeadsSection /> : null}
+          {active === 'installers' ? <InstallersSection /> : null}
           {active === 'audit' ? <AuditSection token={token} /> : null}
         </div>
       </div>

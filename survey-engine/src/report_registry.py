@@ -90,9 +90,24 @@ class ReportRegistry:
         if not reports:
             return {"total_reports": 0, "total_cost_usd": 0.0, "avg_score": 0}
         by_installer: dict[str, int] = {}
+        by_installer_detail: dict[str, dict] = {}
         for r in reports:
             key = r.installer_id or r.technician_name or "unknown"
             by_installer[key] = by_installer.get(key, 0) + 1
+            bucket = by_installer_detail.setdefault(
+                key,
+                {"report_count": 0, "total_capacity_kwp": 0.0, "score_sum": 0, "premium_count": 0},
+            )
+            bucket["report_count"] += 1
+            bucket["total_capacity_kwp"] += r.capacity_kwp
+            bucket["score_sum"] += r.suitability_score
+            if r.premium_tier:
+                bucket["premium_count"] += 1
+        for key, bucket in by_installer_detail.items():
+            count = bucket["report_count"]
+            bucket["total_capacity_kwp"] = round(bucket["total_capacity_kwp"], 1)
+            bucket["avg_score"] = round(bucket["score_sum"] / count, 1) if count else 0
+            del bucket["score_sum"]
         return {
             "total_reports": len(reports),
             "total_cost_usd": round(sum(r.cost_usd for r in reports), 4),
@@ -100,4 +115,5 @@ class ReportRegistry:
             "total_capacity_kwp": round(sum(r.capacity_kwp for r in reports), 1),
             "premium_count": sum(1 for r in reports if r.premium_tier),
             "by_installer": by_installer,
+            "by_installer_detail": by_installer_detail,
         }

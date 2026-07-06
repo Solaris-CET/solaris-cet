@@ -268,6 +268,14 @@ export default function LeadsSection() {
                     >
                       Context
                     </a>
+                    <a
+                      href={`/api/survey/twin-feed?report_id=${encodeURIComponent(l.reportId)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-violet-300 hover:underline"
+                    >
+                      Twin
+                    </a>
                   </span>
                 </div>
               </div>

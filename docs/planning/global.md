@@ -138,3 +138,16 @@
 **Teste:** pytest 62+ · Vitest survey routes · E2E smoke batch/calculator
 
 **Env noi:** `KIMI_*`, `INSTALLER_API_KEYS`, `SURVEY_RATE_LIMIT_PER_HOUR`, `SURVEY_WEBHOOK_URL`, `SURVEY_WEBHOOK_SECRET`
+
+## Epic installer-twin-deploy (D10 UI + Installer SaaS) — 2026-07-06 DONE
+
+| Componentă | Locație |
+|---|---|
+| Installer registry | `installer_registry.py` · `GET /installers` · `GET /installer/me` |
+| Node bridge | `/api/survey/installer/me` · `/api/admin/installers` |
+| Twin UI | `TwinFeedPanel.tsx` + `twinFeedMap.ts` în SurveyPage |
+| Admin instalatori | `InstallersSection.tsx` + nav fix `newLeadsCount` |
+| Deploy gate | `post-deploy-survey.mjs` (context, openapi, twin) · `survey-bridge-smoke.mjs` |
+| OpenAPI + SDK | `/api/survey/installer/me` · `client.survey.installerMe()` |
+
+**VERIFY:** pytest installer_registry · Vitest installerApi + twinFeedMap · E2E twin panel

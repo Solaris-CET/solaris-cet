@@ -5,6 +5,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { SolarisFooter } from '@/components/company/SolarisFooter';
+import { TwinFeedPanel } from '@/components/survey/TwinFeedPanel';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import {
@@ -1060,6 +1061,7 @@ export default function SurveyPage() {
                         Cere ofertă (contact)
                       </a>
                     )}
+                    <TwinFeedPanel reportId={result.report_id} className="mt-2" />
                   </div>
                 </div>
               )}

@@ -17,9 +17,20 @@ export const SURVEY_ROUTE_IDS = [
   'permit-pack',
   'corrections',
   'twin-feed',
+  'installer-me',
 ] as const;
 
 export type SurveyRouteId = (typeof SURVEY_ROUTE_IDS)[number];
+
+const BRIDGE_PATH_OVERRIDES: Partial<Record<SurveyRouteId, string>> = {
+  'permit-pack': '/api/survey/permit-pack',
+  'installer-me': '/api/survey/installer/me',
+  'twin-feed': '/api/survey/twin-feed',
+};
+
+export function surveyBridgePath(id: SurveyRouteId): string {
+  return BRIDGE_PATH_OVERRIDES[id] ?? `/api/survey/${id}`;
+}
 
 const jsonResponse = { description: 'JSON response' };
 const installerKeyParam = {
@@ -121,6 +132,13 @@ export function buildSurveyOpenApiPaths(): Record<string, unknown> {
         summary: 'Digital twin feed snapshot (D10 prep)',
         parameters: [{ name: 'report_id', in: 'query', required: true, schema: { type: 'string' } }],
         responses: { '200': jsonResponse, '404': jsonResponse },
+      },
+    },
+    '/api/survey/installer/me': {
+      get: {
+        summary: 'Authenticated installer SaaS profile',
+        parameters: [installerKeyParam],
+        responses: { '200': jsonResponse, '401': jsonResponse, '503': jsonResponse },
       },
     },
   };

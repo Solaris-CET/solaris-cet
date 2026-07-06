@@ -153,6 +153,71 @@ test.describe('Survey technician app', () => {
     const body = (await res.json()) as { info?: { title?: string }; paths?: Record<string, unknown> };
     expect(body.info?.title).toContain('Survey');
     expect(body.paths?.['/api/survey/health']).toBeTruthy();
+    expect(body.paths?.['/api/survey/installer/me']).toBeTruthy();
+  });
+
+  test('twin feed panel visible after demo report', async ({ page }) => {
+    await page.route('**/api/survey/health', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          platform: 'solaris-cet',
+          engine: { ok: true, cost_budget: { alert: false, exceeded: false } },
+          engine_url: 'http://127.0.0.1:8000',
+        }),
+      });
+    });
+    await page.route('**/api/survey/jurisdictions', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ jurisdictions: [] }),
+      });
+    });
+    await page.route('**/api/survey/demo', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          report_id: 'SOL-DEMO-TWIN',
+          pdf_filename: 'demo.pdf',
+          ahj_filename: 'AHJ_demo.json',
+          pdf_url: '/api/survey/files?file=demo.pdf',
+          ahj_url: '/api/survey/files?file=AHJ_demo.json',
+          score: 87,
+          verdict: 'Recomandat',
+          capacity_kwp: 6,
+          annual_kwh: 7200,
+          routing_reason: 'demo',
+          cost_usd: 0,
+        }),
+      });
+    });
+    await page.route('**/api/survey/twin-feed*', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          feed: {
+            schema: 'solaris-twin-feed-v1',
+            feed_version: 1,
+            generated_at: '2026-07-06T12:00:00Z',
+            report_id: 'SOL-DEMO-TWIN',
+            site: { client_name: 'Demo', city: 'Cluj', latitude: 46.77, longitude: 23.59 },
+            system: { capacity_kwp: 6, annual_kwh: 7200, suitability_score: 87, premium_tier: false },
+            low_confidence_count: 0,
+            corrections_count: 0,
+            corrections_recent: [],
+          },
+        }),
+      });
+    });
+
+    await page.goto('/survey', { waitUntil: 'domcontentloaded' });
+    await page.getByRole('button', { name: /Raport demo/i }).click();
+    await expect(page.getByText(/Digital Twin feed/i)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/solaris-twin-feed-v1/i)).toBeVisible();
   });
 
   test('survey contact prefill via query params', async ({ page }) => {

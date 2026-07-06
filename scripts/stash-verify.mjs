@@ -126,6 +126,10 @@ const smoke = await runNode('survey-smoke.mjs');
 if (smoke.ok) pass('survey:smoke');
 else fail('survey:smoke', smoke.out.trim().slice(-120));
 
+const openapiLocal = await fetchStatus('http://127.0.0.1:5173/api/openapi/survey');
+if (openapiLocal.ok) pass('openapi/survey route', `5173 → ${openapiLocal.status}`);
+else warn('openapi/survey route', 'not running — start: npm run dev:local');
+
 // Local dev stack (optional)
 const local = await fetchStatus('http://127.0.0.1:5173/api/survey/health');
 if (local.ok) pass('local dev API', `5173 → ${local.status}`);

@@ -331,3 +331,17 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 - Batch: `orchestration_summary` în răspuns `/batch`
 
 **VERIFY:** pytest 7/7 · Vitest 21/21 · smoke core OK (S6 extended după restart engine)
+
+---
+
+## Update 2026-07-06 — D10 Twin UI + Installer SaaS (installer-twin-deploy, 30 task-uri)
+
+**Livrat:**
+- `installer_registry.py` — agregat per instalator + `by_installer_detail` în registry stats
+- `GET /installer/me` + `GET /installers` engine · bridge Node + admin `InstallersSection`
+- `TwinFeedPanel` în SurveyPage după generare · link Twin în LeadsSection
+- `post-deploy-survey.mjs` extins (openapi, context, twin) · `npm run survey:bridge-smoke`
+- Fix AdminPanel: `newLeadsCount` în `buildNav()` (nu la nivel de modul)
+- OpenAPI path `/api/survey/installer/me` · SDK `installerMe(installerKey?)`
+
+**VERIFY:** pytest `test_installer_registry` · Vitest installerApi + route · Playwright twin panel

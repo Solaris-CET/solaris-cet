@@ -33,6 +33,14 @@ describe('publicApiSdk', () => {
     expect(url).toContain('/api/survey/twin-feed?report_id=SOL-1');
   });
 
+  it('survey.installerMe forwards X-Installer-Key', async () => {
+    fetchMock.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ installer: { installer_id: 'INST-1' } }) });
+    const client = createSolarisClient({ apiKey: 'cet_sk_test', baseUrl: 'https://example.com' });
+    await client.survey.installerMe('inst-secret');
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect((init.headers as Record<string, string>)['X-Installer-Key']).toBe('inst-secret');
+  });
+
   it('throws with message from API error payload', async () => {
     fetchMock.mockResolvedValueOnce({ ok: false, status: 401, json: async () => ({ error: { message: 'Invalid API key' } }) });
     const client = createSolarisClient({ apiKey: 'bad', baseUrl: 'https://example.com' });

@@ -13,6 +13,7 @@ const ADMIN_SECTION_KEYS = [
   'i18n',
   'settings',
   'leads',
+  'installers',
   'audit',
 ] as const;
 

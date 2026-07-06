@@ -30,6 +30,7 @@
     "survey:web": "cd survey-engine && python -m src.cli web",
     "survey:smoke": "node scripts/survey-smoke.mjs",
     "survey:post-deploy": "node scripts/post-deploy-survey.mjs",
+    "survey:bridge-smoke": "node scripts/survey-bridge-smoke.mjs",
     "survey:deploy": "node scripts/deploy-survey-stack.mjs",
     "gitea:push": "node scripts/gitea-push-main.mjs",
     "survey:deploy:smoke": "node scripts/deploy-survey-stack.mjs --smoke-only",

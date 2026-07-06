@@ -24,7 +24,8 @@ from src.batch_processor import BatchJob, parse_upload_photo_key, run_batch_uplo
 from src.dashboard import format_dashboard_markdown, get_dashboard_data
 from src.models import get_sample_survey, project_root
 from src.pipeline import MAX_PHOTOS, default_checklist, run_pipeline
-from src.installer_auth import require_key_if_configured
+from src.installer_auth import keys_configured, require_key_if_configured, validate_installer_key
+from src.installer_registry import aggregate_installers, get_installer_profile
 from src.jurisdictions import list_jurisdiction_codes
 from src.rate_limit import check_rate_limit
 from src.report_generator import generate_report
@@ -103,7 +104,34 @@ def public_stats():
         "total_capacity_kwp": data["stats"].get("total_capacity_kwp", 0),
         "total_api_cost_usd": data.get("total_api_cost_usd", 0),
         "by_installer": data["stats"].get("by_installer", {}),
+        "by_installer_detail": data["stats"].get("by_installer_detail", {}),
         "soft_cost_roi": data.get("soft_cost_roi"),
+    }
+
+
+@app.get("/installers")
+def installers_public():
+    rows = aggregate_installers()
+    return {"total": len(rows), "installers": rows}
+
+
+@app.get("/installer/me")
+def installer_me(x_installer_key: Optional[str] = Header(None)):
+    if keys_configured():
+        installer_id = validate_installer_key(x_installer_key)
+        if not installer_id:
+            raise HTTPException(401, "Cheie API instalator invalidă sau lipsă (header X-Installer-Key)")
+        return {"auth_required": True, "installer": get_installer_profile(installer_id)}
+    return {
+        "auth_required": False,
+        "installer": {
+            "installer_id": "",
+            "report_count": 0,
+            "api_key_configured": False,
+            "stats": {},
+            "recent_reports": [],
+            "hint": "Setează INSTALLER_API_KEYS pentru identitate SaaS",
+        },
     }
 
 
@@ -402,6 +430,8 @@ def engine_openapi():
             "/context/{report_id}": {"get": {"summary": "Unified context"}},
             "/orchestrate/{report_id}": {"get": {"summary": "OODA plan"}},
             "/twin-feed/{report_id}": {"get": {"summary": "Digital twin feed"}},
+            "/installers": {"get": {"summary": "Installer aggregate list"}},
+            "/installer/me": {"get": {"summary": "Authenticated installer profile"}},
             "/permit-pack/{report_id}": {"get": {"summary": "Permit ZIP"}},
             "/corrections": {"get": {"summary": "List corrections"}, "post": {"summary": "Log correction"}},
         },
