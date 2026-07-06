@@ -1,6 +1,6 @@
 # SOLARIS CET — Master Loops v3 (Ralph × Stash × Fable 5)
 
-**Versiune:** 3.0 · **2026-07-06**  
+**Versiune:** 3.1 · **2026-07-06** (+ Consulting Loops v4 — vezi `CONSULTING-SOLUTIONS.md`)  
 **Filozofie:** *Boil the ocean. Fresh context per task. Memory before motion. Verify in code, not in chat.*
 
 Sinteză din cele mai bune pattern-uri open-source (2024–2026), adaptate la monorepo-ul tău: React 19 + Vite, `survey-engine` Python, multi-model (Grok · DeepSeek · Kimi · **Claude Fable 5**), Stash memory.

@@ -123,8 +123,25 @@ npm run loops:next
 
 ---
 
+## Consulting Loops v4 (BCG / Sogeti / DOE — white papers)
+
+**Master:** `docs/planning/CONSULTING-SOLUTIONS.md` · **Epic:** `features/soft-cost-platform/tasks.md`
+
+| Loop | Source | When |
+|---|---|---|
+| **L-BCG-DRS** | Deploy → Reshape → Invent | Classify every epic before build |
+| **L-FS-6** | BCG Field Service 6 factors | Any `/survey` or field feature |
+| **L-OODA-ITE** | Sogeti OODA + Intent/Interpret/Execute | Agentic multi-step flows |
+| **L-SUP-GATE** | BCG Henderson supervision | Before Fable 5 or permit/AHJ ship |
+| **L-SOFT-ROI** | NREL/SEIA soft cost | End of release — log € saved |
+| **L-AGILITY-70** | BCG 10/20/70 | 70% = UX/training/adoption, not models |
+
+**L-FS-6 checklist:** 1 data layer · 2 edge UX · 3 adaptive feedback · 4 explainability · 5 agent safe · 6 API modular
+
+---
+
 ## Activation
 
-Triggers: `perfect loops`, `ralph`, `stash`, `fable 5`, `follow loops`, `agent memory`.
+Triggers: `perfect loops`, `ralph`, `stash`, `fable 5`, `soft cost`, `consulting`, `field service`.
 
-**Non-negotiable:** Loop 0 before · Loop 7 after · Loop 3 self-sufficient.
+**Non-negotiable:** Loop 0 before · Loop 7 after · Loop 3 self-sufficient · **L-SUP-GATE** before premium permit text.
