@@ -25,6 +25,7 @@
     "survey:smoke": "node scripts/survey-smoke.mjs",
     "survey:post-deploy": "node scripts/post-deploy-survey.mjs",
     "survey:deploy": "node scripts/deploy-survey-stack.mjs",
+    "gitea:push": "node scripts/gitea-push-main.mjs",
     "survey:deploy:smoke": "node scripts/deploy-survey-stack.mjs --smoke-only",
     "stack:survey": "docker compose -f docker/docker-compose.survey.yml up --build",
     "stack:survey:down": "docker compose -f docker/docker-compose.survey.yml down",
