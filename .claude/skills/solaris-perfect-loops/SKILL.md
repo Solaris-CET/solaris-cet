@@ -6,6 +6,7 @@ description: SOLARIS CET master agent loops v3 — Ralph outer loop + 8 inner lo
 # SOLARIS CET — Perfect Loops v3 (Ralph × Stash × Fable 5)
 
 **Master doc:** `docs/planning/SOLARIS-LOOPS-MASTER.md`  
+**Handoff (recovery):** `docs/planning/HANDOFF.md` — când soluția nu merge după prima încercare  
 **Philosophy:** Boil the ocean · Fresh context per task · Memory before motion · Verify in code.
 
 Synthesized from: [Stash](https://github.com/Fergana-Labs/stash), [superpowers](https://github.com/obra/superpowers), [spec-kit](https://github.com/github/spec-kit), [ralphy](https://github.com/michaelshimeles/ralphy), [smart-ralph](https://github.com/tzachbon/smart-ralph), [claude-code](https://github.com/anthropics/claude-code), [mini-swe-agent](https://github.com/SWE-agent/mini-swe-agent).

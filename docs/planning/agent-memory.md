@@ -1,6 +1,7 @@
 # SOLARIS CET — Agent Memory (local Stash)
 
-Persistent memory for coding agents. **Search this file + `grok.md` before building.**
+Persistent memory for coding agents. **Search this file + `grok.md` + `HANDOFF.md` before building.**
+When the first fix fails, read **`HANDOFF.md` §5 Failed attempts** before retry #2.
 When [Fergana Stash](https://github.com/fergana-labs/stash) is connected, also run:
 `stash search "SOLARIS <topic>" --json` and `stash vfs "rg \"<topic>\" /me"`.
 

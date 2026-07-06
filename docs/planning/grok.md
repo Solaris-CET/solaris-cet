@@ -429,3 +429,13 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 
 **LEFT:** prod deploy demo B2B public  
 **BLOCKED:** Hetzner `L002DD869` + Coolify redeploy `main`
+
+---
+
+## Update 2026-07-06 — HANDOFF.md (loops recovery protocol)
+
+**Livrat:** `docs/planning/HANDOFF.md` — handoff complet pentru agenți când prima soluție eșuează.
+
+**Conține:** gol final · stadiu curent · files in flight · timeline sesiuni/agents · failed attempts catalog · next steps · recovery loop R0–R7.
+
+**Next agent Loop 0:** `npm run stash:prime -- handoff` → citește `HANDOFF.md` §1 + §5.
