@@ -386,3 +386,16 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 - Smoke S8: persistent stream + webhook deliveries/status
 
 **VERIFY:** pytest `test_twin_webhook` · Vitest useTwinStream + twin3dScene · Playwright 3D toggle
+
+---
+
+## Update 2026-07-06 — Twin AI Agent (twin-ai-agent, 30 task-uri)
+
+**Livrat:**
+- `twin_agent.py` — fuzionează twin feed + orchestration S5 în plan acțiuni
+- Evenimente `agent_plan_ready` / `agent_action` / `agent_reassess` în twin runtime
+- Bridge: `/api/survey/twin-agent`, `/execute`, `/decisions`
+- `TwinAgentPanel` + `useTwinAgent` · Admin `TwinAgentSection`
+- Webhook `agent_action` pe execute · smoke S9
+
+**VERIFY:** pytest `test_twin_agent` · Vitest twinAgent · Playwright twin agent panel

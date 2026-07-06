@@ -219,6 +219,98 @@ test.describe('Survey technician app', () => {
     await expect(page.locator('iframe[title="Twin site map"]')).toBeVisible();
   });
 
+  test('twin agent panel visible after demo report', async ({ page }) => {
+    await page.route('**/api/survey/health', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          platform: 'solaris-cet',
+          engine: { ok: true, cost_budget: { alert: false, exceeded: false } },
+          engine_url: 'http://127.0.0.1:8000',
+        }),
+      });
+    });
+    await page.route('**/api/survey/jurisdictions', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ jurisdictions: [] }),
+      });
+    });
+    await page.route('**/api/survey/demo', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          report_id: 'SOL-DEMO-AGENT',
+          pdf_filename: 'demo.pdf',
+          ahj_filename: 'AHJ_demo.json',
+          pdf_url: '/api/survey/files?file=demo.pdf',
+          score: 87,
+          verdict: 'Recomandat',
+          capacity_kwp: 6,
+          annual_kwh: 7200,
+        }),
+      });
+    });
+    await page.route('**/api/survey/twin-stream*', async (route) => {
+      const sse = [
+        'event: ready',
+        'data: {"report_id":"SOL-DEMO-AGENT"}',
+        '',
+      ].join('\n');
+      await route.fulfill({
+        status: 200,
+        headers: { 'Content-Type': 'text/event-stream' },
+        body: sse,
+      });
+    });
+    await page.route('**/api/survey/twin-agent*', async (route) => {
+      if (route.request().url().includes('/execute')) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ ok: true }),
+        });
+        return;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          platform: 'solaris-cet',
+          plan: {
+            schema: 'solaris-twin-agent-v1',
+            agent_version: 1,
+            generated_at: '2026-01-01T00:00:00Z',
+            report_id: 'SOL-DEMO-AGENT',
+            confidence: 0.88,
+            reasoning: ['Demo agent'],
+            twin_feed_schema: 'solaris-twin-feed-v1',
+            actions: [
+              {
+                id: 'act-crm',
+                type: 'suggest_crm',
+                label: 'Trimite raport în CRM',
+                priority: 'normal',
+                reason: 'auto',
+                status: 'pending',
+              },
+            ],
+            recommended_next: 'act-crm',
+            actions_total: 1,
+          },
+        }),
+      });
+    });
+
+    await page.goto('/survey', { waitUntil: 'domcontentloaded' });
+    await page.getByRole('button', { name: /Raport demo/i }).click();
+    await expect(page.getByText(/Twin AI agent/i)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/Trimite raport în CRM/i)).toBeVisible();
+  });
+
   test('survey contact prefill via query params', async ({ page }) => {
     await page.goto(
       '/contact?from=survey&report_id=SOL-E2E-001&name=Maria%20Test&city=Vaslui&kwp=6&score=80&phone=0722123456',

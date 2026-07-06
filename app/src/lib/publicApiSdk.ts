@@ -110,6 +110,23 @@ export function createSolarisClient(opts: SolarisClientOptions) {
           method: 'POST',
           body,
         }),
+      twinAgent: (reportId: string) =>
+        requestJson<unknown>(opts, {
+          path: '/api/survey/twin-agent',
+          query: { report_id: reportId },
+        }),
+      executeTwinAgentAction: (reportId: string, body: Record<string, unknown>) =>
+        requestJson<unknown>(opts, {
+          path: '/api/survey/twin-agent/execute',
+          method: 'POST',
+          query: { report_id: reportId },
+          body,
+        }),
+      twinAgentDecisions: (reportId?: string, limit = 50) =>
+        requestJson<unknown>(opts, {
+          path: '/api/survey/twin-agent/decisions',
+          query: { report_id: reportId, limit },
+        }),
       openApiSpec: () => requestJson<unknown>(opts, { path: '/api/openapi/survey' }),
     },
   };

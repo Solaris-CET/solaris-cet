@@ -61,6 +61,16 @@ if (hasS6) {
     console.log('✓ GET /twin-stream', 'snapshot ok');
   }
 
+  if (openapi.paths?.['/twin-agent/{report_id}']) {
+    const agent = await check(`/twin-agent/${demo.report_id}`);
+    console.log('✓ GET /twin-agent', `actions=${agent.actions_total ?? 0}`);
+    const decisions = await check('/twin-agent/decisions?limit=5');
+    console.log('✓ GET /twin-agent/decisions', `total=${decisions.total ?? 0}`);
+    const status = await check('/twin-agent/status');
+    console.log('✓ GET /twin-agent/status', status.agent_schema ?? 'ok');
+    console.log('✓ twin-agent S9', 'plan ok');
+  }
+
   if (openapi.paths?.['/twin-webhook/deliveries']) {
     const deliveries = await check('/twin-webhook/deliveries?limit=5');
     console.log('✓ GET /twin-webhook/deliveries', `total=${deliveries.total ?? 0}`);

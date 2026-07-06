@@ -22,6 +22,9 @@ export const SURVEY_ROUTE_IDS = [
   'twin-stream',
   'twin-webhook',
   'twin-webhook-deliveries',
+  'twin-agent',
+  'twin-agent-execute',
+  'twin-agent-decisions',
 ] as const;
 
 export type SurveyRouteId = (typeof SURVEY_ROUTE_IDS)[number];
@@ -34,6 +37,9 @@ const BRIDGE_PATH_OVERRIDES: Partial<Record<SurveyRouteId, string>> = {
   'twin-stream': '/api/survey/twin-stream',
   'twin-webhook': '/api/survey/twin-webhook',
   'twin-webhook-deliveries': '/api/survey/twin-webhook/deliveries',
+  'twin-agent': '/api/survey/twin-agent',
+  'twin-agent-execute': '/api/survey/twin-agent/execute',
+  'twin-agent-decisions': '/api/survey/twin-agent/decisions',
 };
 
 export function surveyBridgePath(id: SurveyRouteId): string {
@@ -181,6 +187,30 @@ export function buildSurveyOpenApiPaths(): Record<string, unknown> {
         parameters: [
           { name: 'limit', in: 'query', schema: { type: 'integer' } },
           { name: 'direction', in: 'query', schema: { type: 'string', enum: ['inbound', 'outbound'] } },
+        ],
+        responses: { '200': jsonResponse },
+      },
+    },
+    '/api/survey/twin-agent': {
+      get: {
+        summary: 'Twin AI agent plan (D10 + S5)',
+        parameters: [{ name: 'report_id', in: 'query', required: true, schema: { type: 'string' } }],
+        responses: { '200': jsonResponse, '404': jsonResponse },
+      },
+    },
+    '/api/survey/twin-agent/execute': {
+      post: {
+        summary: 'Execute twin agent action',
+        parameters: [{ name: 'report_id', in: 'query', required: true, schema: { type: 'string' } }],
+        responses: { '200': jsonResponse, '400': jsonResponse, '502': jsonResponse },
+      },
+    },
+    '/api/survey/twin-agent/decisions': {
+      get: {
+        summary: 'Twin agent decision log',
+        parameters: [
+          { name: 'report_id', in: 'query', schema: { type: 'string' } },
+          { name: 'limit', in: 'query', schema: { type: 'integer' } },
         ],
         responses: { '200': jsonResponse },
       },

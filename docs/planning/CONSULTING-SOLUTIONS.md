@@ -278,6 +278,8 @@ Skill actualizat: `.claude/skills/solaris-perfect-loops/SKILL.md` (secțiunea Co
 
 **Livrat 2026-07-06 (twin-crm-webhooks):** `Twin3DViewer` WebGL · SSE persistent + heartbeat · webhooks bidirecțional (`TWIN_WEBHOOK_URL` + inbound POST) · Admin delivery log.
 
+**Livrat 2026-07-06 (twin-ai-agent):** Agent AI peste twin feed + OODA — plan acțiuni, execute, decision log, `TwinAgentPanel` în SurveyPage.
+
 **Livrat 2026-07-06 (prod-deploy-gate):** `survey-prod-gate` + Coolify redeploy script + Gitea push retry — gate automat după deploy.
 
 **Blocaj extern:** prod `/api/survey/*` 404 până Hetzner unblock + Coolify redeploy `main` (rulează `npm run deploy:status`).

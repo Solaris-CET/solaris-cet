@@ -39,6 +39,14 @@ from src.twin_runtime import (
     publish_twin_event,
     runtime_status,
 )
+from src.twin_agent import (
+    agent_status,
+    build_twin_agent_plan,
+    execute_agent_action,
+    list_agent_decisions,
+    publish_agent_plan,
+    publish_agent_reassess,
+)
 from src.twin_webhook import handle_inbound_webhook, list_deliveries, webhook_status
 
 load_dotenv(project_root() / ".env")
@@ -172,6 +180,7 @@ def demo_report():
         payload={"source": "demo", "score": survey.executive_summary.suitability_score},
     )
     publish_twin_event(survey.metadata.report_id, "twin_ready", payload={"source": "demo"})
+    publish_agent_plan(survey.metadata.report_id)
     return DemoResponse(
         report_id=survey.metadata.report_id,
         pdf_path=str(pdf),
@@ -315,6 +324,13 @@ async def generate_survey(
             },
         )
         publish_twin_event(survey.metadata.report_id, "twin_ready", payload={"installer_id": effective_installer})
+        alert, exceeded = _budget_flags()
+        publish_agent_plan(
+            survey.metadata.report_id,
+            platform_base_url=str(request.base_url).rstrip("/"),
+            budget_alert=alert,
+            budget_exceeded=exceeded,
+        )
         return GenerateResponse(
             report_id=survey.metadata.report_id,
             pdf_filename=result.pdf_path.name,
@@ -460,6 +476,10 @@ def engine_openapi():
             "/twin-webhook/deliveries": {"get": {"summary": "Twin webhook delivery log"}},
             "/twin-webhook/inbound": {"post": {"summary": "Inbound CRM twin webhook"}},
             "/twin-webhook/status": {"get": {"summary": "Twin webhook status"}},
+            "/twin-agent/{report_id}": {"get": {"summary": "Twin AI agent plan"}},
+            "/twin-agent/{report_id}/execute": {"post": {"summary": "Execute twin agent action"}},
+            "/twin-agent/decisions": {"get": {"summary": "Twin agent decision log"}},
+            "/twin-agent/status": {"get": {"summary": "Twin agent status"}},
             "/installers": {"get": {"summary": "Installer aggregate list"}},
             "/installer/me": {"get": {"summary": "Authenticated installer profile"}},
             "/permit-pack/{report_id}": {"get": {"summary": "Permit ZIP"}},
@@ -525,6 +545,54 @@ def twin_webhook_inbound(body: TwinInboundPayload, x_twin_webhook_secret: Option
     try:
         merged = {"report_id": body.report_id, "event": body.event, **body.payload}
         return handle_inbound_webhook(merged)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+
+
+@app.get("/twin-agent/status")
+def twin_agent_health():
+    return agent_status()
+
+
+@app.get("/twin-agent/decisions")
+def twin_agent_decisions(report_id: Optional[str] = None, limit: int = 50):
+    rows = list_agent_decisions(report_id.strip() if report_id else None, limit=min(limit, 200))
+    return {"total": len(rows), "decisions": rows}
+
+
+@app.get("/twin-agent/{report_id}")
+def twin_agent_plan(report_id: str, request: Request):
+    base = str(request.base_url).rstrip("/")
+    alert, exceeded = _budget_flags()
+    try:
+        plan = build_twin_agent_plan(
+            report_id,
+            platform_base_url=base,
+            budget_alert=alert,
+            budget_exceeded=exceeded,
+        )
+    except KeyError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    return plan
+
+
+class TwinAgentExecuteBody(BaseModel):
+    action_id: str = Field(..., min_length=1, max_length=80)
+    action_type: str = Field(..., min_length=1, max_length=80)
+    executed_by: str = Field(default="technician", max_length=80)
+    detail: str = Field(default="", max_length=500)
+
+
+@app.post("/twin-agent/{report_id}/execute")
+def twin_agent_execute(report_id: str, body: TwinAgentExecuteBody, request: Request, x_installer_key: Optional[str] = Header(None)):
+    _guard_api(request, x_installer_key)
+    try:
+        return execute_agent_action(
+            report_id,
+            action_id=body.action_id,
+            action_type=body.action_type,
+            payload={"executed_by": body.executed_by, "detail": body.detail},
+        )
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
 
@@ -623,6 +691,11 @@ def post_correction(body: CorrectionRequest, request: Request, x_installer_key: 
         payload={"field": body.field, "technician": body.technician},
     )
     publish_twin_event(body.report_id, "feed_refreshed", payload={"reason": "correction"})
+    publish_agent_reassess(body.report_id, reason="correction")
+    publish_agent_plan(
+        body.report_id,
+        platform_base_url=str(request.base_url).rstrip("/"),
+    )
     return {"ok": True, "correction": entry}
 
 

@@ -5,6 +5,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { SolarisFooter } from '@/components/company/SolarisFooter';
+import { TwinAgentPanel } from '@/components/survey/TwinAgentPanel';
 import { TwinRuntimePanel } from '@/components/survey/TwinRuntimePanel';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
@@ -1062,6 +1063,12 @@ export default function SurveyPage() {
                       </a>
                     )}
                     <TwinRuntimePanel reportId={result.report_id} className="mt-2" />
+                    <TwinAgentPanel
+                      reportId={result.report_id}
+                      installerKey={installer.installerApiKey}
+                      onCrmAction={() => void handleCrm()}
+                      className="mt-2"
+                    />
                   </div>
                 </div>
               )}

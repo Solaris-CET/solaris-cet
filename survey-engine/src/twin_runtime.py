@@ -19,6 +19,9 @@ EVENT_TYPES = frozenset({
     "feed_refreshed",
     "twin_ready",
     "crm_sync",
+    "agent_plan_ready",
+    "agent_action",
+    "agent_reassess",
 })
 
 

@@ -190,3 +190,17 @@
 | SDK | `twinWebhookDeliveries()` · `postTwinWebhook()` |
 
 **VERIFY:** pytest twin_webhook + persistent SSE · Vitest useTwinStream + twin3dScene · smoke S8
+
+## Epic twin-ai-agent (D10 + S5 agent layer) — 2026-07-06 DONE
+
+| Componentă | Locație |
+|---|---|
+| Agent core | `twin_agent.py` · schema `solaris-twin-agent-v1` |
+| Plan API | `GET /twin-agent/{id}` · `/api/survey/twin-agent` |
+| Execute | `POST /twin-agent/{id}/execute` · webhooks `agent_action` |
+| Decisions | `GET /twin-agent/decisions` · Admin `TwinAgentSection` |
+| UI | `TwinAgentPanel` + `useTwinAgent` în SurveyPage |
+| Events | `agent_plan_ready` · `agent_action` · `agent_reassess` |
+| SDK | `twinAgent()` · `executeTwinAgentAction()` |
+
+**VERIFY:** pytest `test_twin_agent` · Vitest twinAgent · smoke S9
