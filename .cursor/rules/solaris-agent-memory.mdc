@@ -1,0 +1,42 @@
+---
+description: SOLARIS CET agent memory — read before coding; search grok.md and agent-memory.md; follow perfect loops + Stash self-sufficient rules.
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# SOLARIS CET — Agent Memory & Loops
+
+## Before any task (Loop 0 — Memory)
+```bash
+npm run stash:prime -- <topic>
+```
+Then read hits + `docs/planning/agent-memory.md` + `docs/planning/grok.md`.
+Ask: *Has a prior agent tried this? What failed?*
+
+## After every task (Loop 7 — Retrospective)
+```bash
+npm run stash:sync
+npm run stash:verify   # optional — full Stash + smoke check
+```
+
+## Self-sufficient (from Fergana Stash)
+- Run commands yourself — never tell the user to run what you can run.
+- Check logs, ports, HTTP status yourself.
+- Kill/restart **only** PIDs/ports for this worktree (`dev:local`, not blind `pkill`).
+- Verify UI with HTTP smoke or Playwright — don't ask user to "test in browser".
+
+## Local dev (one command)
+```bash
+npm run dev:local
+```
+Survey UI: http://localhost:5173/survey
+
+## Deploy truth
+- Git remote for production: **gitea.com/Solaris-Cet/solaris-clean**
+- After VPS up: `SITE_URL=https://solaris-cet.com npm run survey:post-deploy`
+
+## After every task (Retrospective)
+Append to `docs/planning/grok.md`: mistake → root cause → permanent fix → verify command.
+
+Skill: `.claude/skills/solaris-perfect-loops/SKILL.md`

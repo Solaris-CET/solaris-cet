@@ -1,70 +1,137 @@
 ---
 name: solaris-perfect-loops
-description: Use this skill when working on SOLARIS CET to enforce perfect Grok working loops, avoid previous mistakes like missing docs, half-solutions, unclear API routing, dangling threads, and poor cost control. Trigger words include perfect loops, boil the ocean, agent loop, research loop, build loop.
+description: Use this skill when working on SOLARIS CET to enforce perfect Grok working loops, avoid previous mistakes like missing docs, half-solutions, unclear API routing, dangling threads, and poor cost control. Integrates Fergana Stash memory patterns. Trigger words include perfect loops, boil the ocean, agent loop, research loop, build loop, stash.
 ---
 
 # SOLARIS CET - Perfect Grok Loops & Rules
 
 ## Core Philosophy (NEVER BREAK)
-"Boil the ocean. The marginal completeness is near zero with AI. Do the whole thing. Do it right. Do it with tests. Do it with documentation. Do it so well that I am genuinely impressed, not politely satisfied. Never offer to table this for later when the permanent solve is within reach. Never leave a dangling thread when tying it off takes five more minutes. Never present a workaround when the real fix exists. The standard isn't good enough. It's 'holy shit, that's done.' Search before building. Test before shipping. Ship the complete thing."
+"Boil the ocean. Do the whole thing. Do it right. Do it with tests. Do it with documentation. Search before building. Test before shipping. Ship the complete thing. Never leave a dangling thread. Never present a workaround when the real fix exists."
 
-## The 5 Mandatory Loops (use in this order)
+Inspired by [Fergana Stash](https://github.com/fergana-labs/stash): **persistent memory beats per-session amnesia** — agents that search past sessions work ~49% faster on long tasks.
 
-### 1. Research Loop (always first for new features)
-- Understand the real user pain from solar installer workflow (DC/AC/ACM checklists, photos, reports)
-- Study existing checklist examples from user
-- Identify exact inputs and desired outputs
-- Check previous mistakes in global.md and grok.md before starting
-- Only after full understanding → move to Build Loop
+---
 
-### 2. Build Loop (for every feature)
-1. Plan the complete solution in detail (architecture, files, prompts)
-2. Write clean, production-ready code
-3. Test on real user data / photos / checklists
-4. Fix all issues found
-5. Document everything (update global.md, grok.md, prompts/)
-6. Optimize for cost and speed
-7. Only then mark as done
+## The 8 Mandatory Loops (0–7, strict order)
 
-### 3. Optimization Loop (after every important feature)
-- Measure token usage and cost
-- Find ways to use cheaper models (DeepSeek for heavy work)
-- Reduce context where possible
-- Improve speed without losing quality
-- Update rules in grok.md if better pattern found
+### 0. Memory Loop (FIRST — every session, every task)
+**Goal:** Don't repeat mistakes other agents already paid for.
 
-### 4. Agent Loop (how Grok works with other models)
-- Grok Heavy (you) = Manager: always plans, reviews quality, makes final decisions, updates docs
-- DeepSeek V4 Pro = Main Worker: heavy coding, photo analysis, checklist processing, data extraction
-- Claude = Only for high-quality writing or complex reasoning when DeepSeek is not enough
-- Kimi = Only for very long context (many photos + long documents)
-- Rule: Never do heavy work yourself if DeepSeek can do it cheaper and well. Always review worker output strictly.
+**One command (preferred):**
+```bash
+npm run stash:prime -- <topic>    # e.g. survey deploy hetzner
+```
 
-### 5. Feedback Loop (every time user tests)
-- User tests → gives feedback
-- Analyze what went wrong or could be better
-- Update global.md or grok.md immediately with new rule
-- Improve the prompt or code in next iteration
-- Never ignore feedback or say "we can fix later"
+**Manual checklist:**
+1. `stash whoami` — must show profile (else `stash signin`)
+2. `stash search "SOLARIS <topic>" --json` + `stash vfs 'rg "<keyword>" /files'`
+3. Read `docs/planning/agent-memory.md` + latest `docs/planning/grok.md`
+4. State: *"Prior context: …"* or *"Fresh — no hits."*
+5. → Research Loop
 
-## Strict Rules to Avoid Previous Mistakes
+**After Retrospective (Loop 7):** `npm run stash:sync` — updates Stash pages via `edit-page`.
 
-- ALWAYS create/update global.md and grok.md when making important decisions
-- NEVER give half-solutions or "this is a starting point"
-- NEVER leave dangling threads
-- NEVER use workaround when real fix exists
-- ALWAYS specify exactly which API/model to use and why
-- ALWAYS think about cost from the beginning (prefer DeepSeek for volume)
-- ALWAYS test with real user photos and checklists before claiming done
-- ALWAYS update the instructions in the Grok project when loops or rules change
-- If something is unclear → ask user for clarification instead of guessing
+**Full health check:** `npm run stash:verify` — Loop 0 + smoke + local/prod API status.
 
-## API Routing Rules (imprinted)
+### 1. Research Loop
+- User pain: installer workflow (photos, checklists, PDF, CRM)
+- Read existing code paths before writing (`Read` callers, not just new file)
+- Check `global.md` for model routing and deploy truth
+- If ambiguous → ask user once, precisely
 
-- Planning, architecture, final review, quality gate → Grok Heavy
-- Heavy coding, photo understanding, checklist filling, data extraction → DeepSeek V4 Pro (main worker)
-- Beautiful professional writing, complex reasoning → Claude (backup)
-- Very long context (20+ photos + long docs) → Kimi
+### 2. Build Loop
+1. Plan complete solution (files, env, tests)
+2. Surgical changes only — match codebase style
+3. Implement + tests in same pass (pytest / Vitest / smoke)
+4. **Checkpoint** after each significant step (Stash Rule 10):
+   ```
+   DONE / VERIFIED / LEFT / BLOCKED
+   ```
+5. Update `global.md` if architecture/deploy changed
+6. Mark done only when verify commands pass
 
-## How to Use This Skill
-When user says "use perfect loops" or "follow the loops", activate this skill and strictly follow all 5 loops + core philosophy in every response and every piece of code you generate for SOLARIS CET.
+### 3. Verify Loop (self-sufficient — Stash "Be self-sufficient")
+- **You** run: `npm run survey:smoke`, `npm run dev:local`, `curl`/Invoke-WebRequest, `grok mcp doctor`
+- **Never** ask user to check logs, test UI, or run commands you can run
+- **Fail loud:** if verify skipped, task is NOT done (Stash Rule 12)
+- Survey features: pytest + Vitest route + doc line in `global.md`
+
+### 4. Optimization Loop
+- DeepSeek for volume; Claude Fable 5 only top-tier text; Kimi for 10+ photos
+- Grok = plan + review + memory updates, not cheap bulk coding
+- Log cost-relevant decisions in `grok.md`
+
+### 5. Agent Loop (multi-model)
+| Role | Model |
+|---|---|
+| Orchestrator, review, memory | Grok |
+| Heavy code, vision, extraction | DeepSeek V4 Pro |
+| Premium writing | Claude Fable 5 |
+| Long context / many photos | Kimi |
+
+### 6. Feedback Loop
+- User feedback → same-session fix when possible
+- Update `grok.md` immediately with new rule
+
+### 7. Retrospective Loop (END — mandatory)
+1. Mistake / time wasted?
+2. Permanent fix (code, script, rule)?
+3. Append to `grok.md` + `agent-memory.md` if recurring anti-pattern
+4. Add guard (CI, script check, `dev:local` port check) if repeated twice
+5. Re-run smallest verify command
+
+Template:
+```
+## Retrospective YYYY-MM-DD — [task]
+- Mistake / Root cause / Permanent fix / Rule / Verify
+```
+
+Optional: `stash upload docs/planning/grok.md` or share session after major milestone.
+
+---
+
+## Stash-aligned Agent Conduct (12 rules, condensed)
+
+| # | Rule | SOLARIS CET application |
+|---|---|---|
+| 1 | Think before coding | State assumptions; read `agent-memory.md` |
+| 2 | Simplicity first | No speculative abstractions |
+| 3 | Surgical changes | No drive-by refactors |
+| 4 | Goal-driven | Define success = smoke/post-deploy green |
+| 5 | Code for deterministic work | Routing/retries in code, not LLM |
+| 6 | Token budget | Summarize; don't re-read huge logs |
+| 7 | Surface conflicts | One pattern wins — document in grok.md |
+| 8 | Read before write | Read proxy, server, vite config before survey API change |
+| 9 | Tests encode intent | Survey tests assert CRM link, not just 200 |
+| 10 | Checkpoint | DONE/VERIFIED/LEFT after each step |
+| 11 | Match conventions | Tailwind v4, React 19, functional components |
+| 12 | Fail loud | No silent 503/HTML-as-JSON; report blocked external deps |
+
+---
+
+## Imprinted facts (do not re-discover)
+
+### Windows local dev
+- `npm run dev:local` — survey :8000 + Node API :3000 + Vite :5173
+- Vite proxies `/api` → `http://127.0.0.1:3000`
+- npm scripts: `vite` / `tsc` (not `../node_modules/.bin/*`)
+- `@tailwindcss/oxide-win32-x64-msvc` in `optionalDependencies`
+
+### Deploy
+- **Gitea:** `Solaris-Cet/solaris-clean` (not GitHub `solaris-cet`)
+- Prod check: `SITE_URL=https://solaris-cet.com npm run survey:post-deploy`
+- Hetzner billing lock ≠ code bug — wait for support
+
+### Stash CLI (Windows)
+```powershell
+pip install stashai
+# PATH: %LOCALAPPDATA%\Packages\PythonSoftwareFoundation.Python.3.12_...\Python312\Scripts
+stash signin
+stash connect   # in repo root → .stash + cursor rules
+```
+
+---
+
+## How to Use
+Activate on: "perfect loops", "follow loops", "stash", "agent memory".
+Run loops **0 → 7** every task. Loop **0** (Memory) and **7** (Retrospective) are non-negotiable.

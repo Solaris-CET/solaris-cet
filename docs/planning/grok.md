@@ -46,6 +46,7 @@ Gata să testăm Fable 5 pe un prompt de analiză sau să continuăm cu UI-ul.
 3. **Optimization Loop** — DeepSeek pentru volum, Fable 5 doar top-tier 15–20%
 4. **Agent Loop** — Grok = manager/review, DeepSeek = worker greu
 5. **Feedback Loop** — feedback user → update imediat în `grok.md`
+6. **Retrospective Loop** — după fiecare task: greșeală → fix permanent → update grok.md/global.md
 
 **Erori evitate:**
 - `npm ci` pe Windows: folosește `npm run ci:win`, nu instalări paralele
@@ -137,3 +138,126 @@ cd app && npm run test -- src/__tests__/survey*.test.ts src/__tests__/contactPre
 **Teste:** pytest 62+ · Vitest +2 routes (jurisdictions, stats) · E2E +2 (batch tab, calculator prefill)
 
 **Env noi în `.env.production.example`:** `KIMI_*`, `INSTALLER_API_KEYS`, `SURVEY_WEBHOOK_*`, `SURVEY_RATE_LIMIT_PER_HOUR`
+
+---
+
+## Update 2026-07-06 — Retrospective Loop + local dev hardening
+
+**Regulă nouă (Loop 6):** După **fiecare task** → retrospectivă obligatorie în `grok.md` (greșeală → cauză → fix permanent → comandă verify). Skill actualizat: 6 loop-uri, nu 5.
+
+### Retrospective — sesiune deploy + Windows local
+
+| Greșeală | Cauză | Fix permanent | Verify |
+|---|---|---|---|
+| Push pe GitHub greșit | Remote confuz `solaris-cet` vs `solaris-clean` | Doc + `gitea:push` → **Gitea `Solaris-Cet/solaris-clean`** | `git remote -v` |
+| Prod `/api/survey/health` 404 | Coolify fără redeploy / serviciu survey | Așteptăm Hetzner unblock → redeploy + `survey:post-deploy` | `npm run survey:post-deploy` |
+| `app:dev` 500 PostCSS | Lipsește oxide Windows | `optionalDependencies` `@tailwindcss/oxide-win32-x64-msvc` | `curl localhost:5173` → 200 |
+| `app:dev` eșuează pe cmd | Script `../node_modules/.bin/vite` | `"dev": "vite"`, `"api:build": "tsc"` | `npm run app:dev` |
+| Survey UI fără API în dev | Vite nu proxy-uia `/api` | `vite.config.ts` proxy `/api` → `:3000` | `5173/api/survey/health` → JSON |
+| 3 terminale, porturi zombie | Procese vechi pe 8000/3000/5173 | **`npm run dev:local`** + check porturi + Ctrl+C oprește tot | `npm run dev:local` |
+| Gmail MCP blocat | OAuth keys lipsă (user step) | Pași documentați; nu pretinde că email merge fără `gcp-oauth.keys.json` | `grok mcp doctor gmail` |
+| Hetzner auto-reply | Lock `L002DD869` = neplată | Așteptăm răspuns uman; homepage prod 200 parțial | Robot invoices Paid |
+
+**Comenzi zilnice (actualizat):**
+```bash
+npm run dev:local          # tot stack-ul local (recomandat)
+npm run dev:local -- --skip-build   # repornire rapidă
+npm run survey:smoke
+npm run survey:post-deploy # după redeploy VPS
+```
+
+**Feedback Loop → Retrospective:** utilizatorul a cerut explicit învățare continuă din greșeli — Loop 6 devine obligatoriu la finalul fiecărui task, nu opțional.
+
+---
+
+## Update 2026-07-06 — Stash memory + loops v2
+
+**Sursă:** [fergana-labs/stash](https://github.com/fergana-labs/stash) — shared memory for coding agents (search sessions, fail loud, self-sufficient, checkpoint).
+
+**Livrat:**
+| Artefact | Rol |
+|---|---|
+| `docs/planning/agent-memory.md` | Memorie locală — bine/rău agenți anteriori (până la `stash connect`) |
+| `.cursor/rules/solaris-agent-memory.mdc` | Reguli Cursor — Memory Loop + dev:local + retrospective |
+| `solaris-perfect-loops` skill | **8 loop-uri (0–7)** — Memory + Verify self-sufficient |
+| `stashai` pip install | CLI pe Windows (necesită `stash signin` + `stash connect` — user) |
+
+**Loop-uri v2 (ordine):**
+0. **Memory** — `agent-memory.md` + `grok.md` + `stash search`
+1. Research
+2. Build (+ checkpoint DONE/VERIFIED/LEFT)
+3. **Verify** — rulezi tu smoke/curl, nu userul
+4. Optimization
+5. Agent routing
+6. Feedback
+7. Retrospective → update `agent-memory.md` dacă anti-pattern nou
+
+**Stash setup (o dată):**
+```powershell
+pip install stashai
+stash signin
+cd "C:\Users\CCons\Desktop\SOLARIS CET"
+stash connect
+```
+
+**Ce am învățat din Stash vs agenții noștri:**
+- ✅ Bun: livrare end-to-end survey, docs în grok.md
+- ❌ Rău: amnesie între sesiuni (push greșit, API fără proxy) → Memory Loop 0
+- ❌ Rău: „rulează tu” → Verify Loop self-sufficient
+- Stash claim: +49% viteză cu memorie persistentă — target pentru echipă după `stash connect`
+
+---
+
+## Update 2026-07-06 — Stash verificat + loops finale
+
+**Stash:** `balabanc053` autentificat · repo conectat (`.stash`, `CLAUDE.md`)
+
+| Document în Stash | Link |
+|---|---|
+| agent-memory | https://app.joinstash.ai/p/8f084fff-c19e-4b8d-83b7-6a7e783ee63c |
+| grok PM notes | https://app.joinstash.ai/p/517aca79-0fd7-4ae6-a047-1734fb7ce61c |
+| perfect-loops SKILL | https://app.joinstash.ai/p/119ed9c3-ab71-43fa-a942-967559793bff |
+
+**Comenzi loops (canonice):**
+```bash
+npm run stash:prime -- <topic>   # Loop 0 — ÎNAINTE de orice task
+npm run dev:local                # Loop 3 — verify local
+npm run survey:smoke             # Loop 3 — verify survey
+npm run stash:sync               # Loop 7 — DUPĂ retrospective
+```
+
+**Verify 2026-07-06:** `stash:prime` OK · search hit pe 8 topicuri · local API 200
+
+---
+
+## Update 2026-07-06 — Stash verify final + sync fix
+
+**Problema:** `stash:sync` eșua cu 409 — `--name` nu schimbă numele paginii la upload fișier unic (folosește stem-ul fișierului).
+
+**Fix permanent:** `stash-sync.mjs` folosește `stash files edit-page <id>` pentru paginile canonice:
+| Fișier | Page ID |
+|---|---|
+| agent-memory.md | `8f084fff-c19e-4b8d-83b7-6a7e783ee63c` |
+| grok.md | `517aca79-0fd7-4ae6-a047-1734fb7ce61c` |
+| SKILL.md | `119ed9c3-ab71-43fa-a942-967559793bff` |
+
+**Comandă nouă:** `npm run stash:verify` — fișiere locale + auth + search + `stash:prime` + `survey:smoke` + local/prod API.
+
+**Verify 2026-07-06 (sesiune curentă):**
+
+| Check | Rezultat |
+|---|---|
+| `stash:prime` | ✓ auth + 5 search queries cu hits |
+| `survey:smoke` | ✓ health, dashboard, demo, jurisdictions |
+| Local `5173/api/survey/health` | ✓ 200 (dev:local activ) |
+| Prod `solaris-cet.com/api/survey/health` | ⚠ 404 — BLOCKED Hetzner `L002DD869` + Coolify redeploy |
+
+**Loops canonice (finale):**
+```bash
+npm run stash:prime -- <topic>   # 0 Memory — ÎNAINTE
+npm run dev:local                # 3 Verify local
+npm run survey:smoke             # 3 Verify survey
+npm run stash:sync               # 7 Retro — DUPĂ
+npm run stash:verify             # audit complet (opțional)
+SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
+```

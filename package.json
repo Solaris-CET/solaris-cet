@@ -14,6 +14,11 @@
   },
   "scripts": {
     "app:dev": "npm --workspace=app run dev --",
+    "api:dev": "npm run api:build --workspace=app && npm run start:node --workspace=app",
+    "dev:local": "node scripts/dev-local.mjs",
+    "stash:prime": "node scripts/stash-prime.mjs",
+    "stash:sync": "node scripts/stash-sync.mjs",
+    "stash:verify": "node scripts/stash-verify.mjs",
     "app:build": "npm run build --workspace=app && npm run api:build --workspace=app",
     "app:build:next": "npm run build --workspace=app",
     "app:verify": "npm run verify --workspace=app",

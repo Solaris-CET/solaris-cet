@@ -32,13 +32,13 @@
   },
   "scripts": {
     "predev": "node ../scripts/generate-release-notes.mjs && node scripts/generate-seo-files.mjs && node scripts/generate-legal-digests.mjs",
-    "dev": "../node_modules/.bin/vite",
+    "dev": "vite",
     "prebuild": "node ../scripts/write-build-info.mjs && node ../scripts/fix-phosphor-webcomponents.mjs && node ../scripts/generate-release-notes.mjs && node scripts/generate-seo-files.mjs && node scripts/generate-legal-digests.mjs",
     "build": "vite build",
     "prebuild:ci": "node ../scripts/write-build-info.mjs && node ../scripts/fix-phosphor-webcomponents.mjs && node ../scripts/generate-release-notes.mjs && node scripts/generate-seo-files.mjs && node scripts/generate-legal-digests.mjs",
     "build:ci": "tsc -b --pretty false && vite build --logLevel warn",
     "start": "../node_modules/.bin/vite preview --host 0.0.0.0 --port ${PORT:-4173}",
-    "api:build": "../node_modules/.bin/tsc -p tsconfig.api.json",
+    "api:build": "tsc -p tsconfig.api.json",
     "start:node": "node server/index.cjs",
     "start:full": "npm run build && npm run api:build && npm run start:node",
     "typecheck": "../node_modules/.bin/tsc --noEmit -p tsconfig.app.json && ../node_modules/.bin/tsc --noEmit -p tsconfig.test.json && ../node_modules/.bin/tsc --noEmit -p tsconfig.node.json && ../node_modules/.bin/tsc --noEmit -p tsconfig.e2e.json",
@@ -150,6 +150,9 @@
     "web-push": "^3.6.7",
     "web-vitals": "^5.2.0",
     "zod": "^4.4.3"
+  },
+  "optionalDependencies": {
+    "@tailwindcss/oxide-win32-x64-msvc": "^4.3.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",

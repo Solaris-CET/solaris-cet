@@ -365,6 +365,12 @@ export default defineConfig({
     cors: true,
     // hmr: { overlay: false }, // optional, if the overlay is annoying
     proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:3000',
+        changeOrigin: true,
+        proxyTimeout: 120000,
+        timeout: 120000,
+      },
       '/api-dedust': {
         target: 'https://api.dedust.io',
         changeOrigin: true,

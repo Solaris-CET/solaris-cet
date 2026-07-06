@@ -58,7 +58,11 @@
 
 **Teste:** 48/48 pytest (`survey-engine`) · Vitest survey + contactPrefill
 
-**Skill agent:** `.claude/skills/solaris-perfect-loops/SKILL.md` — 5 loop-uri obligatorii (Research → Build → Optimization → Agent → Feedback)
+**Skill agent:** `.claude/skills/solaris-perfect-loops/SKILL.md` — **8 loop-uri (0–7):** Memory → Research → Build → Verify → Optimization → Agent → Feedback → Retrospective
+
+**Agent memory (Stash):** `docs/planning/agent-memory.md` + [Fergana Stash](https://github.com/fergana-labs/stash). Comenzi: `npm run stash:prime -- <topic>` (înainte) · `npm run stash:sync` (după) · `npm run stash:verify` (audit).
+
+**Local dev (Windows):** `npm run dev:local` — survey :8000 + Node API :3000 + Vite :5173 (+ proxy `/api`). Nu 3 terminale manuale.
 
 **Windows dev:** `npm run ci:install` (rimraf + retry npm ci + husky) — sau **Dev Container** (recomandat, identic CI). Nu rula instalări npm în paralel.
 
