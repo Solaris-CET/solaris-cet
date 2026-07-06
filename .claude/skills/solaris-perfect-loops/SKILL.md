@@ -1,137 +1,130 @@
 ---
 name: solaris-perfect-loops
-description: Use this skill when working on SOLARIS CET to enforce perfect Grok working loops, avoid previous mistakes like missing docs, half-solutions, unclear API routing, dangling threads, and poor cost control. Integrates Fergana Stash memory patterns. Trigger words include perfect loops, boil the ocean, agent loop, research loop, build loop, stash.
+description: SOLARIS CET master agent loops v3 — Ralph outer loop + 8 inner loops (0-7) + 12 domain loops + Fable 5 cost gate. Stash memory, self-sufficient verify, multi-model routing. Trigger: perfect loops, ralph, stash, fable 5, agent loop.
 ---
 
-# SOLARIS CET - Perfect Grok Loops & Rules
+# SOLARIS CET — Perfect Loops v3 (Ralph × Stash × Fable 5)
 
-## Core Philosophy (NEVER BREAK)
-"Boil the ocean. Do the whole thing. Do it right. Do it with tests. Do it with documentation. Search before building. Test before shipping. Ship the complete thing. Never leave a dangling thread. Never present a workaround when the real fix exists."
+**Master doc:** `docs/planning/SOLARIS-LOOPS-MASTER.md`  
+**Philosophy:** Boil the ocean · Fresh context per task · Memory before motion · Verify in code.
 
-Inspired by [Fergana Stash](https://github.com/fergana-labs/stash): **persistent memory beats per-session amnesia** — agents that search past sessions work ~49% faster on long tasks.
+Synthesized from: [Stash](https://github.com/Fergana-Labs/stash), [superpowers](https://github.com/obra/superpowers), [spec-kit](https://github.com/github/spec-kit), [ralphy](https://github.com/michaelshimeles/ralphy), [smart-ralph](https://github.com/tzachbon/smart-ralph), [claude-code](https://github.com/anthropics/claude-code), [mini-swe-agent](https://github.com/SWE-agent/mini-swe-agent).
 
 ---
 
-## The 8 Mandatory Loops (0–7, strict order)
+## Outer Loop — Ralph (multi-day epics)
 
-### 0. Memory Loop (FIRST — every session, every task)
-**Goal:** Don't repeat mistakes other agents already paid for.
-
-**One command (preferred):**
 ```bash
-npm run stash:prime -- <topic>    # e.g. survey deploy hetzner
+npm run loops:next                    # next unchecked task
+npm run stash:prime -- <slug>         # Loop 0 for that feature
+# … inner 0→7 …
+npm run stash:sync                    # mark done in tasks.md
 ```
 
-**Manual checklist:**
-1. `stash whoami` — must show profile (else `stash signin`)
-2. `stash search "SOLARIS <topic>" --json` + `stash vfs 'rg "<keyword>" /files'`
-3. Read `docs/planning/agent-memory.md` + latest `docs/planning/grok.md`
-4. State: *"Prior context: …"* or *"Fresh — no hits."*
-5. → Research Loop
+**Rules:** 1 task = fresh context · max 3 retries · state in `tasks.md` not chat.
 
-**After Retrospective (Loop 7):** `npm run stash:sync` — updates Stash pages via `edit-page`.
+Feature template: `docs/planning/features/_template/`
 
-**Full health check:** `npm run stash:verify` — Loop 0 + smoke + local/prod API status.
+---
 
-### 1. Research Loop
-- User pain: installer workflow (photos, checklists, PDF, CRM)
-- Read existing code paths before writing (`Read` callers, not just new file)
-- Check `global.md` for model routing and deploy truth
-- If ambiguous → ask user once, precisely
+## Inner Loops 0–7 (every task, strict order)
 
-### 2. Build Loop
-1. Plan complete solution (files, env, tests)
-2. Surgical changes only — match codebase style
-3. Implement + tests in same pass (pytest / Vitest / smoke)
-4. **Checkpoint** after each significant step (Stash Rule 10):
-   ```
-   DONE / VERIFIED / LEFT / BLOCKED
-   ```
-5. Update `global.md` if architecture/deploy changed
-6. Mark done only when verify commands pass
+| # | Loop | Command / action |
+|---:|---|---|
+| 0 | **Memory** | `npm run stash:prime -- <topic>` |
+| 1 | **Research** | Read callers, `global.md`, `features/*/design.md` |
+| 2 | **Build** | Surgical code + tests same pass |
+| 3 | **Verify** | YOU run smoke/curl — never ask user |
+| 4 | **Optimize** | Model routing table below |
+| 5 | **Agent** | Subagent per role |
+| 6 | **Feedback** | Same-session fix → `grok.md` |
+| 7 | **Retro** | `stash:sync` + `agent-memory.md` if anti-pattern |
 
-### 3. Verify Loop (self-sufficient — Stash "Be self-sufficient")
-- **You** run: `npm run survey:smoke`, `npm run dev:local`, `curl`/Invoke-WebRequest, `grok mcp doctor`
-- **Never** ask user to check logs, test UI, or run commands you can run
-- **Fail loud:** if verify skipped, task is NOT done (Stash Rule 12)
-- Survey features: pytest + Vitest route + doc line in `global.md`
+**Audit:** `npm run stash:verify`
 
-### 4. Optimization Loop
-- DeepSeek for volume; Claude Fable 5 only top-tier text; Kimi for 10+ photos
-- Grok = plan + review + memory updates, not cheap bulk coding
-- Log cost-relevant decisions in `grok.md`
+**Checkpoint (mandatory):**
+```
+DONE / VERIFIED / LEFT / BLOCKED
+```
 
-### 5. Agent Loop (multi-model)
+---
+
+## Fable 5 Gate (Claude premium text)
+
+| Use Fable 5 | Never Fable 5 |
+|---|---|
+| Top-tier AHJ narrative | Bulk coding |
+| Ambiguous research | Vision / photos |
+| Enterprise client reports | Default path |
+| ≤15–20% of reports | "Just in case" |
+
+**Flow:** DeepSeek/Kimi extracts JSON → gate `premium_flag` → Fable writes text → log cost → Batch API if not urgent.
+
+**Routine premium text:** Claude Sonnet 5 ($2/$10 intro).
+
+---
+
+## Model routing (Loop 4 + 5)
+
 | Role | Model |
 |---|---|
-| Orchestrator, review, memory | Grok |
-| Heavy code, vision, extraction | DeepSeek V4 Pro |
-| Premium writing | Claude Fable 5 |
-| Long context / many photos | Kimi |
-
-### 6. Feedback Loop
-- User feedback → same-session fix when possible
-- Update `grok.md` immediately with new rule
-
-### 7. Retrospective Loop (END — mandatory)
-1. Mistake / time wasted?
-2. Permanent fix (code, script, rule)?
-3. Append to `grok.md` + `agent-memory.md` if recurring anti-pattern
-4. Add guard (CI, script check, `dev:local` port check) if repeated twice
-5. Re-run smallest verify command
-
-Template:
-```
-## Retrospective YYYY-MM-DD — [task]
-- Mistake / Root cause / Permanent fix / Rule / Verify
-```
-
-Optional: `stash upload docs/planning/grok.md` or share session after major milestone.
+| Orchestrator, review, memory | Grok Heavy |
+| Code, vision ≤6 photos | DeepSeek V4 Pro |
+| Premium routine text | Claude Sonnet 5 |
+| Top-tier + research | Claude Fable 5 |
+| 10+ photos | Kimi |
+| Implementation subagent | DeepSeek |
+| Code review subagent | Grok or Sonnet 5 |
 
 ---
 
-## Stash-aligned Agent Conduct (12 rules, condensed)
+## Domain Loops (pick one per task)
 
-| # | Rule | SOLARIS CET application |
+| ID | Domain | Key verify |
 |---|---|---|
-| 1 | Think before coding | State assumptions; read `agent-memory.md` |
-| 2 | Simplicity first | No speculative abstractions |
-| 3 | Surgical changes | No drive-by refactors |
-| 4 | Goal-driven | Define success = smoke/post-deploy green |
-| 5 | Code for deterministic work | Routing/retries in code, not LLM |
-| 6 | Token budget | Summarize; don't re-read huge logs |
-| 7 | Surface conflicts | One pattern wins — document in grok.md |
-| 8 | Read before write | Read proxy, server, vite config before survey API change |
-| 9 | Tests encode intent | Survey tests assert CRM link, not just 200 |
-| 10 | Checkpoint | DONE/VERIFIED/LEFT after each step |
-| 11 | Match conventions | Tailwind v4, React 19, functional components |
-| 12 | Fail loud | No silent 503/HTML-as-JSON; report blocked external deps |
+| D1 | Field `/survey` | E2E `survey.spec.ts` |
+| D2 | AI vision pipeline | pytest 62+ |
+| D3 | PDF + AHJ + Fable | PDF sample + cost |
+| D4 | CRM / webhooks | Vitest CRM |
+| D5 | Frontend + SEO | `lighthouse:audit` |
+| D6 | Deploy Coolify/Gitea | `survey:post-deploy` |
+| D7 | PWA offline | draft sync Vitest |
+| D8 | Batch SaaS | E2E batch tab |
+| D9 | Security + cost | `audit:prod` |
+| D10 | Enterprise 3D/twin | feature flag, no regress |
+| D11 | Calculator→survey→offer | prefill Vitest |
+| D12 | Multi-agent orchestra | Grok plans, DeepSeek builds |
+
+Details: `SOLARIS-LOOPS-MASTER.md` § Domain Loops.
 
 ---
 
-## Imprinted facts (do not re-discover)
+## 12 Stash rules (condensed)
 
-### Windows local dev
-- `npm run dev:local` — survey :8000 + Node API :3000 + Vite :5173
-- Vite proxies `/api` → `http://127.0.0.1:3000`
-- npm scripts: `vite` / `tsc` (not `../node_modules/.bin/*`)
-- `@tailwindcss/oxide-win32-x64-msvc` in `optionalDependencies`
+Think first · Simplicity · Surgical · Goal-driven · Deterministic gates in code · Token budget · Surface conflicts · Read before write · Tests encode intent · Checkpoint · Match conventions · **Fail loud**
 
-### Deploy
-- **Gitea:** `Solaris-Cet/solaris-clean` (not GitHub `solaris-cet`)
-- Prod check: `SITE_URL=https://solaris-cet.com npm run survey:post-deploy`
-- Hetzner billing lock ≠ code bug — wait for support
+---
 
-### Stash CLI (Windows)
-```powershell
-pip install stashai
-# PATH: %LOCALAPPDATA%\Packages\PythonSoftwareFoundation.Python.3.12_...\Python312\Scripts
-stash signin
-stash connect   # in repo root → .stash + cursor rules
+## Imprinted facts
+
+```bash
+npm run dev:local          # survey :8000 + API :3000 + Vite :5173
+npm run survey:smoke
+npm run verify:fast
+npm run stash:prime -- <topic>
+npm run stash:sync
+npm run stash:verify
+npm run loops:next
 ```
 
+- **Gitea prod:** `Solaris-Cet/solaris-clean` (not GitHub `solaris-cet`)
+- **Vite proxy:** `/api` → `:3000`
+- **Windows:** `vite`/`tsc` not `../node_modules/.bin/*`
+
 ---
 
-## How to Use
-Activate on: "perfect loops", "follow loops", "stash", "agent memory".
-Run loops **0 → 7** every task. Loop **0** (Memory) and **7** (Retrospective) are non-negotiable.
+## Activation
+
+Triggers: `perfect loops`, `ralph`, `stash`, `fable 5`, `follow loops`, `agent memory`.
+
+**Non-negotiable:** Loop 0 before · Loop 7 after · Loop 3 self-sufficient.

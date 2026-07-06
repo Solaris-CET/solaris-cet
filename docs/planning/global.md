@@ -58,7 +58,7 @@
 
 **Teste:** 48/48 pytest (`survey-engine`) · Vitest survey + contactPrefill
 
-**Skill agent:** `.claude/skills/solaris-perfect-loops/SKILL.md` — **8 loop-uri (0–7):** Memory → Research → Build → Verify → Optimization → Agent → Feedback → Retrospective
+**Skill agent:** `.claude/skills/solaris-perfect-loops/SKILL.md` — **Loops v3:** Ralph outer + **8 loop-uri (0–7)** + **12 domain loops (D1–D12)** + Fable 5 gate. Master: `docs/planning/SOLARIS-LOOPS-MASTER.md`
 
 **Agent memory (Stash):** `docs/planning/agent-memory.md` + [Fergana Stash](https://github.com/fergana-labs/stash). Comenzi: `npm run stash:prime -- <topic>` (înainte) · `npm run stash:sync` (după) · `npm run stash:verify` (audit).
 

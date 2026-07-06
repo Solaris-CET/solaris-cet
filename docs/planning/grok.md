@@ -230,6 +230,26 @@ npm run stash:sync               # Loop 7 — DUPĂ retrospective
 
 ---
 
+## Update 2026-07-06 — Loops v3 (Ralph × GitHub best practices × Fable 5)
+
+**Sursă research:** Stash, superpowers (247k★), spec-kit (118k★), BMAD (50k★), ralphy (2.9k★), smart-ralph, claude-code hooks, mini-swe-agent, Aider, LangGraph, OpenHands, Henry Dowling agent velocity.
+
+**Livrat:**
+| Artefact | Rol |
+|---|---|
+| `docs/planning/SOLARIS-LOOPS-MASTER.md` | Master loops — 12 surse OSS + 12 domain loops D1–D12 |
+| `solaris-perfect-loops` SKILL v3 | Ralph outer + inner 0–7 + Fable gate |
+| `docs/planning/features/_template/` | research / design / tasks pentru epics |
+| `npm run loops:next` | Ralph task picker |
+| `.claude/commands/loops.md` | Slash command `/loops` |
+| `.claude/settings.json` hooks | PostToolUse verify + Stop checkpoint |
+
+**Domain loops (toate ideile proiectului):** D1 șantier · D2 vision · D3 PDF/Fable · D4 CRM · D5 SEO · D6 deploy · D7 PWA · D8 batch SaaS · D9 security · D10 enterprise 3D · D11 conversion · D12 multi-agent.
+
+**Regulă Fable 5:** text premium ≤20% rapoarte; DeepSeek/Kimi extrag; Sonnet 5 rutină; Fable doar top-tier + research ambiguu.
+
+---
+
 ## Update 2026-07-06 — Stash verify final + sync fix
 
 **Problema:** `stash:sync` eșua cu 409 — `--name` nu schimbă numele paginii la upload fișier unic (folosește stem-ul fișierului).

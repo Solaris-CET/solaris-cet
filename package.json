@@ -19,6 +19,7 @@
     "stash:prime": "node scripts/stash-prime.mjs",
     "stash:sync": "node scripts/stash-sync.mjs",
     "stash:verify": "node scripts/stash-verify.mjs",
+    "loops:next": "node scripts/loops-next-task.mjs",
     "app:build": "npm run build --workspace=app && npm run api:build --workspace=app",
     "app:build:next": "npm run build --workspace=app",
     "app:verify": "npm run verify --workspace=app",

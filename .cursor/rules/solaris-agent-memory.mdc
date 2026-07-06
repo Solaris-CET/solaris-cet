@@ -7,12 +7,18 @@ alwaysApply: true
 
 # SOLARIS CET — Agent Memory & Loops
 
-## Before any task (Loop 0 — Memory)
+## Loops v3 (Ralph × Stash × Fable 5)
+Master: `docs/planning/SOLARIS-LOOPS-MASTER.md` · Skill: `solaris-perfect-loops`
+
 ```bash
-npm run stash:prime -- <topic>
+npm run loops:next              # Ralph — next task
+npm run stash:prime -- <topic>  # Loop 0 Memory
 ```
-Then read hits + `docs/planning/agent-memory.md` + `docs/planning/grok.md`.
-Ask: *Has a prior agent tried this? What failed?*
+
+Pick one **Domain Loop D1–D12** per task. **Fable 5** = top-tier text only, ≤20% reports.
+
+## Before any task (Loop 0 — Memory)
+Read hits + `agent-memory.md` + `grok.md`. Ask: *Has a prior agent tried this? What failed?*
 
 ## After every task (Loop 7 — Retrospective)
 ```bash
