@@ -376,4 +376,82 @@ test.describe('Offline PWA State', () => {
 
     await context.setOffline(false);
   });
+
+  test('survey shell loads offline for /survey after first visit', async ({ page, context }) => {
+    await page.route('**/api/survey/health', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true, engine: { ok: true } }),
+      });
+    });
+    await page.route('**/api/survey/jurisdictions', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ jurisdictions: [] }),
+      });
+    });
+
+    await page.goto('/en/');
+    const controlled = await waitForServiceWorkerControllingClient(page);
+    test.skip(!controlled, 'Service worker did not control the client in this environment');
+
+    await page.goto('/survey', { waitUntil: 'domcontentloaded' });
+
+    const runSurveyProbe = async () => {
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        try {
+          return await page.evaluate(async () => {
+            try {
+              const controller = navigator?.serviceWorker?.controller;
+              if (!controller) return { ok: false, status: null };
+              return await new Promise<{ ok: boolean; status: number | null }>((resolve) => {
+                const timeout = setTimeout(() => {
+                  cleanup();
+                  resolve({ ok: false, status: null });
+                }, 4_000);
+
+                const onMessage = (ev: MessageEvent) => {
+                  const data = (ev as any)?.data;
+                  if (!data || typeof data !== 'object') return;
+                  if (data.type !== 'PROBE_SURVEY_SHELL_RESULT') return;
+                  cleanup();
+                  resolve({ ok: Boolean(data.ok), status: typeof data.status === 'number' ? data.status : null });
+                };
+
+                const cleanup = () => {
+                  clearTimeout(timeout);
+                  navigator.serviceWorker.removeEventListener('message', onMessage);
+                };
+
+                navigator.serviceWorker.addEventListener('message', onMessage);
+                controller.postMessage({ type: 'PROBE_SURVEY_SHELL' });
+              });
+            } catch {
+              return { ok: false, status: null };
+            }
+          });
+        } catch (err) {
+          const msg = String(err);
+          if (msg.includes('Execution context was destroyed')) {
+            await page.waitForLoadState('domcontentloaded').catch(() => void 0);
+            continue;
+          }
+          throw err;
+        }
+      }
+      return { ok: false, status: null };
+    };
+
+    const probeOnline = await runSurveyProbe();
+    expect(probeOnline.ok).toBe(true);
+
+    await context.setOffline(true);
+
+    const probeOffline = await runSurveyProbe();
+    expect(probeOffline.ok).toBe(true);
+
+    await context.setOffline(false);
+  });
 });

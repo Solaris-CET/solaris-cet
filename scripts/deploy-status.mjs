@@ -4,14 +4,28 @@
  * Usage: node scripts/deploy-status.mjs
  */
 import { spawnSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = (process.env.SITE_URL || 'https://solaris-cet.com').replace(/\/$/, '');
 
+function resolveGit() {
+  if (process.env.GIT_EXE) return process.env.GIT_EXE;
+  if (process.platform === 'win32') {
+    const candidate = 'C:\\Program Files\\Git\\bin\\git.exe';
+    if (existsSync(candidate)) return candidate;
+  }
+  return 'git';
+}
+
 function localSha() {
-  const r = spawnSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: root, encoding: 'utf8' });
+  const git = resolveGit();
+  const r = spawnSync(git, ['rev-parse', '--short', 'HEAD'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
   return r.status === 0 ? r.stdout.trim() : 'unknown';
 }
 
