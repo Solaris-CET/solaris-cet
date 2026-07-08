@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AdminPanel } from '@/admin/AdminPanel';
@@ -68,11 +68,9 @@ describe('AdminPanel', () => {
 
     render(<AdminPanel />);
 
-    await waitFor(() => {
-      expect(screen.getByText('viewer@test.ro')).toBeTruthy();
-    });
-    expect(screen.getByRole('button', { name: 'Dashboard' })).toBeTruthy();
+    expect(await screen.findByRole('button', { name: 'Dashboard' })).toBeTruthy();
     expect(screen.getByRole('button', { name: /Leads & Oferte \(2\)/ })).toBeTruthy();
+    expect(screen.getByText(/viewer@test\.ro/)).toBeTruthy();
     expect(screen.getByTestId('dash')).toBeTruthy();
   });
 });
