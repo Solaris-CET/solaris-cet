@@ -5,7 +5,7 @@ When the first fix fails, read **`HANDOFF.md` §5 Failed attempts** before retry
 When [Fergana Stash](https://github.com/fergana-labs/stash) is connected, also run:
 `stash search "SOLARIS <topic>" --json` and `stash vfs "rg \"<topic>\" /me"`.
 
-Last consolidated: **2026-07-06** · Stash: **balabanc053** connected · `stash:prime` / `stash:sync` / `stash:verify`
+Last consolidated: **2026-07-08** · Stash: **balabanc053** connected · `stash:prime` / `stash:sync` / `stash:verify`
 
 ---
 
@@ -20,6 +20,8 @@ Last consolidated: **2026-07-06** · Stash: **balabanc053** connected · `stash:
 | Deploy artifacts | `coolify.yml`, `post-deploy-survey.mjs`, env examples | Ready for VPS |
 | Windows hardening | `run-bin.mjs`, `ci:install`, `prepare-husky.mjs` | Cross-platform npm |
 | Local dev (final) | `dev:local` one command + `/api` proxy | 2026-07-06 session |
+| Fable 5 agent patterns | effort + verifier + evidence packets | `agent_harness.py` · `FABLE5-LEAK-REFERENCE.md` |
+| Admin test mocks | Mock `guardAdminRoute` directly, not `importOriginal` | 2026-07-08 Kimi/Grok handoff |
 
 ---
 

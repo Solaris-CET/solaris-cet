@@ -10,6 +10,7 @@ from typing import Optional
 
 import httpx
 
+from src.agent_harness import effort_for_job
 from src.api_clients.cost_logger import CostLogger, UsageRecord
 from src.models import project_root
 
@@ -90,8 +91,15 @@ class ClaudeClient:
         }
 
         if premium:
+            photos = survey_data.get("photos") or survey_data.get("photo_analyses") or []
+            ambiguous = bool(survey_data.get("ambiguous") or survey_data.get("needs_research"))
+            effort = effort_for_job(
+                premium=True,
+                photo_count=len(photos) if isinstance(photos, list) else 0,
+                ambiguous=ambiguous,
+            )
             body["betas"] = ["server-side-fallback-2026-06-01"]
-            body["output_config"] = {"effort": "medium"}
+            body["output_config"] = {"effort": effort.value}
 
         with httpx.Client(timeout=120.0) as client:
             response = client.post(ANTHROPIC_URL, headers=headers, json=body)

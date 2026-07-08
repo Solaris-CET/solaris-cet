@@ -472,3 +472,21 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 - **Done:** 78+ items marked in registry
 
 **Rule of 3:** Discover (audit) → Prioritize (P0–P3) → Verify (mark done + tests)
+
+---
+
+## Update 2026-07-08 — Kimi handoff + verify gate + Fable 5 leak
+
+**Kimi/Grok livrat (verify gate):**
+- 69 teste reparate: mock `guardAdminRoute` + restaurat `vi.mock('../../db/client')` în 27 fișiere admin
+- `generate-seo-files.mjs` suprascria `robots.txt` fără `Disallow` — fix la sursă
+- `npm run verify` verde: lint · typecheck · **1827/1827** · build
+
+**Git push:**
+- GitHub `main` → `e81ee69d` ✓
+- Gitea `origin` → **blocat** fără `GITEA_TOKEN` (18 commit-uri în urmă față de prod Coolify)
+
+**Fable 5 leak (din Desktop grok.md / global.md):**
+- Sursă publică: raw GitHub Pliny — vezi `FABLE5-LEAK-REFERENCE.md`
+- Implementat: `agent_harness.py` (effort, evidence packets, verifier loop) + routing în `claude.py`
+- Relevanță solar: poze + checklist DC/AC/ACM cu `evidence_photo_ids` — structură Fable pe DeepSeek/Fable tier

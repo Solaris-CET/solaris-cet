@@ -219,3 +219,27 @@
 | Admin | `SurveyOfflineSection` |
 
 **VERIFY:** pytest `test_survey_offline` · Vitest manifest/queue · Playwright offline queue · smoke S10
+
+## Epic refactor-verify-gate (Kimi + Grok handoff) — 2026-07-08 DONE
+
+| Componentă | Locație |
+|---|---|
+| DeepSeek v4-pro | `app/api/lib/publicChat.ts` · `scripts/deepseek-refine.mjs` |
+| Admin auth guards | `app/api/lib/adminAuth.ts` → `guardAdminRoute` + test mocks |
+| App modularization | `App.tsx` → `routing.ts` · `seoEngine.ts` · `Router.tsx` |
+| robots.txt persist | `app/scripts/generate-seo-files.mjs` — disallow privacy/multumim/cdn-cgi |
+| Verify gate | `npm run verify` — 1827 tests · lint · typecheck · build |
+
+**VERIFY:** `npm run verify` (app) · commit `e81ee69d` · GitHub `main` pushed
+
+## Fable 5 leak reference + agent harness — 2026-07-08 DONE
+
+| Componentă | Locație |
+|---|---|
+| Leak reference doc | `docs/planning/FABLE5-LEAK-REFERENCE.md` |
+| Harness (effort / packets / verifier) | `survey-engine/src/agent_harness.py` |
+| Claude effort routing | `survey-engine/src/api_clients/claude.py` |
+
+**Source:** [CL4R1T4S / CLAUDE-FABLE-5.md](https://raw.githubusercontent.com/elder-plinius/CL4R1T4S/main/ANTHROPIC/CLAUDE-FABLE-5.md) — public, no DM funnel.
+
+**VERIFY:** pytest `test_agent_harness`
