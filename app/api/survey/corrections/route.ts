@@ -1,10 +1,21 @@
-import { getAllowedOrigin } from '../../lib/cors';
-import { dispatchSurveyWebhook } from '../../lib/surveyWebhook';
-import { dispatchTwinWebhook } from '../../lib/twinWebhook';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyCorrectionEngineBody,
+  buildSurveyCorrectionsListUrl,
+  buildSurveyCorrectionsPlatformPayload,
+  buildSurveyCorrectionsPostUrl,
+  buildSurveyCorrectionWebhookPayload,
+  parseSurveyCorrectionPayload,
+  resolveSurveyCorrectionsEngineUrl,
+  SURVEY_CORRECTIONS_PROBE,
+  surveyCorrectionErrorMessage,
+} from '../../lib/surveyCorrections';
+import { dispatchSurveyWebhook } from '@/api/lib/surveyWebhook';
+import { dispatchTwinWebhook } from '@/api/lib/twinWebhook';
+
+export { SURVEY_CORRECTIONS_PATH, SURVEY_CORRECTIONS_PROBE } from '@/api/lib/surveyCorrections';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
 
 function json(body: unknown, origin: string, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -13,19 +24,10 @@ function json(body: unknown, origin: string, status = 200) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': origin,
       Vary: 'Origin',
-      'Cache-Control': 'no-store',
+      'Cache-Control': SURVEY_CORRECTIONS_PROBE.cacheControl,
     },
   });
 }
-
-type CorrectionPayload = {
-  report_id?: string;
-  field?: string;
-  original?: string;
-  corrected?: string;
-  technician?: string;
-  notes?: string;
-};
 
 export default async function handler(req: Request): Promise<Response> {
   const allowed = getAllowedOrigin(req.headers.get('origin'));
@@ -35,26 +37,27 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, X-Installer-Key',
+        'Access-Control-Allow-Methods': SURVEY_CORRECTIONS_PROBE.methods.join(', '),
+        'Access-Control-Allow-Headers': SURVEY_CORRECTIONS_PROBE.allowHeaders,
         Vary: 'Origin',
       },
     });
   }
 
+  const engineUrl = resolveSurveyCorrectionsEngineUrl();
+
   if (req.method === 'GET') {
     const url = new URL(req.url);
-    const reportId = (url.searchParams.get('report_id') || '').trim();
-    const qs = reportId ? `?report_id=${encodeURIComponent(reportId)}` : '';
+    const reportId = (url.searchParams.get(SURVEY_CORRECTIONS_PROBE.reportIdParam) || '').trim();
     try {
-      const res = await fetch(`${ENGINE.replace(/\/$/, '')}/corrections${qs}`, {
-        signal: AbortSignal.timeout(8000),
+      const res = await fetch(buildSurveyCorrectionsListUrl(engineUrl, reportId), {
+        signal: AbortSignal.timeout(SURVEY_CORRECTIONS_PROBE.fetchTimeoutMs),
       });
       const data = await res.json();
-      if (!res.ok) return json({ error: 'Corrections unavailable' }, allowed, 502);
-      return json({ platform: 'solaris-cet', ...data }, allowed, 200);
+      if (!res.ok) return json({ error: SURVEY_CORRECTIONS_PROBE.unavailableError }, allowed, SURVEY_CORRECTIONS_PROBE.engineErrorStatus);
+      return json(buildSurveyCorrectionsPlatformPayload(data as Record<string, unknown>), allowed, 200);
     } catch {
-      return json({ error: 'survey-engine unreachable' }, allowed, 503);
+      return json({ error: SURVEY_CORRECTIONS_PROBE.unreachableError }, allowed, SURVEY_CORRECTIONS_PROBE.unreachableStatus);
     }
   }
 
@@ -62,57 +65,49 @@ export default async function handler(req: Request): Promise<Response> {
     return json({ error: 'Method not allowed' }, allowed, 405);
   }
 
-  let body: CorrectionPayload;
+  let body: unknown;
   try {
-    body = (await req.json()) as CorrectionPayload;
+    body = await req.json();
   } catch {
-    return json({ error: 'JSON invalid' }, allowed, 400);
+    return json({ error: SURVEY_CORRECTIONS_PROBE.invalidJsonError }, allowed, 400);
   }
 
-  const reportId = typeof body.report_id === 'string' ? body.report_id.trim() : '';
-  const field = typeof body.field === 'string' ? body.field.trim() : '';
-  const corrected = typeof body.corrected === 'string' ? body.corrected.trim() : '';
-  if (!reportId || !field || !corrected) {
-    return json({ error: 'Câmpuri obligatorii: report_id, field, corrected' }, allowed, 400);
+  const correction = parseSurveyCorrectionPayload(body);
+  if (!correction) {
+    return json({ error: SURVEY_CORRECTIONS_PROBE.requiredFieldsError }, allowed, 400);
   }
 
   const installerKey = req.headers.get('x-installer-key') || '';
 
   try {
-    const res = await fetch(`${ENGINE.replace(/\/$/, '')}/corrections`, {
+    const res = await fetch(buildSurveyCorrectionsPostUrl(engineUrl), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(installerKey ? { 'X-Installer-Key': installerKey } : {}),
+        ...(installerKey ? { [SURVEY_CORRECTIONS_PROBE.installerKeyHeader]: installerKey } : {}),
       },
-      body: JSON.stringify({
-        report_id: reportId,
-        field,
-        original: typeof body.original === 'string' ? body.original : '',
-        corrected,
-        technician: typeof body.technician === 'string' ? body.technician : '',
-        notes: typeof body.notes === 'string' ? body.notes : '',
-      }),
-      signal: AbortSignal.timeout(8000),
+      body: JSON.stringify(buildSurveyCorrectionEngineBody(correction)),
+      signal: AbortSignal.timeout(SURVEY_CORRECTIONS_PROBE.fetchTimeoutMs),
     });
     const data = await res.json();
     if (!res.ok) {
-      return json({ error: data.detail || 'Correction failed' }, allowed, res.status === 400 ? 400 : 502);
+      return json(
+        { error: surveyCorrectionErrorMessage(data, SURVEY_CORRECTIONS_PROBE.correctionFailedFallback) },
+        allowed,
+        res.status === 400 ? 400 : SURVEY_CORRECTIONS_PROBE.engineErrorStatus,
+      );
     }
+    const webhookPayload = buildSurveyCorrectionWebhookPayload(correction);
     void dispatchSurveyWebhook({
-      event: 'twin_feed_updated',
-      report_id: reportId,
-      field,
-      corrected,
+      event: SURVEY_CORRECTIONS_PROBE.twinFeedEvent,
+      ...webhookPayload,
     });
     void dispatchTwinWebhook({
-      event: 'correction_logged',
-      report_id: reportId,
-      field,
-      corrected,
+      event: SURVEY_CORRECTIONS_PROBE.correctionLoggedEvent,
+      ...webhookPayload,
     });
-    return json({ platform: 'solaris-cet', ...data }, allowed, 200);
+    return json(buildSurveyCorrectionsPlatformPayload(data as Record<string, unknown>), allowed, 200);
   } catch {
-    return json({ error: 'survey-engine unreachable' }, allowed, 503);
+    return json({ error: SURVEY_CORRECTIONS_PROBE.unreachableError }, allowed, SURVEY_CORRECTIONS_PROBE.unreachableStatus);
   }
 }

@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
-import { adminApi } from '../adminClient';
+import { adminApi, adminApiErr } from '../adminClient';
 
 type PostListRow = { id: string; slug: string; title: string; status: string; excerpt: string | null };
 type PostDoc = { id: string; slug: string; title: string; excerpt: string; markdown: string; status: string };
@@ -22,7 +22,7 @@ export function PostsSection({ token }: { token: string }) {
   const loadList = useCallback(async () => {
     const res = await adminApi<{ posts: PostListRow[] }>('/api/admin/cms/posts?locale=ro', { token });
     if (!res.ok) {
-      setError(res.error);
+      setError(adminApiErr(res) ?? 'Request failed');
       return;
     }
     setPosts(res.data.posts);
@@ -42,7 +42,7 @@ export function PostsSection({ token }: { token: string }) {
     (async () => {
       const res = await adminApi<{ post: PostDoc }>(`/api/admin/cms/post?id=${encodeURIComponent(selectedId)}`, { token });
       if (!res.ok) {
-        if (!cancelled) setError(res.error);
+        if (!cancelled) setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       if (!cancelled) {
@@ -73,7 +73,7 @@ export function PostsSection({ token }: { token: string }) {
       body: { slug, title, locale: 'ro' },
     });
     if (!res.ok) {
-      setError(res.error);
+      setError(adminApiErr(res) ?? 'Request failed');
       return;
     }
     setSelectedId(res.data.post.id);
@@ -91,7 +91,7 @@ export function PostsSection({ token }: { token: string }) {
         body: { id: doc.id, title: doc.title, excerpt: doc.excerpt, markdown: doc.markdown, status: doc.status },
       });
       if (!res.ok) {
-        setError(res.error);
+        setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       setDoc({

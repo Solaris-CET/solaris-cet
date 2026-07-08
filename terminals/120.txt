@@ -1,0 +1,58 @@
+---
+pid: 17520
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/twin3dScene.test.ts src/__tests__/useTwinStream.test.ts src/__tests__/twinWebhookRoute.test.ts src/__tests__/twinRuntimeApi.test.ts src/__tests__/surveyProdGate.test.ts"
+started_at: 2026-07-06T17:06:24.370Z
+running_for_ms: 86400010 
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ❯ src/__tests__/useTwinStream.test.ts (2 tests | 2 failed) 10062ms
+     × parses snapshot, ready, and heartbeat 5050ms
+     × schedules reconnect when persistent stream ends 5009ms
+ ✓ src/__tests__/twinRuntimeApi.test.ts (3 tests) 14ms
+ ✓ src/__tests__/surveyProdGate.test.ts (2 tests) 15ms
+ ✓ src/__tests__/twinWebhookRoute.test.ts (2 tests) 18ms
+ ✓ src/__tests__/twin3dScene.test.ts (3 tests) 12ms
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  2 failed | 10 passed (12)
+   Start at  20:06:57
+   Duration  31.67s (transform 556ms, setup 4.79s, import 327ms, tests 10.12s, environment 11.34s)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/useTwinStream.test.ts > useTwinStream persistent > parses snapshot, ready, and heartbeat
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/__tests__/useTwinStream.test.ts:32:3
+     30|   });
+     31|
+     32|   it('parses snapshot, ready, and heartbeat', async () => {
+       |   ^
+     33|     fetchMock.mockResolvedValue({
+     34|       ok: true,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/useTwinStream.test.ts > useTwinStream persistent > schedules reconnect when persistent stream ends
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/__tests__/useTwinStream.test.ts:51:3
+     49|   });
+     50|
+     51|   it('schedules reconnect when persistent stream ends', async () => {
+       |   ^
+     52|     fetchMock.mockResolvedValue({
+     53|       ok: true,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+---
+exit_code: -1
+elapsed_ms: 86400010
+ended_at: 2026-07-07T17:06:27.023Z
+---

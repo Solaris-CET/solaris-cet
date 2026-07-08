@@ -11,6 +11,10 @@
 
     "baseUrl": ".",
     "paths": {
+      "@/api/gamification/lib/*": ["./api/gamification/lib/*"],
+      "@/api/lib/*": ["./api/lib/*"],
+      "@/db/*": ["./db/*"],
+      "@/lib/*": ["./src/lib/*"],
       "@/*": [
         "./src/*"
       ],

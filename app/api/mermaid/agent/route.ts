@@ -1,4 +1,11 @@
-import { getAllowedOrigin } from '../../lib/cors';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildMermaidAgentGraph,
+  MERMAID_AGENT_PROBE,
+  parseMermaidAgentQuery,
+} from '../../lib/mermaidAgent';
+
+export { MERMAID_AGENT_PATH, MERMAID_AGENT_PROBE } from '@/api/lib/mermaidAgent';
 
 export const config = { runtime: 'edge' };
 
@@ -8,7 +15,7 @@ function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Respo
     headers: {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': allowedOrigin,
-      'Vary': 'Origin',
+      Vary: 'Origin',
     },
   });
 }
@@ -22,9 +29,9 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowedOrigin,
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Methods': MERMAID_AGENT_PROBE.methods.join(', '),
         'Access-Control-Allow-Headers': 'Content-Type',
-        'Vary': 'Origin',
+        Vary: 'Origin',
       },
     });
   }
@@ -34,32 +41,20 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   try {
-    const body = (await req.json()) as { query?: unknown };
-    const query =
-      typeof body.query === 'string' && body.query.trim()
-        ? body.query.trim()
-        : 'How to stake CET?';
-
-    const graph = [
-      'graph TD',
-      `  A[User asks: "${query.replace(/"/g, "'")}"] --> B{Is wallet connected?}`,
-      '  B -->|Yes| C[Show staking options]',
-      '  B -->|No| D[Show connect wallet]',
-      '  C --> E[Show staking calculator]',
-      '  E --> F[Show estimated rewards]',
-    ].join('\n');
+    const body = await req.json();
+    const query = parseMermaidAgentQuery(body);
+    const graph = buildMermaidAgentGraph(query);
 
     return jsonResponse(
       {
-        format: 'mermaid',
+        format: MERMAID_AGENT_PROBE.format,
         graph,
-        render: 'client',
+        render: MERMAID_AGENT_PROBE.renderMode,
       },
       allowedOrigin,
       200,
     );
   } catch {
-    return jsonResponse({ error: 'Invalid JSON body' }, allowedOrigin, 400);
+    return jsonResponse({ error: MERMAID_AGENT_PROBE.invalidJsonError }, allowedOrigin, 400);
   }
 }
-

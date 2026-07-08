@@ -1,0 +1,20 @@
+---
+pid: 3912
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:/Users/CCons/Desktop/SOLARIS CET/app\"; npx vitest run src/__tests__/adminMeRoute.test.ts src/__tests__/adminMfaRoute.test.ts src/__tests__/adminAnimationsExportAdVideoRoute.test.ts src/__tests__/publicChatRoute.test.ts 2>&1 | Select-Object -Last 15"
+started_at: 2026-07-08T18:10:13.939Z
+running_for_ms: 189993   
+---
+ FAIL  src/__tests__/adminMfaRoute.test.ts > /api/admin/mfa e2e probe > GET returns enabled:true when MFA is active
+Error: DATABASE_URL is not set
+ ❯ connectionString db/client.ts:26:11
+     24|   const url = process.env.DATABASE_URL;
+     25|   if (!url?.trim()) {
+     26|     throw new Error('DATABASE_URL is not set');
+       |           ^
+     27|   }
+     28|   return url.trim();
+ ❯ getDb db/client.ts:36:20
+ ❯ Module.handler api/admin/mfa/route.ts:24:14
+ ❯ src/__tests__/adminMfaRoute.test.ts:85:17
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯

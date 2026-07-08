@@ -1,43 +1,49 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
+import { createParticleField } from './particleField';
+
 const COIN_COUNT = 20;
 const LEAF_COUNT = 10;
+
+const coinData = createParticleField(
+  COIN_COUNT,
+  (i, positions, speeds, offsets, jitter) => {
+    positions[i * 3] = (Math.random() - 0.5) * 2;
+    positions[i * 3 + 1] = Math.random() * 2;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 2;
+    speeds[i] = 0.3 + Math.random() * 0.5;
+    offsets[i] = Math.random() * Math.PI * 2;
+    if (jitter) {
+      jitter.x[i] = positions[i * 3];
+      jitter.z[i] = positions[i * 3 + 2];
+    }
+  },
+  true,
+);
+
+const leafData = createParticleField(
+  LEAF_COUNT,
+  (i, positions, speeds, offsets, jitter) => {
+    positions[i * 3] = (Math.random() - 0.5) * 2.5;
+    positions[i * 3 + 1] = Math.random() * 2;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 2.5;
+    speeds[i] = 0.2 + Math.random() * 0.4;
+    offsets[i] = Math.random() * Math.PI * 2;
+    if (jitter) {
+      jitter.x[i] = positions[i * 3];
+      jitter.z[i] = positions[i * 3 + 2];
+    }
+  },
+  true,
+);
 
 function FinancingScene() {
   const groupRef = useRef<THREE.Group>(null!);
   const coinRef = useRef<THREE.Points>(null!);
   const leafRef = useRef<THREE.Points>(null!);
-
-  const coinData = useMemo(() => {
-    const positions = new Float32Array(COIN_COUNT * 3);
-    const speeds = new Float32Array(COIN_COUNT);
-    const offsets = new Float32Array(COIN_COUNT);
-    for (let i = 0; i < COIN_COUNT; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 2;
-      positions[i * 3 + 1] = Math.random() * 2;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 2;
-      speeds[i] = 0.3 + Math.random() * 0.5;
-      offsets[i] = Math.random() * Math.PI * 2;
-    }
-    return { positions, speeds, offsets };
-  }, []);
-
-  const leafData = useMemo(() => {
-    const positions = new Float32Array(LEAF_COUNT * 3);
-    const speeds = new Float32Array(LEAF_COUNT);
-    const offsets = new Float32Array(LEAF_COUNT);
-    for (let i = 0; i < LEAF_COUNT; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 2.5;
-      positions[i * 3 + 1] = Math.random() * 2;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 2.5;
-      speeds[i] = 0.2 + Math.random() * 0.4;
-      offsets[i] = Math.random() * Math.PI * 2;
-    }
-    return { positions, speeds, offsets };
-  }, []);
 
   useFrame(({ clock }) => {
     if (groupRef.current) {
@@ -51,9 +57,9 @@ function FinancingScene() {
         const speed = coinData.speeds[i];
         const offset = coinData.offsets[i];
         const y = ((time * speed + offset) % 2) - 0.5;
-        positions[i * 3] = (Math.random() - 0.5) * 2;
+        positions[i * 3] = coinData.jitterX?.[i] ?? 0;
         positions[i * 3 + 1] = y;
-        positions[i * 3 + 2] = (Math.random() - 0.5) * 2;
+        positions[i * 3 + 2] = coinData.jitterZ?.[i] ?? 0;
       }
       coinRef.current.geometry.attributes.position.needsUpdate = true;
     }
@@ -65,9 +71,9 @@ function FinancingScene() {
         const speed = leafData.speeds[i];
         const offset = leafData.offsets[i];
         const y = ((time * speed + offset) % 2) - 0.5;
-        positions[i * 3] = (Math.random() - 0.5) * 2.5;
+        positions[i * 3] = leafData.jitterX?.[i] ?? 0;
         positions[i * 3 + 1] = y;
-        positions[i * 3 + 2] = (Math.random() - 0.5) * 2.5;
+        positions[i * 3 + 2] = leafData.jitterZ?.[i] ?? 0;
       }
       leafRef.current.geometry.attributes.position.needsUpdate = true;
     }

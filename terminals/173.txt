@@ -1,0 +1,69 @@
+---
+pid: 2324
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/useSurveyOfflineSync.test.ts 2>&1"
+started_at: 2026-07-07T04:24:03.204Z
+running_for_ms: 47230006 
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+stderr | src/__tests__/useSurveyOfflineSync.test.ts > useSurveyOfflineSync > syncs pending reports when syncPending is called
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ❯ src/__tests__/useSurveyOfflineSync.test.ts (4 tests | 3 failed) 15074ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/useSurveyOfflineSync.test.ts > useSurveyOfflineSync > loads draft on mount and exposes online status
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/__tests__/useSurveyOfflineSync.test.ts:121:3
+    119|   });
+    120|
+    121|   it('loads draft on mount and exposes online status', async () => {
+       |   ^
+    122|     const onDraftLoaded = vi.fn();
+    123|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/__tests__/useSurveyOfflineSync.test.ts > useSurveyOfflineSync > autosaves draft after debounce when draft is ready
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/__tests__/useSurveyOfflineSync.test.ts:143:3
+    141|   });
+    142|
+    143|   it('autosaves draft after debounce when draft is ready', async () =>…
+       |   ^
+    144|     const { result } = renderHook(() =>
+    145|       useSurveyOfflineSync({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/__tests__/useSurveyOfflineSync.test.ts > useSurveyOfflineSync > syncs pending reports when syncPending is called
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/__tests__/useSurveyOfflineSync.test.ts:187:3
+    185|   });
+    186|
+    187|   it('syncs pending reports when syncPending is called', async () => {
+       |   ^
+    188|     const onSynced = vi.fn();
+    189|     const pendingItem = {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+     × loads draft on mount and exposes online status 5034ms
+     × autosaves draft after debounce when draft is ready 5008ms
+     ✓ enqueues offline report and refreshes stats 10ms
+     × syncs pending reports when syncPending is called 5018ms
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 1 passed (4)
+   Start at  07:24:11
+   Duration  22.91s (transform 239ms, setup 860ms, import 152ms, tests 15.07s, environment 5.19s)
+

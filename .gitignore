@@ -182,3 +182,6 @@ app/coverage/
 /*"
 engine/farming-engine
 .aider*
+
+# AEP orchestrator run logs (local artifacts)
+docs/planning/aep-runs/

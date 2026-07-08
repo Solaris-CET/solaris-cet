@@ -20,16 +20,50 @@ const plan: SurveyOrchestration = {
 };
 
 describe('surveyAgent', () => {
-  it('shouldAutoCrm when budget ok', () => {
+  it('shouldAutoCrm returns false when plan missing or budget exceeded', () => {
+    expect(shouldAutoCrm(undefined)).toBe(false);
+    expect(shouldAutoCrm({ ...plan, auto_crm: false })).toBe(false);
+    expect(shouldAutoCrm({ ...plan, budget_guard: { alert: true, exceeded: true } })).toBe(false);
+  });
+
+  it('shouldAutoCrm returns true when auto_crm enabled and budget ok', () => {
     expect(shouldAutoCrm(plan)).toBe(true);
-    expect(shouldAutoCrm({ ...plan, auto_crm: true, budget_guard: { alert: true, exceeded: true } })).toBe(false);
+    expect(shouldAutoCrm({ ...plan, budget_guard: { alert: true, exceeded: false } })).toBe(true);
   });
 
-  it('permitHintMessage when recommended', () => {
-    expect(permitHintMessage(plan)).toContain('risc 65');
+  it('permitHintMessage returns null when hint disabled', () => {
+    expect(permitHintMessage(undefined)).toBeNull();
+    expect(permitHintMessage({ ...plan, auto_permit_hint: false })).toBeNull();
   });
 
-  it('stepById finds step', () => {
+  it('permitHintMessage includes score and up to two reasons', () => {
+    expect(permitHintMessage(plan)).toBe(
+      'Agent recomandă pachet autorizație (risc 65/100): Județ RO-CJ',
+    );
+    expect(
+      permitHintMessage({
+        ...plan,
+        permit_risk: {
+          ...plan.permit_risk,
+          reasons: ['A', 'B', 'C'],
+        },
+      }),
+    ).toBe('Agent recomandă pachet autorizație (risc 65/100): A · B');
+  });
+
+  it('permitHintMessage omits reason suffix when list is empty', () => {
+    expect(
+      permitHintMessage({
+        ...plan,
+        permit_risk: { ...plan.permit_risk, reasons: [] },
+      }),
+    ).toBe('Agent recomandă pachet autorizație (risc 65/100)');
+  });
+
+  it('stepById finds step or returns undefined', () => {
     expect(stepById(plan, 'crm')?.label).toBe('CRM');
+    expect(stepById(plan, 'missing')).toBeUndefined();
+    expect(stepById(undefined, 'crm')).toBeUndefined();
+    expect(stepById({ ...plan, steps: [] }, 'crm')).toBeUndefined();
   });
 });

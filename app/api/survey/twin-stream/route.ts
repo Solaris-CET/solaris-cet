@@ -1,8 +1,20 @@
-import { getAllowedOrigin } from '../../lib/cors';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyTwinStreamEngineUrl,
+  buildSurveyTwinStreamErrorPayload,
+  buildSurveyTwinStreamFetchOptions,
+  buildSurveyTwinStreamResponseHeaders,
+  parseSurveyTwinStreamPersistent,
+  parseSurveyTwinStreamReportId,
+  resolveSurveyTwinStreamEngineUrl,
+  SURVEY_TWIN_STREAM_PROBE,
+  surveyTwinStreamErrorMessage,
+  surveyTwinStreamHttpStatus,
+} from '../../lib/surveyTwinStream';
+
+export { SURVEY_TWIN_STREAM_PATH, SURVEY_TWIN_STREAM_PROBE } from '@/api/lib/surveyTwinStream';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
 
 function json(body: unknown, origin: string, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -23,7 +35,8 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': SURVEY_TWIN_STREAM_PROBE.methods.join(', '),
+        'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       },
     });
@@ -34,37 +47,36 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const url = new URL(req.url);
-  const reportId = (url.searchParams.get('report_id') || '').trim();
-  const persistent = ['1', 'true', 'yes'].includes((url.searchParams.get('persistent') || '').trim().toLowerCase());
-  if (!reportId || reportId.length > 80) {
-    return json({ error: 'report_id required' }, allowed, 400);
+  const reportId = parseSurveyTwinStreamReportId(url.searchParams.get(SURVEY_TWIN_STREAM_PROBE.reportIdParam));
+  if (!reportId) {
+    return json({ error: SURVEY_TWIN_STREAM_PROBE.missingReportIdError }, allowed, 400);
   }
 
-  const engineQs = persistent ? '?persistent=true' : '';
-  const fetchOpts: RequestInit = persistent
-    ? {}
-    : { signal: AbortSignal.timeout(30_000) };
+  const persistent = parseSurveyTwinStreamPersistent(url.searchParams.get(SURVEY_TWIN_STREAM_PROBE.persistentParam));
+  const engineUrl = resolveSurveyTwinStreamEngineUrl();
 
   try {
     const res = await fetch(
-      `${ENGINE.replace(/\/$/, '')}/twin-stream/${encodeURIComponent(reportId)}${engineQs}`,
-      fetchOpts,
+      buildSurveyTwinStreamEngineUrl(engineUrl, reportId, persistent),
+      buildSurveyTwinStreamFetchOptions(persistent),
     );
     if (!res.ok || !res.body) {
       const data = await res.json().catch(() => ({}));
-      return json({ error: (data as { detail?: string }).detail || 'Twin stream unavailable' }, allowed, res.status === 404 ? 404 : 502);
+      return json(
+        buildSurveyTwinStreamErrorPayload(surveyTwinStreamErrorMessage(data)),
+        allowed,
+        surveyTwinStreamHttpStatus(res.status),
+      );
     }
     return new Response(res.body, {
       status: 200,
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        Connection: 'keep-alive',
-        'Access-Control-Allow-Origin': allowed,
-        Vary: 'Origin',
-      },
+      headers: buildSurveyTwinStreamResponseHeaders(allowed),
     });
   } catch {
-    return json({ error: 'survey-engine unreachable' }, allowed, 503);
+    return json(
+      buildSurveyTwinStreamErrorPayload(SURVEY_TWIN_STREAM_PROBE.unreachableError),
+      allowed,
+      SURVEY_TWIN_STREAM_PROBE.unreachableStatus,
+    );
   }
 }

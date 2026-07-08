@@ -1,20 +1,22 @@
 import { asc, gt } from 'drizzle-orm';
 
-import { getDb, schema } from '../../db/client';
-import { jsonResponse, optionsResponse } from '../lib/http';
+import { getDb, schema } from '@/db/client';
+import { eventsUpcomingCutoff, EVENTS_PROBE } from '@/api/lib/events';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
+
+export { EVENTS_PATH, EVENTS_PROBE } from '@/api/lib/events';
 
 export const config = { runtime: 'nodejs' };
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') {
-    return optionsResponse(req, 'GET, OPTIONS', 'Content-Type');
+    return optionsResponse(req, EVENTS_PROBE.methods.join(', '), 'Content-Type');
   }
   if (req.method !== 'GET') {
     return jsonResponse(req, { error: 'Method not allowed' }, 405);
   }
 
   const db = getDb();
-  const now = new Date(Date.now() - 24 * 60 * 60 * 1000);
   const events = await db
     .select({
       id: schema.events.id,
@@ -28,10 +30,9 @@ export default async function handler(req: Request): Promise<Response> {
       updatedAt: schema.events.updatedAt,
     })
     .from(schema.events)
-    .where(gt(schema.events.startAt, now))
+    .where(gt(schema.events.startAt, eventsUpcomingCutoff()))
     .orderBy(asc(schema.events.startAt))
-    .limit(100);
+    .limit(EVENTS_PROBE.listLimit);
 
   return jsonResponse(req, { events });
 }
-

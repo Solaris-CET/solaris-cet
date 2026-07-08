@@ -1,44 +1,19 @@
 import { and, eq, ne } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 
-import { getDb, schema } from '../../../db/client';
-import { getAllowedOrigin } from '../../lib/cors';
-import { newsletterVerifyEmail } from '../../lib/emailTemplates';
-import { corsJson, corsOptions, isValidEmail, readJson } from '../../lib/http';
-import { publicOrigin } from '../../lib/publicOrigin';
+import { getDb, schema } from '@/db/client';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { newsletterVerifyEmail } from '@/api/lib/emailTemplates';
+import { corsJson, corsOptions, isValidEmail, readJson } from '@/api/lib/http';
+import {
+  MARKETING_LEAD_PROBE,
+  parseMarketingLeadBody,
+} from '../../lib/marketingLead';
+import { publicOrigin } from '@/api/lib/publicOrigin';
+
+export { MARKETING_LEAD_PATH, MARKETING_LEAD_PROBE } from '@/api/lib/marketingLead';
 
 export const config = { runtime: 'nodejs' };
-
-type UTM = {
-  utm_source?: string;
-  utm_medium?: string;
-  utm_campaign?: string;
-  utm_term?: string;
-  utm_content?: string;
-  gclid?: string;
-  fbclid?: string;
-  li_fat_id?: string;
-  campaign?: string;
-};
-
-function pickUtm(input: unknown): UTM | null {
-  if (!input || typeof input !== 'object') return null;
-  const v = input as Record<string, unknown>;
-  const take = (k: keyof UTM) => (typeof v[k] === 'string' && String(v[k]).trim() ? String(v[k]).trim().slice(0, 180) : undefined);
-  const out: UTM = {
-    utm_source: take('utm_source'),
-    utm_medium: take('utm_medium'),
-    utm_campaign: take('utm_campaign'),
-    utm_term: take('utm_term'),
-    utm_content: take('utm_content'),
-    gclid: take('gclid'),
-    fbclid: take('fbclid'),
-    li_fat_id: take('li_fat_id'),
-    campaign: take('campaign'),
-  };
-  const has = Object.values(out).some((x) => typeof x === 'string' && x);
-  return has ? out : null;
-}
 
 export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
@@ -51,19 +26,15 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     body = await readJson(req);
   } catch {
-    return corsJson(req, 400, { error: 'Invalid JSON' });
+    return corsJson(req, 400, { error: MARKETING_LEAD_PROBE.invalidJsonError });
   }
 
-  const email = typeof (body as { email?: unknown })?.email === 'string' ? (body as { email: string }).email.trim() : '';
-  const name = typeof (body as { name?: unknown })?.name === 'string' ? (body as { name: string }).name.trim().slice(0, 160) : null;
-  const locale = typeof (body as { locale?: unknown })?.locale === 'string' ? (body as { locale: string }).locale.trim().slice(0, 12) : null;
-  const consent = (body as { consent?: unknown })?.consent === true;
-  const newsletter = (body as { newsletter?: unknown })?.newsletter !== false;
-  const pageUrl = typeof (body as { pageUrl?: unknown })?.pageUrl === 'string' ? (body as { pageUrl: string }).pageUrl.trim().slice(0, 500) : null;
-  const utm = pickUtm((body as { utm?: unknown })?.utm);
+  const parsed = parseMarketingLeadBody(body);
+  if (!parsed) return corsJson(req, 400, { error: MARKETING_LEAD_PROBE.invalidJsonError });
+  const { email, name, locale, consent, newsletter, pageUrl, utm } = parsed;
 
-  if (!consent) return corsJson(req, 400, { error: 'Consent required' });
-  if (!isValidEmail(email)) return corsJson(req, 400, { error: 'Invalid email' });
+  if (!consent) return corsJson(req, 400, { error: MARKETING_LEAD_PROBE.consentRequiredError });
+  if (!isValidEmail(email)) return corsJson(req, 400, { error: MARKETING_LEAD_PROBE.invalidEmailError });
 
   const db = getDb();
   const [contact] = await db
@@ -122,4 +93,3 @@ export default async function handler(req: Request): Promise<Response> {
     headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
   });
 }
-

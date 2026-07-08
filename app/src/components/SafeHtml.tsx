@@ -19,6 +19,7 @@ export function SafeHtml({
   role,
   ariaLive,
   ariaAtomic,
+  as: Tag = 'div',
 }: {
   html: string;
   config: SafeHtmlConfig;
@@ -27,6 +28,7 @@ export function SafeHtml({
   role?: React.AriaRole;
   ariaLive?: 'off' | 'polite' | 'assertive';
   ariaAtomic?: boolean;
+  as?: 'div' | 'span';
 }) {
   const sanitized = React.useMemo(() => {
     if (config.kind === 'svg') {
@@ -41,7 +43,7 @@ export function SafeHtml({
   }, [html, config]);
 
   return (
-    <div
+    <Tag
       className={className}
       data-testid={dataTestId}
       role={role}

@@ -3,7 +3,7 @@ pid: 15088
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\"; npm run survey:test"
 started_at: 2026-07-05T23:00:55.729Z
-running_for_ms: 5760047  
+running_for_ms: 102232665
 ---
 
 > survey:test
@@ -17,3 +17,9 @@ running_for_ms: 5760047
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 48 passed, 1 warning in 13.23s
+
+---
+exit_code: -1
+elapsed_ms: 102232665
+ended_at: 2026-07-07T03:24:47.329Z
+---

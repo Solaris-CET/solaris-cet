@@ -1,4 +1,4 @@
-import { hmacSha256, hmacSha256Hex, timingSafeEqualHex } from '../lib/nodeCrypto';
+import { hmacSha256, hmacSha256Hex, timingSafeEqualHex } from '@/api/lib/nodeCrypto';
 
 type TelegramWebAppUser = {
   id: number;

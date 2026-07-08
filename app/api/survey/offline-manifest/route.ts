@@ -1,9 +1,19 @@
-import { getAllowedOrigin } from '../../lib/cors';
-import { buildSurveyOfflineManifest } from '../../lib/surveyOfflineManifest';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyOfflineManifest,
+  buildSurveyOfflineManifestResponse,
+  fetchSurveyOfflineEngineHints,
+  resolveSurveyOfflineManifestEngineUrl,
+  SURVEY_OFFLINE_MANIFEST_PROBE,
+} from '../../lib/surveyOfflineManifest';
+
+export {
+  SURVEY_OFFLINE_MANIFEST_PATH,
+  SURVEY_OFFLINE_MANIFEST_PROBE,
+  SURVEY_OFFLINE_SCHEMA,
+} from '../../lib/surveyOfflineManifest';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
 
 function json(body: unknown, origin: string, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -12,7 +22,7 @@ function json(body: unknown, origin: string, status = 200) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': origin,
       Vary: 'Origin',
-      'Cache-Control': 'public, max-age=300',
+      'Cache-Control': SURVEY_OFFLINE_MANIFEST_PROBE.cacheControl,
     },
   });
 }
@@ -25,7 +35,8 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': SURVEY_OFFLINE_MANIFEST_PROBE.methods.join(', '),
+        'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       },
     });
@@ -35,21 +46,9 @@ export default async function handler(req: Request): Promise<Response> {
     return json({ error: 'Method not allowed' }, allowed, 405);
   }
 
-  let engineHints: Record<string, unknown> = {};
-  try {
-    const res = await fetch(`${ENGINE.replace(/\/$/, '')}/offline-hints`, {
-      signal: AbortSignal.timeout(5000),
-    });
-    if (res.ok) {
-      engineHints = (await res.json()) as Record<string, unknown>;
-    }
-  } catch {
-    void 0;
-  }
+  const engineUrl = resolveSurveyOfflineManifestEngineUrl();
+  const engineHints = await fetchSurveyOfflineEngineHints(engineUrl);
+  const manifest = buildSurveyOfflineManifest(engineHints);
 
-  const manifest = buildSurveyOfflineManifest(
-    engineHints.schema ? (engineHints as Parameters<typeof buildSurveyOfflineManifest>[0]) : undefined,
-  );
-
-  return json({ platform: 'solaris-cet', manifest }, allowed, 200);
+  return json(buildSurveyOfflineManifestResponse(manifest), allowed, 200);
 }

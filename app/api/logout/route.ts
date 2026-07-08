@@ -1,9 +1,12 @@
 import { eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../db/client';
-import { requireAuth } from '../lib/auth';
-import { jsonResponse, optionsResponse } from '../lib/http';
-import { ensureAllowedOrigin } from '../lib/originGuard';
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
+import { LOGOUT_PROBE } from '@/api/lib/logout';
+import { ensureAllowedOrigin } from '@/api/lib/originGuard';
+
+export { LOGOUT_PATH, LOGOUT_PROBE } from '@/api/lib/logout';
 
 export const config = { runtime: 'nodejs' };
 
@@ -12,7 +15,7 @@ export default async function handler(req: Request): Promise<Response> {
   if (guard instanceof Response) return guard;
 
   if (req.method === 'OPTIONS') {
-    return optionsResponse(req, 'POST, OPTIONS', 'Content-Type, Authorization');
+    return optionsResponse(req, LOGOUT_PROBE.methods.join(', '), 'Content-Type, Authorization');
   }
   if (req.method !== 'POST') {
     return jsonResponse(req, { error: 'Method not allowed' }, 405);
@@ -26,4 +29,3 @@ export default async function handler(req: Request): Promise<Response> {
   await db.update(schema.sessions).set({ revokedAt: new Date() }).where(eq(schema.sessions.id, ctx.sid));
   return jsonResponse(req, { ok: true });
 }
-

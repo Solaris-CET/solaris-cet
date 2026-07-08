@@ -1,20 +1,24 @@
 import { and, eq, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAuth } from '../../lib/auth';
-import { jsonResponse, optionsResponse } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import { canModerateForumRole, canViewForumContent } from '@/api/lib/forumCommon';
+import { FORUM_POST_PROBE, parseForumPostId } from '@/api/lib/forumPost';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
+
+export { FORUM_POST_PATH, FORUM_POST_PROBE } from '@/api/lib/forumPost';
 
 export const config = { runtime: 'nodejs' };
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') {
-    return optionsResponse(req, 'GET, OPTIONS', 'Content-Type, Authorization');
+    return optionsResponse(req, FORUM_POST_PROBE.methods.join(', '), 'Content-Type, Authorization');
   }
   if (req.method !== 'GET') return jsonResponse(req, { error: 'Method not allowed' }, 405);
 
   const url = new URL(req.url);
-  const postId = (url.searchParams.get('id') ?? '').trim();
-  if (!postId) return jsonResponse(req, { error: 'Missing id' }, 400);
+  const postId = parseForumPostId(url.searchParams);
+  if (!postId) return jsonResponse(req, { error: FORUM_POST_PROBE.missingIdError }, 400);
 
   const db = getDb();
 
@@ -35,20 +39,20 @@ export default async function handler(req: Request): Promise<Response> {
     .where(eq(schema.forumPosts.id, postId))
     .limit(1);
 
-  if (!row) return jsonResponse(req, { error: 'Not found' }, 404);
+  if (!row) return jsonResponse(req, { error: FORUM_POST_PROBE.notFoundError }, 404);
 
   const ctx = await requireAuth(req);
   const isAuthed = !('error' in ctx);
-  const canModerate = isAuthed && (ctx.user.role === 'admin' || ctx.user.role === 'moderator');
+  const canModerate = isAuthed && canModerateForumRole(ctx.user.role);
   const viewerId = isAuthed ? ctx.user.id : null;
-  const canView =
-    row.status === 'visible' || (viewerId && (canModerate || viewerId === row.authorUserId));
-  if (!canView) return jsonResponse(req, { error: 'Not found' }, 404);
+  if (!canViewForumContent(row.status, viewerId, row.authorUserId, canModerate)) {
+    return jsonResponse(req, { error: FORUM_POST_PROBE.notFoundError }, 404);
+  }
 
   const [scoreRow] = await db
     .select({ score: sql<number>`coalesce(sum(${schema.forumVotes.value}), 0)`.as('score') })
     .from(schema.forumVotes)
-    .where(and(eq(schema.forumVotes.targetType, 'post'), eq(schema.forumVotes.targetId, postId)));
+    .where(and(eq(schema.forumVotes.targetType, FORUM_POST_PROBE.voteTargetType), eq(schema.forumVotes.targetId, postId)));
 
   const [commentsRow] = await db
     .select({ comments: sql<number>`count(*)`.as('comments') })
@@ -63,7 +67,7 @@ export default async function handler(req: Request): Promise<Response> {
           .where(
             and(
               eq(schema.forumVotes.userId, viewerId),
-              eq(schema.forumVotes.targetType, 'post'),
+              eq(schema.forumVotes.targetType, FORUM_POST_PROBE.voteTargetType),
               eq(schema.forumVotes.targetId, postId),
             ),
           )
@@ -87,4 +91,3 @@ export default async function handler(req: Request): Promise<Response> {
     },
   });
 }
-

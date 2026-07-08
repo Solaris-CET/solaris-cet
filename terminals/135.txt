@@ -1,0 +1,22 @@
+---
+pid: 11432
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\" ; npm run build 2>&1 | Select-Object -Last 15"
+started_at: 2026-07-06T18:06:10.947Z
+running_for_ms: 84309998 
+---
+vite v8.0.11 building client environment for production...
+
+transforming...✓ 83 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/sw.js  36.73 kB │ gzip: 11.29 kB
+
+✓ built in 215ms
+
+PWA v1.3.0
+mode      injectManifest
+format:   iife
+precache  338 entries (12501.13 KiB)
+files generated
+  dist/sw.js

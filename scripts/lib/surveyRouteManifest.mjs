@@ -32,6 +32,9 @@ export const OPENAPI_REQUIRED_PATHS = [
   '/api/survey/context',
   '/api/survey/orchestrate',
   '/api/survey/installer/me',
+  '/api/admin/survey-insights',
+  '/api/admin/surveys',
+  '/api/openapi/survey',
 ];
 
 export function buildGateUrl(base, route) {

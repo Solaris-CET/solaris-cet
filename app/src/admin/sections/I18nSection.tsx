@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 
-import { adminApi } from '../adminClient';
+import { adminApi, adminApiErr } from '../adminClient';
 
 type Row = { id: string; key: string; value: string };
 
@@ -35,7 +35,7 @@ export function I18nSection({ token }: { token: string }) {
       { token },
     );
     if (!res.ok) {
-      setError(res.error);
+      setError(adminApiErr(res) ?? 'Request failed');
       return;
     }
     setItems(res.data.translations);
@@ -49,7 +49,7 @@ export function I18nSection({ token }: { token: string }) {
   const save = async (k: string, v: string) => {
     const res = await adminApi<{ ok: true }>('/api/admin/i18n', { token, method: 'PUT', body: { locale, namespace, key: k, value: v } });
     if (!res.ok) {
-      setError(res.error);
+      setError(adminApiErr(res) ?? 'Request failed');
       return;
     }
     void load();
@@ -61,7 +61,7 @@ export function I18nSection({ token }: { token: string }) {
       { token },
     );
     if (!res.ok) {
-      setError(res.error);
+      setError(adminApiErr(res) ?? 'Request failed');
       return;
     }
     const blob = new Blob([JSON.stringify(res.data.translations, null, 2)], { type: 'application/json' });

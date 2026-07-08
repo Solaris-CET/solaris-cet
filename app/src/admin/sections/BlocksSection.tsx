@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
-import { adminApi } from '../adminClient';
+import { adminApi, adminApiErr } from '../adminClient';
 
 const KEYS = ['home.hero', 'home.about', 'layout.header', 'layout.footer'];
 
@@ -25,7 +25,7 @@ export function BlocksSection({ token }: { token: string }) {
         { token },
       );
       if (!res.ok) {
-        if (!cancelled) setError(res.error);
+        if (!cancelled) setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       const next: Record<string, Block> = {};
@@ -53,7 +53,7 @@ export function BlocksSection({ token }: { token: string }) {
     try {
       const updates = KEYS.map((k) => ({ key: k, locale, format: values[k]?.format ?? 'plain', content: values[k]?.content ?? '' }));
       const res = await adminApi<{ ok: true }>('/api/admin/cms/blocks', { token, method: 'PUT', body: { updates } });
-      if (!res.ok) setError(res.error);
+      if (!res.ok) setError(adminApiErr(res) ?? 'Request failed');
     } finally {
       setSaving(false);
     }

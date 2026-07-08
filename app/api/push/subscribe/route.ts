@@ -1,7 +1,10 @@
-import { getDb, schema } from '../../../db/client';
-import { requireUser } from '../../lib/authUser';
-import { getAllowedOrigin } from '../../lib/cors';
-import { corsJson, corsOptions, readJson } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { requireUser } from '@/api/lib/authUser';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { corsJson, corsOptions, readJson } from '@/api/lib/http';
+import { parsePushSubscribeBody, PUSH_SUBSCRIBE_PROBE } from '@/api/lib/pushSubscribe';
+
+export { PUSH_SUBSCRIBE_PATH, PUSH_SUBSCRIBE_PROBE } from '@/api/lib/pushSubscribe';
 
 export const config = { runtime: 'nodejs' };
 
@@ -14,7 +17,7 @@ export default async function handler(req: Request): Promise<Response> {
   const user = await requireUser(req);
   if (!user) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
+      status: PUSH_SUBSCRIBE_PROBE.unauthenticatedStatus,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
     });
   }
@@ -23,14 +26,12 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     body = await readJson(req);
   } catch {
-    return corsJson(req, 400, { error: 'Invalid JSON' });
+    return corsJson(req, 400, { error: PUSH_SUBSCRIBE_PROBE.invalidJsonError });
   }
 
-  const endpoint = typeof (body as { endpoint?: unknown })?.endpoint === 'string' ? (body as { endpoint: string }).endpoint.trim() : '';
-  const keys = (body as { keys?: unknown })?.keys as { p256dh?: unknown; auth?: unknown } | undefined;
-  const p256dh = typeof keys?.p256dh === 'string' ? keys.p256dh.trim() : '';
-  const auth = typeof keys?.auth === 'string' ? keys.auth.trim() : '';
-  if (!endpoint || !p256dh || !auth) return corsJson(req, 400, { error: 'Invalid subscription' });
+  const subscription = parsePushSubscribeBody(body);
+  if (!subscription) return corsJson(req, 400, { error: PUSH_SUBSCRIBE_PROBE.invalidSubscriptionError });
+  const { endpoint, p256dh, auth } = subscription;
 
   const db = getDb();
   await db

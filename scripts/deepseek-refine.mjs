@@ -48,7 +48,7 @@ if (!apiKey) {
 }
 
 const body = {
-  model: 'deepseek-chat',
+  model: 'deepseek-v4-pro',
   messages: [
     { role: 'system', content: systemPrompt },
     {

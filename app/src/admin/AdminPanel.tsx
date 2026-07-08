@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
 import type { AdminRole, AdminSession } from './adminClient';
-import { adminApi } from './adminClient';
+import { adminApi, adminApiErr } from './adminClient';
 import { AuditSection } from './sections/AuditSection';
 import LeadsSection from './sections/LeadsSection';
 import { BlocksSection } from './sections/BlocksSection';
@@ -135,7 +135,7 @@ export function AdminPanel() {
       const res = await adminApi<{ admin: AdminSession['admin'] }>('/api/admin/me', { token });
       if (!res.ok) {
         if (!cancelled) {
-          setBootError(res.error);
+          setBootError(adminApiErr(res) ?? 'Request failed');
           logout();
         }
         return;

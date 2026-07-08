@@ -1,32 +1,24 @@
 import { asc, desc, eq, gte } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { jsonResponse, optionsResponse } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import {
+  asCommunityFeedDate,
+  buildEventFeedItem,
+  buildForumFeedItem,
+  COMMUNITY_FEED_PROBE,
+  parseCommunityFeedLimit,
+  sortAndSerializeFeedItems,
+  type CommunityFeedRawItem,
+} from '../../lib/communityFeed';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
+
+export { COMMUNITY_FEED_PATH, COMMUNITY_FEED_PROBE } from '@/api/lib/communityFeed';
 
 export const config = { runtime: 'nodejs' };
 
-function parseLimit(req: Request, fallback: number): number {
-  const url = new URL(req.url);
-  const raw = url.searchParams.get('limit');
-  const n = raw ? Number(raw) : NaN;
-  if (!Number.isFinite(n)) return fallback;
-  return Math.max(1, Math.min(60, Math.floor(n)));
-}
-
-function asDate(value: unknown): Date | null {
-  if (value instanceof Date && Number.isFinite(value.getTime())) return value;
-  if (typeof value === 'string' || typeof value === 'number') {
-    const d = new Date(value);
-    if (Number.isFinite(d.getTime())) return d;
-  }
-  return null;
-}
-
-type RawItem = { kind: 'forum_post' | 'event'; id: string; title: string; at: Date; href: string };
-
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') {
-    return optionsResponse(req, 'GET, OPTIONS');
+    return optionsResponse(req, COMMUNITY_FEED_PROBE.methods.join(', '));
   }
   if (req.method !== 'GET') return jsonResponse(req, { error: 'Method not allowed' }, 405);
 
@@ -37,7 +29,9 @@ export default async function handler(req: Request): Promise<Response> {
     const now = new Date();
     return jsonResponse(req, { now: now.toISOString(), items: [], leaderboard: [], degraded: true });
   }
-  const limit = parseLimit(req, 30);
+
+  const url = new URL(req.url);
+  const limit = parseCommunityFeedLimit(url.searchParams);
   const now = new Date();
 
   let degraded = false;
@@ -50,9 +44,9 @@ export default async function handler(req: Request): Promise<Response> {
           at: schema.forumPosts.lastActivityAt,
         })
         .from(schema.forumPosts)
-        .where(eq(schema.forumPosts.status, 'visible'))
+        .where(eq(schema.forumPosts.status, COMMUNITY_FEED_PROBE.visibleForumStatus))
         .orderBy(desc(schema.forumPosts.lastActivityAt))
-        .limit(Math.min(20, limit));
+        .limit(Math.min(COMMUNITY_FEED_PROBE.forumLimitCap, limit));
     } catch {
       degraded = true;
       return [];
@@ -71,7 +65,7 @@ export default async function handler(req: Request): Promise<Response> {
         .from(schema.events)
         .where(gte(schema.events.startAt, now))
         .orderBy(asc(schema.events.startAt))
-        .limit(8);
+        .limit(COMMUNITY_FEED_PROBE.eventsLimit);
     } catch {
       degraded = true;
       return [];
@@ -88,7 +82,7 @@ export default async function handler(req: Request): Promise<Response> {
         })
         .from(schema.users)
         .orderBy(desc(schema.users.points))
-        .limit(8);
+        .limit(COMMUNITY_FEED_PROBE.leaderboardLimit);
     } catch {
       degraded = true;
       return [];
@@ -97,39 +91,24 @@ export default async function handler(req: Request): Promise<Response> {
 
   const items = [
     ...forum
-      .map((p): RawItem | null => {
-        const at = asDate(p.at);
+      .map((p): CommunityFeedRawItem | null => {
+        const at = asCommunityFeedDate(p.at);
         if (!at) return null;
-        return {
-          kind: 'forum_post' as const,
-          id: p.id,
-          title: p.title,
-          at,
-          href: `/forum/${encodeURIComponent(p.id)}`,
-        };
+        return buildForumFeedItem(p.id, p.title, at);
       })
-      .filter((v): v is RawItem => v !== null),
+      .filter((v): v is CommunityFeedRawItem => v !== null),
     ...events
-      .map((e): RawItem | null => {
-        const at = asDate(e.at);
+      .map((e): CommunityFeedRawItem | null => {
+        const at = asCommunityFeedDate(e.at);
         if (!at) return null;
-        return {
-          kind: 'event' as const,
-          id: e.id,
-          title: e.title,
-          at,
-          href: `/evenimente/${encodeURIComponent(e.slug)}`,
-        };
+        return buildEventFeedItem(e.id, e.slug, e.title, at);
       })
-      .filter((v): v is RawItem => v !== null),
-  ]
-    .sort((a, b) => b.at.getTime() - a.at.getTime())
-    .slice(0, limit)
-    .map((i) => ({ ...i, at: i.at.toISOString() }));
+      .filter((v): v is CommunityFeedRawItem => v !== null),
+  ];
 
   return jsonResponse(req, {
     now: now.toISOString(),
-    items,
+    items: sortAndSerializeFeedItems(items, limit),
     leaderboard,
     degraded,
   });

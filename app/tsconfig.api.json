@@ -7,6 +7,14 @@
     "ignoreDeprecations": "6.0",
     "outDir": ".api-dist",
     "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@/api/gamification/lib/*": ["./api/gamification/lib/*"],
+      "@/api/lib/*": ["./api/lib/*"],
+      "@/db/*": ["./db/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/*": ["./*"]
+    },
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true,

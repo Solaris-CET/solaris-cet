@@ -1,12 +1,18 @@
 import { eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { withRateLimit } from '../../lib/rateLimit';
-import { sendWebPush } from '../../lib/webPush';
+import { getDb, schema } from '@/db/client';
+import {
+  isInternalPushAuthorized,
+  parsePushNotifyAdminBody,
+  PUSH_NOTIFY_ADMIN_PROBE,
+  readInternalPushToken,
+} from '../../lib/pushNotifyAdmin';
+import { withRateLimit } from '@/api/lib/rateLimit';
+import { sendWebPush } from '@/api/lib/webPush';
+
+export { PUSH_NOTIFY_ADMIN_PATH, PUSH_NOTIFY_ADMIN_PROBE } from '@/api/lib/pushNotifyAdmin';
 
 export const config = { runtime: 'nodejs' };
-
-type NotifyAdminBody = { title?: string; body?: string; data?: Record<string, unknown> };
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -18,31 +24,29 @@ function jsonResponse(body: unknown, status = 200): Response {
 export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') return jsonResponse({ error: 'Method not allowed' }, 405);
 
-  const token = (process.env.INTERNAL_PUSH_TOKEN ?? '').trim();
-  if (!token) return jsonResponse({ error: 'Push notify-admin not configured' }, 501);
-
-  const auth = req.headers.get('authorization') || '';
-  if (auth !== `Bearer ${token}`) return jsonResponse({ error: 'Forbidden' }, 403);
+  const token = readInternalPushToken();
+  if (!token) return jsonResponse({ error: PUSH_NOTIFY_ADMIN_PROBE.notConfiguredError }, PUSH_NOTIFY_ADMIN_PROBE.notConfiguredStatus);
+  if (!isInternalPushAuthorized(req, token)) {
+    return jsonResponse({ error: PUSH_NOTIFY_ADMIN_PROBE.forbiddenError }, PUSH_NOTIFY_ADMIN_PROBE.forbiddenStatus);
+  }
 
   const rateLimited = await withRateLimit(req, '*', {
-    keyPrefix: 'push_notify_admin',
-    limit: 30,
-    windowSeconds: 60,
+    keyPrefix: PUSH_NOTIFY_ADMIN_PROBE.rateLimitKey,
+    limit: PUSH_NOTIFY_ADMIN_PROBE.rateLimit,
+    windowSeconds: PUSH_NOTIFY_ADMIN_PROBE.rateWindowSeconds,
   });
   if (rateLimited) return rateLimited;
 
-  let body: NotifyAdminBody;
+  let body: unknown;
   try {
-    body = (await req.json()) as NotifyAdminBody;
+    body = await req.json();
   } catch {
-    return jsonResponse({ error: 'Invalid JSON' }, 400);
+    return jsonResponse({ error: PUSH_NOTIFY_ADMIN_PROBE.invalidJsonError }, 400);
   }
 
-  const titleRaw = typeof body.title === 'string' ? body.title.trim() : '';
-  const notificationBodyRaw = typeof body.body === 'string' ? body.body.trim() : '';
-  const title = (titleRaw || 'Notificare Solaris CET').slice(0, 120);
-  const notificationBody = notificationBodyRaw.slice(0, 400);
-  const data = body.data && typeof body.data === 'object' ? body.data : {};
+  const parsed = parsePushNotifyAdminBody(body);
+  if (!parsed) return jsonResponse({ error: PUSH_NOTIFY_ADMIN_PROBE.invalidJsonError }, 400);
+  const { title, body: notificationBody, data } = parsed;
 
   let adminSubscriptions: Array<{ endpoint: string; p256dh: string; auth: string }>;
   try {
@@ -55,8 +59,8 @@ export default async function handler(req: Request): Promise<Response> {
       })
       .from(schema.pushSubscriptions)
       .innerJoin(schema.users, eq(schema.pushSubscriptions.userId, schema.users.id))
-      .where(eq(schema.users.role, 'admin'))
-      .limit(100);
+      .where(eq(schema.users.role, PUSH_NOTIFY_ADMIN_PROBE.adminRole))
+      .limit(PUSH_NOTIFY_ADMIN_PROBE.adminSubscriptionLimit);
   } catch {
     return jsonResponse({ ok: false, degraded: true, delivered: 0 }, 503);
   }
@@ -66,7 +70,13 @@ export default async function handler(req: Request): Promise<Response> {
     try {
       await sendWebPush(
         { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-        { title, body: notificationBody, data, icon: '/icon-192.png', badge: '/badge-72.png' },
+        {
+          title,
+          body: notificationBody,
+          data,
+          icon: PUSH_NOTIFY_ADMIN_PROBE.pushIcon,
+          badge: PUSH_NOTIFY_ADMIN_PROBE.pushBadge,
+        },
       );
       delivered++;
     } catch (err) {

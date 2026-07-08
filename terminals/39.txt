@@ -3,7 +3,7 @@ pid: 11624
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/contactPrefill.test.ts src/__tests__/surveyRoutes.integration.test.ts src/__tests__/surveyApi.test.ts"
 started_at: 2026-07-05T23:01:22.770Z
-running_for_ms: 5730049  
+running_for_ms: 102201847
 ---
 
  RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
@@ -17,3 +17,9 @@ running_for_ms: 5730049
    Start at  02:01:32
    Duration  6.83s (transform 399ms, setup 3.16s, import 326ms, tests 188ms, environment 1ms)
 
+
+---
+exit_code: -1
+elapsed_ms: 102201847
+ended_at: 2026-07-07T03:24:43.562Z
+---

@@ -1,47 +1,42 @@
 import { and, asc, eq, gt } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAuth } from '../../lib/auth';
-import { jsonResponse, optionsResponse } from '../../lib/http';
-import { ensureAllowedOrigin } from '../../lib/originGuard';
-import { awardPoints } from '../../lib/points';
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import {
+  canModerateChat,
+  CHAT_MESSAGES_PROBE,
+  chatMessageHasBannedWord,
+  isValidChatMessagePost,
+  parseChatMessagePostBody,
+  parseChatMessagesRoomId,
+  parseChatMessagesSince,
+} from '../../lib/chatMessages';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
+import { ensureAllowedOrigin } from '@/api/lib/originGuard';
+import { awardPoints } from '@/api/lib/points';
+
+export { CHAT_MESSAGES_PATH, CHAT_MESSAGES_PROBE } from '@/api/lib/chatMessages';
 
 export const config = { runtime: 'nodejs' };
 
-function bannedWords(): string[] {
-  const raw = String(process.env.CHAT_BANNED_WORDS ?? '').trim();
-  if (!raw) return ['scam', 'airdrop', 'seed phrase'];
-  return raw
-    .split(',')
-    .map((w) => w.trim().toLowerCase())
-    .filter(Boolean)
-    .slice(0, 200);
-}
-
-function hasBanned(text: string): boolean {
-  const t = text.toLowerCase();
-  return bannedWords().some((w) => w && t.includes(w));
-}
-
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') {
-    return optionsResponse(req, 'GET, POST, OPTIONS', 'Content-Type, Authorization');
+    return optionsResponse(req, CHAT_MESSAGES_PROBE.methods.join(', '), 'Content-Type, Authorization');
   }
 
   if (req.method === 'GET') {
     const url = new URL(req.url);
-    const roomId = url.searchParams.get('roomId') ?? '';
-    const since = url.searchParams.get('since');
-    if (!roomId) return jsonResponse(req, { error: 'Missing roomId' }, 400);
+    const roomId = parseChatMessagesRoomId(url.searchParams);
+    const sinceDate = parseChatMessagesSince(url.searchParams);
+    if (!roomId) return jsonResponse(req, { error: CHAT_MESSAGES_PROBE.missingRoomIdError }, 400);
 
     const ctx = await requireAuth(req);
     const isAuthed = !('error' in ctx);
-    const canModerate = isAuthed && (ctx.user.role === 'admin' || ctx.user.role === 'moderator');
+    const canModerate = isAuthed && canModerateChat(ctx.user.role);
     const viewerUserId = isAuthed ? ctx.user.id : null;
 
     const db = getDb();
-    const sinceDate = since ? new Date(since) : null;
-    const where = sinceDate && !Number.isNaN(sinceDate.getTime())
+    const where = sinceDate
       ? and(eq(schema.chatMessages.roomId, roomId), gt(schema.chatMessages.createdAt, sinceDate))
       : eq(schema.chatMessages.roomId, roomId);
 
@@ -57,7 +52,7 @@ export default async function handler(req: Request): Promise<Response> {
       .from(schema.chatMessages)
       .where(where)
       .orderBy(asc(schema.chatMessages.createdAt))
-      .limit(80);
+      .limit(CHAT_MESSAGES_PROBE.listLimit);
 
     const messages = rows.filter((m) => {
       if (m.status === 'visible') return true;
@@ -78,27 +73,23 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     body = await req.json();
   } catch {
-    return jsonResponse(req, { error: 'Invalid JSON body' }, 400);
+    return jsonResponse(req, { error: CHAT_MESSAGES_PROBE.invalidJsonError }, 400);
   }
 
-  const roomId =
-    typeof body === 'object' && body !== null && 'roomId' in body && typeof (body as { roomId?: unknown }).roomId === 'string'
-      ? (body as { roomId: string }).roomId.trim()
-      : '';
-  const text =
-    typeof body === 'object' && body !== null && 'body' in body && typeof (body as { body?: unknown }).body === 'string'
-      ? (body as { body: string }).body.trim()
-      : '';
-  if (!roomId || !text || text.length > 500) return jsonResponse(req, { error: 'Invalid message' }, 400);
+  const parsed = parseChatMessagePostBody(body);
+  if (!isValidChatMessagePost(parsed)) return jsonResponse(req, { error: CHAT_MESSAGES_PROBE.invalidMessageError }, 400);
 
   const db = getDb();
-  const status = hasBanned(text) ? 'queued' : 'visible';
+  const status = chatMessageHasBannedWord(parsed.body) ? 'queued' : 'visible';
   const [msg] = await db
     .insert(schema.chatMessages)
-    .values({ roomId, userId: ctx.user.id, body: text, status })
+    .values({ roomId: parsed.roomId, userId: ctx.user.id, body: parsed.body, status })
     .returning();
 
   const day = new Date().toISOString().slice(0, 10);
-  await awardPoints(db, ctx.user.id, 1, 'chat', { dedupeKey: `chat:${msg.id}`, meta: { activity: 'chat_message', day } });
+  await awardPoints(db, ctx.user.id, CHAT_MESSAGES_PROBE.chatPoints, 'chat', {
+    dedupeKey: `chat:${msg.id}`,
+    meta: { activity: 'chat_message', day },
+  });
   return jsonResponse(req, { ok: true, message: { id: msg.id, status: msg.status, createdAt: msg.createdAt } });
 }

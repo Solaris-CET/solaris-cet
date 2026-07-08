@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { useDocumentHidden } from '@/hooks/useDocumentHidden';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { SpatialGrid } from '@/lib/spatialGrid';
 
 // Sursa: animație quantum field adaptată din design extern
 // Adaptări: reducedMotion gate, ResizeObserver, DPR scaling, cleanup complet, culori aliniate brandului
@@ -129,26 +130,24 @@ export default function QuantumFieldCanvas() {
       ctx.shadowBlur = 0;
     };
 
+    // Grid spațial pentru vecinătăți — evită O(n²) all-pairs
+    const entanglementGrid = new SpatialGrid<QParticle>({ width: 1, height: 1, cellSize: 85 });
+
     // Linii de entanglement — maxDist redus față de original (110→85) pentru claritate
     const drawEntanglement = () => {
       const maxDist = 85;
       ctx.lineWidth = 0.6;
       ctx.save();
       ctx.strokeStyle = VIOLET;
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < maxDist) {
-            const alpha = (1 - dist / maxDist) * 0.55;
-            ctx.globalAlpha = alpha;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
-          }
-        }
+      entanglementGrid.resize({ width: w, height: h, cellSize: maxDist });
+      entanglementGrid.insertAll(particles);
+      for (const { a, b, dist } of entanglementGrid.neighbourPairs(maxDist)) {
+        const alpha = (1 - dist / maxDist) * 0.55;
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
       }
       ctx.restore();
     };

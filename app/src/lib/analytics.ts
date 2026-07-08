@@ -88,9 +88,9 @@ function initDataLayer() {
 
 function flushQueue() {
   if (!ready) return;
-  while (queued.length) {
-    const e = queued.shift();
-    if (!e) break;
+  const batch = queued.slice();
+  queued.length = 0;
+  for (const e of batch) {
     window.gtag?.('event', e.name, e.params ?? {});
   }
 }

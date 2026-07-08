@@ -1,8 +1,11 @@
-import { getDb, schema } from '../../../db/client';
-import { requireAuth } from '../../lib/auth';
-import { getAllowedOrigin } from '../../lib/cors';
-import { sha256Hex } from '../../lib/nodeCrypto';
-import { withUpstashRateLimit } from '../../lib/rateLimit';
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import { AI_REPORT_PROBE, parseReportBody } from '@/api/lib/aiReport';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { sha256Hex } from '@/api/lib/nodeCrypto';
+import { withUpstashRateLimit } from '@/api/lib/rateLimit';
+
+export { AI_REPORT_PATH, AI_REPORT_PROBE } from '@/api/lib/aiReport';
 
 export const config = { runtime: 'nodejs' };
 
@@ -39,9 +42,9 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const limited = await withUpstashRateLimit(req, allowedOrigin, {
-    keyPrefix: 'cet-ai-report',
-    limit: 10,
-    windowSeconds: 30,
+    keyPrefix: AI_REPORT_PROBE.rateLimitKey,
+    limit: AI_REPORT_PROBE.rateLimit,
+    windowSeconds: AI_REPORT_PROBE.rateWindowSeconds,
   });
   if (limited) return limited;
 
@@ -52,28 +55,9 @@ export default async function handler(req: Request): Promise<Response> {
     return jsonResponse(allowedOrigin, { error: 'Invalid JSON body' }, 400);
   }
 
-  const reason =
-    typeof body === 'object' && body !== null && 'reason' in body && typeof (body as { reason: unknown }).reason === 'string'
-      ? (body as { reason: string }).reason.trim().slice(0, 120)
-      : '';
-  const details =
-    typeof body === 'object' && body !== null && 'details' in body && typeof (body as { details: unknown }).details === 'string'
-      ? (body as { details: string }).details.trim().slice(0, 1200)
-      : '';
-  const messageId =
-    typeof body === 'object' && body !== null && 'messageId' in body && typeof (body as { messageId: unknown }).messageId === 'string'
-      ? (body as { messageId: string }).messageId.trim().slice(0, 80)
-      : '';
-  const query =
-    typeof body === 'object' && body !== null && 'query' in body && typeof (body as { query: unknown }).query === 'string'
-      ? (body as { query: string }).query.trim().slice(0, 500)
-      : '';
-  const response =
-    typeof body === 'object' && body !== null && 'response' in body && typeof (body as { response: unknown }).response === 'string'
-      ? (body as { response: string }).response.trim().slice(0, 2000)
-      : '';
-
-  if (!reason) return jsonResponse(allowedOrigin, { error: 'reason missing' }, 400);
+  const parsed = parseReportBody(body);
+  if (!parsed.ok) return jsonResponse(allowedOrigin, { error: parsed.error }, 400);
+  const { reason, details, messageId, query, response } = parsed;
 
   const auth = await requireAuth(req);
   const ctx = 'error' in auth ? null : auth;
@@ -96,4 +80,3 @@ export default async function handler(req: Request): Promise<Response> {
     return jsonResponse(allowedOrigin, { error: 'Unavailable' }, 503);
   }
 }
-

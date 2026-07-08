@@ -1,8 +1,17 @@
-import { getAllowedOrigin } from '../../lib/cors';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyTwinAgentSuccessPayload,
+  parseSurveyTwinAgentReportId,
+  probeSurveyTwinAgent,
+  resolveSurveyTwinAgentEngineUrl,
+  SURVEY_TWIN_AGENT_PROBE,
+  surveyTwinAgentErrorMessage,
+  surveyTwinAgentHttpStatus,
+} from '../../lib/surveyTwinAgent';
+
+export { SURVEY_TWIN_AGENT_PATH, SURVEY_TWIN_AGENT_PROBE } from '@/api/lib/surveyTwinAgent';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
 
 function json(body: unknown, origin: string, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -11,7 +20,7 @@ function json(body: unknown, origin: string, status = 200) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': origin,
       Vary: 'Origin',
-      'Cache-Control': 'no-store',
+      'Cache-Control': SURVEY_TWIN_AGENT_PROBE.cacheControl,
     },
   });
 }
@@ -24,7 +33,8 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': SURVEY_TWIN_AGENT_PROBE.methods.join(', '),
+        'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       },
     });
@@ -35,22 +45,23 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const url = new URL(req.url);
-  const reportId = (url.searchParams.get('report_id') || '').trim();
-  if (!reportId || reportId.length > 80) {
-    return json({ error: 'report_id required' }, allowed, 400);
+  const reportId = parseSurveyTwinAgentReportId(url.searchParams.get(SURVEY_TWIN_AGENT_PROBE.reportIdParam));
+  if (!reportId) {
+    return json({ error: SURVEY_TWIN_AGENT_PROBE.missingReportIdError }, allowed, 400);
   }
 
-  try {
-    const res = await fetch(
-      `${ENGINE.replace(/\/$/, '')}/twin-agent/${encodeURIComponent(reportId)}`,
-      { signal: AbortSignal.timeout(12_000) },
-    );
-    const data = await res.json();
-    if (!res.ok) {
-      return json({ error: data.detail || 'Twin agent unavailable' }, allowed, res.status === 404 ? 404 : 502);
-    }
-    return json({ platform: 'solaris-cet', plan: data }, allowed, 200);
-  } catch {
-    return json({ error: 'survey-engine unreachable' }, allowed, 503);
+  const engineUrl = resolveSurveyTwinAgentEngineUrl();
+  const probe = await probeSurveyTwinAgent(engineUrl, reportId);
+  if (!probe.ok) {
+    return json({ error: SURVEY_TWIN_AGENT_PROBE.unreachableError }, allowed, SURVEY_TWIN_AGENT_PROBE.unreachableStatus);
   }
+  if (probe.status !== 200) {
+    return json(
+      { error: surveyTwinAgentErrorMessage(probe.data) },
+      allowed,
+      surveyTwinAgentHttpStatus(probe.status),
+    );
+  }
+
+  return json(buildSurveyTwinAgentSuccessPayload(probe.data), allowed, 200);
 }

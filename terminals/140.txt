@@ -1,0 +1,28 @@
+---
+pid: 6032
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\" ; $env:PW_WORKERS=\"1\" ; npm run test:e2e -- tests/pwa-offline.spec.ts --grep \"survey shell\" 2>&1 | Select-Object -Last 15"
+started_at: 2026-07-06T18:15:51.122Z
+running_for_ms: 83730010 
+---
+
+
+> solaris-cet@1.0.0 test:e2e
+> node scripts/run-e2e-batched.mjs tests/pwa-offline.spec.ts --grep survey shell
+
+
+Running 1 test using 1 worker
+
+  ✓  1 [chromium] › tests\pwa-offline.spec.ts:380:3 › Offline PWA State › survey shell loads offline for /survey after first visit (9.4s)node.exe : (node:8144) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:8144) War... env being set.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:8144) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+  1 passed (12.3s)

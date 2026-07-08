@@ -1,40 +1,24 @@
 import { asc } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { getAllowedOrigin } from '../../lib/cors';
-import { optionsResponse } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import {
+  buildEventsIcsCalendar,
+  EVENTS_CALENDAR_PROBE,
+  resolveEventsCalendarSiteUrl,
+} from '../../lib/eventsCalendar';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { optionsResponse } from '@/api/lib/http';
+
+export { EVENTS_CALENDAR_PATH, EVENTS_CALENDAR_PROBE } from '@/api/lib/eventsCalendar';
 
 export const config = { runtime: 'nodejs' };
-
-function icsEscape(value: string): string {
-  return value
-    .replace(/\\/g, '\\\\')
-    .replace(/\n/g, '\\n')
-    .replace(/\r/g, '')
-    .replace(/,/g, '\\,')
-    .replace(/;/g, '\\;');
-}
-
-function formatIcsDate(d: Date): string {
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return (
-    String(d.getUTCFullYear()) +
-    pad(d.getUTCMonth() + 1) +
-    pad(d.getUTCDate()) +
-    'T' +
-    pad(d.getUTCHours()) +
-    pad(d.getUTCMinutes()) +
-    pad(d.getUTCSeconds()) +
-    'Z'
-  );
-}
 
 export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
   const allowedOrigin = getAllowedOrigin(origin);
 
   if (req.method === 'OPTIONS') {
-    return optionsResponse(req, 'GET, OPTIONS', 'Content-Type');
+    return optionsResponse(req, EVENTS_CALENDAR_PROBE.methods.join(', '), 'Content-Type');
   }
   if (req.method !== 'GET') {
     return new Response('Method not allowed', {
@@ -60,49 +44,17 @@ export default async function handler(req: Request): Promise<Response> {
     })
     .from(schema.events)
     .orderBy(asc(schema.events.startAt))
-    .limit(200);
+    .limit(EVENTS_CALENDAR_PROBE.listLimit);
 
-  const prod = String(process.env.PUBLIC_SITE_URL ?? '').trim() || 'https://solaris-cet.com';
-  const base = prod.replace(/\/$/, '');
-
-  const lines: string[] = [];
-  lines.push('BEGIN:VCALENDAR');
-  lines.push('VERSION:2.0');
-  lines.push('PRODID:-//Solaris CET//Community Events//EN');
-  lines.push('CALSCALE:GREGORIAN');
-  lines.push('METHOD:PUBLISH');
-
-  for (const e of events) {
-    const uid = `solaris-cet:${e.slug}`;
-    const dtStart = formatIcsDate(e.startAt);
-    const dtEnd = formatIcsDate(e.endAt ?? new Date(e.startAt.getTime() + 60 * 60 * 1000));
-    const dtStamp = formatIcsDate(e.updatedAt);
-    const url = `${base}/evenimente/${encodeURIComponent(e.slug)}`;
-
-    lines.push('BEGIN:VEVENT');
-    lines.push(`UID:${icsEscape(uid)}`);
-    lines.push(`DTSTAMP:${dtStamp}`);
-    lines.push(`DTSTART:${dtStart}`);
-    lines.push(`DTEND:${dtEnd}`);
-    lines.push(`SUMMARY:${icsEscape(e.title)}`);
-    if (e.description) lines.push(`DESCRIPTION:${icsEscape(e.description)}`);
-    if (e.location) lines.push(`LOCATION:${icsEscape(e.location)}`);
-    if (e.joinUrl) lines.push(`URL:${icsEscape(e.joinUrl)}`);
-    lines.push(`X-ALT-DESC;FMTTYPE=text/html:${icsEscape(`<a href="${url}">${e.title}</a>`)}`);
-    lines.push('END:VEVENT');
-  }
-  lines.push('END:VCALENDAR');
-
-  const body = lines.join('\r\n');
+  const body = buildEventsIcsCalendar(events, resolveEventsCalendarSiteUrl());
   return new Response(body, {
     status: 200,
     headers: {
-      'Content-Type': 'text/calendar; charset=utf-8',
+      'Content-Type': EVENTS_CALENDAR_PROBE.contentType,
       'Cache-Control': 'no-store',
       'Access-Control-Allow-Origin': allowedOrigin,
       Vary: 'Origin',
-      'Content-Disposition': 'inline; filename="solaris-cet-events.ics"',
+      'Content-Disposition': `inline; filename="${EVENTS_CALENDAR_PROBE.filename}"`,
     },
   });
 }
-

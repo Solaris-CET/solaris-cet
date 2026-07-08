@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { useDocumentHidden } from '@/hooks/useDocumentHidden';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+import { SpatialGrid } from '@/lib/spatialGrid';
 
 interface Node {
   x: number;
@@ -59,7 +60,12 @@ const AgenticNeuralCanvas = () => {
         vy: (Math.random() - 0.5) * 0.15,
         phase: Math.random() * Math.PI * 2,
       }));
+
+      const linkDist = Math.min(120, w * 0.14);
+      nodeGrid.resize({ width: w, height: h, cellSize: linkDist });
     };
+
+    const nodeGrid = new SpatialGrid<Node>({ width: 1, height: 1, cellSize: 120 });
 
     resize();
     const ro = new ResizeObserver(resize);
@@ -94,21 +100,16 @@ const AgenticNeuralCanvas = () => {
       }
 
       const linkDist = Math.min(120, w * 0.14);
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-          const a = nodes[i]!;
-          const b = nodes[j]!;
-          const d = Math.hypot(a.x - b.x, a.y - b.y);
-          if (d < linkDist) {
-            const alpha = (1 - d / linkDist) * 0.22;
-            ctx.strokeStyle = `rgba(46, 231, 255, ${alpha})`;
-            ctx.lineWidth = 0.6;
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.stroke();
-          }
-        }
+      nodeGrid.resize({ width: w, height: h, cellSize: linkDist });
+      nodeGrid.insertAll(nodes);
+      for (const { a, b, dist } of nodeGrid.neighbourPairs(linkDist)) {
+        const alpha = (1 - dist / linkDist) * 0.22;
+        ctx.strokeStyle = `rgba(46, 231, 255, ${alpha})`;
+        ctx.lineWidth = 0.6;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
       }
 
       for (const n of nodes) {

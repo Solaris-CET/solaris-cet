@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { getDb, schema } from '../../db/client';
+import { getDb, schema } from '@/db/client';
 import { decryptApiKeyWithEnvSecrets, encryptApiKeyWithEnvPrimary } from './crypto';
 import { getJwtSecretsFromEnv, verifyJwtWithSecrets } from './jwt';
 import { verifyTotpCode } from './totp';

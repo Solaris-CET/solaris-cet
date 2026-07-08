@@ -1,9 +1,12 @@
 import { and, desc, eq, isNotNull } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireUser } from '../../lib/authUser';
-import { getAllowedOrigin } from '../../lib/cors';
-import { corsJson, corsOptions, isValidEmail, readJson } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { parseProfileUpdateBody } from '@/api/lib/accountProfile';
+import { requireUser } from '@/api/lib/authUser';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { corsJson, corsOptions, readJson } from '@/api/lib/http';
+
+export { ACCOUNT_PROFILE_PATH, ACCOUNT_PROFILE_PROBE } from '@/api/lib/accountProfile';
 
 export const config = { runtime: 'nodejs' };
 
@@ -72,29 +75,34 @@ export default async function handler(req: Request): Promise<Response> {
     return corsJson(req, 400, { error: 'Invalid JSON' });
   }
 
-  const emailRaw = typeof (body as { email?: unknown })?.email === 'string' ? (body as { email: string }).email.trim() : '';
-  const email = emailRaw ? emailRaw.toLowerCase() : '';
-  if (email && !isValidEmail(email)) return corsJson(req, 400, { error: 'Invalid email' });
+  const parsed = parseProfileUpdateBody(body);
+  if ('error' in parsed) return corsJson(req, 400, { error: parsed.error });
 
-  const marketingNewsletter = Boolean((body as { marketingNewsletter?: unknown })?.marketingNewsletter);
-  const priceAlertsEmail = Boolean((body as { priceAlertsEmail?: unknown })?.priceAlertsEmail);
-  const pushEnabled = Boolean((body as { pushEnabled?: unknown })?.pushEnabled);
-
-  if (email) {
+  if (parsed.email) {
     await db
       .insert(schema.contacts)
-      .values({ userId: user.id, email })
-      .onConflictDoUpdate({ target: schema.contacts.email, set: { userId: user.id, email } });
+      .values({ userId: user.id, email: parsed.email })
+      .onConflictDoUpdate({ target: schema.contacts.email, set: { userId: user.id, email: parsed.email } });
   }
 
   await db
     .insert(schema.notificationPreferences)
-    .values({ userId: user.id, marketingNewsletter, priceAlertsEmail, pushEnabled, updatedAt: new Date() })
+    .values({
+      userId: user.id,
+      marketingNewsletter: parsed.marketingNewsletter,
+      priceAlertsEmail: parsed.priceAlertsEmail,
+      pushEnabled: parsed.pushEnabled,
+      updatedAt: new Date(),
+    })
     .onConflictDoUpdate({
       target: schema.notificationPreferences.userId,
-      set: { marketingNewsletter, priceAlertsEmail, pushEnabled, updatedAt: new Date() },
+      set: {
+        marketingNewsletter: parsed.marketingNewsletter,
+        priceAlertsEmail: parsed.priceAlertsEmail,
+        pushEnabled: parsed.pushEnabled,
+        updatedAt: new Date(),
+      },
     });
 
   return corsJson(req, 200, { ok: true });
 }
-

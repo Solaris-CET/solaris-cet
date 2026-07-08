@@ -1,0 +1,21 @@
+---
+pid: 12488
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/sessionRevokeAllRoute.test.ts src/__tests__/securitySessionsRoute.test.ts src/__tests__/socialShareRoute.test.ts src/__tests__/serviceStatusRoute.test.ts src/__tests__/supportMessageRoute.test.ts"
+started_at: 2026-07-07T15:52:38.891Z
+running_for_ms: 5905010  
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ✓ src/__tests__/securitySessionsRoute.test.ts (7 tests) 68ms
+ ✓ src/__tests__/socialShareRoute.test.ts (8 tests) 72ms
+ ✓ src/__tests__/serviceStatusRoute.test.ts (6 tests) 72ms
+ ✓ src/__tests__/supportMessageRoute.test.ts (9 tests) 77ms
+ ✓ src/__tests__/sessionRevokeAllRoute.test.ts (6 tests) 77ms
+
+ Test Files  5 passed (5)
+      Tests  36 passed (36)
+   Start at  18:52:43
+   Duration  10.26s (transform 515ms, setup 3.84s, import 2.45s, tests 366ms, environment 1ms)
+

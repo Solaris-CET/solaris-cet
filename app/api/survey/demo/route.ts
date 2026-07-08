@@ -1,8 +1,18 @@
-import { getAllowedOrigin } from '../../lib/cors';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyDemoEngineUrl,
+  buildSurveyDemoOrchestrateUrl,
+  buildSurveyDemoSuccessPayload,
+  buildSurveyDemoUnreachablePayload,
+  extractSurveyDemoPdfFilename,
+  resolveSurveyDemoEngineUrl,
+  SURVEY_DEMO_PROBE,
+  type SurveyDemoEnginePayload,
+} from '../../lib/surveyDemo';
+
+export { SURVEY_DEMO_PATH, SURVEY_DEMO_PROBE } from '@/api/lib/surveyDemo';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
 
 function json(body: unknown, origin: string, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -11,7 +21,7 @@ function json(body: unknown, origin: string, status = 200) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': origin,
       Vary: 'Origin',
-      'Cache-Control': 'no-store',
+      'Cache-Control': SURVEY_DEMO_PROBE.cacheControl,
     },
   });
 }
@@ -24,7 +34,7 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Methods': SURVEY_DEMO_PROBE.methods.join(', '),
         'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       },
@@ -35,52 +45,44 @@ export default async function handler(req: Request): Promise<Response> {
     return json({ error: 'Method not allowed' }, allowed, 405);
   }
 
+  const engineUrl = resolveSurveyDemoEngineUrl();
+
   try {
-    const res = await fetch(`${ENGINE.replace(/\/$/, '')}/demo`, {
+    const res = await fetch(buildSurveyDemoEngineUrl(engineUrl), {
       method: 'POST',
-      signal: AbortSignal.timeout(120_000),
+      signal: AbortSignal.timeout(SURVEY_DEMO_PROBE.fetchTimeoutMs),
     });
-    const data = await res.json().catch(() => ({ error: 'Invalid engine response' }));
+    const data = await res.json().catch(() => ({ error: SURVEY_DEMO_PROBE.invalidEngineResponseError }));
     if (!res.ok) {
-      return json({ error: 'Engine demo failed', engine_url: ENGINE }, allowed, res.status);
+      return json({ error: SURVEY_DEMO_PROBE.engineDemoFailedError, engine_url: engineUrl }, allowed, res.status);
     }
 
-    const payload = data as { report_id: string; pdf_path: string; score: number };
-    const pdfFilename = payload.pdf_path.split(/[/\\]/).pop() || `RAPORT_${payload.report_id}.pdf`;
+    const payload = data as SurveyDemoEnginePayload;
+    const pdfFilename = extractSurveyDemoPdfFilename(payload.pdf_path, payload.report_id);
 
     let orchestration: Record<string, unknown> | undefined;
     try {
-      const orchRes = await fetch(
-        `${ENGINE.replace(/\/$/, '')}/orchestrate/${encodeURIComponent(payload.report_id)}`,
-        { signal: AbortSignal.timeout(8000) },
-      );
+      const orchRes = await fetch(buildSurveyDemoOrchestrateUrl(engineUrl, payload.report_id), {
+        signal: AbortSignal.timeout(SURVEY_DEMO_PROBE.orchestrateTimeoutMs),
+      });
       if (orchRes.ok) {
         orchestration = (await orchRes.json()) as Record<string, unknown>;
       }
     } catch {
-      /* orchestration optional */
+      void 0;
     }
 
     return json(
-      {
-        report_id: payload.report_id,
-        pdf_filename: pdfFilename,
-        ahj_filename: `AHJ_${payload.report_id}.json`,
+      buildSurveyDemoSuccessPayload({
+        reportId: payload.report_id,
+        pdfFilename,
         score: payload.score,
-        verdict: 'Demo — date sample',
-        capacity_kwp: 6,
-        annual_kwh: 7200,
-        routing_reason: 'demo/sample-data',
-        cost_usd: 0,
-        pdf_url: `/api/survey/files?file=${encodeURIComponent(pdfFilename)}`,
-        ahj_url: `/api/survey/files?file=${encodeURIComponent(`AHJ_${payload.report_id}.json`)}`,
         orchestration,
-        demo: true,
-      },
+      }),
       allowed,
       200,
     );
   } catch {
-    return json({ error: 'survey-engine unreachable', engine_url: ENGINE }, allowed, 503);
+    return json(buildSurveyDemoUnreachablePayload(engineUrl), allowed, SURVEY_DEMO_PROBE.unreachableStatus);
   }
 }

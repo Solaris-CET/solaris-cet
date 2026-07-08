@@ -3,7 +3,7 @@ pid: 840
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; node \"..\\node_modules\\vitest\\vitest.mjs\" run src/__tests__/contactPrefill.test.ts src/__tests__/surveyApi.test.ts src/__tests__/surveyRoutes.integration.test.ts --environment=node --pool=threads --no-file-parallelism 2>&1 | Select-Object -Last 12"
 started_at: 2026-07-05T22:57:50.274Z
-running_for_ms: 5945056  
+running_for_ms: 102420227
 ---
 
  RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
@@ -17,3 +17,9 @@ running_for_ms: 5945056
    Start at  01:57:55
    Duration  11.40s (transform 768ms, setup 5.34s, import 778ms, tests 265ms, environment 1ms)
 
+
+---
+exit_code: -1
+elapsed_ms: 102420227
+ended_at: 2026-07-07T03:24:49.369Z
+---

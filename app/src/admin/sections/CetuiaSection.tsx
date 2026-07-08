@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
-import { adminApi } from '../adminClient';
+import { adminApi, adminApiErr } from '../adminClient';
 
 type TokenStatus = 'available' | 'reserved' | 'sold';
 
@@ -41,7 +41,7 @@ export function CetuiaSection({ token }: { token: string }) {
         { token },
       );
       if (!res.ok) {
-        setError(res.error);
+        setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       setCounts(res.data.counts);
@@ -63,7 +63,7 @@ export function CetuiaSection({ token }: { token: string }) {
         method: 'POST',
       });
       if (!res.ok) {
-        setError(res.error);
+        setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       await refreshCounts();
@@ -82,7 +82,7 @@ export function CetuiaSection({ token }: { token: string }) {
     try {
       const res = await adminApi<{ ok: true; token: TokenRow | null }>(`/api/admin/cetuia/tokens?id=${parsedId}`, { token });
       if (!res.ok) {
-        setError(res.error);
+        setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       setRow(res.data.token);
@@ -109,7 +109,7 @@ export function CetuiaSection({ token }: { token: string }) {
         body: { id: parsedId, status: row.status, ownerWalletAddress: row.ownerWalletAddress },
       });
       if (!res.ok) {
-        setError(res.error);
+        setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       setRow(res.data.token);

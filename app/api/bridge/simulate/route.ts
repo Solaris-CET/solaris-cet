@@ -2,101 +2,64 @@ import crypto from 'node:crypto';
 
 import { and, desc, eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { BRIDGE_SIM_LIMITS as LIMITS, computeFeeMicro, microToCET, parseCETToMicro } from '../../../src/lib/bridgeMath';
-import { requireUser } from '../../lib/authUser';
-import { getAllowedOrigin } from '../../lib/cors';
-import { corsJson, corsOptions, readJson } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { computeFeeMicro, microToCET, parseCETToMicro } from '@/lib/bridgeMath';
+import {
+  BRIDGE_SIMULATE_PROBE,
+  bridgeChainsForDirection,
+  isBridgeMeta,
+  nowIso,
+  parseBridgeDirection,
+  parseBridgeEvmAddress,
+  type BridgeMeta,
+} from '../../lib/bridgeSimulate';
+import { requireUser } from '@/api/lib/authUser';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { corsJson, corsOptions, readJson } from '@/api/lib/http';
+
+export { BRIDGE_SIMULATE_PATH, BRIDGE_SIMULATE_PROBE } from '@/api/lib/bridgeSimulate';
 
 export const config = { runtime: 'nodejs' };
-
-type BridgeDirection = 'wrap' | 'unwrap';
-type BridgeChain = 'TON' | 'BSC_TESTNET';
-
-type BridgeMeta = {
-  kind: 'bridge_sim';
-  version: 1;
-  asset: 'CET';
-  direction: BridgeDirection;
-  fromChain: BridgeChain;
-  toChain: BridgeChain;
-  tonAddress: string;
-  evmAddress: string | null;
-  amountMicro: string;
-  feeMicro: string;
-  netMicro: string;
-  srcTxHash: string | null;
-  dstTxHash: string | null;
-  sim: {
-    createdAt: string;
-    startedAt: string | null;
-    confirmedAt: string | null;
-    etaMs: number;
-  };
-};
-
-function parseDirection(v: unknown): BridgeDirection | null {
-  if (v === 'wrap' || v === 'unwrap') return v;
-  return null;
-}
-
-function parseEvmAddress(v: unknown): string | null {
-  if (typeof v !== 'string') return null;
-  const s = v.trim();
-  if (!s) return null;
-  if (!/^0x[a-fA-F0-9]{40}$/.test(s)) return null;
-  return s;
-}
 
 function randomHex(bytes: number): string {
   return crypto.randomBytes(bytes).toString('hex');
 }
 
-function nowIso() {
-  return new Date().toISOString();
-}
-
-function isBridgeMeta(v: unknown): v is BridgeMeta {
-  if (!v || typeof v !== 'object') return false;
-  const o = v as Partial<BridgeMeta>;
-  return o.kind === 'bridge_sim' && o.version === 1 && o.asset === 'CET' && (o.direction === 'wrap' || o.direction === 'unwrap');
-}
-
 export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
   const allowedOrigin = getAllowedOrigin(origin);
-  if (req.method === 'OPTIONS') return corsOptions(req, 'GET, POST, OPTIONS');
+  if (req.method === 'OPTIONS') return corsOptions(req, BRIDGE_SIMULATE_PROBE.methods.join(', '));
 
   const user = await requireUser(req);
-  if (!user) return corsJson(req, 401, { error: 'Unauthorized' });
+  if (!user) return corsJson(req, BRIDGE_SIMULATE_PROBE.unauthenticatedStatus, { error: 'Unauthorized' });
 
   const db = getDb();
+  const LIMITS = BRIDGE_SIMULATE_PROBE.limits;
 
   if (req.method === 'POST') {
     let body: unknown;
     try {
       body = await readJson(req);
     } catch {
-      return corsJson(req, 400, { error: 'Invalid JSON' });
+      return corsJson(req, 400, { error: BRIDGE_SIMULATE_PROBE.invalidJsonError });
     }
 
-    const direction = parseDirection((body as { direction?: unknown })?.direction);
+    const direction = parseBridgeDirection((body as { direction?: unknown })?.direction);
     const amountMicro = parseCETToMicro((body as { amountCET?: unknown })?.amountCET);
-    const evmAddress = parseEvmAddress((body as { evmAddress?: unknown })?.evmAddress);
-    if (!direction) return corsJson(req, 400, { error: 'Invalid direction' });
-    if (amountMicro === null || amountMicro <= 0n) return corsJson(req, 400, { error: 'Invalid amount' });
+    const evmAddress = parseBridgeEvmAddress((body as { evmAddress?: unknown })?.evmAddress);
+    if (!direction) return corsJson(req, 400, { error: BRIDGE_SIMULATE_PROBE.invalidDirectionError });
+    if (amountMicro === null || amountMicro <= 0n) return corsJson(req, 400, { error: BRIDGE_SIMULATE_PROBE.invalidAmountError });
 
     const amountCET = microToCET(amountMicro);
     if (amountCET < LIMITS.minCET || amountCET > LIMITS.maxCET) {
-      return corsJson(req, 400, { error: 'Amount out of bounds', limits: LIMITS });
+      return corsJson(req, 400, { error: BRIDGE_SIMULATE_PROBE.amountOutOfBoundsError, limits: LIMITS });
     }
 
     const feeMicro = computeFeeMicro(amountMicro);
-    if (feeMicro >= amountMicro) return corsJson(req, 400, { error: 'Amount too small after fee' });
+    if (feeMicro >= amountMicro) return corsJson(req, 400, { error: BRIDGE_SIMULATE_PROBE.amountTooSmallError });
     const netMicro = amountMicro - feeMicro;
 
-    const fromChain: BridgeChain = direction === 'wrap' ? 'TON' : 'BSC_TESTNET';
-    const toChain: BridgeChain = direction === 'wrap' ? 'BSC_TESTNET' : 'TON';
+    const { fromChain, toChain } = bridgeChainsForDirection(direction);
 
     const meta: BridgeMeta = {
       kind: 'bridge_sim',
@@ -140,7 +103,7 @@ export default async function handler(req: Request): Promise<Response> {
     .from(schema.web3Intents)
     .where(and(eq(schema.web3Intents.userId, user.id), eq(schema.web3Intents.type, 'bridge')))
     .orderBy(desc(schema.web3Intents.createdAt))
-    .limit(100);
+    .limit(BRIDGE_SIMULATE_PROBE.listLimit);
 
   const now = Date.now();
   for (const r of rows) {

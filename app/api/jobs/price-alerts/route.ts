@@ -1,13 +1,16 @@
 import { and, eq, inArray, isNotNull } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { fetchCetPriceUsd } from '../../lib/cetPrice';
-import { getAllowedOrigin } from '../../lib/cors';
-import { requireCron } from '../../lib/cron';
-import { priceAlertEmail } from '../../lib/emailTemplates';
-import { corsJson, corsOptions } from '../../lib/http';
-import { fetchTonPriceUsd } from '../../lib/tonPrice';
+import { getDb, schema } from '@/db/client';
+import { fetchCetPriceUsd } from '@/api/lib/cetPrice';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { requireCron } from '@/api/lib/cron';
+import { priceAlertEmail } from '@/api/lib/emailTemplates';
+import { corsJson, corsOptions } from '@/api/lib/http';
+import { PRICE_ALERTS_JOB_PROBE } from '@/api/lib/priceAlertsJob';
+import { fetchTonPriceUsd } from '@/api/lib/tonPrice';
 import { telegramSendMessage } from '../../telegram/lib';
+
+export { PRICE_ALERTS_JOB_PATH, PRICE_ALERTS_JOB_PROBE } from '@/api/lib/priceAlertsJob';
 
 export const config = { runtime: 'nodejs' };
 
@@ -15,7 +18,7 @@ export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
   const allowedOrigin = getAllowedOrigin(origin);
 
-  if (req.method === 'OPTIONS') return corsOptions(req, 'POST, OPTIONS');
+  if (req.method === 'OPTIONS') return corsOptions(req, PRICE_ALERTS_JOB_PROBE.methods.join(', '));
   if (req.method !== 'POST') return corsJson(req, 405, { error: 'Method not allowed' });
   if (!requireCron(req)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -37,8 +40,8 @@ export default async function handler(req: Request): Promise<Response> {
   const alerts = await db
     .select()
     .from(schema.priceAlerts)
-    .where(inArray(schema.priceAlerts.asset, ['CET', 'TON']))
-    .limit(500);
+    .where(inArray(schema.priceAlerts.asset, [...PRICE_ALERTS_JOB_PROBE.assets]))
+    .limit(PRICE_ALERTS_JOB_PROBE.alertsLimit);
   let triggered = 0;
   let emailQueued = 0;
   let telegramSent = 0;
@@ -56,7 +59,7 @@ export default async function handler(req: Request): Promise<Response> {
     if (!isHit) continue;
 
     const last = a.lastSentAt ? a.lastSentAt.getTime() : 0;
-    const cooldownMs = Math.max(1, a.cooldownMinutes) * 60 * 1000;
+    const cooldownMs = Math.max(PRICE_ALERTS_JOB_PROBE.defaultCooldownMinutes, a.cooldownMinutes) * 60 * 1000;
     if (last && Date.now() - last < cooldownMs) continue;
 
     if (a.channel === 'email') {
@@ -75,7 +78,7 @@ export default async function handler(req: Request): Promise<Response> {
       });
       await db.insert(schema.emailOutbox).values({
         toEmail,
-        template: 'price_alert',
+        template: PRICE_ALERTS_JOB_PROBE.emailTemplate,
         subject: tpl.subject,
         html: tpl.html,
         textBody: tpl.text,

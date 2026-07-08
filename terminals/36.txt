@@ -3,7 +3,7 @@ pid: 12500
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\" && npm run survey:api"
 started_at: 2026-07-05T23:00:52.202Z
-running_for_ms: 5780035  
+running_for_ms: 102252477
 ---
 At line:1 char:41
 + cd "C:\Users\CCons\Desktop\SOLARIS CET" && npm run survey:api
@@ -12,3 +12,9 @@ The token '&&' is not a valid statement separator in this version.
     + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
     + FullyQualifiedErrorId : InvalidEndOfLine
  
+
+---
+exit_code: -1
+elapsed_ms: 102252477
+ended_at: 2026-07-07T03:24:48.525Z
+---

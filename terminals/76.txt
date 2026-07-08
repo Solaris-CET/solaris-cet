@@ -1,0 +1,13 @@
+---
+pid: 12872
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "Get-ChildItem \"$env:USERPROFILE\\.gmail-mcp\" -ErrorAction SilentlyContinue | Format-Table Name, Length, LastWriteTime"
+started_at: 2026-07-06T01:20:14.076Z
+running_for_ms: 93870331 
+---
+
+---
+exit_code: -1
+elapsed_ms: 93870331
+ended_at: 2026-07-07T03:24:43.477Z
+---

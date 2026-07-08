@@ -1,7 +1,5 @@
 import { publicOrigin } from './publicOrigin';
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'solaris-cet@protonmail.com';
-
 type VerifyEmailTemplate = {
   verifyUrl: string;
   unsubscribeUrl: string;

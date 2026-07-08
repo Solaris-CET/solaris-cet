@@ -1,34 +1,23 @@
 import { eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { writeAdminAudit } from '../../lib/adminAudit';
-import { requireAdminAuth, requireAdminRole } from '../../lib/adminAuth';
-import { corsJson, corsOptions, readJson } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { writeAdminAudit } from '@/api/lib/adminAudit';
+import { guardAdminRoute } from '@/api/lib/adminAuth';
+import { ADMIN_TOKEN_PROBE, ADMIN_TOKEN_SYMBOL, parseTokenPutBody } from '@/api/lib/adminToken';
+import { corsJson, corsOptions, readJson } from '@/api/lib/http';
+
+export { ADMIN_TOKEN_PATH, ADMIN_TOKEN_PROBE } from '@/api/lib/adminToken';
 
 export const config = { runtime: 'nodejs' };
 
-function asDecimalString(v: unknown): string | null {
-  if (typeof v === 'number' && Number.isFinite(v)) return String(v);
-  if (typeof v === 'string') {
-    const s = v.trim();
-    if (!s) return null;
-    if (!/^[0-9]+(\.[0-9]+)?$/.test(s)) return null;
-    if (s.length > 80) return null;
-    return s;
-  }
-  return null;
-}
-
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return corsOptions(req, 'GET, PUT, OPTIONS');
-  const ctx = await requireAdminAuth(req);
+  const ctx = await guardAdminRoute(req, { minRole: (m) => (m === 'PUT' ? ADMIN_TOKEN_PROBE.putMinRole : ADMIN_TOKEN_PROBE.getMinRole) });
   if ('error' in ctx) return corsJson(req, ctx.status, { error: ctx.error });
   const db = getDb();
 
   if (req.method === 'GET') {
-    const ok = requireAdminRole(ctx, 'viewer');
-    if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
-    const [row] = await db.select().from(schema.cmsTokenData).where(eq(schema.cmsTokenData.symbol, 'CET'));
+    const [row] = await db.select().from(schema.cmsTokenData).where(eq(schema.cmsTokenData.symbol, ADMIN_TOKEN_SYMBOL));
     return corsJson(req, 200, {
       token: row
         ? {
@@ -43,16 +32,11 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   if (req.method === 'PUT') {
-    const ok = requireAdminRole(ctx, 'editor');
-    if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
     const body = await readJson(req).catch(() => null);
-    const priceUsd = asDecimalString(typeof body === 'object' && body !== null ? (body as { priceUsd?: unknown }).priceUsd : null);
-    const totalSupply = asDecimalString(typeof body === 'object' && body !== null ? (body as { totalSupply?: unknown }).totalSupply : null);
-    const circulatingSupply = asDecimalString(
-      typeof body === 'object' && body !== null ? (body as { circulatingSupply?: unknown }).circulatingSupply : null,
-    );
-    if (!priceUsd || !totalSupply || !circulatingSupply) return corsJson(req, 400, { error: 'Valori invalide' });
-    const [existing] = await db.select().from(schema.cmsTokenData).where(eq(schema.cmsTokenData.symbol, 'CET'));
+    const parsed = parseTokenPutBody(body);
+    if (!parsed.ok) return corsJson(req, 400, { error: parsed.error });
+    const { priceUsd, totalSupply, circulatingSupply } = parsed;
+    const [existing] = await db.select().from(schema.cmsTokenData).where(eq(schema.cmsTokenData.symbol, ADMIN_TOKEN_SYMBOL));
     if (existing) {
       await db
         .update(schema.cmsTokenData)
@@ -60,7 +44,7 @@ export default async function handler(req: Request): Promise<Response> {
         .where(eq(schema.cmsTokenData.id, existing.id));
     } else {
       await db.insert(schema.cmsTokenData).values({
-        symbol: 'CET',
+        symbol: ADMIN_TOKEN_SYMBOL,
         priceUsd,
         totalSupply,
         circulatingSupply,
@@ -68,11 +52,14 @@ export default async function handler(req: Request): Promise<Response> {
         updatedByAdminId: ctx.admin.id,
       });
     }
-    await writeAdminAudit(req, ctx, 'TOKEN_DATA_UPDATED', 'cms_token_data', 'CET', { priceUsd, totalSupply, circulatingSupply });
-    const [row] = await db.select().from(schema.cmsTokenData).where(eq(schema.cmsTokenData.symbol, 'CET'));
+    await writeAdminAudit(req, ctx, ADMIN_TOKEN_PROBE.auditAction, 'cms_token_data', ADMIN_TOKEN_SYMBOL, {
+      priceUsd,
+      totalSupply,
+      circulatingSupply,
+    });
+    const [row] = await db.select().from(schema.cmsTokenData).where(eq(schema.cmsTokenData.symbol, ADMIN_TOKEN_SYMBOL));
     return corsJson(req, 200, { token: row });
   }
 
   return corsJson(req, 405, { error: 'Method not allowed' });
 }
-

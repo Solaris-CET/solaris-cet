@@ -1,5 +1,7 @@
 import React, { useEffect,useRef } from 'react';
 
+import { SpatialGrid } from '@/lib/spatialGrid';
+
 type NodeParticle = {
   x: number;
   y: number;
@@ -65,13 +67,16 @@ const NetworkNodesCanvas: React.FC = () => {
       for (let i = 0; i < maxParticles; i += 1) particles.push(createParticle());
     };
 
+    const linkDist = 130;
+    const nodeGrid = new SpatialGrid<NodeParticle>({ width: 1, height: 1, cellSize: linkDist });
+
     let animationFrame: number;
     let running = false;
     const animate = () => {
       running = true;
       ctx.clearRect(0, 0, width, height);
-      
-      particles.forEach((p, i) => {
+
+      particles.forEach((p) => {
         if (pointer.active) {
           const dxp = pointer.x - p.x;
           const dyp = pointer.y - p.y;
@@ -94,21 +99,6 @@ const NetworkNodesCanvas: React.FC = () => {
         ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(46, 231, 255, 0.4)';
         ctx.fill();
-        
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = p.x - particles[j].x;
-          const dy = p.y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          
-          if (dist < 130) {
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(46, 231, 255, ${0.15 - dist / 130 * 0.15})`;
-            ctx.lineWidth = 1;
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
-          }
-        }
 
         if (pointer.active) {
           const dx = p.x - pointer.x;
@@ -124,6 +114,18 @@ const NetworkNodesCanvas: React.FC = () => {
           }
         }
       });
+
+      // Node-to-node links via spatial grid (was O(n²))
+      nodeGrid.resize({ width, height, cellSize: linkDist });
+      nodeGrid.insertAll(particles);
+      for (const { a, b, dist } of nodeGrid.neighbourPairs(linkDist)) {
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(46, 231, 255, ${0.15 - dist / linkDist * 0.15})`;
+        ctx.lineWidth = 1;
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
 
       if (pointer.active) {
         ctx.beginPath();

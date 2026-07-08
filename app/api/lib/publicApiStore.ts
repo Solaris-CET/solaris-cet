@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 
-import { getDb, schema } from '../../db/client';
+import { getDb, schema } from '@/db/client';
 import { sha256Hex } from './nodeCrypto';
 
 export type ApiKeyRecord = {

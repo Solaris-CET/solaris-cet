@@ -1,0 +1,75 @@
+---
+pid: 17624
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/tonIndexerJobRoute.test.ts src/__tests__/leadRoute.test.ts src/__tests__/logoutRoute.test.ts src/__tests__/lyapunovRoute.test.ts src/__tests__/purgeInactiveRoute.test.ts"
+started_at: 2026-07-07T15:27:10.268Z
+running_for_ms: 7434994  
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+stdout | src/__tests__/leadRoute.test.ts > /api/lead e2e probe > POST with valid JSON stores lead and notifies
+[lead] {"receivedAt":"2026-07-07T15:27:17.967Z","source":"site","name":"Ion Popescu","telefon":"0769889721","email":"ion@example.com","serviciu":"Panouri solare","judet":"București","detalii":"","pageUrl":"","referer":"","userAgent":"","ip":"203.0.113.10"}
+
+ ❯ src/__tests__/leadRoute.test.ts (10 tests | 2 failed) 95ms
+     ✓ exports stable e2e probe contract 4ms
+     × parseLeadFields normalizes aliases 15ms
+     ✓ validateLeadRequiredFields rejects short phone 1ms
+     ✓ isLeadHoneypotTriggered detects bot fields 1ms
+     ✓ buildLeadRecord captures request metadata 45ms
+     × is registered in server/index.cjs 3ms
+     ✓ OPTIONS returns CORS preflight 4ms
+     ✓ POST with valid JSON stores lead and notifies 15ms
+     ✓ POST honeypot returns success without persisting 2ms
+     ✓ POST missing fields returns 400 2ms
+ ✓ src/__tests__/purgeInactiveRoute.test.ts (8 tests) 76ms
+ ✓ src/__tests__/tonIndexerJobRoute.test.ts (10 tests) 66ms
+ ✓ src/__tests__/logoutRoute.test.ts (6 tests) 70ms
+ ✓ src/__tests__/lyapunovRoute.test.ts (8 tests) 82ms
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  2 failed | 40 passed (42)
+   Start at  18:27:15
+   Duration  11.36s (transform 635ms, setup 3.96s, import 3.15s, tests 390ms, environment 1ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/leadRoute.test.ts > leadCapture helpers > parseLeadFields normalizes aliases
+AssertionError: expected '07 698 897 21' to contain '0769'
+
+Expected: "0769"
+Received: "07 698 897 21"
+
+ ❯ src/__tests__/leadRoute.test.ts:105:28
+    103|     });
+    104|     expect(fields.name).toBe('Ana');
+    105|     expect(fields.telefon).toContain('0769');
+       |                            ^
+    106|     expect(fields.serviciu).toBe('Instalare');
+    107|     expect(fields.judet).toBe('Cluj');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/leadRoute.test.ts > /api/lead e2e probe > is registered in server/index.cjs
+Error: [vitest] No "readFileSync" export is defined on the "node:fs" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+
+vi.mock(import("node:fs"), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    // your mocked methods
+  }
+})
+
+ ❯ src/__tests__/leadRoute.test.ts:145:17
+    143|
+    144|   it('is registered in server/index.cjs', () => {
+    145|     const src = readFileSync(join(process.cwd(), 'server', 'index.cjs'…
+       |                 ^
+    146|     expect(src).toContain(LEAD_PATH);
+    147|     expect(src).toContain('api/lead/route.js');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

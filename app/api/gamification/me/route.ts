@@ -1,28 +1,21 @@
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireUser } from '../../lib/authUser';
-import { corsJson, corsOptions } from '../../lib/http';
-import { bootstrapGamification, levelCosmeticUnlocks, levelProgressFromXp, listActiveQuests, todayKeyUtc, vipTierFrom } from '../lib/gamification';
+import { getDb, schema } from '@/db/client';
+import { requireUser } from '@/api/lib/authUser';
+import { ensureGamificationMeBadge, GAMIFICATION_ME_PROBE } from '@/api/lib/gamificationMe';
+import { corsJson, corsOptions } from '@/api/lib/http';
+import { bootstrapGamification, levelCosmeticUnlocks, levelProgressFromXp, listActiveQuests, todayKeyUtc, vipTierFrom } from '@/api/gamification/lib/gamification';
+
+export { GAMIFICATION_ME_PATH, GAMIFICATION_ME_PROBE } from '@/api/lib/gamificationMe';
 
 export const config = { runtime: 'nodejs' };
 
-async function ensureBadge(db: ReturnType<typeof getDb>, userId: string, slug: string): Promise<void> {
-  const [b] = await db
-    .select({ id: schema.badges.id })
-    .from(schema.badges)
-    .where(and(eq(schema.badges.slug, slug), eq(schema.badges.active, true)))
-    .limit(1);
-  if (!b?.id) return;
-  await db.insert(schema.userBadges).values({ userId, badgeId: b.id }).onConflictDoNothing();
-}
-
 export default async function handler(req: Request): Promise<Response> {
-  if (req.method === 'OPTIONS') return corsOptions(req, 'GET, OPTIONS');
+  if (req.method === 'OPTIONS') return corsOptions(req, GAMIFICATION_ME_PROBE.methods.join(', '));
   if (req.method !== 'GET') return corsJson(req, 405, { error: 'Method not allowed' });
 
   const user = await requireUser(req);
-  if (!user) return corsJson(req, 401, { error: 'Unauthorized' });
+  if (!user) return corsJson(req, GAMIFICATION_ME_PROBE.unauthenticatedStatus, { error: 'Unauthorized' });
 
   const db = getDb();
   await bootstrapGamification(db);
@@ -38,7 +31,7 @@ export default async function handler(req: Request): Promise<Response> {
     .from(schema.users)
     .where(eq(schema.users.id, user.id))
     .limit(1);
-  if (!u) return corsJson(req, 401, { error: 'Unauthorized' });
+  if (!u) return corsJson(req, GAMIFICATION_ME_PROBE.unauthenticatedStatus, { error: 'Unauthorized' });
 
   const xp = u.points ?? 0;
   const progress = levelProgressFromXp(xp);
@@ -71,7 +64,7 @@ export default async function handler(req: Request): Promise<Response> {
           })
           .from(schema.userQuestProgress)
           .where(and(eq(schema.userQuestProgress.userId, u.id), inArray(schema.userQuestProgress.questId, questIds)))
-          .limit(200);
+          .limit(GAMIFICATION_ME_PROBE.questProgressLimit);
 
   const byKey = new Map<string, { progress: number; status: string; proofUrl: string | null }>();
   for (const r of progressRows) {
@@ -135,15 +128,17 @@ export default async function handler(req: Request): Promise<Response> {
       };
     });
 
-  await ensureBadge(db, u.id, 'wallet-connected');
-  if (xp > 0) await ensureBadge(db, u.id, 'first-xp');
-  if ((streak?.currentStreak ?? 0) >= 7) await ensureBadge(db, u.id, 'streak-7');
+  await ensureGamificationMeBadge(db, u.id, 'wallet-connected');
+  if (xp > 0) await ensureGamificationMeBadge(db, u.id, 'first-xp');
+  if ((streak?.currentStreak ?? 0) >= GAMIFICATION_ME_PROBE.streakBadgeThreshold) {
+    await ensureGamificationMeBadge(db, u.id, 'streak-7');
+  }
 
   const [refCount] = await db
     .select({ c: sql<number>`count(*)` })
     .from(schema.referrals)
     .where(eq(schema.referrals.referrerUserId, u.id));
-  if ((refCount?.c ?? 0) > 0) await ensureBadge(db, u.id, 'referral-1');
+  if ((refCount?.c ?? 0) > 0) await ensureGamificationMeBadge(db, u.id, 'referral-1');
 
   const badgesRows = await db
     .select({
@@ -157,7 +152,7 @@ export default async function handler(req: Request): Promise<Response> {
     .innerJoin(schema.badges, eq(schema.userBadges.badgeId, schema.badges.id))
     .where(eq(schema.userBadges.userId, u.id))
     .orderBy(desc(schema.userBadges.awardedAt))
-    .limit(200);
+    .limit(GAMIFICATION_ME_PROBE.badgesLimit);
 
   const equipped = await db
     .select({
@@ -171,7 +166,7 @@ export default async function handler(req: Request): Promise<Response> {
     .from(schema.userInventory)
     .innerJoin(schema.shopItems, eq(schema.userInventory.itemId, schema.shopItems.id))
     .where(and(eq(schema.userInventory.userId, u.id), eq(schema.userInventory.equipped, true)))
-    .limit(20);
+    .limit(GAMIFICATION_ME_PROBE.equippedLimit);
 
   return corsJson(req, 200, {
     ok: true,

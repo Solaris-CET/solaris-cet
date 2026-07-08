@@ -1,8 +1,15 @@
-import { getAllowedOrigin } from '../../lib/cors';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyJurisdictionsUnreachablePayload,
+  probeSurveyJurisdictions,
+  resolveSurveyJurisdictionsEngineUrl,
+  SURVEY_JURISDICTIONS_PROBE,
+  surveyJurisdictionsHttpStatus,
+} from '../../lib/surveyJurisdictions';
+
+export { SURVEY_JURISDICTIONS_PATH, SURVEY_JURISDICTIONS_PROBE } from '@/api/lib/surveyJurisdictions';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
 
 function json(body: unknown, origin: string, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -11,7 +18,7 @@ function json(body: unknown, origin: string, status = 200) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': origin,
       Vary: 'Origin',
-      'Cache-Control': 'public, max-age=86400',
+      'Cache-Control': SURVEY_JURISDICTIONS_PROBE.cacheControl,
     },
   });
 }
@@ -24,7 +31,8 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': SURVEY_JURISDICTIONS_PROBE.methods.join(', '),
+        'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       },
     });
@@ -34,11 +42,11 @@ export default async function handler(req: Request): Promise<Response> {
     return json({ error: 'Method not allowed' }, allowed, 405);
   }
 
-  try {
-    const res = await fetch(`${ENGINE.replace(/\/$/, '')}/jurisdictions`, { signal: AbortSignal.timeout(8000) });
-    const data = await res.json();
-    return json(data, allowed, res.ok ? 200 : 502);
-  } catch {
-    return json({ error: 'survey-engine unreachable' }, allowed, 503);
+  const engineUrl = resolveSurveyJurisdictionsEngineUrl();
+  const probe = await probeSurveyJurisdictions(engineUrl);
+  if (!probe.ok) {
+    return json(buildSurveyJurisdictionsUnreachablePayload(), allowed, SURVEY_JURISDICTIONS_PROBE.unreachableStatus);
   }
+
+  return json(probe.data, allowed, surveyJurisdictionsHttpStatus(probe.engineResponseOk));
 }

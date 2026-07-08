@@ -1,12 +1,23 @@
-import { requireAdminAuth, requireAdminRole } from '../../../lib/adminAuth';
-import { getAllowedOrigin } from '../../../lib/cors';
-import { corsJson, corsOptions } from '../../../lib/http';
-import { withRateLimit } from '../../../lib/rateLimit';
+import {
+  buildExportAdVideoPreviewUrl,
+  exportAdVideoDimensions,
+  parseExportAdVideoBody,
+} from '../../../lib/adminAnimationsExportAdVideo';
+import { guardAdminRoute } from '@/api/lib/adminAuth';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { corsJson, corsOptions } from '@/api/lib/http';
+import { withRateLimit } from '@/api/lib/rateLimit';
+
+export {
+  ADMIN_ANIMATIONS_EXPORT_AD_VIDEO_PATH,
+  ADMIN_ANIMATIONS_EXPORT_AD_VIDEO_PROBE,
+} from '../../../lib/adminAnimationsExportAdVideo';
 
 export const config = { runtime: 'nodejs' };
 
-export async function POST(request: Request) {
+export default async function handler(request: Request): Promise<Response> {
   if (request.method === 'OPTIONS') return corsOptions(request, 'POST, OPTIONS');
+  if (request.method !== 'POST') return corsJson(request, 405, { error: 'Method not allowed' });
 
   const origin = request.headers.get('origin');
   const allowedOrigin = getAllowedOrigin(origin);
@@ -19,45 +30,27 @@ export async function POST(request: Request) {
   });
   if (limited) return limited;
 
-  const ctx = await requireAdminAuth(request);
+  const ctx = await guardAdminRoute(request, { minRole: 'editor' });
   if ('error' in ctx) return corsJson(request, ctx.status, { error: ctx.error });
-  const ok = requireAdminRole(ctx, 'editor');
-  if (!ok.ok) return corsJson(request, ok.status, { error: ok.error });
 
   try {
-    const body = (await request.json()) as {
-      animation?: unknown;
-      format?: unknown;
-      ctaText?: unknown;
-    };
-    const { animation, format, ctaText } = body;
+    const parsed = parseExportAdVideoBody(await request.json());
+    if (!parsed.ok) return corsJson(request, 400, { error: parsed.error });
 
-    // Validare parametri
-    if (!animation || typeof animation !== 'string') {
-      return corsJson(request, 400, { error: 'Parametrul "animation" este obligatoriu și trebuie să fie un string.' });
-    }
-
-    const validFormats = ['1080x1920', '1920x1080'] as const;
-    const selectedFormat =
-      typeof format === 'string' && validFormats.includes(format as (typeof validFormats)[number]) ? format : '1080x1920';
-    const [width, height] = selectedFormat.split('x').map(Number);
-
-    const defaultCta = 'Cere ofertă gratuită → solaris-cet.com';
-    const finalCta = ctaText && typeof ctaText === 'string' ? ctaText : defaultCta;
-
-    // Simulare generare video (în producție s-ar folosi Puppeteer + ffmpeg)
-    const videoUrl = `/api/admin/animations/export-ad-video/preview?animation=${encodeURIComponent(animation)}&format=${selectedFormat}&cta=${encodeURIComponent(finalCta)}`;
+    const { animation, format, ctaText } = parsed;
+    const { width, height } = exportAdVideoDimensions(format);
+    const videoUrl = buildExportAdVideoPreviewUrl(animation, format, ctaText);
 
     return corsJson(request, 200, {
       success: true,
       videoUrl,
       metadata: {
         animation,
-        format: selectedFormat,
+        format,
         width,
         height,
         durationSeconds: 15,
-        ctaText: finalCta,
+        ctaText,
         generatedAt: new Date().toISOString(),
       },
     });

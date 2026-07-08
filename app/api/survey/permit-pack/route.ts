@@ -1,8 +1,18 @@
-import { getAllowedOrigin } from '../../lib/cors';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyPermitPackEngineUrl,
+  buildSurveyPermitPackFilename,
+  buildSurveyPermitPackUnreachablePayload,
+  parseSurveyPermitPackReportId,
+  resolveSurveyPermitPackEngineUrl,
+  SURVEY_PERMIT_PACK_PROBE,
+  surveyPermitPackErrorMessage,
+  surveyPermitPackHttpStatus,
+} from '../../lib/surveyPermitPack';
+
+export { SURVEY_PERMIT_PACK_PATH, SURVEY_PERMIT_PACK_PROBE } from '@/api/lib/surveyPermitPack';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
 
 export default async function handler(req: Request): Promise<Response> {
   const allowed = getAllowedOrigin(req.headers.get('origin'));
@@ -12,7 +22,8 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': SURVEY_PERMIT_PACK_PROBE.methods.join(', '),
+        'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       },
     });
@@ -26,23 +37,24 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const url = new URL(req.url);
-  const reportId = (url.searchParams.get('report_id') || '').trim();
-  if (!reportId || reportId.length > 80) {
-    return new Response(JSON.stringify({ error: 'report_id required' }), {
+  const reportId = parseSurveyPermitPackReportId(url.searchParams.get(SURVEY_PERMIT_PACK_PROBE.reportIdParam));
+  if (!reportId) {
+    return new Response(JSON.stringify({ error: SURVEY_PERMIT_PACK_PROBE.missingReportIdError }), {
       status: 400,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowed, Vary: 'Origin' },
     });
   }
 
+  const engineUrl = resolveSurveyPermitPackEngineUrl();
+
   try {
-    const res = await fetch(
-      `${ENGINE.replace(/\/$/, '')}/permit-pack/${encodeURIComponent(reportId)}`,
-      { signal: AbortSignal.timeout(30_000) },
-    );
+    const res = await fetch(buildSurveyPermitPackEngineUrl(engineUrl, reportId), {
+      signal: AbortSignal.timeout(SURVEY_PERMIT_PACK_PROBE.fetchTimeoutMs),
+    });
     if (!res.ok) {
       const err = await res.text();
-      return new Response(JSON.stringify({ error: err || 'Permit pack unavailable' }), {
-        status: res.status === 404 ? 404 : 502,
+      return new Response(JSON.stringify({ error: surveyPermitPackErrorMessage(err) }), {
+        status: surveyPermitPackHttpStatus(res.status),
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowed, Vary: 'Origin' },
       });
     }
@@ -50,16 +62,16 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response(buf, {
       status: 200,
       headers: {
-        'Content-Type': 'application/zip',
-        'Content-Disposition': `attachment; filename="PERMIT_${reportId}.zip"`,
+        'Content-Type': SURVEY_PERMIT_PACK_PROBE.zipMediaType,
+        'Content-Disposition': `attachment; filename="${buildSurveyPermitPackFilename(reportId)}"`,
         'Access-Control-Allow-Origin': allowed,
         Vary: 'Origin',
-        'Cache-Control': 'private, max-age=3600',
+        'Cache-Control': SURVEY_PERMIT_PACK_PROBE.cacheControl,
       },
     });
   } catch {
-    return new Response(JSON.stringify({ error: 'survey-engine unreachable' }), {
-      status: 503,
+    return new Response(JSON.stringify(buildSurveyPermitPackUnreachablePayload()), {
+      status: SURVEY_PERMIT_PACK_PROBE.unreachableStatus,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowed, Vary: 'Origin' },
     });
   }

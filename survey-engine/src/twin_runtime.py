@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -73,7 +74,10 @@ def list_twin_events(
     for line in path.read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
-        row = json.loads(line)
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            continue
         if report_id and row.get("report_id") != report_id:
             continue
         rows.append(row)
@@ -114,14 +118,37 @@ def iter_sse_stream(report_id: str, *, event_limit: int = 30) -> Iterator[str]:
     yield _sse_frame("ready", {"report_id": report_id, "feed_schema": SCHEMA_ID})
 
 
+def _read_new_events(
+    report_id: str,
+    seen: set[str],
+    handle,
+) -> Iterator[dict[str, Any]]:
+    """Yield new events appended since the last read position."""
+    for line in handle:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if report_id and row.get("report_id") != report_id:
+            continue
+        event_id = str(row.get("event_id", ""))
+        if event_id and event_id not in seen:
+            seen.add(event_id)
+            yield row
+
+
 def iter_sse_persistent_stream(
     report_id: str,
     *,
     event_limit: int = 30,
     poll_seconds: float = 2.0,
     heartbeat_seconds: float = 15.0,
+    stop_event: Optional[threading.Event] = None,
 ) -> Iterator[str]:
-    """Long-lived SSE: initial burst then heartbeat + live event polling."""
+    """Long-lived SSE: initial burst then heartbeat + incremental event tailing."""
     seen: set[str] = set()
     for frame in iter_sse_stream(report_id, event_limit=event_limit):
         yield frame
@@ -140,14 +167,26 @@ def iter_sse_persistent_stream(
                 except (StopIteration, json.JSONDecodeError, KeyError):
                     pass
 
+    path = events_path()
     last_heartbeat = time.monotonic()
+    consecutive_errors = 0
+    max_backoff_seconds = 30.0
+
     while True:
-        for event in list_twin_events(report_id, limit=event_limit):
-            event_id = str(event.get("event_id", ""))
-            if not event_id or event_id in seen:
-                continue
-            seen.add(event_id)
-            yield _sse_frame(event["event_type"], event)
+        if stop_event is not None and stop_event.is_set():
+            break
+
+        try:
+            if path.exists():
+                with path.open("r", encoding="utf-8") as handle:
+                    for event in _read_new_events(report_id, seen, handle):
+                        yield _sse_frame(event["event_type"], event)
+            consecutive_errors = 0
+        except Exception as exc:
+            consecutive_errors += 1
+            backoff = min(poll_seconds * (2 ** (consecutive_errors - 1)), max_backoff_seconds)
+            time.sleep(backoff)
+            continue
 
         now = time.monotonic()
         if now - last_heartbeat >= heartbeat_seconds:
@@ -156,6 +195,7 @@ def iter_sse_persistent_stream(
                 {"report_id": report_id, "ts": datetime.now(timezone.utc).isoformat()},
             )
             last_heartbeat = now
+
         time.sleep(poll_seconds)
 
 

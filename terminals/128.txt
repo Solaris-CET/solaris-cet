@@ -1,0 +1,18 @@
+---
+pid: 15540
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/twinAgent.test.ts src/__tests__/twinAgentRoute.test.ts"
+started_at: 2026-07-06T17:31:42.415Z
+running_for_ms: 86374998 
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ✓ src/__tests__/twinAgent.test.ts (2 tests) 10ms
+ ✓ src/__tests__/twinAgentRoute.test.ts (2 tests) 11ms
+
+ Test Files  2 passed (2)
+      Tests  4 passed (4)
+   Start at  20:31:52
+   Duration  9.85s (transform 306ms, setup 2.57s, import 156ms, tests 21ms, environment 5.27s)
+

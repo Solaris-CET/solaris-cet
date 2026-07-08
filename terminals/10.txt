@@ -3,7 +3,7 @@ pid: 16664
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/surveyApi.test.ts src/__tests__/surveyRoutes.integration.test.ts"
 started_at: 2026-07-05T20:25:18.796Z
-running_for_ms: 15095041 
+running_for_ms: 86400010 
 ---
 npm warn exec The following package was not found and will be installed: vitest@4.1.9
 vitest.config.ts (2:29) [UNRESOLVED_IMPORT] Could not resolve 'vitest/config' in vitest.config.ts
@@ -33,3 +33,9 @@ Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vitest' imported from C:\User
 
 
 
+
+---
+exit_code: -1
+elapsed_ms: 86400010
+ended_at: 2026-07-06T20:25:26.246Z
+---

@@ -1,8 +1,15 @@
-import { getAllowedOrigin } from '../../lib/cors';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyStatsSuccessPayload,
+  buildSurveyStatsUnreachablePayload,
+  probeSurveyStats,
+  resolveSurveyStatsEngineUrl,
+  SURVEY_STATS_PROBE,
+} from '../../lib/surveyStats';
+
+export { SURVEY_STATS_PATH, SURVEY_STATS_PROBE } from '@/api/lib/surveyStats';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
 
 function json(body: unknown, origin: string, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -11,7 +18,7 @@ function json(body: unknown, origin: string, status = 200) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': origin,
       Vary: 'Origin',
-      'Cache-Control': 'public, max-age=300',
+      'Cache-Control': SURVEY_STATS_PROBE.cacheControl,
     },
   });
 }
@@ -24,7 +31,8 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': SURVEY_STATS_PROBE.methods.join(', '),
+        'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       },
     });
@@ -34,14 +42,14 @@ export default async function handler(req: Request): Promise<Response> {
     return json({ error: 'Method not allowed' }, allowed, 405);
   }
 
-  try {
-    const res = await fetch(`${ENGINE.replace(/\/$/, '')}/stats`, { signal: AbortSignal.timeout(8000) });
-    const data = await res.json();
-    if (!res.ok) {
-      return json({ error: 'Engine stats unavailable' }, allowed, 502);
-    }
-    return json({ platform: 'solaris-cet', stats: data }, allowed, 200);
-  } catch {
-    return json({ error: 'survey-engine unreachable' }, allowed, 503);
+  const engineUrl = resolveSurveyStatsEngineUrl();
+  const probe = await probeSurveyStats(engineUrl);
+  if (!probe.ok) {
+    return json(buildSurveyStatsUnreachablePayload(), allowed, SURVEY_STATS_PROBE.unreachableStatus);
   }
+  if (!probe.engineResponseOk) {
+    return json({ error: SURVEY_STATS_PROBE.unavailableError }, allowed, SURVEY_STATS_PROBE.engineErrorStatus);
+  }
+
+  return json(buildSurveyStatsSuccessPayload(probe.data), allowed, 200);
 }

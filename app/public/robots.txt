@@ -4,6 +4,8 @@ Disallow: /api/
 Disallow: /admin/
 Disallow: /.well-known/
 Disallow: /push/
+Disallow: /privacy-settings/
+Disallow: /multumim/
 
 User-agent: Googlebot
 Allow: /api/openapi/

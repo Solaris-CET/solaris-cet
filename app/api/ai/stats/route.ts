@@ -1,9 +1,12 @@
 import { and, eq, gte, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAuth } from '../../lib/auth';
-import { getAllowedOrigin } from '../../lib/cors';
-import { withUpstashRateLimit } from '../../lib/rateLimit';
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import { aiStatsSince24h, aiStatsSince7d, AI_STATS_PROBE, normalizeAiStatsAvgScore } from '@/api/lib/aiStats';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { withUpstashRateLimit } from '@/api/lib/rateLimit';
+
+export { AI_STATS_PATH, AI_STATS_PROBE } from '@/api/lib/aiStats';
 
 export const config = { runtime: 'nodejs' };
 
@@ -40,9 +43,9 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const limited = await withUpstashRateLimit(req, allowedOrigin, {
-    keyPrefix: 'cet-ai-stats',
-    limit: 20,
-    windowSeconds: 10,
+    keyPrefix: AI_STATS_PROBE.rateLimitKey,
+    limit: AI_STATS_PROBE.rateLimit,
+    windowSeconds: AI_STATS_PROBE.rateWindowSeconds,
   });
   if (limited) return limited;
 
@@ -55,8 +58,8 @@ export default async function handler(req: Request): Promise<Response> {
 
   try {
     const db = getDb();
-    const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const since7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const since24h = aiStatsSince24h();
+    const since7d = aiStatsSince7d();
 
     const [q24h] = await db
       .select({ c: sql<number>`count(*)`.as('c') })
@@ -85,8 +88,7 @@ export default async function handler(req: Request): Promise<Response> {
     return jsonResponse(allowedOrigin, {
       queries24h: q24h?.c ?? 0,
       queries7d: q7d?.c ?? 0,
-      avgQualityScore7d:
-        typeof avg?.avgScore7d === 'number' && Number.isFinite(avg.avgScore7d) ? Number(avg.avgScore7d) : null,
+      avgQualityScore7d: normalizeAiStatsAvgScore(avg?.avgScore7d),
       feedback7d: { total: fb7d?.total ?? 0, up: fb7d?.up ?? 0, down: fb7d?.down ?? 0 },
     });
   } catch {

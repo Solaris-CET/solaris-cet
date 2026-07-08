@@ -3,9 +3,15 @@ pid: 6792
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx tsc --noEmit -p tsconfig.app.json 2>&1 | Select-String \"SurveyPage|AdminPanel\""
 started_at: 2026-07-05T23:13:52.480Z
-running_for_ms: 4980008  
+running_for_ms: 101456090
 ---
 
 src/pages_legacy/SurveyPage.tsx(3,23): error TS2305: Module '"lucide-react"' has no exported member 'CloudUpload'.
 
 
+
+---
+exit_code: -1
+elapsed_ms: 101456090
+ended_at: 2026-07-07T03:24:47.748Z
+---

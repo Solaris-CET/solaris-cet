@@ -54,30 +54,34 @@ export function createTimeoutSignal(ms: number): AbortSignal {
 export function useLivePoolData({ enabled = true }: { enabled?: boolean } = {}): PoolData {
   const [data, setData] = useState<PoolData>(INITIAL_STATE);
 
-  const fetchData = useCallback(async ({ allowGql = true }: { allowGql?: boolean } = {}) => {
-    try {
-      const lhci = import.meta.env.VITE_LHCI === '1';
-      if (lhci) {
-        await chainStatePromise;
-        setData({
-          priceUsd: null,
-          tvlUsd: null,
-          volume24hUsd: null,
-          tonPriceUsd: null,
-          loading: false,
-          error: null,
-          lastUpdated: new Date(),
-        });
-        return;
-      }
-      const signal = createTimeoutSignal(8000);
+  const fetchData = useCallback(
+    async ({ allowGql = true, signal }: { allowGql?: boolean; signal?: AbortSignal } = {}) => {
+      try {
+        const lhci = import.meta.env.VITE_LHCI === '1';
+        if (lhci) {
+          await chainStatePromise;
+          setData({
+            priceUsd: null,
+            tvlUsd: null,
+            volume24hUsd: null,
+            tonPriceUsd: null,
+            loading: false,
+            error: null,
+            lastUpdated: new Date(),
+          });
+          return;
+        }
+        const timeoutSignal = createTimeoutSignal(8000);
+        const composedSignal = signal
+          ? AbortSignal.any?.([signal, timeoutSignal]) ?? timeoutSignal
+          : timeoutSignal;
       const isDev = import.meta.env.DEV;
       const pricesUrl = isDev ? '/api-dedust/v2/prices' : 'https://mainnet.api.dedust.io/v2/prices';
 
       // Fetch chain state (cached promise) and live prices (small 1.1 KB)
       const [state, pricesRes] = await Promise.all([
         chainStatePromise,
-        fetch(pricesUrl, { signal }),
+        fetch(pricesUrl, { signal: composedSignal }),
       ]);
 
       if (!pricesRes.ok) {
@@ -150,7 +154,10 @@ export function useLivePoolData({ enabled = true }: { enabled?: boolean } = {}):
       }
 
       if (priceUsd === null && allowGql) {
-        const gqlSignal = createTimeoutSignal(4500);
+        const gqlTimeoutSignal = createTimeoutSignal(4500);
+        const gqlSignal = signal
+          ? AbortSignal.any?.([signal, gqlTimeoutSignal]) ?? gqlTimeoutSignal
+          : gqlTimeoutSignal;
         const gqlRes = await fetch('https://mainnet.api.dedust.io/v3/graphql', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
@@ -219,6 +226,7 @@ export function useLivePoolData({ enabled = true }: { enabled?: boolean } = {}):
         lastUpdated: new Date(),
       });
     } catch (err) {
+      if (signal?.aborted) return;
       setData((prev) => ({
         ...prev,
         loading: false,
@@ -229,11 +237,11 @@ export function useLivePoolData({ enabled = true }: { enabled?: boolean } = {}):
 
   useEffect(() => {
     if (!enabled) return;
-    let cancelled = false;
+    const controller = new AbortController();
 
     const run = () => {
-      if (cancelled) return;
-      void fetchData({ allowGql: false });
+      if (controller.signal.aborted) return;
+      void fetchData({ allowGql: false, signal: controller.signal });
     };
 
     if (typeof window === 'undefined') {
@@ -253,11 +261,12 @@ export function useLivePoolData({ enabled = true }: { enabled?: boolean } = {}):
     }
 
     const id = setInterval(() => {
-      void fetchData();
+      if (controller.signal.aborted) return;
+      void fetchData({ signal: controller.signal });
     }, REFRESH_INTERVAL_MS);
 
     return () => {
-      cancelled = true;
+      controller.abort();
       clearInterval(id);
     };
   }, [fetchData, enabled]);

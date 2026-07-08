@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
-import { adminApi } from '../adminClient';
+import { adminApi, adminApiErr } from '../adminClient';
 
 type UserRow = { id: string; walletAddress: string; role: string; points: number; email: string | null };
 
@@ -18,7 +18,7 @@ export function UsersSection({ token }: { token: string }) {
     try {
       const res = await adminApi<{ users: UserRow[] }>('/api/admin/users', { token });
       if (!res.ok) {
-        setError(res.error);
+        setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       setUsers(res.data.users);
@@ -35,7 +35,7 @@ export function UsersSection({ token }: { token: string }) {
     if (!confirm('Ștergi contul utilizatorului?')) return;
     const res = await adminApi<{ ok: true }>(`/api/admin/users?id=${encodeURIComponent(id)}`, { token, method: 'DELETE' });
     if (!res.ok) {
-      setError(res.error);
+      setError(adminApiErr(res) ?? 'Request failed');
       return;
     }
     void load();

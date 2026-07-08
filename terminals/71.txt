@@ -1,0 +1,31 @@
+---
+pid: 7980
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "grok mcp list 2>&1; node -v 2>&1; npx -y @gongrzhe/gmail-mcp-server --help 2>&1 | Select-Object -First 15"
+started_at: 2026-07-06T01:08:20.154Z
+running_for_ms: 94589825 
+---
+No MCP servers configured. Run `grok mcp add --help` to get started.
+v24.13.0
+node.exe : npm error code E404
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm error code E404:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+npm error 404 Not Found - GET https://registry.npmjs.org/@gongrzhe%2fgmail-mcp-server - Not found
+npm error 404
+npm error 404  The requested resource '@gongrzhe/gmail-mcp-server@*' could not be found or you do not have permission t
+o access it.
+npm error 404
+npm error 404 Note that you can also install from a
+npm error 404 tarball, folder, http url, or git url.
+npm error A complete log of this run can be found in: C:\Users\CCons\AppData\Local\npm-cache\_logs\2026-07-06T01_08_23_
+706Z-debug-0.log
+
+---
+exit_code: -1
+elapsed_ms: 94589825
+ended_at: 2026-07-07T03:24:49.109Z
+---

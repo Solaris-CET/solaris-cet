@@ -26,6 +26,7 @@ const INITIAL: State = {
 
 const RECONNECT_BASE_MS = 1500;
 const MAX_RECONNECT_ATTEMPTS = 8;
+const STABLE_CONNECTION_RESET_MS = 60_000;
 
 function parseSseChunk(raw: string): TwinStreamMessage | null {
   let eventType = 'message';
@@ -67,20 +68,47 @@ function applyMessage(s: State, msg: TwinStreamMessage): State {
   return s;
 }
 
+function computeReconnectDelay(attempt: number): number {
+  const exponential = RECONNECT_BASE_MS * 2 ** attempt;
+  const capped = Math.min(exponential, 30_000);
+  const jitter = capped * 0.25 * Math.random();
+  return Math.floor(capped + jitter);
+}
+
 export function useTwinStream(reportId: string | null, options?: { persistent?: boolean }) {
   const persistent = options?.persistent !== false;
   const [state, setState] = useState<State>(INITIAL);
   const abortRef = useRef<AbortController | null>(null);
   const reconnectAttemptRef = useRef(0);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stableTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const connectRef = useRef<(() => Promise<void>) | null>(null);
 
-  const connect = useCallback(async () => {
-    if (!reportId) return;
-    abortRef.current?.abort();
+  const scheduleReconnect = useCallback((delay: number) => {
+    reconnectTimerRef.current = setTimeout(() => {
+      void connectRef.current?.();
+    }, delay);
+  }, []);
+
+  const clearReconnectTimer = useCallback(() => {
     if (reconnectTimerRef.current) {
       clearTimeout(reconnectTimerRef.current);
       reconnectTimerRef.current = null;
     }
+  }, []);
+
+  const clearStableTimer = useCallback(() => {
+    if (stableTimerRef.current) {
+      clearTimeout(stableTimerRef.current);
+      stableTimerRef.current = null;
+    }
+  }, []);
+
+  const connect = useCallback(async () => {
+    if (!reportId) return;
+    abortRef.current?.abort();
+    clearReconnectTimer();
+    clearStableTimer();
     const controller = new AbortController();
     abortRef.current = controller;
     setState((s) => ({ ...s, loading: true, error: '', ready: false }));
@@ -95,7 +123,16 @@ export function useTwinStream(reportId: string | null, options?: { persistent?: 
       let buffer = '';
 
       while (true) {
-        const { done, value } = await reader.read();
+        let done: boolean;
+        let value: Uint8Array | undefined;
+        try {
+          const readResult = await reader.read();
+          done = readResult.done;
+          value = readResult.value;
+        } catch (readErr) {
+          if (controller.signal.aborted) return;
+          throw readErr;
+        }
         if (done) break;
         buffer += decoder.decode(value, { stream: true });
         const parts = buffer.split('\n\n');
@@ -111,10 +148,11 @@ export function useTwinStream(reportId: string | null, options?: { persistent?: 
       reconnectAttemptRef.current = 0;
 
       if (persistent && !controller.signal.aborted) {
-        const delay = RECONNECT_BASE_MS;
-        reconnectTimerRef.current = setTimeout(() => {
-          void connect();
-        }, delay);
+        // Reset attempt counter after a stable connection period.
+        stableTimerRef.current = setTimeout(() => {
+          reconnectAttemptRef.current = 0;
+        }, STABLE_CONNECTION_RESET_MS);
+        scheduleReconnect(RECONNECT_BASE_MS);
       }
     } catch (err) {
       if (controller.signal.aborted) return;
@@ -122,23 +160,26 @@ export function useTwinStream(reportId: string | null, options?: { persistent?: 
       setState((s) => ({ ...s, loading: false, error: message, connected: false }));
 
       if (persistent && reconnectAttemptRef.current < MAX_RECONNECT_ATTEMPTS) {
+        const attempt = reconnectAttemptRef.current;
         reconnectAttemptRef.current += 1;
-        const delay = RECONNECT_BASE_MS * reconnectAttemptRef.current;
-        reconnectTimerRef.current = setTimeout(() => {
-          void connect();
-        }, delay);
+        scheduleReconnect(computeReconnectDelay(attempt));
       }
     }
-  }, [reportId, persistent]);
+  }, [reportId, persistent, scheduleReconnect, clearReconnectTimer, clearStableTimer]);
+
+  useEffect(() => {
+    connectRef.current = connect;
+  }, [connect]);
 
   useEffect(() => {
     reconnectAttemptRef.current = 0;
     void connect();
     return () => {
       abortRef.current?.abort();
-      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+      clearReconnectTimer();
+      clearStableTimer();
     };
-  }, [connect]);
+  }, [connect, clearReconnectTimer, clearStableTimer]);
 
   return { ...state, reconnect: connect };
 }

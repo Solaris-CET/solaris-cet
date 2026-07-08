@@ -1,4 +1,4 @@
-import { getDb, schema } from '../../db/client';
+import { getDb, schema } from '@/db/client';
 import type { AdminAuthContext } from './adminAuth';
 import { clientIp } from './clientIp';
 

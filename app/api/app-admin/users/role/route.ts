@@ -1,14 +1,17 @@
 import { eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../../db/client';
-import { requireAdminMfa, requireAuth } from '../../../lib/auth';
-import { jsonResponse, optionsResponse } from '../../../lib/http';
-import { ensureAllowedOrigin } from '../../../lib/originGuard';
+import { getDb, schema } from '@/db/client';
+import { requireAdminMfa, requireAuth } from '@/api/lib/auth';
+import {
+  APP_ADMIN_USERS_ROLE_PROBE,
+  parseRoleChangeBody,
+} from '../../../lib/appAdminUsersRole';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
+import { ensureAllowedOrigin } from '@/api/lib/originGuard';
+
+export { APP_ADMIN_USERS_ROLE_PATH, APP_ADMIN_USERS_ROLE_PROBE } from '@/api/lib/appAdminUsersRole';
 
 export const config = { runtime: 'nodejs' };
-
-const ROLES = ['visitor', 'investor', 'admin'] as const;
-type Role = (typeof ROLES)[number];
 
 export default async function handler(req: Request): Promise<Response> {
   const guard = ensureAllowedOrigin(req);
@@ -33,24 +36,23 @@ export default async function handler(req: Request): Promise<Response> {
     return jsonResponse(req, { error: 'Invalid JSON body' }, 400);
   }
 
-  const userId =
-    typeof body === 'object' && body !== null && 'userId' in body && typeof (body as { userId?: unknown }).userId === 'string'
-      ? (body as { userId: string }).userId.trim()
-      : '';
-  const roleRaw =
-    typeof body === 'object' && body !== null && 'role' in body && typeof (body as { role?: unknown }).role === 'string'
-      ? (body as { role: string }).role.trim().toLowerCase()
-      : '';
-  const role = (ROLES as readonly string[]).includes(roleRaw) ? (roleRaw as Role) : null;
-  if (!userId || !role) return jsonResponse(req, { error: 'Invalid payload' }, 400);
-  if (userId === ctx.user.id) return jsonResponse(req, { error: 'Cannot change own role' }, 409);
+  const parsed = parseRoleChangeBody(body);
+  if (!parsed.ok) return jsonResponse(req, { error: parsed.error }, 400);
+  const { userId, role } = parsed;
+  if (userId === ctx.user.id) {
+    return jsonResponse(req, { error: APP_ADMIN_USERS_ROLE_PROBE.cannotChangeOwnRoleError }, 409);
+  }
 
   const db = getDb();
   const [u] = await db.select().from(schema.users).where(eq(schema.users.id, userId)).limit(1);
-  if (!u) return jsonResponse(req, { error: 'Not found' }, 404);
+  if (!u) return jsonResponse(req, { error: APP_ADMIN_USERS_ROLE_PROBE.notFoundError }, 404);
 
   await db.update(schema.users).set({ role }).where(eq(schema.users.id, userId));
-  await db.insert(schema.auditLogs).values({ walletAddress: u.walletAddress, action: 'USER_ROLE_CHANGED', details: `role=${role}` });
+  await db.insert(schema.auditLogs).values({
+    walletAddress: u.walletAddress,
+    action: APP_ADMIN_USERS_ROLE_PROBE.auditAction,
+    details: `role=${role}`,
+  });
 
   const bot = String(process.env.TELEGRAM_BOT_TOKEN ?? '').trim();
   if (bot) {

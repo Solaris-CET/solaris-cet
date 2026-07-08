@@ -1,10 +1,16 @@
 import { nanoid } from 'nanoid';
 
-import { getDb, schema } from '../../../db/client';
-import { getAllowedOrigin } from '../../lib/cors';
-import { newsletterVerifyEmail } from '../../lib/emailTemplates';
-import { corsJson, corsOptions, isValidEmail, readJson } from '../../lib/http';
-import { publicOrigin } from '../../lib/publicOrigin';
+import { getDb, schema } from '@/db/client';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { newsletterVerifyEmail } from '@/api/lib/emailTemplates';
+import { corsJson, corsOptions, isValidEmail, readJson } from '@/api/lib/http';
+import {
+  NEWSLETTER_SUBSCRIBE_PROBE,
+  parseNewsletterSubscribeBody,
+} from '../../lib/newsletterSubscribe';
+import { publicOrigin } from '@/api/lib/publicOrigin';
+
+export { NEWSLETTER_SUBSCRIBE_PATH, NEWSLETTER_SUBSCRIBE_PROBE } from '@/api/lib/newsletterSubscribe';
 
 export const config = { runtime: 'nodejs' };
 
@@ -19,14 +25,15 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     body = await readJson(req);
   } catch {
-    return corsJson(req, 400, { error: 'Invalid JSON' });
+    return corsJson(req, 400, { error: NEWSLETTER_SUBSCRIBE_PROBE.invalidJsonError });
   }
 
-  const email = typeof (body as { email?: unknown })?.email === 'string' ? (body as { email: string }).email.trim() : '';
-  const locale = typeof (body as { locale?: unknown })?.locale === 'string' ? (body as { locale: string }).locale.trim().slice(0, 12) : null;
-  const consent = (body as { consent?: unknown })?.consent === true;
-  if (!consent) return corsJson(req, 400, { error: 'Consent required' });
-  if (!isValidEmail(email)) return corsJson(req, 400, { error: 'Invalid email' });
+  const parsed = parseNewsletterSubscribeBody(body);
+  if (!parsed) return corsJson(req, 400, { error: NEWSLETTER_SUBSCRIBE_PROBE.invalidJsonError });
+  const { email, locale, consent } = parsed;
+
+  if (!consent) return corsJson(req, 400, { error: NEWSLETTER_SUBSCRIBE_PROBE.consentRequiredError });
+  if (!isValidEmail(email)) return corsJson(req, 400, { error: NEWSLETTER_SUBSCRIBE_PROBE.invalidEmailError });
 
   const db = getDb();
   const [contact] = await db
@@ -51,7 +58,7 @@ export default async function handler(req: Request): Promise<Response> {
   const tpl = newsletterVerifyEmail(req, { verifyUrl, unsubscribeUrl });
   await db.insert(schema.emailOutbox).values({
     toEmail: email,
-    template: 'newsletter_verify',
+    template: NEWSLETTER_SUBSCRIBE_PROBE.verifyTemplate,
     subject: tpl.subject,
     html: tpl.html,
     textBody: tpl.text,

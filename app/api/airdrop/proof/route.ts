@@ -1,9 +1,16 @@
-import { getAllowedOrigin } from '../../lib/cors'
-import { withRateLimit } from '../../lib/rateLimit'
-import { parseTonNetwork } from '../../lib/tonapi'
-import { tonAddressSchema } from '../../lib/validation'
+import {
+  AIRDROP_PROOF_PROBE,
+  parseAirdropProofNetwork,
+  parseAirdropProofsEnv,
+  parseAirdropProofWallet,
+} from '../../lib/airdropProof';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { withRateLimit } from '@/api/lib/rateLimit';
+import { tonAddressSchema } from '@/api/lib/validation';
 
-export const config = { runtime: 'nodejs' }
+export { AIRDROP_PROOF_PATH, AIRDROP_PROOF_PROBE } from '@/api/lib/airdropProof';
+
+export const config = { runtime: 'nodejs' };
 
 function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -14,26 +21,12 @@ function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Respo
       Vary: 'Origin',
       'Cache-Control': 'no-store',
     },
-  })
-}
-
-type StoredProof = { amountNanoCET: string; proof: string[]; index: number }
-
-function parseProofsEnv(): Record<string, StoredProof> | null {
-  const raw = (process.env.AIRDROP_PROOFS_JSON ?? '').trim()
-  if (!raw) return null
-  try {
-    const json = JSON.parse(raw) as unknown
-    if (!json || typeof json !== 'object') return null
-    return json as Record<string, StoredProof>
-  } catch {
-    return null
-  }
+  });
 }
 
 export default async function handler(req: Request): Promise<Response> {
-  const origin = req.headers.get('origin')
-  const allowedOrigin = getAllowedOrigin(origin)
+  const origin = req.headers.get('origin');
+  const allowedOrigin = getAllowedOrigin(origin);
 
   if (req.method === 'OPTIONS') {
     return new Response(null, {
@@ -44,35 +37,51 @@ export default async function handler(req: Request): Promise<Response> {
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         Vary: 'Origin',
       },
-    })
+    });
   }
 
   if (req.method !== 'GET') {
-    return jsonResponse({ ok: false, error: 'Method not allowed' }, allowedOrigin, 405)
+    return jsonResponse({ ok: false, error: 'Method not allowed' }, allowedOrigin, 405);
   }
 
-  const limited = await withRateLimit(req, allowedOrigin, { keyPrefix: 'airdrop-proof', limit: 60, windowSeconds: 60 })
-  if (limited) return limited
+  const limited = await withRateLimit(req, allowedOrigin, {
+    keyPrefix: AIRDROP_PROOF_PROBE.rateLimitKey,
+    limit: AIRDROP_PROOF_PROBE.rateLimit,
+    windowSeconds: AIRDROP_PROOF_PROBE.rateWindowSeconds,
+  });
+  if (limited) return limited;
 
-  const url = new URL(req.url)
-  const walletRaw = (url.searchParams.get('wallet') ?? '').trim()
-  const network = parseTonNetwork(url.searchParams.get('network'))
-  const parsed = tonAddressSchema.safeParse(walletRaw)
+  const searchParams = new URL(req.url).searchParams;
+  const walletRaw = parseAirdropProofWallet(searchParams);
+  const network = parseAirdropProofNetwork(searchParams);
+  const parsed = tonAddressSchema.safeParse(walletRaw);
   if (!parsed.success) {
-    return jsonResponse({ ok: false, eligible: false, wallet: walletRaw, error: 'Invalid address' }, allowedOrigin, 400)
+    return jsonResponse(
+      { ok: false, eligible: false, wallet: walletRaw, error: AIRDROP_PROOF_PROBE.invalidAddressError },
+      allowedOrigin,
+      400,
+    );
   }
-  const wallet = parsed.data.toString()
+  const wallet = parsed.data.toString();
 
-  const merkleRoot = (process.env.AIRDROP_MERKLE_ROOT ?? '').trim()
-  const expiresAt = (process.env.AIRDROP_EXPIRES_AT ?? '').trim()
-  const proofs = parseProofsEnv()
+  const merkleRoot = (process.env.AIRDROP_MERKLE_ROOT ?? '').trim();
+  const expiresAt = (process.env.AIRDROP_EXPIRES_AT ?? '').trim();
+  const proofs = parseAirdropProofsEnv();
   if (!merkleRoot || !proofs) {
-    return jsonResponse({ ok: false, eligible: false, wallet, error: 'not_configured', network }, allowedOrigin, 200)
+    return jsonResponse(
+      { ok: false, eligible: false, wallet, error: AIRDROP_PROOF_PROBE.notConfiguredError, network },
+      allowedOrigin,
+      200,
+    );
   }
 
-  const rec = proofs[wallet]
+  const rec = proofs[wallet];
   if (!rec) {
-    return jsonResponse({ ok: true, eligible: false, wallet, merkleRoot, expiresAt: expiresAt || undefined, network }, allowedOrigin, 200)
+    return jsonResponse(
+      { ok: true, eligible: false, wallet, merkleRoot, expiresAt: expiresAt || undefined, network },
+      allowedOrigin,
+      200,
+    );
   }
 
   return jsonResponse(
@@ -89,6 +98,5 @@ export default async function handler(req: Request): Promise<Response> {
     },
     allowedOrigin,
     200,
-  )
+  );
 }
-

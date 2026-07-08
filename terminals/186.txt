@@ -1,0 +1,25 @@
+---
+pid: 1452
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\" ; npm run test -- src/__tests__/aiAskRoute.test.ts src/__tests__/aiAttachmentsRoute.test.ts src/__tests__/aiFeedbackRoute.test.ts src/__tests__/aiHistoryRoute.test.ts src/__tests__/aiPinsRoute.test.ts"
+started_at: 2026-07-07T13:43:03.029Z
+running_for_ms: 13685020 
+---
+
+> solaris-cet@1.0.0 test
+> node ../scripts/run-bin.mjs vitest run src/__tests__/aiAskRoute.test.ts src/__tests__/aiAttachmentsRoute.test.ts src/__tests__/aiFeedbackRoute.test.ts src/__tests__/aiHistoryRoute.test.ts src/__tests__/aiPinsRoute.test.ts
+
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ✓ src/__tests__/aiPinsRoute.test.ts (10 tests) 96ms
+ ✓ src/__tests__/aiAttachmentsRoute.test.ts (10 tests) 72ms
+ ✓ src/__tests__/aiHistoryRoute.test.ts (6 tests) 73ms
+ ✓ src/__tests__/aiFeedbackRoute.test.ts (8 tests) 75ms
+ ✓ src/__tests__/aiAskRoute.test.ts (9 tests) 61ms
+
+ Test Files  5 passed (5)
+      Tests  43 passed (43)
+   Start at  16:43:07
+   Duration  12.64s (transform 900ms, setup 4.10s, import 4.30s, tests 377ms, environment 1ms)
+

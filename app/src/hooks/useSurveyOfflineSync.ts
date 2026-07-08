@@ -17,7 +17,14 @@ import {
 import { getSurveyQueueStats, type SurveyQueueStats } from '@/lib/surveyOfflineQueue';
 import { prefetchSurveyOfflineAssets } from '@/lib/surveyOfflinePrefetch';
 
-type Options = {
+const SYNC_MESSAGES = {
+  syncFailed: 'Sincronizare eșuată',
+  itemSyncFailed: 'Sync failed',
+} as const;
+
+const DRAFT_AUTOSAVE_MS = 600;
+
+export type UseSurveyOfflineSyncOptions = {
   form: SurveyFormData;
   installer: InstallerProfile;
   photos: File[];
@@ -26,6 +33,21 @@ type Options = {
   onDraftLoaded?: (draft: SurveyDraftRecord) => void;
 };
 
+export type UseSurveyOfflineSyncResult = {
+  online: boolean;
+  draftSavedAt: string | null;
+  draftReady: boolean;
+  stats: SurveyQueueStats;
+  syncing: boolean;
+  enqueueOffline: () => Promise<void>;
+  syncPending: () => Promise<void>;
+  refreshStats: () => Promise<void>;
+};
+
+function toErrorMessage(err: unknown, fallback: string): string {
+  return err instanceof Error ? err.message : fallback;
+}
+
 export function useSurveyOfflineSync({
   form,
   installer,
@@ -33,7 +55,7 @@ export function useSurveyOfflineSync({
   onSynced,
   onSyncError,
   onDraftLoaded,
-}: Options) {
+}: UseSurveyOfflineSyncOptions): UseSurveyOfflineSyncResult {
   const online = useOnlineStatus();
   const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
   const [draftReady, setDraftReady] = useState(false);
@@ -75,7 +97,7 @@ export function useSurveyOfflineSync({
           await updatePendingReport(item.id, {
             status: retry >= 3 ? 'failed' : 'pending',
             retryCount: retry,
-            lastError: err instanceof Error ? err.message : 'Sync failed',
+            lastError: toErrorMessage(err, SYNC_MESSAGES.itemSyncFailed),
           });
         }
       }
@@ -84,7 +106,7 @@ export function useSurveyOfflineSync({
         onSynced?.(synced);
       }
     } catch (err) {
-      onSyncError?.(err instanceof Error ? err.message : 'Sincronizare eșuată');
+      onSyncError?.(toErrorMessage(err, SYNC_MESSAGES.syncFailed));
     } finally {
       setSyncing(false);
       await refreshStats();
@@ -115,7 +137,7 @@ export function useSurveyOfflineSync({
     return () => {
       cancelled = true;
     };
-  }, [refreshStats]);
+  }, [refreshStats, onDraftLoaded]);
 
   useEffect(() => {
     if (!draftReady) return;
@@ -124,7 +146,7 @@ export function useSurveyOfflineSync({
       void saveSurveyDraft(form, installer, photos)
         .then(() => setDraftSavedAt(new Date().toISOString()))
         .catch(() => void 0);
-    }, 600);
+    }, DRAFT_AUTOSAVE_MS);
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };

@@ -1,40 +1,57 @@
-import { CET_JETTON_MASTER_ADDRESS } from '../../src/constants/token';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
-type DexScreenerSearch = {
-  pairs?: Array<{ priceUsd?: string | number | null; liquidity?: { usd?: number | null } | null }>;
+import { fetchTonPriceUsd } from './tonPrice';
+
+export const CET_PRICE_PATH = '/api/price/cet';
+export const CET_PRICE_METHODS = 'GET, OPTIONS';
+
+export const CET_PRICE_PROBE = {
+  path: CET_PRICE_PATH,
+  methods: ['GET', 'OPTIONS'] as const,
+  authRequired: false,
+  symbol: 'CET' as const,
+  stateRelativePath: 'public/api/state.json' as const,
+  unavailableStatus: 503,
+  unavailableError: 'Unavailable' as const,
 };
 
-export async function fetchCetPriceUsd(): Promise<{ priceUsd: number; source: 'dexscreener' | 'env' | 'fallback' }> {
-  const fromEnv = String(process.env.CET_PRICE_USD ?? '').trim();
-  if (fromEnv) {
-    const n = Number(fromEnv);
-    if (Number.isFinite(n) && n > 0) return { priceUsd: n, source: 'env' };
-  }
+export type CetChainState = {
+  pool?: { priceTonPerCet?: string | null };
+  updatedAt?: string;
+};
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 8000);
-  try {
-    const url = `https://api.dexscreener.com/latest/dex/search?q=${encodeURIComponent(CET_JETTON_MASTER_ADDRESS)}`;
-    const res = await fetch(url, { signal: controller.signal, headers: { 'Cache-Control': 'no-store' } });
-    if (!res.ok) return { priceUsd: 0, source: 'fallback' };
-    const data = (await res.json()) as DexScreenerSearch;
-    const pairs = Array.isArray(data.pairs) ? data.pairs : [];
-    const scored = pairs
-      .map((p) => {
-        const raw = p.priceUsd;
-        const price = typeof raw === 'number' ? raw : typeof raw === 'string' ? Number(raw) : Number.NaN;
-        const liq = typeof p.liquidity?.usd === 'number' ? p.liquidity.usd : 0;
-        return { price, liq };
-      })
-      .filter((p) => Number.isFinite(p.price) && p.price > 0)
-      .sort((a, b) => (b.liq || 0) - (a.liq || 0));
-    const best = scored[0];
-    if (!best) return { priceUsd: 0, source: 'fallback' };
-    return { priceUsd: best.price, source: 'dexscreener' };
-  } catch {
-    return { priceUsd: 0, source: 'fallback' };
-  } finally {
-    clearTimeout(timer);
-  }
+export type CetPriceSnapshot = {
+  symbol: typeof CET_PRICE_PROBE.symbol;
+  priceTonPerCet: string | null;
+  updatedAt: string | null;
+};
+
+export function cetPriceStateFilePath(cwd = process.cwd()): string {
+  return join(cwd, CET_PRICE_PROBE.stateRelativePath);
 }
 
+export function parseCetPriceState(raw: unknown): CetPriceSnapshot {
+  const parsed = raw && typeof raw === 'object' ? (raw as CetChainState) : {};
+  const priceTonPerCet = typeof parsed.pool?.priceTonPerCet === 'string' ? parsed.pool.priceTonPerCet : null;
+  const updatedAt = typeof parsed.updatedAt === 'string' ? parsed.updatedAt : null;
+  return { symbol: CET_PRICE_PROBE.symbol, priceTonPerCet, updatedAt };
+}
+
+export async function loadCetPriceSnapshot(cwd = process.cwd()): Promise<CetPriceSnapshot> {
+  const raw = await readFile(cetPriceStateFilePath(cwd), 'utf8');
+  return parseCetPriceState(JSON.parse(raw) as unknown);
+}
+
+export async function fetchCetPriceUsd(): Promise<{ priceUsd: number; source: 'state' | 'fallback' }> {
+  try {
+    const [snapshot, ton] = await Promise.all([loadCetPriceSnapshot(), fetchTonPriceUsd()]);
+    const priceTonPerCet = Number(snapshot.priceTonPerCet);
+    if (!Number.isFinite(priceTonPerCet) || priceTonPerCet <= 0 || !ton.priceUsd) {
+      return { priceUsd: 0, source: 'fallback' };
+    }
+    return { priceUsd: priceTonPerCet * ton.priceUsd, source: 'state' };
+  } catch {
+    return { priceUsd: 0, source: 'fallback' };
+  }
+}

@@ -59,8 +59,12 @@ declare module 'lucide-react' {
     export const ArrowUp: LucideIcon;
     export const ArrowUpDown: LucideIcon;
     export const Atom: LucideIcon;
+    export const Award: LucideIcon;
     export const BadgeCheck: LucideIcon;
+    export const Bell: LucideIcon;
+    export const BellOff: LucideIcon;
     export const BarChart2: LucideIcon;
+    export const BarChart3: LucideIcon;
     export const Battery: LucideIcon;
     export const BookOpen: LucideIcon;
     export const Bot: LucideIcon;
@@ -101,11 +105,13 @@ declare module 'lucide-react' {
     export const Crown: LucideIcon;
     export const Database: LucideIcon;
     export const Dna: LucideIcon;
+    export const DollarSign: LucideIcon;
     export const Download: LucideIcon;
     export const Droplets: LucideIcon;
     export const ExternalLink: LucideIcon;
     export const Eye: LucideIcon;
     export const EyeOff: LucideIcon;
+    export const Factory: LucideIcon;
     export const FileCheck: LucideIcon;
     export const FileSearch: LucideIcon;
     export const FileText: LucideIcon;
@@ -181,8 +187,10 @@ declare module 'lucide-react' {
     export const Smartphone: LucideIcon;
     export const Sparkles: LucideIcon;
     export const Star: LucideIcon;
+    export const Square: LucideIcon;
     export const StopCircle: LucideIcon;
     export const Sun: LucideIcon;
+    export const TreePine: LucideIcon;
     export const Tag: LucideIcon;
     export const ThumbsDown: LucideIcon;
     export const ThumbsUp: LucideIcon;

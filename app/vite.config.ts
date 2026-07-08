@@ -350,6 +350,10 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      "@/api/gamification/lib": path.resolve(__dirname, "./api/gamification/lib"),
+      "@/api/lib": path.resolve(__dirname, "./api/lib"),
+      "@/db": path.resolve(__dirname, "./db"),
+      "@/lib": path.resolve(__dirname, "./src/lib"),
       "@": path.resolve(__dirname, "./src"),
       "@components": path.resolve(__dirname, "./src/components"),
       "@sections": path.resolve(__dirname, "./src/sections"),

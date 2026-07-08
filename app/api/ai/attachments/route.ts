@@ -1,9 +1,20 @@
 import { and, eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAuth } from '../../lib/auth';
-import { getAllowedOrigin } from '../../lib/cors';
-import { withUpstashRateLimit } from '../../lib/rateLimit';
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import {
+  AI_ATTACHMENTS_PROBE,
+  attachmentDownloadUrl,
+  base64FromBytes,
+  decodeAttachmentBase64,
+  isAllowedAttachmentMime,
+  parseAttachmentGetId,
+  sanitizeAttachmentFilename,
+} from '../../lib/aiAttachments';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { withUpstashRateLimit } from '@/api/lib/rateLimit';
+
+export { AI_ATTACHMENTS_PATH, AI_ATTACHMENTS_PROBE } from '@/api/lib/aiAttachments';
 
 export const config = { runtime: 'nodejs' };
 
@@ -17,28 +28,6 @@ function jsonResponse(allowedOrigin: string, body: unknown, status = 200): Respo
       'Cache-Control': 'no-store',
     },
   });
-}
-
-function base64FromBytes(bytes: Uint8Array): string {
-  return Buffer.from(bytes).toString('base64');
-}
-
-function decodeBase64(data: string): Uint8Array {
-  return new Uint8Array(Buffer.from(data, 'base64'));
-}
-
-function isAllowedMime(mime: string): boolean {
-  return (
-    mime === 'image/png' ||
-    mime === 'image/jpeg' ||
-    mime === 'image/webp' ||
-    mime === 'image/gif' ||
-    mime === 'text/plain' ||
-    mime === 'text/markdown' ||
-    mime === 'text/csv' ||
-    mime === 'application/json' ||
-    mime === 'application/pdf'
-  );
 }
 
 export default async function handler(req: Request): Promise<Response> {
@@ -62,9 +51,9 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const limited = await withUpstashRateLimit(req, allowedOrigin, {
-    keyPrefix: 'cet-ai-attachments',
-    limit: 12,
-    windowSeconds: 10,
+    keyPrefix: AI_ATTACHMENTS_PROBE.rateLimitKey,
+    limit: AI_ATTACHMENTS_PROBE.rateLimit,
+    windowSeconds: AI_ATTACHMENTS_PROBE.rateWindowSeconds,
   });
   if (limited) return limited;
 
@@ -77,18 +66,17 @@ export default async function handler(req: Request): Promise<Response> {
   const ctx = auth;
 
   if (req.method === 'GET') {
-    const url = new URL(req.url);
-    const id = (url.searchParams.get('id') ?? '').trim();
-    if (!id) return jsonResponse(allowedOrigin, { error: 'Missing id' }, 400);
+    const id = parseAttachmentGetId(new URL(req.url).searchParams);
+    if (!id) return jsonResponse(allowedOrigin, { error: AI_ATTACHMENTS_PROBE.missingIdError }, 400);
     try {
       const db = getDb();
       const [row] = await db
         .select({ dataBase64: schema.aiAttachments.dataBase64, mimeType: schema.aiAttachments.mimeType, filename: schema.aiAttachments.filename })
         .from(schema.aiAttachments)
         .where(and(eq(schema.aiAttachments.id, id), eq(schema.aiAttachments.userId, ctx.user.id)));
-      if (!row) return jsonResponse(allowedOrigin, { error: 'Not found' }, 404);
-      const bytes = decodeBase64(row.dataBase64);
-      return new Response(bytes as any, {
+      if (!row) return jsonResponse(allowedOrigin, { error: AI_ATTACHMENTS_PROBE.notFoundError }, 404);
+      const bytes = decodeAttachmentBase64(row.dataBase64);
+      return new Response(bytes as BodyInit, {
         status: 200,
         headers: {
           'Content-Type': row.mimeType,
@@ -105,19 +93,23 @@ export default async function handler(req: Request): Promise<Response> {
 
   const ct = req.headers.get('content-type') ?? '';
   if (!ct.toLowerCase().includes('multipart/form-data')) {
-    return jsonResponse(allowedOrigin, { error: 'Expected multipart/form-data' }, 415);
+    return jsonResponse(allowedOrigin, { error: AI_ATTACHMENTS_PROBE.expectedMultipartError }, 415);
   }
 
   const form = await req.formData();
   const file = form.get('file');
-  if (!(file instanceof File)) return jsonResponse(allowedOrigin, { error: 'Missing file' }, 400);
+  if (!(file instanceof File)) return jsonResponse(allowedOrigin, { error: AI_ATTACHMENTS_PROBE.missingFileError }, 400);
 
-  const filename = (file.name || 'attachment').slice(0, 200);
+  const filename = sanitizeAttachmentFilename(file.name);
   const mimeType = file.type || 'application/octet-stream';
-  if (!isAllowedMime(mimeType)) return jsonResponse(allowedOrigin, { error: 'Tip fișier nepermis' }, 400);
+  if (!isAllowedAttachmentMime(mimeType)) {
+    return jsonResponse(allowedOrigin, { error: AI_ATTACHMENTS_PROBE.invalidMimeError }, 400);
+  }
 
   const buf = new Uint8Array(await file.arrayBuffer());
-  if (buf.byteLength > 1_500_000) return jsonResponse(allowedOrigin, { error: 'Fișier prea mare' }, 413);
+  if (buf.byteLength > AI_ATTACHMENTS_PROBE.maxBytes) {
+    return jsonResponse(allowedOrigin, { error: AI_ATTACHMENTS_PROBE.tooLargeError }, 413);
+  }
 
   try {
     const db = getDb();
@@ -132,7 +124,11 @@ export default async function handler(req: Request): Promise<Response> {
       })
       .returning({ id: schema.aiAttachments.id, filename: schema.aiAttachments.filename, mimeType: schema.aiAttachments.mimeType, bytes: schema.aiAttachments.bytes });
 
-    return jsonResponse(allowedOrigin, { attachment: row ?? null, url: row ? `/api/ai/attachments?id=${row.id}` : null }, 200);
+    return jsonResponse(
+      allowedOrigin,
+      { attachment: row ?? null, url: row ? attachmentDownloadUrl(row.id) : null },
+      200,
+    );
   } catch {
     return jsonResponse(allowedOrigin, { error: 'Unavailable' }, 503);
   }

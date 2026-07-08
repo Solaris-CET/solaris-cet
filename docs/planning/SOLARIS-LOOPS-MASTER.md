@@ -299,3 +299,18 @@ while tasks remain:
 
 Skill operativ: `.claude/skills/solaris-perfect-loops/SKILL.md`  
 Anti-pattern ledger: `docs/planning/agent-memory.md`
+
+---
+
+## Runtime loop hardening (applied)
+
+The following production loops were hardened to be fast, robust, terminable, and leak-free:
+
+- **AI feedback loop** — `app/api/ai/ask/route.ts` now evaluates every answer, retries once with an alternate provider when the quality score is `< 70`, and uses `synthesizeConsensus()` for dual-provider mode anchored to on-chain data.
+- **Outbound webhooks** — `app/api/lib/fetchRetry.ts` provides exponential backoff + jitter; adopted by `surveyWebhook.ts`, `twinWebhook.ts`, and the Python `dispatch_outbound_twin_webhook`.
+- **Canvas O(n²) loops** — `QuantumFieldCanvas`, `ParticleCanvas`, `NetworkNodesCanvas`, and `AgenticNeuralCanvas` use a shared `SpatialGrid` (`app/src/lib/spatialGrid.ts`) for neighbour lookups.
+- **KB embedding loop** — `app/api/lib/kbIndex.ts` batches embedding requests via `embedTexts()` in `app/api/lib/embeddings.ts`.
+- **Queue flush loops** — `app/src/lib/analytics.ts` and `marketingPixels.ts` avoid `shift()`-in-`while` quadratic behaviour.
+- **SSE / polling loops** — `useTwinStream`, `usePresenceCount`, `realtimePresence.ts`, and several frontend polling hooks now use exponential backoff, abort signals, and graceful cleanup.
+- **Go engine** — `engine/main.go` persistence send no longer silently drops updates under backpressure; workers have panic recovery.
+- **Python twin runtime** — `survey-engine/src/twin_runtime.py` tails `events.jsonl` incrementally, supports a stop event, and backs off on read errors.

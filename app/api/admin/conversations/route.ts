@@ -1,9 +1,15 @@
 import { desc, inArray } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAdminAuth, requireAdminRole } from '../../lib/adminAuth';
-import { getAllowedOrigin } from '../../lib/cors';
-import { corsJson, corsOptions } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import {
+  ADMIN_CONVERSATIONS_PROBE,
+  parseConversationsStatusFilter,
+} from '../../lib/adminConversations';
+import { guardAdminRoute } from '@/api/lib/adminAuth';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { corsJson, corsOptions } from '@/api/lib/http';
+
+export { ADMIN_CONVERSATIONS_PATH, ADMIN_CONVERSATIONS_PROBE } from '@/api/lib/adminConversations';
 
 export const config = { runtime: 'nodejs' };
 
@@ -14,29 +20,26 @@ export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return corsOptions(req, 'GET, OPTIONS');
   if (req.method !== 'GET') return corsJson(req, 405, { error: 'Method not allowed' });
 
-  const ctx = await requireAdminAuth(req);
+  const ctx = await guardAdminRoute(req, { minRole: ADMIN_CONVERSATIONS_PROBE.minRole });
   if ('error' in ctx) return corsJson(req, ctx.status, { error: ctx.error });
-  const ok = requireAdminRole(ctx, 'viewer');
-  if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
 
-  const url = new URL(req.url);
-  const statusParam = String(url.searchParams.get('status') ?? '').trim();
-  const statuses = statusParam === 'resolved' ? (['resolved'] as const) : statusParam === 'open' ? (['open'] as const) : (['open', 'resolved'] as const);
-
+  const statuses = parseConversationsStatusFilter(new URL(req.url).searchParams);
   const db = getDb();
   const convs = await db
     .select()
     .from(schema.crmConversations)
     .where(inArray(schema.crmConversations.status, statuses))
     .orderBy(desc(schema.crmConversations.updatedAt))
-    .limit(200);
+    .limit(ADMIN_CONVERSATIONS_PROBE.maxListRows);
 
   const contactIds = convs.map((c) => c.contactId).filter(Boolean) as string[];
   const userIds = convs.map((c) => c.userId).filter(Boolean) as string[];
   const contacts = contactIds.length
-    ? await db.select().from(schema.contacts).where(inArray(schema.contacts.id, contactIds)).limit(500)
+    ? await db.select().from(schema.contacts).where(inArray(schema.contacts.id, contactIds)).limit(ADMIN_CONVERSATIONS_PROBE.maxRelatedRows)
     : [];
-  const users = userIds.length ? await db.select().from(schema.users).where(inArray(schema.users.id, userIds)).limit(500) : [];
+  const users = userIds.length
+    ? await db.select().from(schema.users).where(inArray(schema.users.id, userIds)).limit(ADMIN_CONVERSATIONS_PROBE.maxRelatedRows)
+    : [];
 
   const byContact = new Map(contacts.map((c) => [c.id, c]));
   const byUser = new Map(users.map((u) => [u.id, u]));

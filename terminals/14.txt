@@ -3,7 +3,7 @@ pid: 15684
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; node \"..\\node_modules\\vitest\\vitest.mjs\" run src/__tests__/surveyApi.test.ts src/__tests__/surveyRoutes.integration.test.ts"
 started_at: 2026-07-05T20:58:43.919Z
-running_for_ms: 13090051 
+running_for_ms: 86400007 
 ---
 
  RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
@@ -65,3 +65,9 @@ Caused by: Error: Cannot find package 'C:\Users\CCons\Desktop\SOLARIS CET\node_m
 Serialized Error: { code: 'ERR_MODULE_NOT_FOUND' }
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 
+
+---
+exit_code: -1
+elapsed_ms: 86400007
+ended_at: 2026-07-06T20:58:51.208Z
+---

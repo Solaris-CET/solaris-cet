@@ -1,4 +1,7 @@
-import { getAllowedOrigin } from '../lib/cors';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { computeLyapunovScore, LYAPUNOV_PROBE, parseLyapunovState } from '@/api/lib/lyapunov';
+
+export { LYAPUNOV_PATH, LYAPUNOV_PROBE } from '@/api/lib/lyapunov';
 
 export const config = { runtime: 'edge' };
 
@@ -8,15 +11,9 @@ function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Respo
     headers: {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': allowedOrigin,
-      'Vary': 'Origin',
+      Vary: 'Origin',
     },
   });
-}
-
-function toFiniteNumber(v: unknown): number | null {
-  if (typeof v !== 'number') return null;
-  if (!Number.isFinite(v)) return null;
-  return v;
 }
 
 export default async function handler(req: Request): Promise<Response> {
@@ -28,9 +25,9 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowedOrigin,
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Methods': LYAPUNOV_PROBE.methods.join(', '),
         'Access-Control-Allow-Headers': 'Content-Type',
-        'Vary': 'Origin',
+        Vary: 'Origin',
       },
     });
   }
@@ -40,35 +37,15 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   try {
-    const body = (await req.json()) as { state?: unknown };
-    const state = (body?.state ?? {}) as Record<string, unknown>;
-
-    const balance = toFiniteNumber(state.balance);
-    const price = toFiniteNumber(state.price);
-    const volatility = toFiniteNumber(state.volatility);
-
-    if (balance === null || price === null || volatility === null) {
-      return jsonResponse(
-        { error: 'Invalid state: expected numeric { balance, price, volatility }' },
-        allowedOrigin,
-        400,
-      );
+    const body = await req.json();
+    const state = parseLyapunovState(body);
+    if (!state) {
+      return jsonResponse({ error: LYAPUNOV_PROBE.invalidStateError }, allowedOrigin, 400);
     }
 
-    const score = balance * price - volatility;
-    const stable = score >= 0;
-
-    return jsonResponse(
-      {
-        stable,
-        score,
-        model: 'heuristic',
-      },
-      allowedOrigin,
-      200,
-    );
+    const { stable, score } = computeLyapunovScore(state);
+    return jsonResponse({ stable, score, model: LYAPUNOV_PROBE.model }, allowedOrigin, 200);
   } catch {
-    return jsonResponse({ error: 'Invalid JSON body' }, allowedOrigin, 400);
+    return jsonResponse({ error: LYAPUNOV_PROBE.invalidJsonError }, allowedOrigin, 400);
   }
 }
-

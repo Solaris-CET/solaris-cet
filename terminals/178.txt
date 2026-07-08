@@ -1,0 +1,7 @@
+---
+pid: 10948
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; node ../scripts/run-bin.mjs eslint . --quiet 2>&1 | Select-Object -Last 25"
+started_at: 2026-07-07T04:44:45.626Z
+running_for_ms: 45985017 
+---

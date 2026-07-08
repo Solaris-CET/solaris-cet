@@ -1,9 +1,12 @@
 import { desc } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAdminMfa, requireAuth } from '../../lib/auth';
-import { jsonResponse, optionsResponse } from '../../lib/http';
-import { ensureAllowedOrigin } from '../../lib/originGuard';
+import { getDb, schema } from '@/db/client';
+import { requireAdminMfa, requireAuth } from '@/api/lib/auth';
+import { parseAppAdminUsersLimit } from '@/api/lib/appAdminUsers';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
+import { ensureAllowedOrigin } from '@/api/lib/originGuard';
+
+export { APP_ADMIN_USERS_PATH, APP_ADMIN_USERS_PROBE } from '@/api/lib/appAdminUsers';
 
 export const config = { runtime: 'nodejs' };
 
@@ -23,9 +26,7 @@ export default async function handler(req: Request): Promise<Response> {
   const gate = await requireAdminMfa(req, ctx);
   if (!gate.ok) return jsonResponse(req, { error: gate.error }, gate.status);
 
-  const url = new URL(req.url);
-  const limitRaw = url.searchParams.get('limit') ?? '50';
-  const limit = Math.max(1, Math.min(200, Number.parseInt(limitRaw, 10) || 50));
+  const limit = parseAppAdminUsersLimit(new URL(req.url).searchParams);
 
   const db = getDb();
   const users = await db
@@ -35,4 +36,3 @@ export default async function handler(req: Request): Promise<Response> {
     .limit(limit);
   return jsonResponse(req, { ok: true, users: users.map((u) => ({ ...u, createdAt: u.createdAt.toISOString() })) });
 }
-

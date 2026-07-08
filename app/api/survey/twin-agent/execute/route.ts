@@ -1,10 +1,22 @@
-import { getAllowedOrigin } from '../../../lib/cors';
-import { dispatchSurveyWebhook } from '../../../lib/surveyWebhook';
-import { dispatchTwinWebhook } from '../../../lib/twinWebhook';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyTwinAgentExecuteEngineUrl,
+  buildSurveyTwinAgentExecuteSuccessPayload,
+  buildSurveyTwinExecuteEngineBody,
+  buildSurveyTwinExecuteWebhookPayload,
+  parseSurveyTwinExecuteBody,
+  parseSurveyTwinExecuteReportId,
+  resolveSurveyTwinAgentExecuteEngineUrl,
+  SURVEY_TWIN_AGENT_EXECUTE_PROBE,
+  surveyTwinAgentExecuteErrorMessage,
+  surveyTwinAgentExecuteHttpStatus,
+} from '../../../lib/surveyTwinAgentExecute';
+import { dispatchSurveyWebhook } from '@/api/lib/surveyWebhook';
+import { dispatchTwinWebhook } from '@/api/lib/twinWebhook';
+
+export { SURVEY_TWIN_AGENT_EXECUTE_PATH, SURVEY_TWIN_AGENT_EXECUTE_PROBE } from '@/api/lib/surveyTwinAgentExecute';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
 
 function json(body: unknown, origin: string, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -13,7 +25,7 @@ function json(body: unknown, origin: string, status = 200) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': origin,
       Vary: 'Origin',
-      'Cache-Control': 'no-store',
+      'Cache-Control': SURVEY_TWIN_AGENT_EXECUTE_PROBE.cacheControl,
     },
   });
 }
@@ -26,8 +38,8 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, X-Installer-Key',
+        'Access-Control-Allow-Methods': SURVEY_TWIN_AGENT_EXECUTE_PROBE.methods.join(', '),
+        'Access-Control-Allow-Headers': SURVEY_TWIN_AGENT_EXECUTE_PROBE.allowHeaders,
         Vary: 'Origin',
       },
     });
@@ -38,68 +50,57 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const url = new URL(req.url);
-  const reportId = (url.searchParams.get('report_id') || '').trim();
-  if (!reportId || reportId.length > 80) {
-    return json({ error: 'report_id required' }, allowed, 400);
+  const reportId = parseSurveyTwinExecuteReportId(url.searchParams.get(SURVEY_TWIN_AGENT_EXECUTE_PROBE.reportIdParam));
+  if (!reportId) {
+    return json({ error: SURVEY_TWIN_AGENT_EXECUTE_PROBE.missingReportIdError }, allowed, 400);
   }
 
-  let body: Record<string, unknown>;
+  let body: unknown;
   try {
-    body = (await req.json()) as Record<string, unknown>;
+    body = await req.json();
   } catch {
-    return json({ error: 'JSON invalid' }, allowed, 400);
+    return json({ error: SURVEY_TWIN_AGENT_EXECUTE_PROBE.invalidJsonError }, allowed, 400);
   }
 
-  const actionId = String(body.action_id ?? '').trim();
-  const actionType = String(body.action_type ?? '').trim();
-  if (!actionId || !actionType) {
-    return json({ error: 'action_id and action_type required' }, allowed, 400);
+  const parsed = parseSurveyTwinExecuteBody(body);
+  if (!parsed) {
+    return json({ error: SURVEY_TWIN_AGENT_EXECUTE_PROBE.requiredActionFieldsError }, allowed, 400);
   }
 
   const installerKey = req.headers.get('x-installer-key') ?? '';
+  const engineUrl = resolveSurveyTwinAgentExecuteEngineUrl();
 
   try {
-    const res = await fetch(
-      `${ENGINE.replace(/\/$/, '')}/twin-agent/${encodeURIComponent(reportId)}/execute`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(installerKey ? { 'X-Installer-Key': installerKey } : {}),
-        },
-        body: JSON.stringify({
-          action_id: actionId,
-          action_type: actionType,
-          executed_by: body.executed_by ?? 'technician',
-          detail: body.detail ?? '',
-        }),
-        signal: AbortSignal.timeout(12_000),
+    const res = await fetch(buildSurveyTwinAgentExecuteEngineUrl(engineUrl, reportId), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(installerKey ? { [SURVEY_TWIN_AGENT_EXECUTE_PROBE.installerKeyHeader]: installerKey } : {}),
       },
-    );
+      body: JSON.stringify(buildSurveyTwinExecuteEngineBody(parsed)),
+      signal: AbortSignal.timeout(SURVEY_TWIN_AGENT_EXECUTE_PROBE.fetchTimeoutMs),
+    });
     const data = await res.json();
     if (!res.ok) {
       return json(
-        { error: (data as { detail?: string }).detail || 'Twin agent execute failed' },
+        { error: surveyTwinAgentExecuteErrorMessage(data) },
         allowed,
-        res.status === 400 ? 400 : 502,
+        surveyTwinAgentExecuteHttpStatus(res.status),
       );
     }
 
+    const webhookPayload = buildSurveyTwinExecuteWebhookPayload(reportId, parsed);
     void dispatchSurveyWebhook({
-      event: 'agent_action',
-      report_id: reportId,
-      action_id: actionId,
-      action_type: actionType,
+      event: SURVEY_TWIN_AGENT_EXECUTE_PROBE.surveyWebhookEvent,
+      ...webhookPayload,
     });
     void dispatchTwinWebhook({
-      event: 'agent_action',
-      report_id: reportId,
-      action_id: actionId,
-      action_type: actionType,
+      event: SURVEY_TWIN_AGENT_EXECUTE_PROBE.twinWebhookEvent,
+      ...webhookPayload,
     });
 
-    return json({ platform: 'solaris-cet', ...data }, allowed, 200);
+    return json(buildSurveyTwinAgentExecuteSuccessPayload(data as Record<string, unknown>), allowed, 200);
   } catch {
-    return json({ error: 'survey-engine unreachable' }, allowed, 503);
+    return json({ error: SURVEY_TWIN_AGENT_EXECUTE_PROBE.unreachableError }, allowed, SURVEY_TWIN_AGENT_EXECUTE_PROBE.unreachableStatus);
   }
 }

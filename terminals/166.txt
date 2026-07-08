@@ -1,0 +1,7 @@
+---
+pid: 17684
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; node ../scripts/run-bin.mjs eslint . --quiet 2>&1 | Out-File -FilePath \"../terminals/lint-out.txt\" -Encoding utf8"
+started_at: 2026-07-07T04:03:28.300Z
+running_for_ms: 48465001 
+---

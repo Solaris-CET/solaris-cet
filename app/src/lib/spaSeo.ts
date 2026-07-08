@@ -1,5 +1,4 @@
 import { localizePathname, shouldLocalePrefixPathname, type UrlLocale } from '@/i18n/urlRouting'
-import { getSeoConfig } from './seoConfig'
 
 export type SpaSeoConfig = {
   origin: string
@@ -83,16 +82,4 @@ export function applySpaSeo(config: SpaSeoConfig) {
   upsertMetaRobots(Boolean(config.noindex))
 
   upsertJsonLd('spa-jsonld', config.jsonLd ?? null)
-}
-
-export function setPageSEO(pathname: string): void {
-  const config = getSeoConfig(pathname);
-  if (!config) return;
-  document.title = config.title;
-  setMeta('meta[name="description"]', config.description);
-  if (config.keywords) setMeta('meta[name="keywords"]', config.keywords);
-  setMeta('meta[property="og:title"]', config.title);
-  setMeta('meta[property="og:description"]', config.description);
-  setMeta('meta[name="twitter:title"]', config.title);
-  setMeta('meta[name="twitter:description"]', config.description);
 }

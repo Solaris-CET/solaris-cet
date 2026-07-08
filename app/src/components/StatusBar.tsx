@@ -39,18 +39,18 @@ export default function StatusBar({ className }: { className?: string }) {
   const [online, setOnline] = useState(() => (typeof navigator !== 'undefined' ? navigator.onLine : true));
 
   useEffect(() => {
-    let alive = true;
+    let currentController: AbortController | null = null;
 
     const run = async () => {
+      currentController?.abort();
+      currentController = new AbortController();
       try {
-        const res = await fetch('/health.json', { cache: 'no-store' });
+        const res = await fetch('/health.json', { cache: 'no-store', signal: currentController.signal });
         if (!res.ok) throw new Error('bad status');
         const payload = (await res.json()) as HealthPayload;
-        if (!alive) return;
         setHealth(payload);
         setFailed(false);
       } catch {
-        if (!alive) return;
         setFailed(true);
       }
     };
@@ -58,7 +58,7 @@ export default function StatusBar({ className }: { className?: string }) {
     void run();
     const id = window.setInterval(run, 30_000);
     return () => {
-      alive = false;
+      currentController?.abort();
       window.clearInterval(id);
     };
   }, []);

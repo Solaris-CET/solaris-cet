@@ -1,0 +1,14 @@
+---
+pid: 15212
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx eslint src/__tests__/forumPostRoute.test.ts src/__tests__/forumCommentsRoute.test.ts src/__tests__/eventRsvpRoute.test.ts src/__tests__/forumPostsRoute.test.ts src/__tests__/forumReportRoute.test.ts api/lib/eventRsvp.ts api/lib/forumCommon.ts api/lib/forumPost.ts api/lib/forumPosts.ts api/lib/forumComments.ts api/lib/forumReport.ts api/events/rsvp/route.ts api/forum/post/route.ts api/forum/posts/route.ts api/forum/comments/route.ts api/forum/report/route.ts 2>&1"
+started_at: 2026-07-07T15:02:39.062Z
+running_for_ms: 8905013  
+---
+
+C:\Users\CCons\Desktop\SOLARIS CET\app\api\forum\comments\route.ts
+  1:1  warning  Run autofix to sort these imports!  simple-import-sort/imports
+
+✖ 1 problem (0 errors, 1 warning)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

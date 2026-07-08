@@ -7,14 +7,17 @@ import crypto from 'node:crypto';
 import { and, eq, isNull, or, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 
-import { getDb, schema } from '../../db/client';
-import { findReferrerByCode, todayKeyUtc } from '../gamification/lib/gamification';
-import { clientIp } from '../lib/clientIp';
-import { getAllowedOrigin } from '../lib/cors';
-import { getJwtSecretsFromEnv, signJwt, verifyJwtWithSecrets } from '../lib/jwt';
-import { awardPoints } from '../lib/points';
-import { withRateLimit } from '../lib/rateLimit';
-import { tonAddressSchema } from '../lib/validation';
+import { getDb, schema } from '@/db/client';
+import { findReferrerByCode, todayKeyUtc } from '@/api/gamification/lib/gamification';
+import { API_AUTH_PROBE, parseWalletAuthPostBody } from '@/api/lib/apiAuth';
+import { clientIp } from '@/api/lib/clientIp';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { getJwtSecretsFromEnv, signJwt, verifyJwtWithSecrets } from '@/api/lib/jwt';
+import { awardPoints } from '@/api/lib/points';
+import { withRateLimit } from '@/api/lib/rateLimit';
+import { tonAddressSchema } from '@/api/lib/validation';
+
+export { API_AUTH_PATH, API_AUTH_PROBE } from '@/api/lib/apiAuth';
 
 export const config = { runtime: 'nodejs' };
 
@@ -25,16 +28,6 @@ function isUniqueViolation(err: unknown): boolean {
     'code' in err &&
     (err as { code?: string }).code === '23505'
   );
-}
-
-const JWT_TTL_SECONDS = 60 * 60;
-
-function normalizeReferralCode(input: unknown): string | null {
-  if (typeof input !== 'string') return null;
-  const code = input.trim().toUpperCase();
-  if (!code) return null;
-  if (!/^[A-Z0-9_-]{4,20}$/.test(code)) return null;
-  return code;
 }
 
 function sha256Hex(input: string): string {
@@ -71,9 +64,9 @@ export default async function handler(req: Request): Promise<Response> {
 
   if (req.method === 'GET' || req.method === 'DELETE') {
     const limited = await withRateLimit(req, allowedOrigin, {
-      keyPrefix: 'auth-read',
-      limit: req.method === 'DELETE' ? 10 : 120,
-      windowSeconds: 60,
+      keyPrefix: API_AUTH_PROBE.readRateLimitKey,
+      limit: req.method === 'DELETE' ? API_AUTH_PROBE.deleteRateLimit : API_AUTH_PROBE.readRateLimit,
+      windowSeconds: API_AUTH_PROBE.rateWindowSeconds,
     });
     if (limited) return limited;
 
@@ -148,9 +141,9 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const limited = await withRateLimit(req, allowedOrigin, {
-    keyPrefix: 'auth-write',
-    limit: 5,
-    windowSeconds: 60,
+    keyPrefix: API_AUTH_PROBE.writeRateLimitKey,
+    limit: API_AUTH_PROBE.writeRateLimit,
+    windowSeconds: API_AUTH_PROBE.rateWindowSeconds,
   });
   if (limited) return limited;
 
@@ -169,16 +162,20 @@ export default async function handler(req: Request): Promise<Response> {
       });
     }
 
-    const rawWallet =
-      typeof body === 'object' &&
-      body !== null &&
-      'walletAddress' in body &&
-      typeof (body as { walletAddress: unknown }).walletAddress === 'string'
-        ? (body as { walletAddress: string }).walletAddress
-        : '';
-    const parsedWallet = tonAddressSchema.safeParse(rawWallet);
+    const parsedBody = parseWalletAuthPostBody(body);
+    if (!parsedBody.ok) {
+      return new Response(JSON.stringify({ error: parsedBody.error }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': allowedOrigin,
+          Vary: 'Origin',
+        },
+      });
+    }
+    const parsedWallet = tonAddressSchema.safeParse(parsedBody.walletRaw);
     if (!parsedWallet.success) {
-      return new Response(JSON.stringify({ error: 'Adresă invalidă' }), {
+      return new Response(JSON.stringify({ error: API_AUTH_PROBE.invalidWalletError }), {
         status: 400,
         headers: {
           'Content-Type': 'application/json',
@@ -188,14 +185,7 @@ export default async function handler(req: Request): Promise<Response> {
       });
     }
     const walletAddress = parsedWallet.data.toString();
-    const referralCode =
-      typeof body === 'object' && body !== null && 'referralCode' in body
-        ? normalizeReferralCode((body as { referralCode?: unknown }).referralCode)
-        : null;
-    const inviteToken =
-      typeof body === 'object' && body !== null && 'inviteToken' in body && typeof (body as { inviteToken?: unknown }).inviteToken === 'string'
-        ? (body as { inviteToken: string }).inviteToken.trim().slice(0, 200)
-        : '';
+    const { referralCode, inviteToken } = parsedBody;
 
     const db = getDb();
 
@@ -219,14 +209,14 @@ export default async function handler(req: Request): Promise<Response> {
             .insert(schema.sessions)
             .values({
               userId: existing.id,
-              expiresAt: new Date(Date.now() + JWT_TTL_SECONDS * 1000),
+              expiresAt: new Date(Date.now() + API_AUTH_PROBE.jwtTtlSeconds * 1000),
               ip: clientIp(req),
               userAgent: req.headers.get('user-agent')?.slice(0, 300) ?? null,
             })
             .returning();
-          token = await signJwt({ wallet: walletAddress, sid: session.id }, secret, JWT_TTL_SECONDS);
+          token = await signJwt({ wallet: walletAddress, sid: session.id }, secret, API_AUTH_PROBE.jwtTtlSeconds);
         } catch {
-          token = await signJwt({ wallet: walletAddress }, secret, JWT_TTL_SECONDS);
+          token = await signJwt({ wallet: walletAddress }, secret, API_AUTH_PROBE.jwtTtlSeconds);
         }
       }
       return new Response(JSON.stringify({ ...existing, token }), {
@@ -336,14 +326,14 @@ export default async function handler(req: Request): Promise<Response> {
               .insert(schema.sessions)
               .values({
                 userId: newUser.id,
-                expiresAt: new Date(Date.now() + JWT_TTL_SECONDS * 1000),
+                expiresAt: new Date(Date.now() + API_AUTH_PROBE.jwtTtlSeconds * 1000),
                 ip: clientIp(req),
                 userAgent: req.headers.get('user-agent')?.slice(0, 300) ?? null,
               })
               .returning();
-            token = await signJwt({ wallet: walletAddress, sid: session.id }, secret, JWT_TTL_SECONDS);
+            token = await signJwt({ wallet: walletAddress, sid: session.id }, secret, API_AUTH_PROBE.jwtTtlSeconds);
           } catch {
-            token = await signJwt({ wallet: walletAddress }, secret, JWT_TTL_SECONDS);
+            token = await signJwt({ wallet: walletAddress }, secret, API_AUTH_PROBE.jwtTtlSeconds);
           }
         }
         return new Response(JSON.stringify({ ...newUser, token }), {
@@ -362,7 +352,7 @@ export default async function handler(req: Request): Promise<Response> {
     }
 
     console.error('Auth API: referralCode collision after retries', lastErr);
-    return new Response(JSON.stringify({ error: 'Nu s-a putut genera un cod de referral unic' }), {
+    return new Response(JSON.stringify({ error: API_AUTH_PROBE.referralCollisionError }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json',

@@ -1,10 +1,21 @@
 import type { SQL } from 'drizzle-orm';
 import { and, asc, desc, eq, gte, inArray, lte, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAdminAuth, requireAdminRole } from '../../lib/adminAuth';
-import { getAllowedOrigin } from '../../lib/cors';
-import { corsJson, corsOptions } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import {
+  ADMIN_CHAT_ANALYTICS_PROBE,
+  ADMIN_CHAT_ANALYTICS_TOPIC_KEYWORDS,
+  chatAnalyticsOffset,
+  parseChatAnalyticsLimit,
+  parseChatAnalyticsPage,
+  parseChatAnalyticsResolvedFilter,
+  parseChatAnalyticsSessionId,
+} from '../../lib/adminChatAnalytics';
+import { guardAdminRoute } from '@/api/lib/adminAuth';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { corsJson, corsOptions } from '@/api/lib/http';
+
+export { ADMIN_CHAT_ANALYTICS_PATH, ADMIN_CHAT_ANALYTICS_PROBE } from '@/api/lib/adminChatAnalytics';
 
 export const config = { runtime: 'nodejs' };
 
@@ -15,19 +26,17 @@ export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return corsOptions(req, 'GET, OPTIONS');
   if (req.method !== 'GET') return corsJson(req, 405, { error: 'Method not allowed' });
 
-  const ctx = await requireAdminAuth(req);
+  const ctx = await guardAdminRoute(req, { minRole: ADMIN_CHAT_ANALYTICS_PROBE.minRole });
   if ('error' in ctx) return corsJson(req, ctx.status, { error: ctx.error });
-  const ok = requireAdminRole(ctx, 'viewer');
-  if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
 
-  const url = new URL(req.url);
-  const page = Math.max(1, Number(url.searchParams.get('page')) || 1);
-  const limit = Math.min(100, Math.max(1, Number(url.searchParams.get('limit')) || 20));
-  const offset = (page - 1) * limit;
-  const sessionId = String(url.searchParams.get('session_id') ?? '').trim();
-  const filterResolved = url.searchParams.get('resolved');
-  const filterDateFrom = url.searchParams.get('date_from') || '';
-  const filterDateTo = url.searchParams.get('date_to') || '';
+  const searchParams = new URL(req.url).searchParams;
+  const page = parseChatAnalyticsPage(searchParams);
+  const limit = parseChatAnalyticsLimit(searchParams);
+  const offset = chatAnalyticsOffset(page, limit);
+  const sessionId = parseChatAnalyticsSessionId(searchParams);
+  const filterResolved = parseChatAnalyticsResolvedFilter(searchParams);
+  const filterDateFrom = searchParams.get('date_from') || '';
+  const filterDateTo = searchParams.get('date_to') || '';
 
   const db = getDb();
 
@@ -87,7 +96,7 @@ export default async function handler(req: Request): Promise<Response> {
         .where(inArray(schema.crmMessages.conversationId, itemIds))
         .orderBy(asc(schema.crmMessages.createdAt))
     : [];
-  const messagesByConversation = new Map<string, Array<typeof itemMessages[number]>>();
+  const messagesByConversation = new Map<string, Array<(typeof itemMessages)[number]>>();
   for (const message of itemMessages) {
     const bucket = messagesByConversation.get(message.conversationId) ?? [];
     bucket.push(message);
@@ -135,10 +144,9 @@ export default async function handler(req: Request): Promise<Response> {
     }));
 
   const topicCounts: Record<string, number> = {};
-  const topicKeywords = ['pret', 'cost', 'finantare', 'montaj', 'garantie', 'acoperis', 'fotovoltaic', 'contact', 'program', 'casa verde'];
   for (const message of recentMessages) {
     const lower = message.body.toLowerCase();
-    for (const keyword of topicKeywords) {
+    for (const keyword of ADMIN_CHAT_ANALYTICS_TOPIC_KEYWORDS) {
       if (lower.includes(keyword)) {
         topicCounts[keyword] = (topicCounts[keyword] || 0) + 1;
       }
@@ -151,7 +159,8 @@ export default async function handler(req: Request): Promise<Response> {
 
   const totalConversationCount = Number(totalCount[0]?.count ?? 0);
   const resolvedConversationCount = Number(resolvedCount[0]?.count ?? 0);
-  const resolutionRate = totalConversationCount > 0 ? Math.round((resolvedConversationCount / totalConversationCount) * 100) : 0;
+  const resolutionRate =
+    totalConversationCount > 0 ? Math.round((resolvedConversationCount / totalConversationCount) * 100) : 0;
 
   return corsJson(req, 200, {
     conversations: items.map((item) => ({

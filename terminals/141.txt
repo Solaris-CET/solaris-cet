@@ -1,0 +1,23 @@
+---
+pid: 8732
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\" ; npm run gitea:push-retry 2>&1"
+started_at: 2026-07-06T18:41:44.165Z
+running_for_ms: 82175004 
+---
+
+> gitea:push-retry
+> node scripts/gitea-push-retry.mjs
+
+Push origin main (max 4 attempts)
+Waiting 12000ms…
+✗ attempt 1/4 failed (retryable)
+fatal: unable to access 'https://gitea.com/Solaris-Cet/solaris-clean.git/': The requested URL returned error: 504
+Waiting 12000ms…
+✗ attempt 2/4 failed (retryable)
+fatal: unable to access 'https://gitea.com/Solaris-Cet/solaris-clean.git/': The requested URL returned error: 504
+Waiting 12000ms…
+✗ attempt 3/4 failed (retryable)
+fatal: unable to access 'https://gitea.com/Solaris-Cet/solaris-clean.git/': The requested URL returned error: 504
+✗ attempt 4/4 failed (retryable)
+fatal: unable to access 'https://gitea.com/Solaris-Cet/solaris-clean.git/': The requested URL returned error: 504

@@ -1,7 +1,7 @@
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { type EmbeddingProvider,embedText } from './embeddings';
+import { type EmbeddingProvider,embedTexts } from './embeddings';
 import { sha256Hex } from './nodeCrypto';
 
 export type KbSourceFile = { absPath: string; relPath: string; title: string; text: string };
@@ -148,22 +148,46 @@ export type KbChunk = {
 
 export async function buildKbChunks(
   sources: KbSourceFile[],
-  opts?: { embeddingProvider?: EmbeddingProvider },
+  opts?: { embeddingProvider?: EmbeddingProvider; batchSize?: number },
 ): Promise<KbChunk[]> {
-  const chunks: KbChunk[] = [];
+  const batchSize = Math.max(1, Math.min(64, opts?.batchSize ?? 16));
+
+  type PendingChunk = {
+    idHash: string;
+    relPath: string;
+    title: string;
+    chunkIndex: number;
+    text: string;
+  };
+
+  const pending: PendingChunk[] = [];
   for (const s of sources) {
     const parts = chunkText(s.text);
     for (let i = 0; i < parts.length; i++) {
       const text = parts[i] ?? '';
       const idHash = sha256Hex(`kb:v1:${s.relPath}:${i}:${sha256Hex(text)}`);
-      const embedding = await embedText(text, { provider: opts?.embeddingProvider });
-      chunks.push({
+      pending.push({
         idHash,
         relPath: s.relPath,
         title: s.title,
         chunkIndex: i,
         text,
-        embedding,
+      });
+    }
+  }
+
+  const chunks: KbChunk[] = [];
+  for (let i = 0; i < pending.length; i += batchSize) {
+    const batch = pending.slice(i, i + batchSize);
+    const embeddings = await embedTexts(
+      batch.map((c) => c.text),
+      { provider: opts?.embeddingProvider },
+    );
+    for (let j = 0; j < batch.length; j++) {
+      const meta = batch[j]!;
+      chunks.push({
+        ...meta,
+        embedding: embeddings[j]!,
       });
     }
   }

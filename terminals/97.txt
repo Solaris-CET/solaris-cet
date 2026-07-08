@@ -1,0 +1,20 @@
+---
+pid: 2412
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cmd /c \"cd /d C:\\Users\\CCons\\Desktop\\SOLARIS CET && node scripts\\stash-sync.mjs\""
+started_at: 2026-07-06T02:47:29.225Z
+running_for_ms: 88633050 
+---
+Syncing memory to Stash…
+
+✗ docs/planning/agent-memory.md: Error [409]: Page 'agent-memory' already exists in the root of the scope.
+✗ docs/planning/grok.md: Error [409]: Page 'grok' already exists in the root of the scope.
+✗ .claude/skills/solaris-perfect-loops/SKILL.md: Error [409]: Page 'SKILL' already exists in the root of the scope.
+
+Done. Next agent: npm run stash:prime
+
+---
+exit_code: -1
+elapsed_ms: 88633050
+ended_at: 2026-07-07T03:24:41.060Z
+---

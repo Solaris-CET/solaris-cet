@@ -1,11 +1,20 @@
 import { eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../../db/client';
-import { writeAdminAudit } from '../../../lib/adminAudit';
-import { requireAdminAuth, requireAdminRole } from '../../../lib/adminAuth';
-import { getAllowedOrigin } from '../../../lib/cors';
-import { corsJson, corsOptions, readJson } from '../../../lib/http';
-import { withRateLimit } from '../../../lib/rateLimit';
+import { getDb, schema } from '@/db/client';
+import { writeAdminAudit } from '@/api/lib/adminAudit';
+import { guardAdminRoute } from '@/api/lib/adminAuth';
+import {
+  ADMIN_CONVERSATION_RESOLVE_PROBE,
+  parseConversationResolveBody,
+} from '../../../lib/adminConversationResolve';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { corsJson, corsOptions, readJson } from '@/api/lib/http';
+import { withRateLimit } from '@/api/lib/rateLimit';
+
+export {
+  ADMIN_CONVERSATION_RESOLVE_PATH,
+  ADMIN_CONVERSATION_RESOLVE_PROBE,
+} from '../../../lib/adminConversationResolve';
 
 export const config = { runtime: 'nodejs' };
 
@@ -17,13 +26,15 @@ export default async function handler(req: Request): Promise<Response> {
 
   if (origin && allowedOrigin !== origin) return corsJson(req, 403, { error: 'Forbidden' });
 
-  const limited = await withRateLimit(req, allowedOrigin, { keyPrefix: 'admin-crm-resolve', limit: 60, windowSeconds: 60 });
+  const limited = await withRateLimit(req, allowedOrigin, {
+    keyPrefix: ADMIN_CONVERSATION_RESOLVE_PROBE.rateLimitKey,
+    limit: 60,
+    windowSeconds: 60,
+  });
   if (limited) return limited;
 
-  const ctx = await requireAdminAuth(req);
+  const ctx = await guardAdminRoute(req, { minRole: ADMIN_CONVERSATION_RESOLVE_PROBE.minRole });
   if ('error' in ctx) return corsJson(req, ctx.status, { error: ctx.error });
-  const ok = requireAdminRole(ctx, 'editor');
-  if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
 
   let body: unknown;
   try {
@@ -32,19 +43,21 @@ export default async function handler(req: Request): Promise<Response> {
     return corsJson(req, 400, { error: 'Invalid JSON' });
   }
 
-  const conversationId =
-    typeof (body as { conversationId?: unknown })?.conversationId === 'string'
-      ? (body as { conversationId: string }).conversationId.trim()
-      : '';
-  if (!conversationId) return corsJson(req, 400, { error: 'Missing conversationId' });
+  const parsed = parseConversationResolveBody(body);
+  if (!parsed.ok) return corsJson(req, 400, { error: parsed.error });
+  const { conversationId } = parsed;
 
   const db = getDb();
   await db
     .update(schema.crmConversations)
-    .set({ status: 'resolved', resolvedAt: new Date(), updatedAt: new Date() })
+    .set({
+      status: ADMIN_CONVERSATION_RESOLVE_PROBE.resolvedStatus,
+      resolvedAt: new Date(),
+      updatedAt: new Date(),
+    })
     .where(eq(schema.crmConversations.id, conversationId));
 
-  await writeAdminAudit(req, ctx, 'CRM_CONVERSATION_RESOLVED', 'crm_conversation', conversationId, {});
+  await writeAdminAudit(req, ctx, ADMIN_CONVERSATION_RESOLVE_PROBE.auditAction, 'crm_conversation', conversationId, {});
 
   return corsJson(req, 200, { ok: true });
 }

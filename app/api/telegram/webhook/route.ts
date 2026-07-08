@@ -1,29 +1,23 @@
 import { and, eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { jsonResponse } from '../../lib/http';
-import { awardPoints } from '../../lib/points';
-import { parseCommand, telegramSendMessage, type TelegramUpdate } from '../lib';
+import { getDb, schema } from '@/db/client';
+import { jsonResponse } from '@/api/lib/http';
+import { awardPoints } from '@/api/lib/points';
+import {
+  allowTelegramChatCommand,
+  extractTelegramMessageContext,
+  isTelegramWebhookConfigured,
+  readTrimmedTelegramEnv,
+  resolveTelegramChannelChat,
+  resolveTelegramPublicSiteBase,
+  TELEGRAM_WEBHOOK_PROBE,
+  validateTelegramWebhookSecret,
+} from '../../lib/telegramWebhookRoute';
+import { parseCommand, telegramSendMessage } from '../lib';
+
+export { TELEGRAM_WEBHOOK_PATH, TELEGRAM_WEBHOOK_PROBE } from '@/api/lib/telegramWebhookRoute';
 
 export const config = { runtime: 'nodejs' };
-
-function env(name: string): string {
-  return String(process.env[name] ?? '').trim();
-}
-
-const spamWindows = new Map<string, { count: number; resetAtMs: number }>();
-
-function allowChatCommand(chatId: number): boolean {
-  const key = String(chatId);
-  const now = Date.now();
-  const existing = spamWindows.get(key);
-  if (!existing || existing.resetAtMs <= now) {
-    spamWindows.set(key, { count: 1, resetAtMs: now + 60_000 });
-    return true;
-  }
-  existing.count += 1;
-  return existing.count <= 12;
-}
 
 async function linkedUserId(db: ReturnType<typeof getDb>, chatId: number): Promise<string | null> {
   const [tg] = await db.select().from(schema.telegramLinks).where(eq(schema.telegramLinks.chatId, String(chatId))).limit(1);
@@ -178,7 +172,7 @@ async function handleJoinCheck(db: ReturnType<typeof getDb>, chatId: number, tok
     await telegramSendMessage(token, chatId, 'Contul nu este conectat. Folosește /link <COD>.');
     return;
   }
-  const channel = env('TELEGRAM_CHANNEL_CHAT') || '@SolarisCET';
+  const channel = resolveTelegramChannelChat();
   const status = await getChannelMembership(token, channel, chatId);
   if (status !== 'member') {
     await telegramSendMessage(token, chatId, `Nu te văd ca membru în ${channel}. Intră în canal și reîncearcă.`);
@@ -234,8 +228,7 @@ async function handleSubscribe(db: ReturnType<typeof getDb>, chatId: number, ena
 }
 
 async function handlePrice(): Promise<string> {
-  const site = String(process.env.PUBLIC_SITE_URL ?? '').trim();
-  const base = site ? site.replace(/\/$/, '') : 'https://solaris-cet.com';
+  const base = resolveTelegramPublicSiteBase();
   try {
     const res = await fetch(`${base}/api/price/cet`, { headers: { 'Accept': 'application/json' } });
     const data = (await res.json().catch(() => null)) as { priceTonPerCet?: unknown; updatedAt?: unknown } | null;
@@ -249,8 +242,7 @@ async function handlePrice(): Promise<string> {
 }
 
 async function handleEvents(): Promise<string> {
-  const site = String(process.env.PUBLIC_SITE_URL ?? '').trim();
-  const base = site ? site.replace(/\/$/, '') : 'https://solaris-cet.com';
+  const base = resolveTelegramPublicSiteBase();
   try {
     const res = await fetch(`${base}/api/events`, { headers: { 'Accept': 'application/json' } });
     const data = (await res.json().catch(() => null)) as { events?: unknown } | null;
@@ -274,39 +266,43 @@ async function handleEvents(): Promise<string> {
 }
 
 export default async function handler(req: Request): Promise<Response> {
-  const token = env('TELEGRAM_BOT_TOKEN');
-  const secret = env('TELEGRAM_WEBHOOK_SECRET');
+  const token = readTrimmedTelegramEnv(TELEGRAM_WEBHOOK_PROBE.botTokenEnv);
+  const secret = readTrimmedTelegramEnv(TELEGRAM_WEBHOOK_PROBE.webhookSecretEnv);
 
-  if (!token || !secret) return jsonResponse(req, { ok: true, configured: false });
+  if (!isTelegramWebhookConfigured(token, secret)) {
+    return jsonResponse(req, TELEGRAM_WEBHOOK_PROBE.notConfiguredResponse);
+  }
 
-  const provided = String(req.headers.get('x-telegram-bot-api-secret-token') ?? '').trim();
-  if (!provided || provided !== secret) {
-    return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+  if (!validateTelegramWebhookSecret(req, secret)) {
+    return new Response(JSON.stringify({ error: 'Forbidden' }), {
+      status: TELEGRAM_WEBHOOK_PROBE.forbiddenStatus,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
   }
 
-  let update: TelegramUpdate;
+  let update: unknown;
   try {
-    update = (await req.json()) as TelegramUpdate;
+    update = await req.json();
   } catch {
     return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   }
 
-  const msg = update.message;
-  const text = msg?.text;
-  const chatId = typeof msg?.chat?.id === 'number' ? msg.chat.id : null;
-  if (!chatId || typeof text !== 'string') return new Response(JSON.stringify({ ok: true }), { status: 200 });
+  const context = extractTelegramMessageContext(update as Parameters<typeof extractTelegramMessageContext>[0]);
+  if (!context) return new Response(JSON.stringify({ ok: true }), { status: 200 });
 
-  if (!allowChatCommand(chatId)) return new Response(JSON.stringify({ ok: true }), { status: 200 });
+  if (!allowTelegramChatCommand(context.chatId)) {
+    return new Response(JSON.stringify({ ok: true }), { status: 200 });
+  }
 
-  const cmd = parseCommand(text);
+  const cmd = parseCommand(context.text);
   if (!cmd) return new Response(JSON.stringify({ ok: true }), { status: 200 });
 
   const db = getDb();
-  const username = (msg?.chat?.username ?? msg?.from?.username ?? '').trim() || null;
+  const { chatId, username } = context;
 
   if (cmd.cmd === '/start' || cmd.cmd === '/help') {
     await telegramSendMessage(

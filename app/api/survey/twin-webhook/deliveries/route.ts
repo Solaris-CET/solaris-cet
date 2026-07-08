@@ -1,8 +1,17 @@
-import { getAllowedOrigin } from '../../../lib/cors';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyTwinWebhookDeliveriesEngineUrl,
+  buildSurveyTwinWebhookDeliveriesSuccessPayload,
+  parseSurveyTwinLimit,
+  parseSurveyTwinWebhookDeliveriesDirection,
+  resolveSurveyTwinWebhookDeliveriesEngineUrl,
+  SURVEY_TWIN_WEBHOOK_DELIVERIES_PROBE,
+  surveyTwinWebhookDeliveriesErrorMessage,
+} from '../../../lib/surveyTwinWebhookDeliveries';
+
+export { SURVEY_TWIN_WEBHOOK_DELIVERIES_PATH, SURVEY_TWIN_WEBHOOK_DELIVERIES_PROBE } from '@/api/lib/surveyTwinWebhookDeliveries';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
 
 function json(body: unknown, origin: string, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -11,7 +20,7 @@ function json(body: unknown, origin: string, status = 200) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': origin,
       Vary: 'Origin',
-      'Cache-Control': 'no-store',
+      'Cache-Control': SURVEY_TWIN_WEBHOOK_DELIVERIES_PROBE.cacheControl,
     },
   });
 }
@@ -24,7 +33,8 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': SURVEY_TWIN_WEBHOOK_DELIVERIES_PROBE.methods.join(', '),
+        'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       },
     });
@@ -35,21 +45,24 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const url = new URL(req.url);
-  const limit = Math.min(200, Math.max(1, Number(url.searchParams.get('limit')) || 50));
-  const direction = (url.searchParams.get('direction') || '').trim();
-  const qs = new URLSearchParams({ limit: String(limit) });
-  if (direction) qs.set('direction', direction);
+  const limit = parseSurveyTwinLimit(url.searchParams.get(SURVEY_TWIN_WEBHOOK_DELIVERIES_PROBE.limitParam));
+  const direction = parseSurveyTwinWebhookDeliveriesDirection(url.searchParams.get(SURVEY_TWIN_WEBHOOK_DELIVERIES_PROBE.directionParam));
+  const engineUrl = resolveSurveyTwinWebhookDeliveriesEngineUrl();
 
   try {
-    const res = await fetch(`${ENGINE.replace(/\/$/, '')}/twin-webhook/deliveries?${qs}`, {
-      signal: AbortSignal.timeout(8000),
+    const res = await fetch(buildSurveyTwinWebhookDeliveriesEngineUrl(engineUrl, limit, direction || undefined), {
+      signal: AbortSignal.timeout(SURVEY_TWIN_WEBHOOK_DELIVERIES_PROBE.fetchTimeoutMs),
     });
     const data = await res.json();
     if (!res.ok) {
-      return json({ error: (data as { detail?: string }).detail || 'Deliveries unavailable' }, allowed, 502);
+      return json(
+        { error: surveyTwinWebhookDeliveriesErrorMessage(data) },
+        allowed,
+        SURVEY_TWIN_WEBHOOK_DELIVERIES_PROBE.engineErrorStatus,
+      );
     }
-    return json({ platform: 'solaris-cet', ...data }, allowed, 200);
+    return json(buildSurveyTwinWebhookDeliveriesSuccessPayload(data as Record<string, unknown>), allowed, 200);
   } catch {
-    return json({ error: 'survey-engine unreachable' }, allowed, 503);
+    return json({ error: SURVEY_TWIN_WEBHOOK_DELIVERIES_PROBE.unreachableError }, allowed, SURVEY_TWIN_WEBHOOK_DELIVERIES_PROBE.unreachableStatus);
   }
 }

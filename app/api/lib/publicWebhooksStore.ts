@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { desc,eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 
-import { getDb, schema } from '../../db/client';
+import { getDb, schema } from '@/db/client';
 import { encryptForDb } from './auth';
 import { decryptWebhookSecret, hashWebhookSecret } from './publicWebhookCrypto';
 import { type DeliveryRecord,dispatchWithRetry } from './publicWebhookDispatcher';

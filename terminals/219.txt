@@ -1,0 +1,36 @@
+---
+pid: 17944
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/testimonialsRoute.test.ts src/__tests__/tonBalanceRoute.test.ts src/__tests__/tonDnsBackresolveRoute.test.ts src/__tests__/tonDnsResolveRoute.test.ts src/__tests__/tonIndexedTxsRoute.test.ts src/__tests__/tonNftsRoute.test.ts src/__tests__/tonTxsRoute.test.ts src/__tests__/userSettingsRoute.test.ts src/__tests__/publicV1PriceRoute.test.ts src/__tests__/publicV1StatsRoute.test.ts src/__tests__/publicV1TransactionsRoute.test.ts src/__tests__/publicV1WebhookDeliveriesRoute.test.ts src/__tests__/publicV1WebhooksRoute.test.ts src/__tests__/publicV2PriceRoute.test.ts src/__tests__/v2AiOracleRoute.test.ts src/__tests__/publicV2StatsRoute.test.ts src/__tests__/publicV2TransactionsRoute.test.ts src/__tests__/waitlistRoute.test.ts src/__tests__/walletBalanceRoute.test.ts src/__tests__/walletsLinkRoute.test.ts"
+started_at: 2026-07-07T16:46:46.570Z
+running_for_ms: 2659984  
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ✓ src/__tests__/tonTxsRoute.test.ts (4 tests) 60ms
+ ✓ src/__tests__/userSettingsRoute.test.ts (6 tests) 65ms
+ ✓ src/__tests__/publicV1WebhooksRoute.test.ts (4 tests) 68ms
+ ✓ src/__tests__/publicV1TransactionsRoute.test.ts (5 tests) 64ms
+ ✓ src/__tests__/waitlistRoute.test.ts (5 tests) 78ms
+ ✓ src/__tests__/publicV2TransactionsRoute.test.ts (4 tests) 76ms
+ ✓ src/__tests__/tonNftsRoute.test.ts (4 tests) 58ms
+ ✓ src/__tests__/publicV2PriceRoute.test.ts (4 tests) 68ms
+ ✓ src/__tests__/tonBalanceRoute.test.ts (6 tests) 67ms
+ ✓ src/__tests__/walletsLinkRoute.test.ts (5 tests) 67ms
+ ✓ src/__tests__/publicV2StatsRoute.test.ts (4 tests) 63ms
+ ✓ src/__tests__/tonDnsResolveRoute.test.ts (5 tests) 63ms
+ ✓ src/__tests__/v2AiOracleRoute.test.ts (5 tests) 50ms
+ ✓ src/__tests__/publicV1StatsRoute.test.ts (4 tests) 78ms
+ ✓ src/__tests__/publicV1WebhookDeliveriesRoute.test.ts (4 tests) 63ms
+ ✓ src/__tests__/testimonialsRoute.test.ts (5 tests) 65ms
+ ✓ src/__tests__/walletBalanceRoute.test.ts (3 tests) 60ms
+ ✓ src/__tests__/publicV1PriceRoute.test.ts (5 tests) 59ms
+ ✓ src/__tests__/tonIndexedTxsRoute.test.ts (4 tests) 55ms
+ ✓ src/__tests__/tonDnsBackresolveRoute.test.ts (5 tests) 65ms
+
+ Test Files  20 passed (20)
+      Tests  91 passed (91)
+   Start at  19:46:51
+   Duration  39.44s (transform 1.78s, setup 16.36s, import 9.37s, tests 1.29s, environment 5ms)
+

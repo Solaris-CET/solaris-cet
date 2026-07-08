@@ -64,6 +64,26 @@ Guidelines:
 
 When Redis (Upstash REST) is configured, `/api/ai/ask` may cache FAQ-like answers (single-turn) for short TTLs.
 
+## Quality Evaluation (per-dimension RAV scoring)
+
+`/api/ai/ask` runs a lightweight evaluator over every live answer when `CET_AI_ENABLE_EVAL` is not `0`. The evaluator scores the answer across five dimensions:
+
+- `factual` (35%): no hallucinations; prices/names/numbers are correct or flagged as uncertain.
+- `useful` (25%): directly answers the query and provides actionable context.
+- `safe` (15%): no disguised financial certainty, unsafe links, or policy violations.
+- `style` (10%): clear structure, matching user language, appropriate tone.
+- `source_grounded` (15%): cites real sources when available; never invents URLs.
+
+The total weighted score drives a closed feedback loop: if the score is below 70, the router retries once with a different provider and a correction prompt focused on the weakest dimension.
+
+## Consensus Heuristic (`synthesizeConsensus`)
+
+When dual-provider mode is active, the two replies are reconciled by `app/api/lib/reactBrain.ts`:
+
+- If on-chain price context is available, replies are scored against the verified CET/TON prices.
+- Wrong price mentions and common hallucination markers (e.g. Ethereum/Solana without TON context) are penalized.
+- If one reply is significantly better anchored, it is used as the primary output; otherwise the replies are merged with a verified-data prefix.
+
 ## Adjusting Behavior
 
 Practical knobs:

@@ -1,9 +1,12 @@
 import { desc } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../../db/client';
-import { requireAdmin, requireAuth } from '../../../lib/auth';
-import { getAllowedOrigin } from '../../../lib/cors';
-import { sha256Hex } from '../../../lib/nodeCrypto';
+import { getDb, schema } from '@/db/client';
+import { requireAdmin, requireAuth } from '@/api/lib/auth';
+import { AI_ADMIN_QUERIES_PROBE, anonymizeAiAdminUserId } from '@/api/lib/aiAdminQueries';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { sha256Hex } from '@/api/lib/nodeCrypto';
+
+export { AI_ADMIN_QUERIES_PATH, AI_ADMIN_QUERIES_PROBE } from '@/api/lib/aiAdminQueries';
 
 export const config = { runtime: 'nodejs' };
 
@@ -60,13 +63,13 @@ export default async function handler(req: Request): Promise<Response> {
       })
       .from(schema.aiQueryLogs)
       .orderBy(desc(schema.aiQueryLogs.createdAt))
-      .limit(500);
+      .limit(AI_ADMIN_QUERIES_PROBE.maxListRows);
 
     const out = rows.map((r) => ({
       id: r.id,
-      user: r.userId ? sha256Hex(r.userId).slice(0, 10) : 'anon',
+      user: anonymizeAiAdminUserId(r.userId, sha256Hex),
       createdAt: r.createdAt,
-      query: r.query.slice(0, 400),
+      query: r.query.slice(0, AI_ADMIN_QUERIES_PROBE.maxQueryPreviewLength),
       model: r.model,
       latencyMs: r.latencyMs,
       usedCache: r.usedCache,

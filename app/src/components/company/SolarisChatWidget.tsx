@@ -1,5 +1,7 @@
-import { Bot, ChevronDown, Send, X } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Bot, ChevronDown, Send, Square, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+import { useLanguage } from '@/hooks/useLanguage';
 
 import { SafeEmailLink } from '@/components/SafeEmailLink';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -37,15 +39,27 @@ function safeSave(state: { dept: CompanyDepartmentId; turns: ChatTurn[] }) {
 }
 
 export function SolarisChatWidget() {
+  const { t } = useLanguage();
   const initial = useMemo(() => safeLoad(), []);
   const [open, setOpen] = useState(false);
   const [dept, setDept] = useState<CompanyDepartmentId>(initial?.dept ?? 'ofertare');
   const [turns, setTurns] = useState<ChatTurn[]>(initial?.turns ?? []);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [deptOpen, setDeptOpen] = useState(false);
+  const [turnKeys, setTurnKeys] = useState<string[]>([]);
   const abortRef = useRef<AbortController | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setTurnKeys((prev) => {
+      if (prev.length === turns.length) return prev;
+      const next = prev.slice();
+      while (next.length < turns.length) next.push(crypto.randomUUID());
+      return next.slice(0, turns.length);
+    });
+  }, [turns.length]);
 
   const activeDept = useMemo(() => companyDepartments.find((d) => d.id === dept) ?? companyDepartments[0]!, [dept]);
 
@@ -59,12 +73,19 @@ export function SolarisChatWidget() {
     el.scrollTop = el.scrollHeight;
   }, [turns, open]);
 
-  const send = async (content: string) => {
+  const stopGeneration = useCallback(() => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setBusy(false);
+  }, []);
+
+  const send = useCallback(async (content: string) => {
     const q = content.trim();
     if (!q || busy) return;
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
+    setError(null);
 
     const nextTurns = [...turns, { role: 'user' as const, content: q }].slice(-24);
     setTurns(nextTurns);
@@ -83,17 +104,25 @@ export function SolarisChatWidget() {
         }),
         signal: controller.signal,
       });
-      const json = (await res.json().catch(() => null)) as { response?: unknown; message?: unknown } | null;
+      const json = (await res.json().catch(() => null)) as { response?: unknown; message?: unknown; error?: unknown } | null;
+      if (!res.ok) {
+        const errText = typeof json?.error === 'string' ? json.error : 'Serverul a răspuns cu o eroare.';
+        setError(errText);
+        setTurns((t) => [...t, { role: 'assistant' as const, content: errText }].slice(-24));
+        return;
+      }
       const text = typeof json?.response === 'string' ? json.response : typeof json?.message === 'string' ? json.message : '';
       setTurns((t) =>
         [...t, { role: 'assistant' as const, content: text || 'Nu am putut genera un răspuns acum. Încearcă din nou.' }].slice(-24),
       );
     } catch {
-      setTurns((t) => [...t, { role: 'assistant' as const, content: 'Conexiunea a eșuat. Te rog încearcă din nou.' }].slice(-24));
+      const errText = 'Conexiunea a eșuat. Te rog încearcă din nou.';
+      setError(errText);
+      setTurns((t) => [...t, { role: 'assistant' as const, content: errText }].slice(-24));
     } finally {
       setBusy(false);
     }
-  };
+  }, [busy, turns, dept]);
 
   return (
     <>
@@ -122,18 +151,34 @@ export function SolarisChatWidget() {
                 </span>
                 <span>Asistent Solaris CET</span>
               </DialogTitle>
-              <button
-                type="button"
-                className="p-2 rounded-xl border border-white/10 bg-white/5 text-solaris-muted hover:text-solaris-text transition-colors"
-                onClick={() => setOpen(false)}
-                aria-label="Închide"
-              >
-                <X className="h-4 w-4" aria-hidden />
-              </button>
+              <div className="flex items-center gap-2">
+                {busy && (
+                  <button
+                    type="button"
+                    onClick={stopGeneration}
+                    className="inline-flex items-center gap-1 px-2 py-1.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-red-400 text-xs font-semibold transition-colors"
+                    aria-label="Oprește generarea"
+                  >
+                    <Square className="h-3 w-3 fill-current" />
+                    Stop
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="p-2 rounded-xl border border-white/10 bg-white/5 text-solaris-muted hover:text-solaris-text transition-colors"
+                  onClick={() => setOpen(false)}
+                  aria-label="Închide"
+                >
+                  <X className="h-4 w-4" aria-hidden />
+                </button>
+              </div>
             </div>
             <DialogDescription className="sr-only">
               Chat direct cu Solaris CET pentru oferte, programari si intrebari rapide.
             </DialogDescription>
+            <div aria-live="polite" aria-atomic="true" className="sr-only">
+              {busy ? t.cetAi.processing : error ? `${t.cetAi.liveApiErrorDetailLabel} ${error}` : ''}
+            </div>
           </DialogHeader>
 
           <div className="bg-slate-950">
@@ -207,7 +252,7 @@ export function SolarisChatWidget() {
               ) : (
                 turns.map((t, idx) => (
                   <div
-                    key={idx}
+                    key={turnKeys[idx] ?? idx}
                     className={cn(
                       'max-w-[92%] rounded-2xl border px-3 py-2 text-sm leading-relaxed',
                       t.role === 'user'
@@ -237,7 +282,8 @@ export function SolarisChatWidget() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Scrie mesajul…"
-                className="flex-1 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-solaris-text placeholder:text-solaris-muted focus:outline-none focus:ring-2 focus:ring-solaris-gold/40"
+                disabled={busy}
+                className="flex-1 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-solaris-text placeholder:text-solaris-muted focus:outline-none focus:ring-2 focus:ring-solaris-gold/40 disabled:opacity-50"
                 maxLength={1200}
               />
               <button

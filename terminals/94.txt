@@ -1,0 +1,43 @@
+---
+pid: 5400
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\"; npm run stash:prime -- survey deploy 2>&1"
+started_at: 2026-07-06T02:42:42.560Z
+running_for_ms: 88926309 
+---
+
+> stash:prime
+> node scripts/stash-prime.mjs survey deploy
+
+═══ SOLARIS CET — Loop 0 Memory Prime ═══
+
+✓ Stash auth OK
+
+search "survey deploy": agent-memory
+search "hetzner": agent-memory
+search "dev:local": agent-memory
+search "coolify": agent-memory
+search "anti-pattern": agent-memory
+
+── Local memory (always read) ──
+✓ docs/planning/agent-memory.md
+✓ docs/planning/grok.md
+✓ docs/planning/global.md
+✓ .stash connected
+
+── Loop order (0→7) ──
+0 Memory → 1 Research → 2 Build → 3 Verify → 4 Optimize → 5 Agent → 6 Feedback → 7 Retrospective
+
+── Verify commands ──
+  npm run dev:local
+  npm run survey:smoke
+  SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # after VPS up
+
+✓ Prime complete — proceed to Research Loop
+
+
+---
+exit_code: -1
+elapsed_ms: 88926309
+ended_at: 2026-07-07T03:24:47.623Z
+---

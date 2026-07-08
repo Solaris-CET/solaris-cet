@@ -1,23 +1,45 @@
 import type { SurveyFormData } from '@/lib/surveyApi';
 
+export const PREFILL_SOURCES = ['calculator', 'contact'] as const;
+export type SurveyPrefillSource = (typeof PREFILL_SOURCES)[number];
+
+export const CALCULATOR_ROOF_MAP: Record<string, string> = {
+  tigla: 'tile',
+  tabla: 'metal',
+  'tabla-plata': 'metal',
+  membrana: 'flat',
+  altul: 'other',
+};
+
+export const DEFAULT_SURVEY_ROOF_TYPE = 'tile';
+export const KWP_TO_AREA_FACTOR = 7;
+export const SURVEY_PREFILL_PATH = '/survey';
+
 export type SurveyPrefill = {
   clientCity?: string;
   annualConsumptionKwh?: number;
   usableAreaM2?: number;
   roofType?: string;
-  source?: 'calculator' | 'contact';
+  source?: SurveyPrefillSource;
 };
+
+export function isSurveyPrefillSource(value: string): value is SurveyPrefillSource {
+  return (PREFILL_SOURCES as readonly string[]).includes(value);
+}
+
+export function hasSurveyPrefill(prefill: SurveyPrefill): boolean {
+  return Boolean(
+    prefill.source &&
+      (prefill.clientCity ||
+        prefill.annualConsumptionKwh ||
+        prefill.usableAreaM2 ||
+        prefill.roofType),
+  );
+}
 
 /** Map calculator roof labels to survey engine roof_type values. */
 export function calculatorRoofToSurvey(roof: string): string {
-  const map: Record<string, string> = {
-    tigla: 'tile',
-    tabla: 'metal',
-    'tabla-plata': 'metal',
-    membrana: 'flat',
-    altul: 'other',
-  };
-  return map[roof.toLowerCase()] ?? 'tile';
+  return CALCULATOR_ROOF_MAP[roof.toLowerCase()] ?? DEFAULT_SURVEY_ROOF_TYPE;
 }
 
 /**
@@ -25,8 +47,12 @@ export function calculatorRoofToSurvey(roof: string): string {
  * Supports: judet, consum (kWh/month), putere (kWp), roof, suprafata
  */
 export function parseSurveySearchParams(search: string): SurveyPrefill {
-  const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
-  if (params.get('from') !== 'calculator') return {};
+  const normalized = search.trim();
+  if (!normalized) return {};
+
+  const params = new URLSearchParams(normalized.startsWith('?') ? normalized.slice(1) : normalized);
+  const from = params.get('from') ?? '';
+  if (from !== 'calculator') return {};
 
   const consumMonth = Number(params.get('consum'));
   const putere = Number(params.get('putere'));
@@ -43,7 +69,7 @@ export function parseSurveySearchParams(search: string): SurveyPrefill {
   }
 
   if (Number.isFinite(putere) && putere > 0) {
-    prefill.usableAreaM2 = Math.round(putere * 7);
+    prefill.usableAreaM2 = Math.round(putere * KWP_TO_AREA_FACTOR);
   } else if (Number.isFinite(suprafata) && suprafata > 0) {
     prefill.usableAreaM2 = suprafata;
   }
@@ -54,7 +80,7 @@ export function parseSurveySearchParams(search: string): SurveyPrefill {
 }
 
 export function applySurveyPrefill(form: SurveyFormData, prefill: SurveyPrefill): SurveyFormData {
-  if (!prefill.source) return form;
+  if (!hasSurveyPrefill(prefill)) return form;
   return {
     ...form,
     clientCity: prefill.clientCity ?? form.clientCity,
@@ -77,5 +103,5 @@ export function buildCalculatorSurveyUrl(input: {
   if (input.putereKwp) params.set('putere', String(input.putereKwp));
   if (input.roof) params.set('roof', input.roof);
   if (input.suprafataM2) params.set('suprafata', String(input.suprafataM2));
-  return `/survey?${params.toString()}`;
+  return `${SURVEY_PREFILL_PATH}?${params.toString()}`;
 }

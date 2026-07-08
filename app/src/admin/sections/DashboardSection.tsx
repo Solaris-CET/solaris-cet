@@ -12,7 +12,7 @@ import {
 
 import { Card } from '@/components/ui/card';
 
-import { adminApi } from '../adminClient';
+import { adminApi, adminApiErr } from '../adminClient';
 import { subscribeAsAdmin } from '@/lib/pushClient';
 
 type Stats = {
@@ -48,11 +48,11 @@ export function DashboardSection({ token }: { token: string }) {
       const res = await adminApi<Stats>('/api/admin/stats', { token });
       const ovr = await adminApi<Overview>('/api/admin/analytics/overview?days=30', { token });
       if (!res.ok) {
-        if (!cancelled) setError(res.error);
+        if (!cancelled) setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       if (!ovr.ok) {
-        if (!cancelled) setError(ovr.error);
+        if (!cancelled) setError(adminApiErr(ovr) ?? 'Request failed');
         return;
       }
       if (!cancelled) {

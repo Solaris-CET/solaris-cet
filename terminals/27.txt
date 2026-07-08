@@ -3,7 +3,7 @@ pid: 15180
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "Get-ChildItem \"C:\\Users\\CCons\\AppData\\Local\\npm-cache\\_logs\" -Filter \"*debug*.log\" | Sort-Object LastWriteTime -Descending | Select-Object -First 3 | ForEach-Object { Write-Output \"=== $($_.Name) ===\"; Get-Content $_.FullName -Tail 25 }"
 started_at: 2026-07-05T21:45:51.744Z
-running_for_ms: 10259970 
+running_for_ms: 86400011 
 ---
 === 2026-07-05T21_41_40_175Z-debug-0.log ===
 258 silly packumentCache corgi:https://registry.npmjs.org/@walletconnect%2fethereum-provider set size:1127748 disposed:false
@@ -83,3 +83,9 @@ running_for_ms: 10259970
 1026 http fetch GET 200 https://registry.npmjs.org/@swagger-api/apidom-ns-asyncapi-3/-/apidom-ns-asyncapi-3-1.11.1.tgz 1223701ms (cache miss)
 1027 http fetch GET 200 https://registry.npmjs.org/@swagger-api/apidom-ns-asyncapi-2/-/apidom-ns-asyncapi-2-1.11.1.tgz 1241167ms (cache miss)
 1028 http fetch GET 200 https://registry.npmjs.org/three-stdlib/-/three-stdlib-2.36.1.tgz 1264438ms (cache miss)
+
+---
+exit_code: -1
+elapsed_ms: 86400011
+ended_at: 2026-07-06T21:46:00.410Z
+---

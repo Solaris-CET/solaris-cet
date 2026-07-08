@@ -1,7 +1,7 @@
 import { and, eq, isNull, or, sql } from 'drizzle-orm';
 
-import type { Database } from '../../db/client';
-import { schema } from '../../db/client';
+import type { Database } from '@/db/client';
+import { schema } from '@/db/client';
 
 function isUniqueViolation(err: unknown): boolean {
   return (

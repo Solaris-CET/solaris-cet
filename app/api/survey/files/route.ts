@@ -1,15 +1,17 @@
-import { getAllowedOrigin } from '../../lib/cors';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyFilesEngineUrl,
+  buildSurveyFilesUnreachablePayload,
+  resolveSurveyFilesEngineUrl,
+  safeSurveyFilePath,
+  SURVEY_FILES_PROBE,
+  surveyFileMediaType,
+  surveyFilesHttpStatus,
+} from '../../lib/surveyFiles';
+
+export { SURVEY_FILES_PATH, SURVEY_FILES_PROBE } from '@/api/lib/surveyFiles';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
-
-function safeFilePath(raw: string): string | null {
-  const name = raw.trim().replace(/\\/g, '/');
-  if (!name || name.includes('..') || name.startsWith('/')) return null;
-  if (!/^[A-Za-z0-9._/-]+$/.test(name)) return null;
-  return name;
-}
 
 export default async function handler(req: Request): Promise<Response> {
   const allowed = getAllowedOrigin(req.headers.get('origin'));
@@ -19,7 +21,7 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': SURVEY_FILES_PROBE.methods.join(', '),
         'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       },
@@ -34,41 +36,41 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const url = new URL(req.url);
-  const file = safeFilePath(url.searchParams.get('file') || '');
+  const file = safeSurveyFilePath(url.searchParams.get(SURVEY_FILES_PROBE.fileParam));
   if (!file) {
-    return new Response(JSON.stringify({ error: 'Invalid file parameter' }), {
+    return new Response(JSON.stringify({ error: SURVEY_FILES_PROBE.invalidFileError }), {
       status: 400,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowed, Vary: 'Origin' },
     });
   }
 
+  const engineUrl = resolveSurveyFilesEngineUrl();
+
   try {
-    const enginePath = file.split('/').map((seg) => encodeURIComponent(seg)).join('/');
-    const res = await fetch(`${ENGINE.replace(/\/$/, '')}/files/${enginePath}`, {
-      signal: AbortSignal.timeout(30_000),
+    const res = await fetch(buildSurveyFilesEngineUrl(engineUrl, file), {
+      signal: AbortSignal.timeout(SURVEY_FILES_PROBE.fetchTimeoutMs),
     });
     if (!res.ok) {
-      return new Response(JSON.stringify({ error: 'File not found' }), {
-        status: res.status === 404 ? 404 : 502,
+      return new Response(JSON.stringify({ error: SURVEY_FILES_PROBE.notFoundError }), {
+        status: surveyFilesHttpStatus(res.status),
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowed, Vary: 'Origin' },
       });
     }
 
     const buf = await res.arrayBuffer();
-    const media = file.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'application/json';
     return new Response(buf, {
       status: 200,
       headers: {
-        'Content-Type': media,
+        'Content-Type': surveyFileMediaType(file),
         'Content-Disposition': `attachment; filename="${file}"`,
         'Access-Control-Allow-Origin': allowed,
         Vary: 'Origin',
-        'Cache-Control': 'private, max-age=3600',
+        'Cache-Control': SURVEY_FILES_PROBE.cacheControl,
       },
     });
   } catch {
-    return new Response(JSON.stringify({ error: 'survey-engine unreachable', engine_url: ENGINE }), {
-      status: 503,
+    return new Response(JSON.stringify(buildSurveyFilesUnreachablePayload(engineUrl)), {
+      status: SURVEY_FILES_PROBE.unreachableStatus,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowed, Vary: 'Origin' },
     });
   }

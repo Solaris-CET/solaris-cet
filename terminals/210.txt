@@ -1,0 +1,21 @@
+---
+pid: 18212
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/solarisMetricsRoute.test.ts src/__tests__/newsletterSubscribeRoute.test.ts src/__tests__/newsletterConfirmRoute.test.ts src/__tests__/newsletterUnsubscribeRoute.test.ts src/__tests__/newsletterVerifyRoute.test.ts"
+started_at: 2026-07-07T15:35:04.871Z
+running_for_ms: 6959971  
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ✓ src/__tests__/newsletterVerifyRoute.test.ts (8 tests) 66ms
+ ✓ src/__tests__/newsletterConfirmRoute.test.ts (7 tests) 75ms
+ ✓ src/__tests__/newsletterSubscribeRoute.test.ts (6 tests) 64ms
+ ✓ src/__tests__/newsletterUnsubscribeRoute.test.ts (7 tests) 69ms
+ ✓ src/__tests__/solarisMetricsRoute.test.ts (8 tests) 78ms
+
+ Test Files  5 passed (5)
+      Tests  36 passed (36)
+   Start at  18:35:11
+   Duration  10.11s (transform 507ms, setup 3.98s, import 2.26s, tests 352ms, environment 2ms)
+

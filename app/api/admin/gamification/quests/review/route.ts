@@ -1,12 +1,21 @@
 import { and, eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../../../db/client';
-import { writeAdminAudit } from '../../../../lib/adminAudit';
-import { requireAdminAuth, requireAdminRole } from '../../../../lib/adminAuth';
-import { getAllowedOrigin } from '../../../../lib/cors';
-import { corsJson, corsOptions, readJson } from '../../../../lib/http';
-import { awardPoints } from '../../../../lib/points';
-import { withRateLimit } from '../../../../lib/rateLimit';
+import { getDb, schema } from '@/db/client';
+import { writeAdminAudit } from '@/api/lib/adminAudit';
+import { guardAdminRoute } from '@/api/lib/adminAuth';
+import {
+  ADMIN_GAMIFICATION_QUEST_REVIEW_PROBE,
+  parseQuestReviewBody,
+} from '../../../../lib/adminGamificationQuestReview';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { corsJson, corsOptions, readJson } from '@/api/lib/http';
+import { awardPoints } from '@/api/lib/points';
+import { withRateLimit } from '@/api/lib/rateLimit';
+
+export {
+  ADMIN_GAMIFICATION_QUEST_REVIEW_PATH,
+  ADMIN_GAMIFICATION_QUEST_REVIEW_PROBE,
+} from '../../../../lib/adminGamificationQuestReview';
 
 export const config = { runtime: 'nodejs' };
 
@@ -17,20 +26,21 @@ export default async function handler(req: Request): Promise<Response> {
   const allowedOrigin = getAllowedOrigin(origin);
   if (origin && allowedOrigin !== origin) return corsJson(req, 403, { error: 'Forbidden' });
 
-  const limited = await withRateLimit(req, allowedOrigin, { keyPrefix: 'admin-quest-review', limit: 60, windowSeconds: 60 });
+  const limited = await withRateLimit(req, allowedOrigin, {
+    keyPrefix: ADMIN_GAMIFICATION_QUEST_REVIEW_PROBE.rateLimitKey,
+    limit: 60,
+    windowSeconds: 60,
+  });
   if (limited) return limited;
 
-  const ctx = await requireAdminAuth(req);
+  const ctx = await guardAdminRoute(req, { minRole: ADMIN_GAMIFICATION_QUEST_REVIEW_PROBE.minRole });
   if ('error' in ctx) return corsJson(req, ctx.status, { error: ctx.error });
-  const okRole = requireAdminRole(ctx, 'editor');
-  if (!okRole.ok) return corsJson(req, okRole.status, { error: okRole.error });
 
   if (req.method !== 'POST') return corsJson(req, 405, { error: 'Method not allowed' });
 
-  const body = await readJson(req).catch(() => null);
-  const progressId = typeof (body as { progressId?: unknown })?.progressId === 'string' ? (body as { progressId: string }).progressId.trim() : '';
-  const decision = typeof (body as { decision?: unknown })?.decision === 'string' ? (body as { decision: string }).decision.trim() : '';
-  if (!progressId || (decision !== 'approve' && decision !== 'reject')) return corsJson(req, 400, { error: 'Invalid request' });
+  const parsed = parseQuestReviewBody(await readJson(req).catch(() => null));
+  if (!parsed.ok) return corsJson(req, 400, { error: parsed.error });
+  const { progressId, decision } = parsed;
 
   const db = getDb();
   const [row] = await db
@@ -45,7 +55,7 @@ export default async function handler(req: Request): Promise<Response> {
     .where(eq(schema.userQuestProgress.id, progressId))
     .limit(1);
   if (!row) return corsJson(req, 404, { error: 'Not found' });
-  if (row.status !== 'pending_review') return corsJson(req, 409, { error: 'Not pending' });
+  if (row.status !== ADMIN_GAMIFICATION_QUEST_REVIEW_PROBE.pendingStatus) return corsJson(req, 409, { error: 'Not pending' });
 
   const [quest] = await db
     .select({ slug: schema.quests.slug, pointsReward: schema.quests.pointsReward, requiresProof: schema.quests.requiresProof })
@@ -60,7 +70,7 @@ export default async function handler(req: Request): Promise<Response> {
       .update(schema.userQuestProgress)
       .set({ status: 'rejected', updatedAt: new Date() })
       .where(eq(schema.userQuestProgress.id, row.id));
-    await writeAdminAudit(req, ctx, 'QUEST_REVIEWED', 'user_quest_progress', row.id, {
+    await writeAdminAudit(req, ctx, ADMIN_GAMIFICATION_QUEST_REVIEW_PROBE.auditAction, 'user_quest_progress', row.id, {
       decision: 'reject',
       questId: row.questId,
       userId: row.userId,
@@ -84,7 +94,7 @@ export default async function handler(req: Request): Promise<Response> {
     return { awarded };
   });
 
-  await writeAdminAudit(req, ctx, 'QUEST_REVIEWED', 'user_quest_progress', row.id, {
+  await writeAdminAudit(req, ctx, ADMIN_GAMIFICATION_QUEST_REVIEW_PROBE.auditAction, 'user_quest_progress', row.id, {
     decision: 'approve',
     questId: row.questId,
     userId: row.userId,

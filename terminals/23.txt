@@ -3,7 +3,7 @@ pid: 16388
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "npm view @rolldown/binding-linux-x64-gnu@1.0.0-rc.18 dist.integrity dist.tarball; npm view @rolldown/binding-linux-x64-musl@1.0.0-rc.18 dist.integrity dist.tarball; npm view fsevents@2.3.2 dist.integrity dist.tarball 2>&1"
 started_at: 2026-07-05T21:25:36.511Z
-running_for_ms: 11480014 
+running_for_ms: 86400014 
 ---
 dist.integrity = 'sha512-uCo8ElcCIAMyYAZyuIZ81oFkhTSIllNvUCHCAlbhlN4ji3uC28h7IIdlXyIvGO7HsuqnV9p3rD/bpH7XhIyhRw=='
 dist.tarball = 'https://registry.npmjs.org/@rolldown/binding-linux-x64-gnu/-/binding-linux-x64-gnu-1.0.0-rc.18.tgz'
@@ -11,3 +11,9 @@ dist.integrity = 'sha512-XNOQZtuE6yUIvx4rwGemwh8kpL1xvU41FXy/s9K7T/3JVcqGzo3NfKM
 dist.tarball = 'https://registry.npmjs.org/@rolldown/binding-linux-x64-musl/-/binding-linux-x64-musl-1.0.0-rc.18.tgz'
 dist.integrity = 'sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA=='
 dist.tarball = 'https://registry.npmjs.org/fsevents/-/fsevents-2.3.2.tgz'
+
+---
+exit_code: -1
+elapsed_ms: 86400014
+ended_at: 2026-07-06T21:25:43.843Z
+---

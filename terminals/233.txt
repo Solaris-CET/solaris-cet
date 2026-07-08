@@ -1,0 +1,23 @@
+---
+pid: 15840
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:/Users/CCons/Desktop/SOLARIS CET/app\"; npx vitest run src/__tests__/adminCacheClearRoute.test.ts src/__tests__/adminUsersRoute.test.ts src/__tests__/adminSurveysRoute.test.ts 2>&1 | Select-Object -Last 20"
+started_at: 2026-07-08T17:50:20.755Z
+running_for_ms: 1384992  
+---
+
+- 405
++ 401
+ ❯ src/__tests__/adminUsersRoute.test.ts:213:24
+    211|   it('POST returns 405', async () => {
+    212|     const res = await adminUsersRoute(adminRequest(ADMIN_USERS_PATH, {…
+    213|     expect(res.status).toBe(405);
+       |                        ^
+    214|   });
+    215| });
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+ Test Files  2 failed | 1 passed (3)
+      Tests  6 failed | 26 passed (32)
+   Start at  20:50:29
+   Duration  10.31s (transform 929ms, setup 3.08s, import 3.98s, tests 322ms, environment 1ms)
+

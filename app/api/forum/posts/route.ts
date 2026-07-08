@@ -1,39 +1,40 @@
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAuth } from '../../lib/auth';
-import { jsonResponse, optionsResponse } from '../../lib/http';
-import { ensureAllowedOrigin } from '../../lib/originGuard';
-import { awardPoints } from '../../lib/points';
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import {
+  FORUM_POSTS_PROBE,
+  isValidForumPostCreate,
+  parseForumPostCreateBody,
+  parseForumPostsLimit,
+  parseForumPostsSort,
+} from '../../lib/forumPosts';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
+import { ensureAllowedOrigin } from '@/api/lib/originGuard';
+import { awardPoints } from '@/api/lib/points';
+
+export { FORUM_POSTS_PATH, FORUM_POSTS_PROBE } from '@/api/lib/forumPosts';
 
 export const config = { runtime: 'nodejs' };
 
-function parseLimit(req: Request, fallback: number): number {
-  const url = new URL(req.url);
-  const raw = url.searchParams.get('limit');
-  const n = raw ? Number(raw) : NaN;
-  if (!Number.isFinite(n)) return fallback;
-  return Math.max(1, Math.min(50, Math.floor(n)));
-}
-
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') {
-    return optionsResponse(req, 'GET, POST, OPTIONS', 'Content-Type, Authorization');
+    return optionsResponse(req, FORUM_POSTS_PROBE.methods.join(', '), 'Content-Type, Authorization');
   }
 
   const db = getDb();
 
   if (req.method === 'GET') {
     const url = new URL(req.url);
-    const sort = (url.searchParams.get('sort') ?? 'activity').trim();
-    const limit = parseLimit(req, 20);
+    const sort = parseForumPostsSort(url.searchParams);
+    const limit = parseForumPostsLimit(url.searchParams);
 
     const ctx = await requireAuth(req);
     const isAuthed = !('error' in ctx);
     const viewerId = isAuthed ? ctx.user.id : null;
 
     const orderBy =
-      sort === 'new' ? desc(schema.forumPosts.createdAt) : desc(schema.forumPosts.lastActivityAt);
+      sort === FORUM_POSTS_PROBE.newSort ? desc(schema.forumPosts.createdAt) : desc(schema.forumPosts.lastActivityAt);
 
     const rows = await db
       .select({
@@ -62,7 +63,7 @@ export default async function handler(req: Request): Promise<Response> {
               score: sql<number>`coalesce(sum(${schema.forumVotes.value}), 0)`.as('score'),
             })
             .from(schema.forumVotes)
-            .where(and(eq(schema.forumVotes.targetType, 'post'), inArray(schema.forumVotes.targetId, ids)))
+            .where(and(eq(schema.forumVotes.targetType, FORUM_POSTS_PROBE.voteTargetType), inArray(schema.forumVotes.targetId, ids)))
             .groupBy(schema.forumVotes.targetId)
         : [];
     const commentCounts =
@@ -87,7 +88,7 @@ export default async function handler(req: Request): Promise<Response> {
             .where(
               and(
                 eq(schema.forumVotes.userId, viewerId),
-                eq(schema.forumVotes.targetType, 'post'),
+                eq(schema.forumVotes.targetType, FORUM_POSTS_PROBE.voteTargetType),
                 inArray(schema.forumVotes.targetId, ids),
               ),
             )
@@ -124,27 +125,24 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     body = await req.json();
   } catch {
-    return jsonResponse(req, { error: 'Invalid JSON body' }, 400);
+    return jsonResponse(req, { error: FORUM_POSTS_PROBE.invalidJsonError }, 400);
   }
 
-  const title =
-    typeof body === 'object' && body !== null && 'title' in body && typeof (body as { title?: unknown }).title === 'string'
-      ? (body as { title: string }).title.trim()
-      : '';
-  const text =
-    typeof body === 'object' && body !== null && 'body' in body && typeof (body as { body?: unknown }).body === 'string'
-      ? (body as { body: string }).body.trim()
-      : '';
-
-  if (title.length < 3 || title.length > 120) return jsonResponse(req, { error: 'Invalid title' }, 400);
-  if (!text || text.length > 4000) return jsonResponse(req, { error: 'Invalid body' }, 400);
+  const parsed = parseForumPostCreateBody(body);
+  if (!isValidForumPostCreate(parsed)) {
+    const error =
+      parsed.title.length < FORUM_POSTS_PROBE.minTitleLength || parsed.title.length > FORUM_POSTS_PROBE.maxTitleLength
+        ? FORUM_POSTS_PROBE.invalidTitleError
+        : FORUM_POSTS_PROBE.invalidBodyError;
+    return jsonResponse(req, { error }, 400);
+  }
 
   const [post] = await db
     .insert(schema.forumPosts)
     .values({
       authorUserId: ctx.user.id,
-      title,
-      body: text,
+      title: parsed.title,
+      body: parsed.body,
       status: 'visible',
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -152,7 +150,6 @@ export default async function handler(req: Request): Promise<Response> {
     })
     .returning();
 
-  await awardPoints(db, ctx.user.id, 5, 'forum_post', { dedupeKey: `forum_post:${post.id}` });
+  await awardPoints(db, ctx.user.id, FORUM_POSTS_PROBE.createPoints, 'forum_post', { dedupeKey: `forum_post:${post.id}` });
   return jsonResponse(req, { ok: true, postId: post.id });
 }
-

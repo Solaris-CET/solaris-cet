@@ -1,0 +1,30 @@
+---
+pid: 2676
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\" ; npm install @rollup/rollup-win32-x64-msvc@4.60.4 --no-save"
+started_at: 2026-07-06T18:05:27.345Z
+running_for_ms: 84349993 
+---
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: 'mute-stream@4.0.0',
+npm warn EBADENGINE   required: { node: '^22.22.2 || ^24.15.0 || >=26.0.0' },
+npm warn EBADENGINE   current: { node: 'v24.13.0', npm: '11.6.2' }
+npm warn EBADENGINE }
+
+added 1 package, changed 1 package, and audited 2150 packages in 35s
+
+345 packages are looking for funding
+  run `npm fund` for details
+
+41 vulnerabilities (1 low, 33 moderate, 6 high, 1 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues possible (including breaking changes), run:
+  npm audit fix --force
+
+Some issues need review, and may require choosing
+a different dependency.
+
+Run `npm audit` for details.

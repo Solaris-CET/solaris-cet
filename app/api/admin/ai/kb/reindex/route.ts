@@ -2,15 +2,21 @@ import path from 'node:path';
 
 import { and, desc, eq, isNull, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../../../db/client';
-import { writeAdminAudit } from '../../../../lib/adminAudit';
-import { requireAdminAuth, requireAdminRole } from '../../../../lib/adminAuth';
-import { getAllowedOrigin } from '../../../../lib/cors';
-import { configuredEmbeddingProvider, type EmbeddingProvider } from '../../../../lib/embeddings';
-import { corsJson, corsOptions, readJson } from '../../../../lib/http';
-import { buildKbChunks, collectKbSourceFiles } from '../../../../lib/kbIndex';
-import { withRateLimit } from '../../../../lib/rateLimit';
-import { redisSetJson } from '../../../../lib/upstashRedis';
+import { getDb, schema } from '@/db/client';
+import {
+  parseReindexProviderBody,
+  safeKbText,
+} from '../../../../lib/adminAiKbReindex';
+import { writeAdminAudit } from '@/api/lib/adminAudit';
+import { guardAdminRoute } from '@/api/lib/adminAuth';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { configuredEmbeddingProvider } from '@/api/lib/embeddings';
+import { corsJson, corsOptions, readJson } from '@/api/lib/http';
+import { buildKbChunks, collectKbSourceFiles } from '@/api/lib/kbIndex';
+import { withRateLimit } from '@/api/lib/rateLimit';
+import { redisSetJson } from '@/api/lib/upstashRedis';
+
+export { ADMIN_AI_KB_REINDEX_PATH, ADMIN_AI_KB_REINDEX_PROBE } from '@/api/lib/adminAiKbReindex';
 
 export const config = { runtime: 'nodejs' };
 
@@ -20,16 +26,6 @@ function repoRootDir(): string {
   const cwd = process.cwd();
   if (path.basename(cwd) === 'app') return path.resolve(cwd, '..');
   return cwd;
-}
-
-function normalizeProvider(raw: unknown): EmbeddingProvider | null {
-  if (raw === 'hash' || raw === 'openai') return raw;
-  return null;
-}
-
-function safeTrim(s: string, max: number): string {
-  const t = s.trim();
-  return t.length <= max ? t : t.slice(0, max);
 }
 
 export default async function handler(req: Request): Promise<Response> {
@@ -46,10 +42,8 @@ export default async function handler(req: Request): Promise<Response> {
   });
   if (limited) return limited;
 
-  const ctx = await requireAdminAuth(req);
+  const ctx = await guardAdminRoute(req, { minRole: 'admin' });
   if ('error' in ctx) return corsJson(req, ctx.status, { error: ctx.error });
-  const ok = requireAdminRole(ctx, 'admin');
-  if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
 
   const db = getDb();
 
@@ -70,8 +64,7 @@ export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') return corsJson(req, 405, { error: 'Method not allowed' });
 
   const body = await readJson(req).catch(() => null);
-  const providerBody =
-    typeof body === 'object' && body !== null && 'provider' in body ? normalizeProvider((body as { provider?: unknown }).provider) : null;
+  const providerBody = parseReindexProviderBody(body);
   const provider = providerBody ?? configuredEmbeddingProvider();
 
   const rootDir = repoRootDir();
@@ -94,7 +87,7 @@ export default async function handler(req: Request): Promise<Response> {
       batch.map((c) => ({
         userId: null,
         kind: 'kb',
-        text: safeTrim(c.text, 6000),
+        text: safeKbText(c.text, 6000),
         embedding: c.embedding.vector as unknown as object,
         meta: {
           idHash: c.idHash,
@@ -120,4 +113,3 @@ export default async function handler(req: Request): Promise<Response> {
 
   return corsJson(req, 200, { ok: true, provider, sources: picked.length, chunks: pickedChunks.length, version });
 }
-

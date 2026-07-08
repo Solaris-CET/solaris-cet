@@ -24,23 +24,30 @@ vi.mock('../../api/lib/twinWebhook', () => ({
 const fetchMock = vi.fn();
 vi.stubGlobal('fetch', fetchMock);
 
+import openApiSurveyRoute from '../../api/openapi/survey/route';
 import surveyBatchRoute from '../../api/survey/batch/route';
 import surveyContextRoute from '../../api/survey/context/route';
 import surveyCorrectionsRoute from '../../api/survey/corrections/route';
+import surveyDashboardRoute from '../../api/survey/dashboard/route';
 import surveyDemoRoute from '../../api/survey/demo/route';
 import surveyHealthRoute from '../../api/survey/health/route';
 import surveyCrmRoute from '../../api/survey/crm/route';
 import surveyJurisdictionsRoute from '../../api/survey/jurisdictions/route';
+import surveyOfflineManifestRoute from '../../api/survey/offline-manifest/route';
 import surveyOrchestrateRoute from '../../api/survey/orchestrate/route';
+import surveyTwinEventsRoute from '../../api/survey/twin-events/route';
 import surveyTwinFeedRoute from '../../api/survey/twin-feed/route';
 import surveyPermitPackRoute from '../../api/survey/permit-pack/route';
 import surveyStatsRoute from '../../api/survey/stats/route';
 import surveyGenerateRoute from '../../api/survey/generate/route';
+import { SURVEY_OPENAPI_TITLE } from '../../api/lib/surveyOpenApi';
 import { dispatchSurveyWebhook } from '../../api/lib/surveyWebhook';
-
-function jsonBody(res: Response): Promise<unknown> {
-  return res.text().then((t) => (t ? (JSON.parse(t) as unknown) : null));
-}
+import {
+  expectJsonStatus,
+  hasCorsAllowOrigin,
+  jsonBody,
+  surveyRequest,
+} from './surveyRoutesTestUtils';
 
 describe('survey API routes', () => {
   const originalEnv = { ...process.env };
@@ -62,17 +69,31 @@ describe('survey API routes', () => {
     fetchMock.mockResolvedValueOnce(
       new Response(JSON.stringify({ ok: true, service: 'survey-engine' }), { status: 200 }),
     );
-    const req = new Request('http://test/api/survey/health', { method: 'GET', headers: { origin: 'https://x.test' } });
-    const res = await surveyHealthRoute(req);
-    expect(res.status).toBe(200);
-    const body = (await jsonBody(res)) as { engine: { ok: boolean } };
+    const res = await surveyHealthRoute(surveyRequest('/api/survey/health', { method: 'GET' }));
+    const body = (await expectJsonStatus(res, 200)) as { engine: { ok: boolean }; platform: string };
     expect(body.engine.ok).toBe(true);
+    expect(body.platform).toBe('solaris-cet');
+  });
+
+  it('/api/survey/health: GET returns 503 when engine is unreachable', async () => {
+    fetchMock.mockRejectedValueOnce(new Error('ECONNREFUSED'));
+    const res = await surveyHealthRoute(surveyRequest('/api/survey/health', { method: 'GET' }));
+    const body = (await expectJsonStatus(res, 503)) as { engine: { ok: boolean; error: string } };
+    expect(body.engine.ok).toBe(false);
+    expect(body.engine.error).toContain('unreachable');
+  });
+
+  it('/api/survey/health: OPTIONS returns CORS preflight', async () => {
+    const res = await surveyHealthRoute(surveyRequest('/api/survey/health', { method: 'OPTIONS' }));
+    expect(res.status).toBe(204);
+    expect(hasCorsAllowOrigin(res)).toBe(true);
+    expect(res.headers.get('Access-Control-Allow-Methods')).toContain('GET');
   });
 
   it('/api/survey/crm: POST validates required fields', async () => {
-    const req = new Request('http://test/api/survey/crm', {
+    const req = surveyRequest('/api/survey/crm', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', origin: 'https://x.test' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ report_id: 'R1' }),
     });
     const res = await surveyCrmRoute(req);
@@ -210,6 +231,75 @@ describe('survey API routes', () => {
     expect(body.orchestration.report_id).toBe('SOL-ORCH-1');
   });
 
+  it('/api/survey/context: GET requires report_id', async () => {
+    const res = await surveyContextRoute(surveyRequest('/api/survey/context', { method: 'GET' }));
+    const body = (await expectJsonStatus(res, 400)) as { error: string };
+    expect(body.error).toContain('report_id');
+  });
+
+  it('/api/survey/orchestrate: GET requires report_id', async () => {
+    const res = await surveyOrchestrateRoute(surveyRequest('/api/survey/orchestrate', { method: 'GET' }));
+    const body = (await expectJsonStatus(res, 400)) as { error: string };
+    expect(body.error).toContain('report_id');
+  });
+
+  it('/api/survey/dashboard: GET proxies dashboard stats', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          stats: { total_reports: 5, avg_score: 81, total_capacity_kwp: 22 },
+          recent_reports: [],
+          total_api_cost_usd: 1.2,
+        }),
+        { status: 200 },
+      ),
+    );
+    const res = await surveyDashboardRoute(surveyRequest('/api/survey/dashboard', { method: 'GET' }));
+    const body = (await expectJsonStatus(res, 200)) as { stats: { total_reports: number } };
+    expect(body.stats.total_reports).toBe(5);
+  });
+
+  it('/api/survey/offline-manifest: GET returns PWA manifest', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          schema: 'solaris-survey-offline-v1',
+          draft_autosave_ms: 900,
+          max_queue_items: 15,
+        }),
+        { status: 200 },
+      ),
+    );
+    const res = await surveyOfflineManifestRoute(surveyRequest('/api/survey/offline-manifest', { method: 'GET' }));
+    const body = (await expectJsonStatus(res, 200)) as {
+      platform: string;
+      manifest: { queue_supported: boolean; draft_autosave_ms: number };
+    };
+    expect(body.platform).toBe('solaris-cet');
+    expect(body.manifest.queue_supported).toBe(true);
+    expect(body.manifest.draft_autosave_ms).toBe(900);
+  });
+
+  it('/api/survey/twin-events: GET proxies event log', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ events: [{ id: 'e1', type: 'snapshot' }], total: 1 }), { status: 200 }),
+    );
+    const res = await surveyTwinEventsRoute(
+      surveyRequest('/api/survey/twin-events?report_id=SOL-EV-1&limit=5', { method: 'GET' }),
+    );
+    const body = (await expectJsonStatus(res, 200)) as { platform: string; events: unknown[] };
+    expect(body.platform).toBe('solaris-cet');
+    expect(body.events).toHaveLength(1);
+  });
+
+  it('/api/openapi/survey: GET returns OpenAPI contract', async () => {
+    const res = await openApiSurveyRoute(surveyRequest('/api/openapi/survey', { method: 'GET' }));
+    const body = (await expectJsonStatus(res, 200)) as { info: { title: string }; paths: Record<string, unknown> };
+    expect(body.info.title).toBe(SURVEY_OPENAPI_TITLE);
+    expect(body.paths['/api/survey/health']).toBeTruthy();
+    expect(hasCorsAllowOrigin(res)).toBe(true);
+  });
+
   it('/api/survey/context: GET proxies unified context', async () => {
     fetchMock.mockResolvedValueOnce(
       new Response(
@@ -316,7 +406,7 @@ describe('survey API routes', () => {
     fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
     const req = new Request('http://test/api/survey/crm', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', origin: 'https://x.test', host: 'test' },
+      headers: { 'Content-Type': 'application/json', host: 'test' },
       body: JSON.stringify({
         report_id: 'SOL-TEST-001',
         pdf_filename: 'RAPORT_SOL-TEST-001.pdf',

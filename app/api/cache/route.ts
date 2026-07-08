@@ -1,4 +1,7 @@
-import { getAllowedOrigin } from '../lib/cors';
+import { CACHE_PROBE } from '@/api/lib/cache';
+import { getAllowedOrigin } from '@/api/lib/cors';
+
+export { CACHE_PATH, CACHE_PROBE } from '@/api/lib/cache';
 
 export const config = { runtime: 'edge' };
 
@@ -10,7 +13,7 @@ function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Respo
     headers: {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': allowedOrigin,
-      'Vary': 'Origin',
+      Vary: 'Origin',
       'Cache-Control': 'no-store',
     },
   });
@@ -25,7 +28,7 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowedOrigin,
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': CACHE_PROBE.methods.join(', '),
         'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       },
@@ -38,7 +41,7 @@ export default async function handler(req: Request): Promise<Response> {
 
   const upstashUrl = (process.env.UPSTASH_REDIS_REST_URL ?? '').trim();
   const upstashToken = (process.env.UPSTASH_REDIS_REST_TOKEN ?? '').trim();
-  const key = 'cet-state-json';
+  const key = CACHE_PROBE.upstashKey;
 
   if (upstashUrl && upstashToken) {
     try {
@@ -58,18 +61,18 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   try {
-    const res = await fetch('/api/state.json', { headers: { 'Cache-Control': 'no-store' } });
+    const res = await fetch(CACHE_PROBE.fallbackStatePath, { headers: { 'Cache-Control': 'no-store' } });
     const json = await res.json();
 
     if (upstashUrl && upstashToken) {
       const setUrl = `${upstashUrl}/set/${encodeURIComponent(key)}/${encodeURIComponent(JSON.stringify(json))}`;
-      void fetch(`${setUrl}?ex=60`, {
+      void fetch(`${setUrl}?ex=${CACHE_PROBE.upstashTtlSeconds}`, {
         headers: { Authorization: `Bearer ${upstashToken}`, 'Cache-Control': 'no-store' },
       }).catch(() => {});
     }
 
     return jsonResponse(json, allowedOrigin, 200);
   } catch {
-    return jsonResponse({ error: 'unavailable' }, allowedOrigin, 200);
+    return jsonResponse({ error: CACHE_PROBE.unavailableError }, allowedOrigin, 200);
   }
 }

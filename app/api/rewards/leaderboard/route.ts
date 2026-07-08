@@ -1,13 +1,21 @@
 import { and, desc, gte, inArray, isNotNull, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { corsJson, corsOptions } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { corsJson, corsOptions } from '@/api/lib/http';
+import {
+  buildRewardsLeaderboardPayload,
+  mapAiLeaderboardRows,
+  REWARDS_LEADERBOARD_PROBE,
+  rewardsLeaderboardSince,
+} from '../../lib/rewardsLeaderboard';
+
+export { REWARDS_LEADERBOARD_PATH, REWARDS_LEADERBOARD_PROBE } from '@/api/lib/rewardsLeaderboard';
 
 export const config = { runtime: 'nodejs' };
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') {
-    return corsOptions(req, 'GET, OPTIONS');
+    return corsOptions(req, REWARDS_LEADERBOARD_PROBE.methods.join(', '));
   }
   if (req.method !== 'GET') {
     return corsJson(req, 405, { error: 'Method not allowed' });
@@ -22,9 +30,9 @@ export default async function handler(req: Request): Promise<Response> {
     })
     .from(schema.users)
     .orderBy(desc(schema.users.points))
-    .limit(20);
+    .limit(REWARDS_LEADERBOARD_PROBE.pointsLimit);
 
-  const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const since = rewardsLeaderboardSince();
   const topAi = await db
     .select({
       userId: schema.aiQueryLogs.userId,
@@ -34,7 +42,7 @@ export default async function handler(req: Request): Promise<Response> {
     .where(and(isNotNull(schema.aiQueryLogs.userId), gte(schema.aiQueryLogs.createdAt, since)))
     .groupBy(schema.aiQueryLogs.userId)
     .orderBy(desc(sql`count(*)`))
-    .limit(20);
+    .limit(REWARDS_LEADERBOARD_PROBE.aiLimit);
 
   const aiUserIds = topAi.map((r) => r.userId).filter((v): v is string => typeof v === 'string');
   const aiUsers = aiUserIds.length
@@ -45,13 +53,12 @@ export default async function handler(req: Request): Promise<Response> {
     : [];
   const aiWalletById = new Map(aiUsers.map((u) => [u.id, u.walletAddress]));
 
-  return corsJson(req, 200, {
-    points: topPoints,
-    ai: topAi.map((r) => ({
-      userId: r.userId,
-      walletAddress: typeof r.userId === 'string' ? aiWalletById.get(r.userId) ?? null : null,
-      aiQueries: r.aiQueries,
-    })),
-    windowDays: 7,
-  });
+  return corsJson(
+    req,
+    200,
+    buildRewardsLeaderboardPayload({
+      points: topPoints,
+      ai: mapAiLeaderboardRows(topAi, aiWalletById),
+    }),
+  );
 }

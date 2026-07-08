@@ -1,6 +1,6 @@
-import { getAllowedOrigin } from '../../lib/cors';
-import { dispatchSurveyWebhook } from '../../lib/surveyWebhook';
-import { dispatchTwinWebhook } from '../../lib/twinWebhook';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { dispatchSurveyWebhook } from '@/api/lib/surveyWebhook';
+import { dispatchTwinWebhook } from '@/api/lib/twinWebhook';
 
 export const config = { runtime: 'nodejs' };
 

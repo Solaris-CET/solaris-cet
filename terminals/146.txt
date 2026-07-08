@@ -1,0 +1,7 @@
+---
+pid: 3612
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "Start-Sleep -Seconds 30"
+started_at: 2026-07-06T18:54:26.980Z
+running_for_ms: 280006   
+---

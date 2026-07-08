@@ -1,8 +1,15 @@
-import { getAllowedOrigin } from '../../lib/cors';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyDashboardUnreachablePayload,
+  probeSurveyDashboard,
+  resolveSurveyDashboardEngineUrl,
+  SURVEY_DASHBOARD_PROBE,
+  surveyDashboardHttpStatus,
+} from '../../lib/surveyDashboard';
+
+export { SURVEY_DASHBOARD_PATH, SURVEY_DASHBOARD_PROBE } from '@/api/lib/surveyDashboard';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
 
 function json(body: unknown, origin: string, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -11,7 +18,7 @@ function json(body: unknown, origin: string, status = 200) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': origin,
       Vary: 'Origin',
-      'Cache-Control': 'no-store',
+      'Cache-Control': SURVEY_DASHBOARD_PROBE.cacheControl,
     },
   });
 }
@@ -24,7 +31,7 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': SURVEY_DASHBOARD_PROBE.methods.join(', '),
         'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       },
@@ -35,13 +42,11 @@ export default async function handler(req: Request): Promise<Response> {
     return json({ error: 'Method not allowed' }, allowed, 405);
   }
 
-  try {
-    const res = await fetch(`${ENGINE.replace(/\/$/, '')}/dashboard`, {
-      signal: AbortSignal.timeout(8000),
-    });
-    const data = await res.json();
-    return json(data, allowed, res.ok ? 200 : 502);
-  } catch {
-    return json({ error: 'survey-engine unreachable', engine_url: ENGINE }, allowed, 503);
+  const engineUrl = resolveSurveyDashboardEngineUrl();
+  const probe = await probeSurveyDashboard(engineUrl);
+  if (!probe.ok) {
+    return json(buildSurveyDashboardUnreachablePayload(engineUrl), allowed, SURVEY_DASHBOARD_PROBE.unreachableStatus);
   }
+
+  return json(probe.data, allowed, surveyDashboardHttpStatus(probe.engineResponseOk));
 }

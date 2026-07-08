@@ -1,0 +1,21 @@
+---
+pid: 17760
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\" ; npm run lint 2>&1 | Select-Object -Last 8"
+started_at: 2026-07-06T19:00:55.796Z
+running_for_ms: 81025002 
+---
+
+node.exe : npm error Lifecycle script `lint` failed with error:
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm error Lifec...led with error::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+npm error code 1
+npm error path C:\Users\CCons\Desktop\SOLARIS CET\app
+npm error workspace solaris-cet@1.0.0
+npm error location C:\Users\CCons\Desktop\SOLARIS CET\app
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c node ../scripts/run-bin.mjs eslint . --quiet

@@ -1,21 +1,22 @@
 import { desc, eq, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../../db/client';
-import { writeAdminAudit } from '../../../lib/adminAudit';
-import { requireAdminAuth, requireAdminRole } from '../../../lib/adminAuth';
-import { corsJson, corsOptions } from '../../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { parseDeleteConversationId } from '@/api/lib/adminAiConversations';
+import { writeAdminAudit } from '@/api/lib/adminAudit';
+import { guardAdminRoute } from '@/api/lib/adminAuth';
+import { corsJson, corsOptions } from '@/api/lib/http';
+
+export { ADMIN_AI_CONVERSATIONS_PATH, ADMIN_AI_CONVERSATIONS_PROBE } from '@/api/lib/adminAiConversations';
 
 export const config = { runtime: 'nodejs' };
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return corsOptions(req, 'GET, DELETE, OPTIONS');
-  const ctx = await requireAdminAuth(req);
+  const ctx = await guardAdminRoute(req, { minRole: (m) => (m === 'DELETE' ? 'admin' : 'viewer') });
   if ('error' in ctx) return corsJson(req, ctx.status, { error: ctx.error });
 
   const db = getDb();
   if (req.method === 'GET') {
-    const ok = requireAdminRole(ctx, 'viewer');
-    if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
     const rows = await db
       .select({
         id: schema.aiConversations.id,
@@ -48,10 +49,7 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   if (req.method === 'DELETE') {
-    const ok = requireAdminRole(ctx, 'admin');
-    if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
-    const url = new URL(req.url);
-    const id = (url.searchParams.get('id') ?? '').trim();
+    const id = parseDeleteConversationId(new URL(req.url).searchParams);
     if (!id) return corsJson(req, 400, { error: 'Missing id' });
     const [existing] = await db.select().from(schema.aiConversations).where(eq(schema.aiConversations.id, id));
     if (!existing) return corsJson(req, 404, { error: 'Not found' });
@@ -62,4 +60,3 @@ export default async function handler(req: Request): Promise<Response> {
 
   return corsJson(req, 405, { error: 'Method not allowed' });
 }
-

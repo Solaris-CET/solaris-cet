@@ -11,24 +11,22 @@ export default function EvmWalletPanel() {
   const [health, setHealth] = useState<{ ok: boolean; block?: number; error?: string } | null>(null);
 
   useEffect(() => {
-    let alive = true;
-    const controller = new AbortController();
+    let currentController: AbortController | null = null;
     const run = async () => {
+      currentController?.abort();
+      currentController = new AbortController();
       try {
-        const hex = await evmRpc<string>(BSC_TESTNET.rpcUrl, 'eth_blockNumber', [], controller.signal);
+        const hex = await evmRpc<string>(BSC_TESTNET.rpcUrl, 'eth_blockNumber', [], currentController.signal);
         const block = hexToNumber(hex);
-        if (!alive) return;
         setHealth({ ok: true, block });
       } catch (e) {
-        if (!alive) return;
         setHealth({ ok: false, error: e instanceof Error ? e.message : 'unavailable' });
       }
     };
     void run();
     const id = window.setInterval(() => void run(), 20_000);
     return () => {
-      alive = false;
-      controller.abort();
+      currentController?.abort();
       window.clearInterval(id);
     };
   }, []);

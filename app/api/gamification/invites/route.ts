@@ -1,17 +1,20 @@
 import { desc, eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireUser } from '../../lib/authUser';
-import { corsJson, corsOptions } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { requireUser } from '@/api/lib/authUser';
+import { GAMIFICATION_INVITES_PROBE } from '@/api/lib/gamificationInvites';
+import { corsJson, corsOptions } from '@/api/lib/http';
+
+export { GAMIFICATION_INVITES_PATH, GAMIFICATION_INVITES_PROBE } from '@/api/lib/gamificationInvites';
 
 export const config = { runtime: 'nodejs' };
 
 export default async function handler(req: Request): Promise<Response> {
-  if (req.method === 'OPTIONS') return corsOptions(req, 'GET, OPTIONS');
+  if (req.method === 'OPTIONS') return corsOptions(req, GAMIFICATION_INVITES_PROBE.methods.join(', '));
   if (req.method !== 'GET') return corsJson(req, 405, { error: 'Method not allowed' });
 
   const user = await requireUser(req);
-  if (!user) return corsJson(req, 401, { error: 'Unauthorized' });
+  if (!user) return corsJson(req, GAMIFICATION_INVITES_PROBE.unauthenticatedStatus, { error: 'Unauthorized' });
 
   const db = getDb();
   const invites = await db
@@ -26,7 +29,7 @@ export default async function handler(req: Request): Promise<Response> {
     .from(schema.userInvites)
     .where(eq(schema.userInvites.createdByUserId, user.id))
     .orderBy(desc(schema.userInvites.createdAt))
-    .limit(50);
+    .limit(GAMIFICATION_INVITES_PROBE.listLimit);
 
   return corsJson(req, 200, {
     ok: true,
@@ -40,4 +43,3 @@ export default async function handler(req: Request): Promise<Response> {
     })),
   });
 }
-

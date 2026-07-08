@@ -1,15 +1,23 @@
 import { eq } from 'drizzle-orm';
-import { corsJson, optionsResponse, readJson } from '../../lib/http';
-import { ensureAllowedOrigin } from '../../lib/originGuard';
-import { withRateLimit } from '../../lib/rateLimit';
-import { awardPoints } from '../../lib/points';
+
+import { getDb, schema } from '@/db/client';
+import {
+  COMMUNITY_SHARE_AI_PROBE,
+  communityShareAiDedupeKey,
+  parseCommunityShareAiContext,
+} from '../../lib/communityShareAi';
+import { corsJson, optionsResponse, readJson } from '@/api/lib/http';
+import { ensureAllowedOrigin } from '@/api/lib/originGuard';
+import { withRateLimit } from '@/api/lib/rateLimit';
+import { awardPoints } from '@/api/lib/points';
 import { verifyTelegramInitData } from '../../telegram/initData';
-import { getDb, schema } from '../../../db/client';
+
+export { COMMUNITY_SHARE_AI_PATH, COMMUNITY_SHARE_AI_PROBE } from '@/api/lib/communityShareAi';
 
 export const config = { runtime: 'nodejs' };
 
-function env(name: string): string {
-  return String(process.env[name] ?? '').trim();
+function envTelegramBotToken(): string {
+  return String(process.env.TELEGRAM_BOT_TOKEN ?? '').trim();
 }
 
 function todayKeyUtc(now = new Date()): string {
@@ -20,44 +28,38 @@ export default async function handler(req: Request): Promise<Response> {
   const guard = ensureAllowedOrigin(req);
   if (guard instanceof Response) return guard;
 
-  if (req.method === 'OPTIONS') return optionsResponse(req, 'POST, OPTIONS', 'Content-Type, X-Telegram-Init-Data');
+  if (req.method === 'OPTIONS') {
+    return optionsResponse(req, COMMUNITY_SHARE_AI_PROBE.methods.join(', '), `Content-Type, ${COMMUNITY_SHARE_AI_PROBE.telegramInitHeader}`);
+  }
   if (req.method !== 'POST') return corsJson(req, 405, { error: 'Method not allowed' });
 
   const limited = await withRateLimit(req, guard.allowedOrigin, {
-    keyPrefix: 'community-share-ai',
-    limit: 10,
-    windowSeconds: 60,
+    keyPrefix: COMMUNITY_SHARE_AI_PROBE.rateLimitKey,
+    limit: COMMUNITY_SHARE_AI_PROBE.rateLimit,
+    windowSeconds: COMMUNITY_SHARE_AI_PROBE.rateWindowSeconds,
   });
   if (limited) return limited;
 
   const initData = String(req.headers.get('x-telegram-init-data') ?? '').trim();
-  if (!initData) return corsJson(req, 401, { error: 'Missing Telegram initData' });
+  if (!initData) return corsJson(req, 401, { error: COMMUNITY_SHARE_AI_PROBE.missingInitDataError });
 
-  const botToken = env('TELEGRAM_BOT_TOKEN');
-  const verified = verifyTelegramInitData(initData, botToken);
-  if (!verified.ok) return corsJson(req, 401, { error: 'Invalid Telegram initData', code: verified.error });
+  const verified = verifyTelegramInitData(initData, envTelegramBotToken());
+  if (!verified.ok) return corsJson(req, 401, { error: COMMUNITY_SHARE_AI_PROBE.invalidInitDataError, code: verified.error });
 
   const tgId = verified.user?.id;
-  if (!tgId) return corsJson(req, 401, { error: 'Missing Telegram user' });
+  if (!tgId) return corsJson(req, 401, { error: COMMUNITY_SHARE_AI_PROBE.missingTelegramUserError });
 
   const db = getDb();
   const [link] = await db.select().from(schema.telegramLinks).where(eq(schema.telegramLinks.chatId, String(tgId))).limit(1);
-  if (!link) return corsJson(req, 401, { error: 'Telegram not linked', notLinked: true });
+  if (!link) return corsJson(req, 401, { error: COMMUNITY_SHARE_AI_PROBE.notLinkedError, notLinked: true });
 
   const context = await readJson(req)
-    .then((body) => {
-      if (typeof body !== 'object' || body === null) return 'cet-ai';
-      if (!('context' in body)) return 'cet-ai';
-      const v = (body as { context?: unknown }).context;
-      if (typeof v !== 'string') return 'cet-ai';
-      const t = v.trim();
-      return t ? t.slice(0, 80) : 'cet-ai';
-    })
-    .catch(() => 'cet-ai');
+    .then((body) => parseCommunityShareAiContext(body))
+    .catch(() => COMMUNITY_SHARE_AI_PROBE.defaultContext);
 
   const day = todayKeyUtc();
-  const { awarded } = await awardPoints(db, link.userId, 5, 'share', {
-    dedupeKey: `share-ai:${day}`,
+  const { awarded } = await awardPoints(db, link.userId, COMMUNITY_SHARE_AI_PROBE.sharePoints, 'share', {
+    dedupeKey: communityShareAiDedupeKey(day),
     meta: { day, platform: 'telegram', activity: 'ai_share', context },
   });
 

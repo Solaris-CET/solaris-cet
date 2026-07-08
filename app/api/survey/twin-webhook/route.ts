@@ -1,8 +1,21 @@
-import { getAllowedOrigin } from '../../lib/cors';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyTwinWebhookEngineBody,
+  buildSurveyTwinWebhookInboundEngineUrl,
+  buildSurveyTwinWebhookInboundHeaders,
+  buildSurveyTwinWebhookSuccessPayload,
+  parseTwinWebhookInboundBody,
+  readTwinWebhookSecret,
+  resolveSurveyTwinWebhookEngineUrl,
+  SURVEY_TWIN_WEBHOOK_PROBE,
+  surveyTwinWebhookInboundErrorMessage,
+  surveyTwinWebhookInboundHttpStatus,
+  validateTwinWebhookSecret,
+} from '../../lib/surveyTwinWebhookInbound';
+
+export { SURVEY_TWIN_WEBHOOK_PATH, SURVEY_TWIN_WEBHOOK_PROBE } from '@/api/lib/surveyTwinWebhookInbound';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
 
 function json(body: unknown, origin: string, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -11,16 +24,9 @@ function json(body: unknown, origin: string, status = 200) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': origin,
       Vary: 'Origin',
-      'Cache-Control': 'no-store',
+      'Cache-Control': SURVEY_TWIN_WEBHOOK_PROBE.cacheControl,
     },
   });
-}
-
-function twinSecretOk(req: Request): boolean {
-  const expected = String(process.env.TWIN_WEBHOOK_SECRET ?? '').trim();
-  if (!expected) return true;
-  const got = String(req.headers.get('x-twin-webhook-secret') ?? '').trim();
-  return got === expected;
 }
 
 export default async function handler(req: Request): Promise<Response> {
@@ -31,8 +37,8 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, X-Twin-Webhook-Secret',
+        'Access-Control-Allow-Methods': SURVEY_TWIN_WEBHOOK_PROBE.methods.join(', '),
+        'Access-Control-Allow-Headers': SURVEY_TWIN_WEBHOOK_PROBE.allowHeaders,
         Vary: 'Origin',
       },
     });
@@ -42,47 +48,42 @@ export default async function handler(req: Request): Promise<Response> {
     return json({ error: 'Method not allowed' }, allowed, 405);
   }
 
-  if (!twinSecretOk(req)) {
-    return json({ error: 'Invalid twin webhook secret' }, allowed, 401);
+  if (!validateTwinWebhookSecret(req)) {
+    return json({ error: SURVEY_TWIN_WEBHOOK_PROBE.invalidSecretError }, allowed, SURVEY_TWIN_WEBHOOK_PROBE.unauthorizedStatus);
   }
 
-  let body: Record<string, unknown>;
+  let body: unknown;
   try {
-    body = (await req.json()) as Record<string, unknown>;
+    body = await req.json();
   } catch {
-    return json({ error: 'JSON invalid' }, allowed, 400);
+    return json({ error: SURVEY_TWIN_WEBHOOK_PROBE.invalidJsonError }, allowed, 400);
   }
 
-  const reportId = String(body.report_id ?? body.reportId ?? '').trim();
-  if (!reportId) {
-    return json({ error: 'report_id required' }, allowed, 400);
+  const parsed = parseTwinWebhookInboundBody(body);
+  if (!parsed) {
+    return json({ error: SURVEY_TWIN_WEBHOOK_PROBE.missingReportIdError }, allowed, 400);
   }
 
-  const event = String(body.event ?? body.event_type ?? 'crm_sync').trim();
-  const { report_id: _r, reportId: _r2, event: _e, event_type: _e2, ...rest } = body;
+  const engineUrl = resolveSurveyTwinWebhookEngineUrl();
+  const secret = readTwinWebhookSecret();
 
   try {
-    const res = await fetch(`${ENGINE.replace(/\/$/, '')}/twin-webhook/inbound`, {
+    const res = await fetch(buildSurveyTwinWebhookInboundEngineUrl(engineUrl), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(process.env.TWIN_WEBHOOK_SECRET
-          ? { 'X-Twin-Webhook-Secret': process.env.TWIN_WEBHOOK_SECRET }
-          : {}),
-      },
-      body: JSON.stringify({ report_id: reportId, event, payload: rest }),
-      signal: AbortSignal.timeout(12_000),
+      headers: buildSurveyTwinWebhookInboundHeaders(secret),
+      body: JSON.stringify(buildSurveyTwinWebhookEngineBody(parsed)),
+      signal: AbortSignal.timeout(SURVEY_TWIN_WEBHOOK_PROBE.fetchTimeoutMs),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       return json(
-        { error: (data as { detail?: string }).detail || 'Inbound twin webhook failed' },
+        { error: surveyTwinWebhookInboundErrorMessage(data) },
         allowed,
-        res.status === 400 ? 400 : 502,
+        surveyTwinWebhookInboundHttpStatus(res.status),
       );
     }
-    return json({ platform: 'solaris-cet', ...data }, allowed, 200);
+    return json(buildSurveyTwinWebhookSuccessPayload(data as Record<string, unknown>), allowed, 200);
   } catch {
-    return json({ error: 'survey-engine unreachable' }, allowed, 503);
+    return json({ error: SURVEY_TWIN_WEBHOOK_PROBE.unreachableError }, allowed, SURVEY_TWIN_WEBHOOK_PROBE.unreachableStatus);
   }
 }

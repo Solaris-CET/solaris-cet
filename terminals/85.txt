@@ -1,0 +1,20 @@
+---
+pid: 15824
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "$env:SURVEY_ENGINE_URL='http://127.0.0.1:8000'; cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; node server/index.cjs"
+started_at: 2026-07-06T01:40:47.885Z
+running_for_ms: 92657581 
+---
+{"level":30,"time":1783302070648,"pid":16888,"hostname":"Claudiu-Balaban","kind":"http","request_id":"fae0dc6f-9cb7-40ad-a01f-def036e6f146","trace_id":null,"span_id":null,"method":"GET","path":"/api/survey/health","status":200,"duration_ms":287,"msg":"http_request"}
+{"level":30,"time":1783302089529,"pid":16888,"hostname":"Claudiu-Balaban","kind":"http","request_id":"4aa26f17-3045-450a-90be-18c3a66f2600","trace_id":null,"span_id":null,"method":"GET","path":"/api/survey/health","status":200,"duration_ms":2,"msg":"http_request"}
+{"level":30,"time":1783302090002,"pid":16888,"hostname":"Claudiu-Balaban","kind":"http","request_id":"d2a6263c-3b91-4634-8255-31087c6436d7","trace_id":null,"span_id":null,"method":"GET","path":"/api/survey/jurisdictions","status":200,"duration_ms":33,"msg":"http_request"}
+{"level":30,"time":1783302113262,"pid":16888,"hostname":"Claudiu-Balaban","kind":"http","request_id":"76a78b27-485c-4bad-958b-80aadf8682d0","trace_id":null,"span_id":null,"method":"GET","path":"/api/survey/health","status":200,"duration_ms":1,"msg":"http_request"}
+{"level":30,"time":1783302113309,"pid":16888,"hostname":"Claudiu-Balaban","kind":"http","request_id":"d8e2f3b3-6901-4091-92bc-6a702d123d1f","trace_id":null,"span_id":null,"method":"GET","path":"/api/survey/health","status":200,"duration_ms":2,"msg":"http_request"}
+{"level":30,"time":1783303416911,"pid":16888,"hostname":"Claudiu-Balaban","kind":"http","request_id":"d8340195-6857-4777-947b-202e5db3920a","trace_id":null,"span_id":null,"method":"GET","path":"/api/testimonials","status":200,"duration_ms":89,"msg":"http_request"}
+{"level":30,"time":1783303416997,"pid":16888,"hostname":"Claudiu-Balaban","kind":"http","request_id":"a0165afa-134d-49fb-a5d6-470cd7087522","trace_id":null,"span_id":null,"method":"GET","path":"/api/testimonials","status":200,"duration_ms":9,"msg":"http_request"}
+
+---
+exit_code: -1
+elapsed_ms: 92657581
+ended_at: 2026-07-07T03:24:49.293Z
+---

@@ -1,0 +1,46 @@
+---
+pid: 7772
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\" ; $env:PW_WORKERS=\"1\" ; npm run test:e2e -- tests/pwa-offline.spec.ts --grep \"survey shell\""
+started_at: 2026-07-06T18:09:48.961Z
+running_for_ms: 84090005 
+---
+
+> solaris-cet@1.0.0 pretest:e2e
+> node ../scripts/check-dist-for-e2e.mjs && npm run api:build
+
+
+> solaris-cet@1.0.0 api:build
+> tsc -p tsconfig.api.json
+
+
+> solaris-cet@1.0.0 test:e2e
+> node scripts/run-e2e-batched.mjs tests/pwa-offline.spec.ts --grep survey shell
+
+node:events:486
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: spawn C:\Program Files\nodejs\node.exe ENOENT
+    at ChildProcess._handle.onexit (node:internal/child_process:286:19)
+    at onErrorNT (node:internal/child_process:484:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+Emitted 'error' event on ChildProcess instance at:
+    at ChildProcess._handle.onexit (node:internal/child_process:292:12)
+    at onErrorNT (node:internal/child_process:484:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21) {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'spawn C:\\Program Files\\nodejs\\node.exe',
+  path: 'C:\\Program Files\\nodejs\\node.exe',
+  spawnargs: [ 'server/index.cjs' ]
+}
+
+Node.js v24.13.0
+npm error Lifecycle script `test:e2e` failed with error:
+npm error code 1
+npm error path C:\Users\CCons\Desktop\SOLARIS CET\app
+npm error workspace solaris-cet@1.0.0
+npm error location C:\Users\CCons\Desktop\SOLARIS CET\app
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c node scripts/run-e2e-batched.mjs tests/pwa-offline.spec.ts --grep ^"survey^ shell^"

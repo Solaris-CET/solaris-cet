@@ -1,0 +1,11 @@
+---
+pid: 18592
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:/Users/CCons/Desktop/SOLARIS CET/app\"; npm run typecheck 2>&1 | Select-Object -Last 25"
+started_at: 2026-07-08T18:02:11.419Z
+running_for_ms: 675109   
+---
+
+> solaris-cet@1.0.0 typecheck
+> node ../scripts/run-bin.mjs tsc --noEmit -p tsconfig.app.json && node ../scripts/run-bin.mjs tsc --noEmit -p tsconfig.test.json && node ../scripts/run-bin.mjs tsc --noEmit -p tsconfig.node.json && node ../scripts/run-bin.mjs tsc --noEmit -p tsconfig.e2e.json
+

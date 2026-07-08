@@ -46,8 +46,8 @@ export class ErrorBoundary extends Component<Props, State> {
     // Log to Sentry if available
     try {
       import('../lib/sentryClient').then((mod) => {
-        if (typeof mod.captureException === 'function') {
-          mod.captureException(error, { extra: { componentStack: info.componentStack } });
+        if (typeof mod.captureExceptionLazy === 'function') {
+          void mod.captureExceptionLazy(error, { extra: { componentStack: info.componentStack } });
         }
       }).catch(() => {});
     } catch {

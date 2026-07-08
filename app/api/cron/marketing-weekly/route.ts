@@ -1,9 +1,17 @@
 import { gte, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { cronAuthResult } from '../../lib/cron';
-import { jsonResponse, optionsResponse } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import {
+  buildMarketingWeeklyTelegramMessage,
+  CRON_MARKETING_WEEKLY_PROBE,
+  marketingWeeklySince,
+  type MarketingWeeklyStats,
+} from '../../lib/cronMarketingWeekly';
+import { cronAuthResult } from '@/api/lib/cron';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
 import { telegramSendMessage } from '../../telegram/lib';
+
+export { CRON_MARKETING_WEEKLY_PATH, CRON_MARKETING_WEEKLY_PROBE } from '@/api/lib/cronMarketingWeekly';
 
 export const config = { runtime: 'nodejs' };
 
@@ -13,7 +21,7 @@ function env(name: string): string {
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') {
-    return optionsResponse(req, 'POST, OPTIONS', 'Content-Type, X-Cron-Secret');
+    return optionsResponse(req, CRON_MARKETING_WEEKLY_PROBE.methods.join(', '), `Content-Type, ${CRON_MARKETING_WEEKLY_PROBE.cronSecretHeader}`);
   }
   if (req.method !== 'POST') {
     return jsonResponse(req, { error: 'Method not allowed' }, 405);
@@ -23,7 +31,7 @@ export default async function handler(req: Request): Promise<Response> {
   if (!cron.ok) return jsonResponse(req, { error: cron.error }, cron.status);
 
   const db = getDb();
-  const since7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const since7d = marketingWeeklySince();
 
   const [leads] = await db
     .select({ c: sql<number>`count(*)`.as('c') })
@@ -50,7 +58,7 @@ export default async function handler(req: Request): Promise<Response> {
     .from(schema.referrals)
     .where(gte(schema.referrals.createdAt, since7d));
 
-  const payload = {
+  const payload: MarketingWeeklyStats = {
     ok: true,
     since: since7d.toISOString(),
     leads7d: leads?.c ?? 0,
@@ -68,15 +76,8 @@ export default async function handler(req: Request): Promise<Response> {
   const reportChatIdRaw = env('MARKETING_REPORT_TELEGRAM_CHAT_ID');
   const reportChatId = Number(reportChatIdRaw);
   if (botToken && Number.isFinite(reportChatId) && reportChatId > 0) {
-    const msg =
-      `Marketing weekly (7d)\n` +
-      `Leads: ${payload.leads7d}\n` +
-      `Newsletter: ${payload.newsletter7d.total} (active ${payload.newsletter7d.active}, pending ${payload.newsletter7d.pending})\n` +
-      `Shares: ${payload.shares7d}\n` +
-      `Referrals: ${payload.referrals7d}\n` +
-      `Since: ${payload.since}`;
     try {
-      await telegramSendMessage(botToken, reportChatId, msg);
+      await telegramSendMessage(botToken, reportChatId, buildMarketingWeeklyTelegramMessage(payload));
     } catch {
       void 0;
     }

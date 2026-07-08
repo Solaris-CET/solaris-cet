@@ -1,8 +1,11 @@
 import { asc, desc, eq, inArray } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAuth } from '../../lib/auth';
-import { getAllowedOrigin } from '../../lib/cors';
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import { AI_HISTORY_PROBE } from '@/api/lib/aiHistory';
+import { getAllowedOrigin } from '@/api/lib/cors';
+
+export { AI_HISTORY_PATH, AI_HISTORY_PROBE } from '@/api/lib/aiHistory';
 
 export const config = { runtime: 'nodejs' };
 
@@ -58,7 +61,7 @@ export default async function handler(req: Request): Promise<Response> {
       .from(schema.aiConversations)
       .where(eq(schema.aiConversations.userId, auth.user.id))
       .orderBy(desc(schema.aiConversations.lastMessageAt))
-      .limit(50);
+      .limit(AI_HISTORY_PROBE.maxConversations);
 
     const ids = conversations.map((c) => c.id);
     const messagesByConversation = new Map<string, Array<{ id: string; role: string; content: string; createdAt: Date; revisionOf: string | null }>>();

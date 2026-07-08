@@ -3,7 +3,7 @@ pid: 4036
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "winget install --id Git.Git -e --accept-source-agreements --accept-package-agreements 2>&1"
 started_at: 2026-07-06T00:23:17.755Z
-running_for_ms: 814998   
+running_for_ms: 97292740 
 ---
 Found Git [Git.Git] Version 2.55.0.2
 This application is licensed to you by its owner.
@@ -13,3 +13,9 @@ Successfully verified installer hash
 Starting package install...
 The installer will request to run as administrator. Expect a prompt.
 Successfully installed
+
+---
+exit_code: -1
+elapsed_ms: 97292740
+ended_at: 2026-07-07T03:24:49.355Z
+---

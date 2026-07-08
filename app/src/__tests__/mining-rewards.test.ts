@@ -1,14 +1,11 @@
 import { describe, expect,it } from "vitest";
 
-import { calculateRewards as rewardsCalc } from "../lib/mining-calc";
 import {
+  calculateRewards as rewardsCalc,
   calculateRewards as rewardsLegacy,
-  type MiningInput,
-} from "../lib/mining-calculations";
-import {
   calculateRewards as miningMathRewards,
-  type MiningInput as MiningMathInput,
-} from "../lib/mining-math";
+  type MiningInput,
+} from "../lib/mining";
 
 /** Worker (`mining.worker.ts`) delegates to `mining-calc`; both TS modules must stay identical. */
 const PARITY_CASES: MiningInput[] = [
@@ -115,7 +112,7 @@ describe("mining rewards", () => {
 describe("mining-math module", () => {
   it("≡ mining-calc + shape, monotonicity, device profiles", () => {
     for (const c of PARITY_CASES) {
-      expect(miningMathRewards(c as MiningMathInput), JSON.stringify(c)).toEqual(
+      expect(miningMathRewards(c as MiningInput), JSON.stringify(c)).toEqual(
         rewardsCalc(c),
       );
     }
@@ -125,7 +122,7 @@ describe("mining-math module", () => {
     expect(a).toHaveProperty("monthly");
     expect(a).toHaveProperty("apy");
 
-    const inputs: MiningMathInput[] = [
+    const inputs: MiningInput[] = [
       { adjustedHashrate: 0.5, stake: 0 },
       { adjustedHashrate: 2.5, stake: 0 },
       { adjustedHashrate: 8.0, stake: 0 },

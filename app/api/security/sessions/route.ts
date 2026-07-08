@@ -1,13 +1,23 @@
 import { and, desc, eq, isNull, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAuth } from '../../lib/auth';
-import { corsJson, optionsResponse } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import { corsJson, optionsResponse } from '@/api/lib/http';
+import {
+  buildSecuritySessionsPayload,
+  mapSecuritySessionItem,
+  normalizeSessionCount,
+  SECURITY_SESSIONS_PROBE,
+} from '../../lib/securitySessions';
+
+export { SECURITY_SESSIONS_PATH, SECURITY_SESSIONS_PROBE } from '@/api/lib/securitySessions';
 
 export const config = { runtime: 'nodejs' };
 
 export default async function handler(req: Request): Promise<Response> {
-  if (req.method === 'OPTIONS') return optionsResponse(req, 'GET, OPTIONS');
+  if (req.method === 'OPTIONS') {
+    return optionsResponse(req, SECURITY_SESSIONS_PROBE.methods.join(', '));
+  }
   if (req.method !== 'GET') return corsJson(req, 405, { error: 'Method not allowed' });
 
   const ctx = await requireAuth(req);
@@ -19,32 +29,25 @@ export default async function handler(req: Request): Promise<Response> {
     .from(schema.sessions)
     .where(eq(schema.sessions.userId, ctx.user.id))
     .orderBy(desc(schema.sessions.createdAt))
-    .limit(50);
+    .limit(SECURITY_SESSIONS_PROBE.listLimit);
 
   const now = Date.now();
-  const sessions = rows.map((s) => ({
-    id: s.id,
-    createdAt: s.createdAt.toISOString(),
-    lastUsedAt: s.lastUsedAt ? s.lastUsedAt.toISOString() : null,
-    expiresAt: s.expiresAt.toISOString(),
-    revokedAt: s.revokedAt ? s.revokedAt.toISOString() : null,
-    ip: s.ip ?? null,
-    userAgent: s.userAgent ?? null,
-    active: !s.revokedAt && s.expiresAt.getTime() > now,
-    current: Boolean(ctx.sid && s.id === ctx.sid),
-  }));
+  const sessions = rows.map((s) => mapSecuritySessionItem(s, now, ctx.sid));
 
   const [row] = await db
     .select({ c: sql<number>`count(*)`.as('c') })
     .from(schema.sessions)
     .where(and(eq(schema.sessions.userId, ctx.user.id), isNull(schema.sessions.revokedAt)));
-  const notRevoked = typeof row?.c === 'number' ? row.c : 0;
+  const notRevoked = normalizeSessionCount(row?.c);
 
-  return corsJson(req, 200, {
-    ok: true,
-    currentSessionId: ctx.sid,
-    mfaEnabled: ctx.mfaEnabled,
-    sessions,
-    counts: { total: rows.length, notRevoked },
-  });
+  return corsJson(
+    req,
+    200,
+    buildSecuritySessionsPayload({
+      sessions,
+      currentSessionId: ctx.sid,
+      mfaEnabled: ctx.mfaEnabled,
+      notRevokedCount: notRevoked,
+    }),
+  );
 }

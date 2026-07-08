@@ -1,19 +1,22 @@
-/**
- * POST /api/newsletter/confirm — completes double opt-in flow.
- * Node.js runtime (Postgres TCP + email provider).
- */
-import { and, eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client'
-import { getAllowedOrigin } from '../../lib/cors'
-import { newsletterWelcomeEmail, onboardingEmail } from '../../lib/emailTemplates'
-import { withRateLimit } from '../../lib/rateLimit'
+import { getDb, schema } from '@/db/client';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { queueNewsletterActivationEmails } from '@/api/lib/newsletterActivation';
+import {
+  isValidNewsletterConfirmToken,
+  NEWSLETTER_CONFIRM_PROBE,
+  parseNewsletterConfirmToken,
+} from '../../lib/newsletterConfirm';
+import { withRateLimit } from '@/api/lib/rateLimit';
 
-export const config = { runtime: 'nodejs' }
+export { NEWSLETTER_CONFIRM_PATH, NEWSLETTER_CONFIRM_PROBE } from '@/api/lib/newsletterConfirm';
+
+export const config = { runtime: 'nodejs' };
 
 export default async function handler(req: Request): Promise<Response> {
-  const origin = req.headers.get('origin')
-  const allowedOrigin = getAllowedOrigin(origin)
+  const origin = req.headers.get('origin');
+  const allowedOrigin = getAllowedOrigin(origin);
 
   if (origin && allowedOrigin !== origin) {
     return new Response(JSON.stringify({ error: 'Forbidden' }), {
@@ -24,7 +27,7 @@ export default async function handler(req: Request): Promise<Response> {
         Vary: 'Origin',
         'Cache-Control': 'no-store',
       },
-    })
+    });
   }
 
   if (req.method === 'OPTIONS') {
@@ -32,119 +35,79 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowedOrigin,
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Methods': NEWSLETTER_CONFIRM_PROBE.methods.join(', '),
         'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       },
-    })
+    });
   }
 
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
       status: 405,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
-    })
+    });
   }
 
   const limited = await withRateLimit(req, allowedOrigin, {
-    keyPrefix: 'newsletter-confirm',
-    limit: 12,
-    windowSeconds: 60,
-  })
-  if (limited) return limited
+    keyPrefix: NEWSLETTER_CONFIRM_PROBE.rateLimitKey,
+    limit: NEWSLETTER_CONFIRM_PROBE.rateLimit,
+    windowSeconds: NEWSLETTER_CONFIRM_PROBE.rateWindowSeconds,
+  });
+  if (limited) return limited;
 
-  let body: unknown
+  let body: unknown;
   try {
-    body = await req.json()
+    body = await req.json();
   } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
+    return new Response(JSON.stringify({ error: NEWSLETTER_CONFIRM_PROBE.invalidJsonError }), {
       status: 400,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
-    })
+    });
   }
 
-  const token =
-    typeof body === 'object' && body !== null && typeof (body as { token?: unknown }).token === 'string'
-      ? String((body as { token: string }).token).trim()
-      : ''
-  if (!token || token.length < 10 || token.length > 300) {
-    return new Response(JSON.stringify({ status: 'invalid' }), {
+  const token = parseNewsletterConfirmToken(body);
+  if (!isValidNewsletterConfirmToken(token)) {
+    return new Response(JSON.stringify({ status: NEWSLETTER_CONFIRM_PROBE.statusInvalid }), {
       status: 200,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
-    })
+    });
   }
 
-  const db = getDb()
+  const db = getDb();
   const [record] = await db
     .select()
     .from(schema.newsletterSubscriptions)
     .where(eq(schema.newsletterSubscriptions.verifyToken, token))
-    .limit(1)
+    .limit(1);
 
   if (!record) {
-    return new Response(JSON.stringify({ status: 'invalid' }), {
+    return new Response(JSON.stringify({ status: NEWSLETTER_CONFIRM_PROBE.statusInvalid }), {
       status: 200,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
-    })
+    });
   }
 
   if (record.status === 'active') {
-    return new Response(JSON.stringify({ status: 'already_confirmed' }), {
+    return new Response(JSON.stringify({ status: NEWSLETTER_CONFIRM_PROBE.statusAlreadyConfirmed }), {
       status: 200,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
-    })
+    });
   }
 
   await db
     .update(schema.newsletterSubscriptions)
     .set({ status: 'active', verifiedAt: new Date() })
-    .where(and(eq(schema.newsletterSubscriptions.id, record.id), eq(schema.newsletterSubscriptions.status, 'pending')))
+    .where(and(eq(schema.newsletterSubscriptions.id, record.id), eq(schema.newsletterSubscriptions.status, 'pending')));
 
-  const [contact] = await db.select().from(schema.contacts).where(eq(schema.contacts.id, record.contactId)).limit(1)
-  const email = contact?.email
+  const [contact] = await db.select().from(schema.contacts).where(eq(schema.contacts.id, record.contactId)).limit(1);
+  const email = contact?.email;
   if (email) {
-    const welcome = newsletterWelcomeEmail(req)
-    await db.insert(schema.emailOutbox).values({
-      toEmail: email,
-      template: 'newsletter_welcome',
-      subject: welcome.subject,
-      html: welcome.html,
-      textBody: welcome.text,
-      sendAfter: new Date(Date.now() + 15_000),
-    })
-    const s1 = onboardingEmail(req, 1)
-    const s2 = onboardingEmail(req, 2)
-    const s3 = onboardingEmail(req, 3)
-    await db.insert(schema.emailOutbox).values([
-      {
-        toEmail: email,
-        template: 'onboarding_1',
-        subject: s1.subject,
-        html: s1.html,
-        textBody: s1.text,
-        sendAfter: new Date(Date.now() + 60 * 60 * 1000),
-      },
-      {
-        toEmail: email,
-        template: 'onboarding_2',
-        subject: s2.subject,
-        html: s2.html,
-        textBody: s2.text,
-        sendAfter: new Date(Date.now() + 48 * 60 * 60 * 1000),
-      },
-      {
-        toEmail: email,
-        template: 'onboarding_3',
-        subject: s3.subject,
-        html: s3.html,
-        textBody: s3.text,
-        sendAfter: new Date(Date.now() + 96 * 60 * 60 * 1000),
-      },
-    ])
+    await queueNewsletterActivationEmails(req, email);
   }
 
-  return new Response(JSON.stringify({ status: 'confirmed' }), {
+  return new Response(JSON.stringify({ status: NEWSLETTER_CONFIRM_PROBE.statusConfirmed }), {
     status: 200,
     headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
-  })
+  });
 }

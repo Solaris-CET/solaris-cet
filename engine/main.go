@@ -88,6 +88,11 @@ func NewFarmingEngine(dbPath string) (*FarmingEngine, error) {
 
 func (e *FarmingEngine) persistenceWorker() {
 	defer e.wg.Done()
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("Panic in persistence worker: %v", r)
+		}
+	}()
 	for {
 		select {
 		case land := <-e.saveCh:
@@ -202,6 +207,11 @@ func (e *FarmingEngine) simulateAllLands() {
 		wg.Add(1)
 		go func(start, end int) {
 			defer wg.Done()
+			defer func() {
+				if r := recover(); r != nil {
+					log.Printf("Panic in simulation worker: %v", r)
+				}
+			}()
 			for j := start; j < end; j++ {
 				e.simulateLand(lands[j])
 			}
@@ -244,11 +254,11 @@ func (e *FarmingEngine) simulateLand(land *Land) {
 
 	land.LastUpdate = time.Now()
 
-	// Queue for persistence (non-blocking)
+	// Queue for persistence with bounded wait (backpressure-aware, no silent drops)
 	select {
 	case e.saveCh <- land:
-	default:
-		// Channel full, skip this save for now
+	case <-time.After(2 * time.Second):
+		log.Printf("Persistence backpressure: save queue full for land %d", land.ID)
 	}
 }
 

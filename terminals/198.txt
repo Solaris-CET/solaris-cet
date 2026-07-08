@@ -1,0 +1,76 @@
+---
+pid: 19968
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\" ; npm run test -- src/__tests__/eventRsvpRoute.test.ts src/__tests__/forumPostRoute.test.ts src/__tests__/forumPostsRoute.test.ts src/__tests__/forumCommentsRoute.test.ts src/__tests__/forumReportRoute.test.ts 2>&1"
+started_at: 2026-07-07T14:58:46.104Z
+running_for_ms: 9139992  
+---
+
+> solaris-cet@1.0.0 test
+> node ../scripts/run-bin.mjs vitest run src/__tests__/eventRsvpRoute.test.ts src/__tests__/forumPostRoute.test.ts src/__tests__/forumPostsRoute.test.ts src/__tests__/forumCommentsRoute.test.ts src/__tests__/forumReportRoute.test.ts
+
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ❯ src/__tests__/forumCommentsRoute.test.ts (7 tests | 1 failed) 82ms
+     ✓ exports stable e2e probe contract 5ms
+     ✓ parseForumCommentsPostId and parseForumCommentPostBody 1ms
+     ✓ is registered in server/index.cjs 3ms
+     ✓ OPTIONS returns CORS preflight 47ms
+     ✓ GET without postId returns 400 6ms
+     × GET returns comments for post 11ms
+     ✓ POST creates comment when authenticated 5ms
+ ✓ src/__tests__/forumPostsRoute.test.ts (8 tests) 76ms
+ ❯ src/__tests__/forumPostRoute.test.ts (8 tests | 1 failed) 72ms
+     ✓ exports stable e2e probe contract 5ms
+     ✓ parseForumPostId reads id param 1ms
+     ✓ canViewForumContent allows visible posts 1ms
+     ✓ is registered in server/index.cjs 2ms
+     ✓ OPTIONS returns CORS preflight 47ms
+     ✓ GET without id returns 400 3ms
+     × GET returns post when visible 9ms
+     ✓ GET returns 404 when post missing 2ms
+ ✓ src/__tests__/forumReportRoute.test.ts (7 tests) 67ms
+ ✓ src/__tests__/eventRsvpRoute.test.ts (7 tests) 68ms
+
+ Test Files  2 failed | 3 passed (5)
+      Tests  2 failed | 35 passed (37)
+   Start at  17:58:51
+   Duration  14.24s (transform 783ms, setup 4.61s, import 4.30s, tests 365ms, environment 2ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/forumCommentsRoute.test.ts > /api/forum/comments e2e probe > GET returns comments for post
+TypeError: db.select(...).from(...).where(...).groupBy is not a function
+ ❯ Module.handler api/forum/comments/route.ts:88:14
+     86|             .from(schema.forumVotes)
+     87|             .where(and(eq(schema.forumVotes.targetType, FORUM_COMMENTS…
+     88|             .groupBy(schema.forumVotes.targetId)
+       |              ^
+     89|         : [];
+     90|     const viewerVotes =
+ ❯ src/__tests__/forumCommentsRoute.test.ts:153:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/forumPostRoute.test.ts > /api/forum/post e2e probe > GET returns post when visible
+TypeError: (intermediate value) is not iterable
+ ❯ Module.handler api/forum/post/route.ts:52:22
+     50|   }
+     51|
+     52|   const [scoreRow] = await db
+       |                      ^
+     53|     .select({ score: sql<number>`coalesce(sum(${schema.forumVotes.valu…
+     54|     .from(schema.forumVotes)
+ ❯ src/__tests__/forumPostRoute.test.ts:132:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path C:\Users\CCons\Desktop\SOLARIS CET\app
+npm error workspace solaris-cet@1.0.0
+npm error location C:\Users\CCons\Desktop\SOLARIS CET\app
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c node ../scripts/run-bin.mjs vitest run src/__tests__/eventRsvpRoute.test.ts src/__tests__/forumPostRoute.test.ts src/__tests__/forumPostsRoute.test.ts src/__tests__/forumCommentsRoute.test.ts src/__tests__/forumReportRoute.test.ts

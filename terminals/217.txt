@@ -1,0 +1,179 @@
+---
+pid: 15224
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/testimonialsRoute.test.ts src/__tests__/tonBalanceRoute.test.ts src/__tests__/tonDnsBackresolveRoute.test.ts src/__tests__/tonDnsResolveRoute.test.ts src/__tests__/tonIndexedTxsRoute.test.ts src/__tests__/tonNftsRoute.test.ts src/__tests__/tonTxsRoute.test.ts src/__tests__/userSettingsRoute.test.ts src/__tests__/publicV1PriceRoute.test.ts src/__tests__/publicV1StatsRoute.test.ts src/__tests__/publicV1TransactionsRoute.test.ts src/__tests__/publicV1WebhookDeliveriesRoute.test.ts src/__tests__/publicV1WebhooksRoute.test.ts src/__tests__/publicV2PriceRoute.test.ts src/__tests__/v2AiOracleRoute.test.ts src/__tests__/publicV2StatsRoute.test.ts src/__tests__/publicV2TransactionsRoute.test.ts src/__tests__/waitlistRoute.test.ts src/__tests__/walletBalanceRoute.test.ts src/__tests__/walletsLinkRoute.test.ts"
+started_at: 2026-07-07T16:42:50.767Z
+running_for_ms: 2895006  
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ❯ src/__tests__/walletsLinkRoute.test.ts (5 tests | 1 failed) 77ms
+     ✓ exports stable e2e probe contract 4ms
+     ✓ parseWalletsLinkBody extracts wallet fields 3ms
+     ✓ is registered in server/index.cjs 2ms
+     ✓ POST without auth returns 401 42ms
+     × POST links wallet with valid proof 23ms
+ ✓ src/__tests__/userSettingsRoute.test.ts (6 tests) 73ms
+ ❯ src/__tests__/tonBalanceRoute.test.ts (6 tests | 1 failed) 71ms
+     ✓ exports stable e2e probe contract 4ms
+     ✓ resolveCetJettonMaster falls back to mainnet default 1ms
+     ✓ extracts balances from tonapi payloads 1ms
+     ✓ is registered in server/index.cjs 3ms
+     ✓ OPTIONS returns CORS preflight 38ms
+     × GET returns balance payload 20ms
+ ✓ src/__tests__/publicV1TransactionsRoute.test.ts (5 tests) 71ms
+ ✓ src/__tests__/v2AiOracleRoute.test.ts (5 tests) 66ms
+ ✓ src/__tests__/waitlistRoute.test.ts (5 tests) 71ms
+ ✓ src/__tests__/publicV1PriceRoute.test.ts (5 tests) 60ms
+ ✓ src/__tests__/publicV2TransactionsRoute.test.ts (4 tests) 71ms
+ ✓ src/__tests__/tonDnsResolveRoute.test.ts (5 tests) 67ms
+ ✓ src/__tests__/publicV1StatsRoute.test.ts (4 tests) 64ms
+ ✓ src/__tests__/publicV1WebhookDeliveriesRoute.test.ts (4 tests) 63ms
+ ✓ src/__tests__/publicV1WebhooksRoute.test.ts (4 tests) 71ms
+ ❯ src/__tests__/tonIndexedTxsRoute.test.ts (4 tests | 1 failed) 61ms
+     ✓ exports stable e2e probe contract 5ms
+     ✓ clamps indexed tx limits 1ms
+     ✓ is registered in server/index.cjs 2ms
+     × GET returns indexed transactions 50ms
+ ❯ src/__tests__/tonNftsRoute.test.ts (4 tests | 1 failed) 62ms
+     ✓ exports stable e2e probe contract 4ms
+     ✓ mapTonNftItem extracts metadata 1ms
+     ✓ is registered in server/index.cjs 2ms
+     × GET returns NFT items 51ms
+ ✓ src/__tests__/publicV2PriceRoute.test.ts (4 tests) 70ms
+ ✓ src/__tests__/tonDnsBackresolveRoute.test.ts (5 tests) 56ms
+ ❯ src/__tests__/tonTxsRoute.test.ts (4 tests | 1 failed) 65ms
+     ✓ exports stable e2e probe contract 4ms
+     ✓ mapTonTxEvent infers transfer type 1ms
+     ✓ is registered in server/index.cjs 2ms
+     × GET returns transaction events 55ms
+ ✓ src/__tests__/publicV2StatsRoute.test.ts (4 tests) 68ms
+ ✓ src/__tests__/testimonialsRoute.test.ts (5 tests) 62ms
+ ❯ src/__tests__/walletBalanceRoute.test.ts (3 tests | 1 failed) 66ms
+     ✓ exports stable e2e probe contract 7ms
+     ✓ is registered in server/index.cjs 2ms
+     × GET returns wallet balance payload 52ms
+
+ Test Files  6 failed | 14 passed (20)
+      Tests  6 failed | 85 passed (91)
+   Start at  19:42:56
+   Duration  41.09s (transform 1.96s, setup 16.60s, import 10.40s, tests 1.33s, environment 5ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/tonBalanceRoute.test.ts > /api/ton/balance e2e probe > GET returns balance payload
+AssertionError: expected 400 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 400
+
+ ❯ src/__tests__/tonBalanceRoute.test.ts:83:24
+     81|   it('GET returns balance payload', async () => {
+     82|     const res = await tonBalanceRoute(balanceRequest());
+     83|     expect(res.status).toBe(200);
+       |                        ^
+     84|     const body = (await res.json()) as { ok: boolean; address: string …
+     85|     expect(body.ok).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/__tests__/tonIndexedTxsRoute.test.ts > /api/ton/indexed-txs e2e probe > GET returns indexed transactions
+AssertionError: expected 400 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 400
+
+ ❯ src/__tests__/tonIndexedTxsRoute.test.ts:60:24
+     58|       }),
+     59|     );
+     60|     expect(res.status).toBe(200);
+       |                        ^
+     61|     const body = (await res.json()) as { ok: boolean; items: Array<{ t…
+     62|     expect(body.ok).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/__tests__/tonNftsRoute.test.ts > /api/ton/nfts e2e probe > GET returns NFT items
+AssertionError: expected 400 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 400
+
+ ❯ src/__tests__/tonNftsRoute.test.ts:62:24
+     60|       new Request(`http://test${TON_NFTS_PATH}?owner=${wallet}`, { met…
+     61|     );
+     62|     expect(res.status).toBe(200);
+       |                        ^
+     63|     const body = (await res.json()) as { ok: boolean; items: Array<{ n…
+     64|     expect(body.ok).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  src/__tests__/tonTxsRoute.test.ts > /api/ton/txs e2e probe > GET returns transaction events
+AssertionError: expected 400 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 400
+
+ ❯ src/__tests__/tonTxsRoute.test.ts:59:24
+     57|       new Request(`http://test${TON_TXS_PATH}?address=${wallet}`, { me…
+     58|     );
+     59|     expect(res.status).toBe(200);
+       |                        ^
+     60|     const body = (await res.json()) as { ok: boolean; items: Array<{ h…
+     61|     expect(body.ok).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  src/__tests__/walletBalanceRoute.test.ts > /api/wallet/balance e2e probe > GET returns wallet balance payload
+AssertionError: expected 400 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 400
+
+ ❯ src/__tests__/walletBalanceRoute.test.ts:47:24
+     45|       new Request(`http://test${WALLET_BALANCE_PATH}?address=${wallet}…
+     46|     );
+     47|     expect(res.status).toBe(200);
+       |                        ^
+     48|     const body = (await res.json()) as { ok: boolean; address: string;…
+     49|     expect(body.ok).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  src/__tests__/walletsLinkRoute.test.ts > /api/wallets/link e2e probe > POST links wallet with valid proof
+AssertionError: expected 400 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 400
+
+ ❯ src/__tests__/walletsLinkRoute.test.ts:133:24
+    131|       linkRequest({ walletAddress: wallet, tonProof: { payload: 'chall…
+    132|     );
+    133|     expect(res.status).toBe(200);
+       |                        ^
+    134|     const body = (await res.json()) as { ok: boolean; wallet: string; …
+    135|     expect(body.ok).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+

@@ -1,33 +1,35 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Box, Cylinder } from '@react-three/drei';
 import * as THREE from 'three';
 
+import { createParticleField } from './particleField';
+
 const WATER_PARTICLE_COUNT = 40;
+
+const waterData = createParticleField(
+  WATER_PARTICLE_COUNT,
+  (i, positions, speeds, offsets, jitter) => {
+    const y = Math.random() * 2.5 - 0.5;
+    const x = 1.2 + (Math.random() - 0.5) * 0.3;
+    const z = (Math.random() - 0.5) * 0.3;
+    positions[i * 3] = x;
+    positions[i * 3 + 1] = y;
+    positions[i * 3 + 2] = z;
+    speeds[i] = 0.5 + Math.random() * 0.8;
+    offsets[i] = Math.random() * Math.PI * 2;
+    if (jitter) {
+      jitter.x[i] = x;
+      jitter.z[i] = z;
+    }
+  },
+  true,
+);
 
 function TPOMembrane() {
   const groupRef = useRef<THREE.Group>(null!);
   const waterRef = useRef<THREE.Points>(null!);
   const lightRef = useRef<THREE.DirectionalLight>(null!);
-
-  // Inițializare particule de apă
-  const waterData = useMemo(() => {
-    const positions = new Float32Array(WATER_PARTICLE_COUNT * 3);
-    const speeds = new Float32Array(WATER_PARTICLE_COUNT);
-    const offsets = new Float32Array(WATER_PARTICLE_COUNT);
-    for (let i = 0; i < WATER_PARTICLE_COUNT; i++) {
-      // Poziție inițială de-a lungul burlanului (axa Y)
-      const y = Math.random() * 2.5 - 0.5; // -0.5 .. 2.0
-      const x = 1.2 + (Math.random() - 0.5) * 0.3;
-      const z = (Math.random() - 0.5) * 0.3;
-      positions[i * 3] = x;
-      positions[i * 3 + 1] = y;
-      positions[i * 3 + 2] = z;
-      speeds[i] = 0.5 + Math.random() * 0.8;
-      offsets[i] = Math.random() * Math.PI * 2;
-    }
-    return { positions, speeds, offsets };
-  }, []);
 
   useFrame(({ clock }) => {
     if (groupRef.current) {
@@ -49,8 +51,8 @@ function TPOMembrane() {
         const offset = waterData.offsets[i];
         // Mișcare descendentă (Y) cu viteză variabilă
         const y = ((time * speed + offset) % 2.5) - 0.5; // -0.5 .. 2.0
-        const x = 1.2 + (Math.random() - 0.5) * 0.3;
-        const z = (Math.random() - 0.5) * 0.3;
+        const x = waterData.jitterX?.[i] ?? 1.2;
+        const z = waterData.jitterZ?.[i] ?? 0;
         positions[i * 3] = x;
         positions[i * 3 + 1] = y;
         positions[i * 3 + 2] = z;

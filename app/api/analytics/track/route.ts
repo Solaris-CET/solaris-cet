@@ -1,42 +1,19 @@
-import { getDb, schema } from '../../../db/client';
-import { requireAuth } from '../../lib/auth';
-import { clientIp } from '../../lib/clientIp';
-import { getAllowedOrigin } from '../../lib/cors';
-import { corsJson, corsOptions, readJson } from '../../lib/http';
-import { sha256Hex } from '../../lib/nodeCrypto';
-import { withRateLimit } from '../../lib/rateLimit';
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import {
+  analyticsDayKeyUtc,
+  ANALYTICS_TRACK_PROBE,
+  parseAnalyticsEventsBody,
+} from '../../lib/analyticsTrack';
+import { clientIp } from '@/api/lib/clientIp';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { corsJson, corsOptions, readJson } from '@/api/lib/http';
+import { sha256Hex } from '@/api/lib/nodeCrypto';
+import { withRateLimit } from '@/api/lib/rateLimit';
+
+export { ANALYTICS_TRACK_PATH, ANALYTICS_TRACK_PROBE } from '@/api/lib/analyticsTrack';
 
 export const config = { runtime: 'nodejs' };
-
-function dayKeyUtc(d: Date): string {
-  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
-}
-
-type IncomingEvent = {
-  name: string;
-  anonId: string;
-  sessionId: string;
-  ts?: number;
-  props?: unknown;
-  pagePath?: unknown;
-  referrer?: unknown;
-};
-
-function parseIncomingEvent(raw: unknown): IncomingEvent | null {
-  if (!raw || typeof raw !== 'object') return null;
-  const rec = raw as Record<string, unknown>;
-  const name = typeof rec.name === 'string' ? rec.name.trim() : '';
-  const anonId = typeof rec.anonId === 'string' ? rec.anonId.trim() : '';
-  const sessionId = typeof rec.sessionId === 'string' ? rec.sessionId.trim() : '';
-  const ts = typeof rec.ts === 'number' && Number.isFinite(rec.ts) ? rec.ts : undefined;
-  if (!name || name.length > 80) return null;
-  if (!anonId || anonId.length > 120) return null;
-  if (!sessionId || sessionId.length > 140) return null;
-  const props = rec.props;
-  const pagePath = rec.pagePath;
-  const referrer = rec.referrer;
-  return { name, anonId, sessionId, ts, props, pagePath, referrer };
-}
 
 export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
@@ -45,9 +22,9 @@ export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') return corsJson(req, 405, { error: 'Method not allowed' });
 
   const rl = await withRateLimit(req, allowedOrigin, {
-    keyPrefix: 'analytics_track',
-    limit: 240,
-    windowSeconds: 60,
+    keyPrefix: ANALYTICS_TRACK_PROBE.rateLimitKey,
+    limit: ANALYTICS_TRACK_PROBE.rateLimit,
+    windowSeconds: ANALYTICS_TRACK_PROBE.rateWindowSeconds,
   });
   if (rl) return rl;
 
@@ -58,17 +35,8 @@ export default async function handler(req: Request): Promise<Response> {
     return corsJson(req, 400, { error: 'Invalid JSON' });
   }
 
-  const rawEvents = (body as { events?: unknown }).events;
-  const list = Array.isArray(rawEvents) ? rawEvents : [body];
-  if (list.length === 0) return corsJson(req, 400, { error: 'Missing events' });
-  if (list.length > 50) return corsJson(req, 400, { error: 'Too many events' });
-
-  const parsed: IncomingEvent[] = [];
-  for (const item of list) {
-    const e = parseIncomingEvent(item);
-    if (e) parsed.push(e);
-  }
-  if (parsed.length === 0) return corsJson(req, 400, { error: 'No valid events' });
+  const parsed = parseAnalyticsEventsBody(body);
+  if (!parsed.ok) return corsJson(req, 400, { error: parsed.error });
 
   const ctx = await requireAuth(req);
   const userId = 'error' in ctx ? null : ctx.user.id;
@@ -82,10 +50,10 @@ export default async function handler(req: Request): Promise<Response> {
 
   const db = getDb();
   await db.insert(schema.analyticsEvents).values(
-    parsed.map((e) => {
+    parsed.events.map((e) => {
       const createdAt = e.ts ? new Date(e.ts) : now;
-      const pagePath = typeof e.pagePath === 'string' ? e.pagePath.trim().slice(0, 500) : null;
-      const referrer = typeof e.referrer === 'string' ? e.referrer.trim().slice(0, 800) : null;
+      const pagePath = typeof e.pagePath === 'string' ? e.pagePath.trim().slice(0, ANALYTICS_TRACK_PROBE.maxPagePathLength) : null;
+      const referrer = typeof e.referrer === 'string' ? e.referrer.trim().slice(0, ANALYTICS_TRACK_PROBE.maxReferrerLength) : null;
       const props = e.props && typeof e.props === 'object' ? (e.props as Record<string, unknown>) : null;
       return {
         userId,
@@ -97,11 +65,11 @@ export default async function handler(req: Request): Promise<Response> {
         referrer,
         uaHash,
         ipHash,
-        day: dayKeyUtc(createdAt),
+        day: analyticsDayKeyUtc(createdAt),
         createdAt,
       };
     }),
   );
 
-  return corsJson(req, 201, { ok: true, ingested: parsed.length });
+  return corsJson(req, 201, { ok: true, ingested: parsed.events.length });
 }

@@ -1,1 +1,1 @@
-export { getAllowedOrigin } from '../../src/lib/corsAllowedOrigin';
+export { getAllowedOrigin } from '@/lib/corsAllowedOrigin';

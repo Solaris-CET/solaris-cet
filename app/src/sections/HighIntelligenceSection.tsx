@@ -1,5 +1,5 @@
 import { Atom, Brain, ChevronRight, Cpu,Eye, RotateCcw, Zap } from 'lucide-react';
-import { useCallback,useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback,useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useLanguage } from '@/hooks/useLanguage';
 import { type ObserveLocusBranch,observeLocusClip } from '@/lib/meshSkillFeed';
@@ -130,7 +130,10 @@ const NeuralReasoningEngine = () => {
   const [steps, setSteps] = useState<ReasoningStep[]>([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const [isRunning, setIsRunning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const reducedMotionRef = useRef(false);
+  const wasRunningRef = useRef(false);
 
   const clearTimer = useCallback(() => {
     if (intervalRef.current !== null) {
@@ -141,10 +144,18 @@ const NeuralReasoningEngine = () => {
 
   const runReasoning = useCallback((q: string) => {
     clearTimer();
+    setError(null);
     const built = buildReasoningSteps(q || tx.neural.defaultQuestion, tx);
     setSteps(built);
     setVisibleIndex(0);
     setIsRunning(true);
+
+    if (reducedMotionRef.current) {
+      setVisibleIndex(built.length - 1);
+      setIsRunning(false);
+      return;
+    }
+
     let idx = 0;
     intervalRef.current = setInterval(() => {
       idx += 1;
@@ -160,12 +171,41 @@ const NeuralReasoningEngine = () => {
 
   useEffect(() => () => clearTimer(), [clearTimer]);
 
+  // Pause on tab hidden / reduced motion.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    reducedMotionRef.current = mq.matches;
+    const onChange = (e: MediaQueryListEvent) => {
+      reducedMotionRef.current = e.matches;
+    };
+    mq.addEventListener?.('change', onChange);
+
+    const onVisibility = () => {
+      if (document.hidden) {
+        if (intervalRef.current !== null) {
+          wasRunningRef.current = isRunning;
+          clearTimer();
+        }
+      } else if (wasRunningRef.current && steps.length > 0 && visibleIndex < steps.length - 1) {
+        wasRunningRef.current = false;
+        runReasoning(query);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      mq.removeEventListener?.('change', onChange);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [clearTimer, isRunning, query, runReasoning, steps.length, visibleIndex]);
+
   const handleReset = () => {
     clearTimer();
     setIsRunning(false);
     setVisibleIndex(-1);
     setSteps([]);
     setQuery('');
+    setError(null);
   };
 
   const phaseIcons: Record<string, typeof Brain> = {
@@ -175,6 +215,13 @@ const NeuralReasoningEngine = () => {
     ACT: Zap,
     VERIFY: ChevronRight,
   };
+
+  const liveText = useMemo(() => {
+    if (error) return `Error: ${error}`;
+    if (isRunning) return `Reasoning: ${steps[visibleIndex]?.phase ?? 'OBSERVE'}`;
+    if (visibleIndex >= 0 && steps.length > 0) return 'Reasoning complete';
+    return '';
+  }, [error, isRunning, steps, visibleIndex]);
 
   return (
     <div className="bento-card p-6 h-full flex flex-col gap-4">
@@ -200,6 +247,10 @@ const NeuralReasoningEngine = () => {
         {tx.neural.prompt}
       </p>
 
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {liveText}
+      </div>
+
       <div className="flex gap-2">
         <input
           type="text"
@@ -207,7 +258,8 @@ const NeuralReasoningEngine = () => {
           onChange={e => setQuery(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && !isRunning && runReasoning(query)}
           placeholder={tx.neural.placeholder}
-          className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-solaris-text placeholder:text-solaris-muted/50 focus:outline-none focus:border-solaris-gold/50 transition-colors text-sm"
+          disabled={isRunning}
+          className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-solaris-text placeholder:text-solaris-muted/50 focus:outline-none focus:border-solaris-gold/50 transition-colors text-sm disabled:opacity-50"
         />
         <button
           onClick={() => !isRunning && runReasoning(query)}
@@ -250,7 +302,7 @@ const NeuralReasoningEngine = () => {
             const active = i === visibleIndex;
             return (
               <div
-                key={step.phase}
+                key={`${step.phase}-${i}`}
                 className="transition-all duration-500"
                 style={{
                   opacity: visible ? (active ? 1 : 0.45) : 0,
@@ -277,10 +329,17 @@ const NeuralReasoningEngine = () => {
           })}
         </div>
 
-        {!isRunning && visibleIndex >= 0 && steps.length > 0 && (
+        {!isRunning && visibleIndex >= 0 && steps.length > 0 && !error && (
           <div className="mt-3 flex items-center gap-1.5 text-emerald-400">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             <span className="text-[10px] font-mono">{tx.neural.completeLine}</span>
+          </div>
+        )}
+
+        {error && (
+          <div className="mt-3 flex items-center gap-1.5 text-red-400">
+            <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+            <span className="text-[10px] font-mono">{error}</span>
           </div>
         )}
 
@@ -326,11 +385,27 @@ const QuantumEntropyCetAi = () => {
   const [isCollapsing, setIsCollapsing] = useState(false);
   const animFrameRef = useRef<number | null>(null);
   const angleOffsetRef = useRef(0);
+  const reducedMotionRef = useRef(false);
 
-  // Animate superposition rotation
+  // Animate superposition rotation (pauses on hidden tab / reduced motion)
   useEffect(() => {
-    if (collapsed) return;
+    if (typeof window !== 'undefined') {
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      reducedMotionRef.current = mq.matches;
+      const onChange = (e: MediaQueryListEvent) => {
+        reducedMotionRef.current = e.matches;
+      };
+      mq.addEventListener?.('change', onChange);
+      return () => mq.removeEventListener?.('change', onChange);
+    }
+    return undefined;
+  }, []);
+
+  useEffect(() => {
+    if (collapsed || reducedMotionRef.current) return;
+    let running = true;
     const animate = () => {
+      if (!running) return;
       angleOffsetRef.current += 0.025;
       setQubits(prev =>
         prev.map(q => ({
@@ -341,7 +416,23 @@ const QuantumEntropyCetAi = () => {
       animFrameRef.current = requestAnimationFrame(animate);
     };
     animFrameRef.current = requestAnimationFrame(animate);
+
+    const onVisibility = () => {
+      if (document.hidden) {
+        if (animFrameRef.current !== null) {
+          cancelAnimationFrame(animFrameRef.current);
+          animFrameRef.current = null;
+        }
+      } else if (!collapsed) {
+        running = true;
+        animFrameRef.current = requestAnimationFrame(animate);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
     return () => {
+      running = false;
+      document.removeEventListener('visibilitychange', onVisibility);
       if (animFrameRef.current !== null) cancelAnimationFrame(animFrameRef.current);
     };
   }, [collapsed]);

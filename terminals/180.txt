@@ -1,0 +1,25 @@
+---
+pid: 12936
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\" ; npm run test -- src/__tests__/adminConversationsRoute.test.ts src/__tests__/adminGamificationBadgeMarkMintedRoute.test.ts src/__tests__/adminGamificationQuestReviewRoute.test.ts src/__tests__/adminI18nExportRoute.test.ts src/__tests__/adminI18nRoute.test.ts"
+started_at: 2026-07-07T13:08:32.214Z
+running_for_ms: 15755002 
+---
+
+> solaris-cet@1.0.0 test
+> node ../scripts/run-bin.mjs vitest run src/__tests__/adminConversationsRoute.test.ts src/__tests__/adminGamificationBadgeMarkMintedRoute.test.ts src/__tests__/adminGamificationQuestReviewRoute.test.ts src/__tests__/adminI18nExportRoute.test.ts src/__tests__/adminI18nRoute.test.ts
+
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ✓ src/__tests__/adminGamificationQuestReviewRoute.test.ts (6 tests) 79ms
+ ✓ src/__tests__/adminI18nRoute.test.ts (8 tests) 72ms
+ ✓ src/__tests__/adminGamificationBadgeMarkMintedRoute.test.ts (6 tests) 71ms
+ ✓ src/__tests__/adminConversationsRoute.test.ts (6 tests) 68ms
+ ✓ src/__tests__/adminI18nExportRoute.test.ts (6 tests) 100ms
+
+ Test Files  5 passed (5)
+      Tests  32 passed (32)
+   Start at  16:08:37
+   Duration  13.69s (transform 737ms, setup 4.68s, import 3.53s, tests 390ms, environment 1ms)
+

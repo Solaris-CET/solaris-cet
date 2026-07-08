@@ -2,9 +2,10 @@ import {
   listPendingReports,
   removePendingReport,
   type PendingReportRecord,
+  type PendingReportStatus,
 } from './surveyDraftStorage';
 
-export type QueueItemStatus = 'pending' | 'syncing' | 'failed';
+export type QueueItemStatus = PendingReportStatus;
 
 export type SurveyQueueStats = {
   total: number;
@@ -19,16 +20,28 @@ export function queueItemStatus(item: PendingReportRecord): QueueItemStatus {
   return 'pending';
 }
 
+export function countQueueByStatus(items: PendingReportRecord[]): Pick<SurveyQueueStats, 'pending' | 'failed'> {
+  let failed = 0;
+  for (const item of items) {
+    if (queueItemStatus(item) === 'failed') failed += 1;
+  }
+  return { pending: items.length - failed, failed };
+}
+
+export function oldestQueueTimestamp(items: PendingReportRecord[]): string | null {
+  if (!items.length) return null;
+  const sorted = [...items].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  return sorted[0]?.createdAt ?? null;
+}
+
 export async function getSurveyQueueStats(): Promise<SurveyQueueStats> {
   const items = await listPendingReports();
-  const failed = items.filter((i) => queueItemStatus(i) === 'failed').length;
-  const pending = items.length - failed;
-  const sorted = [...items].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  const { pending, failed } = countQueueByStatus(items);
   return {
     total: items.length,
     pending,
     failed,
-    oldestAt: sorted[0]?.createdAt ?? null,
+    oldestAt: oldestQueueTimestamp(items),
   };
 }
 

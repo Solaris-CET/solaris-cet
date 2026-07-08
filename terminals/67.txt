@@ -1,0 +1,24 @@
+---
+pid: 10084
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "$git = \"C:\\Program Files\\Git\\cmd\\git.exe\"; $repo = \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\"; $input = \"protocol=https`nhost=gitea.com`n`n\"; $credText = $input | & $git credential fill 2>$null; $user = ($credText | Select-String '^username=(.+)$').Matches.Groups[1].Value; $pass = ($credText | Select-String '^password=(.+)$').Matches.Groups[1].Value; $pair = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(\"${user}:${pass}\")); $headers = @{ Authorization = \"Basic $pair\"; 'Content-Type' = 'application/json' }; $body = '{\"name\":\"solaris-cet\",\"private\":false,\"auto_init\":false,\"description\":\"SOLARIS CET platform + survey engine\"}'; try { $r = Invoke-RestMethod -Uri 'https://gitea.com/api/v1/user/repos' -Method POST -Headers $headers -Body $body -TimeoutSec 30; \"created=$($r.full_name)\" } catch { if ($_.Exception.Response.StatusCode.value__ -eq 409) { 'exists' } else { $_.Exception.Message; exit 1 } }; $env:GIT_TERMINAL_PROMPT='0'; & $git -C $repo push -u origin main 2>&1"
+started_at: 2026-07-06T00:46:48.326Z
+running_for_ms: 95879980 
+---
+created=Solaris-Cet/solaris-cet
+git.exe : error: RPC failed; HTTP 502 curl 22 The requested URL returned error: 502
+At line:1 char:945
++ ... env:GIT_TERMINAL_PROMPT='0'; & $git -C $repo push -u origin main 2>&1
++                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: RPC fail...rned error: 502:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+send-pack: unexpected disconnect while reading sideband packet
+fatal: the remote end hung up unexpectedly
+Everything up-to-date
+
+---
+exit_code: -1
+elapsed_ms: 95879980
+ended_at: 2026-07-07T03:24:47.502Z
+---

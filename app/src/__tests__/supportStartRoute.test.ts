@@ -1,4 +1,16 @@
+// @vitest-environment node
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import {
+  buildSupportStartMessage,
+  parseSupportStartFromRecord,
+  SUPPORT_START_PATH,
+  SUPPORT_START_PROBE,
+  supportServiceLabel,
+} from '../../api/lib/supportStart';
 
 const mocks = vi.hoisted(() => {
   const recorded = {
@@ -86,13 +98,61 @@ vi.mock('../../api/lib/publicApiRateLimit', () => ({
   }),
 }));
 
-import supportStartRoute from '../../api/support/start/route';
+import supportStartRoute, { SUPPORT_START_PROBE as routeProbe } from '../../api/support/start/route';
 
 function resetRecorded() {
   mocks.recorded.contacts.length = 0;
   mocks.recorded.conversations.length = 0;
   mocks.recorded.messages.length = 0;
 }
+
+describe('supportStart helpers', () => {
+  it('exports stable e2e probe contract', () => {
+    expect(SUPPORT_START_PROBE.path).toBe('/api/support/start');
+    expect(routeProbe.rateLimitKey).toBe('support_start');
+    expect(routeProbe.authRequired).toBe(false);
+  });
+
+  it('supportServiceLabel maps known services', () => {
+    expect(supportServiceLabel('fotovoltaice')).toBe('Fotovoltaice');
+    expect(supportServiceLabel('custom')).toBe('custom');
+  });
+
+  it('parseSupportStartFromRecord builds html form message', () => {
+    const input = parseSupportStartFromRecord(
+      {
+        name: 'Ana',
+        email: 'ana@example.com',
+        service: 'fotovoltaice',
+        phone: '0769889721',
+        message: 'Detalii proiect',
+        consent: 'yes',
+      },
+      true,
+    );
+    expect(input.email).toBe('ana@example.com');
+    expect(input.message).toContain('Serviciu: Fotovoltaice');
+    expect(input.consent).toBe(true);
+  });
+
+  it('buildSupportStartMessage includes optional fields', () => {
+    const message = buildSupportStartMessage({
+      baseMessage: 'Mesaj',
+      service: 'tpo',
+      phone: '0700000000',
+    });
+    expect(message).toContain('Acoperișuri industriale TPO');
+    expect(message).toContain('Mesaj');
+  });
+});
+
+describe('/api/support/start e2e probe', () => {
+  it('is registered in server/index.cjs', () => {
+    const src = readFileSync(join(process.cwd(), 'server', 'index.cjs'), 'utf8');
+    expect(src).toContain(SUPPORT_START_PATH);
+    expect(src).toContain('api/support/start/route.js');
+  });
+});
 
 describe('/api/support/start', () => {
   beforeEach(() => {

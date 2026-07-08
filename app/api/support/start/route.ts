@@ -1,79 +1,20 @@
-import { getDb, schema } from '../../../db/client';
-import { requireUser } from '../../lib/authUser';
-import { getAllowedOrigin } from '../../lib/cors';
-import { corsJson, corsOptions, isValidEmail, readJson } from '../../lib/http';
-import { decideRateLimit, rateLimitHeaders } from '../../lib/publicApiRateLimit';
+import { getDb, schema } from '@/db/client';
+import { requireUser } from '@/api/lib/authUser';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { corsJson, corsOptions, isValidEmail, readJson } from '@/api/lib/http';
+import { decideRateLimit, rateLimitHeaders } from '@/api/lib/publicApiRateLimit';
+import {
+  buildSupportStartJsonSuccess,
+  isSupportHtmlFormContentType,
+  isValidSupportStartMessage,
+  parseSupportStartFromRecord,
+  SUPPORT_START_PROBE,
+  type SupportStartInput,
+} from '../../lib/supportStart';
+
+export { SUPPORT_START_PATH, SUPPORT_START_PROBE } from '@/api/lib/supportStart';
 
 export const config = { runtime: 'nodejs' };
-
-type SupportInput = {
-  name: string | null;
-  email: string;
-  message: string;
-  pageUrl: string | null;
-  utm: Record<string, unknown> | null;
-  isHtmlForm: boolean;
-  consent: boolean;
-  honeypot: string;
-};
-
-function asTrimmedString(value: unknown, max = 2000): string {
-  return typeof value === 'string' ? value.trim().slice(0, max) : '';
-}
-
-function parseBoolean(value: unknown): boolean {
-  const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
-  return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on';
-}
-
-function parseUtm(value: unknown): Record<string, unknown> | null {
-  if (!value) return null;
-  if (typeof value === 'object' && value !== null) return value as Record<string, unknown>;
-  if (typeof value !== 'string') return null;
-  try {
-    const parsed = JSON.parse(value);
-    return typeof parsed === 'object' && parsed !== null ? (parsed as Record<string, unknown>) : null;
-  } catch {
-    return null;
-  }
-}
-
-function serviceLabel(raw: string): string {
-  switch (raw) {
-    case 'fotovoltaice':
-      return 'Fotovoltaice';
-    case 'acoperisuri':
-      return 'Acoperișuri tablă/țiglă';
-    case 'tpo':
-      return 'Acoperișuri industriale TPO';
-    case 'atice-fatade':
-      return 'Atice & fațade tablă';
-    case 'reparatii':
-      return 'Reparații & mentenanță';
-    default:
-      return raw;
-  }
-}
-
-function buildMessage(parts: {
-  baseMessage: string;
-  service?: string;
-  phone?: string;
-  location?: string;
-  urgent?: boolean;
-  email?: string;
-}): string {
-  const lines = [
-    parts.service ? `Serviciu: ${serviceLabel(parts.service)}` : null,
-    parts.location ? `Locație: ${parts.location}` : null,
-    parts.urgent ? 'Urgență: da' : null,
-    parts.phone ? `Telefon: ${parts.phone}` : null,
-    parts.email ? `Email: ${parts.email}` : null,
-    '',
-    parts.baseMessage,
-  ].filter((line): line is string => typeof line === 'string' && line.length > 0);
-  return lines.join('\n');
-}
 
 function htmlResponse(status: number, title: string, body: string, extraHeaders?: Record<string, string>): Response {
   const html = `<!doctype html>
@@ -144,9 +85,9 @@ function errorHtml(status: number, message: string, extraHeaders?: Record<string
   );
 }
 
-async function readSupportInput(req: Request): Promise<SupportInput> {
-  const contentType = String(req.headers.get('content-type') ?? '').toLowerCase();
-  const isHtmlForm = contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data');
+async function readSupportInput(req: Request): Promise<SupportStartInput> {
+  const contentType = String(req.headers.get('content-type') ?? '');
+  const isHtmlForm = isSupportHtmlFormContentType(contentType);
 
   let raw: Record<string, unknown>;
   if (isHtmlForm) {
@@ -157,27 +98,7 @@ async function readSupportInput(req: Request): Promise<SupportInput> {
     raw = typeof body === 'object' && body !== null ? (body as Record<string, unknown>) : {};
   }
 
-  const name = asTrimmedString(raw.name, 120) || null;
-  const emailRaw = asTrimmedString(raw.email, 254).toLowerCase();
-  const pageUrl = asTrimmedString(raw.pageUrl, 600) || null;
-  const utm = parseUtm(raw.utm);
-  const consent = parseBoolean(raw.consent);
-  const honeypot = asTrimmedString(raw.company, 120);
-
-  if (isHtmlForm) {
-    const message = buildMessage({
-      baseMessage: asTrimmedString(raw.message, 2000),
-      service: asTrimmedString(raw.service, 120) || undefined,
-      phone: asTrimmedString(raw.phone, 80) || undefined,
-      location: asTrimmedString(raw.location, 160) || undefined,
-      urgent: parseBoolean(raw.urgent),
-      email: emailRaw || undefined,
-    });
-    return { name, email: emailRaw, message, pageUrl, utm, isHtmlForm, consent, honeypot };
-  }
-
-  const message = asTrimmedString(raw.message, 2000);
-  return { name, email: emailRaw, message, pageUrl, utm, isHtmlForm, consent, honeypot };
+  return parseSupportStartFromRecord(raw, isHtmlForm);
 }
 
 export default async function handler(req: Request): Promise<Response> {
@@ -186,26 +107,30 @@ export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return corsOptions(req);
   if (req.method !== 'POST') return corsJson(req, 405, { error: 'Method not allowed' });
 
-  let input: SupportInput;
+  let input: SupportStartInput;
   try {
     input = await readSupportInput(req);
   } catch {
-    return corsJson(req, 400, { error: 'Invalid request payload' });
+    return corsJson(req, 400, { error: SUPPORT_START_PROBE.invalidPayloadError });
   }
 
   const rateLimit = decideRateLimit({
     req,
-    bucket: 'support_start',
-    limit: 5,
-    windowSeconds: 600,
+    bucket: SUPPORT_START_PROBE.rateLimitKey,
+    limit: SUPPORT_START_PROBE.rateLimit,
+    windowSeconds: SUPPORT_START_PROBE.rateWindowSeconds,
     keyPart: input.email,
   });
   const limitHeaders = rateLimitHeaders(rateLimit);
   if (!rateLimit.ok) {
     if (input.isHtmlForm) {
-      return errorHtml(429, 'Ai trimis prea multe solicitări într-un interval scurt. Te rugăm să încerci din nou în câteva minute.', limitHeaders);
+      return errorHtml(
+        SUPPORT_START_PROBE.tooManyRequestsStatus,
+        'Ai trimis prea multe solicitări într-un interval scurt. Te rugăm să încerci din nou în câteva minute.',
+        limitHeaders,
+      );
     }
-    return corsJson(req, 429, { error: 'Too many requests' }, limitHeaders);
+    return corsJson(req, SUPPORT_START_PROBE.tooManyRequestsStatus, { error: SUPPORT_START_PROBE.tooManyRequestsError }, limitHeaders);
   }
 
   if (input.honeypot) {
@@ -223,13 +148,15 @@ export default async function handler(req: Request): Promise<Response> {
         });
   }
 
-  if (!input.message || input.message.length > 2200) {
+  if (!isValidSupportStartMessage(input.message)) {
     return input.isHtmlForm
       ? errorHtml(400, 'Completează câmpul de detalii cu suficiente informații despre proiect.')
-      : corsJson(req, 400, { error: 'Invalid message' });
+      : corsJson(req, 400, { error: SUPPORT_START_PROBE.invalidMessageError });
   }
   if (input.email && !isValidEmail(input.email)) {
-    return input.isHtmlForm ? errorHtml(400, 'Adresa de email introdusă nu este validă.') : corsJson(req, 400, { error: 'Invalid email' });
+    return input.isHtmlForm
+      ? errorHtml(400, 'Adresa de email introdusă nu este validă.')
+      : corsJson(req, 400, { error: SUPPORT_START_PROBE.invalidEmailError });
   }
   if (input.isHtmlForm && !input.consent) {
     return errorHtml(400, 'Este necesar acordul pentru a putea procesa solicitarea și a reveni cu ofertă.');
@@ -258,7 +185,7 @@ export default async function handler(req: Request): Promise<Response> {
     .values({
       contactId: contact.id,
       userId: user?.id ?? null,
-      status: 'open',
+      status: SUPPORT_START_PROBE.conversationStatus,
       pageUrl: input.pageUrl,
       utm: input.utm,
       updatedAt: new Date(),
@@ -267,7 +194,7 @@ export default async function handler(req: Request): Promise<Response> {
 
   await db.insert(schema.crmMessages).values({
     conversationId: conv.id,
-    sender: user ? 'user' : 'visitor',
+    sender: user ? SUPPORT_START_PROBE.userSender : SUPPORT_START_PROBE.visitorSender,
     body: input.message,
   });
 
@@ -280,7 +207,7 @@ export default async function handler(req: Request): Promise<Response> {
 
   if (input.isHtmlForm) return successHtml(conv.id);
 
-  return new Response(JSON.stringify({ ok: true, conversationId: conv.id }), {
+  return new Response(JSON.stringify(buildSupportStartJsonSuccess(conv.id)), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',

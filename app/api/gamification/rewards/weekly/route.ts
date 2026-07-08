@@ -1,17 +1,20 @@
 import { desc, eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../../db/client';
-import { requireUser } from '../../../lib/authUser';
-import { corsJson, corsOptions } from '../../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { requireUser } from '@/api/lib/authUser';
+import { corsJson, corsOptions } from '@/api/lib/http';
+import { REWARDS_WEEKLY_PROBE } from '@/api/lib/rewardsWeekly';
+
+export { REWARDS_WEEKLY_PATH, REWARDS_WEEKLY_PROBE } from '@/api/lib/rewardsWeekly';
 
 export const config = { runtime: 'nodejs' };
 
 export default async function handler(req: Request): Promise<Response> {
-  if (req.method === 'OPTIONS') return corsOptions(req, 'GET, OPTIONS');
+  if (req.method === 'OPTIONS') return corsOptions(req, REWARDS_WEEKLY_PROBE.methods.join(', '));
   if (req.method !== 'GET') return corsJson(req, 405, { error: 'Method not allowed' });
 
   const user = await requireUser(req);
-  if (!user) return corsJson(req, 401, { error: 'Unauthorized' });
+  if (!user) return corsJson(req, REWARDS_WEEKLY_PROBE.unauthenticatedStatus, { error: 'Unauthorized' });
 
   const db = getDb();
   const rows = await db
@@ -29,7 +32,7 @@ export default async function handler(req: Request): Promise<Response> {
     .innerJoin(schema.weeklyLeaderboards, eq(schema.weeklyRewards.leaderboardId, schema.weeklyLeaderboards.id))
     .where(eq(schema.weeklyRewards.userId, user.id))
     .orderBy(desc(schema.weeklyRewards.createdAt))
-    .limit(50);
+    .limit(REWARDS_WEEKLY_PROBE.listLimit);
 
   return corsJson(req, 200, {
     ok: true,
@@ -45,4 +48,3 @@ export default async function handler(req: Request): Promise<Response> {
     })),
   });
 }
-

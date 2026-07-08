@@ -1,0 +1,14 @@
+---
+pid: 13748
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npm rebuild @tailwindcss/oxide 2>&1"
+started_at: 2026-07-06T01:25:13.971Z
+running_for_ms: 93576450 
+---
+rebuilt dependencies successfully
+
+---
+exit_code: -1
+elapsed_ms: 93576450
+ended_at: 2026-07-07T03:24:49.232Z
+---

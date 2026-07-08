@@ -1,22 +1,24 @@
 import { and, eq, gt, isNull, or, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { writeAdminAudit } from '../../lib/adminAudit';
-import { clientIp } from '../../lib/clientIp';
-import { getAllowedOrigin } from '../../lib/cors';
-import { corsJson, corsOptions, isValidEmail, readJson } from '../../lib/http';
-import { getJwtSecretsFromEnv, signJwt } from '../../lib/jwt';
-import { sha256Hex } from '../../lib/nodeCrypto';
-import { hashPassword } from '../../lib/password';
-import { withRateLimit } from '../../lib/rateLimit';
+import { getDb, schema } from '@/db/client';
+import { writeAdminAudit } from '@/api/lib/adminAudit';
+import {
+  ADMIN_SIGNUP_PROBE,
+  isAdminSignupPasswordValid,
+  isAdminSignupTokenValid,
+  parseAdminSignupBody,
+} from '../../lib/adminSignup';
+import { clientIp } from '@/api/lib/clientIp';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { corsJson, corsOptions, isValidEmail, readJson } from '@/api/lib/http';
+import { getJwtSecretsFromEnv, signJwt } from '@/api/lib/jwt';
+import { sha256Hex } from '@/api/lib/nodeCrypto';
+import { hashPassword } from '@/api/lib/password';
+import { withRateLimit } from '@/api/lib/rateLimit';
+
+export { ADMIN_SIGNUP_PATH, ADMIN_SIGNUP_PROBE } from '@/api/lib/adminSignup';
 
 export const config = { runtime: 'nodejs' };
-
-const JWT_TTL_SECONDS = 60 * 60 * 8;
-
-function normalizeEmail(email: string): string {
-  return email.trim().toLowerCase();
-}
 
 export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
@@ -26,26 +28,17 @@ export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return corsOptions(req, 'POST, OPTIONS');
   if (req.method !== 'POST') return corsJson(req, 405, { error: 'Method not allowed' });
 
-  const limited = await withRateLimit(req, allowedOrigin, { keyPrefix: 'admin-signup', limit: 10, windowSeconds: 60 });
+  const limited = await withRateLimit(req, allowedOrigin, {
+    keyPrefix: ADMIN_SIGNUP_PROBE.rateLimitKey,
+    limit: 10,
+    windowSeconds: 60,
+  });
   if (limited) return limited;
 
-  const body = await readJson(req).catch(() => null);
-  const token =
-    typeof body === 'object' && body !== null && 'token' in body && typeof (body as { token?: unknown }).token === 'string'
-      ? (body as { token: string }).token.trim()
-      : '';
-  const emailRaw =
-    typeof body === 'object' && body !== null && 'email' in body && typeof (body as { email?: unknown }).email === 'string'
-      ? (body as { email: string }).email
-      : '';
-  const password =
-    typeof body === 'object' && body !== null && 'password' in body && typeof (body as { password?: unknown }).password === 'string'
-      ? (body as { password: string }).password
-      : '';
-  const email = normalizeEmail(emailRaw);
-  if (!token || token.length < 16 || token.length > 300) return corsJson(req, 400, { error: 'Token invalid' });
+  const { token, email, password } = parseAdminSignupBody(await readJson(req).catch(() => null));
+  if (!isAdminSignupTokenValid(token)) return corsJson(req, 400, { error: 'Token invalid' });
   if (!isValidEmail(email)) return corsJson(req, 400, { error: 'Email invalid' });
-  if (password.length < 10 || password.length > 200) return corsJson(req, 400, { error: 'Parolă invalidă' });
+  if (!isAdminSignupPasswordValid(password)) return corsJson(req, 400, { error: 'Parolă invalidă' });
 
   const secrets = getJwtSecretsFromEnv();
   const secret = secrets[0];
@@ -57,7 +50,7 @@ export default async function handler(req: Request): Promise<Response> {
   const passwordHash = await hashPassword(password);
   const ip = clientIp(req);
   const userAgent = req.headers.get('user-agent')?.slice(0, 300) ?? null;
-  const sessionExpiresAt = new Date(Date.now() + JWT_TTL_SECONDS * 1000);
+  const sessionExpiresAt = new Date(Date.now() + ADMIN_SIGNUP_PROBE.jwtTtlSeconds * 1000);
 
   const result = await db
     .transaction(async (tx) => {
@@ -111,8 +104,8 @@ export default async function handler(req: Request): Promise<Response> {
 
   if (!result.ok) return corsJson(req, result.status, { error: result.error });
 
-  const jwt = await signJwt({ kind: 'admin', sub: result.admin.id, sid: result.sessionId }, secret, JWT_TTL_SECONDS);
-  await writeAdminAudit(req, { admin: result.admin, sessionId: result.sessionId }, 'ADMIN_SIGNUP', 'admin_account', result.admin.id, {
+  const jwt = await signJwt({ kind: 'admin', sub: result.admin.id, sid: result.sessionId }, secret, ADMIN_SIGNUP_PROBE.jwtTtlSeconds);
+  await writeAdminAudit(req, { admin: result.admin, sessionId: result.sessionId }, ADMIN_SIGNUP_PROBE.auditAction, 'admin_account', result.admin.id, {
     email,
     role: result.admin.role,
     inviteId: result.inviteId,

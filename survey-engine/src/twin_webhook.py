@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
@@ -107,28 +108,53 @@ def dispatch_outbound_twin_webhook(event: dict[str, Any]) -> dict[str, Any]:
     if secret:
         headers["X-Twin-Webhook-Secret"] = secret
 
-    try:
-        with httpx.Client(timeout=10.0) as client:
-            res = client.post(url, json=body, headers=headers)
-        ok = 200 <= res.status_code < 300
-        return log_delivery(
-            direction="outbound",
-            status="delivered" if ok else "failed",
-            event_type=event_type,
-            report_id=report_id,
-            http_status=res.status_code,
-            detail=res.text[:200] if not ok else "",
-            payload={"event": event},
-        )
-    except Exception as exc:
-        return log_delivery(
-            direction="outbound",
-            status="error",
-            event_type=event_type,
-            report_id=report_id,
-            detail=str(exc)[:200],
-            payload={"event": event},
-        )
+    max_attempts = 5
+    base_delay = 0.5
+    max_delay = 30.0
+    last_exception: Optional[Exception] = None
+
+    for attempt in range(max_attempts):
+        try:
+            with httpx.Client(timeout=10.0) as client:
+                res = client.post(url, json=body, headers=headers)
+            ok = 200 <= res.status_code < 300
+            if ok or attempt == max_attempts - 1:
+                return log_delivery(
+                    direction="outbound",
+                    status="delivered" if ok else "failed",
+                    event_type=event_type,
+                    report_id=report_id,
+                    http_status=res.status_code,
+                    detail=res.text[:200] if not ok else "",
+                    payload={"event": event},
+                )
+            if res.status_code < 500 and res.status_code != 429:
+                return log_delivery(
+                    direction="outbound",
+                    status="failed",
+                    event_type=event_type,
+                    report_id=report_id,
+                    http_status=res.status_code,
+                    detail=res.text[:200],
+                    payload={"event": event},
+                )
+        except Exception as exc:
+            last_exception = exc
+            if attempt == max_attempts - 1:
+                break
+
+        delay = min(base_delay * (2 ** attempt), max_delay)
+        delay = delay * (0.75 + 0.5 * (hash(report_id) % 1000) / 1000.0)  # jitter
+        time.sleep(delay)
+
+    return log_delivery(
+        direction="outbound",
+        status="error",
+        event_type=event_type,
+        report_id=report_id,
+        detail=str(last_exception)[:200] if last_exception else "Max retries exceeded",
+        payload={"event": event},
+    )
 
 
 def handle_inbound_webhook(payload: dict[str, Any]) -> dict[str, Any]:

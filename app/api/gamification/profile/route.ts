@@ -1,24 +1,27 @@
 import { and, desc, eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireUser } from '../../lib/authUser';
-import { corsJson, corsOptions } from '../../lib/http';
-import { tonAddressSchema } from '../../lib/validation';
-import { levelProgressFromXp } from '../lib/gamification';
+import { getDb, schema } from '@/db/client';
+import { requireUser } from '@/api/lib/authUser';
+import { GAMIFICATION_PROFILE_PROBE, parseGamificationProfileWallet } from '@/api/lib/gamificationProfile';
+import { corsJson, corsOptions } from '@/api/lib/http';
+import { tonAddressSchema } from '@/api/lib/validation';
+import { levelProgressFromXp } from '@/api/gamification/lib/gamification';
+
+export { GAMIFICATION_PROFILE_PATH, GAMIFICATION_PROFILE_PROBE } from '@/api/lib/gamificationProfile';
 
 export const config = { runtime: 'nodejs' };
 
 export default async function handler(req: Request): Promise<Response> {
-  if (req.method === 'OPTIONS') return corsOptions(req, 'GET, OPTIONS');
+  if (req.method === 'OPTIONS') return corsOptions(req, GAMIFICATION_PROFILE_PROBE.methods.join(', '));
   if (req.method !== 'GET') return corsJson(req, 405, { error: 'Method not allowed' });
 
   const viewer = await requireUser(req);
-  if (!viewer) return corsJson(req, 401, { error: 'Unauthorized' });
+  if (!viewer) return corsJson(req, GAMIFICATION_PROFILE_PROBE.unauthenticatedStatus, { error: 'Unauthorized' });
 
   const url = new URL(req.url);
-  const walletRaw = (url.searchParams.get('wallet') ?? '').trim();
+  const walletRaw = parseGamificationProfileWallet(url.searchParams);
   const parsed = tonAddressSchema.safeParse(walletRaw);
-  if (!parsed.success) return corsJson(req, 400, { error: 'Invalid wallet' });
+  if (!parsed.success) return corsJson(req, 400, { error: GAMIFICATION_PROFILE_PROBE.invalidWalletError });
   const walletAddress = parsed.data.toString();
 
   const db = getDb();
@@ -27,7 +30,7 @@ export default async function handler(req: Request): Promise<Response> {
     .from(schema.users)
     .where(eq(schema.users.walletAddress, walletAddress))
     .limit(1);
-  if (!u) return corsJson(req, 404, { error: 'Not found' });
+  if (!u) return corsJson(req, 404, { error: GAMIFICATION_PROFILE_PROBE.notFoundError });
 
   const badges = await db
     .select({
@@ -40,7 +43,7 @@ export default async function handler(req: Request): Promise<Response> {
     .innerJoin(schema.badges, eq(schema.userBadges.badgeId, schema.badges.id))
     .where(and(eq(schema.userBadges.userId, u.id), eq(schema.badges.active, true)))
     .orderBy(desc(schema.userBadges.awardedAt))
-    .limit(50);
+    .limit(GAMIFICATION_PROFILE_PROBE.badgesLimit);
 
   const lp = levelProgressFromXp(u.points ?? 0);
   return corsJson(req, 200, {

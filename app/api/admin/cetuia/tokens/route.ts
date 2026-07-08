@@ -1,53 +1,32 @@
 import { and, eq, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../../db/client';
-import { writeAdminAudit } from '../../../lib/adminAudit';
-import { requireAdminAuth, requireAdminRole } from '../../../lib/adminAuth';
-import { corsJson, corsOptions, readJson } from '../../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { writeAdminAudit } from '@/api/lib/adminAudit';
+import { guardAdminRoute } from '@/api/lib/adminAuth';
+import {
+  ADMIN_CETUIA_TOKENS_PROBE,
+  computeCetuiaAvailableCount,
+  isCetuiaTokensDatabaseConfigured,
+  parseCetuiaTokenId,
+  parseCetuiaTokenOwner,
+  parseCetuiaTokenStatus,
+} from '../../../lib/adminCetuiaTokens';
+import { corsJson, corsOptions, readJson } from '@/api/lib/http';
+
+export { ADMIN_CETUIA_TOKENS_PATH, ADMIN_CETUIA_TOKENS_PROBE } from '@/api/lib/adminCetuiaTokens';
 
 export const config = { runtime: 'nodejs' };
 
-const TOTAL_TOKENS = 9000;
-const VALID_STATUSES = new Set(['available', 'reserved', 'sold'] as const);
-type TokenStatus = typeof VALID_STATUSES extends Set<infer T> ? T : never;
-
-function parseId(raw: string | null): number | null {
-  if (!raw) return null;
-  const n = Number.parseInt(raw, 10);
-  if (!Number.isFinite(n)) return null;
-  if (n < 1 || n > TOTAL_TOKENS) return null;
-  return n;
-}
-
-function parseStatus(v: unknown): TokenStatus | null {
-  if (typeof v !== 'string') return null;
-  const s = v.trim();
-  return VALID_STATUSES.has(s as TokenStatus) ? (s as TokenStatus) : null;
-}
-
-function parseOwner(v: unknown): string | null {
-  if (v === null || v === undefined) return null;
-  if (typeof v !== 'string') return null;
-  const s = v.trim();
-  if (!s) return null;
-  if (s.length > 200) return null;
-  return s;
-}
-
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return corsOptions(req, 'GET, PUT, OPTIONS');
-  if (!process.env.DATABASE_URL?.trim()) return corsJson(req, 503, { error: 'Unavailable' });
+  if (!isCetuiaTokensDatabaseConfigured()) return corsJson(req, 503, { error: 'Unavailable' });
 
-  const ctx = await requireAdminAuth(req);
+  const ctx = await guardAdminRoute(req, { minRole: (m) => (m === 'PUT' ? ADMIN_CETUIA_TOKENS_PROBE.putMinRole : ADMIN_CETUIA_TOKENS_PROBE.getMinRole) });
   if ('error' in ctx) return corsJson(req, ctx.status, { error: ctx.error });
   const db = getDb();
 
   if (req.method === 'GET') {
-    const ok = requireAdminRole(ctx, 'viewer');
-    if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
-
-    const url = new URL(req.url);
-    const id = parseId(url.searchParams.get('id'));
+    const id = parseCetuiaTokenId(new URL(req.url).searchParams.get('id'));
     if (id) {
       const [row] = await db.select().from(schema.cetuiaTokens).where(eq(schema.cetuiaTokens.id, id));
       return corsJson(req, 200, { ok: true, token: row ?? null });
@@ -64,19 +43,29 @@ export default async function handler(req: Request): Promise<Response> {
     const sold = counts?.sold ?? 0;
     const reserved = counts?.reserved ?? 0;
     const total = counts?.total ?? 0;
-    const available = Math.max(0, TOTAL_TOKENS - sold - reserved);
+    const available = computeCetuiaAvailableCount(total, sold, reserved);
 
-    return corsJson(req, 200, { ok: true, counts: { total, available, reserved, sold }, max: TOTAL_TOKENS });
+    return corsJson(req, 200, {
+      ok: true,
+      counts: { total, available, reserved, sold },
+      max: ADMIN_CETUIA_TOKENS_PROBE.totalTokens,
+    });
   }
 
   if (req.method === 'PUT') {
-    const ok = requireAdminRole(ctx, 'editor');
-    if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
-
     const body = await readJson(req).catch(() => null);
-    const id = typeof body === 'object' && body !== null ? parseId(String((body as { id?: unknown }).id ?? '')) : null;
-    const status = typeof body === 'object' && body !== null ? parseStatus((body as { status?: unknown }).status) : null;
-    const owner = typeof body === 'object' && body !== null ? parseOwner((body as { ownerWalletAddress?: unknown }).ownerWalletAddress) : null;
+    const id =
+      typeof body === 'object' && body !== null
+        ? parseCetuiaTokenId(String((body as { id?: unknown }).id ?? ''))
+        : null;
+    const status =
+      typeof body === 'object' && body !== null
+        ? parseCetuiaTokenStatus((body as { status?: unknown }).status)
+        : null;
+    const owner =
+      typeof body === 'object' && body !== null
+        ? parseCetuiaTokenOwner((body as { ownerWalletAddress?: unknown }).ownerWalletAddress)
+        : null;
 
     if (!id || !status) return corsJson(req, 400, { error: 'Valori invalide' });
 
@@ -90,12 +79,15 @@ export default async function handler(req: Request): Promise<Response> {
       await db.update(schema.cetuiaTokens).set(next).where(eq(schema.cetuiaTokens.id, id));
     }
 
-    await writeAdminAudit(req, ctx, 'CETUIA_TOKEN_UPDATED', 'cetuia_tokens', String(id), {
+    await writeAdminAudit(req, ctx, ADMIN_CETUIA_TOKENS_PROBE.auditAction, 'cetuia_tokens', String(id), {
       prev: existing ? { status: existing.status, ownerWalletAddress: existing.ownerWalletAddress } : null,
       next,
     });
 
-    const [row] = await db.select().from(schema.cetuiaTokens).where(and(eq(schema.cetuiaTokens.id, id), eq(schema.cetuiaTokens.status, status)));
+    const [row] = await db
+      .select()
+      .from(schema.cetuiaTokens)
+      .where(and(eq(schema.cetuiaTokens.id, id), eq(schema.cetuiaTokens.status, status)));
     return corsJson(req, 200, { ok: true, token: row ?? null });
   }
 

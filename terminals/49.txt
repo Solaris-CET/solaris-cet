@@ -3,7 +3,7 @@ pid: 16200
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\survey-engine\"; python -m pytest tests/ -q --tb=short"
 started_at: 2026-07-05T23:24:22.824Z
-running_for_ms: 4349980  
+running_for_ms: 100825573
 ---
 ...........................................F.......                      [100%]
 ================================== FAILURES ===================================
@@ -97,3 +97,9 @@ E   TypeError: BatchJob.__init__() missing 1 required positional argument: 'phot
 =========================== short test summary info ===========================
 FAILED tests/test_server.py::test_batch_endpoint - TypeError: BatchJob.__init...
 1 failed, 50 passed, 1 warning in 22.80s
+
+---
+exit_code: -1
+elapsed_ms: 100825573
+ended_at: 2026-07-07T03:24:47.322Z
+---

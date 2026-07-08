@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 
-import { adminApi } from '../adminClient';
+import { adminApi, adminApiErr } from '../adminClient';
 
 export function TokenSection({ token }: { token: string }) {
   const [priceUsd, setPriceUsd] = useState('');
@@ -20,7 +20,7 @@ export function TokenSection({ token }: { token: string }) {
         token,
       });
       if (!res.ok) {
-        if (!cancelled) setError(res.error);
+        if (!cancelled) setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       const t = res.data.token;
@@ -45,7 +45,7 @@ export function TokenSection({ token }: { token: string }) {
         method: 'PUT',
         body: { priceUsd, totalSupply, circulatingSupply },
       });
-      if (!res.ok) setError(res.error);
+      if (!res.ok) setError(adminApiErr(res) ?? 'Request failed');
     } finally {
       setSaving(false);
     }

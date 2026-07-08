@@ -16,8 +16,8 @@
  *           { type: 'ERROR',             message: string }
  */
 
-import { calculateRewards } from '../lib/mining-calc';
-export type { MiningInput, MiningResult } from '../lib/mining-calc';
+import { calculateRewards } from '../lib/mining';
+export type { MiningInput, MiningResult } from '../lib/mining';
 
 // ---------------------------------------------------------------------------
 // Worker message handler

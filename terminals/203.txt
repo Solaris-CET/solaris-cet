@@ -1,0 +1,21 @@
+---
+pid: 20188
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/gamificationInvitesRoute.test.ts src/__tests__/leaderboardWeeklyRoute.test.ts src/__tests__/gamificationMeRoute.test.ts src/__tests__/gamificationProfileRoute.test.ts src/__tests__/questClaimRoute.test.ts 2>&1"
+started_at: 2026-07-07T15:09:15.505Z
+running_for_ms: 8510015  
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ✓ src/__tests__/gamificationMeRoute.test.ts (5 tests) 73ms
+ ✓ src/__tests__/questClaimRoute.test.ts (7 tests) 71ms
+ ✓ src/__tests__/gamificationProfileRoute.test.ts (6 tests) 194ms
+ ✓ src/__tests__/gamificationInvitesRoute.test.ts (5 tests) 82ms
+ ✓ src/__tests__/leaderboardWeeklyRoute.test.ts (5 tests) 87ms
+
+ Test Files  5 passed (5)
+      Tests  28 passed (28)
+   Start at  18:09:20
+   Duration  13.20s (transform 584ms, setup 4.07s, import 4.59s, tests 507ms, environment 1ms)
+

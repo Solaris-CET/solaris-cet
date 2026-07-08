@@ -1,0 +1,33 @@
+---
+pid: 14332
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "if (Test-Path \"$env:USERPROFILE\\.gmail-mcp\\gcp-oauth.keys.json\") { Write-Output \"KEYS: yes\" } else { Write-Output \"KEYS: no\" }; if (Test-Path \"$env:USERPROFILE\\.gmail-mcp\\credentials.json\") { Write-Output \"CREDS: yes\" } else { Write-Output \"CREDS: no\" }; grok mcp doctor gmail 2>&1"
+started_at: 2026-07-06T01:18:49.047Z
+running_for_ms: 93961458 
+---
+KEYS: no
+CREDS: no
+
+MCP Doctor
+
+  Config sources
+    ~/.grok/config.toml                      1 server
+    ~/.claude.json                           0 servers
+    .mcp.json                                not found
+    grok.com                                 3 servers
+
+  gmail (stdio: npx -y @gongrzhe/server-gmail-autoauth-mcp)
+    ✓ command found (C:\Program Files\nodejs\npx
+C:\Program Files\nodejs\npx.cmd)
+    ✓ server started (0.0s)
+    ✗ handshake failed (connection closed: initialize response)
+    → check server logs
+
+Found 0 healthy, 1 failing. Run `grok mcp doctor --json` for full diagnostics.
+
+
+---
+exit_code: -1
+elapsed_ms: 93961458
+ended_at: 2026-07-07T03:24:49.361Z
+---

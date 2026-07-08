@@ -1,8 +1,12 @@
 import { eq, sql } from 'drizzle-orm';
-import { getAllowedOrigin } from '../lib/cors';
-import { jsonResponse, optionsResponse } from '../lib/http';
-import { requireAuth } from '../lib/auth';
-import { getDb, schema } from '../../db/client';
+
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
+import { buildUserMePayload, normalizeReferralsCount, USER_ME_PROBE } from '@/api/lib/userMe';
+
+export { USER_ME_PATH, USER_ME_PROBE } from '@/api/lib/userMe';
 
 export const config = { runtime: 'nodejs' };
 
@@ -10,7 +14,7 @@ export default async function handler(req: Request): Promise<Response> {
   const allowedOrigin = getAllowedOrigin(req.headers.get('origin'));
 
   if (req.method === 'OPTIONS') {
-    return optionsResponse(req, 'GET, OPTIONS', 'Content-Type, Authorization');
+    return optionsResponse(req, USER_ME_PROBE.methods.join(', '), 'Content-Type, Authorization');
   }
 
   if (req.method !== 'GET') {
@@ -38,31 +42,14 @@ export default async function handler(req: Request): Promise<Response> {
     .from(schema.referrals)
     .where(eq(schema.referrals.referrerUserId, ctx.user.id));
 
-  const referralsCount = typeof refCount?.c === 'number' ? refCount.c : 0;
-
-  return jsonResponse(req, {
-    user: {
-      id: ctx.user.id,
-      walletAddress: ctx.user.walletAddress,
-      role: ctx.user.role,
-      points: ctx.user.points,
-      referralCode: ctx.user.referralCode,
-      createdAt: ctx.user.createdAt,
-    },
-    settings: {
-      displayName: settings?.displayName ?? null,
-      email: settings?.email ?? null,
-      emailRemindersEnabled: settings?.emailRemindersEnabled ?? false,
-      telegramNotificationsEnabled: settings?.telegramNotificationsEnabled ?? true,
-      locale: settings?.locale ?? 'ro',
-      theme: settings?.theme ?? 'dark',
-    },
+  const payload = buildUserMePayload({
+    ctx,
+    settings: settings ?? null,
     telegram: tg
       ? { linked: true, username: tg.username ?? null, chatId: tg.chatId }
       : { linked: false, username: null, chatId: null },
-    stats: {
-      referralsCount,
-      mfaEnabled: ctx.mfaEnabled,
-    },
+    referralsCount: normalizeReferralsCount(refCount?.c),
   });
+
+  return jsonResponse(req, payload);
 }

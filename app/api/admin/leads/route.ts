@@ -1,11 +1,22 @@
 import type { SQL } from 'drizzle-orm';
 import { and, asc, desc, eq, gte, lte, sql } from 'drizzle-orm';
 
-import { getDb } from '../../../db/client';
-import { quotes } from '../../../db/schema';
-import { requireAdminAuth, requireAdminRole } from '../../lib/adminAuth';
-import { getAllowedOrigin } from '../../lib/cors';
-import { corsJson, corsOptions } from '../../lib/http';
+import { getDb } from '@/db/client';
+import { quotes } from '@/db/schema';
+import { guardAdminRoute } from '@/api/lib/adminAuth';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { corsJson, corsOptions } from '@/api/lib/http';
+import {
+  ADMIN_LEADS_PROBE,
+  parseLeadsLimit,
+  parseLeadsOffset,
+  parseLeadsPage,
+  parseLeadsSortDir,
+  parseLeadsSortField,
+  shouldReturnEmptyLeads,
+} from '../../lib/adminLeads';
+
+export { ADMIN_LEADS_PATH, ADMIN_LEADS_PROBE } from '@/api/lib/adminLeads';
 
 export const config = { runtime: 'nodejs' };
 
@@ -19,38 +30,29 @@ export default async function handler(req: Request): Promise<Response> {
 }
 
 async function handleGet(req: Request): Promise<Response> {
-  const ctx = await requireAdminAuth(req);
+  const ctx = await guardAdminRoute(req, { minRole: ADMIN_LEADS_PROBE.minRole });
   if ('error' in ctx) return corsJson(req, ctx.status, { error: ctx.error });
-  const ok = requireAdminRole(ctx, 'viewer');
-  if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
 
-  const url = new URL(req.url);
-  const page = Math.max(1, Number(url.searchParams.get('page')) || 1);
-  const limit = Math.min(100, Math.max(1, Number(url.searchParams.get('limit')) || 20));
-  const offset = (page - 1) * limit;
-  const sortField = url.searchParams.get('sortField') || 'createdAt';
-  const sortDir = url.searchParams.get('sortDir') === 'asc' ? 'asc' : 'desc';
-  const filterService = url.searchParams.get('service_type') || '';
-  const filterStatus = url.searchParams.get('status') || '';
-  const filterDateFrom = url.searchParams.get('date_from') || '';
-  const filterDateTo = url.searchParams.get('date_to') || '';
+  const searchParams = new URL(req.url).searchParams;
+  const page = parseLeadsPage(searchParams);
+  const limit = parseLeadsLimit(searchParams);
+  const offset = parseLeadsOffset(page, limit);
+  const sortField = parseLeadsSortField(searchParams);
+  const sortDir = parseLeadsSortDir(searchParams);
+  const filterService = searchParams.get('service_type') || '';
+  const filterStatus = searchParams.get('status') || '';
+  const filterDateFrom = searchParams.get('date_from') || '';
+  const filterDateTo = searchParams.get('date_to') || '';
 
-  const db = getDb();
-
-  const conditions: SQL<unknown>[] = [];
-
-  if (filterService) {
-    conditions.push(eq(quotes.serviceType, filterService));
-  }
-  if (filterStatus && filterStatus !== 'nou') {
+  if (shouldReturnEmptyLeads(filterStatus)) {
     return corsJson(req, 200, { leads: [], total: 0, totalPages: 0, page, limit });
   }
-  if (filterDateFrom) {
-    conditions.push(gte(quotes.createdAt, new Date(filterDateFrom)));
-  }
-  if (filterDateTo) {
-    conditions.push(lte(quotes.createdAt, new Date(filterDateTo)));
-  }
+
+  const db = getDb();
+  const conditions: SQL<unknown>[] = [];
+  if (filterService) conditions.push(eq(quotes.serviceType, filterService));
+  if (filterDateFrom) conditions.push(gte(quotes.createdAt, new Date(filterDateFrom)));
+  if (filterDateTo) conditions.push(lte(quotes.createdAt, new Date(filterDateTo)));
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
   const sortColumn =
@@ -81,7 +83,7 @@ async function handleGet(req: Request): Promise<Response> {
       email: item.email,
       location: item.location,
       serviceType: item.serviceType,
-      status: 'nou' as const,
+      status: ADMIN_LEADS_PROBE.defaultLeadStatus,
       notes: item.message ?? null,
     })),
     total,

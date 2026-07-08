@@ -3,7 +3,16 @@
 import json
 from pathlib import Path
 
-from src.batch_processor import BatchJob, load_manifest_json, parse_upload_photo_key, run_batch
+from src.batch_processor import (
+    BATCH_VERSION,
+    BatchJob,
+    load_manifest,
+    load_manifest_csv,
+    load_manifest_json,
+    parse_upload_photo_key,
+    run_batch,
+    run_batch_uploaded,
+)
 from src.dashboard import get_dashboard_data, format_dashboard_markdown
 from src.models import get_sample_survey
 from src.report_registry import ReportRegistry
@@ -30,6 +39,39 @@ def test_batch_json_manifest(tmp_path: Path):
     jobs = load_manifest_json(manifest)
     assert len(jobs) == 1
     assert jobs[0].job_id == "test-1"
+
+
+def test_batch_csv_manifest(tmp_path: Path):
+    manifest = tmp_path / "jobs.csv"
+    manifest.write_text(
+        "job_id,photos_dir,client_name,client_city,premium\n"
+        f"csv-1,{tmp_path / 'photos'},CSV Client,Cluj,true\n",
+        encoding="utf-8",
+    )
+    photos = tmp_path / "photos"
+    photos.mkdir()
+    (photos / "roof.jpg").write_bytes(b"\xff\xd8\xff" + b"\x00" * 50)
+    jobs = load_manifest_csv(manifest)
+    assert len(jobs) == 1
+    assert jobs[0].job_id == "csv-1"
+    assert jobs[0].premium is True
+    assert load_manifest(manifest)[0].client_name == "CSV Client"
+
+
+def test_run_batch_uploaded_missing_photos(tmp_path: Path):
+    jobs = [BatchJob(job_id="empty", client_name="No Photos")]
+    summary = run_batch_uploaded(jobs, photos_by_job={}, output_dir=tmp_path / "out")
+    assert summary.failed == 1
+    assert summary.results[0].error == "Nicio poză pentru job"
+    summary_json = json.loads((tmp_path / "out" / "batch_summary.json").read_text(encoding="utf-8"))
+    assert summary_json["batch_version"] == BATCH_VERSION
+
+
+def test_run_batch_missing_photos_dir(tmp_path: Path):
+    jobs = [BatchJob(job_id="missing-dir", photos_dir=str(tmp_path / "nope"), client_name="X")]
+    summary = run_batch(jobs, output_dir=tmp_path / "out")
+    assert summary.failed == 1
+    assert "inexistent" in (summary.results[0].error or "").lower()
 
 
 def test_batch_run(tmp_path: Path):

@@ -1,0 +1,50 @@
+---
+pid: 8180
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx tsc --noEmit -p tsconfig.app.json 2>&1 | Select-String -Pattern \"twin|Twin3D|useTwinStream|twinWebhook|twin3d\""
+started_at: 2026-07-06T17:13:41.610Z
+running_for_ms: 86400017 
+---
+
+src/components/survey/Twin3DViewer.tsx(32,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicEleme
+nts'.
+src/components/survey/Twin3DViewer.tsx(33,7): error TS2339: Property 'directionalLight' does not exist on type 'JSX.Int
+rinsicElements'.
+src/components/survey/Twin3DViewer.tsx(34,7): error TS2339: Property 'ambientLight' does not exist on type 'JSX.Intrins
+icElements'.
+src/components/survey/Twin3DViewer.tsx(35,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElemen
+ts'.
+src/components/survey/Twin3DViewer.tsx(36,9): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.Intrinsi
+cElements'.
+src/components/survey/Twin3DViewer.tsx(37,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX
+.IntrinsicElements'.
+src/components/survey/Twin3DViewer.tsx(38,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElemen
+ts'.
+src/components/survey/Twin3DViewer.tsx(40,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElemen
+ts'.
+src/components/survey/Twin3DViewer.tsx(41,11): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.Intrins
+icElements'.
+src/components/survey/Twin3DViewer.tsx(42,11): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JS
+X.IntrinsicElements'.
+src/components/survey/Twin3DViewer.tsx(43,9): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElemen
+ts'.
+src/components/survey/Twin3DViewer.tsx(45,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElemen
+ts'.
+src/components/survey/Twin3DViewer.tsx(46,9): error TS2339: Property 'boxGeometry' does not exist on type 'JSX.Intrinsi
+cElements'.
+src/components/survey/Twin3DViewer.tsx(47,9): error TS2339: Property 'meshStandardMaterial' does not exist on type 'JSX
+.IntrinsicElements'.
+src/components/survey/Twin3DViewer.tsx(48,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElemen
+ts'.
+src/components/survey/Twin3DViewer.tsx(49,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicEleme
+nts'.
+src/components/survey/TwinRuntimePanel.tsx(2,20): error TS2305: Module '"lucide-react"' has no exported member 'Box'.
+src/components/survey/TwinRuntimePanel.tsx(2,25): error TS2305: Module '"lucide-react"' has no exported member 'Map'.
+
+
+
+---
+exit_code: -1
+elapsed_ms: 86400017
+ended_at: 2026-07-07T17:13:42.406Z
+---

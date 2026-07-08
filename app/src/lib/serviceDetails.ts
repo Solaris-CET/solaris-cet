@@ -4,6 +4,7 @@ type ServiceDetail = {
   slug: string;
   title: string;
   subtitle: string;
+  image?: string;
   highlights?: Array<{ label: string; value: string }>;
   chart?: { title: string; labels: string[]; values: number[] };
   longDescription?: string[];

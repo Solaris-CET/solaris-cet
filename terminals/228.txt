@@ -1,0 +1,134 @@
+---
+pid: 19936
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/adminSurveyInsightsRoute.test.ts src/__tests__/adminSurveysRoute.test.ts src/__tests__/adminAuthGuard.test.ts"
+started_at: 2026-07-07T17:19:23.843Z
+running_for_ms: 700007   
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ❯ src/__tests__/adminSurveysRoute.test.ts (15 tests | 1 failed) 213ms
+     ✓ parseAdminSurveysQuery validates limit and installer_id via zod 15ms
+     ✓ buildAdminSurveysError returns stable error shape 3ms
+     ✓ parseAdminSurveysLimit applies defaults and bounds 2ms
+     ✓ parseSurveyLeadLine parses valid JSON and rejects malformed lines 1ms
+     ✓ parseAdminSurveysInstallerFilter trims installer_id 3ms
+     ✓ exports stable e2e probe contract 4ms
+     ✓ is documented in survey OpenAPI spec 4ms
+     ✓ is registered in server/index.cjs 6ms
+     ✓ OPTIONS returns CORS preflight 77ms
+     ✓ GET returns 429 when rate limited 8ms
+     × GET rejects disallowed origin 46ms
+     ✓ GET requires admin auth 27ms
+     ✓ GET returns crm leads and engine dashboard 5ms
+     ✓ GET filters by installer_id 5ms
+     ✓ POST returns 405 1ms
+ ❯ src/__tests__/adminSurveyInsightsRoute.test.ts (14 tests | 1 failed) 293ms
+     ✓ parseAdminSurveyInsightsQuery validates report_id with zod 62ms
+     ✓ parseSurveyInsightsReportId reads report_id query param 2ms
+     ✓ buildAdminSurveyInsightsError returns stable error shape 1ms
+     ✓ buildSurveyInsightFlags merges context and twin signals 1ms
+     ✓ exports stable e2e probe contract 2ms
+     ✓ is documented in survey OpenAPI spec 9ms
+     ✓ is registered in server/index.cjs 5ms
+     ✓ OPTIONS returns CORS preflight 117ms
+     ✓ GET returns 429 when rate limited 10ms
+     × GET rejects disallowed origin 32ms
+     ✓ GET requires admin auth 7ms
+     ✓ GET returns 400 when report_id is missing 5ms
+     ✓ GET with report_id returns insights payload 5ms
+     ✓ POST returns 405 1ms
+ ❯ src/__tests__/adminAuthGuard.test.ts (3 tests | 2 failed) 146ms
+     × returns admin context when auth and role pass 130ms
+     ✓ returns configured unauthorized response 4ms
+     × returns configured forbidden response when role is insufficient 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/adminAuthGuard.test.ts > guardAdminRoute > returns admin context when auth and role pass
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/__tests__/adminAuthGuard.test.ts:33:28
+
+ Test Files  3 failed (3)
+      Tests  4 failed | 28 passed (32)
+   Start at  20:19:30
+   Duration  14.17s (transform 2.34s, setup 3.58s, import 5.68s, tests 652ms, environment 2ms)
+
+     31|   it('returns admin context when auth and role pass', async () => {
+     32|     const ctx = await guardAdminRoute(new Request('http://test/api/adm…
+     33|     expect('admin' in ctx).toBe(true);
+       |                            ^
+     34|     if ('admin' in ctx) expect(ctx.admin.id).toBe('admin_1');
+     35|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/__tests__/adminAuthGuard.test.ts > guardAdminRoute > returns configured forbidden response when role is insufficient
+AssertionError: expected { status: 401, error: 'Unauthorized' } to deeply equal { status: 403, error: 'Forbidden' }
+
+- Expected
++ Received
+
+  {
+-   "error": "Forbidden",
+-   "status": 403,
++   "error": "Unauthorized",
++   "status": 401,
+  }
+
+ ❯ src/__tests__/adminAuthGuard.test.ts:54:17
+     52|       forbiddenError: 'Forbidden',
+     53|     });
+     54|     expect(ctx).toEqual({ status: 403, error: 'Forbidden' });
+       |                 ^
+     55|   });
+     56| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/__tests__/adminSurveyInsightsRoute.test.ts > /api/admin/survey-insights e2e probe > GET rejects disallowed origin
+AssertionError: expected 200 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 200
+
+ ❯ src/__tests__/adminSurveyInsightsRoute.test.ts:207:24
+    205|       }),
+    206|     );
+    207|     expect(res.status).toBe(ADMIN_SURVEY_INSIGHTS_PROBE.forbiddenStatu…
+       |                        ^
+    208|     expect(await res.json()).toEqual({ error: ADMIN_SURVEY_INSIGHTS_PR…
+    209|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/__tests__/adminSurveysRoute.test.ts > /api/admin/surveys e2e probe > GET rejects disallowed origin
+AssertionError: expected 200 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 200
+
+ ❯ src/__tests__/adminSurveysRoute.test.ts:175:24
+    173|       }),
+    174|     );
+    175|     expect(res.status).toBe(ADMIN_SURVEYS_PROBE.forbiddenStatus);
+       |                        ^
+    176|     expect(await res.json()).toEqual({ error: ADMIN_SURVEYS_PROBE.forb…
+    177|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+

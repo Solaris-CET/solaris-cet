@@ -1,8 +1,17 @@
-import { getAllowedOrigin } from '../../lib/cors';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyOrchestrateSuccessPayload,
+  parseSurveyOrchestrateReportId,
+  probeSurveyOrchestrate,
+  resolveSurveyOrchestrateEngineUrl,
+  SURVEY_ORCHESTRATE_PROBE,
+  surveyOrchestrateErrorMessage,
+  surveyOrchestrateHttpStatus,
+} from '../../lib/surveyOrchestrate';
+
+export { SURVEY_ORCHESTRATE_PATH, SURVEY_ORCHESTRATE_PROBE } from '@/api/lib/surveyOrchestrate';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
 
 function json(body: unknown, origin: string, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -11,7 +20,7 @@ function json(body: unknown, origin: string, status = 200) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': origin,
       Vary: 'Origin',
-      'Cache-Control': 'private, max-age=60',
+      'Cache-Control': SURVEY_ORCHESTRATE_PROBE.cacheControl,
     },
   });
 }
@@ -24,7 +33,8 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': SURVEY_ORCHESTRATE_PROBE.methods.join(', '),
+        'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       },
     });
@@ -35,22 +45,23 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const url = new URL(req.url);
-  const reportId = (url.searchParams.get('report_id') || '').trim();
-  if (!reportId || reportId.length > 80) {
-    return json({ error: 'report_id required' }, allowed, 400);
+  const reportId = parseSurveyOrchestrateReportId(url.searchParams.get(SURVEY_ORCHESTRATE_PROBE.reportIdParam));
+  if (!reportId) {
+    return json({ error: SURVEY_ORCHESTRATE_PROBE.missingReportIdError }, allowed, 400);
   }
 
-  try {
-    const res = await fetch(
-      `${ENGINE.replace(/\/$/, '')}/orchestrate/${encodeURIComponent(reportId)}`,
-      { signal: AbortSignal.timeout(8000) },
-    );
-    const data = await res.json();
-    if (!res.ok) {
-      return json({ error: data.detail || 'Orchestration unavailable' }, allowed, res.status === 404 ? 404 : 502);
-    }
-    return json({ platform: 'solaris-cet', orchestration: data }, allowed, 200);
-  } catch {
-    return json({ error: 'survey-engine unreachable' }, allowed, 503);
+  const engineUrl = resolveSurveyOrchestrateEngineUrl();
+  const probe = await probeSurveyOrchestrate(engineUrl, reportId);
+  if (!probe.ok) {
+    return json({ error: SURVEY_ORCHESTRATE_PROBE.unreachableError }, allowed, SURVEY_ORCHESTRATE_PROBE.unreachableStatus);
   }
+  if (probe.status !== 200) {
+    return json(
+      { error: surveyOrchestrateErrorMessage(probe.data) },
+      allowed,
+      surveyOrchestrateHttpStatus(probe.status),
+    );
+  }
+
+  return json(buildSurveyOrchestrateSuccessPayload(probe.data), allowed, 200);
 }

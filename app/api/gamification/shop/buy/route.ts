@@ -1,31 +1,31 @@
 import { and, eq, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../../db/client';
-import { requireUser } from '../../../lib/authUser';
-import { corsJson, corsOptions, readJson } from '../../../lib/http';
-import { bootstrapGamification } from '../../lib/gamification';
+import { getDb, schema } from '@/db/client';
+import { requireUser } from '@/api/lib/authUser';
+import { corsJson, corsOptions, readJson } from '@/api/lib/http';
+import { isShopBuyUniqueViolation, parseShopBuyItemSlug, SHOP_BUY_PROBE } from '@/api/lib/shopBuy';
+import { bootstrapGamification } from '@/api/gamification/lib/gamification';
+
+export { SHOP_BUY_PATH, SHOP_BUY_PROBE } from '@/api/lib/shopBuy';
 
 export const config = { runtime: 'nodejs' };
 
-function isUniqueViolation(err: unknown): boolean {
-  return typeof err === 'object' && err !== null && 'code' in err && (err as { code?: string }).code === '23505';
-}
-
 export default async function handler(req: Request): Promise<Response> {
-  if (req.method === 'OPTIONS') return corsOptions(req, 'POST, OPTIONS');
+  if (req.method === 'OPTIONS') return corsOptions(req, SHOP_BUY_PROBE.methods.join(', '));
   if (req.method !== 'POST') return corsJson(req, 405, { error: 'Method not allowed' });
 
   const user = await requireUser(req);
-  if (!user) return corsJson(req, 401, { error: 'Unauthorized' });
+  if (!user) return corsJson(req, SHOP_BUY_PROBE.unauthenticatedStatus, { error: 'Unauthorized' });
 
   let body: unknown;
   try {
     body = await readJson(req);
   } catch {
-    return corsJson(req, 400, { error: 'Invalid JSON' });
+    return corsJson(req, 400, { error: SHOP_BUY_PROBE.invalidJsonError });
   }
-  const itemSlug = typeof (body as { itemSlug?: unknown })?.itemSlug === 'string' ? (body as { itemSlug: string }).itemSlug.trim() : '';
-  if (!itemSlug) return corsJson(req, 400, { error: 'Invalid item' });
+
+  const itemSlug = parseShopBuyItemSlug(body);
+  if (!itemSlug) return corsJson(req, 400, { error: SHOP_BUY_PROBE.invalidItemError });
 
   const db = getDb();
   await bootstrapGamification(db);
@@ -40,9 +40,9 @@ export default async function handler(req: Request): Promise<Response> {
         .from(schema.shopItems)
         .where(eq(schema.shopItems.slug, itemSlug))
         .limit(1);
-      if (!item || !item.active) return { ok: false as const, status: 404 as const, error: 'Item not found' };
+      if (!item || !item.active) return { ok: false as const, status: 404 as const, error: SHOP_BUY_PROBE.notFoundError };
       const cost = item.cost ?? 0;
-      if (cost <= 0) return { ok: false as const, status: 400 as const, error: 'Invalid item cost' };
+      if (cost <= 0) return { ok: false as const, status: 400 as const, error: SHOP_BUY_PROBE.invalidCostError };
 
       const [owned] = await tx
         .select({ id: schema.userInventory.id })
@@ -55,12 +55,12 @@ export default async function handler(req: Request): Promise<Response> {
         await tx.insert(schema.pointsLedger).values({
           userId: user.id,
           delta: -cost,
-          reason: 'shop',
+          reason: SHOP_BUY_PROBE.shopReason,
           dedupeKey: `shop:${item.id}`,
           meta: { item: item.slug, cost },
         });
       } catch (err) {
-        if (!isUniqueViolation(err)) throw err;
+        if (!isShopBuyUniqueViolation(err)) throw err;
         return { ok: true as const, purchased: false, alreadyOwned: true, cost };
       }
 
@@ -78,7 +78,7 @@ export default async function handler(req: Request): Promise<Response> {
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : '';
-    if (msg === 'insufficient_points') return corsJson(req, 409, { error: 'Insufficient points' });
+    if (msg === 'insufficient_points') return corsJson(req, 409, { error: SHOP_BUY_PROBE.insufficientPointsError });
     throw err;
   }
 

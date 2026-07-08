@@ -1,0 +1,28 @@
+---
+pid: 15284
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx tsc --noEmit -p tsconfig.app.json 2>&1 | Select-Object -Last 15"
+started_at: 2026-07-06T17:08:24.148Z
+running_for_ms: 86400010 
+---
+src/experience/HologramToken.tsx(168,7): error TS2339: Property 'mesh' does not exist on type 'JSX.IntrinsicElements'.
+src/experience/HologramToken.tsx(169,5): error TS2339: Property 'group' does not exist on type 'JSX.IntrinsicElements'.
+src/experience/HologramToken.tsx(243,10): error TS2339: Property 'lineSegments' does not exist on type 'JSX.IntrinsicElements'.
+src/lib/spaSeo.ts(89,31): error TS2554: Expected 0 arguments, but got 1.
+src/lib/spaSeo.ts(93,14): error TS2339: Property 'keywords' does not exist on type '{ title: string; description: string; openGraph: { type: string; locale: string; url: string; siteName: string; }; }'.
+src/lib/spaSeo.ts(93,64): error TS2339: Property 'keywords' does not exist on type '{ title: string; description: string; openGraph: { type: string; locale: string; url: string; siteName: string; }; }'.
+src/pages_legacy/ServiceDetailPage.tsx(46,22): error TS2339: Property 'image' does not exist on type 'ServiceDetail'.
+src/pages_legacy/ServiceDetailPage.tsx(105,54): error TS2339: Property 'image' does not exist on type 'ServiceDetail'.
+src/pages_legacy/SolarCalculatorPage.tsx(1,61): error TS2305: Module '"lucide-react"' has no exported member 'TreePine'.
+src/pages_legacy/SolarCalculatorPage.tsx(1,100): error TS2305: Module '"lucide-react"' has no exported member 'Factory'.
+src/pages_legacy/SolarCalculatorPage.tsx(1,131): error TS2305: Module '"lucide-react"' has no exported member 'DollarSign'.
+src/pages_legacy/SolarCalculatorPage.tsx(1,152): error TS2724: '"lucide-react"' has no exported member named 'BarChart3'. Did you mean 'BarChart2'?
+src/pages_legacy/TokenomicsPage.tsx(9,8): error TS2307: Cannot find module 'chart.js' or its corresponding type declarations.
+src/pages_legacy/TokenomicsPage.tsx(11,30): error TS2307: Cannot find module 'react-chartjs-2' or its corresponding type declarations.
+src/sections/SocialProofSection.tsx(2,57): error TS2305: Module '"lucide-react"' has no exported member 'Award'.
+
+---
+exit_code: -1
+elapsed_ms: 86400010
+ended_at: 2026-07-07T17:08:24.902Z
+---

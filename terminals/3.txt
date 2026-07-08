@@ -3,7 +3,7 @@ pid: 3888
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "Set-Location \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\"; python -m pytest tests/test_report_generator.py tests/test_cli.py -v --tb=short 2>&1; python -m src.cli demo 2>&1; python -m src.cli demo 2>&1; python -m src.cli demo 2>&1"
 started_at: 2026-07-05T19:59:21.326Z
-running_for_ms: 16655100 
+running_for_ms: 86400003 
 ---
 ============================= test session starts =============================
 platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\CCons\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\python.exe
@@ -139,3 +139,9 @@ TypeError: ReportGenerator._page_toc() takes 2 positional arguments but 3 were g
   Scor:      87/100
   Design:    v6 (3× refined)
   Fișier:    C:\Users\CCons\Desktop\SOLARIS CET\output\SOLARIS_SOL-2026-0042_20260705_225959.pdf
+
+---
+exit_code: -1
+elapsed_ms: 86400003
+ended_at: 2026-07-06T19:59:28.931Z
+---

@@ -1,0 +1,27 @@
+---
+pid: 19652
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npm install -D fake-indexeddb"
+started_at: 2026-07-07T04:28:54.659Z
+running_for_ms: 46935013 
+---
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: 'mute-stream@4.0.0',
+npm warn EBADENGINE   required: { node: '^22.22.2 || ^24.15.0 || >=26.0.0' },
+npm warn EBADENGINE   current: { node: 'v24.13.0', npm: '11.6.2' }
+npm warn EBADENGINE }
+
+added 1 package, changed 1 package, and audited 2151 packages in 34s
+
+345 packages are looking for funding
+  run `npm fund` for details
+
+36 vulnerabilities (1 low, 30 moderate, 4 high, 1 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.

@@ -1,0 +1,39 @@
+---
+pid: 12276
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; node ../scripts/run-bin.mjs eslint . --quiet 2>&1 | Select-String \"error\" | Select-Object -First 40"
+started_at: 2026-07-07T03:59:21.362Z
+running_for_ms: 48710001 
+---
+
+  45:7  error  The value assigned to 'dbStatus' is not used in subsequent statements     no-useless-assignment
+  59:7  error  The value assigned to 'redisStatus' is not used in subsequent statements  no-useless-assignment
+  90:13  error  Error: This value cannot be modified
+  90:13  error  Error: This value cannot be modified
+  17:21  error  Error: Cannot call impure function during render
+  18:28  error  Error: Cannot call impure function during render
+  20:31  error  Error: Cannot call impure function during render
+  22:25  error  Error: Cannot call impure function during render
+  23:20  error  Error: Cannot call impure function during render
+  19:27  error  Error: Cannot call impure function during render
+  20:30  error  Error: Cannot call impure function during render
+  21:31  error  Error: Cannot call impure function during render
+  22:25  error  Error: Cannot call impure function during render
+  23:20  error  Error: Cannot call impure function during render
+  33:27  error  Error: Cannot call impure function during render
+  34:30  error  Error: Cannot call impure function during render
+  35:31  error  Error: Cannot call impure function during render
+  36:25  error  Error: Cannot call impure function during render
+  37:20  error  Error: Cannot call impure function during render
+  20:18  error  Error: Cannot call impure function during render
+  21:18  error  Error: Cannot call impure function during render
+  29:25  error  Error: Cannot call impure function during render
+  30:20  error  Error: Cannot call impure function during render
+  20:17  error  Error: Cannot call impure function during render
+  21:24  error  Error: Cannot call impure function during render
+  22:18  error  Error: Cannot call impure function during render
+  26:25  error  Error: Cannot call impure function during render
+  27:20  error  Error: Cannot call impure function during render
+✖ 28 problems (28 errors, 0 warnings)
+
+

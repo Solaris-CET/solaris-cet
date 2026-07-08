@@ -1,10 +1,23 @@
 import type { InstallerProfile, SurveyFormData } from '@/lib/surveyApi';
+import { SURVEY_INDEXEDDB_NAME } from '@/lib/surveyOfflineManifest';
 
-const DB_NAME = 'solaris-survey-v1';
-const DB_VERSION = 1;
-const DRAFT_KEY = 'current';
-const DRAFT_STORE = 'drafts';
-const QUEUE_STORE = 'queue';
+export const SURVEY_DRAFT_SCHEMA = 'solaris-survey-draft-v1';
+export const SURVEY_DB_NAME = SURVEY_INDEXEDDB_NAME;
+export const SURVEY_DB_VERSION = 1;
+export const SURVEY_DRAFT_KEY = 'current';
+export const DRAFT_STORE = 'drafts';
+export const QUEUE_STORE = 'queue';
+
+export const DEFAULT_PHOTO_NAME = 'photo.jpg';
+export const DEFAULT_PHOTO_TYPE = 'image/jpeg';
+
+export const STORAGE_ERRORS = {
+  openFailed: 'IndexedDB indisponibil',
+  requestFailed: 'Citire stocare eșuată',
+  txFailed: 'Tranzacție stocare eșuată',
+} as const;
+
+export const PENDING_REPORT_STATUSES = ['pending', 'syncing', 'failed'] as const;
 
 export type StoredPhoto = {
   name: string;
@@ -20,7 +33,7 @@ export type SurveyDraftRecord = {
   updatedAt: string;
 };
 
-export type PendingReportStatus = 'pending' | 'syncing' | 'failed';
+export type PendingReportStatus = (typeof PENDING_REPORT_STATUSES)[number];
 
 export type PendingReportRecord = {
   id: string;
@@ -33,9 +46,26 @@ export type PendingReportRecord = {
   lastError?: string;
 };
 
+export function createPendingReportId(now = Date.now()): string {
+  return `pending-${now}`;
+}
+
+export function isPendingReportStatus(value: string): value is PendingReportStatus {
+  return (PENDING_REPORT_STATUSES as readonly string[]).includes(value);
+}
+
+export function queueStatusLabel(status: PendingReportStatus): string {
+  const labels: Record<PendingReportStatus, string> = {
+    pending: 'În așteptare',
+    syncing: 'Se sincronizează',
+    failed: 'Eșuat',
+  };
+  return labels[status];
+}
+
 function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    const req = indexedDB.open(SURVEY_DB_NAME, SURVEY_DB_VERSION);
     req.onupgradeneeded = () => {
       const db = req.result;
       if (!db.objectStoreNames.contains(DRAFT_STORE)) {
@@ -46,7 +76,7 @@ function openDb(): Promise<IDBDatabase> {
       }
     };
     req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error ?? new Error('IndexedDB open failed'));
+    req.onerror = () => reject(req.error ?? new Error(STORAGE_ERRORS.openFailed));
   });
 }
 
@@ -62,17 +92,17 @@ function tx<T>(
         const store = transaction.objectStore(storeName);
         const request = fn(store);
         request.onsuccess = () => resolve(request.result as T);
-        request.onerror = () => reject(request.error ?? new Error('IndexedDB request failed'));
+        request.onerror = () => reject(request.error ?? new Error(STORAGE_ERRORS.requestFailed));
         transaction.oncomplete = () => db.close();
-        transaction.onerror = () => reject(transaction.error ?? new Error('IndexedDB tx failed'));
+        transaction.onerror = () => reject(transaction.error ?? new Error(STORAGE_ERRORS.txFailed));
       }),
   );
 }
 
 export function photosToStored(photos: File[]): StoredPhoto[] {
   return photos.map((file) => ({
-    name: file.name || 'photo.jpg',
-    type: file.type || 'image/jpeg',
+    name: file.name || DEFAULT_PHOTO_NAME,
+    type: file.type || DEFAULT_PHOTO_TYPE,
     blob: file,
   }));
 }
@@ -87,7 +117,7 @@ export async function saveSurveyDraft(
   photos: File[],
 ): Promise<void> {
   const record: SurveyDraftRecord = {
-    key: DRAFT_KEY,
+    key: SURVEY_DRAFT_KEY,
     form,
     installer,
     photos: photosToStored(photos),
@@ -99,7 +129,7 @@ export async function saveSurveyDraft(
 export async function loadSurveyDraft(): Promise<SurveyDraftRecord | null> {
   try {
     const record = await tx<SurveyDraftRecord | undefined>(DRAFT_STORE, 'readonly', (store) =>
-      store.get(DRAFT_KEY),
+      store.get(SURVEY_DRAFT_KEY),
     );
     return record ?? null;
   } catch {
@@ -109,7 +139,7 @@ export async function loadSurveyDraft(): Promise<SurveyDraftRecord | null> {
 
 export async function clearSurveyDraft(): Promise<void> {
   try {
-    await tx(DRAFT_STORE, 'readwrite', (store) => store.delete(DRAFT_KEY));
+    await tx(DRAFT_STORE, 'readwrite', (store) => store.delete(SURVEY_DRAFT_KEY));
   } catch {
     void 0;
   }
@@ -119,8 +149,8 @@ export async function enqueuePendingReport(
   form: SurveyFormData,
   installer: InstallerProfile,
   photos: File[],
+  id = createPendingReportId(),
 ): Promise<string> {
-  const id = `pending-${Date.now()}`;
   const record: PendingReportRecord = {
     id,
     form,
@@ -138,10 +168,28 @@ export async function updatePendingReport(
   id: string,
   patch: Partial<Pick<PendingReportRecord, 'status' | 'retryCount' | 'lastError'>>,
 ): Promise<void> {
-  const existing = await tx<PendingReportRecord | undefined>(QUEUE_STORE, 'readonly', (store) => store.get(id));
-  if (!existing) return;
-  await tx(QUEUE_STORE, 'readwrite', (store) =>
-    store.put({ ...existing, ...patch }),
+  await openDb().then(
+    (db) =>
+      new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction(QUEUE_STORE, 'readwrite');
+        const store = transaction.objectStore(QUEUE_STORE);
+        const getReq = store.get(id);
+        getReq.onsuccess = () => {
+          const existing = getReq.result as PendingReportRecord | undefined;
+          if (!existing) {
+            resolve();
+            return;
+          }
+          const putReq = store.put({ ...existing, ...patch });
+          putReq.onerror = () => reject(putReq.error ?? new Error(STORAGE_ERRORS.requestFailed));
+        };
+        getReq.onerror = () => reject(getReq.error ?? new Error(STORAGE_ERRORS.requestFailed));
+        transaction.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        transaction.onerror = () => reject(transaction.error ?? new Error(STORAGE_ERRORS.txFailed));
+      }),
   );
 }
 

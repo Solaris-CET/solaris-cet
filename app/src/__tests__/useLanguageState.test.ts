@@ -19,6 +19,14 @@ beforeEach(() => {
   });
 });
 
+function setPathname(path: string) {
+  try {
+    window.history.pushState({}, '', path);
+  } catch {
+    // ignore
+  }
+}
+
 describe('useLanguageState', () => {
   it('defaults, localStorage, invalid key, browser zh, setLang, document lang, t, SUPPORTED_LANGS', async () => {
     Object.defineProperty(navigator, 'language', {
@@ -26,16 +34,36 @@ describe('useLanguageState', () => {
       writable: true,
       configurable: true,
     });
-    const { resultRef: r0 } = await renderHook(() => useLanguageState());
-    expect(r0.current.lang).toBe('en');
+    Object.defineProperty(navigator, 'languages', {
+      value: ['ja-JP'],
+      writable: true,
+      configurable: true,
+    });
 
+    // Canonical Romanian paths default to ro regardless of browser language.
+    setPathname('/');
+    const { resultRef: r0 } = await renderHook(() => useLanguageState());
+    expect(r0.current.lang).toBe('ro');
+
+    // Non-canonical paths fall back to navigator language when supported; otherwise ro.
+    setPathname('/global/page');
+    const { resultRef: r0en } = await renderHook(() => useLanguageState());
+    expect(r0en.current.lang).toBe('ro');
+
+    // Canonical Romanian paths ignore stored preference.
+    setPathname('/');
     localStorage.setItem('solaris_lang', 'es');
     const { resultRef: r1 } = await renderHook(() => useLanguageState());
-    expect(r1.current.lang).toBe('es');
+    expect(r1.current.lang).toBe('ro');
+
+    // Non-canonical paths respect stored preference.
+    setPathname('/global/page');
+    const { resultRef: r1b } = await renderHook(() => useLanguageState());
+    expect(r1b.current.lang).toBe('es');
 
     localStorage.setItem('solaris_lang', 'xx');
     const { resultRef: r2 } = await renderHook(() => useLanguageState());
-    expect(r2.current.lang).toBe('en');
+    expect(r2.current.lang).toBe('ro');
 
     Object.defineProperty(navigator, 'language', {
       value: 'zh-TW',
@@ -47,9 +75,11 @@ describe('useLanguageState', () => {
       writable: true,
       configurable: true,
     });
+    setPathname('/global');
     const { resultRef: r3 } = await renderHook(() => useLanguageState());
     expect(r3.current.lang).toBe('zh');
 
+    setPathname('/en/page');
     const { resultRef: r4 } = await renderHook(() => useLanguageState());
     await act(() => {
       r4.current.setLang('ro');

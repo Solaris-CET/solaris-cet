@@ -6,6 +6,7 @@ description: SOLARIS CET master agent loops v3 — Ralph outer loop + 8 inner lo
 # SOLARIS CET — Perfect Loops v3 (Ralph × Stash × Fable 5)
 
 **Master doc:** `docs/planning/SOLARIS-LOOPS-MASTER.md`  
+**Agent Engineering Protocol (AEP):** `docs/planning/AGENT-ENGINEERING.md` — disciplina P0–P6 sub care rulează toate loop-urile (orice agent, orice model)  
 **Handoff (recovery):** `docs/planning/HANDOFF.md` — când soluția nu merge după prima încercare  
 **Philosophy:** Boil the ocean · Fresh context per task · Memory before motion · Verify in code.
 

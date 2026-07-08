@@ -1,23 +1,28 @@
 import { and, desc, eq, gte } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAdminAuth, requireAdminRole } from '../../lib/adminAuth';
-import { corsJson, corsOptions } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import {
+  auditSinceDate,
+  parseAuditActionParam,
+  parseAuditSinceHoursParam,
+} from '../../lib/adminAuditLogs';
+import { guardAdminRoute } from '@/api/lib/adminAuth';
+import { corsJson, corsOptions } from '@/api/lib/http';
+
+export { ADMIN_AUDIT_LOGS_PATH, ADMIN_AUDIT_LOGS_PROBE } from '@/api/lib/adminAuditLogs';
 
 export const config = { runtime: 'nodejs' };
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return corsOptions(req, 'GET, OPTIONS');
   if (req.method !== 'GET') return corsJson(req, 405, { error: 'Method not allowed' });
-  const ctx = await requireAdminAuth(req);
+  const ctx = await guardAdminRoute(req, { minRole: 'viewer' });
   if ('error' in ctx) return corsJson(req, ctx.status, { error: ctx.error });
-  const ok = requireAdminRole(ctx, 'viewer');
-  if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
 
-  const url = new URL(req.url);
-  const action = (url.searchParams.get('action') ?? '').trim();
-  const sinceHours = Math.max(0, Math.min(24 * 90, Number(url.searchParams.get('sinceHours') ?? '0') || 0));
-  const since = sinceHours ? new Date(Date.now() - sinceHours * 60 * 60 * 1000) : null;
+  const searchParams = new URL(req.url).searchParams;
+  const action = parseAuditActionParam(searchParams);
+  const sinceHours = parseAuditSinceHoursParam(searchParams);
+  const since = auditSinceDate(sinceHours);
 
   const db = getDb();
   const where = and(
@@ -45,4 +50,3 @@ export default async function handler(req: Request): Promise<Response> {
     })),
   });
 }
-

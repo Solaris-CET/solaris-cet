@@ -1,24 +1,24 @@
 import { and, desc, eq, ilike } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { writeAdminAudit } from '../../lib/adminAudit';
-import { requireAdminAuth, requireAdminRole } from '../../lib/adminAuth';
-import { corsJson, corsOptions } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { writeAdminAudit } from '@/api/lib/adminAudit';
+import { guardAdminRoute } from '@/api/lib/adminAuth';
+import { ADMIN_USERS_PROBE, parseAdminUserDeleteId, parseAdminUsersQuery } from '@/api/lib/adminUsers';
+import { corsJson, corsOptions } from '@/api/lib/http';
+
+export { ADMIN_USERS_PATH, ADMIN_USERS_PROBE } from '@/api/lib/adminUsers';
 
 export const config = { runtime: 'nodejs' };
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return corsOptions(req, 'GET, DELETE, OPTIONS');
-  const ctx = await requireAdminAuth(req);
+  const ctx = await guardAdminRoute(req, { minRole: (m) => (m === 'DELETE' ? ADMIN_USERS_PROBE.deleteMinRole : ADMIN_USERS_PROBE.getMinRole) });
   if ('error' in ctx) return corsJson(req, ctx.status, { error: ctx.error });
 
   const db = getDb();
 
   if (req.method === 'GET') {
-    const ok = requireAdminRole(ctx, 'viewer');
-    if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
-    const url = new URL(req.url);
-    const q = (url.searchParams.get('q') ?? '').trim();
+    const q = parseAdminUsersQuery(new URL(req.url).searchParams);
     const rows = await db
       .select({
         id: schema.users.id,
@@ -39,7 +39,7 @@ export default async function handler(req: Request): Promise<Response> {
           : undefined,
       )
       .orderBy(desc(schema.users.createdAt))
-      .limit(300);
+      .limit(ADMIN_USERS_PROBE.maxListRows);
     return corsJson(req, 200, {
       users: rows.map((r) => ({
         id: r.id,
@@ -54,18 +54,14 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   if (req.method === 'DELETE') {
-    const ok = requireAdminRole(ctx, 'admin');
-    if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
-    const url = new URL(req.url);
-    const id = (url.searchParams.get('id') ?? '').trim();
-    if (!id) return corsJson(req, 400, { error: 'Missing id' });
+    const id = parseAdminUserDeleteId(new URL(req.url).searchParams);
+    if (!id) return corsJson(req, 400, { error: ADMIN_USERS_PROBE.missingIdError });
     const [existing] = await db.select().from(schema.users).where(eq(schema.users.id, id));
-    if (!existing) return corsJson(req, 404, { error: 'Not found' });
+    if (!existing) return corsJson(req, 404, { error: ADMIN_USERS_PROBE.notFoundError });
     await db.delete(schema.users).where(eq(schema.users.id, id));
-    await writeAdminAudit(req, ctx, 'USER_DELETED', 'user', id, { walletAddress: existing.walletAddress });
+    await writeAdminAudit(req, ctx, ADMIN_USERS_PROBE.auditAction, 'user', id, { walletAddress: existing.walletAddress });
     return corsJson(req, 200, { ok: true });
   }
 
   return corsJson(req, 405, { error: 'Method not allowed' });
 }
-

@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 
 import type { AdminRole } from '../adminClient';
-import { adminApi } from '../adminClient';
+import { adminApi, adminApiErr } from '../adminClient';
 
 type InviteRow = {
   id: string;
@@ -38,7 +38,7 @@ export function InvitesSection({ token }: { token: string }) {
   const load = useCallback(async () => {
     const res = await adminApi<{ invites: InviteRow[] }>('/api/admin/invites', { token });
     if (!res.ok) {
-      setError(res.error);
+      setError(adminApiErr(res) ?? 'Request failed');
       return;
     }
     setItems(res.data.invites);
@@ -58,7 +58,7 @@ export function InvitesSection({ token }: { token: string }) {
       const eh = Number(expiresInHours);
       const res = await adminApi<{ token: string }>('/api/admin/invites', { token, method: 'POST', body: { role, maxUses: mu, expiresInHours: eh } });
       if (!res.ok) {
-        setError(res.error);
+        setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       setCreatedToken(res.data.token);
@@ -72,7 +72,7 @@ export function InvitesSection({ token }: { token: string }) {
     if (!confirm('Revoci invitația?')) return;
     const res = await adminApi<{ ok: true }>(`/api/admin/invites?id=${encodeURIComponent(id)}`, { token, method: 'DELETE' });
     if (!res.ok) {
-      setError(res.error);
+      setError(adminApiErr(res) ?? 'Request failed');
       return;
     }
     void load();

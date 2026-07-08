@@ -13,6 +13,15 @@ async function readJsonSafe(res: Response): Promise<unknown> {
   }
 }
 
+export type AdminApiResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; status: number; error: string };
+
+/** Safe error message when `res.ok === false` (TS narrowing helper). */
+export function adminApiErr<T>(res: AdminApiResult<T>): string | null {
+  return res.ok === false ? res.error : null;
+}
+
 export async function adminApi<T>(
   path: string,
   opts: {
@@ -20,7 +29,7 @@ export async function adminApi<T>(
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
     body?: unknown;
   },
-): Promise<{ ok: true; data: T } | { ok: false; status: number; error: string }> {
+): Promise<AdminApiResult<T>> {
   const res = await fetch(path, {
     method: opts.method ?? 'GET',
     headers: {

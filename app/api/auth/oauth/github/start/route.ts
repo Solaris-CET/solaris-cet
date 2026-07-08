@@ -1,8 +1,13 @@
 import crypto from 'node:crypto';
-import { jsonResponse, optionsResponse } from '../../../../lib/http';
-import { ensureAllowedOrigin } from '../../../../lib/originGuard';
-import { requireAuth } from '../../../../lib/auth';
-import { getDb, schema } from '../../../../../db/client';
+
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
+import { OAUTH_GITHUB_START_PROBE } from '@/api/lib/oauthGitHubStart';
+import { OAUTH_STATE_TTL_MS, parseOAuthReturnTo } from '@/api/lib/oauthCommon';
+import { ensureAllowedOrigin } from '@/api/lib/originGuard';
+
+export { OAUTH_GITHUB_START_PATH, OAUTH_GITHUB_START_PROBE } from '@/api/lib/oauthGitHubStart';
 
 export const config = { runtime: 'nodejs' };
 
@@ -25,8 +30,8 @@ export default async function handler(req: Request): Promise<Response> {
     return jsonResponse(req, { error: 'Method not allowed' }, 405);
   }
 
-  const clientId = env('GITHUB_OAUTH_CLIENT_ID');
-  if (!clientId) return jsonResponse(req, { error: 'Not configured' }, 501);
+  const clientId = env(OAUTH_GITHUB_START_PROBE.clientIdEnv);
+  if (!clientId) return jsonResponse(req, { error: OAUTH_GITHUB_START_PROBE.notConfiguredError }, 501);
 
   const ctx = await requireAuth(req);
   const userId = 'error' in ctx ? null : ctx.user.id;
@@ -37,36 +42,32 @@ export default async function handler(req: Request): Promise<Response> {
   } catch {
     body = null;
   }
-  const returnTo =
-    typeof body === 'object' && body !== null && 'returnTo' in body && typeof (body as { returnTo?: unknown }).returnTo === 'string'
-      ? (body as { returnTo: string }).returnTo.trim().slice(0, 200)
-      : '/login';
+  const returnTo = parseOAuthReturnTo(body);
 
   const state = randomUrlSafe(24);
   const codeVerifier = randomUrlSafe(48);
-  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + OAUTH_STATE_TTL_MS);
 
   const db = getDb();
   await db.insert(schema.oauthStates).values({
     state,
-    provider: 'github',
+    provider: OAUTH_GITHUB_START_PROBE.provider,
     userId,
     codeVerifier,
     returnTo,
     expiresAt,
   });
 
-  const callbackUrl = new URL('/api/auth/oauth/github/callback', String(process.env.PUBLIC_SITE_URL ?? '').trim() || req.url);
+  const callbackUrl = new URL(OAUTH_GITHUB_START_PROBE.callbackPath, String(process.env.PUBLIC_SITE_URL ?? '').trim() || req.url);
 
-  const auth = new URL('https://github.com/login/oauth/authorize');
+  const auth = new URL(OAUTH_GITHUB_START_PROBE.authorizeHost);
   auth.searchParams.set('client_id', clientId);
   auth.searchParams.set('redirect_uri', callbackUrl.toString());
   auth.searchParams.set('state', state);
-  auth.searchParams.set('scope', 'read:user user:email');
+  auth.searchParams.set('scope', OAUTH_GITHUB_START_PROBE.scope);
   auth.searchParams.set('code_challenge_method', 'S256');
   const challenge = crypto.createHash('sha256').update(codeVerifier).digest().toString('base64url');
   auth.searchParams.set('code_challenge', challenge);
 
   return jsonResponse(req, { ok: true, url: auth.toString() });
 }
-

@@ -1,8 +1,16 @@
-import { getAllowedOrigin } from '../../lib/cors';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyHealthSuccessPayload,
+  buildSurveyHealthUnreachablePayload,
+  probeSurveyEngineHealth,
+  resolveSurveyEngineUrl,
+  SURVEY_HEALTH_PROBE,
+  surveyHealthHttpStatus,
+} from '../../lib/surveyHealth';
+
+export { SURVEY_HEALTH_PATH, SURVEY_HEALTH_PROBE } from '@/api/lib/surveyHealth';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
 
 function json(body: unknown, origin: string, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -11,7 +19,7 @@ function json(body: unknown, origin: string, status = 200) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': origin,
       Vary: 'Origin',
-      'Cache-Control': 'no-store',
+      'Cache-Control': SURVEY_HEALTH_PROBE.cacheControl,
     },
   });
 }
@@ -24,7 +32,7 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': SURVEY_HEALTH_PROBE.methods.join(', '),
         'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       },
@@ -35,17 +43,15 @@ export default async function handler(req: Request): Promise<Response> {
     return json({ error: 'Method not allowed' }, allowed, 405);
   }
 
-  try {
-    const res = await fetch(`${ENGINE.replace(/\/$/, '')}/health`, {
-      signal: AbortSignal.timeout(5000),
-    });
-    const data = await res.json();
-    return json({ platform: 'solaris-cet', engine: data, engine_url: ENGINE }, allowed, res.ok ? 200 : 502);
-  } catch {
-    return json({
-      platform: 'solaris-cet',
-      engine: { ok: false, error: 'survey-engine unreachable' },
-      engine_url: ENGINE,
-    }, allowed, 503);
+  const engineUrl = resolveSurveyEngineUrl();
+  const probe = await probeSurveyEngineHealth(engineUrl);
+  if (!probe.ok) {
+    return json(buildSurveyHealthUnreachablePayload(engineUrl), allowed, SURVEY_HEALTH_PROBE.unreachableStatus);
   }
+
+  return json(
+    buildSurveyHealthSuccessPayload(probe.data, engineUrl),
+    allowed,
+    surveyHealthHttpStatus(probe.engineResponseOk),
+  );
 }

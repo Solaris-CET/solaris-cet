@@ -1,37 +1,25 @@
 import { and, desc, eq, gte, inArray, isNotNull, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../../db/client';
-import { requireAdminAuth, requireAdminRole } from '../../../lib/adminAuth';
-import { corsJson, corsOptions } from '../../../lib/http';
+import { getDb, schema } from '@/db/client';
+import {
+  activationRate,
+  addDaysUtc,
+  dateToDayUtc,
+  parseOverviewDaysParam,
+  sessionQueryPercentiles,
+  type RetentionDay,
+} from '../../../lib/adminAnalyticsOverview';
+import { guardAdminRoute } from '@/api/lib/adminAuth';
+import { corsJson, corsOptions } from '@/api/lib/http';
+
+export { ADMIN_ANALYTICS_OVERVIEW_PATH, ADMIN_ANALYTICS_OVERVIEW_PROBE } from '@/api/lib/adminAnalyticsOverview';
 
 export const config = { runtime: 'nodejs' };
-
-function clampInt(v: string | null, def: number, min: number, max: number): number {
-  const n = Number.parseInt(String(v ?? ''), 10);
-  if (!Number.isFinite(n)) return def;
-  return Math.max(min, Math.min(max, n));
-}
-
-function dateToDayUtc(d: Date): string {
-  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
-}
-
-function addDaysUtc(day: string, add: number): string | null {
-  const m = day.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!m) return null;
-  const y = Number.parseInt(m[1]!, 10);
-  const mo = Number.parseInt(m[2]!, 10) - 1;
-  const da = Number.parseInt(m[3]!, 10);
-  if (!Number.isFinite(y) || !Number.isFinite(mo) || !Number.isFinite(da)) return null;
-  const d = new Date(Date.UTC(y, mo, da));
-  d.setUTCDate(d.getUTCDate() + add);
-  return dateToDayUtc(d);
-}
 
 type Overview = {
   windowDays: number;
   funnel: Array<{ step: string; users: number }>;
-  retention: Array<{ day: 'D1' | 'D7' | 'D30'; cohort: number; returning: number; rate: number }>;
+  retention: Array<{ day: RetentionDay; cohort: number; returning: number; rate: number }>;
   activation: { activated: number; eligible: number; rate: number };
   aiQueriesPerSession7d: { avg: number; p50: number; p90: number };
   segments: Array<{ label: string; users: number }>;
@@ -41,13 +29,10 @@ type Overview = {
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return corsOptions(req, 'GET, OPTIONS');
   if (req.method !== 'GET') return corsJson(req, 405, { error: 'Method not allowed' });
-  const ctx = await requireAdminAuth(req);
+  const ctx = await guardAdminRoute(req, { minRole: 'viewer' });
   if ('error' in ctx) return corsJson(req, ctx.status, { error: ctx.error });
-  const ok = requireAdminRole(ctx, 'viewer');
-  if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
 
-  const url = new URL(req.url);
-  const windowDays = clampInt(url.searchParams.get('days'), 30, 1, 90);
+  const windowDays = parseOverviewDaysParam(new URL(req.url).searchParams);
   const now = new Date();
   const since = new Date(now.getTime() - windowDays * 24 * 60 * 60 * 1000);
   const since7 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -84,11 +69,8 @@ export default async function handler(req: Request): Promise<Response> {
     .from(schema.analyticsEvents)
     .where(and(gte(schema.analyticsEvents.createdAt, since7), eq(schema.analyticsEvents.name, 'ai_query')))
     .groupBy(schema.analyticsEvents.sessionId);
-  const sessionCounts = sessions7d.map((r) => r.cnt ?? 0).filter((n) => Number.isFinite(n));
-  sessionCounts.sort((a, b) => a - b);
-  const avg = sessionCounts.length ? sessionCounts.reduce((a, b) => a + b, 0) / sessionCounts.length : 0;
-  const p50 = sessionCounts.length ? sessionCounts[Math.floor((sessionCounts.length - 1) * 0.5)] ?? 0 : 0;
-  const p90 = sessionCounts.length ? sessionCounts[Math.floor((sessionCounts.length - 1) * 0.9)] ?? 0 : 0;
+  const sessionCounts = sessions7d.map((r) => r.cnt ?? 0);
+  const { avg, p50, p90 } = sessionQueryPercentiles(sessionCounts);
 
   const daysRows = await db
     .select({ anonId: schema.analyticsEvents.anonId, day: schema.analyticsEvents.day })
@@ -186,7 +168,7 @@ export default async function handler(req: Request): Promise<Response> {
     activation: {
       activated: activated?.c ?? 0,
       eligible: eligible?.c ?? 0,
-      rate: (eligible?.c ?? 0) > 0 ? (activated?.c ?? 0) / (eligible?.c ?? 0) : 0,
+      rate: activationRate(activated?.c ?? 0, eligible?.c ?? 0),
     },
     aiQueriesPerSession7d: { avg, p50, p90 },
     segments: [

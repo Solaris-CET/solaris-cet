@@ -1,0 +1,27 @@
+---
+pid: 17984
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/twin3dScene.test.ts src/__tests__/useTwinStream.test.ts src/__tests__/twinWebhookRoute.test.ts src/__tests__/twinRuntimeApi.test.ts src/__tests__/surveyProdGate.test.ts"
+started_at: 2026-07-06T17:12:14.286Z
+running_for_ms: 86400003 
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ✓ src/__tests__/useTwinStream.test.ts (2 tests) 131ms
+ ✓ src/__tests__/twinWebhookRoute.test.ts (2 tests) 9ms
+ ✓ src/__tests__/surveyProdGate.test.ts (2 tests) 15ms
+ ✓ src/__tests__/twinRuntimeApi.test.ts (3 tests) 13ms
+ ✓ src/__tests__/twin3dScene.test.ts (3 tests) 10ms
+
+ Test Files  5 passed (5)
+      Tests  12 passed (12)
+   Start at  20:12:20
+   Duration  15.87s (transform 364ms, setup 4.17s, import 290ms, tests 178ms, environment 8.17s)
+
+
+---
+exit_code: -1
+elapsed_ms: 86400003
+ended_at: 2026-07-07T17:12:15.111Z
+---

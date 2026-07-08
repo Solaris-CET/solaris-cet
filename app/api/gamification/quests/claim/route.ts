@@ -1,30 +1,32 @@
 import { and, eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../../db/client';
-import { requireUser } from '../../../lib/authUser';
-import { corsJson, corsOptions, readJson } from '../../../lib/http';
-import { awardPoints } from '../../../lib/points';
-import { bootstrapGamification, todayKeyUtc } from '../../lib/gamification';
+import { getDb, schema } from '@/db/client';
+import { requireUser } from '@/api/lib/authUser';
+import { corsJson, corsOptions, readJson } from '@/api/lib/http';
+import { awardPoints } from '@/api/lib/points';
+import { isValidQuestClaimPost, parseQuestClaimPostBody, QUEST_CLAIM_PROBE } from '@/api/lib/questClaim';
+import { bootstrapGamification, todayKeyUtc } from '@/api/gamification/lib/gamification';
+
+export { QUEST_CLAIM_PATH, QUEST_CLAIM_PROBE } from '@/api/lib/questClaim';
 
 export const config = { runtime: 'nodejs' };
 
 export default async function handler(req: Request): Promise<Response> {
-  if (req.method === 'OPTIONS') return corsOptions(req, 'POST, OPTIONS');
+  if (req.method === 'OPTIONS') return corsOptions(req, QUEST_CLAIM_PROBE.methods.join(', '));
   if (req.method !== 'POST') return corsJson(req, 405, { error: 'Method not allowed' });
 
   const user = await requireUser(req);
-  if (!user) return corsJson(req, 401, { error: 'Unauthorized' });
+  if (!user) return corsJson(req, QUEST_CLAIM_PROBE.unauthenticatedStatus, { error: 'Unauthorized' });
 
   let body: unknown;
   try {
     body = await readJson(req);
   } catch {
-    return corsJson(req, 400, { error: 'Invalid JSON' });
+    return corsJson(req, 400, { error: QUEST_CLAIM_PROBE.invalidJsonError });
   }
 
-  const questSlug = typeof (body as { questSlug?: unknown })?.questSlug === 'string' ? (body as { questSlug: string }).questSlug.trim() : '';
-  const proofUrl = typeof (body as { proofUrl?: unknown })?.proofUrl === 'string' ? (body as { proofUrl: string }).proofUrl.trim().slice(0, 600) : '';
-  if (!questSlug) return corsJson(req, 400, { error: 'Invalid quest' });
+  const parsed = parseQuestClaimPostBody(body);
+  if (!isValidQuestClaimPost(parsed)) return corsJson(req, 400, { error: QUEST_CLAIM_PROBE.invalidQuestError });
 
   const db = getDb();
   await bootstrapGamification(db);
@@ -39,12 +41,12 @@ export default async function handler(req: Request): Promise<Response> {
       requiresProof: schema.quests.requiresProof,
     })
     .from(schema.quests)
-    .where(and(eq(schema.quests.slug, questSlug), eq(schema.quests.active, true)))
+    .where(and(eq(schema.quests.slug, parsed.questSlug), eq(schema.quests.active, true)))
     .limit(1);
-  if (!quest) return corsJson(req, 404, { error: 'Quest not found' });
+  if (!quest) return corsJson(req, 404, { error: QUEST_CLAIM_PROBE.notFoundError });
 
   const day = todayKeyUtc();
-  const dayKey = quest.kind === 'daily' ? day : '';
+  const dayKey = quest.kind === 'daily' ? day : QUEST_CLAIM_PROBE.seasonalDayKey;
 
   const [row] = await db
     .select({
@@ -53,14 +55,20 @@ export default async function handler(req: Request): Promise<Response> {
       status: schema.userQuestProgress.status,
     })
     .from(schema.userQuestProgress)
-    .where(and(eq(schema.userQuestProgress.userId, user.id), eq(schema.userQuestProgress.questId, quest.id), eq(schema.userQuestProgress.day, dayKey)))
+    .where(
+      and(
+        eq(schema.userQuestProgress.userId, user.id),
+        eq(schema.userQuestProgress.questId, quest.id),
+        eq(schema.userQuestProgress.day, dayKey),
+      ),
+    )
     .limit(1);
 
   const progress = row?.progress ?? 0;
   const target = quest.targetCount ?? 1;
-  if (progress < target) return corsJson(req, 409, { error: 'Not completed' });
+  if (progress < target) return corsJson(req, 409, { error: QUEST_CLAIM_PROBE.notCompletedError });
   if (row?.status === 'claimed') return corsJson(req, 200, { ok: true, claimed: true });
-  if (quest.requiresProof && !proofUrl) return corsJson(req, 400, { error: 'Proof required' });
+  if (quest.requiresProof && !parsed.proofUrl) return corsJson(req, 400, { error: QUEST_CLAIM_PROBE.proofRequiredError });
 
   if (quest.requiresProof) {
     await db
@@ -71,13 +79,13 @@ export default async function handler(req: Request): Promise<Response> {
         day: dayKey,
         progress,
         status: 'pending_review',
-        proofUrl,
+        proofUrl: parsed.proofUrl,
         completedAt: new Date(),
         updatedAt: new Date(),
       })
       .onConflictDoUpdate({
         target: [schema.userQuestProgress.userId, schema.userQuestProgress.questId, schema.userQuestProgress.day],
-        set: { status: 'pending_review', proofUrl, completedAt: new Date(), updatedAt: new Date() },
+        set: { status: 'pending_review', proofUrl: parsed.proofUrl, completedAt: new Date(), updatedAt: new Date() },
       });
     return corsJson(req, 200, { ok: true, pendingReview: true });
   }
@@ -128,4 +136,3 @@ export default async function handler(req: Request): Promise<Response> {
 
   return corsJson(req, 200, { ok: true, claimed: true, awarded: res.awarded, delta: quest.pointsReward });
 }
-

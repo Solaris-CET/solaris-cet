@@ -1,9 +1,16 @@
 import { and, desc, eq, gte, lt, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { cronAuthResult } from '../../lib/cron';
-import { corsJson, corsOptions } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import {
+  CRON_WEEKLY_LEADERBOARD_PROBE,
+  weeklyCetRewardForRank,
+  weeklyLeaderboardRange,
+} from '../../lib/cronWeeklyLeaderboard';
+import { cronAuthResult } from '@/api/lib/cron';
+import { corsJson, corsOptions } from '@/api/lib/http';
 import { telegramSendMessage } from '../../telegram/lib';
+
+export { CRON_WEEKLY_LEADERBOARD_PATH, CRON_WEEKLY_LEADERBOARD_PROBE } from '@/api/lib/cronWeeklyLeaderboard';
 
 export const config = { runtime: 'nodejs' };
 
@@ -11,36 +18,21 @@ function env(name: string): string {
   return String(process.env[name] ?? '').trim();
 }
 
-function startOfWeekUtc(d: Date): Date {
-  const x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
-  const day = x.getUTCDay();
-  const delta = (day + 6) % 7;
-  x.setUTCDate(x.getUTCDate() - delta);
-  return x;
-}
-
-function dayKeyUtc(d: Date): string {
-  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
-}
-
-const WEEKLY_CET_REWARDS: number[] = [50, 30, 20, 10, 8, 6, 5, 4, 3, 2];
-
 export default async function handler(req: Request): Promise<Response> {
-  if (req.method === 'OPTIONS') return corsOptions(req, 'POST, OPTIONS');
+  if (req.method === 'OPTIONS') return corsOptions(req, CRON_WEEKLY_LEADERBOARD_PROBE.methods.join(', '));
   if (req.method !== 'POST') return corsJson(req, 405, { error: 'Method not allowed' });
 
   const cron = cronAuthResult(req);
   if (!cron.ok) return corsJson(req, cron.status, { error: cron.error });
 
   const db = getDb();
-  const now = new Date();
-  const thisWeek = startOfWeekUtc(now);
-  const start = new Date(thisWeek.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const end = thisWeek;
-  const weekStart = dayKeyUtc(start);
-  const weekEnd = dayKeyUtc(new Date(end.getTime() - 24 * 60 * 60 * 1000));
+  const { start, end, weekStart, weekEnd } = weeklyLeaderboardRange();
 
-  const [existing] = await db.select({ id: schema.weeklyLeaderboards.id }).from(schema.weeklyLeaderboards).where(eq(schema.weeklyLeaderboards.weekStart, weekStart)).limit(1);
+  const [existing] = await db
+    .select({ id: schema.weeklyLeaderboards.id })
+    .from(schema.weeklyLeaderboards)
+    .where(eq(schema.weeklyLeaderboards.weekStart, weekStart))
+    .limit(1);
   if (existing?.id) return corsJson(req, 200, { ok: true, weekStart, weekEnd, alreadyGenerated: true });
 
   const top = await db
@@ -52,10 +44,13 @@ export default async function handler(req: Request): Promise<Response> {
     .where(and(gte(schema.pointsLedger.createdAt, start), lt(schema.pointsLedger.createdAt, end)))
     .groupBy(schema.pointsLedger.userId)
     .orderBy(desc(sql<number>`sum(${schema.pointsLedger.delta})`))
-    .limit(50);
+    .limit(CRON_WEEKLY_LEADERBOARD_PROBE.topUsersLimit);
 
   if (top.length === 0) {
-    const [lb] = await db.insert(schema.weeklyLeaderboards).values({ weekStart, weekEnd, generatedAt: new Date(), meta: { empty: true } }).returning({ id: schema.weeklyLeaderboards.id });
+    const [lb] = await db
+      .insert(schema.weeklyLeaderboards)
+      .values({ weekStart, weekEnd, generatedAt: new Date(), meta: { empty: true } })
+      .returning({ id: schema.weeklyLeaderboards.id });
     return corsJson(req, 200, { ok: true, weekStart, weekEnd, leaderboardId: lb?.id ?? null, generated: true, empty: true });
   }
 
@@ -70,7 +65,7 @@ export default async function handler(req: Request): Promise<Response> {
   const badgeIdRow = await db
     .select({ id: schema.badges.id })
     .from(schema.badges)
-    .where(and(eq(schema.badges.slug, 'top10-weekly'), eq(schema.badges.active, true)))
+    .where(and(eq(schema.badges.slug, CRON_WEEKLY_LEADERBOARD_PROBE.top10BadgeSlug), eq(schema.badges.active, true)))
     .limit(1);
   const top10BadgeId = badgeIdRow[0]?.id ?? null;
 
@@ -91,11 +86,11 @@ export default async function handler(req: Request): Promise<Response> {
     }));
     await tx.insert(schema.weeklyLeaderboardEntries).values(entries);
 
-    const rewards = entries.slice(0, 10).map((e, idx) => ({
+    const rewards = entries.slice(0, CRON_WEEKLY_LEADERBOARD_PROBE.rewardsCount).map((e, idx) => ({
       leaderboardId,
       userId: e.userId,
       rank: e.rank,
-      cetAmount: String(WEEKLY_CET_REWARDS[idx] ?? 0),
+      cetAmount: String(weeklyCetRewardForRank(idx)),
       status: 'pending' as const,
       meta: { source: 'weekly', weekStart, weekEnd },
     }));
@@ -104,7 +99,7 @@ export default async function handler(req: Request): Promise<Response> {
     if (top10BadgeId) {
       await tx
         .insert(schema.userBadges)
-        .values(entries.slice(0, 10).map((e) => ({ userId: e.userId, badgeId: top10BadgeId })))
+        .values(entries.slice(0, CRON_WEEKLY_LEADERBOARD_PROBE.rewardsCount).map((e) => ({ userId: e.userId, badgeId: top10BadgeId })))
         .onConflictDoNothing();
     }
 
@@ -112,7 +107,7 @@ export default async function handler(req: Request): Promise<Response> {
   });
 
   const botToken = env('TELEGRAM_BOT_TOKEN');
-  const notify = env('TELEGRAM_NOTIFY_WEEKLY');
+  const notify = env(CRON_WEEKLY_LEADERBOARD_PROBE.telegramNotifyEnv);
   if (botToken && notify === '1') {
     try {
       const winners = await db
@@ -128,7 +123,7 @@ export default async function handler(req: Request): Promise<Response> {
         .leftJoin(schema.userSettings, eq(schema.userSettings.userId, schema.weeklyRewards.userId))
         .where(eq(schema.weeklyRewards.leaderboardId, result.leaderboardId))
         .orderBy(schema.weeklyRewards.rank)
-        .limit(10);
+        .limit(CRON_WEEKLY_LEADERBOARD_PROBE.rewardsCount);
       for (const w of winners) {
         const enabled = w.enabled !== false;
         const chatId = w.chatId ? Number(w.chatId) : NaN;

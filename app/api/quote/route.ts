@@ -1,29 +1,18 @@
-/**
- * POST /api/quote
- *
- * Accepts quote request form data and stores it in the database.
- * Falls back to email if DB write fails.
- *
- * Body:
- *   name: string (min 2 chars)
- *   phone: string (Romanian format)
- *   email?: string (optional, validated if provided)
- *   location: string (required)
- *   serviceType: "fotovoltaic" | "acoperis" | "ambale" (required)
- *   powerNeeded?: string
- *   roofType?: string
- *   message?: string
- *
- * Returns:
- *   { success: true, message: "Oferta ta a fost trimisă. Te contactăm în 24h." }
- */
+import { getDb } from '@/db/client';
+import { quotes } from '@/db/schema';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { sendEmail } from '@/api/lib/emailProvider';
+import { clientConfirmationEmail, internalLeadNotification } from '@/api/lib/emailTemplates';
+import {
+  buildQuoteFallbackEmailBody,
+  parseQuoteBody,
+  QUOTE_PROBE,
+  validateQuoteFields,
+} from '../lib/quoteRequest';
 
-import { getDb } from '../../db/client';
-import { quotes } from '../../db/schema';
+export { QUOTE_PATH, QUOTE_PROBE } from '@/api/lib/quoteRequest';
 
-import { getAllowedOrigin } from '../lib/cors';
-import { sendEmail } from '../lib/emailProvider';
-import { internalLeadNotification, clientConfirmationEmail } from '../lib/emailTemplates';
+export const config = { runtime: 'nodejs' };
 
 function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -31,29 +20,24 @@ function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Respo
     headers: {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': allowedOrigin,
-      'Vary': 'Origin',
+      Vary: 'Origin',
       'Cache-Control': 'no-store',
     },
   });
 }
 
-// Romanian phone regex: +40xxxxxxxxx or 07xxxxxxxx
-const PHONE_REGEX = /^(\+40|0)7\d{8}$/;
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
   const allowedOrigin = getAllowedOrigin(origin);
 
-  // CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowedOrigin,
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Methods': QUOTE_PROBE.methods.join(', '),
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        'Vary': 'Origin',
+        Vary: 'Origin',
       },
     });
   }
@@ -62,84 +46,54 @@ export default async function handler(req: Request): Promise<Response> {
     return jsonResponse({ error: 'Method not allowed' }, allowedOrigin, 405);
   }
 
-  let body: Record<string, unknown>;
+  let body: unknown;
   try {
-    body = (await req.json()) as Record<string, unknown>;
+    body = await req.json();
   } catch {
-    return jsonResponse({ error: 'Invalid JSON body' }, allowedOrigin, 400);
+    return jsonResponse({ error: QUOTE_PROBE.invalidJsonError }, allowedOrigin, 400);
   }
 
-  // ── Validation ──────────────────────────────────────────────────────────
-  const name = typeof body.name === 'string' ? body.name.trim() : '';
-  if (name.length < 2) {
-    return jsonResponse({ error: 'Numele trebuie să aibă cel puțin 2 caractere.' }, allowedOrigin, 400);
+  const fields = parseQuoteBody(body);
+  if (!fields) {
+    return jsonResponse({ error: QUOTE_PROBE.invalidServiceTypeError }, allowedOrigin, 400);
   }
 
-  const phone = typeof body.phone === 'string' ? body.phone.trim() : '';
-  if (!PHONE_REGEX.test(phone)) {
-    return jsonResponse({ error: 'Numărul de telefon nu este valid (ex: +407xxxxxxxx).' }, allowedOrigin, 400);
+  const validationError = validateQuoteFields(fields);
+  if (validationError) {
+    return jsonResponse({ error: validationError }, allowedOrigin, 400);
   }
 
-  const email = typeof body.email === 'string' ? body.email.trim() : '';
-  if (email && !EMAIL_REGEX.test(email)) {
-    return jsonResponse({ error: 'Adresa de email nu este validă.' }, allowedOrigin, 400);
-  }
+  const { name, phone, email, location, serviceType, powerNeeded, roofType, message } = fields;
 
-  const location = typeof body.location === 'string' ? body.location.trim() : '';
-  if (!location) {
-    return jsonResponse({ error: 'Locația este obligatorie.' }, allowedOrigin, 400);
-  }
-
-  const serviceType = typeof body.serviceType === 'string' ? body.serviceType.trim() : '';
-  const validServiceTypes = ['fotovoltaic', 'acoperis', 'ambale'];
-  if (!validServiceTypes.includes(serviceType)) {
-    return jsonResponse({ error: 'Tipul serviciului trebuie să fie: fotovoltaic, acoperis sau ambale.' }, allowedOrigin, 400);
-  }
-
-  const powerNeeded = typeof body.powerNeeded === 'string' ? body.powerNeeded.trim() : null;
-  const roofType = typeof body.roofType === 'string' ? body.roofType.trim() : null;
-  const message = typeof body.message === 'string' ? body.message.trim() : null;
-
-  // ── Save to database ────────────────────────────────────────────────────
   let newLeadId: string | null = null;
   try {
     const db = getDb();
-    const [inserted] = await db.insert(quotes).values({
-      name,
-      phone,
-      email: email || null,
-      location,
-      serviceType,
-      powerNeeded,
-      roofType,
-      message,
-    }).returning({ id: quotes.id });
+    const [inserted] = await db
+      .insert(quotes)
+      .values({
+        name,
+        phone,
+        email: email || null,
+        location,
+        serviceType,
+        powerNeeded,
+        roofType,
+        message,
+      })
+      .returning({ id: quotes.id });
     newLeadId = inserted?.id ?? null;
   } catch (dbErr) {
     console.error('DB insert error for quote:', dbErr);
-    // Fallback: try to send email
     try {
-      const emailBody = [
-        `Nume: ${name}`,
-        `Telefon: ${phone}`,
-        email ? `Email: ${email}` : '',
-        `Locație: ${location}`,
-        `Tip serviciu: ${serviceType}`,
-        powerNeeded ? `Putere necesară: ${powerNeeded}` : '',
-        roofType ? `Tip acoperiș: ${roofType}` : '',
-        message ? `Mesaj: ${message}` : '',
-      ]
-        .filter(Boolean)
-        .join('\n');
-
-      // Use a simple fetch to a mail service or just log
-      console.log('Quote email would be sent to solaris-cet@protonmail.com with body:\n', emailBody);
+      console.log(
+        `Quote email would be sent to ${QUOTE_PROBE.defaultAdminEmail} with body:\n`,
+        buildQuoteFallbackEmailBody(fields),
+      );
     } catch (emailErr) {
       console.error('Email fallback also failed:', emailErr);
     }
   }
 
-  // ── Notify admins via push ──────────────────────────────────────────────
   if (newLeadId) {
     try {
       const internalUrl = process.env.INTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`;
@@ -157,9 +111,8 @@ export default async function handler(req: Request): Promise<Response> {
     }
   }
 
-  // ── Send email notifications ──────────────────────────────────────────────
   try {
-    const adminEmail = process.env.ADMIN_EMAIL || 'solaris-cet@protonmail.com';
+    const adminEmail = process.env.ADMIN_EMAIL || QUOTE_PROBE.defaultAdminEmail;
     const internal = internalLeadNotification({
       name,
       phone,
@@ -185,8 +138,5 @@ export default async function handler(req: Request): Promise<Response> {
     }
   }
 
-  return jsonResponse(
-    { success: true, message: 'Oferta ta a fost trimisă. Te contactăm în 24h.' },
-    allowedOrigin,
-  );
+  return jsonResponse({ success: true, message: QUOTE_PROBE.successMessage }, allowedOrigin);
 }

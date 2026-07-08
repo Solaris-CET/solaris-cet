@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
-import { adminApi } from '../adminClient';
+import { adminApi, adminApiErr } from '../adminClient';
 
 type ConversationRow = {
   id: string;
@@ -48,7 +48,7 @@ export function ConversationsSection({ token }: { token: string }) {
       resolutionRate: number;
     }>(`/api/admin/chat-analytics?page=${page}&limit=20`, { token });
     if (!res.ok) {
-      setError(res.error);
+      setError(adminApiErr(res) ?? 'Request failed');
       return;
     }
     setConversations(res.data.conversations);
@@ -69,7 +69,7 @@ export function ConversationsSection({ token }: { token: string }) {
       { token }
     );
     if (!res.ok) {
-      setError(res.error);
+      setError(adminApiErr(res) ?? 'Request failed');
       return;
     }
     setConvMessages(res.data.messages);
@@ -82,7 +82,7 @@ export function ConversationsSection({ token }: { token: string }) {
       body: JSON.stringify({ resolved: true }),
     });
     if (!res.ok) {
-      setError(res.error);
+      setError(adminApiErr(res) ?? 'Request failed');
       return;
     }
     void load();

@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
-import { adminApi } from '../adminClient';
+import { adminApi, adminApiErr } from '../adminClient';
 
 type SettingRow = { key: string; value: unknown; updatedAt: string };
 
@@ -25,7 +25,7 @@ export function SettingsSection({ token }: { token: string }) {
   const load = useCallback(async () => {
     const res = await adminApi<{ settings: SettingRow[] }>('/api/admin/settings', { token });
     if (!res.ok) {
-      setError(res.error);
+      setError(adminApiErr(res) ?? 'Request failed');
       return;
     }
     setRows(res.data.settings);
@@ -55,7 +55,7 @@ export function SettingsSection({ token }: { token: string }) {
       }
       const res = await adminApi<{ setting: SettingRow }>('/api/admin/settings', { token, method: 'PUT', body: { key, value: parsed } });
       if (!res.ok) {
-        setError(res.error);
+        setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       setKey('');
@@ -72,7 +72,7 @@ export function SettingsSection({ token }: { token: string }) {
     try {
       const res = await adminApi<{ ok: true; deleted: number }>('/api/admin/cache/clear', { token, method: 'POST' });
       if (!res.ok) {
-        setError(res.error);
+        setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       alert(`Cache clear: ${res.data.deleted} keys`);
@@ -87,7 +87,7 @@ export function SettingsSection({ token }: { token: string }) {
     try {
       const res = await adminApi<{ secret: string; otpauthUrl: string }>('/api/admin/mfa/setup', { token, method: 'POST' });
       if (!res.ok) {
-        setError(res.error);
+        setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       setMfaSecret(res.data.secret);
@@ -104,7 +104,7 @@ export function SettingsSection({ token }: { token: string }) {
     try {
       const res = await adminApi<{ ok: true }>('/api/admin/mfa/enable', { token, method: 'POST', body: { code: mfaCode } });
       if (!res.ok) {
-        setError(res.error);
+        setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       setMfaEnabled(true);
@@ -123,7 +123,7 @@ export function SettingsSection({ token }: { token: string }) {
     try {
       const res = await adminApi<{ ok: true }>('/api/admin/mfa/disable', { token, method: 'POST', body: { code: mfaCode } });
       if (!res.ok) {
-        setError(res.error);
+        setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       setMfaEnabled(false);

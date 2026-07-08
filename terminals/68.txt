@@ -1,0 +1,14 @@
+---
+pid: 11176
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "node -e \"const {spawnSync}=require('child_process');const c=spawnSync('C:/Program Files/Git/cmd/git.exe',['credential','fill'],{input:'protocol=https\\nhost=gitea.com\\n\\n',encoding:'utf8',timeout:15000});const m=(k)=>((c.stdout||'').match(new RegExp('^'+k+'=(.+)$','m'))||[])[1];const user=m('username');const pass=m('password');if(!user||!pass){console.error('no creds');process.exit(2);}const auth=Buffer.from(user+':'+pass).toString('base64');fetch('https://gitea.com/api/v1/user/repos',{method:'POST',headers:{Authorization:'Basic '+auth,'Content-Type':'application/json'},body:JSON.stringify({name:'solaris-cet',private:false,auto_init:false})}).then(async r=>{const t=await r.text();console.log('status',r.status,t.slice(0,300));process.exit(r.ok||r.status===409?0:1);}).catch(e=>{console.error(e);process.exit(1);});\""
+started_at: 2026-07-06T00:51:28.633Z
+running_for_ms: 95602061 
+---
+no creds
+
+---
+exit_code: -1
+elapsed_ms: 95602061
+ended_at: 2026-07-07T03:24:49.546Z
+---

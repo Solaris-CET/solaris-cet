@@ -1,13 +1,16 @@
 import { eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAuth } from '../../lib/auth';
-import { corsJson, optionsResponse } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import { corsJson, optionsResponse } from '@/api/lib/http';
+import { buildUserMfaStatus, USER_MFA_STATUS_PROBE } from '@/api/lib/userMfaStatus';
+
+export { USER_MFA_STATUS_PATH, USER_MFA_STATUS_PROBE } from '@/api/lib/userMfaStatus';
 
 export const config = { runtime: 'nodejs' };
 
 export default async function handler(req: Request): Promise<Response> {
-  if (req.method === 'OPTIONS') return optionsResponse(req, 'GET, OPTIONS');
+  if (req.method === 'OPTIONS') return optionsResponse(req, USER_MFA_STATUS_PROBE.methods.join(', '));
   if (req.method !== 'GET') return corsJson(req, 405, { error: 'Method not allowed' });
 
   const ctx = await requireAuth(req);
@@ -15,7 +18,5 @@ export default async function handler(req: Request): Promise<Response> {
 
   const db = getDb();
   const [mfa] = await db.select().from(schema.userMfa).where(eq(schema.userMfa.userId, ctx.user.id)).limit(1);
-  const enabled = Boolean(mfa?.enabledAt);
-  const pending = Boolean(!enabled && (mfa?.secretEncrypted ?? '').trim());
-  return corsJson(req, 200, { ok: true, enabled, pending });
+  return corsJson(req, 200, buildUserMfaStatus(mfa));
 }

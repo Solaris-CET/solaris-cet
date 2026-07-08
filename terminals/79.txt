@@ -1,0 +1,173 @@
+---
+pid: 10596
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\"; npm run app:dev"
+started_at: 2026-07-06T01:24:46.269Z
+running_for_ms: 93617485 
+---
+
+> app:dev
+> npm --workspace=app run dev --
+
+
+> solaris-cet@1.0.0 predev
+> node ../scripts/generate-release-notes.mjs && node scripts/generate-seo-files.mjs && node scripts/generate-legal-digests.mjs
+
+
+📊 SEO Audit Report
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Total pages: 48
+Pages without description: 0
+Duplicate titles: 4
+  Duplicate titles:
+  - "Politica de confidențialitate — Solaris CET"
+  - "Politica de cookie-uri — Solaris CET"
+  - "Servicii — Solaris CET"
+  - "Portofoliu — Solaris CET"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Google ping: 404
+✅ Bing ping: 410
+✅ Sitemap submitted to Google and Bing
+
+> solaris-cet@1.0.0 dev
+> vite
+
+
+  VITE v8.0.11  ready in 1967 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.1.140:5173/
+04:24:59 [vite] Internal server error: Failed to load PostCSS config (searchPath: C:/Users/CCons/Desktop/SOLARIS CET/app): [Error] Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+Error: Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+    at load (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19648:10)
+    at async Promise.all (index 0)
+    at async plugins (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19670:11)
+    at async processResult (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19708:13)
+  Plugin: vite:css
+  File: C:/Users/CCons/Desktop/SOLARIS CET/app/index.html?html-proxy&direct&index=0.css
+04:25:00 [vite] (client) Pre-transform error: Failed to load PostCSS config (searchPath: C:/Users/CCons/Desktop/SOLARIS CET/app): [Error] Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+Error: Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+    at load (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19648:10)
+    at async Promise.all (index 0)
+    at async plugins (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19670:11)
+    at async processResult (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19708:13)
+  Plugin: vite:css
+  File: C:/Users/CCons/Desktop/SOLARIS CET/app/index.html?html-proxy&direct&index=0.css
+04:25:00 [vite] (client) Pre-transform error: Failed to load PostCSS config (searchPath: C:/Users/CCons/Desktop/SOLARIS CET/app): [Error] Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+Error: Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+    at load (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19648:10)
+    at async Promise.all (index 0)
+    at async plugins (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19670:11)
+    at async processResult (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19708:13)
+  Plugin: vite:css
+  File: C:/Users/CCons/Desktop/SOLARIS CET/app/index.html?html-proxy&direct&index=0.css
+04:25:00 [vite] (client) Pre-transform error: Failed to load PostCSS config (searchPath: C:/Users/CCons/Desktop/SOLARIS CET/app): [Error] Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+Error: Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+    at load (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19648:10)
+    at async Promise.all (index 0)
+    at async plugins (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19670:11)
+    at async processResult (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19708:13)
+  Plugin: vite:css
+  File: C:/Users/CCons/Desktop/SOLARIS CET/app/index.html?html-proxy&direct&index=0.css
+04:25:00 [vite] (client) Pre-transform error: Failed to load PostCSS config (searchPath: C:/Users/CCons/Desktop/SOLARIS CET/app): [Error] Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+Error: Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+    at load (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19648:10)
+    at async Promise.all (index 0)
+    at async plugins (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19670:11)
+    at async processResult (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19708:13)
+  Plugin: vite:css
+  File: C:/Users/CCons/Desktop/SOLARIS CET/app/index.html?html-proxy&direct&index=0.css
+04:25:01 [vite] (client) Pre-transform error: Failed to load PostCSS config (searchPath: C:/Users/CCons/Desktop/SOLARIS CET/app): [Error] Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+Error: Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+    at load (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19648:10)
+    at async Promise.all (index 0)
+    at async plugins (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19670:11)
+    at async processResult (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19708:13)
+  Plugin: vite:css
+  File: C:/Users/CCons/Desktop/SOLARIS CET/app/index.html?html-proxy&direct&index=0.css
+04:25:01 [vite] (client) Pre-transform error: Failed to load PostCSS config (searchPath: C:/Users/CCons/Desktop/SOLARIS CET/app): [Error] Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+Error: Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+    at load (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19648:10)
+    at async Promise.all (index 0)
+    at async plugins (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19670:11)
+    at async processResult (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19708:13)
+  Plugin: vite:css
+  File: C:/Users/CCons/Desktop/SOLARIS CET/app/index.html?html-proxy&direct&index=0.css
+04:25:01 [vite] (client) Pre-transform error: Failed to load PostCSS config (searchPath: C:/Users/CCons/Desktop/SOLARIS CET/app): [Error] Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+Error: Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+    at load (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19648:10)
+    at async Promise.all (index 0)
+    at async plugins (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19670:11)
+    at async processResult (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19708:13)
+  Plugin: vite:css
+  File: C:/Users/CCons/Desktop/SOLARIS CET/app/index.html?html-proxy&direct&index=0.css
+04:25:07 [vite] Internal server error: Failed to load PostCSS config (searchPath: C:/Users/CCons/Desktop/SOLARIS CET/app): [Error] Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+Error: Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+    at load (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19648:10)
+    at async Promise.all (index 0)
+    at async plugins (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19670:11)
+    at async processResult (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19708:13)
+  Plugin: vite:css
+  File: C:/Users/CCons/Desktop/SOLARIS CET/app/index.html?html-proxy&direct&index=0.css
+04:27:47 [vite] Internal server error: Failed to load PostCSS config (searchPath: C:/Users/CCons/Desktop/SOLARIS CET/app): [Error] Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+Error: Loading PostCSS Plugin failed: Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+
+(@C:\Users\CCons\Desktop\SOLARIS CET\app\postcss.config.js)
+    at load (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19648:10)
+    at async Promise.all (index 0)
+    at async plugins (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19670:11)
+    at async processResult (file:///C:/Users/CCons/Desktop/SOLARIS%20CET/node_modules/vite/dist/node/chunks/node.js:19708:13)
+  Plugin: vite:css
+  File: C:/Users/CCons/Desktop/SOLARIS CET/app/index.html?html-proxy&direct&index=0.css
+npm error Lifecycle script `dev` failed with error:
+npm error code 4294967295
+npm error path C:\Users\CCons\Desktop\SOLARIS CET\app
+npm error workspace solaris-cet@1.0.0
+npm error location C:\Users\CCons\Desktop\SOLARIS CET\app
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c vite
+
+---
+exit_code: -1
+elapsed_ms: 93617485
+ended_at: 2026-07-07T03:24:47.646Z
+---

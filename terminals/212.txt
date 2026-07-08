@@ -1,0 +1,44 @@
+---
+pid: 17752
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/sessionRevokeAllRoute.test.ts src/__tests__/securitySessionsRoute.test.ts src/__tests__/socialShareRoute.test.ts src/__tests__/serviceStatusRoute.test.ts src/__tests__/supportMessageRoute.test.ts"
+started_at: 2026-07-07T15:51:03.752Z
+running_for_ms: 6000013  
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ✓ src/__tests__/supportMessageRoute.test.ts (9 tests) 70ms
+ ❯ src/__tests__/securitySessionsRoute.test.ts (7 tests | 1 failed) 69ms
+     ✓ exports stable e2e probe contract 5ms
+     ✓ mapSecuritySessionItem marks current and active 3ms
+     ✓ normalizeSessionCount coerces invalid values 1ms
+     ✓ buildSecuritySessionsPayload shapes response 1ms
+     ✓ is registered in server/index.cjs 2ms
+     ✓ OPTIONS returns CORS preflight 44ms
+     × GET lists sessions for authenticated user 10ms
+ ✓ src/__tests__/socialShareRoute.test.ts (8 tests) 76ms
+ ✓ src/__tests__/sessionRevokeAllRoute.test.ts (6 tests) 63ms
+ ✓ src/__tests__/serviceStatusRoute.test.ts (6 tests) 73ms
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 35 passed (36)
+   Start at  18:51:08
+   Duration  12.59s (transform 731ms, setup 4.71s, import 2.87s, tests 351ms, environment 1ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/securitySessionsRoute.test.ts > /api/security/sessions e2e probe > GET lists sessions for authenticated user
+TypeError: (intermediate value) is not iterable
+ ❯ Module.handler api/security/sessions/route.ts:37:17
+     35|   const sessions = rows.map((s) => mapSecuritySessionItem(s, now, ctx.…
+     36|
+     37|   const [row] = await db
+       |                 ^
+     38|     .select({ c: sql<number>`count(*)`.as('c') })
+     39|     .from(schema.sessions)
+ ❯ src/__tests__/securitySessionsRoute.test.ts:138:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

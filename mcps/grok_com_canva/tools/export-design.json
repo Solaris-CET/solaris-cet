@@ -1,6 +1,6 @@
 {
   "name": "export-design",
-  "description": "Export a Canva design, doc, presentation, whiteboard, videos and other Canva content types to various formats (PDF, JPG, PNG, PPTX, GIF, MP4, CSV). You should use the `get-export-formats` tool first to check which export formats are supported for the design. This tool provides a download URL for the exported file that you can share with users. Always display this download URL to users so they can access their exported content.",
+  "description": "Export a Canva design, doc, presentation, whiteboard, video, or other Canva content type to a downloadable file (PDF, JPG, PNG, PPTX, GIF, MP4, CSV). REQUIRED: you MUST call the `get-export-formats` tool for this design first and pass only a `format.type` that it reports as supported. Designs do not all support every format, and calling this tool with an unsupported format will fail — never guess the format or assume it is supported, even if the user named it. This tool provides a download URL for the exported file; always display this download URL to users so they can access their exported content.",
   "inputSchema": {
     "type": "object",
     "properties": {

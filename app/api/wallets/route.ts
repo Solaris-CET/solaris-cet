@@ -1,24 +1,28 @@
 import { and, eq, inArray } from 'drizzle-orm';
 
-import { getDb, schema } from '../../db/client';
-import { requireAuth } from '../lib/auth';
-import { jsonResponse, optionsResponse } from '../lib/http';
-import { ensureAllowedOrigin } from '../lib/originGuard';
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
+import { ensureAllowedOrigin } from '@/api/lib/originGuard';
+import {
+  buildWalletsListResponse,
+  buildWalletsUnlinkTelegramMessage,
+  mergeUserWallets,
+  parseWalletsDeleteAddress,
+  validateWalletsDelete,
+  WALLETS_PROBE,
+} from '../lib/wallets';
+
+export { WALLETS_PATH, WALLETS_PROBE } from '@/api/lib/wallets';
 
 export const config = { runtime: 'nodejs' };
-
-type WalletRow = {
-  address: string;
-  label: string | null;
-  isPrimary: boolean;
-};
 
 export default async function handler(req: Request): Promise<Response> {
   const guard = ensureAllowedOrigin(req);
   if (guard instanceof Response) return guard;
 
   if (req.method === 'OPTIONS') {
-    return optionsResponse(req, 'GET, DELETE, OPTIONS', 'Content-Type, Authorization');
+    return optionsResponse(req, WALLETS_PROBE.methods.join(', '), WALLETS_PROBE.allowHeaders);
   }
 
   const ctx = await requireAuth(req);
@@ -29,34 +33,18 @@ export default async function handler(req: Request): Promise<Response> {
 
   if (req.method === 'GET') {
     const rows = await db.select().from(schema.userTonWallets).where(eq(schema.userTonWallets.userId, ctx.user.id));
-    const wallets: WalletRow[] = [];
-
-    const hasPrimaryInTable = rows.some((r) => r.address === primary);
-    if (!hasPrimaryInTable) {
-      wallets.push({ address: primary, label: null, isPrimary: true });
-    }
-    for (const r of rows) {
-      wallets.push({ address: r.address, label: r.label ?? null, isPrimary: r.address === primary || Boolean(r.isPrimary) });
-    }
-
-    const uniq = new Map<string, WalletRow>();
-    for (const w of wallets) {
-      const prev = uniq.get(w.address);
-      if (!prev) uniq.set(w.address, w);
-      else uniq.set(w.address, { ...prev, ...w, isPrimary: prev.isPrimary || w.isPrimary });
-    }
-    return jsonResponse(req, { ok: true, wallets: Array.from(uniq.values()) });
+    const wallets = mergeUserWallets(primary, rows);
+    return jsonResponse(req, buildWalletsListResponse(wallets));
   }
 
   if (req.method === 'DELETE') {
-    const url = new URL(req.url);
-    const address = (url.searchParams.get('address') ?? '').trim();
-    if (!address) return jsonResponse(req, { error: 'Missing address' }, 400);
-    if (address === primary) return jsonResponse(req, { error: 'Cannot unlink primary wallet' }, 409);
+    const address = parseWalletsDeleteAddress(new URL(req.url));
+    const validation = validateWalletsDelete(address, primary);
+    if (!validation.ok) return jsonResponse(req, { error: validation.error }, validation.status);
 
     await db
       .delete(schema.userTonWallets)
-      .where(and(eq(schema.userTonWallets.userId, ctx.user.id), eq(schema.userTonWallets.address, address)));
+      .where(and(eq(schema.userTonWallets.userId, ctx.user.id), eq(schema.userTonWallets.address, validation.address)));
 
     const token = String(process.env.TELEGRAM_BOT_TOKEN ?? '').trim();
     if (token) {
@@ -67,7 +55,7 @@ export default async function handler(req: Request): Promise<Response> {
           const chatId = tg?.chatId ? Number.parseInt(String(tg.chatId), 10) : Number.NaN;
           if (tg && Number.isFinite(chatId)) {
             const { telegramSendMessage } = await import('../telegram/lib');
-            await telegramSendMessage(token, chatId, `Wallet eliminat: ${address.slice(0, 10)}…`);
+            await telegramSendMessage(token, chatId, buildWalletsUnlinkTelegramMessage(validation.address));
           }
         }
       } catch {
@@ -88,4 +76,3 @@ export default async function handler(req: Request): Promise<Response> {
 
   return jsonResponse(req, { error: 'Method not allowed' }, 405);
 }
-

@@ -115,9 +115,9 @@ function initLinkedInPartner(partnerId: string) {
 function flushQueue(consent: CookieConsentState, cfg: MarketingPixelsConfig) {
   if (!facebookReady && !linkedinReady) return;
   if (!consent.marketing) return;
-  while (queued.length) {
-    const e = queued.shift();
-    if (!e) break;
+  const batch = queued.slice();
+  queued.length = 0;
+  for (const e of batch) {
     if (e.kind === 'event') trackMarketingEvent(e.name, e.params, consent, cfg);
     else trackConversion(e.name, e.params, consent, cfg);
   }

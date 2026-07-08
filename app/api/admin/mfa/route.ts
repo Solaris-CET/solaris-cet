@@ -1,9 +1,12 @@
 import { eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAdminAuth } from '../../lib/adminAuth';
-import { getAllowedOrigin } from '../../lib/cors';
-import { corsJson, corsOptions } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { resolveMfaStatus } from '@/api/lib/adminMfa';
+import { requireAdminAuth } from '@/api/lib/adminAuth';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { corsJson, corsOptions } from '@/api/lib/http';
+
+export { ADMIN_MFA_PATH, ADMIN_MFA_PROBE } from '@/api/lib/adminMfa';
 
 export const config = { runtime: 'nodejs' };
 
@@ -20,8 +23,6 @@ export default async function handler(req: Request): Promise<Response> {
 
   const db = getDb();
   const [admin] = await db.select().from(schema.adminAccounts).where(eq(schema.adminAccounts.id, ctx.admin.id)).limit(1);
-  const enabled = Boolean(admin?.mfaEnabledAt);
-  const pending = Boolean(!enabled && admin?.mfaSecretEncrypted);
+  const { enabled, pending } = resolveMfaStatus(admin);
   return corsJson(req, 200, { ok: true, enabled, pending });
 }
-

@@ -1,0 +1,32 @@
+---
+pid: 6064
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\" ; node ../scripts/run-bin.mjs eslint . --quiet --max-warnings 0 2>&1 | Select-Object -Last 25"
+started_at: 2026-07-06T19:06:23.460Z
+running_for_ms: 80695008 
+---
+>  78 |     if (!reportId) return;
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  79 |     abortRef.current?.abort();
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 131 |     }
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 132 |   }, [reportId, persistent]);
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `connect` is declared here
+  133 |
+  134 |   useEffect(() => {
+  135 |     reconnectAttemptRef.current = 0;  react-hooks/immutability
+
+C:\Users\CCons\Desktop\SOLARIS CET\app\src\pages_legacy\FaqPage.tsx
+  273:7   error  'html' is never reassigned. Use 'const' instead            prefer-const
+  484:35  error  Use SafeHtml component instead of dangerouslySetInnerHTML  no-restricted-syntax
+  494:31  error  Use SafeHtml component instead of dangerouslySetInnerHTML  no-restricted-syntax
+
+C:\Users\CCons\Desktop\SOLARIS CET\app\src\types\react-three-fiber.d.ts
+   5:15  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+  11:15  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+✖ 35 problems (35 errors, 0 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

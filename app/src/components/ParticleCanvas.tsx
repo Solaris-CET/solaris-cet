@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { useDocumentHidden } from '@/hooks/useDocumentHidden';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { shortSkillWhisper, skillSeedFromLabel } from '@/lib/meshSkillFeed';
+import { SpatialGrid } from '@/lib/spatialGrid';
 
 interface Particle {
   x: number;
@@ -77,6 +78,7 @@ const ParticleCanvas = ({
   const mouseRef = useRef({ x: -9999, y: -9999 });
   const rafRef = useRef<number>(0);
   const rectRef = useRef({ left: 0, top: 0 });
+  const connectionGridRef = useRef<SpatialGrid<Particle> | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const hidden = useDocumentHidden();
 
@@ -186,27 +188,30 @@ const ParticleCanvas = ({
 
       ctx.globalAlpha = 1;
 
-      // Draw connections
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < connectionRadius) {
-            const alpha = (1 - dist / connectionRadius) * 0.15;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            // Use gold for connections close to cursor
-            const cdx = (particles[i].x + particles[j].x) / 2 - mouse.x;
-            const cdy = (particles[i].y + particles[j].y) / 2 - mouse.y;
-            const cdist = Math.sqrt(cdx * cdx + cdy * cdy);
-            ctx.strokeStyle = cdist < 150 ? '#F2C94C' : '#2EE7FF';
-            ctx.globalAlpha = alpha * (cdist < 150 ? 2 : 1);
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        }
+      // Draw connections using a spatial grid (O(n) instead of O(n²))
+      if (!connectionGridRef.current) {
+        connectionGridRef.current = new SpatialGrid<Particle>({
+          width: canvas.width,
+          height: canvas.height,
+          cellSize: connectionRadius,
+        });
+      }
+      const connectionGrid = connectionGridRef.current;
+      connectionGrid.resize({ width: canvas.width, height: canvas.height, cellSize: connectionRadius });
+      connectionGrid.insertAll(particles);
+      for (const { a, b, dist } of connectionGrid.neighbourPairs(connectionRadius)) {
+        const alpha = (1 - dist / connectionRadius) * 0.15;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        // Use gold for connections close to cursor
+        const cdx = (a.x + b.x) / 2 - mouse.x;
+        const cdy = (a.y + b.y) / 2 - mouse.y;
+        const cdist = Math.sqrt(cdx * cdx + cdy * cdy);
+        ctx.strokeStyle = cdist < 150 ? '#F2C94C' : '#2EE7FF';
+        ctx.globalAlpha = alpha * (cdist < 150 ? 2 : 1);
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
       }
       ctx.globalAlpha = 1;
 

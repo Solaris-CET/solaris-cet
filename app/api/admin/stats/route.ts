@@ -1,22 +1,28 @@
 import { gte, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAdminAuth, requireAdminRole } from '../../lib/adminAuth';
-import { corsJson, corsOptions } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { guardAdminRoute } from '@/api/lib/adminAuth';
+import {
+  ADMIN_STATS_PROBE,
+  adminStatsSince24h,
+  adminStatsSince7d,
+  normalizeAdminAvgQualityScore,
+} from '../../lib/adminStats';
+import { corsJson, corsOptions } from '@/api/lib/http';
+
+export { ADMIN_STATS_PATH, ADMIN_STATS_PROBE } from '@/api/lib/adminStats';
 
 export const config = { runtime: 'nodejs' };
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return corsOptions(req, 'GET, OPTIONS');
   if (req.method !== 'GET') return corsJson(req, 405, { error: 'Method not allowed' });
-  const ctx = await requireAdminAuth(req);
+  const ctx = await guardAdminRoute(req, { minRole: ADMIN_STATS_PROBE.minRole });
   if ('error' in ctx) return corsJson(req, ctx.status, { error: ctx.error });
-  const ok = requireAdminRole(ctx, 'viewer');
-  if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
 
   const db = getDb();
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const since7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const since = adminStatsSince24h();
+  const since7d = adminStatsSince7d();
   const [u] = await db.select({ c: sql<number>`count(*)`.as('c') }).from(schema.users);
   const [q] = await db
     .select({ c: sql<number>`count(*)`.as('c') })
@@ -54,7 +60,6 @@ export default async function handler(req: Request): Promise<Response> {
       up: fb?.up ?? 0,
       down: fb?.down ?? 0,
     },
-    aiAvgQualityScore7d:
-      typeof avg?.avgScore7d === 'number' && Number.isFinite(avg.avgScore7d) ? Number(avg.avgScore7d) : null,
+    aiAvgQualityScore7d: normalizeAdminAvgQualityScore(avg?.avgScore7d),
   });
 }

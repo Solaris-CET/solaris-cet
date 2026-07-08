@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 
 import type { AdminSession } from '../adminClient';
-import { adminApi } from '../adminClient';
+import { adminApi, adminApiErr } from '../adminClient';
 
 export function LoginView({ onLoggedIn }: { onLoggedIn: (session: AdminSession) => void }) {
   const [email, setEmail] = useState('');
@@ -28,7 +28,7 @@ export function LoginView({ onLoggedIn }: { onLoggedIn: (session: AdminSession) 
       const body = isInvite ? { token: inviteToken, email, password } : { email, password, mfaCode: mfaCode.trim() || null };
       const res = await adminApi<AdminSession>(endpoint, { token: null, method: 'POST', body });
       if (!res.ok) {
-        setError(res.error);
+        setError(adminApiErr(res) ?? 'Request failed');
         return;
       }
       onLoggedIn(res.data);

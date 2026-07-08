@@ -3,7 +3,7 @@ pid: 13896
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 2; cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\"; npm run ci:win 2>&1 | Select-Object -Last 15"
 started_at: 2026-07-05T21:48:01.797Z
-running_for_ms: 10135037 
+running_for_ms: 86400008 
 ---
 
 > ci:win
@@ -22,3 +22,9 @@ npm warn EBADENGINE   current: { node: 'v24.13.0', npm: '11.6.2' }
 npm warn EBADENGINE }
 npm warn deprecated @safe-global/safe-gateway-typescript-sdk@3.23.1: Package no longer supported. Contact Support at ht
 tps://www.npmjs.com/support for more info.
+
+---
+exit_code: -1
+elapsed_ms: 86400008
+ended_at: 2026-07-06T21:48:09.270Z
+---

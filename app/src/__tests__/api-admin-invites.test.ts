@@ -9,10 +9,8 @@ vi.mock('../../api/lib/rateLimit', () => ({
 }));
 
 vi.mock('../../api/lib/adminAuth', () => ({
-  requireAdminAuth: async () => ({ admin: { id: 'admin_1', role: 'admin' }, sessionId: 'sess_1' }),
-  requireAdminRole: () => ({ ok: true }),
+  guardAdminRoute: async () => ({ admin: { id: 'admin_1', role: 'admin' }, sessionId: 'sess_1' }),
 }));
-
 vi.mock('../../api/lib/adminAudit', () => ({
   writeAdminAudit: async () => undefined,
 }));

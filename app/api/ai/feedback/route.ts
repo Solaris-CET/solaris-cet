@@ -1,7 +1,10 @@
-import { getDb, schema } from '../../../db/client';
-import { type AuthContext,requireAuth } from '../../lib/auth';
-import { getAllowedOrigin } from '../../lib/cors';
-import { withUpstashRateLimit } from '../../lib/rateLimit';
+import { getDb, schema } from '@/db/client';
+import { type AuthContext, requireAuth } from '@/api/lib/auth';
+import { AI_FEEDBACK_PROBE, parseFeedbackBody } from '@/api/lib/aiFeedback';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { withUpstashRateLimit } from '@/api/lib/rateLimit';
+
+export { AI_FEEDBACK_PATH, AI_FEEDBACK_PROBE } from '@/api/lib/aiFeedback';
 
 export const config = { runtime: 'nodejs' };
 
@@ -16,15 +19,6 @@ function jsonResponse(allowedOrigin: string, body: unknown, status = 200, extraH
       ...(extraHeaders ?? {}),
     },
   });
-}
-
-function safeText(v: unknown, max: number): string {
-  return typeof v === 'string' ? v.trim().slice(0, max) : '';
-}
-
-function safeId(v: unknown): string | null {
-  const s = safeText(v, 80);
-  return s.length >= 10 ? s : null;
 }
 
 export default async function handler(req: Request): Promise<Response> {
@@ -48,9 +42,9 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const limited = await withUpstashRateLimit(req, allowedOrigin, {
-    keyPrefix: 'cet-ai-feedback',
-    limit: 30,
-    windowSeconds: 10,
+    keyPrefix: AI_FEEDBACK_PROBE.rateLimitKey,
+    limit: AI_FEEDBACK_PROBE.rateLimit,
+    windowSeconds: AI_FEEDBACK_PROBE.rateWindowSeconds,
   });
   if (limited) return limited;
 
@@ -65,19 +59,11 @@ export default async function handler(req: Request): Promise<Response> {
     return jsonResponse(allowedOrigin, { error: 'Invalid JSON body' }, 400);
   }
 
-  const ratingRaw =
-    typeof body === 'object' && body !== null && 'rating' in body ? (body as { rating: unknown }).rating : null;
-  const rating = typeof ratingRaw === 'number' ? Math.trunc(ratingRaw) : Number(ratingRaw);
-  if (![1, 0, -1].includes(rating)) {
-    return jsonResponse(allowedOrigin, { error: 'Invalid rating. Expected -1, 0, or 1.' }, 400);
+  const parsed = parseFeedbackBody(body);
+  if (!parsed) {
+    return jsonResponse(allowedOrigin, { error: AI_FEEDBACK_PROBE.invalidRatingError }, 400);
   }
-
-  const messageId =
-    typeof body === 'object' && body !== null && 'messageId' in body ? safeId((body as { messageId: unknown }).messageId) : null;
-  const queryLogId =
-    typeof body === 'object' && body !== null && 'queryLogId' in body ? safeId((body as { queryLogId: unknown }).queryLogId) : null;
-  const comment =
-    typeof body === 'object' && body !== null && 'comment' in body ? safeText((body as { comment: unknown }).comment, 2000) : '';
+  const { rating, messageId, queryLogId, comment } = parsed;
 
   let ctx: AuthContext | null;
   try {
@@ -105,4 +91,3 @@ export default async function handler(req: Request): Promise<Response> {
     return jsonResponse(allowedOrigin, { error: 'Unavailable' }, 503);
   }
 }
-

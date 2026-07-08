@@ -1,8 +1,11 @@
-import { createAuthChallenge } from '../../lib/authChallenges'
-import { getAllowedOrigin } from '../../lib/cors'
-import { withRateLimit } from '../../lib/rateLimit'
+import { AUTH_CHALLENGE_PROBE } from '@/api/lib/authChallenge';
+import { createAuthChallenge } from '@/api/lib/authChallenges';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { withRateLimit } from '@/api/lib/rateLimit';
 
-export const config = { runtime: 'nodejs' }
+export { AUTH_CHALLENGE_PATH, AUTH_CHALLENGE_PROBE } from '@/api/lib/authChallenge';
+
+export const config = { runtime: 'nodejs' };
 
 function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -13,12 +16,12 @@ function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Respo
       Vary: 'Origin',
       'Cache-Control': 'no-store',
     },
-  })
+  });
 }
 
 export default async function handler(req: Request): Promise<Response> {
-  const origin = req.headers.get('origin')
-  const allowedOrigin = getAllowedOrigin(origin)
+  const origin = req.headers.get('origin');
+  const allowedOrigin = getAllowedOrigin(origin);
 
   if (req.method === 'OPTIONS') {
     return new Response(null, {
@@ -29,16 +32,20 @@ export default async function handler(req: Request): Promise<Response> {
         'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       },
-    })
+    });
   }
 
   if (req.method !== 'GET') {
-    return jsonResponse({ error: 'Method not allowed' }, allowedOrigin, 405)
+    return jsonResponse({ error: 'Method not allowed' }, allowedOrigin, 405);
   }
 
-  const limited = await withRateLimit(req, allowedOrigin, { keyPrefix: 'auth-challenge', limit: 40, windowSeconds: 60 })
-  if (limited) return limited
+  const limited = await withRateLimit(req, allowedOrigin, {
+    keyPrefix: AUTH_CHALLENGE_PROBE.rateLimitKey,
+    limit: AUTH_CHALLENGE_PROBE.rateLimit,
+    windowSeconds: AUTH_CHALLENGE_PROBE.rateWindowSeconds,
+  });
+  if (limited) return limited;
 
-  const ch = createAuthChallenge(5 * 60 * 1000)
-  return jsonResponse({ payload: ch.payload, expiresAt: ch.expiresAt }, allowedOrigin, 200)
+  const ch = createAuthChallenge(AUTH_CHALLENGE_PROBE.challengeTtlMs);
+  return jsonResponse({ payload: ch.payload, expiresAt: ch.expiresAt }, allowedOrigin, 200);
 }

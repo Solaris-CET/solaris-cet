@@ -1,26 +1,25 @@
 import { desc, eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireUser } from '../../lib/authUser';
-import { getAllowedOrigin } from '../../lib/cors';
-import { corsJson, corsOptions, readJson } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { requireUser } from '@/api/lib/authUser';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { corsJson, corsOptions, readJson } from '@/api/lib/http';
+import {
+  buildWeb3IntentCreateResponse,
+  buildWeb3IntentsListResponse,
+  mapWeb3IntentRow,
+  parseWeb3IntentCreateBody,
+  WEB3_INTENTS_PROBE,
+} from '../../lib/web3Intents';
+
+export { WEB3_INTENTS_PATH, WEB3_INTENTS_PROBE } from '@/api/lib/web3Intents';
 
 export const config = { runtime: 'nodejs' };
-
-function parseType(v: unknown): 'stake' | 'unstake' | 'claim' | 'vote' | 'bridge' | 'onramp' | null {
-  if (v === 'stake' || v === 'unstake' || v === 'claim' || v === 'vote' || v === 'bridge' || v === 'onramp') return v;
-  return null;
-}
-
-function parseStatus(v: unknown): 'created' | 'pending' | 'confirmed' | 'failed' | null {
-  if (v === 'created' || v === 'pending' || v === 'confirmed' || v === 'failed') return v;
-  return null;
-}
 
 export default async function handler(req: Request): Promise<Response> {
   const origin = req.headers.get('origin');
   const allowedOrigin = getAllowedOrigin(origin);
-  if (req.method === 'OPTIONS') return corsOptions(req, 'GET, POST, OPTIONS');
+  if (req.method === 'OPTIONS') return corsOptions(req, WEB3_INTENTS_PROBE.methods.join(', '));
 
   const user = await requireUser(req);
   if (!user) {
@@ -37,19 +36,8 @@ export default async function handler(req: Request): Promise<Response> {
       .from(schema.web3Intents)
       .where(eq(schema.web3Intents.userId, user.id))
       .orderBy(desc(schema.web3Intents.createdAt))
-      .limit(50);
-    return corsJson(req, 200, {
-      ok: true,
-      intents: rows.map((r) => ({
-        id: r.id,
-        type: r.type,
-        status: r.status,
-        txHash: r.txHash ?? null,
-        providerRef: r.providerRef ?? null,
-        meta: r.meta ?? null,
-        createdAt: r.createdAt.toISOString(),
-      })),
-    });
+      .limit(WEB3_INTENTS_PROBE.listLimit);
+    return corsJson(req, 200, buildWeb3IntentsListResponse(rows.map(mapWeb3IntentRow)));
   }
 
   if (req.method !== 'POST') return corsJson(req, 405, { error: 'Method not allowed' });
@@ -58,19 +46,22 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     body = await readJson(req);
   } catch {
-    return corsJson(req, 400, { error: 'Invalid JSON' });
+    return corsJson(req, 400, { error: WEB3_INTENTS_PROBE.invalidJsonError });
   }
 
-  const type = parseType((body as { type?: unknown })?.type);
-  const status = parseStatus((body as { status?: unknown })?.status) ?? 'created';
-  const txHash = typeof (body as { txHash?: unknown })?.txHash === 'string' ? (body as { txHash: string }).txHash.trim().slice(0, 220) : null;
-  const providerRef = typeof (body as { providerRef?: unknown })?.providerRef === 'string' ? (body as { providerRef: string }).providerRef.trim().slice(0, 220) : null;
-  const meta = (body as { meta?: unknown })?.meta;
-  if (!type) return corsJson(req, 400, { error: 'Invalid type' });
+  const parsed = parseWeb3IntentCreateBody(body);
+  if (!parsed) return corsJson(req, 400, { error: WEB3_INTENTS_PROBE.invalidTypeError });
 
   const [row] = await db
     .insert(schema.web3Intents)
-    .values({ userId: user.id, type, status, txHash, providerRef, meta: meta && typeof meta === 'object' ? (meta as Record<string, unknown>) : null })
+    .values({
+      userId: user.id,
+      type: parsed.type,
+      status: parsed.status,
+      txHash: parsed.txHash,
+      providerRef: parsed.providerRef,
+      meta: parsed.meta,
+    })
     .returning();
-  return corsJson(req, 201, { ok: true, id: row.id });
+  return corsJson(req, 201, buildWeb3IntentCreateResponse(row.id));
 }

@@ -1,8 +1,11 @@
 import { and, desc, eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAuth } from '../../lib/auth';
-import { getAllowedOrigin } from '../../lib/cors';
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import { AI_PINS_PROBE, parsePinDeleteId, parsePinPostBody } from '@/api/lib/aiPins';
+import { getAllowedOrigin } from '@/api/lib/cors';
+
+export { AI_PINS_PATH, AI_PINS_PROBE } from '@/api/lib/aiPins';
 
 export const config = { runtime: 'nodejs' };
 
@@ -55,7 +58,7 @@ export default async function handler(req: Request): Promise<Response> {
       .innerJoin(schema.aiMessages, eq(schema.aiPins.messageId, schema.aiMessages.id))
       .where(eq(schema.aiPins.userId, auth.user.id))
       .orderBy(desc(schema.aiPins.createdAt))
-      .limit(200);
+      .limit(AI_PINS_PROBE.maxListRows);
     return jsonResponse(allowedOrigin, { pins: rows });
   }
 
@@ -66,21 +69,15 @@ export default async function handler(req: Request): Promise<Response> {
     } catch {
       return jsonResponse(allowedOrigin, { error: 'Invalid JSON body' }, 400);
     }
-    const messageId =
-      typeof body === 'object' && body !== null && 'messageId' in body && typeof (body as { messageId: unknown }).messageId === 'string'
-        ? (body as { messageId: string }).messageId.trim()
-        : '';
-    const note =
-      typeof body === 'object' && body !== null && 'note' in body && typeof (body as { note: unknown }).note === 'string'
-        ? (body as { note: string }).note.trim().slice(0, 300)
-        : '';
-    if (!messageId) return jsonResponse(allowedOrigin, { error: 'messageId missing' }, 400);
+    const parsed = parsePinPostBody(body);
+    if (!parsed.ok) return jsonResponse(allowedOrigin, { error: parsed.error }, 400);
+    const { messageId, note } = parsed;
 
     const [m] = await db
       .select({ id: schema.aiMessages.id, conversationId: schema.aiMessages.conversationId })
       .from(schema.aiMessages)
       .where(eq(schema.aiMessages.id, messageId));
-    if (!m) return jsonResponse(allowedOrigin, { error: 'Not found' }, 404);
+    if (!m) return jsonResponse(allowedOrigin, { error: AI_PINS_PROBE.notFoundError }, 404);
     const [c] = await db
       .select({ id: schema.aiConversations.id })
       .from(schema.aiConversations)
@@ -99,9 +96,8 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   if (req.method === 'DELETE') {
-    const url = new URL(req.url);
-    const id = (url.searchParams.get('id') ?? '').trim();
-    if (!id) return jsonResponse(allowedOrigin, { error: 'id missing' }, 400);
+    const id = parsePinDeleteId(new URL(req.url).searchParams);
+    if (!id) return jsonResponse(allowedOrigin, { error: AI_PINS_PROBE.missingIdError }, 400);
     await db.delete(schema.aiPins).where(and(eq(schema.aiPins.id, id), eq(schema.aiPins.userId, auth.user.id)));
     return new Response(null, {
       status: 204,
@@ -111,4 +107,3 @@ export default async function handler(req: Request): Promise<Response> {
 
   return jsonResponse(allowedOrigin, { error: 'Method not allowed' }, 405);
 }
-

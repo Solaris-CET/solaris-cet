@@ -1,4 +1,4 @@
-import { PRODUCTION_SITE_ORIGIN } from '../../src/lib/brandAssetFilenames';
+import { PRODUCTION_SITE_ORIGIN } from '@/lib/brandAssetFilenames';
 
 export function publicOrigin(req?: Request): string {
   const fromEnv = String(process.env.VITE_APP_ORIGIN ?? '').trim();

@@ -1,8 +1,17 @@
-import { getAllowedOrigin } from '../../lib/cors';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyBatchEngineUrl,
+  buildSurveyBatchSuccessPayload,
+  buildSurveyBatchUnreachablePayload,
+  isSurveyBatchMultipartContentType,
+  resolveSurveyBatchEngineUrl,
+  SURVEY_BATCH_PROBE,
+  type SurveyBatchEnginePayload,
+} from '../../lib/surveyBatch';
+
+export { SURVEY_BATCH_PATH, SURVEY_BATCH_PROBE } from '@/api/lib/surveyBatch';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
 
 function json(body: unknown, origin: string, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -11,7 +20,7 @@ function json(body: unknown, origin: string, status = 200) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': origin,
       Vary: 'Origin',
-      'Cache-Control': 'no-store',
+      'Cache-Control': SURVEY_BATCH_PROBE.cacheControl,
     },
   });
 }
@@ -24,8 +33,8 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, X-Installer-Key',
+        'Access-Control-Allow-Methods': SURVEY_BATCH_PROBE.methods.join(', '),
+        'Access-Control-Allow-Headers': SURVEY_BATCH_PROBE.allowHeaders,
         Vary: 'Origin',
       },
     });
@@ -35,10 +44,12 @@ export default async function handler(req: Request): Promise<Response> {
     return json({ error: 'Method not allowed' }, allowed, 405);
   }
 
-  const ct = (req.headers.get('content-type') || '').toLowerCase();
-  if (!ct.includes('multipart/form-data')) {
-    return json({ error: 'Expected multipart/form-data' }, allowed, 415);
+  const contentType = req.headers.get('content-type') || '';
+  if (!isSurveyBatchMultipartContentType(contentType)) {
+    return json({ error: SURVEY_BATCH_PROBE.invalidContentTypeError }, allowed, 415);
   }
+
+  const engineUrl = resolveSurveyBatchEngineUrl();
 
   try {
     const incoming = await req.formData();
@@ -48,54 +59,27 @@ export default async function handler(req: Request): Promise<Response> {
     }
 
     const installerKey = req.headers.get('x-installer-key');
-    const res = await fetch(`${ENGINE.replace(/\/$/, '')}/batch`, {
+    const res = await fetch(buildSurveyBatchEngineUrl(engineUrl), {
       method: 'POST',
-      headers: installerKey ? { 'X-Installer-Key': installerKey } : undefined,
+      headers: installerKey ? { [SURVEY_BATCH_PROBE.installerKeyHeader]: installerKey } : undefined,
       body: engineForm,
-      signal: AbortSignal.timeout(600_000),
+      signal: AbortSignal.timeout(SURVEY_BATCH_PROBE.fetchTimeoutMs),
     });
 
-    const data = await res.json().catch(() => ({ error: 'Invalid engine response' }));
+    const data = await res.json().catch(() => ({ error: SURVEY_BATCH_PROBE.invalidEngineResponseError }));
     if (!res.ok) {
       return json(
-        { error: (data as { detail?: string }).detail || 'Engine batch error', engine_url: ENGINE },
+        {
+          error: (data as { detail?: string }).detail || SURVEY_BATCH_PROBE.engineBatchErrorFallback,
+          engine_url: engineUrl,
+        },
         allowed,
         res.status,
       );
     }
 
-    const payload = data as {
-      total: number;
-      succeeded: number;
-      failed: number;
-      results: Array<{
-        job_id: string;
-        success: boolean;
-        report_id: string;
-        pdf_filename: string;
-        ahj_filename: string;
-        score: number;
-        error: string;
-      }>;
-    };
-
-    return json(
-      {
-        ...payload,
-        results: payload.results.map((r) => ({
-          ...r,
-          pdf_url: r.pdf_filename
-            ? `/api/survey/files?file=${encodeURIComponent(r.pdf_filename)}`
-            : '',
-          ahj_url: r.ahj_filename
-            ? `/api/survey/files?file=${encodeURIComponent(r.ahj_filename)}`
-            : '',
-        })),
-      },
-      allowed,
-      200,
-    );
+    return json(buildSurveyBatchSuccessPayload(data as SurveyBatchEnginePayload), allowed, 200);
   } catch {
-    return json({ error: 'survey-engine unreachable', engine_url: ENGINE }, allowed, 503);
+    return json(buildSurveyBatchUnreachablePayload(engineUrl), allowed, 503);
   }
 }

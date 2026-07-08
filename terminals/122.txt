@@ -1,0 +1,54 @@
+---
+pid: 15736
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "$git = \"C:\\Program Files\\Git\\bin\\git.exe\"; cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\"; & $git commit -m \"feat(twin-crm-webhooks): 3D viewer, persistent SSE, bidirectional CRM webhooks\"; & $git push github main 2>&1; & $git push origin main 2>&1"
+started_at: 2026-07-06T17:10:31.985Z
+running_for_ms: 86400016 
+---
+[main 624e08c] feat(twin-crm-webhooks): 3D viewer, persistent SSE, bidirectional CRM webhooks
+ 37 files changed, 1194 insertions(+), 59 deletions(-)
+ create mode 100644 app/api/lib/twinWebhook.ts
+ create mode 100644 app/api/survey/twin-webhook/deliveries/route.ts
+ create mode 100644 app/api/survey/twin-webhook/route.ts
+ create mode 100644 app/src/__tests__/twin3dScene.test.ts
+ create mode 100644 app/src/__tests__/twinWebhookRoute.test.ts
+ create mode 100644 app/src/__tests__/useTwinStream.test.ts
+ create mode 100644 app/src/admin/sections/TwinWebhookSection.tsx
+ create mode 100644 app/src/components/survey/Twin3DViewer.tsx
+ create mode 100644 app/src/lib/twin3dScene.ts
+ create mode 100644 app/src/lib/twinWebhook.ts
+ create mode 100644 app/src/lib/twinWebhookApi.ts
+ create mode 100644 docs/planning/features/twin-crm-webhooks/tasks.md
+ create mode 100644 survey-engine/src/twin_webhook.py
+ create mode 100644 survey-engine/tests/test_twin_webhook.py
+git.exe : remote: Bypassed rule violations for refs/heads/main:        
+At line:1 char:184
++ ... SE, bidirectional CRM webhooks"; & $git push github main 2>&1; & $git ...
++                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (remote: Bypasse...s/main:        :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+remote: 
+remote: - Changes must be made through a pull request.        
+remote: 
+remote: 
+remote: GitHub found 27 vulnerabilities on Solaris-CET/solaris-cet's default branch (1 critical, 7 high, 13 moderate, 6
+ low). To find out more, visit:        
+remote:      https://github.com/Solaris-CET/solaris-cet/security/dependabot        
+remote: 
+To https://github.com/Solaris-CET/solaris-cet.git
+   1a3a276..624e08c  main -> main
+git.exe : fatal: unable to access 'https://gitea.com/Solaris-Cet/solaris-clean.git/': The requested URL returned error:
+ 504
+At line:1 char:214
++ ... webhooks"; & $git push github main 2>&1; & $git push origin main 2>&1
++                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (fatal: unable t...rned error: 504:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+---
+exit_code: -1
+elapsed_ms: 86400016
+ended_at: 2026-07-07T17:10:32.845Z
+---

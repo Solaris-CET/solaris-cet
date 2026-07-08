@@ -1,36 +1,24 @@
 import { and, eq, gte, lt } from 'drizzle-orm';
-import nodemailer from 'nodemailer';
 
-import { getDb, schema } from '../../../db/client';
-import { cronAuthResult } from '../../lib/cron';
-import { jsonResponse, optionsResponse } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import {
+  buildEventReminderSmtpTransport,
+  buildEventReminderUrl,
+  CRON_EVENT_REMINDERS_PROBE,
+  envTrim,
+  eventReminderWindow,
+} from '../../lib/cronEventReminders';
+import { cronAuthResult } from '@/api/lib/cron';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
 import { telegramSendMessage } from '../../telegram/lib';
+
+export { CRON_EVENT_REMINDERS_PATH, CRON_EVENT_REMINDERS_PROBE } from '@/api/lib/cronEventReminders';
 
 export const config = { runtime: 'nodejs' };
 
-function env(name: string): string {
-  return String(process.env[name] ?? '').trim();
-}
-
-function buildTransport() {
-  const host = env('SMTP_HOST');
-  const portRaw = env('SMTP_PORT');
-  const user = env('SMTP_USER');
-  const pass = env('SMTP_PASS');
-  if (!host || !portRaw || !user || !pass) return null;
-  const port = Number(portRaw);
-  if (!Number.isFinite(port) || port <= 0) return null;
-  return nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: { user, pass },
-  });
-}
-
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') {
-    return optionsResponse(req, 'POST, OPTIONS', 'Content-Type');
+    return optionsResponse(req, CRON_EVENT_REMINDERS_PROBE.methods.join(', '), 'Content-Type');
   }
   if (req.method !== 'POST') {
     return jsonResponse(req, { error: 'Method not allowed' }, 405);
@@ -40,9 +28,7 @@ export default async function handler(req: Request): Promise<Response> {
   if (!cron.ok) return jsonResponse(req, { error: cron.error }, cron.status);
 
   const db = getDb();
-  const now = Date.now();
-  const from = new Date(now + 23 * 60 * 60 * 1000);
-  const to = new Date(now + 25 * 60 * 60 * 1000);
+  const { from, to } = eventReminderWindow();
 
   const events = await db
     .select({
@@ -53,13 +39,12 @@ export default async function handler(req: Request): Promise<Response> {
     })
     .from(schema.events)
     .where(and(gte(schema.events.startAt, from), lt(schema.events.startAt, to)))
-    .limit(50);
+    .limit(CRON_EVENT_REMINDERS_PROBE.eventsLimit);
 
-  const botToken = env('TELEGRAM_BOT_TOKEN');
-  const transport = buildTransport();
-  const fromEmail = env('SMTP_FROM') || env('SMTP_USER');
-  const site = env('PUBLIC_SITE_URL') || 'https://solaris-cet.com';
-  const base = site.replace(/\/$/, '');
+  const botToken = envTrim('TELEGRAM_BOT_TOKEN');
+  const transport = buildEventReminderSmtpTransport();
+  const fromEmail = envTrim('SMTP_FROM') || envTrim('SMTP_USER');
+  const base = envTrim('PUBLIC_SITE_URL') || CRON_EVENT_REMINDERS_PROBE.defaultSiteUrl;
 
   let emailSent = 0;
   let telegramSent = 0;
@@ -74,7 +59,7 @@ export default async function handler(req: Request): Promise<Response> {
       const [settings] = await db.select().from(schema.userSettings).where(eq(schema.userSettings.userId, r.userId));
       const [tg] = await db.select().from(schema.telegramLinks).where(eq(schema.telegramLinks.userId, r.userId));
 
-      const eventUrl = `${base}/evenimente/${encodeURIComponent(e.slug)}`;
+      const eventUrl = buildEventReminderUrl(base, e.slug);
       const startText = e.startAt.toISOString();
       const subject = `Reminder: ${e.title}`;
 

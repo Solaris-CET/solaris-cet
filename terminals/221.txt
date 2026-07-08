@@ -1,0 +1,18 @@
+---
+pid: 14384
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/walletsRoute.test.ts src/__tests__/web3IntentsRoute.test.ts; npx eslint api/lib/wallets.ts api/lib/web3Intents.ts api/wallets/route.ts api/web3/intents/route.ts src/__tests__/walletsRoute.test.ts src/__tests__/web3IntentsRoute.test.ts --fix"
+started_at: 2026-07-07T16:53:14.481Z
+running_for_ms: 2269971  
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ✓ src/__tests__/web3IntentsRoute.test.ts (7 tests) 107ms
+ ✓ src/__tests__/walletsRoute.test.ts (6 tests) 82ms
+
+ Test Files  2 passed (2)
+      Tests  13 passed (13)
+   Start at  19:53:22
+   Duration  6.56s (transform 367ms, setup 2.20s, import 1.75s, tests 189ms, environment 1ms)
+

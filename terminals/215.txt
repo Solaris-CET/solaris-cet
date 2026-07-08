@@ -1,0 +1,21 @@
+---
+pid: 16356
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/supportMessagesRoute.test.ts src/__tests__/supportStartRoute.test.ts src/__tests__/surveyBatchRoute.test.ts src/__tests__/surveyContextRoute.test.ts src/__tests__/surveyCorrectionsRoute.test.ts"
+started_at: 2026-07-07T16:19:35.634Z
+running_for_ms: 4290000  
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ✓ src/__tests__/surveyBatchRoute.test.ts (9 tests) 101ms
+ ✓ src/__tests__/surveyCorrectionsRoute.test.ts (9 tests) 76ms
+ ✓ src/__tests__/surveyContextRoute.test.ts (9 tests) 81ms
+ ✓ src/__tests__/supportStartRoute.test.ts (8 tests) 75ms
+ ✓ src/__tests__/supportMessagesRoute.test.ts (8 tests) 70ms
+
+ Test Files  5 passed (5)
+      Tests  43 passed (43)
+   Start at  19:19:40
+   Duration  9.52s (transform 562ms, setup 4.04s, import 1.25s, tests 402ms, environment 1ms)
+

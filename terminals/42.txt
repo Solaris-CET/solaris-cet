@@ -3,7 +3,7 @@ pid: 16948
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx tsc --noEmit -p tsconfig.app.json 2>&1 | Select-String \"SurveyPage|AdminPanel|leads\""
 started_at: 2026-07-05T23:08:08.956Z
-running_for_ms: 5325007  
+running_for_ms: 101799114
 ---
 
 src/admin/AdminPanel.tsx(123,28): error TS2339: Property 'error' does not exist on type '{ ok: false; status: number; e
@@ -13,3 +13,9 @@ src/pages_legacy/SurveyPage.tsx(3,31): error TS2724: '"lucide-react"' has no exp
  'Users'?
 
 
+
+---
+exit_code: -1
+elapsed_ms: 101799114
+ended_at: 2026-07-07T03:24:47.380Z
+---

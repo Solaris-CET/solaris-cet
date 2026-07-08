@@ -1,0 +1,29 @@
+---
+pid: 5856
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "$env:Path += \";$env:LOCALAPPDATA\\Packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\Scripts;C:\\Program Files\\Git\\bin\"; foreach ($q in @(\"SOLARIS\",\"survey\",\"deploy\",\"hetzner\",\"windows\",\"coolify\",\"agent\",\"loops\")) { Write-Output \"--- $q ---\"; stash search $q --json 2>&1 }"
+started_at: 2026-07-06T02:41:02.853Z
+running_for_ms: 89026694 
+---
+--- SOLARIS ---
+[{"source": "files", "ref": "8f084fff-c19e-4b8d-83b7-6a7e783ee63c", "name": "agent-memory", "snippet": "# SOLARIS CET \u2014 Agent Memory (local Stash)\n\nPersistent memory for coding agents. **Search this file + `grok.md` before building.**\nWhen [Fergana Stash](https://github.com/fergana-labs/stash) is connected, also run:\n`stash search \"SOLARIS <topic>\" --json` and `stash vfs \"rg \\\"<topic>\\\" /me\"`.\n\nLast c"}]
+--- survey ---
+[{"source": "files", "ref": "8f084fff-c19e-4b8d-83b7-6a7e783ee63c", "name": "agent-memory", "snippet": "# SOLARIS CET \u2014 Agent Memory (local Stash)\n\nPersistent memory for coding agents. **Search this file + `grok.md` before building.**\nWhen [Fergana Stash](https://github.com/fergana-labs/stash) is connected, also run:\n`stash search \"SOLARIS <topic>\" --json` and `stash vfs \"rg \\\"<topic>\\\" /me\"`.\n\nLast c"}]
+--- deploy ---
+[{"source": "files", "ref": "8f084fff-c19e-4b8d-83b7-6a7e783ee63c", "name": "agent-memory", "snippet": "# SOLARIS CET \u2014 Agent Memory (local Stash)\n\nPersistent memory for coding agents. **Search this file + `grok.md` before building.**\nWhen [Fergana Stash](https://github.com/fergana-labs/stash) is connected, also run:\n`stash search \"SOLARIS <topic>\" --json` and `stash vfs \"rg \\\"<topic>\\\" /me\"`.\n\nLast c"}]
+--- hetzner ---
+[{"source": "files", "ref": "8f084fff-c19e-4b8d-83b7-6a7e783ee63c", "name": "agent-memory", "snippet": "# SOLARIS CET \u2014 Agent Memory (local Stash)\n\nPersistent memory for coding agents. **Search this file + `grok.md` before building.**\nWhen [Fergana Stash](https://github.com/fergana-labs/stash) is connected, also run:\n`stash search \"SOLARIS <topic>\" --json` and `stash vfs \"rg \\\"<topic>\\\" /me\"`.\n\nLast c"}]
+--- windows ---
+[{"source": "files", "ref": "8f084fff-c19e-4b8d-83b7-6a7e783ee63c", "name": "agent-memory", "snippet": "# SOLARIS CET \u2014 Agent Memory (local Stash)\n\nPersistent memory for coding agents. **Search this file + `grok.md` before building.**\nWhen [Fergana Stash](https://github.com/fergana-labs/stash) is connected, also run:\n`stash search \"SOLARIS <topic>\" --json` and `stash vfs \"rg \\\"<topic>\\\" /me\"`.\n\nLast c"}]
+--- coolify ---
+[{"source": "files", "ref": "8f084fff-c19e-4b8d-83b7-6a7e783ee63c", "name": "agent-memory", "snippet": "# SOLARIS CET \u2014 Agent Memory (local Stash)\n\nPersistent memory for coding agents. **Search this file + `grok.md` before building.**\nWhen [Fergana Stash](https://github.com/fergana-labs/stash) is connected, also run:\n`stash search \"SOLARIS <topic>\" --json` and `stash vfs \"rg \\\"<topic>\\\" /me\"`.\n\nLast c"}]
+--- agent ---
+[{"source": "files", "ref": "8f084fff-c19e-4b8d-83b7-6a7e783ee63c", "name": "agent-memory", "snippet": "# SOLARIS CET \u2014 Agent Memory (local Stash)\n\nPersistent memory for coding agents. **Search this file + `grok.md` before building.**\nWhen [Fergana Stash](https://github.com/fergana-labs/stash) is connected, also run:\n`stash search \"SOLARIS <topic>\" --json` and `stash vfs \"rg \\\"<topic>\\\" /me\"`.\n\nLast c"}]
+--- loops ---
+[{"source": "files", "ref": "8f084fff-c19e-4b8d-83b7-6a7e783ee63c", "name": "agent-memory", "snippet": "# SOLARIS CET \u2014 Agent Memory (local Stash)\n\nPersistent memory for coding agents. **Search this file + `grok.md` before building.**\nWhen [Fergana Stash](https://github.com/fergana-labs/stash) is connected, also run:\n`stash search \"SOLARIS <topic>\" --json` and `stash vfs \"rg \\\"<topic>\\\" /me\"`.\n\nLast c"}]
+
+---
+exit_code: -1
+elapsed_ms: 89026694
+ended_at: 2026-07-07T03:24:48.423Z
+---

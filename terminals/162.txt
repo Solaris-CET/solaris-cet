@@ -1,0 +1,19 @@
+---
+pid: 6448
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/SurveyOfflineSection.test.tsx src/__tests__/adminClient.test.ts 2>&1"
+started_at: 2026-07-07T03:57:45.993Z
+running_for_ms: 48805004 
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ✓ src/__tests__/SurveyOfflineSection.test.tsx (3 tests) 569ms
+     ✓ reloads manifest when refresh is clicked  397ms
+ ✓ src/__tests__/adminClient.test.ts (4 tests) 17ms
+
+ Test Files  2 passed (2)
+      Tests  7 passed (7)
+   Start at  06:57:52
+   Duration  8.23s (transform 341ms, setup 1.56s, import 526ms, tests 586ms, environment 4.02s)
+

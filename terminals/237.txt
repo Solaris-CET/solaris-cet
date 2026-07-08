@@ -1,0 +1,55 @@
+---
+pid: 14572
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:/Users/CCons/Desktop/SOLARIS CET/app\"; npm run verify 2>&1 | Select-Object -Last 40"
+started_at: 2026-07-08T17:57:44.452Z
+running_for_ms: 940008   
+---
+
+> solaris-cet@1.0.0 verify
+> npm run lint && npm run typecheck && npm run test && npm run build
+
+
+> solaris-cet@1.0.0 lint
+> node ../scripts/run-bin.mjs eslint . --quiet
+
+
+> solaris-cet@1.0.0 typecheck
+> node ../scripts/run-bin.mjs tsc --noEmit -p tsconfig.app.json && node ../scripts/run-bin.mjs tsc --noEmit -p tsconfig.test.json && node ../scripts/run-bin.mjs tsc --noEmit -p tsconfig.node.json && node ../scripts/run-bin.mjs tsc --noEmit -p tsconfig.e2e.json
+
+src/__tests__/adminAnimationsExportAdVideoRoute.test.ts(72,23): error TS2552: Cannot find name 'adminAnimationsExportAdVideoRoute'. Did you mean 'ADMIN_ANIMATIONS_EXPORT_AD_VIDEO_PROBE'?
+src/__tests__/adminAnimationsExportAdVideoRoute.test.ts(83,23): error TS2552: Cannot find name 'adminAnimationsExportAdVideoRoute'. Did you mean 'ADMIN_ANIMATIONS_EXPORT_AD_VIDEO_PROBE'?
+src/__tests__/adminAnimationsExportAdVideoRoute.test.ts(94,23): error TS2552: Cannot find name 'adminAnimationsExportAdVideoRoute'. Did you mean 'ADMIN_ANIMATIONS_EXPORT_AD_VIDEO_PROBE'?
+src/__tests__/adminAnimationsExportAdVideoRoute.test.ts(106,23): error TS2552: Cannot find name 'adminAnimationsExportAdVideoRoute'. Did you mean 'ADMIN_ANIMATIONS_EXPORT_AD_VIDEO_PROBE'?
+src/__tests__/adminAnimationsExportAdVideoRoute.test.ts(117,23): error TS2552: Cannot find name 'adminAnimationsExportAdVideoRoute'. Did you mean 'ADMIN_ANIMATIONS_EXPORT_AD_VIDEO_PROBE'?
+src/__tests__/adminAnimationsExportAdVideoRoute.test.ts(143,23): error TS2552: Cannot find name 'adminAnimationsExportAdVideoRoute'. Did you mean 'ADMIN_ANIMATIONS_EXPORT_AD_VIDEO_PROBE'?
+src/__tests__/adminAnimationsExportAdVideoRoute.test.ts(154,23): error TS2552: Cannot find name 'adminAnimationsExportAdVideoRoute'. Did you mean 'ADMIN_ANIMATIONS_EXPORT_AD_VIDEO_PROBE'?
+src/__tests__/adminLogoutRoute.test.ts(36,27): error TS2339: Property 'role' does not exist on type '{ authOk: boolean; revokeCalls: number; revokedSessionId: string | null; }'.
+src/__tests__/adminLogoutRoute.test.ts(42,55): error TS2339: Property 'role' does not exist on type '{ authOk: boolean; revokeCalls: number; revokedSessionId: string | null; }'.
+src/__tests__/adminMeRoute.test.ts(30,27): error TS2339: Property 'role' does not exist on type '{ authOk: boolean; }'.
+src/__tests__/adminMeRoute.test.ts(36,55): error TS2339: Property 'role' does not exist on type '{ authOk: boolean; }'.
+src/__tests__/adminMfaRoute.test.ts(37,27): error TS2339: Property 'role' does not exist on type '{ authOk: boolean; mfaEnabledAt: Date | null; mfaSecretEncrypted: string | null; }'.
+src/__tests__/adminMfaRoute.test.ts(43,55): error TS2339: Property 'role' does not exist on type '{ authOk: boolean; mfaEnabledAt: Date | null; mfaSecretEncrypted: string | null; }'.
+node.exe : npm error Lifecycle script `typecheck` failed with error:
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm error Lifec...led with error::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+npm error code 2
+npm error path C:\Users\CCons\Desktop\SOLARIS CET\app
+npm error workspace solaris-cet@1.0.0
+npm error location C:\Users\CCons\Desktop\SOLARIS CET\app
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c node ../scripts/run-bin.mjs tsc --noEmit -p tsconfig.app.json &&
+ node ../scripts/run-bin.mjs tsc --noEmit -p tsconfig.test.json && node ../scripts/run-bin.mjs tsc --noEmit -p tsconfig
+.node.json && node ../scripts/run-bin.mjs tsc --noEmit -p tsconfig.e2e.json
+npm error Lifecycle script `verify` failed with error:
+npm error code 2
+npm error path C:\Users\CCons\Desktop\SOLARIS CET\app
+npm error workspace solaris-cet@1.0.0
+npm error location C:\Users\CCons\Desktop\SOLARIS CET\app
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c npm run lint && npm run typecheck && npm run test && npm run bui
+ld

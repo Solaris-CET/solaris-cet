@@ -1,36 +1,34 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Box, Sphere, Plane } from '@react-three/drei';
 import * as THREE from 'three';
 
+import { createParticleField } from './particleField';
+
 const PARTICLE_COUNT = 30;
+const PANEL_TILT = -Math.PI / 4;
+
+const particleData = createParticleField(
+  PARTICLE_COUNT,
+  (i, positions, speeds, offsets, jitter) => {
+    const x = (Math.random() - 0.5) * 1.8;
+    const z = (Math.random() - 0.5) * 1.3;
+    const y = Math.sin(PANEL_TILT) * z;
+    const zRot = Math.cos(PANEL_TILT) * z;
+    positions[i * 3] = x;
+    positions[i * 3 + 1] = y + 0.03;
+    positions[i * 3 + 2] = zRot;
+    speeds[i] = 0.3 + Math.random() * 0.5;
+    offsets[i] = Math.random() * Math.PI * 2;
+    if (jitter) jitter.z[i] = z;
+  },
+  true,
+);
 
 function SolarPanel3D() {
   const meshRef = useRef<THREE.Mesh>(null!);
   const lightRef = useRef<THREE.PointLight>(null!);
   const particleRef = useRef<THREE.Points>(null!);
-
-  // Inițializare particule
-  const particleData = useMemo(() => {
-    const positions = new Float32Array(PARTICLE_COUNT * 3);
-    const speeds = new Float32Array(PARTICLE_COUNT);
-    const offsets = new Float32Array(PARTICLE_COUNT);
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      // Poziție inițială pe suprafața panoului (în planul rotit)
-      const x = (Math.random() - 0.5) * 1.8;
-      const z = (Math.random() - 0.5) * 1.3;
-      // Aplicăm aceeași rotație ca panoul
-      const angle = -Math.PI / 4;
-      const y = Math.sin(angle) * z;
-      const zRot = Math.cos(angle) * z;
-      positions[i * 3] = x;
-      positions[i * 3 + 1] = y + 0.03;
-      positions[i * 3 + 2] = zRot;
-      speeds[i] = 0.3 + Math.random() * 0.5;
-      offsets[i] = Math.random() * Math.PI * 2;
-    }
-    return { positions, speeds, offsets };
-  }, []);
 
   useFrame(({ clock }) => {
     if (meshRef.current) {
@@ -53,10 +51,9 @@ function SolarPanel3D() {
         const speed = particleData.speeds[i];
         const offset = particleData.offsets[i];
         const x = ((time * speed + offset) % 2) - 1; // -1 .. 1
-        const z = (Math.random() - 0.5) * 1.3;
-        const angle = -Math.PI / 4;
-        const y = Math.sin(angle) * z;
-        const zRot = Math.cos(angle) * z;
+        const z = particleData.jitterZ?.[i] ?? 0;
+        const y = Math.sin(PANEL_TILT) * z;
+        const zRot = Math.cos(PANEL_TILT) * z;
         positions[i * 3] = x * 0.9;
         positions[i * 3 + 1] = y + 0.03;
         positions[i * 3 + 2] = zRot;

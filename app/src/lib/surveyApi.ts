@@ -4,6 +4,35 @@ import type { CorrectionPayload, ReportContext } from './surveyContext';
 import { permitPackUrl } from './surveyContext';
 import type { SoftCostRoi } from './softCostRoi';
 
+export const API_ERRORS = {
+  dashboard: 'Dashboard indisponibil',
+  jurisdictions: 'Jurisdicții indisponibile',
+  stats: 'Statistici indisponibile',
+  generate: 'Generare eșuată',
+  demo: 'Demo eșuat',
+  batch: 'Batch eșuat',
+  twinFeed: 'Twin feed indisponibil',
+  twinFeedMissing: 'Feed lipsă',
+  corrections: 'Corecții indisponibile',
+  orchestration: 'Orchestration indisponibilă',
+  orchestrationMissing: 'Plan lipsă',
+  context: 'Context indisponibil',
+  contextMissing: 'Context lipsă',
+  correctionSubmit: 'Corecție eșuată',
+  crm: 'CRM indisponibil',
+} as const;
+
+export function apiErrorMessage(
+  payload: { error?: string; detail?: string } | null | undefined,
+  fallback: string,
+): string {
+  if (payload && typeof payload === 'object') {
+    if (typeof payload.error === 'string' && payload.error.trim()) return payload.error;
+    if (typeof payload.detail === 'string' && payload.detail.trim()) return payload.detail;
+  }
+  return fallback;
+}
+
 export type ChecklistStatus = 'pass' | 'warning' | 'fail' | 'na';
 
 export type InstallerProfile = {
@@ -175,20 +204,20 @@ export async function fetchSurveyHealth(): Promise<SurveyHealth> {
 
 export async function fetchSurveyDashboard(): Promise<DashboardData> {
   const res = await fetch('/api/survey/dashboard');
-  if (!res.ok) throw new Error('Dashboard indisponibil');
+  if (!res.ok) throw new Error(API_ERRORS.dashboard);
   return res.json() as Promise<DashboardData>;
 }
 
 export async function fetchJurisdictions(): Promise<JurisdictionItem[]> {
   const res = await fetch('/api/survey/jurisdictions');
-  if (!res.ok) throw new Error('Jurisdicții indisponibile');
+  if (!res.ok) throw new Error(API_ERRORS.jurisdictions);
   const data = (await res.json()) as { jurisdictions?: JurisdictionItem[] };
   return data.jurisdictions ?? [];
 }
 
 export async function fetchSurveyStats(): Promise<SurveyPublicStats> {
   const res = await fetch('/api/survey/stats');
-  if (!res.ok) throw new Error('Statistici indisponibile');
+  if (!res.ok) throw new Error(API_ERRORS.stats);
   return res.json() as Promise<SurveyPublicStats>;
 }
 
@@ -255,7 +284,7 @@ export async function generateSurveyReport(
   });
   const data = (await res.json()) as GenerateReportResult & { error?: string; detail?: string };
   if (!res.ok) {
-    throw new Error(data.error || data.detail || 'Generare eșuată');
+    throw new Error(apiErrorMessage(data, API_ERRORS.generate));
   }
   return data;
 }
@@ -263,7 +292,7 @@ export async function generateSurveyReport(
 export async function generateDemoReport(): Promise<GenerateReportResult> {
   const res = await fetch('/api/survey/demo', { method: 'POST' });
   const data = (await res.json()) as GenerateReportResult & { error?: string };
-  if (!res.ok) throw new Error(data.error || 'Demo eșuat');
+  if (!res.ok) throw new Error(apiErrorMessage(data, API_ERRORS.demo));
   return data;
 }
 
@@ -288,7 +317,7 @@ export async function runSurveyBatch(
   });
   const data = (await res.json()) as BatchRunResult & { error?: string; detail?: string };
   if (!res.ok) {
-    throw new Error(data.error || data.detail || 'Batch eșuat');
+    throw new Error(apiErrorMessage(data, API_ERRORS.batch));
   }
   return data;
 }
@@ -305,8 +334,8 @@ export type SurveyCorrection = {
 export async function fetchTwinFeed(reportId: string): Promise<TwinFeed> {
   const res = await fetch(`/api/survey/twin-feed?report_id=${encodeURIComponent(reportId)}`);
   const data = (await res.json()) as { feed?: TwinFeed; error?: string };
-  if (!res.ok) throw new Error(data.error || 'Twin feed indisponibil');
-  if (!data.feed) throw new Error('Feed lipsă');
+  if (!res.ok) throw new Error(apiErrorMessage(data, API_ERRORS.twinFeed));
+  if (!data.feed) throw new Error(API_ERRORS.twinFeedMissing);
   return data.feed;
 }
 
@@ -314,23 +343,23 @@ export async function fetchCorrections(reportId?: string): Promise<SurveyCorrect
   const qs = reportId ? `?report_id=${encodeURIComponent(reportId)}` : '';
   const res = await fetch(`/api/survey/corrections${qs}`);
   const data = (await res.json()) as { corrections?: SurveyCorrection[]; error?: string };
-  if (!res.ok) throw new Error(data.error || 'Corecții indisponibile');
+  if (!res.ok) throw new Error(apiErrorMessage(data, API_ERRORS.corrections));
   return data.corrections ?? [];
 }
 
 export async function fetchOrchestration(reportId: string): Promise<SurveyOrchestration> {
   const res = await fetch(`/api/survey/orchestrate?report_id=${encodeURIComponent(reportId)}`);
   const data = (await res.json()) as { orchestration?: SurveyOrchestration; error?: string };
-  if (!res.ok) throw new Error(data.error || 'Orchestration indisponibilă');
-  if (!data.orchestration) throw new Error('Plan lipsă');
+  if (!res.ok) throw new Error(apiErrorMessage(data, API_ERRORS.orchestration));
+  if (!data.orchestration) throw new Error(API_ERRORS.orchestrationMissing);
   return data.orchestration;
 }
 
 export async function fetchReportContext(reportId: string): Promise<ReportContext> {
   const res = await fetch(`/api/survey/context?report_id=${encodeURIComponent(reportId)}`);
   const data = (await res.json()) as { context?: ReportContext; error?: string };
-  if (!res.ok) throw new Error(data.error || 'Context indisponibil');
-  if (!data.context) throw new Error('Context lipsă');
+  if (!res.ok) throw new Error(apiErrorMessage(data, API_ERRORS.context));
+  if (!data.context) throw new Error(API_ERRORS.contextMissing);
   return data.context;
 }
 
@@ -350,7 +379,7 @@ export async function submitSurveyCorrection(
     }),
   });
   const data = (await res.json()) as { ok?: boolean; error?: string };
-  if (!res.ok) throw new Error(data.error || 'Corecție eșuată');
+  if (!res.ok) throw new Error(apiErrorMessage(data, API_ERRORS.correctionSubmit));
   return { ok: Boolean(data.ok) };
 }
 
@@ -375,6 +404,6 @@ export async function submitSurveyToCrm(payload: {
     body: JSON.stringify(payload),
   });
   const data = (await res.json()) as { success?: boolean; pdfUrl?: string; error?: string };
-  if (!res.ok) throw new Error(data.error || 'CRM indisponibil');
+  if (!res.ok) throw new Error(apiErrorMessage(data, API_ERRORS.crm));
   return { success: Boolean(data.success), pdfUrl: data.pdfUrl };
 }

@@ -3,7 +3,7 @@ pid: 11596
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npm run test -- src/__tests__/surveyRoutes.integration.test.ts --reporter=dot"
 started_at: 2026-07-05T23:13:52.480Z
-running_for_ms: 4980008  
+running_for_ms: 101455188
 ---
 
 > solaris-cet@1.0.0 test
@@ -19,3 +19,9 @@ running_for_ms: 4980008
    Start at  02:14:02
    Duration  5.04s (transform 383ms, setup 1.69s, import 250ms, tests 216ms, environment 0ms)
 
+
+---
+exit_code: -1
+elapsed_ms: 101455188
+ended_at: 2026-07-07T03:24:46.847Z
+---

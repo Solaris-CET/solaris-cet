@@ -1,0 +1,7 @@
+---
+pid: 16720
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; node ../scripts/run-bin.mjs eslint src/pages_legacy/SurveyPage.tsx src/lib/surveyPageHelpers.ts src/__tests__/SurveyPage.test.tsx src/__tests__/surveyPageHelpers.test.ts --quiet 2>&1"
+started_at: 2026-07-07T04:36:59.413Z
+running_for_ms: 46449997 
+---

@@ -1,38 +1,49 @@
 import { and, eq, gte, inArray, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 
-import { getDb, schema } from '../../../../db/client';
-import { requireUser } from '../../../lib/authUser';
-import { corsJson, corsOptions } from '../../../lib/http';
-import { bootstrapGamification, todayKeyUtc } from '../../lib/gamification';
+import { getDb, schema } from '@/db/client';
+import { AFFILIATE_LINKS_PROBE } from '@/api/lib/affiliateLinks';
+import { requireUser } from '@/api/lib/authUser';
+import { corsJson, corsOptions } from '@/api/lib/http';
+import { bootstrapGamification, todayKeyUtc } from '@/api/gamification/lib/gamification';
+
+export { AFFILIATE_LINKS_PATH, AFFILIATE_LINKS_PROBE } from '@/api/lib/affiliateLinks';
 
 export const config = { runtime: 'nodejs' };
 
 export default async function handler(req: Request): Promise<Response> {
-  if (req.method === 'OPTIONS') return corsOptions(req, 'GET, POST, OPTIONS');
+  if (req.method === 'OPTIONS') return corsOptions(req, AFFILIATE_LINKS_PROBE.methods.join(', '));
   const user = await requireUser(req);
-  if (!user) return corsJson(req, 401, { error: 'Unauthorized' });
+  if (!user) return corsJson(req, AFFILIATE_LINKS_PROBE.unauthenticatedStatus, { error: 'Unauthorized' });
 
   const db = getDb();
   await bootstrapGamification(db);
 
   if (req.method === 'GET') {
     const links = await db
-      .select({ id: schema.affiliateLinks.id, code: schema.affiliateLinks.code, active: schema.affiliateLinks.active, createdAt: schema.affiliateLinks.createdAt })
+      .select({
+        id: schema.affiliateLinks.id,
+        code: schema.affiliateLinks.code,
+        active: schema.affiliateLinks.active,
+        createdAt: schema.affiliateLinks.createdAt,
+      })
       .from(schema.affiliateLinks)
       .where(eq(schema.affiliateLinks.userId, user.id))
-      .limit(50);
+      .limit(AFFILIATE_LINKS_PROBE.listLimit);
 
     const linkIds = links.map((l) => l.id);
     const codes = links.map((l) => l.code);
     const now = new Date();
-    const day7 = todayKeyUtc(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000));
+    const day7 = todayKeyUtc(new Date(now.getTime() - AFFILIATE_LINKS_PROBE.clicksLookbackDays * 24 * 60 * 60 * 1000));
 
     const clicks =
       linkIds.length === 0
         ? []
         : await db
-            .select({ affiliateLinkId: schema.affiliateClicksDaily.affiliateLinkId, clicks: sql<number>`sum(${schema.affiliateClicksDaily.count})` })
+            .select({
+              affiliateLinkId: schema.affiliateClicksDaily.affiliateLinkId,
+              clicks: sql<number>`sum(${schema.affiliateClicksDaily.count})`,
+            })
             .from(schema.affiliateClicksDaily)
             .where(and(inArray(schema.affiliateClicksDaily.affiliateLinkId, linkIds), gte(schema.affiliateClicksDaily.day, day7)))
             .groupBy(schema.affiliateClicksDaily.affiliateLinkId);
@@ -64,8 +75,7 @@ export default async function handler(req: Request): Promise<Response> {
 
   if (req.method !== 'POST') return corsJson(req, 405, { error: 'Method not allowed' });
 
-  const maxAttempts = 6;
-  for (let i = 0; i < maxAttempts; i += 1) {
+  for (let i = 0; i < AFFILIATE_LINKS_PROBE.maxCodeAttempts; i += 1) {
     const code = nanoid(10).toUpperCase();
     try {
       await db.insert(schema.affiliateLinks).values({ userId: user.id, code, active: true });
@@ -77,5 +87,5 @@ export default async function handler(req: Request): Promise<Response> {
     }
   }
 
-  return corsJson(req, 500, { error: 'Could not generate code' });
+  return corsJson(req, 500, { error: AFFILIATE_LINKS_PROBE.codeGenerationError });
 }

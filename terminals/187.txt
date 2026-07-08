@@ -1,0 +1,11 @@
+---
+pid: 20200
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\" ; npm run lint"
+started_at: 2026-07-07T13:47:01.480Z
+running_for_ms: 13445012 
+---
+
+> solaris-cet@1.0.0 lint
+> node ../scripts/run-bin.mjs eslint . --quiet
+

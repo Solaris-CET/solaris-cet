@@ -3,7 +3,7 @@ pid: 16768
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx tsc --noEmit -p tsconfig.app.json; npx tsc --noEmit -p tsconfig.test.json; npx tsc --noEmit -p tsconfig.node.json; npx tsc --noEmit -p tsconfig.e2e.json"
 started_at: 2026-07-05T23:05:04.234Z
-running_for_ms: 5510170  
+running_for_ms: 101979642
 ---
 src/admin/AdminPanel.tsx(40,7): error TS2322: Type '"leads"' is not assignable to type '"media" | "token" | "posts" | "invites" | "audit" | "dashboard" | "conversations" | "users" | "blocks" | "cetuia" | "i18n" | "settings"'.
 src/admin/AdminPanel.tsx(69,5): error TS2322: Type '"audit" | "dashboard" | "users" | "invites" | "blocks" | "posts" | "media" | "token" | "cetuia" | "conversations" | "i18n" | "settings" | "leads"' is not assignable to type '"media" | "token" | "posts" | "invites" | "audit" | "dashboard" | "conversations" | "users" | "blocks" | "cetuia" | "i18n" | "settings"'.
@@ -491,3 +491,9 @@ src/components/Navigation.tsx(332,11): error TS2322: Type 'RefObject<HTMLDivElem
   Type 'RefObject<HTMLDivElement>' is not assignable to type 'RefObject<never>'.
     Type 'HTMLDivElement' is not assignable to type 'never'.
 api/lib/emailTemplates.ts(3,7): error TS6133: 'ADMIN_EMAIL' is declared but its value is never read.
+
+---
+exit_code: -1
+elapsed_ms: 101979642
+ended_at: 2026-07-07T03:24:42.961Z
+---

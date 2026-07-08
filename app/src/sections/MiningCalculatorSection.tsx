@@ -6,7 +6,7 @@ import { meshStandardBurstFromKey, meshWhisperFromKey } from '@/lib/meshSkillFee
 
 import MeshSkillRibbon from '../components/MeshSkillRibbon';
 import { useLanguage } from '../hooks/useLanguage';
-import type { MiningInput, MiningResult } from '../lib/mining-math';
+import type { MiningInput, MiningResult } from '../lib/mining';
 
 const BTC_S_SYMBOL = 'BTC-S';
 

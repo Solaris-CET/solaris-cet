@@ -144,6 +144,19 @@ export function decideCetAiRavPlan(args: {
   };
 }
 
+export type CetAiDimensionScore = {
+  dimension: 'factual' | 'useful' | 'safe' | 'style' | 'source_grounded';
+  score: number;
+  rationale?: string;
+};
+
+export type CetAiEvaluation = {
+  total: number;
+  dimensions: CetAiDimensionScore[];
+  model: string;
+  latencyMs: number;
+};
+
 /**
  * RAV v2 Consensus Heuristic
  * Reconciles dual-provider outputs by prioritizing factual DeDust/TON data

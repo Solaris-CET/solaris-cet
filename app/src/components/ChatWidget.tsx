@@ -1,10 +1,33 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, X, MessageCircle, Loader2 } from 'lucide-react';
+import { Send, X, MessageCircle, Loader2, Square } from 'lucide-react';
+
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+}
+
+async function streamAssistantReply(
+  reader: ReadableStreamDefaultReader<Uint8Array>,
+  onUpdate: (content: string) => void,
+): Promise<void> {
+  const decoder = new TextDecoder();
+  let content = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) {
+      const remaining = decoder.decode();
+      if (remaining) {
+        content += remaining;
+        onUpdate(content);
+      }
+      return;
+    }
+    content += decoder.decode(value, { stream: true });
+    onUpdate(content);
+  }
 }
 
 const QUICK_BUTTONS = [
@@ -15,6 +38,7 @@ const QUICK_BUTTONS = [
 ];
 
 export default function ChatWidget() {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -32,6 +56,12 @@ export default function ChatWidget() {
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  function stopGeneration() {
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = null;
+    setIsLoading(false);
+  }
 
   useEffect(() => {
     return () => {
@@ -73,8 +103,6 @@ export default function ChatWidget() {
       }
 
       const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let assistantContent = '';
       const assistantId = crypto.randomUUID();
 
       setMessages((prev) => [
@@ -82,27 +110,11 @@ export default function ChatWidget() {
         { id: assistantId, role: 'assistant', content: '' },
       ]);
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) {
-          const remaining = decoder.decode();
-          if (remaining) {
-            assistantContent += remaining;
-            setMessages((prev) =>
-              prev.map((m) =>
-                m.id === assistantId ? { ...m, content: assistantContent } : m
-              )
-            );
-          }
-          break;
-        }
-        assistantContent += decoder.decode(value, { stream: true });
+      await streamAssistantReply(reader, (content) => {
         setMessages((prev) =>
-          prev.map((m) =>
-            m.id === assistantId ? { ...m, content: assistantContent } : m
-          )
+          prev.map((m) => (m.id === assistantId ? { ...m, content } : m)),
         );
-      }
+      });
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') return;
       setError('A apărut o eroare neașteptată. Încearcă din nou.');
@@ -148,8 +160,6 @@ export default function ChatWidget() {
       }
 
       const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let assistantContent = '';
       const assistantId = crypto.randomUUID();
 
       setMessages((prev) => [
@@ -157,27 +167,11 @@ export default function ChatWidget() {
         { id: assistantId, role: 'assistant', content: '' },
       ]);
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) {
-          const remaining = decoder.decode();
-          if (remaining) {
-            assistantContent += remaining;
-            setMessages((prev) =>
-              prev.map((m) =>
-                m.id === assistantId ? { ...m, content: assistantContent } : m
-              )
-            );
-          }
-          break;
-        }
-        assistantContent += decoder.decode(value, { stream: true });
+      await streamAssistantReply(reader, (content) => {
         setMessages((prev) =>
-          prev.map((m) =>
-            m.id === assistantId ? { ...m, content: assistantContent } : m
-          )
+          prev.map((m) => (m.id === assistantId ? { ...m, content } : m)),
         );
-      }
+      });
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') return;
       setError('A apărut o eroare neașteptată. Încearcă din nou.');
@@ -211,13 +205,29 @@ export default function ChatWidget() {
                 <p className="text-xs text-slate-400">AI • Online</p>
               </div>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-slate-400 hover:text-white transition-colors"
-              aria-label="Închide chat"
-            >
-              <X size={20} />
-            </button>
+            <div className="flex items-center gap-2">
+              {isLoading && (
+                <button
+                  type="button"
+                  onClick={stopGeneration}
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-red-400 text-xs font-semibold transition-colors"
+                  aria-label="Oprește generarea"
+                >
+                  <Square className="w-3 h-3 fill-current" />
+                  Stop
+                </button>
+              )}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-slate-400 hover:text-white transition-colors"
+                aria-label="Închide chat"
+              >
+                <X size={20} />
+              </button>
+            </div>
+          </div>
+          <div aria-live="polite" aria-atomic="true" className="sr-only">
+            {isLoading ? t.cetAi.processing : error ? `${t.cetAi.liveApiErrorDetailLabel} ${error}` : ''}
           </div>
 
           {/* Quick buttons */}

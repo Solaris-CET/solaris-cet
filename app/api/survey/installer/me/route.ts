@@ -1,8 +1,17 @@
-import { getAllowedOrigin } from '../../../lib/cors';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import {
+  buildSurveyInstallerMeEngineUrl,
+  buildSurveyInstallerMeHeaders,
+  buildSurveyInstallerMeSuccessPayload,
+  resolveSurveyInstallerMeEngineUrl,
+  SURVEY_INSTALLER_ME_PROBE,
+  surveyInstallerMeErrorMessage,
+  surveyInstallerMeHttpStatus,
+} from '../../../lib/surveyInstallerMe';
+
+export { SURVEY_INSTALLER_ME_PATH, SURVEY_INSTALLER_ME_PROBE } from '@/api/lib/surveyInstallerMe';
 
 export const config = { runtime: 'nodejs' };
-
-const ENGINE = process.env.SURVEY_ENGINE_URL || 'http://127.0.0.1:8000';
 
 function json(body: unknown, origin: string, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -11,7 +20,7 @@ function json(body: unknown, origin: string, status = 200) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': origin,
       Vary: 'Origin',
-      'Cache-Control': 'private, no-store',
+      'Cache-Control': SURVEY_INSTALLER_ME_PROBE.cacheControl,
     },
   });
 }
@@ -24,8 +33,8 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowed,
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, X-Installer-Key',
+        'Access-Control-Allow-Methods': SURVEY_INSTALLER_ME_PROBE.methods.join(', '),
+        'Access-Control-Allow-Headers': SURVEY_INSTALLER_ME_PROBE.allowHeaders,
         Vary: 'Origin',
       },
     });
@@ -36,19 +45,23 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const installerKey = req.headers.get('x-installer-key')?.trim() || '';
-  const headers: HeadersInit = installerKey ? { 'X-Installer-Key': installerKey } : {};
+  const engineUrl = resolveSurveyInstallerMeEngineUrl();
 
   try {
-    const res = await fetch(`${ENGINE.replace(/\/$/, '')}/installer/me`, {
-      headers,
-      signal: AbortSignal.timeout(8000),
+    const res = await fetch(buildSurveyInstallerMeEngineUrl(engineUrl), {
+      headers: buildSurveyInstallerMeHeaders(installerKey),
+      signal: AbortSignal.timeout(SURVEY_INSTALLER_ME_PROBE.fetchTimeoutMs),
     });
     const data = await res.json();
     if (!res.ok) {
-      return json({ error: data.detail || 'Installer profile unavailable' }, allowed, res.status === 401 ? 401 : 502);
+      return json(
+        { error: surveyInstallerMeErrorMessage(data) },
+        allowed,
+        surveyInstallerMeHttpStatus(res.status),
+      );
     }
-    return json({ platform: 'solaris-cet', ...data }, allowed, 200);
+    return json(buildSurveyInstallerMeSuccessPayload(data as Record<string, unknown>), allowed, 200);
   } catch {
-    return json({ error: 'survey-engine unreachable' }, allowed, 503);
+    return json({ error: SURVEY_INSTALLER_ME_PROBE.unreachableError }, allowed, SURVEY_INSTALLER_ME_PROBE.unreachableStatus);
   }
 }

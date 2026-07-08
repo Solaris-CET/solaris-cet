@@ -3,7 +3,7 @@ pid: 14864
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "Get-Process node -ErrorAction SilentlyContinue | Where-Object { $_.Id -ne $PID } | Stop-Process -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 3; cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\"; if (Test-Path node_modules) { Remove-Item -Recurse -Force node_modules -ErrorAction SilentlyContinue }; if (Test-Path app\\node_modules) { Remove-Item -Recurse -Force app\\node_modules -ErrorAction SilentlyContinue }; npm ci --ignore-scripts 2>&1 | Select-Object -Last 12"
 started_at: 2026-07-05T21:30:06.573Z
-running_for_ms: 11204976 
+running_for_ms: 86400007 
 ---
 node.exe : npm warn EBADENGINE Unsupported engine {
 At line:1 char:1
@@ -18,3 +18,9 @@ npm warn EBADENGINE   current: { node: 'v24.13.0', npm: '11.6.2' }
 npm warn EBADENGINE }
 npm warn deprecated @safe-global/safe-gateway-typescript-sdk@3.23.1: Package no longer supported. Contact Support at ht
 tps://www.npmjs.com/support for more info.
+
+---
+exit_code: -1
+elapsed_ms: 86400007
+ended_at: 2026-07-06T21:30:14.523Z
+---

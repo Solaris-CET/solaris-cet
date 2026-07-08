@@ -1,0 +1,25 @@
+---
+pid: 17716
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npm test -- src/__tests__/adminMeRoute.test.ts src/__tests__/adminMediaUploadRoute.test.ts src/__tests__/adminMfaRoute.test.ts src/__tests__/adminMfaDisableRoute.test.ts src/__tests__/adminMfaEnableRoute.test.ts"
+started_at: 2026-07-07T13:20:26.691Z
+running_for_ms: 5017     
+---
+
+> solaris-cet@1.0.0 test
+> node ../scripts/run-bin.mjs vitest run src/__tests__/adminMeRoute.test.ts src/__tests__/adminMediaUploadRoute.test.ts src/__tests__/adminMfaRoute.test.ts src/__tests__/adminMfaDisableRoute.test.ts src/__tests__/adminMfaEnableRoute.test.ts
+
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ✓ src/__tests__/adminMediaUploadRoute.test.ts (7 tests) 92ms
+ ✓ src/__tests__/adminMfaDisableRoute.test.ts (7 tests) 83ms
+ ✓ src/__tests__/adminMfaEnableRoute.test.ts (7 tests) 69ms
+ ✓ src/__tests__/adminMfaRoute.test.ts (7 tests) 70ms
+ ✓ src/__tests__/adminMeRoute.test.ts (6 tests) 80ms
+
+ Test Files  5 passed (5)
+      Tests  34 passed (34)
+   Start at  16:20:31
+   Duration  10.88s (transform 620ms, setup 4.11s, import 2.41s, tests 394ms, environment 1ms)
+

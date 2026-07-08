@@ -1,6 +1,6 @@
 import { describe, expect,it } from 'vitest';
 
-import { calculateRewards, type MiningInput } from '../lib/mining-math';
+import { calculateRewards, type MiningInput } from '../lib/mining';
 
 describe('calculateRewards', () => {
   it('shape, zeros, scaling, stake, APY, rounding, device profiles', () => {

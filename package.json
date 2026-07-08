@@ -23,6 +23,7 @@
     "loops:status": "node scripts/loops-status.mjs",
     "loops:refine": "node scripts/deepseek-refine.mjs",
     "aider": "node scripts/aider-run.mjs",
+    "kimi:aep": "node scripts/kimi-aep-run.mjs",
     "app:build": "npm run build --workspace=app && npm run api:build --workspace=app",
     "app:build:next": "npm run build --workspace=app",
     "app:verify": "npm run verify --workspace=app",

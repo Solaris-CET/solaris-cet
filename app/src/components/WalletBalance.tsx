@@ -47,16 +47,18 @@ export default function WalletBalance({ className }: { className?: string }) {
     if (!address) return;
 
     let alive = true;
-    const controller = new AbortController();
+    let currentController: AbortController | null = null;
 
     const run = async () => {
       if (!online || hidden) return;
+      currentController?.abort();
+      currentController = new AbortController();
       setLoading(true);
       try {
         const preferred = await fetch(
           `/api/ton/balance?address=${encodeURIComponent(address)}&network=${encodeURIComponent(network)}`,
           {
-          signal: controller.signal,
+          signal: currentController.signal,
           cache: 'no-store',
           },
         );
@@ -71,7 +73,7 @@ export default function WalletBalance({ className }: { className?: string }) {
         const fallback = await fetch(
           `/api/wallet/balance?address=${encodeURIComponent(address)}&network=${encodeURIComponent(network)}`,
           {
-          signal: controller.signal,
+          signal: currentController.signal,
           cache: 'no-store',
           },
         );
@@ -98,7 +100,7 @@ export default function WalletBalance({ className }: { className?: string }) {
     }, dataSaver ? 60_000 : 20_000);
     return () => {
       alive = false;
-      controller.abort();
+      currentController?.abort();
       window.clearTimeout(first);
       window.clearInterval(id);
     };

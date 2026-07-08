@@ -1,9 +1,19 @@
 import { desc, gte, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../../db/client';
-import { requireAdmin, requireAuth } from '../../../lib/auth';
-import { getAllowedOrigin } from '../../../lib/cors';
-import { sha256Hex } from '../../../lib/nodeCrypto';
+import { getDb, schema } from '@/db/client';
+import { requireAdmin, requireAuth } from '@/api/lib/auth';
+import {
+  AI_ADMIN_FEEDBACK_PROBE,
+  aiAdminFeedbackSince24h,
+  aiAdminFeedbackSince7d,
+  anonymizeAiAdminUserId,
+  normalizeAvgQualityScore,
+  parseAiAdminFeedbackLimit,
+} from '../../../lib/aiAdminFeedback';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { sha256Hex } from '@/api/lib/nodeCrypto';
+
+export { AI_ADMIN_FEEDBACK_PATH, AI_ADMIN_FEEDBACK_PROBE } from '@/api/lib/aiAdminFeedback';
 
 export const config = { runtime: 'nodejs' };
 
@@ -17,12 +27,6 @@ function jsonResponse(allowedOrigin: string, body: unknown, status = 200): Respo
       'Cache-Control': 'no-store',
     },
   });
-}
-
-function clampInt(v: string | null, min: number, max: number, fallback: number): number {
-  const n = Number(v);
-  if (!Number.isFinite(n)) return fallback;
-  return Math.max(min, Math.min(max, Math.trunc(n)));
 }
 
 export default async function handler(req: Request): Promise<Response> {
@@ -53,10 +57,10 @@ export default async function handler(req: Request): Promise<Response> {
   if (!process.env.DATABASE_URL?.trim()) return jsonResponse(allowedOrigin, { error: 'Unavailable' }, 503);
 
   try {
-    const url = new URL(req.url);
-    const limit = clampInt(url.searchParams.get('limit'), 1, 500, 200);
-    const since7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const searchParams = new URL(req.url).searchParams;
+    const limit = parseAiAdminFeedbackLimit(searchParams);
+    const since7d = aiAdminFeedbackSince7d();
+    const since24h = aiAdminFeedbackSince24h();
     const db = getDb();
 
     const rows = await db
@@ -92,18 +96,18 @@ export default async function handler(req: Request): Promise<Response> {
 
     const out = rows.map((r) => ({
       id: r.id,
-      user: r.userId ? sha256Hex(r.userId).slice(0, 10) : 'anon',
+      user: anonymizeAiAdminUserId(r.userId, sha256Hex),
       queryLogId: r.queryLogId,
       messageId: r.messageId,
       rating: r.rating,
-      comment: (r.comment ?? '').slice(0, 800) || null,
+      comment: (r.comment ?? '').slice(0, AI_ADMIN_FEEDBACK_PROBE.maxCommentLength) || null,
       createdAt: r.createdAt,
     }));
 
     return jsonResponse(allowedOrigin, {
       feedback: out,
       aggregates: {
-        avgQualityScore7d: typeof avg?.avgScore7d === 'number' && Number.isFinite(avg.avgScore7d) ? Number(avg.avgScore7d) : null,
+        avgQualityScore7d: normalizeAvgQualityScore(avg?.avgScore7d),
         scoredCount7d: avg?.scoredCount7d ?? 0,
         feedback24h: {
           total: fb24?.total24h ?? 0,
@@ -116,4 +120,3 @@ export default async function handler(req: Request): Promise<Response> {
     return jsonResponse(allowedOrigin, { error: 'Unavailable' }, 503);
   }
 }
-

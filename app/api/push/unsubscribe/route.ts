@@ -1,9 +1,12 @@
 import { and, eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireUser } from '../../lib/authUser';
-import { getAllowedOrigin } from '../../lib/cors';
-import { corsJson, corsOptions, readJson } from '../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { requireUser } from '@/api/lib/authUser';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { corsJson, corsOptions, readJson } from '@/api/lib/http';
+import { parsePushUnsubscribeEndpoint, PUSH_UNSUBSCRIBE_PROBE } from '@/api/lib/pushUnsubscribe';
+
+export { PUSH_UNSUBSCRIBE_PATH, PUSH_UNSUBSCRIBE_PROBE } from '@/api/lib/pushUnsubscribe';
 
 export const config = { runtime: 'nodejs' };
 
@@ -16,7 +19,7 @@ export default async function handler(req: Request): Promise<Response> {
   const user = await requireUser(req);
   if (!user) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
+      status: PUSH_UNSUBSCRIBE_PROBE.unauthenticatedStatus,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
     });
   }
@@ -25,11 +28,11 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     body = await readJson(req);
   } catch {
-    return corsJson(req, 400, { error: 'Invalid JSON' });
+    return corsJson(req, 400, { error: PUSH_UNSUBSCRIBE_PROBE.invalidJsonError });
   }
 
-  const endpoint = typeof (body as { endpoint?: unknown })?.endpoint === 'string' ? (body as { endpoint: string }).endpoint.trim() : '';
-  if (!endpoint) return corsJson(req, 400, { error: 'Missing endpoint' });
+  const endpoint = parsePushUnsubscribeEndpoint(body);
+  if (!endpoint) return corsJson(req, 400, { error: PUSH_UNSUBSCRIBE_PROBE.missingEndpointError });
 
   const db = getDb();
   await db
@@ -41,4 +44,3 @@ export default async function handler(req: Request): Promise<Response> {
     headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
   });
 }
-

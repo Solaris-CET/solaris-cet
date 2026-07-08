@@ -1,10 +1,13 @@
 import { and, eq, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../../../db/client';
-import { clientIp } from '../../../../lib/clientIp';
-import { getAllowedOrigin } from '../../../../lib/cors';
-import { getJwtSecretsFromEnv, signJwt } from '../../../../lib/jwt';
+import { getDb, schema } from '@/db/client';
+import { clientIp } from '@/api/lib/clientIp';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { getJwtSecretsFromEnv, signJwt } from '@/api/lib/jwt';
+import { OAUTH_GITHUB_CALLBACK_PROBE } from '@/api/lib/oauthGitHubCallback';
+import { parseOAuthCallbackParams, safeOAuthRedirect } from '@/api/lib/oauthCommon';
 
+export { OAUTH_GITHUB_CALLBACK_PATH, OAUTH_GITHUB_CALLBACK_PROBE } from '@/api/lib/oauthGitHubCallback';
 
 export const config = { runtime: 'nodejs' };
 
@@ -12,18 +15,8 @@ function env(name: string): string {
   return String(process.env[name] ?? '').trim();
 }
 
-function safeRedirect(to: string): string {
-  const trimmed = String(to ?? '').trim();
-  if (!trimmed.startsWith('/')) return '/login';
-  if (trimmed.startsWith('//')) return '/login';
-  return trimmed;
-}
-
 export default async function handler(req: Request): Promise<Response> {
-  const url = new URL(req.url);
-  const state = (url.searchParams.get('state') ?? '').trim();
-  const code = (url.searchParams.get('code') ?? '').trim();
-  const error = (url.searchParams.get('error') ?? '').trim();
+  const { state, code, error } = parseOAuthCallbackParams(new URL(req.url).searchParams);
 
   const origin = req.headers.get('origin');
   const allowedOrigin = getAllowedOrigin(origin);
@@ -40,7 +33,7 @@ export default async function handler(req: Request): Promise<Response> {
   const [row] = await db
     .select()
     .from(schema.oauthStates)
-    .where(and(eq(schema.oauthStates.state, state), eq(schema.oauthStates.provider, 'github'), sql`${schema.oauthStates.expiresAt} >= ${now}`))
+    .where(and(eq(schema.oauthStates.state, state), eq(schema.oauthStates.provider, OAUTH_GITHUB_CALLBACK_PROBE.provider), sql`${schema.oauthStates.expiresAt} >= ${now}`))
     .limit(1);
 
   if (!row) {
@@ -48,14 +41,14 @@ export default async function handler(req: Request): Promise<Response> {
   }
   await db.delete(schema.oauthStates).where(eq(schema.oauthStates.state, state));
 
-  const clientId = env('GITHUB_OAUTH_CLIENT_ID');
-  const clientSecret = env('GITHUB_OAUTH_CLIENT_SECRET');
+  const clientId = env(OAUTH_GITHUB_CALLBACK_PROBE.clientIdEnv);
+  const clientSecret = env(OAUTH_GITHUB_CALLBACK_PROBE.clientSecretEnv);
   if (!clientId || !clientSecret) {
     return new Response(null, { status: 302, headers: { Location: '/login#oauth_error=not_configured', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' } });
   }
 
-  const callbackUrl = new URL('/api/auth/oauth/github/callback', String(process.env.PUBLIC_SITE_URL ?? '').trim() || req.url);
-  const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
+  const callbackUrl = new URL(OAUTH_GITHUB_CALLBACK_PROBE.callbackPath, String(process.env.PUBLIC_SITE_URL ?? '').trim() || req.url);
+  const tokenRes = await fetch(OAUTH_GITHUB_CALLBACK_PROBE.tokenUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({
@@ -72,7 +65,7 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response(null, { status: 302, headers: { Location: '/login#oauth_error=token', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' } });
   }
 
-  const userRes = await fetch('https://api.github.com/user', {
+  const userRes = await fetch(OAUTH_GITHUB_CALLBACK_PROBE.userUrl, {
     headers: { Authorization: `Bearer ${accessToken}`, 'User-Agent': 'solaris-cet' },
   });
   const userJson = (await userRes.json().catch(() => null)) as { id?: unknown; login?: unknown } | null;
@@ -88,19 +81,19 @@ export default async function handler(req: Request): Promise<Response> {
     const [idRow] = await db
       .select()
       .from(schema.oauthIdentities)
-      .where(and(eq(schema.oauthIdentities.provider, 'github'), eq(schema.oauthIdentities.providerUserId, providerUserId)))
+      .where(and(eq(schema.oauthIdentities.provider, OAUTH_GITHUB_CALLBACK_PROBE.provider), eq(schema.oauthIdentities.providerUserId, providerUserId)))
       .limit(1);
     userId = idRow?.userId ?? null;
   }
   if (!userId) {
-    const to = safeRedirect(row.returnTo ?? '/login');
+    const to = safeOAuthRedirect(row.returnTo ?? '/login');
     return new Response(null, { status: 302, headers: { Location: `${to}#oauth_error=not_linked`, 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' } });
   }
 
   if (linkedUserId) {
     await db
       .insert(schema.oauthIdentities)
-      .values({ userId, provider: 'github', providerUserId, username })
+      .values({ userId, provider: OAUTH_GITHUB_CALLBACK_PROBE.provider, providerUserId, username })
       .onConflictDoUpdate({
         target: [schema.oauthIdentities.provider, schema.oauthIdentities.providerUserId],
         set: { userId, username, linkedAt: new Date() },
@@ -129,7 +122,7 @@ export default async function handler(req: Request): Promise<Response> {
     .returning();
   const jwt = await signJwt({ wallet: user.walletAddress, sid: session.id, sub: user.id }, secret, ttlSeconds);
 
-  const to = safeRedirect(row.returnTo ?? '/login');
+  const to = safeOAuthRedirect(row.returnTo ?? '/login');
   return new Response(null, {
     status: 302,
     headers: {

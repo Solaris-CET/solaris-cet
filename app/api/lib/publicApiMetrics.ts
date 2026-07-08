@@ -1,4 +1,4 @@
-import { getDb, schema } from '../../db/client';
+import { getDb, schema } from '@/db/client';
 
 export type PublicApiUsagePoint = {
   tsMs: number;

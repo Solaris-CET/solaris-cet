@@ -3,7 +3,7 @@ pid: 3024
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npm run test -- src/__tests__/surveyPrefill.test.ts"
 started_at: 2026-07-05T23:24:58.687Z
-running_for_ms: 4315045  
+running_for_ms: 100787160
 ---
 
 > solaris-cet@1.0.0 test
@@ -19,3 +19,9 @@ running_for_ms: 4315045
    Start at  02:25:05
    Duration  9.39s (transform 141ms, setup 1.17s, import 70ms, tests 15ms, environment 6.52s)
 
+
+---
+exit_code: -1
+elapsed_ms: 100787160
+ended_at: 2026-07-07T03:24:44.744Z
+---

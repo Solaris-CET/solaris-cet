@@ -3,7 +3,7 @@ pid: 8016
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\survey-engine\" ; python -m pytest tests/ -q 2>&1"
 started_at: 2026-07-05T23:40:05.758Z
-running_for_ms: 3410014  
+running_for_ms: 99879448 
 ---
 ..............................................................           [100%]
 ============================== warnings summary ===============================
@@ -13,3 +13,9 @@ running_for_ms: 3410014
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 62 passed, 1 warning in 16.79s
+
+---
+exit_code: -1
+elapsed_ms: 99879448
+ended_at: 2026-07-07T03:24:44.086Z
+---

@@ -1,13 +1,17 @@
 import { sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../../db/client';
-import { writeAdminAudit } from '../../../lib/adminAudit';
-import { requireAdminAuth, requireAdminRole } from '../../../lib/adminAuth';
-import { corsJson, corsOptions } from '../../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { writeAdminAudit } from '@/api/lib/adminAudit';
+import { guardAdminRoute } from '@/api/lib/adminAuth';
+import {
+  ADMIN_CETUIA_SEED_PROBE,
+  isCetuiaSeedDatabaseConfigured,
+} from '../../../lib/adminCetuiaSeed';
+import { corsJson, corsOptions } from '@/api/lib/http';
+
+export { ADMIN_CETUIA_SEED_PATH, ADMIN_CETUIA_SEED_PROBE } from '@/api/lib/adminCetuiaSeed';
 
 export const config = { runtime: 'nodejs' };
-
-const TOTAL_TOKENS = 9000;
 
 async function countTokens(): Promise<number> {
   const db = getDb();
@@ -17,28 +21,28 @@ async function countTokens(): Promise<number> {
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return corsOptions(req, 'POST, OPTIONS');
-
   if (req.method !== 'POST') return corsJson(req, 405, { error: 'Method not allowed' });
-  if (!process.env.DATABASE_URL?.trim()) return corsJson(req, 503, { error: 'Unavailable' });
+  if (!isCetuiaSeedDatabaseConfigured()) return corsJson(req, 503, { error: 'Unavailable' });
 
-  const ctx = await requireAdminAuth(req);
+  const ctx = await guardAdminRoute(req, { minRole: ADMIN_CETUIA_SEED_PROBE.minRole });
   if ('error' in ctx) return corsJson(req, ctx.status, { error: ctx.error });
-  const ok = requireAdminRole(ctx, 'admin');
-  if (!ok.ok) return corsJson(req, ok.status, { error: ok.error });
 
   const before = await countTokens().catch(() => 0);
   const db = getDb();
+  const { totalTokens, batchSize } = ADMIN_CETUIA_SEED_PROBE;
 
-  const batchSize = 750;
-  for (let start = 1; start <= TOTAL_TOKENS; start += batchSize) {
-    const end = Math.min(TOTAL_TOKENS, start + batchSize - 1);
+  for (let start = 1; start <= totalTokens; start += batchSize) {
+    const end = Math.min(totalTokens, start + batchSize - 1);
     const values = Array.from({ length: end - start + 1 }, (_, i) => ({ id: start + i }));
     await db.insert(schema.cetuiaTokens).values(values).onConflictDoNothing();
   }
 
   const after = await countTokens().catch(() => before);
-  await writeAdminAudit(req, ctx, 'CETUIA_TOKENS_SEEDED', 'cetuia_tokens', 'all', { before, after, total: TOTAL_TOKENS });
+  await writeAdminAudit(req, ctx, ADMIN_CETUIA_SEED_PROBE.auditAction, 'cetuia_tokens', 'all', {
+    before,
+    after,
+    total: totalTokens,
+  });
 
-  return corsJson(req, 200, { ok: true, before, after, total: TOTAL_TOKENS });
+  return corsJson(req, 200, { ok: true, before, after, total: totalTokens });
 }
-

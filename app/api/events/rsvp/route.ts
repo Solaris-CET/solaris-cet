@@ -1,10 +1,18 @@
 import { and, eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAuth } from '../../lib/auth';
-import { jsonResponse, optionsResponse } from '../../lib/http';
-import { ensureAllowedOrigin } from '../../lib/originGuard';
-import { awardPoints } from '../../lib/points';
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import {
+  EVENT_RSVP_PROBE,
+  eventRsvpDedupeKey,
+  isEventRsvpCancel,
+  parseEventRsvpPostBody,
+} from '../../lib/eventRsvp';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
+import { ensureAllowedOrigin } from '@/api/lib/originGuard';
+import { awardPoints } from '@/api/lib/points';
+
+export { EVENT_RSVP_PATH, EVENT_RSVP_PROBE } from '@/api/lib/eventRsvp';
 
 export const config = { runtime: 'nodejs' };
 
@@ -13,7 +21,7 @@ export default async function handler(req: Request): Promise<Response> {
   if (guard instanceof Response) return guard;
 
   if (req.method === 'OPTIONS') {
-    return optionsResponse(req, 'POST, OPTIONS', 'Content-Type, Authorization');
+    return optionsResponse(req, EVENT_RSVP_PROBE.methods.join(', '), 'Content-Type, Authorization');
   }
   if (req.method !== 'POST') {
     return jsonResponse(req, { error: 'Method not allowed' }, 405);
@@ -26,37 +34,32 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     body = await req.json();
   } catch {
-    return jsonResponse(req, { error: 'Invalid JSON body' }, 400);
+    return jsonResponse(req, { error: EVENT_RSVP_PROBE.invalidJsonError }, 400);
   }
 
-  const eventId =
-    typeof body === 'object' && body !== null && 'eventId' in body && typeof (body as { eventId?: unknown }).eventId === 'string'
-      ? (body as { eventId: string }).eventId.trim()
-      : '';
-  const status =
-    typeof body === 'object' && body !== null && 'status' in body && typeof (body as { status?: unknown }).status === 'string'
-      ? (body as { status: string }).status.trim()
-      : 'yes';
-
-  if (!eventId) return jsonResponse(req, { error: 'Invalid event' }, 400);
+  const parsed = parseEventRsvpPostBody(body);
+  if (!parsed.eventId) return jsonResponse(req, { error: EVENT_RSVP_PROBE.invalidEventError }, 400);
 
   const db = getDb();
-  if (status === 'none') {
+  if (isEventRsvpCancel(parsed.status)) {
     await db
       .delete(schema.eventRsvps)
-      .where(and(eq(schema.eventRsvps.eventId, eventId), eq(schema.eventRsvps.userId, ctx.user.id)));
-    return jsonResponse(req, { ok: true, status: 'none' });
+      .where(and(eq(schema.eventRsvps.eventId, parsed.eventId), eq(schema.eventRsvps.userId, ctx.user.id)));
+    return jsonResponse(req, { ok: true, status: EVENT_RSVP_PROBE.cancelStatus });
   }
 
   await db
     .insert(schema.eventRsvps)
-    .values({ eventId, userId: ctx.user.id, status: 'yes' })
+    .values({ eventId: parsed.eventId, userId: ctx.user.id, status: EVENT_RSVP_PROBE.defaultStatus })
     .onConflictDoUpdate({
       target: [schema.eventRsvps.eventId, schema.eventRsvps.userId],
-      set: { status: 'yes' },
+      set: { status: EVENT_RSVP_PROBE.defaultStatus },
     });
 
   const day = new Date().toISOString().slice(0, 10);
-  await awardPoints(db, ctx.user.id, 3, 'rsvp', { dedupeKey: `rsvp:${eventId}`, meta: { activity: 'rsvp', day, eventId } });
-  return jsonResponse(req, { ok: true, status: 'yes' });
+  await awardPoints(db, ctx.user.id, EVENT_RSVP_PROBE.rsvpPoints, 'rsvp', {
+    dedupeKey: eventRsvpDedupeKey(parsed.eventId),
+    meta: { activity: 'rsvp', day, eventId: parsed.eventId },
+  });
+  return jsonResponse(req, { ok: true, status: EVENT_RSVP_PROBE.defaultStatus });
 }

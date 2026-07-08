@@ -1,5 +1,5 @@
 import { ArrowLeftRight, ExternalLink, RefreshCw } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { Button } from '@/components/ui/button';
@@ -61,17 +61,33 @@ export default function BridgeSimulatorPanel({ token }: { token: string }) {
   const [info, setInfo] = useState<string | null>(null);
   const [data, setData] = useState<ApiResponse | null>(null);
 
+  const abortRef = useRef<AbortController | null>(null);
+
   const load = useCallback(async () => {
-    const res = await fetch('/api/bridge/simulate', { headers: authHeaders, cache: 'no-store' });
-    if (!res.ok) return;
-    const json = (await res.json()) as ApiResponse;
-    setData(json);
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    try {
+      const res = await fetch('/api/bridge/simulate', {
+        headers: authHeaders,
+        cache: 'no-store',
+        signal: controller.signal,
+      });
+      if (!res.ok) return;
+      const json = (await res.json()) as ApiResponse;
+      setData(json);
+    } catch {
+      // Ignore network / abort errors.
+    }
   }, [authHeaders]);
 
   useEffect(() => {
     void load();
     const id = window.setInterval(() => void load(), 4_000);
-    return () => window.clearInterval(id);
+    return () => {
+      abortRef.current?.abort();
+      window.clearInterval(id);
+    };
   }, [load]);
 
   const limits = data?.limits ?? null;

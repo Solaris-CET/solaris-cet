@@ -1,12 +1,21 @@
-import { getAllowedOrigin } from '../lib/cors';
-import { withRateLimit } from '../lib/rateLimit';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { withRateLimit } from '@/api/lib/rateLimit';
+import { isValidWaitlistEmail, parseWaitlistEmail, resolveWaitlistWebhookUrl, WAITLIST_PROBE } from '@/api/lib/waitlist';
+
+export { WAITLIST_PATH, WAITLIST_PROBE } from '@/api/lib/waitlist';
 
 export const config = { runtime: 'edge' };
 
-function isValidEmail(email: string): boolean {
-  const e = email.trim();
-  if (e.length < 6 || e.length > 254) return false;
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+function jsonResponse(body: unknown, allowedOrigin: string, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': allowedOrigin,
+      Vary: 'Origin',
+      'Cache-Control': WAITLIST_PROBE.cacheControl,
+    },
+  });
 }
 
 export default async function handler(req: Request): Promise<Response> {
@@ -14,15 +23,7 @@ export default async function handler(req: Request): Promise<Response> {
   const allowedOrigin = getAllowedOrigin(origin);
 
   if (origin && allowedOrigin !== origin) {
-    return new Response(JSON.stringify({ error: 'Forbidden' }), {
-      status: 403,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': allowedOrigin,
-        Vary: 'Origin',
-        'Cache-Control': 'no-store',
-      },
-    });
+    return jsonResponse({ error: 'Forbidden' }, allowedOrigin, 403);
   }
 
   if (req.method === 'OPTIONS') {
@@ -30,7 +31,7 @@ export default async function handler(req: Request): Promise<Response> {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': allowedOrigin,
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Methods': WAITLIST_PROBE.methods.join(', '),
         'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       },
@@ -38,16 +39,13 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
-    });
+    return jsonResponse({ error: 'Method not allowed' }, allowedOrigin, 405);
   }
 
   const limited = await withRateLimit(req, allowedOrigin, {
-    keyPrefix: 'waitlist',
-    limit: 6,
-    windowSeconds: 60,
+    keyPrefix: WAITLIST_PROBE.rateLimitKey,
+    limit: WAITLIST_PROBE.rateLimit,
+    windowSeconds: WAITLIST_PROBE.rateWindowSeconds,
   });
   if (limited) return limited;
 
@@ -55,26 +53,17 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     body = await req.json();
   } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
-    });
+    return jsonResponse({ error: 'Invalid JSON' }, allowedOrigin, 400);
   }
 
-  const email = typeof (body as { email?: unknown })?.email === 'string' ? (body as { email: string }).email.trim() : '';
-  if (!isValidEmail(email)) {
-    return new Response(JSON.stringify({ error: 'Invalid email' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
-    });
+  const email = parseWaitlistEmail(body);
+  if (!isValidWaitlistEmail(email)) {
+    return jsonResponse({ error: 'Invalid email' }, allowedOrigin, 400);
   }
 
-  const webhook = (process.env.WAITLIST_WEBHOOK_URL ?? '').trim();
+  const webhook = resolveWaitlistWebhookUrl();
   if (!webhook) {
-    return new Response(JSON.stringify({ ok: false, error: 'Waitlist not configured' }), {
-      status: 503,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
-    });
+    return jsonResponse({ ok: false, error: WAITLIST_PROBE.notConfiguredMessage }, allowedOrigin, 503);
   }
 
   try {
@@ -84,20 +73,11 @@ export default async function handler(req: Request): Promise<Response> {
       body: JSON.stringify({ email }),
     });
     if (!res.ok) {
-      return new Response(JSON.stringify({ ok: false, error: 'Upstream rejected' }), {
-        status: 502,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
-      });
+      return jsonResponse({ ok: false, error: 'Upstream rejected' }, allowedOrigin, 502);
     }
   } catch {
-    return new Response(JSON.stringify({ ok: false, error: 'Upstream unavailable' }), {
-      status: 502,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
-    });
+    return jsonResponse({ ok: false, error: 'Upstream unavailable' }, allowedOrigin, 502);
   }
 
-  return new Response(JSON.stringify({ ok: true }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin, Vary: 'Origin' },
-  });
+  return jsonResponse({ ok: true }, allowedOrigin, 200);
 }

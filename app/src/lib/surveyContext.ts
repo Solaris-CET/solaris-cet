@@ -1,3 +1,7 @@
+export const REPORT_CONTEXT_SCHEMA = 'solaris-report-context-v1';
+
+export const DEFAULT_LOW_CONFIDENCE_THRESHOLD = 0.7;
+
 export type ExplainableFinding = {
   claim: string;
   confidence: number;
@@ -60,6 +64,21 @@ export type CorrectionPayload = {
   notes?: string;
 };
 
+export function normalizeReportId(reportId: string): string {
+  return reportId.trim();
+}
+
 export function permitPackUrl(reportId: string): string {
-  return `/api/survey/permit-pack?report_id=${encodeURIComponent(reportId)}`;
+  return `/api/survey/permit-pack?report_id=${encodeURIComponent(normalizeReportId(reportId))}`;
+}
+
+export function countLowConfidenceFindings(
+  findings: ExplainableFinding[],
+  threshold = DEFAULT_LOW_CONFIDENCE_THRESHOLD,
+): number {
+  return findings.filter((finding) => finding.confidence < threshold).length;
+}
+
+export function hasPermitPack(context: Pick<ReportContext, 'files'> | undefined): boolean {
+  return Boolean(context?.files.permit_pack_url?.trim());
 }

@@ -3,8 +3,14 @@ pid: 17092
 cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
 command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\survey-engine\"; python -m pytest tests/ -q --tb=no 2>&1 | Select-Object -Last 3"
 started_at: 2026-07-05T21:54:30.767Z
-running_for_ms: 9745005  
+running_for_ms: 106216835
 ---
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 48 passed, 1 warning in 35.99s
+
+---
+exit_code: -1
+elapsed_ms: 106216835
+ended_at: 2026-07-07T03:24:46.695Z
+---

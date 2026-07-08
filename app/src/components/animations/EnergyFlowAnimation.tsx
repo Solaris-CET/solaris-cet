@@ -1,29 +1,25 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Box, Sphere, Cylinder } from '@react-three/drei';
 import * as THREE from 'three';
 
+import { createParticleField } from './particleField';
+
 const PARTICLE_COUNT = 50;
+
+const particleData = createParticleField(PARTICLE_COUNT, (i, positions, speeds, offsets) => {
+  const angle = Math.random() * Math.PI * 2;
+  const radius = 0.5 + Math.random() * 1.5;
+  positions[i * 3] = Math.cos(angle) * radius;
+  positions[i * 3 + 1] = (Math.random() - 0.5) * 2;
+  positions[i * 3 + 2] = Math.sin(angle) * radius;
+  speeds[i] = 0.2 + Math.random() * 0.5;
+  offsets[i] = Math.random() * Math.PI * 2;
+});
 
 function EnergyFlow() {
   const groupRef = useRef<THREE.Group>(null!);
   const particleRef = useRef<THREE.Points>(null!);
-
-  const particleData = useMemo(() => {
-    const positions = new Float32Array(PARTICLE_COUNT * 3);
-    const speeds = new Float32Array(PARTICLE_COUNT);
-    const offsets = new Float32Array(PARTICLE_COUNT);
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const radius = 0.5 + Math.random() * 1.5;
-      positions[i * 3] = Math.cos(angle) * radius;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 2;
-      positions[i * 3 + 2] = Math.sin(angle) * radius;
-      speeds[i] = 0.2 + Math.random() * 0.5;
-      offsets[i] = Math.random() * Math.PI * 2;
-    }
-    return { positions, speeds, offsets };
-  }, []);
 
   useFrame(({ clock }) => {
     if (groupRef.current) {

@@ -1,4 +1,4 @@
-import { Brain, CheckCircle2, ExternalLink,Eye, XCircle, Zap } from 'lucide-react';
+import { Brain, CheckCircle2, ExternalLink,Eye, Square, XCircle, Zap } from 'lucide-react';
 import { useCallback, useEffect, useMemo,useReducer } from 'react';
 
 import { DEDUST_POOL_DEPOSIT_URL } from '@/lib/dedustUrls';
@@ -15,6 +15,7 @@ interface ReActStep {
   label: string;
   content: string;
   color: string;
+  id: string;
 }
 
 interface ReActTerminalProps {
@@ -22,6 +23,10 @@ interface ReActTerminalProps {
   responseText: string;
   /** True while the fetch is in flight */
   isLoading: boolean;
+  /** Optional error message to surface in the terminal */
+  error?: string | null;
+  /** Called when the user presses the stop button while loading */
+  onStop?: () => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -46,6 +51,7 @@ function parseReActSteps(text: string): ReActStep[] {
       label: 'DIAGNOSTIC INTERN',
       content: thoughtMatch[1].trim(),
       color: 'var(--solaris-gold)',
+      id: 'thought-0',
     });
   }
   if (actionMatch?.[1]?.trim()) {
@@ -54,6 +60,7 @@ function parseReActSteps(text: string): ReActStep[] {
       label: 'DECODARE ORACOL',
       content: actionMatch[1].trim(),
       color: 'rgb(249 115 22)',
+      id: 'action-0',
     });
   }
   if (observationMatch?.[1]?.trim()) {
@@ -62,6 +69,7 @@ function parseReActSteps(text: string): ReActStep[] {
       label: 'DIRECTIVĂ DE ACȚIUNE',
       content: observationMatch[1].trim(),
       color: 'rgb(52 211 153)',
+      id: 'observation-0',
     });
   }
 
@@ -72,6 +80,7 @@ function parseReActSteps(text: string): ReActStep[] {
       label: 'ORACLE RESPONSE',
       content: text.trim(),
       color: 'var(--solaris-cyan)',
+      id: 'fallback-0',
     });
   }
 
@@ -127,7 +136,7 @@ function terminalReducer(state: TerminalState, action: TerminalAction): Terminal
 // Component
 // ---------------------------------------------------------------------------
 
-const ReActTerminal = ({ responseText, isLoading }: ReActTerminalProps) => {
+const ReActTerminal = ({ responseText, isLoading, error, onStop }: ReActTerminalProps) => {
   const [{ steps, visibleCount, hitlDismissed }, dispatch] = useReducer(terminalReducer, {
     steps: [],
     visibleCount: 0,
@@ -171,6 +180,16 @@ const ReActTerminal = ({ responseText, isLoading }: ReActTerminalProps) => {
     containsSwapIntent(lastStep.content);
 
   const allDone = visibleCount >= steps.length && steps.length > 0;
+  const hasError = Boolean(error);
+
+  /** Live region text: announces current phase to screen readers. */
+  const liveAnnouncement = useMemo(() => {
+    if (hasError) return `Error: ${error}`;
+    if (isLoading && steps.length === 0) return 'Initializing ReAct loop';
+    if (isLoading) return `Revealing ${steps[visibleCount - 1]?.label ?? 'next step'}`;
+    if (allDone) return 'Reasoning chain complete';
+    return '';
+  }, [hasError, error, isLoading, steps, visibleCount, allDone]);
 
   const meshTrace = useMemo(
     () =>
@@ -182,6 +201,9 @@ const ReActTerminal = ({ responseText, isLoading }: ReActTerminalProps) => {
 
   return (
     <div className="font-mono text-sm bg-white/5 backdrop-blur-lg rounded-xl border border-white/10 overflow-hidden">
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {liveAnnouncement}
+      </div>
       {/* Terminal title bar */}
       <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/8 bg-white/[0.03]">
         <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
@@ -191,10 +213,26 @@ const ReActTerminal = ({ responseText, isLoading }: ReActTerminalProps) => {
           Solaris ReAct Protocol · Groq LPU
         </span>
         <div className="ml-auto flex items-center gap-1.5">
-          {isLoading ? (
+          {hasError ? (
+            <>
+              <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+              <span className="text-[10px] text-red-500">ERROR</span>
+            </>
+          ) : isLoading ? (
             <>
               <div className="w-1.5 h-1.5 rounded-full bg-solaris-gold animate-pulse" />
               <span className="text-[10px] text-solaris-gold">PROCESSING</span>
+              {onStop && (
+                <button
+                  type="button"
+                  onClick={onStop}
+                  className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-red-400 transition-colors"
+                  aria-label="Stop generation"
+                >
+                  <Square className="w-2.5 h-2.5 fill-current" />
+                  STOP
+                </button>
+              )}
             </>
           ) : allDone ? (
             <>
@@ -221,7 +259,7 @@ const ReActTerminal = ({ responseText, isLoading }: ReActTerminalProps) => {
 
           return (
             <div
-              key={i}
+              key={step.id}
               className="transition-all duration-500"
               style={{
                 opacity: visible ? (active ? 1 : 0.55) : 0,
@@ -255,10 +293,18 @@ const ReActTerminal = ({ responseText, isLoading }: ReActTerminalProps) => {
         )}
 
         {/* Done indicator */}
-        {allDone && !showHitl && hitlDismissed === null && (
+        {allDone && !showHitl && hitlDismissed === null && !hasError && (
           <div className="flex items-center gap-1.5 pt-1 text-emerald-400">
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span className="text-[10px]">CHAIN VERIFIED · REASONING COMPLETE</span>
+          </div>
+        )}
+
+        {/* Error indicator */}
+        {hasError && (
+          <div className="flex items-start gap-1.5 pt-1 text-red-400">
+            <XCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+            <span className="text-[10px]">{error}</span>
           </div>
         )}
       </div>

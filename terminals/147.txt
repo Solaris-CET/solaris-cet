@@ -1,0 +1,27 @@
+---
+pid: 12308
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "Set-Location \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npm audit 2>&1 | Select-Object -Last 20"
+started_at: 2026-07-06T18:54:52.131Z
+running_for_ms: 254966   
+---
+undici vulnerable to HTTP response queue poisoning via keep-alive socket reuse - https://github.com/advisories/GHSA-35p6-xmwp-9g52
+undici vulnerable to Set-Cookie SameSite attribute downgrade via permissive substring matching - https://github.com/advisories/GHSA-g8m3-5g58-fq7m
+undici vulnerable to cross-user information disclosure via shared cache whitespace bypass - https://github.com/advisories/GHSA-pr7r-676h-xcf6
+fix available via `npm audit fix`
+node_modules/undici
+
+vite  8.0.0 - 8.0.15
+Severity: high
+launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows - https://github.com/advisories/GHSA-v6wh-96g9-6wx3
+vite: `server.fs.deny` bypass on Windows alternate paths - https://github.com/advisories/GHSA-fx2h-pf6j-xcff
+fix available via `npm audit fix`
+node_modules/vite
+
+36 vulnerabilities (1 low, 30 moderate, 4 high, 1 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force

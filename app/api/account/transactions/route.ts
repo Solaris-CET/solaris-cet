@@ -1,9 +1,12 @@
 import { desc, eq, inArray } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAuth } from '../../lib/auth';
-import { jsonResponse, optionsResponse } from '../../lib/http';
-import { ensureAllowedOrigin } from '../../lib/originGuard';
+import { getDb, schema } from '@/db/client';
+import { parseTransactionQuery } from '@/api/lib/accountTransactions';
+import { requireAuth } from '@/api/lib/auth';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
+import { ensureAllowedOrigin } from '@/api/lib/originGuard';
+
+export { ACCOUNT_TRANSACTIONS_PATH, ACCOUNT_TRANSACTIONS_PROBE } from '@/api/lib/accountTransactions';
 
 export const config = { runtime: 'nodejs' };
 
@@ -32,10 +35,7 @@ export default async function handler(req: Request): Promise<Response> {
   const ctx = await requireAuth(req);
   if ('error' in ctx) return jsonResponse(req, { error: ctx.error }, ctx.status);
 
-  const url = new URL(req.url);
-  const limitRaw = url.searchParams.get('limit') ?? '50';
-  const limit = Math.max(1, Math.min(200, Number.parseInt(limitRaw, 10) || 50));
-  const source = (url.searchParams.get('source') ?? 'all').trim().toLowerCase();
+  const { limit, source } = parseTransactionQuery(new URL(req.url).searchParams);
 
   const db = getDb();
   const rows: TxRow[] = [];

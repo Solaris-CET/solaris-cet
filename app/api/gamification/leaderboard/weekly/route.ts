@@ -1,30 +1,21 @@
 import { and, desc, gte, lt, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../../db/client';
-import { corsJson, corsOptions } from '../../../lib/http';
+import { getDb, schema } from '@/db/client';
+import { corsJson, corsOptions } from '@/api/lib/http';
+import { dayKeyUtc, LEADERBOARD_WEEKLY_PROBE, startOfWeekUtc } from '@/api/lib/leaderboardWeekly';
+
+export { LEADERBOARD_WEEKLY_PATH, LEADERBOARD_WEEKLY_PROBE } from '@/api/lib/leaderboardWeekly';
 
 export const config = { runtime: 'nodejs' };
 
-function startOfWeekUtc(d: Date): Date {
-  const x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
-  const day = x.getUTCDay();
-  const delta = (day + 6) % 7;
-  x.setUTCDate(x.getUTCDate() - delta);
-  return x;
-}
-
-function dayKeyUtc(d: Date): string {
-  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
-}
-
 export default async function handler(req: Request): Promise<Response> {
-  if (req.method === 'OPTIONS') return corsOptions(req, 'GET, OPTIONS');
+  if (req.method === 'OPTIONS') return corsOptions(req, LEADERBOARD_WEEKLY_PROBE.methods.join(', '));
   if (req.method !== 'GET') return corsJson(req, 405, { error: 'Method not allowed' });
 
   const db = getDb();
   const now = new Date();
   const start = startOfWeekUtc(now);
-  const end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const end = new Date(start.getTime() + LEADERBOARD_WEEKLY_PROBE.weekDays * 24 * 60 * 60 * 1000);
 
   const rows = await db
     .select({
@@ -35,7 +26,7 @@ export default async function handler(req: Request): Promise<Response> {
     .where(and(gte(schema.pointsLedger.createdAt, start), lt(schema.pointsLedger.createdAt, end)))
     .groupBy(schema.pointsLedger.userId)
     .orderBy(desc(sql<number>`sum(${schema.pointsLedger.delta})`))
-    .limit(50);
+    .limit(LEADERBOARD_WEEKLY_PROBE.listLimit);
 
   const userIds = rows.map((r) => r.userId);
   const users =
@@ -45,7 +36,7 @@ export default async function handler(req: Request): Promise<Response> {
           .select({ id: schema.users.id, walletAddress: schema.users.walletAddress, points: schema.users.points })
           .from(schema.users)
           .where(sql`${schema.users.id} = any(${userIds})`)
-          .limit(60);
+          .limit(LEADERBOARD_WEEKLY_PROBE.userLookupLimit);
   const byId = new Map(users.map((u) => [u.id, u]));
 
   return corsJson(req, 200, {

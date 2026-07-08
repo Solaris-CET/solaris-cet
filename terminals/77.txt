@@ -1,0 +1,50 @@
+---
+pid: 16676
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\"; npm run app:dev"
+started_at: 2026-07-06T01:23:04.715Z
+running_for_ms: 93711096 
+---
+
+> app:dev
+> npm --workspace=app run dev --
+
+
+> solaris-cet@1.0.0 predev
+> node ../scripts/generate-release-notes.mjs && node scripts/generate-seo-files.mjs && node scripts/generate-legal-digests.mjs
+
+
+📊 SEO Audit Report
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Total pages: 48
+Pages without description: 0
+Duplicate titles: 4
+  Duplicate titles:
+  - "Politica de confidențialitate — Solaris CET"
+  - "Politica de cookie-uri — Solaris CET"
+  - "Servicii — Solaris CET"
+  - "Portofoliu — Solaris CET"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Google ping: 404
+✅ Bing ping: 410
+✅ Sitemap submitted to Google and Bing
+
+> solaris-cet@1.0.0 dev
+> ../node_modules/.bin/vite
+
+'..' is not recognized as an internal or external command,
+operable program or batch file.
+npm error Lifecycle script `dev` failed with error:
+npm error code 1
+npm error path C:\Users\CCons\Desktop\SOLARIS CET\app
+npm error workspace solaris-cet@1.0.0
+npm error location C:\Users\CCons\Desktop\SOLARIS CET\app
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c ../node_modules/.bin/vite
+
+---
+exit_code: -1
+elapsed_ms: 93711096
+ended_at: 2026-07-07T03:24:39.511Z
+---

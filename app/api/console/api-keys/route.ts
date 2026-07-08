@@ -1,7 +1,12 @@
-import { z } from 'zod';
-
-import { requireAuth } from '../../lib/auth';
-import { decideRateLimit, rateLimitHeaders } from '../../lib/publicApiRateLimit';
+import { requireAuth } from '@/api/lib/auth';
+import {
+  CONSOLE_API_KEYS_PROBE,
+  consoleApiKeyCreateSchema,
+  consoleApiKeyRotateSchema,
+  parseConsoleApiKeysAction,
+  parseConsoleApiKeysDeleteId,
+} from '../../lib/consoleApiKeys';
+import { decideRateLimit, rateLimitHeaders } from '@/api/lib/publicApiRateLimit';
 import {
   allowedOriginFromReq,
   errorResponsePublic,
@@ -9,22 +14,27 @@ import {
   optionsResponsePublic,
   rateLimitedResponsePublic,
 } from '../../lib/publicApiResponse';
-import { createApiKey, listApiKeys, revokeApiKey, rotateApiKey } from '../../lib/publicApiStore';
+import { createApiKey, listApiKeys, revokeApiKey, rotateApiKey } from '@/api/lib/publicApiStore';
+
+export { CONSOLE_API_KEYS_PATH, CONSOLE_API_KEYS_PROBE } from '@/api/lib/consoleApiKeys';
 
 export const config = { runtime: 'nodejs' };
 
-const createSchema = z.object({ name: z.string().trim().min(2).max(120) });
-const rotateSchema = z.object({ id: z.string().trim().min(10).max(80) });
-
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') {
-    return optionsResponsePublic(req, 'GET, POST, DELETE, OPTIONS', 'Content-Type, Authorization');
+    return optionsResponsePublic(req, CONSOLE_API_KEYS_PROBE.methods.join(', '), 'Content-Type, Authorization');
   }
 
   const auth = await requireAuth(req);
   if ('error' in auth) return errorResponsePublic(req, auth.status, 'unauthorized', auth.error);
 
-  const d = decideRateLimit({ req, bucket: 'console-api-keys', keyPart: auth.user.id, limit: 120, windowSeconds: 60 });
+  const d = decideRateLimit({
+    req,
+    bucket: CONSOLE_API_KEYS_PROBE.rateLimitBucket,
+    keyPart: auth.user.id,
+    limit: CONSOLE_API_KEYS_PROBE.rateLimit,
+    windowSeconds: CONSOLE_API_KEYS_PROBE.rateWindowSeconds,
+  });
   if (!d.ok) return rateLimitedResponsePublic(req, d);
 
   if (req.method === 'GET') {
@@ -34,44 +44,44 @@ export default async function handler(req: Request): Promise<Response> {
 
   if (req.method === 'POST') {
     const url = new URL(req.url);
-    const action = (url.searchParams.get('action') ?? '').trim();
+    const action = parseConsoleApiKeysAction(url.searchParams);
     let json: unknown;
     try {
       json = await req.json();
     } catch {
-      return errorResponsePublic(req, 400, 'invalid_request', 'Invalid JSON body');
+      return errorResponsePublic(req, 400, 'invalid_request', CONSOLE_API_KEYS_PROBE.invalidJsonError);
     }
 
-    if (action === 'rotate') {
-      const parsed = rotateSchema.safeParse(json);
+    if (action === CONSOLE_API_KEYS_PROBE.rotateAction) {
+      const parsed = consoleApiKeyRotateSchema.safeParse(json);
       if (!parsed.success) return errorResponsePublic(req, 400, 'invalid_request', 'Invalid request', parsed.error.flatten());
       let rotated: Awaited<ReturnType<typeof rotateApiKey>> | null;
       try {
         rotated = await rotateApiKey(auth.user.id, parsed.data.id);
       } catch {
-        return errorResponsePublic(req, 501, 'not_configured', 'API key hashing not configured');
+        return errorResponsePublic(req, 501, 'not_configured', CONSOLE_API_KEYS_PROBE.notConfiguredError);
       }
-      if (!rotated) return errorResponsePublic(req, 404, 'not_found', 'API key not found');
+      if (!rotated) return errorResponsePublic(req, 404, 'not_found', CONSOLE_API_KEYS_PROBE.notFoundError);
       return jsonResponsePublic(req, { apiKey: rotated.apiKey, rawKey: rotated.rawKey }, 200, rateLimitHeaders(d));
     }
 
-    const parsed = createSchema.safeParse(json);
+    const parsed = consoleApiKeyCreateSchema.safeParse(json);
     if (!parsed.success) return errorResponsePublic(req, 400, 'invalid_request', 'Invalid request', parsed.error.flatten());
     let created: Awaited<ReturnType<typeof createApiKey>>;
     try {
       created = await createApiKey(auth.user.id, parsed.data.name);
     } catch {
-      return errorResponsePublic(req, 501, 'not_configured', 'API key hashing not configured');
+      return errorResponsePublic(req, 501, 'not_configured', CONSOLE_API_KEYS_PROBE.notConfiguredError);
     }
     return jsonResponsePublic(req, { apiKey: created.apiKey, rawKey: created.rawKey }, 201, rateLimitHeaders(d));
   }
 
   if (req.method === 'DELETE') {
     const url = new URL(req.url);
-    const id = (url.searchParams.get('id') ?? '').trim();
-    if (!id) return errorResponsePublic(req, 400, 'invalid_request', 'Missing id');
+    const id = parseConsoleApiKeysDeleteId(url.searchParams);
+    if (!id) return errorResponsePublic(req, 400, 'invalid_request', CONSOLE_API_KEYS_PROBE.missingIdError);
     const ok = await revokeApiKey(auth.user.id, id);
-    if (!ok) return errorResponsePublic(req, 404, 'not_found', 'API key not found');
+    if (!ok) return errorResponsePublic(req, 404, 'not_found', CONSOLE_API_KEYS_PROBE.notFoundError);
     return new Response(null, {
       status: 204,
       headers: {

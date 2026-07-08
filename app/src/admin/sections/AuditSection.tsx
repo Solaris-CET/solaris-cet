@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
-import { adminApi } from '../adminClient';
+import { adminApi, adminApiErr } from '../adminClient';
 
 type AuditRow = {
   id: string;
@@ -20,7 +20,7 @@ export function AuditSection({ token }: { token: string }) {
   const load = useCallback(async () => {
     const res = await adminApi<{ audit: AuditRow[] }>('/api/admin/audit?sinceHours=168', { token });
     if (!res.ok) {
-      setError(res.error);
+      setError(adminApiErr(res) ?? 'Request failed');
       return;
     }
     setRows(res.data.audit);

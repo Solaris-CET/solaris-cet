@@ -1,44 +1,22 @@
-import crypto from 'node:crypto';
-
 import { and, eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../../db/client';
-import { requireUser } from '../../../lib/authUser';
-import { corsJson, corsOptions } from '../../../lib/http';
-import { awardPoints } from '../../../lib/points';
-import { todayKeyUtc } from '../../lib/gamification';
+import { getDb, schema } from '@/db/client';
+import { requireUser } from '@/api/lib/authUser';
+import { corsJson, corsOptions } from '@/api/lib/http';
+import { awardPoints } from '@/api/lib/points';
+import { isWheelSpinUniqueViolation, rollWheelReward, WHEEL_SPIN_PROBE } from '@/api/lib/wheelSpin';
+import { todayKeyUtc } from '@/api/gamification/lib/gamification';
+
+export { WHEEL_SPIN_PATH, WHEEL_SPIN_PROBE } from '@/api/lib/wheelSpin';
 
 export const config = { runtime: 'nodejs' };
 
-function isUniqueViolation(err: unknown): boolean {
-  return typeof err === 'object' && err !== null && 'code' in err && (err as { code?: string }).code === '23505';
-}
-
-function rollReward(): number {
-  const buckets: Array<{ reward: number; weight: number }> = [
-    { reward: 0, weight: 10 },
-    { reward: 1, weight: 30 },
-    { reward: 2, weight: 25 },
-    { reward: 3, weight: 18 },
-    { reward: 5, weight: 12 },
-    { reward: 10, weight: 5 },
-  ];
-  const total = buckets.reduce((acc, b) => acc + b.weight, 0);
-  const r = crypto.randomInt(0, total);
-  let cur = 0;
-  for (const b of buckets) {
-    cur += b.weight;
-    if (r < cur) return b.reward;
-  }
-  return 0;
-}
-
 export default async function handler(req: Request): Promise<Response> {
-  if (req.method === 'OPTIONS') return corsOptions(req, 'POST, OPTIONS');
+  if (req.method === 'OPTIONS') return corsOptions(req, WHEEL_SPIN_PROBE.methods.join(', '));
   if (req.method !== 'POST') return corsJson(req, 405, { error: 'Method not allowed' });
 
   const user = await requireUser(req);
-  if (!user) return corsJson(req, 401, { error: 'Unauthorized' });
+  if (!user) return corsJson(req, WHEEL_SPIN_PROBE.unauthenticatedStatus, { error: 'Unauthorized' });
 
   const db = getDb();
   const day = todayKeyUtc();
@@ -49,10 +27,16 @@ export default async function handler(req: Request): Promise<Response> {
     .where(and(eq(schema.wheelSpins.userId, user.id), eq(schema.wheelSpins.day, day)))
     .limit(1);
   if (existing) {
-    return corsJson(req, 200, { ok: true, spun: true, rewardPoints: existing.rewardPoints, day, createdAt: existing.createdAt.toISOString() });
+    return corsJson(req, 200, {
+      ok: true,
+      spun: true,
+      rewardPoints: existing.rewardPoints,
+      day,
+      createdAt: existing.createdAt.toISOString(),
+    });
   }
 
-  const rewardPoints = rollReward();
+  const rewardPoints = rollWheelReward();
   const res = await db.transaction(async (tx) => {
     try {
       const [row] = await tx
@@ -61,14 +45,14 @@ export default async function handler(req: Request): Promise<Response> {
         .returning({ createdAt: schema.wheelSpins.createdAt });
       const { awarded } =
         rewardPoints > 0
-          ? await awardPoints(tx as unknown as typeof db, user.id, rewardPoints, 'wheel', {
+          ? await awardPoints(tx as unknown as typeof db, user.id, rewardPoints, WHEEL_SPIN_PROBE.wheelReason, {
               dedupeKey: `wheel:${day}`,
               meta: { activity: 'wheel_spin', day, rewardPoints },
             })
           : { awarded: false };
       return { createdAt: row?.createdAt ?? new Date(), awarded };
     } catch (err) {
-      if (!isUniqueViolation(err)) throw err;
+      if (!isWheelSpinUniqueViolation(err)) throw err;
       const [row] = await tx
         .select({ rewardPoints: schema.wheelSpins.rewardPoints, createdAt: schema.wheelSpins.createdAt })
         .from(schema.wheelSpins)
@@ -80,4 +64,3 @@ export default async function handler(req: Request): Promise<Response> {
 
   return corsJson(req, 200, { ok: true, spun: true, rewardPoints, day, awarded: res.awarded, createdAt: res.createdAt.toISOString() });
 }
-

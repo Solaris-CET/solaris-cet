@@ -1,6 +1,18 @@
 /** OpenAPI 3.1 paths for `/api/survey/*` bridge contract (S6). */
 
+import { ADMIN_SURVEY_INSIGHTS_OPENAPI } from './adminSurveyInsights';
+import { ADMIN_SURVEYS_OPENAPI } from './adminSurveys';
+
 export const SURVEY_API_VERSION = '1.0.0';
+export const SURVEY_OPENAPI_VERSION = '3.1.0';
+export const SURVEY_OPENAPI_TITLE = 'SOLARIS CET Survey Bridge API';
+export const SURVEY_OPENAPI_TAG = 'survey';
+export const SURVEY_OPENAPI_TAG_DESCRIPTION = 'Field survey + AHJ + orchestration';
+export const SURVEY_ADMIN_OPENAPI_TAG = 'admin-survey';
+export const SURVEY_ADMIN_OPENAPI_TAG_DESCRIPTION = 'Admin CRM + survey-engine aggregates';
+export const SURVEY_OPENAPI_META_PATH = '/api/openapi/survey';
+export const SURVEY_OPENAPI_META_TAG = 'meta';
+export const SURVEY_OPENAPI_META_TAG_DESCRIPTION = 'Contract discovery endpoints';
 
 export const SURVEY_ROUTE_IDS = [
   'health',
@@ -30,6 +42,45 @@ export const SURVEY_ROUTE_IDS = [
 
 export type SurveyRouteId = (typeof SURVEY_ROUTE_IDS)[number];
 
+export type SurveyOpenApiSpec = {
+  openapi: string;
+  info: { title: string; version: string; description: string };
+  servers: { url: string }[];
+  tags: { name: string; description: string }[];
+  paths: Record<string, unknown>;
+};
+
+export type SurveyHttpMethod = 'get' | 'post';
+
+export function isSurveyRouteId(value: string): value is SurveyRouteId {
+  return (SURVEY_ROUTE_IDS as readonly string[]).includes(value);
+}
+
+export function listSurveyBridgePaths(): string[] {
+  return SURVEY_ROUTE_IDS.map(surveyBridgePath);
+}
+
+export function hasOpenApiOperation(
+  paths: Record<string, unknown>,
+  path: string,
+  method: SurveyHttpMethod,
+): boolean {
+  const entry = paths[path] as Record<string, unknown> | undefined;
+  return Boolean(entry?.[method]);
+}
+
+export function openApiPathSummaries(paths: Record<string, unknown>): string[] {
+  const summaries: string[] = [];
+  for (const entry of Object.values(paths)) {
+    const ops = entry as Record<string, { summary?: string } | undefined>;
+    for (const method of ['get', 'post'] as const) {
+      const summary = ops[method]?.summary;
+      if (summary) summaries.push(summary);
+    }
+  }
+  return summaries;
+}
+
 const BRIDGE_PATH_OVERRIDES: Partial<Record<SurveyRouteId, string>> = {
   'permit-pack': '/api/survey/permit-pack',
   'installer-me': '/api/survey/installer/me',
@@ -55,6 +106,76 @@ const installerKeyParam = {
   schema: { type: 'string' },
   required: false,
 };
+const adminAuthParam = {
+  name: 'Authorization',
+  in: 'header',
+  schema: { type: 'string' },
+  required: true,
+  description: 'Admin bearer token',
+};
+
+export function buildOpenApiSurveyMetaPaths(): Record<string, unknown> {
+  return {
+    '/api/openapi/survey': {
+      get: {
+        tags: [SURVEY_OPENAPI_META_TAG],
+        summary: 'Survey bridge OpenAPI 3.1 document',
+        responses: {
+          '200': {
+            description: 'OpenAPI 3.1 JSON document',
+            content: { 'application/json': { schema: { type: 'object' } } },
+          },
+          '405': { description: 'Method not allowed' },
+        },
+      },
+    },
+  };
+}
+
+export function buildAdminSurveyOpenApiPaths(): Record<string, unknown> {
+  return {
+    '/api/admin/survey-insights': {
+      get: {
+        tags: [ADMIN_SURVEY_INSIGHTS_OPENAPI.tag],
+        summary: ADMIN_SURVEY_INSIGHTS_OPENAPI.summary,
+        parameters: [
+          adminAuthParam,
+          {
+            name: ADMIN_SURVEY_INSIGHTS_OPENAPI.reportIdParam,
+            in: 'query',
+            required: true,
+            schema: { type: 'string' },
+          },
+        ],
+        responses: {
+          '200': jsonResponse,
+          '400': jsonResponse,
+          '401': jsonResponse,
+          '403': jsonResponse,
+          '404': jsonResponse,
+          '502': jsonResponse,
+        },
+      },
+    },
+    '/api/admin/surveys': {
+      get: {
+        tags: [ADMIN_SURVEYS_OPENAPI.tag],
+        summary: ADMIN_SURVEYS_OPENAPI.summary,
+        parameters: [
+          adminAuthParam,
+          { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100 } },
+          { name: 'installer_id', in: 'query', schema: { type: 'string' } },
+        ],
+        responses: {
+          '200': jsonResponse,
+          '401': jsonResponse,
+          '403': jsonResponse,
+          '502': jsonResponse,
+        },
+      },
+    },
+  };
+}
 
 export function buildSurveyOpenApiPaths(): Record<string, unknown> {
   return {
@@ -223,20 +344,26 @@ export function buildSurveyOpenApiPaths(): Record<string, unknown> {
         responses: { '200': jsonResponse },
       },
     },
+    ...buildAdminSurveyOpenApiPaths(),
+    ...buildOpenApiSurveyMetaPaths(),
   };
 }
 
-export function buildSurveyOpenApiSpec() {
+export function buildSurveyOpenApiSpec(): SurveyOpenApiSpec {
   return {
-    openapi: '3.1.0',
+    openapi: SURVEY_OPENAPI_VERSION,
     info: {
-      title: 'SOLARIS CET Survey Bridge API',
+      title: SURVEY_OPENAPI_TITLE,
       version: SURVEY_API_VERSION,
       description:
         'Stable Node bridge over Python survey-engine. Contract for installers, CRM, and future Digital Twin (D10).',
     },
     servers: [{ url: '/' }],
-    tags: [{ name: 'survey', description: 'Field survey + AHJ + orchestration' }],
+    tags: [
+      { name: SURVEY_OPENAPI_TAG, description: SURVEY_OPENAPI_TAG_DESCRIPTION },
+      { name: SURVEY_ADMIN_OPENAPI_TAG, description: SURVEY_ADMIN_OPENAPI_TAG_DESCRIPTION },
+      { name: SURVEY_OPENAPI_META_TAG, description: SURVEY_OPENAPI_META_TAG_DESCRIPTION },
+    ],
     paths: buildSurveyOpenApiPaths(),
   };
 }

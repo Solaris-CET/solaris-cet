@@ -1,19 +1,14 @@
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { CET_PRICE_PROBE, loadCetPriceSnapshot } from '@/api/lib/cetPrice';
+import { getAllowedOrigin } from '@/api/lib/cors';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
 
-import { getAllowedOrigin } from '../../lib/cors';
-import { jsonResponse, optionsResponse } from '../../lib/http';
+export { CET_PRICE_PATH, CET_PRICE_PROBE } from '@/api/lib/cetPrice';
 
 export const config = { runtime: 'nodejs' };
 
-type ChainState = {
-  pool?: { priceTonPerCet?: string | null };
-  updatedAt?: string;
-};
-
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') {
-    return optionsResponse(req, 'GET, OPTIONS', 'Content-Type');
+    return optionsResponse(req, CET_PRICE_PROBE.methods.join(', '), 'Content-Type');
   }
   if (req.method !== 'GET') {
     return jsonResponse(req, { error: 'Method not allowed' }, 405);
@@ -21,15 +16,11 @@ export default async function handler(req: Request): Promise<Response> {
 
   const allowedOrigin = getAllowedOrigin(req.headers.get('origin'));
   try {
-    const p = join(process.cwd(), 'public', 'api', 'state.json');
-    const raw = await readFile(p, 'utf8');
-    const parsed = JSON.parse(raw) as ChainState;
-    const priceTonPerCet = typeof parsed.pool?.priceTonPerCet === 'string' ? parsed.pool?.priceTonPerCet : null;
-    const updatedAt = typeof parsed.updatedAt === 'string' ? parsed.updatedAt : null;
-    return jsonResponse(req, { symbol: 'CET', priceTonPerCet, updatedAt });
+    const snapshot = await loadCetPriceSnapshot();
+    return jsonResponse(req, snapshot);
   } catch {
-    return new Response(JSON.stringify({ error: 'Unavailable' }), {
-      status: 503,
+    return new Response(JSON.stringify({ error: CET_PRICE_PROBE.unavailableError }), {
+      status: CET_PRICE_PROBE.unavailableStatus,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': allowedOrigin,
@@ -39,4 +30,3 @@ export default async function handler(req: Request): Promise<Response> {
     });
   }
 }
-

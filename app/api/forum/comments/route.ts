@@ -1,10 +1,20 @@
 import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm';
 
-import { getDb, schema } from '../../../db/client';
-import { requireAuth } from '../../lib/auth';
-import { jsonResponse, optionsResponse } from '../../lib/http';
-import { ensureAllowedOrigin } from '../../lib/originGuard';
-import { awardPoints } from '../../lib/points';
+import { getDb, schema } from '@/db/client';
+import { requireAuth } from '@/api/lib/auth';
+import {
+  FORUM_COMMENTS_PROBE,
+  isValidForumCommentPost,
+  parseForumCommentPostBody,
+  parseForumCommentsPostId,
+  parseForumCommentsSort,
+} from '../../lib/forumComments';
+import { canModerateForumRole, canViewForumContent } from '@/api/lib/forumCommon';
+import { jsonResponse, optionsResponse } from '@/api/lib/http';
+import { ensureAllowedOrigin } from '@/api/lib/originGuard';
+import { awardPoints } from '@/api/lib/points';
+
+export { FORUM_COMMENTS_PATH, FORUM_COMMENTS_PROBE } from '@/api/lib/forumComments';
 
 export const config = { runtime: 'nodejs' };
 
@@ -18,33 +28,34 @@ async function canViewPost(
     .from(schema.forumPosts)
     .where(eq(schema.forumPosts.id, postId))
     .limit(1);
-  if (!post) return { ok: false, res: jsonResponse(req, { error: 'Not found' }, 404) };
+  if (!post) return { ok: false, res: jsonResponse(req, { error: FORUM_COMMENTS_PROBE.notFoundError }, 404) };
 
   const ctx = await requireAuth(req);
   const isAuthed = !('error' in ctx);
-  const canModerate = isAuthed && (ctx.user.role === 'admin' || ctx.user.role === 'moderator');
+  const canModerate = isAuthed && canModerateForumRole(ctx.user.role);
   const viewerId = isAuthed ? ctx.user.id : null;
-  const canView = post.status === 'visible' || (viewerId && (canModerate || viewerId === post.authorUserId));
-  if (!canView) return { ok: false, res: jsonResponse(req, { error: 'Not found' }, 404) };
+  if (!canViewForumContent(post.status, viewerId, post.authorUserId, canModerate)) {
+    return { ok: false, res: jsonResponse(req, { error: FORUM_COMMENTS_PROBE.notFoundError }, 404) };
+  }
   return { ok: true, viewerId, canModerate, authorUserId: post.authorUserId };
 }
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') {
-    return optionsResponse(req, 'GET, POST, OPTIONS', 'Content-Type, Authorization');
+    return optionsResponse(req, FORUM_COMMENTS_PROBE.methods.join(', '), 'Content-Type, Authorization');
   }
 
   const url = new URL(req.url);
-  const postId = (url.searchParams.get('postId') ?? '').trim();
-  if (!postId) return jsonResponse(req, { error: 'Missing postId' }, 400);
+  const postId = parseForumCommentsPostId(url.searchParams);
+  if (!postId) return jsonResponse(req, { error: FORUM_COMMENTS_PROBE.missingPostIdError }, 400);
 
   if (req.method === 'GET') {
     const access = await canViewPost(req, postId);
     if (!access.ok) return access.res;
 
     const db = getDb();
-    const sort = (url.searchParams.get('sort') ?? 'new').trim();
-    const orderBy = sort === 'top' ? desc(schema.forumComments.createdAt) : asc(schema.forumComments.createdAt);
+    const sort = parseForumCommentsSort(url.searchParams);
+    const orderBy = sort === FORUM_COMMENTS_PROBE.topSort ? desc(schema.forumComments.createdAt) : asc(schema.forumComments.createdAt);
 
     const rows = await db
       .select({
@@ -62,7 +73,7 @@ export default async function handler(req: Request): Promise<Response> {
       .leftJoin(schema.users, eq(schema.forumComments.authorUserId, schema.users.id))
       .where(and(eq(schema.forumComments.postId, postId), eq(schema.forumComments.status, 'visible')))
       .orderBy(orderBy)
-      .limit(200);
+      .limit(FORUM_COMMENTS_PROBE.listLimit);
 
     const ids = rows.map((r) => r.id);
     const scores =
@@ -73,7 +84,7 @@ export default async function handler(req: Request): Promise<Response> {
               score: sql<number>`coalesce(sum(${schema.forumVotes.value}), 0)`.as('score'),
             })
             .from(schema.forumVotes)
-            .where(and(eq(schema.forumVotes.targetType, 'comment'), inArray(schema.forumVotes.targetId, ids)))
+            .where(and(eq(schema.forumVotes.targetType, FORUM_COMMENTS_PROBE.voteTargetType), inArray(schema.forumVotes.targetId, ids)))
             .groupBy(schema.forumVotes.targetId)
         : [];
     const viewerVotes =
@@ -84,7 +95,7 @@ export default async function handler(req: Request): Promise<Response> {
             .where(
               and(
                 eq(schema.forumVotes.userId, access.viewerId),
-                eq(schema.forumVotes.targetType, 'comment'),
+                eq(schema.forumVotes.targetType, FORUM_COMMENTS_PROBE.voteTargetType),
                 inArray(schema.forumVotes.targetId, ids),
               ),
             )
@@ -123,31 +134,20 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     body = await req.json();
   } catch {
-    return jsonResponse(req, { error: 'Invalid JSON body' }, 400);
+    return jsonResponse(req, { error: FORUM_COMMENTS_PROBE.invalidJsonError }, 400);
   }
 
-  const text =
-    typeof body === 'object' && body !== null && 'body' in body && typeof (body as { body?: unknown }).body === 'string'
-      ? (body as { body: string }).body.trim()
-      : '';
-  const parentCommentId =
-    typeof body === 'object' &&
-    body !== null &&
-    'parentCommentId' in body &&
-    typeof (body as { parentCommentId?: unknown }).parentCommentId === 'string'
-      ? (body as { parentCommentId: string }).parentCommentId.trim()
-      : '';
-
-  if (!text || text.length > 2000) return jsonResponse(req, { error: 'Invalid comment' }, 400);
+  const parsed = parseForumCommentPostBody(body);
+  if (!isValidForumCommentPost(parsed)) return jsonResponse(req, { error: FORUM_COMMENTS_PROBE.invalidCommentError }, 400);
 
   const db = getDb();
-  if (parentCommentId) {
+  if (parsed.parentCommentId) {
     const [parent] = await db
       .select({ id: schema.forumComments.id })
       .from(schema.forumComments)
-      .where(and(eq(schema.forumComments.id, parentCommentId), eq(schema.forumComments.postId, postId)))
+      .where(and(eq(schema.forumComments.id, parsed.parentCommentId), eq(schema.forumComments.postId, postId)))
       .limit(1);
-    if (!parent) return jsonResponse(req, { error: 'Invalid parentCommentId' }, 400);
+    if (!parent) return jsonResponse(req, { error: FORUM_COMMENTS_PROBE.invalidParentError }, 400);
   }
 
   const now = new Date();
@@ -156,8 +156,8 @@ export default async function handler(req: Request): Promise<Response> {
     .values({
       postId,
       authorUserId: ctx.user.id,
-      parentCommentId: parentCommentId || null,
-      body: text,
+      parentCommentId: parsed.parentCommentId || null,
+      body: parsed.body,
       status: 'visible',
       createdAt: now,
       updatedAt: now,
@@ -169,7 +169,6 @@ export default async function handler(req: Request): Promise<Response> {
     .set({ updatedAt: now, lastActivityAt: now })
     .where(eq(schema.forumPosts.id, postId));
 
-  await awardPoints(db, ctx.user.id, 2, 'forum_comment', { dedupeKey: `forum_comment:${comment.id}` });
+  await awardPoints(db, ctx.user.id, FORUM_COMMENTS_PROBE.commentPoints, 'forum_comment', { dedupeKey: `forum_comment:${comment.id}` });
   return jsonResponse(req, { ok: true, commentId: comment.id });
 }
-

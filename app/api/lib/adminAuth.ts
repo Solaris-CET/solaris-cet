@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 
-import { getDb, schema } from '../../db/client';
+import { getDb, schema } from '@/db/client';
 import { clientIp } from './clientIp';
 import { getJwtSecretsFromEnv, verifyJwtWithSecrets } from './jwt';
 
@@ -31,6 +31,36 @@ export function requireAdminRole(
   const r = (ctx.admin.role as AdminRole) || 'viewer';
   if (roleRank(r) >= roleRank(minRole)) return { ok: true };
   return { ok: false, status: 403, error: 'Forbidden' };
+}
+
+export type AdminRouteGuardProbe = {
+  minRole: AdminRole | ((method: string) => AdminRole);
+  unauthenticatedStatus?: number;
+  unauthorizedError?: string;
+  forbiddenStatus?: number;
+  forbiddenError?: string;
+};
+
+export async function guardAdminRoute(
+  req: Request,
+  probe: AdminRouteGuardProbe,
+): Promise<AdminAuthContext | { status: number; error: string }> {
+  const ctx = await requireAdminAuth(req);
+  if ('error' in ctx) {
+    return {
+      status: probe.unauthenticatedStatus ?? ctx.status,
+      error: probe.unauthorizedError ?? ctx.error,
+    };
+  }
+  const resolvedRole = typeof probe.minRole === 'function' ? probe.minRole(req.method) : probe.minRole;
+  const roleCheck = requireAdminRole(ctx, resolvedRole);
+  if (!roleCheck.ok) {
+    return {
+      status: probe.forbiddenStatus ?? roleCheck.status,
+      error: probe.forbiddenError ?? roleCheck.error,
+    };
+  }
+  return ctx;
 }
 
 export async function requireAdminAuth(

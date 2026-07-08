@@ -1,0 +1,177 @@
+---
+pid: 2840
+cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
+command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx vitest run src/__tests__/SurveyOfflineSection.test.ts src/__tests__/adminClient.test.ts 2>&1"
+started_at: 2026-07-07T03:57:13.302Z
+running_for_ms: 48839979 
+---
+
+ RUN  v4.1.7 C:/Users/CCons/Desktop/SOLARIS CET/app
+
+ ❯ src/__tests__/SurveyOfflineSection.test.tsx (3 tests | 1 failed) 590ms
+     ✓ renders manifest prefetch urls on success 144ms
+     ✓ shows API error message when manifest fetch fails 26ms
+     × reloads manifest when refresh is clicked 417ms
+ ✓ src/__tests__/adminClient.test.ts (4 tests) 21ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 6 passed (7)
+   Start at  06:57:22
+   Duration  10.45s (transform 338ms, setup 1.86s, import 585ms, tests 611ms, environment 4.63s)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/SurveyOfflineSection.test.tsx > SurveyOfflineSection > reloads manifest when refresh is clicked
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reîmprospătează"
+
+Here are the accessible roles:
+
+  region:
+
+  Name "Survey offline PWA":
+  <section
+    aria-busy="false"
+    aria-labelledby="survey-offline-heading"
+    class="space-y-4"
+  />
+
+  --------------------------------------------------
+  heading:
+
+  Name "Survey offline PWA":
+  <h2
+    class="text-lg font-semibold text-white"
+    id="survey-offline-heading"
+  />
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  <p
+    class="text-sm text-white/55"
+  />
+
+  Name "":
+  <p
+    class="font-mono text-xs text-amber-200"
+  />
+
+  Name "":
+  <p
+    class="text-white/70"
+  />
+
+  --------------------------------------------------
+  button:
+
+  Name "Reîmprospătează manifestul offline":
+  <button
+    aria-label="Reîmprospătează manifestul offline"
+    class="relative overflow-hidden inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97] [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5"
+    data-size="sm"
+    data-slot="button"
+    data-variant="outline"
+  />
+
+  --------------------------------------------------
+  list:
+
+  Name "":
+  <ul
+    class="text-xs text-white/50 space-y-1 max-h-48 overflow-y-auto"
+  />
+
+  --------------------------------------------------
+  listitem:
+
+  Name "":
+  <li
+    class="font-mono"
+  />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <section
+      aria-busy="false"
+      aria-labelledby="survey-offline-heading"
+      class="space-y-4"
+    >
+      <div
+        class="flex flex-wrap items-center justify-between gap-3"
+      >
+        <div>
+          <h2
+            class="text-lg font-semibold text-white"
+            id="survey-offline-heading"
+          >
+            Survey offline PWA
+          </h2>
+          <p
+            class="text-sm text-white/55"
+          >
+            Manifest precache + coadă IndexedDB pentru tehnician pe șantier
+          </p>
+        </div>
+        <button
+          aria-label="Reîmprospătează manifestul offline"
+          class="relative overflow-hidden inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97] [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5"
+          data-size="sm"
+          data-slot="button"
+          data-variant="outline"
+        >
+          Reîmprospătează
+        </button>
+      </div>
+      <div
+        class="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm space-y-2"
+      >
+        <p
+          class="font-mono text-xs text-amber-200"
+        >
+          solaris-survey-offline-v1
+        </p>
+        <p
+          class="text-white/70"
+        >
+          IndexedDB: 
+          <span
+            class="font-mono text-cyan-200/90"
+          >
+            survey-queue-v1
+          </span>
+           · 
+          Coadă: 
+          nu
+        </p>
+        <ul
+          class="text-xs text-white/50 space-y-1 max-h-48 overflow-y-auto"
+        >
+          <li
+            class="font-mono"
+          >
+            /api/survey/context
+          </li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</body>
+ ❯ Object.getElementError ../node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/__tests__/SurveyOfflineSection.test.tsx:81:29
+     79|     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+     80|
+     81|     await user.click(screen.getByRole('button', { name: 'Reîmprospătea…
+       |                             ^
+     82|
+     83|     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

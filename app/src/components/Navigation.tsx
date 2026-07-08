@@ -329,7 +329,6 @@ export default function Navigation() {
 
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetContent
-          ref={mobileMenuContentRef}
           id="mobile-menu"
           side="right"
           overlayClassName="backdrop-blur-[20px] bg-[rgba(10,10,30,0.55)]"
@@ -340,7 +339,8 @@ export default function Navigation() {
             '[&>button]:top-5 [&>button]:right-5 [&>button]:size-10 [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center',
           )}
         >
-          <SheetHeader className="p-6 sm:p-8 pb-4 border-b border-white/6 text-left shrink-0">
+          <div ref={mobileMenuContentRef} className="contents">
+            <SheetHeader className="p-6 sm:p-8 pb-4 border-b border-white/6 text-left shrink-0">
             <SheetTitle className="font-display text-lg text-solaris-text tracking-tight flex items-center gap-3">
               <span className="relative w-9 h-9 shrink-0 flex items-center justify-center overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02]">
                 <SolarisLogoMark className="h-full w-full" />
@@ -386,6 +386,7 @@ export default function Navigation() {
               </a>
             </div>
           </nav>
+          </div>
         </SheetContent>
       </Sheet>
     </header>
