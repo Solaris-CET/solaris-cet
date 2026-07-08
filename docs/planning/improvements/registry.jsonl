@@ -5,7 +5,7 @@
 {"id":"IMP-00005","status":"done","priority":"P2","category":"frontend","dimension":"error-boundary","path":"app/src/admin/adminClient.ts","done_at":"2026-07-07"}
 {"id":"IMP-00006","status":"done","priority":"P2","category":"frontend","dimension":"i18n","path":"app/src/admin/adminClient.ts","done_at":"2026-07-07"}
 {"id":"IMP-00007","status":"done","priority":"P2","category":"frontend","dimension":"seo","path":"app/src/admin/adminClient.ts","done_at":"2026-07-07"}
-{"id":"IMP-00008","status":"open","priority":"P2","category":"frontend","dimension":"unit-test","path":"app/src/admin/AdminPanel.tsx"}
+{"id":"IMP-00008","status":"done","priority":"P2","category":"frontend","dimension":"unit-test","path":"app/src/admin/AdminPanel.tsx","done_at":"2026-07-08"}
 {"id":"IMP-00009","status":"open","priority":"P2","category":"frontend","dimension":"type-safety","path":"app/src/admin/AdminPanel.tsx"}
 {"id":"IMP-00010","status":"open","priority":"P2","category":"frontend","dimension":"a11y","path":"app/src/admin/AdminPanel.tsx"}
 {"id":"IMP-00011","status":"open","priority":"P2","category":"frontend","dimension":"perf","path":"app/src/admin/AdminPanel.tsx"}
@@ -5375,7 +5375,7 @@
 {"id":"IMP-05375","status":"open","priority":"P2","category":"api","dimension":"observability","path":"app/api/support/start/route.ts"}
 {"id":"IMP-05376","status":"done","priority":"P1","category":"api","dimension":"route-test","path":"app/api/survey/batch/route.ts","done_at":"2026-07-07"}
 {"id":"IMP-05377","status":"done","priority":"P1","category":"api","dimension":"e2e-probe","path":"app/api/survey/batch/route.ts","done_at":"2026-07-07"}
-{"id":"IMP-05378","status":"open","priority":"P1","category":"api","dimension":"openapi-doc","path":"app/api/survey/batch/route.ts"}
+{"id":"IMP-05378","status":"done","priority":"P1","category":"api","dimension":"openapi-doc","path":"app/api/survey/batch/route.ts","done_at":"2026-07-08"}
 {"id":"IMP-05379","status":"open","priority":"P1","category":"api","dimension":"rate-limit","path":"app/api/survey/batch/route.ts"}
 {"id":"IMP-05380","status":"open","priority":"P1","category":"api","dimension":"auth-guard","path":"app/api/survey/batch/route.ts"}
 {"id":"IMP-05381","status":"open","priority":"P1","category":"api","dimension":"zod-validate","path":"app/api/survey/batch/route.ts"}

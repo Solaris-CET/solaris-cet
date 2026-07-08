@@ -33,7 +33,7 @@
   - **VERIFY:** epic created with T1–T3
   - **DONE when:** tasks.md with baseline plan
 
-- [ ] **T6 — Pass 3 npm audit wave**
+- [ ] **T6 — Pass 3 npm audit wave** *(blocked 2026-07-08: `npm audit fix` broke node_modules on Windows — use `npm run ci:install` / `cd app && npm ci` before retry)*
   - **Files:** `package-lock.json` (vite/undici safe bumps)
   - **VERIFY:** `npm audit --omit=dev` count reduced
   - **DONE when:** no new critical

@@ -121,3 +121,5 @@ npm run graphify:update                # after code changes (AST-only)
 ```
 
 Install skill for new agents: `python -m graphify install --project --platform cursor` (also `agents`, `claude`).
+
+Windows pitfalls: `docs/planning/GRAPHIFY-WINDOWS.md`

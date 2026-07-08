@@ -502,3 +502,18 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 - `graphify-out/graph.json` — hartă merged (survey-engine + app + contracts)
 
 **Regulă nouă (toți agenții):** `graphify query/path/explain` **înainte** de Read/Grep oarbă. După edit cod: `npm run graphify:update`.
+
+---
+
+## Update 2026-07-08 — Random task wave (mic/mediu/mare)
+
+| Size | Task | Status |
+|------|------|--------|
+| S | IMP-05378 batch OpenAPI (`SURVEY_BATCH_OPENAPI` + 405/415/503) | ✅ |
+| S | `GRAPHIFY-WINDOWS.md` + Agents.md link | ✅ |
+| S | IMP-00008 `adminNav.test.ts` + extract `adminNav.ts` | ✅ |
+| M | `AdminPanel.test.tsx` (Login + viewer shell) | ⏳ needs `npm ci` after audit mishap |
+| M | T6 npm audit wave | ❌ `npm audit fix` broke deps — T6 blocked note in tasks.md |
+| L | tsc-cleanup lucide/R3F | ⏳ deferred (typecheck slow; epic T1–T3 open) |
+
+**VERIFY:** surveyOpenApi 14/14 · pytest agent_harness+offline 10/10 · adminNav pending vitest after npm ci

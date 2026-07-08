@@ -3,6 +3,28 @@ import { resolveSurveyEngineUrl, SURVEY_HEALTH_PROBE } from './surveyHealth';
 export const SURVEY_BATCH_PATH = '/api/survey/batch';
 export const SURVEY_BATCH_METHODS = 'POST, OPTIONS';
 
+/** OpenAPI fragment for batch route (S6 contract). */
+export const SURVEY_BATCH_OPENAPI = {
+  path: SURVEY_BATCH_PATH,
+  tag: 'survey' as const,
+  post: {
+    summary: 'Batch manifest + photos (multi-report upload)',
+    description:
+      'Proxies multipart batch jobs to survey-engine. Requires multipart/form-data; optional X-Installer-Key for installer auth.',
+    parameters: [{ name: 'X-Installer-Key', in: 'header' as const, required: false, schema: { type: 'string' } }],
+    requestBody: {
+      required: true,
+      content: { 'multipart/form-data': { schema: { type: 'object' } } },
+    },
+    responses: {
+      '200': { description: 'Batch job results (total, succeeded, failed, results[])' },
+      '405': { description: 'Method not allowed' },
+      '415': { description: 'Expected multipart/form-data' },
+      '503': { description: 'survey-engine unreachable' },
+    },
+  },
+};
+
 export const SURVEY_BATCH_PROBE = {
   path: SURVEY_BATCH_PATH,
   methods: ['POST', 'OPTIONS'] as const,

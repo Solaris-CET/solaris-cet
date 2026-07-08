@@ -2,6 +2,7 @@
 
 import { ADMIN_SURVEY_INSIGHTS_OPENAPI } from './adminSurveyInsights';
 import { ADMIN_SURVEYS_OPENAPI } from './adminSurveys';
+import { SURVEY_BATCH_OPENAPI } from './surveyBatch';
 
 export const SURVEY_API_VERSION = '1.0.0';
 export const SURVEY_OPENAPI_VERSION = '3.1.0';
@@ -205,15 +206,17 @@ export function buildSurveyOpenApiPaths(): Record<string, unknown> {
     '/api/survey/demo': {
       post: { summary: 'Demo report (sample data)', responses: { '200': jsonResponse, '503': jsonResponse } },
     },
-    '/api/survey/batch': {
+    [SURVEY_BATCH_OPENAPI.path]: {
       post: {
-        summary: 'Batch manifest + photos',
+        ...SURVEY_BATCH_OPENAPI.post,
+        tags: [SURVEY_OPENAPI_TAG],
         parameters: [installerKeyParam],
-        requestBody: {
-          required: true,
-          content: { 'multipart/form-data': { schema: { type: 'object' } } },
+        responses: {
+          '200': jsonResponse,
+          '405': jsonResponse,
+          '415': jsonResponse,
+          '503': jsonResponse,
         },
-        responses: { '200': jsonResponse },
       },
     },
     '/api/survey/files': {

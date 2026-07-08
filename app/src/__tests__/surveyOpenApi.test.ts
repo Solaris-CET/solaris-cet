@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { ADMIN_SURVEY_INSIGHTS_OPENAPI } from '../../api/lib/adminSurveyInsights';
 import { ADMIN_SURVEYS_OPENAPI } from '../../api/lib/adminSurveys';
+import { SURVEY_BATCH_OPENAPI } from '../../api/lib/surveyBatch';
 import {
   buildAdminSurveyOpenApiPaths,
   buildOpenApiSurveyMetaPaths,
@@ -65,6 +66,17 @@ describe('surveyOpenApi', () => {
     expect(hasOpenApiOperation(paths, '/api/survey/generate', 'post')).toBe(true);
     expect(hasOpenApiOperation(paths, '/api/survey/health', 'get')).toBe(true);
     expect(hasOpenApiOperation(paths, '/api/survey/health', 'post')).toBe(false);
+  });
+
+  it('batch route documents POST multipart and error responses', () => {
+    const paths = buildSurveyOpenApiPaths();
+    expect(hasOpenApiOperation(paths, SURVEY_BATCH_OPENAPI.path, 'post')).toBe(true);
+    const batch = paths[SURVEY_BATCH_OPENAPI.path] as {
+      post?: { responses?: Record<string, unknown>; requestBody?: { content?: Record<string, unknown> } };
+    };
+    expect(batch.post?.requestBody?.content?.['multipart/form-data']).toBeTruthy();
+    expect(batch.post?.responses?.['415']).toBeTruthy();
+    expect(batch.post?.responses?.['503']).toBeTruthy();
   });
 
   it('multipart routes declare installer key header', () => {
