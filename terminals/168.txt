@@ -1,7 +1,0 @@
----
-pid: 18380
-cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
-command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; node ../scripts/run-bin.mjs eslint . --quiet 2>&1"
-started_at: 2026-07-07T04:06:48.817Z
-running_for_ms: 48264999 
----

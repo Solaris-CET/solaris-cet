@@ -1,7 +1,0 @@
----
-pid: 12312
-cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
-command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\" ; npx eslint api/lib/cronEventReminders.ts api/lib/cronMarketingWeekly.ts api/lib/cronWeeklyLeaderboard.ts api/lib/eventsCalendar.ts api/lib/events.ts api/cron/event-reminders/route.ts api/cron/marketing-weekly/route.ts api/cron/weekly-leaderboard/route.ts api/events/calendar/route.ts api/events/route.ts src/__tests__/cronEventRemindersRoute.test.ts src/__tests__/cronMarketingWeeklyRoute.test.ts src/__tests__/cronWeeklyLeaderboardRoute.test.ts src/__tests__/eventsCalendarRoute.test.ts src/__tests__/eventsRoute.test.ts --quiet 2>&1"
-started_at: 2026-07-07T14:50:27.657Z
-running_for_ms: 9639986  
----

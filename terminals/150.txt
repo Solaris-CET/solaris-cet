@@ -1,7 +1,0 @@
----
-pid: 18196
-cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
-command: "Set-Location \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; npx tsc --noEmit -p tsconfig.api.json 2>&1 | Select-Object -First 80"
-started_at: 2026-07-06T18:56:16.030Z
-running_for_ms: 170009   
----

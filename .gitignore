@@ -21,6 +21,9 @@ cli/dist/
 *.log
 npm-debug.log*
 
+# Local agent/IDE terminal capture (never commit)
+terminals/
+
 __pycache__/
 *.pyc
 

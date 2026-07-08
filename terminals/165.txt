@@ -1,7 +1,0 @@
----
-pid: 9132
-cwd: "C:\Users\CCons\Desktop\SOLARIS CET"
-command: "cd \"C:\\Users\\CCons\\Desktop\\SOLARIS CET\\app\"; node ../scripts/run-bin.mjs eslint src/components/animations --quiet 2>&1"
-started_at: 2026-07-07T04:00:34.539Z
-running_for_ms: 48635007 
----
