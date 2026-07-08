@@ -32,6 +32,7 @@ describe("Public discovery — sitemap, security.txt, humans.txt", () => {
     expect(robots).toContain(`Sitemap: ${PRODUCTION_SITE_ORIGIN}/sitemap.xml`);
     expect(robots).toContain("Disallow: /privacy-settings/");
     expect(robots).toContain("Disallow: /multumim/");
+    expect(robots).toContain("Disallow: /cdn-cgi/");
 
     const xml = readFileSync(join(appPublic, "sitemap.xml"), "utf8");
     expect(xml).toContain(`${PRODUCTION_SITE_ORIGIN}/servicii/`);
