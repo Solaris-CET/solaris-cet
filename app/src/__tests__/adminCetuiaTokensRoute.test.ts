@@ -88,6 +88,52 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select(arg?: unknown) {
+      const isAggregate =
+        arg && typeof arg === 'object' && ('total' in arg || 'sold' in arg || 'reserved' in arg);
+      if (isAggregate) {
+        return {
+          from: async () => nextDbResult(),
+        };
+      }
+      return {
+        from() {
+          return {
+            where: async () => nextDbResult(),
+          };
+        },
+      };
+    },
+    update() {
+      adminMocks.updateCalls += 1;
+      return {
+        set(values: Record<string, unknown>) {
+          const row = adminMocks.responses[3]?.[0] as Record<string, unknown> | undefined;
+          if (row) Object.assign(row, values);
+          return { where: async () => undefined };
+        },
+      };
+    },
+    insert() {
+      return {
+        values() {
+          return { onConflictDoNothing: async () => undefined };
+        },
+      };
+    },
+  }),
+  schema: {
+    cetuiaTokens: {
+      id: 'cetuiaTokens.id',
+      status: 'cetuiaTokens.status',
+      ownerWalletAddress: 'cetuiaTokens.ownerWalletAddress',
+    },
+  },
+}));
+
 import adminCetuiaTokensRoute, { ADMIN_CETUIA_TOKENS_PROBE as routeProbe } from '../../api/admin/cetuia/tokens/route';
 import { writeAdminAudit } from '../../api/lib/adminAudit';
 

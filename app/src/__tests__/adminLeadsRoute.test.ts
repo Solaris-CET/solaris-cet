@@ -73,6 +73,42 @@ vi.mock('../../db/schema', () => ({
   },
 }));
 
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select(arg?: unknown) {
+      const isCount = arg && typeof arg === 'object' && 'count' in arg;
+      if (isCount) {
+        return {
+          from() {
+            return {
+              where: async () => [{ count: adminMocks.leads.length }],
+            };
+          },
+        };
+      }
+      return {
+        from() {
+          return {
+            where() {
+              return {
+                orderBy() {
+                  return {
+                    limit() {
+                      return {
+                        offset: async () => adminMocks.leads,
+                      };
+                    },
+                  };
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  }),
+}));
+
 import adminLeadsRoute, { ADMIN_LEADS_PROBE as routeProbe } from '../../api/admin/leads/route';
 
 describe('adminLeads helpers', () => {

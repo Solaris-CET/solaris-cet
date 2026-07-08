@@ -69,6 +69,78 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select() {
+      return {
+        from() {
+          return {
+            where() {
+              return {
+                orderBy() {
+                  return {
+                    limit: async () => adminMocks.posts,
+                  };
+                },
+                then(onFulfilled: (rows: unknown[]) => void, onRejected?: (err: unknown) => void) {
+                  const rows = adminMocks.existingPost ? [adminMocks.existingPost] : [];
+                  return Promise.resolve(rows).then(onFulfilled, onRejected);
+                },
+              };
+            },
+            orderBy() {
+              return {
+                limit: async () => adminMocks.posts,
+              };
+            },
+          };
+        },
+      };
+    },
+    insert() {
+      return {
+        values() {
+          return {
+            returning: async () => [
+              {
+                id: 'post-new',
+                slug: 'new-post',
+                title: 'New Post',
+                excerpt: '',
+                locale: 'ro',
+                status: 'draft',
+                markdown: '',
+                updatedAt: new Date(),
+                publishedAt: null,
+              },
+            ],
+          };
+        },
+      };
+    },
+    update() {
+      adminMocks.updateCalls += 1;
+      return { set: () => ({ where: async () => undefined }) };
+    },
+    delete() {
+      return {
+        where: async () => {
+          adminMocks.deleted = true;
+        },
+      };
+    },
+  }),
+  schema: {
+    cmsPosts: {
+      id: 'cmsPosts.id',
+      slug: 'cmsPosts.slug',
+      locale: 'cmsPosts.locale',
+      updatedAt: 'cmsPosts.updatedAt',
+    },
+  },
+}));
+
 import adminCmsPostsRoute, { ADMIN_CMS_POSTS_PROBE as routeProbe } from '../../api/admin/cms/posts/route';
 import { writeAdminAudit } from '../../api/lib/adminAudit';
 

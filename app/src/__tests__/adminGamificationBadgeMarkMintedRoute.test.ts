@@ -50,6 +50,33 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select() {
+      return {
+        from() {
+          return {
+            where() {
+              return {
+                limit: async () => (adminMocks.badgeFound ? [{ id: 'badge-1' }] : []),
+              };
+            },
+          };
+        },
+      };
+    },
+    update() {
+      adminMocks.updateCalls += 1;
+      return { set: () => ({ where: async () => undefined }) };
+    },
+  }),
+  schema: {
+    badges: { id: 'badges.id', slug: 'badges.slug', active: 'badges.active' },
+    nftBadgeClaims: { userId: 'nftBadgeClaims.userId', badgeId: 'nftBadgeClaims.badgeId' },
+  },
+}));
+
 import adminGamificationBadgeMarkMintedRoute, {
   ADMIN_GAMIFICATION_BADGE_MARK_MINTED_PROBE as routeProbe,
 } from '../../api/admin/gamification/badges/mark-minted/route';

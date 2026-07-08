@@ -56,6 +56,28 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    update() {
+      adminMocks.updateCalls += 1;
+      return {
+        set(values: Record<string, unknown>) {
+          adminMocks.lastUpdate = {
+            status: String(values.status),
+            resolvedAt: values.resolvedAt as Date,
+            updatedAt: values.updatedAt as Date,
+          };
+          return { where: async () => undefined };
+        },
+      };
+    },
+  }),
+  schema: {
+    crmConversations: { id: 'crmConversations.id', status: 'crmConversations.status' },
+  },
+}));
+
 import adminConversationResolveRoute, {
   ADMIN_CONVERSATION_RESOLVE_PROBE as routeProbe,
 } from '../../api/admin/conversation/resolve/route';

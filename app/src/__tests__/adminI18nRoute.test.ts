@@ -47,6 +47,48 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select() {
+      return {
+        from() {
+          return {
+            where() {
+              return {
+                orderBy() {
+                  return {
+                    limit: async () => [{ key: 'hello', value: 'Salut' }],
+                  };
+                },
+                then(onFulfilled: (rows: unknown[]) => void, onRejected?: (err: unknown) => void) {
+                  const rows = adminMocks.existing ? [adminMocks.existing] : [];
+                  return Promise.resolve(rows).then(onFulfilled, onRejected);
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+    update() {
+      adminMocks.updateCalls += 1;
+      return { set: () => ({ where: async () => undefined }) };
+    },
+    insert() {
+      adminMocks.insertCalls += 1;
+      return { values: async () => undefined };
+    },
+  }),
+  schema: {
+    cmsTranslations: {
+      locale: 'cmsTranslations.locale',
+      namespace: 'cmsTranslations.namespace',
+      key: 'cmsTranslations.key',
+    },
+  },
+}));
+
 import adminI18nRoute, { ADMIN_I18N_PROBE as routeProbe } from '../../api/admin/i18n/route';
 import { writeAdminAudit } from '../../api/lib/adminAudit';
 

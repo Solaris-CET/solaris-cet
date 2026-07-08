@@ -47,6 +47,64 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select() {
+      const step = adminMocks.queryStep++;
+      const results: unknown[][] = [
+        [
+          {
+            id: 'conv-1',
+            status: 'open',
+            contactId: 'contact-1',
+            userId: 'user-1',
+            pageUrl: '/contact',
+            createdAt: new Date('2026-03-01T10:00:00Z'),
+            updatedAt: new Date('2026-03-01T11:00:00Z'),
+          },
+        ],
+        [{ id: 'contact-1', email: 'a@test.com', name: 'Ana' }],
+        [{ id: 'user-1', walletAddress: 'EQ_USER' }],
+      ];
+      const row = results[step] ?? [];
+      return {
+        from() {
+          return {
+            where() {
+              return {
+                orderBy() {
+                  return {
+                    limit: async () => row,
+                  };
+                },
+                limit: async () => row,
+              };
+            },
+            orderBy() {
+              return {
+                limit: async () => row,
+              };
+            },
+            limit: async () => row,
+          };
+        },
+      };
+    },
+  }),
+  schema: {
+    crmConversations: {
+      id: 'crmConversations.id',
+      status: 'crmConversations.status',
+      contactId: 'crmConversations.contactId',
+      userId: 'crmConversations.userId',
+      updatedAt: 'crmConversations.updatedAt',
+    },
+    contacts: { id: 'contacts.id', email: 'contacts.email', name: 'contacts.name' },
+    users: { id: 'users.id', walletAddress: 'users.walletAddress' },
+  },
+}));
+
 import adminConversationsRoute, { ADMIN_CONVERSATIONS_PROBE as routeProbe } from '../../api/admin/conversations/route';
 
 describe('adminConversations helpers', () => {

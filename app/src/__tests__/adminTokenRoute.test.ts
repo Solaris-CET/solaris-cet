@@ -59,6 +59,46 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: tokenMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select() {
+      tokenMocks.selectCall += 1;
+      return {
+        from() {
+          return {
+            where: async () => [tokenMocks.row],
+          };
+        },
+      };
+    },
+    update() {
+      tokenMocks.updateCalls += 1;
+      return {
+        set(values: Record<string, unknown>) {
+          Object.assign(tokenMocks.row, values);
+          return { where: async () => undefined };
+        },
+      };
+    },
+    insert() {
+      tokenMocks.insertCalls += 1;
+      return { values: async () => undefined };
+    },
+  }),
+  schema: {
+    cmsTokenData: {
+      id: 'cmsTokenData.id',
+      symbol: 'cmsTokenData.symbol',
+      priceUsd: 'cmsTokenData.priceUsd',
+      totalSupply: 'cmsTokenData.totalSupply',
+      circulatingSupply: 'cmsTokenData.circulatingSupply',
+      updatedAt: 'cmsTokenData.updatedAt',
+      updatedByAdminId: 'cmsTokenData.updatedByAdminId',
+    },
+  },
+}));
+
 import adminTokenRoute, { ADMIN_TOKEN_PROBE as routeProbe } from '../../api/admin/token/route';
 import { writeAdminAudit } from '../../api/lib/adminAudit';
 

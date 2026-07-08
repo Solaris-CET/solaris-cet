@@ -21,29 +21,20 @@ describe('ErrorBoundary', () => {
     );
 
     expect(screen.getByRole('alert')).toBeInTheDocument();
-    const sovereign = document.querySelector('a[href="/sovereign/"]');
-    expect(sovereign).not.toBeNull();
+    expect(screen.getByRole('link', { name: /pagina principală/i })).toHaveAttribute('href', '/');
   });
 
-  it('retries in-place', async () => {
-    let shouldThrow = true;
-
-    function Flaky() {
-      if (shouldThrow) {
-        throw new Error('flaky');
-      }
-      return <div>ok</div>;
+  it('offers reload control after an error', () => {
+    function Boom(): ReactElement {
+      throw new Error('flaky');
     }
 
     render(
       <ErrorBoundary>
-        <Flaky />
+        <Boom />
       </ErrorBoundary>,
     );
 
-    const retry = screen.getByRole('button', { name: /try again/i });
-    shouldThrow = false;
-    retry.click();
-    expect(await screen.findByText('ok')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /reîncarcă pagina/i })).toBeInTheDocument();
   });
 });

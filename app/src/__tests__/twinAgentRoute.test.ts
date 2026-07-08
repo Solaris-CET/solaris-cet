@@ -6,16 +6,21 @@ import { describe, expect, it } from 'vitest';
 
 describe('twin-agent routes', () => {
   it('plan route proxies to engine', () => {
+    const libPath = join(process.cwd(), 'api', 'lib', 'surveyTwinAgent.ts');
     const routePath = join(process.cwd(), 'api', 'survey', 'twin-agent', 'route.ts');
-    const src = readFileSync(routePath, 'utf8');
-    expect(src).toContain('/twin-agent/');
-    expect(src).toContain('report_id');
+    const libSrc = readFileSync(libPath, 'utf8');
+    const routeSrc = readFileSync(routePath, 'utf8');
+    expect(libSrc).toContain('/twin-agent/');
+    expect(libSrc).toContain('parseSurveyTwinAgentReportId');
+    expect(routeSrc).toContain('resolveSurveyTwinAgentEngineUrl');
   });
 
   it('execute route dispatches webhooks', () => {
+    const libPath = join(process.cwd(), 'api', 'lib', 'surveyTwinAgentExecute.ts');
     const routePath = join(process.cwd(), 'api', 'survey', 'twin-agent', 'execute', 'route.ts');
-    const src = readFileSync(routePath, 'utf8');
-    expect(src).toContain('agent_action');
-    expect(src).toContain('dispatchTwinWebhook');
+    const libSrc = readFileSync(libPath, 'utf8');
+    const routeSrc = readFileSync(routePath, 'utf8');
+    expect(libSrc).toContain('agent_action');
+    expect(routeSrc).toContain('dispatchTwinWebhook');
   });
 });

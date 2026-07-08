@@ -36,6 +36,42 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select() {
+      return {
+        from() {
+          return {
+            where() {
+              return {
+                limit: async () => [{ id: 'admin_1', mfaSecretEncrypted: 'enc-secret' }],
+              };
+            },
+          };
+        },
+      };
+    },
+    update() {
+      return {
+        set(values: Record<string, unknown>) {
+          if ('mfaSecretEncrypted' in values && values.mfaSecretEncrypted === null) {
+            adminMocks.mfaCleared = true;
+          }
+          return { where: async () => undefined };
+        },
+      };
+    },
+  }),
+  schema: {
+    adminAccounts: {
+      id: 'adminAccounts.id',
+      mfaSecretEncrypted: 'adminAccounts.mfaSecretEncrypted',
+      mfaEnabledAt: 'adminAccounts.mfaEnabledAt',
+    },
+  },
+}));
+
 import adminMfaDisableRoute, { ADMIN_MFA_DISABLE_PROBE as routeProbe } from '../../api/admin/mfa/disable/route';
 import { decryptApiKeyWithEnvSecrets } from '../../api/lib/crypto';
 import { verifyTotpCode } from '../../api/lib/totp';

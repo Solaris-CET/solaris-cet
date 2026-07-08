@@ -69,6 +69,46 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select(arg?: unknown) {
+      const isQuest = arg && typeof arg === 'object' && 'slug' in arg;
+      return {
+        from() {
+          return {
+            where() {
+              return {
+                limit: async () => {
+                  if (isQuest) return adminMocks.quest ? [adminMocks.quest] : [];
+                  return adminMocks.progress ? [adminMocks.progress] : [];
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+    update() {
+      adminMocks.updateCalls += 1;
+      return { set: () => ({ where: async () => undefined }) };
+    },
+    transaction(fn: (tx: { update: () => ReturnType<ReturnType<typeof Object>['update']> }) => Promise<{ awarded: boolean }>) {
+      const tx = {
+        update() {
+          adminMocks.updateCalls += 1;
+          return { set: () => ({ where: async () => undefined }) };
+        },
+      };
+      return fn(tx);
+    },
+  }),
+  schema: {
+    userQuestProgress: { id: 'userQuestProgress.id', status: 'userQuestProgress.status' },
+    quests: { id: 'quests.id', slug: 'quests.slug', active: 'quests.active' },
+  },
+}));
+
 import adminGamificationQuestReviewRoute, {
   ADMIN_GAMIFICATION_QUEST_REVIEW_PROBE as routeProbe,
 } from '../../api/admin/gamification/quests/review/route';

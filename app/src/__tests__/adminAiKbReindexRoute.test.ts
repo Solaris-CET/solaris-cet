@@ -78,6 +78,56 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select(arg?: unknown) {
+      const isCount = arg && typeof arg === 'object' && 'c' in arg;
+      if (isCount) {
+        return {
+          from() {
+            return {
+              where: async () => [{ c: 12 }],
+            };
+          },
+        };
+      }
+      return {
+        from() {
+          return {
+            where() {
+              return {
+                orderBy() {
+                  return {
+                    limit: async () => [{ createdAt: new Date('2026-03-01T10:00:00Z') }],
+                  };
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+    delete() {
+      return { where: async () => undefined };
+    },
+    insert() {
+      return {
+        values: async () => {
+          adminMocks.inserted += 1;
+        },
+      };
+    },
+  }),
+  schema: {
+    aiVectorDocs: {
+      kind: 'aiVectorDocs.kind',
+      userId: 'aiVectorDocs.userId',
+      createdAt: 'aiVectorDocs.createdAt',
+    },
+  },
+}));
+
 import adminAiKbReindexRoute, { ADMIN_AI_KB_REINDEX_PROBE as routeProbe } from '../../api/admin/ai/kb/reindex/route';
 import { writeAdminAudit } from '../../api/lib/adminAudit';
 import { redisSetJson } from '../../api/lib/upstashRedis';

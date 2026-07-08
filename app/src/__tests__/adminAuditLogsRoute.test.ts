@@ -60,6 +60,35 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select() {
+      return {
+        from() {
+          return {
+            where() {
+              return {
+                orderBy() {
+                  return {
+                    limit: async () => adminMocks.rows,
+                  };
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  }),
+  schema: {
+    adminAuditLogs: {
+      action: 'adminAuditLogs.action',
+      createdAt: 'adminAuditLogs.createdAt',
+    },
+  },
+}));
+
 import adminAuditLogsRoute, { ADMIN_AUDIT_LOGS_PROBE as routeProbe } from '../../api/admin/audit/route';
 
 describe('adminAuditLogs helpers', () => {

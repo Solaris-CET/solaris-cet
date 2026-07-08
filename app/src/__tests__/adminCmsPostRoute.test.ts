@@ -51,6 +51,24 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select() {
+      return {
+        from() {
+          return {
+            where: async () => (adminMocks.post ? [adminMocks.post] : []),
+          };
+        },
+      };
+    },
+  }),
+  schema: {
+    cmsPosts: { id: 'cmsPosts.id' },
+  },
+}));
+
 import adminCmsPostRoute, { ADMIN_CMS_POST_PROBE as routeProbe } from '../../api/admin/cms/post/route';
 
 describe('adminCmsPost helpers', () => {

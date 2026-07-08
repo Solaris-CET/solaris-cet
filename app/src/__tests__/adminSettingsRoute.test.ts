@@ -62,6 +62,63 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: settingsMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select() {
+      return {
+        from() {
+          return {
+            orderBy() {
+              return {
+                limit: async () => settingsMocks.rows,
+              };
+            },
+            where: async () => {
+              const row = settingsMocks.rows.find((r) => r.key === settingsMocks.pendingPutKey);
+              return row ? [row] : [];
+            },
+          };
+        },
+      };
+    },
+    update() {
+      return {
+        set(values: Record<string, unknown>) {
+          const row = settingsMocks.rows.find((r) => r.key === settingsMocks.pendingPutKey);
+          if (row) {
+            row.value = values.value;
+            row.updatedAt = values.updatedAt as Date;
+            row.updatedByAdminId = values.updatedByAdminId as string;
+          }
+          return { where: async () => undefined };
+        },
+      };
+    },
+    insert() {
+      return {
+        values(values: Record<string, unknown>) {
+          settingsMocks.rows.push({
+            key: values.key as string,
+            value: values.value,
+            updatedAt: values.updatedAt as Date,
+            updatedByAdminId: values.updatedByAdminId as string,
+          });
+          return Promise.resolve();
+        },
+      };
+    },
+  }),
+  schema: {
+    cmsSettings: {
+      key: 'cmsSettings.key',
+      value: 'cmsSettings.value',
+      updatedAt: 'cmsSettings.updatedAt',
+      updatedByAdminId: 'cmsSettings.updatedByAdminId',
+    },
+  },
+}));
+
 import adminSettingsRoute, { ADMIN_SETTINGS_PROBE as routeProbe } from '../../api/admin/settings/route';
 import { writeAdminAudit } from '../../api/lib/adminAudit';
 

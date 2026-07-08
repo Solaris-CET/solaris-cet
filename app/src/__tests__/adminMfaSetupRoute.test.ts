@@ -30,9 +30,33 @@ vi.mock('../../api/lib/totp', () => ({
 vi.mock('../../api/lib/adminAuth', () => ({
   requireAdminAuth: async () => {
     if (!adminMocks.authOk) return { status: 401, error: 'Unauthorized' };
-    return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
+    return { admin: { id: 'admin_1', role: adminMocks.role, email: 'admin@test.com' }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    update() {
+      return {
+        set(values: Record<string, unknown>) {
+          if ('mfaSecretEncrypted' in values) {
+            adminMocks.updatedMfaSecret = values.mfaSecretEncrypted as string;
+            adminMocks.mfaEnabledAt = (values.mfaEnabledAt as Date | null) ?? null;
+          }
+          return { where: async () => undefined };
+        },
+      };
+    },
+  }),
+  schema: {
+    adminAccounts: {
+      id: 'adminAccounts.id',
+      mfaSecretEncrypted: 'adminAccounts.mfaSecretEncrypted',
+      mfaEnabledAt: 'adminAccounts.mfaEnabledAt',
+    },
+  },
+}));
+
 import adminMfaSetupRoute, { ADMIN_MFA_SETUP_PROBE as routeProbe } from '../../api/admin/mfa/setup/route';
 import { encryptApiKeyWithEnvPrimary } from '../../api/lib/crypto';
 import { buildOtpAuthUrl, generateTotpSecretBase32 } from '../../api/lib/totp';

@@ -60,6 +60,59 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select(arg?: unknown) {
+      const isList = arg && typeof arg === 'object' && 'messages' in arg;
+      if (isList) {
+        return {
+          from() {
+            return {
+              leftJoin() {
+                return {
+                  leftJoin() {
+                    return {
+                      groupBy() {
+                        return {
+                          orderBy() {
+                            return {
+                              limit: async () => [adminMocks.conversation],
+                            };
+                          },
+                        };
+                      },
+                    };
+                  },
+                };
+              },
+            };
+          },
+        };
+      }
+      return {
+        from() {
+          return {
+            where: async () => (adminMocks.deleted ? [] : [{ id: 'conv-1', userId: 'user-1' }]),
+          };
+        },
+      };
+    },
+    delete() {
+      return {
+        where: async () => {
+          adminMocks.deleted = true;
+        },
+      };
+    },
+  }),
+  schema: {
+    aiConversations: { id: 'aiConversations.id', userId: 'aiConversations.userId' },
+    aiMessages: { id: 'aiMessages.id', conversationId: 'aiMessages.conversationId' },
+    users: { id: 'users.id', walletAddress: 'users.walletAddress' },
+  },
+}));
+
 import adminAiConversationsRoute, { ADMIN_AI_CONVERSATIONS_PROBE as routeProbe } from '../../api/admin/ai/conversations/route';
 import { writeAdminAudit } from '../../api/lib/adminAudit';
 

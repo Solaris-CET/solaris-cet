@@ -62,6 +62,31 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    insert() {
+      return {
+        values() {
+          return {
+            returning: async () => [
+              {
+                id: 'asset-1',
+                filename: 'probe.png',
+                mimeType: 'image/png',
+                bytes: 67,
+              },
+            ],
+          };
+        },
+      };
+    },
+  }),
+  schema: {
+    cmsAssets: { id: 'cmsAssets.id' },
+  },
+}));
+
 import adminMediaUploadRoute, { ADMIN_MEDIA_UPLOAD_PROBE as routeProbe } from '../../api/admin/media/upload/route';
 import { writeAdminAudit } from '../../api/lib/adminAudit';
 

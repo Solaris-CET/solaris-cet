@@ -67,6 +67,37 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select() {
+      return {
+        from() {
+          return {
+            where() {
+              return {
+                limit: async () => (adminMocks.conversation ? [adminMocks.conversation] : []),
+                orderBy() {
+                  return Promise.resolve(adminMocks.messages);
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  }),
+  schema: {
+    crmConversations: { id: 'crmConversations.id' },
+    crmMessages: {
+      id: 'crmMessages.id',
+      sender: 'crmMessages.sender',
+      body: 'crmMessages.body',
+      conversationId: 'crmMessages.conversationId',
+    },
+  },
+}));
+
 import adminConversationRoute, { ADMIN_CONVERSATION_PROBE as routeProbe } from '../../api/admin/conversation/route';
 
 describe('adminConversation helpers', () => {

@@ -52,6 +52,44 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: statsMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select() {
+      const n = statsMocks.selectCall++;
+      const c = statsMocks.counts;
+      const results: unknown[][] = [
+        [{ c: c.users }],
+        [{ c: c.aiQueries24h }],
+        [{ c: c.aiConversations }],
+        [{ c: c.cmsPosts }],
+        [{ c: c.adminActions24h }],
+        [{ total: c.feedback.total, up: c.feedback.up, down: c.feedback.down }],
+        [{ avgScore7d: c.avgScore7d }],
+      ];
+      const row = results[n] ?? [{ c: 0 }];
+      return {
+        from() {
+          return {
+            where: async () => row,
+            then(onFulfilled: (rows: unknown[]) => void, onRejected?: (err: unknown) => void) {
+              return Promise.resolve(row).then(onFulfilled, onRejected);
+            },
+          };
+        },
+      };
+    },
+  }),
+  schema: {
+    users: {},
+    aiQueryLogs: { createdAt: 'aiQueryLogs.createdAt', qualityScore: 'aiQueryLogs.qualityScore' },
+    aiConversations: {},
+    cmsPosts: {},
+    adminAuditLogs: { createdAt: 'adminAuditLogs.createdAt' },
+    aiFeedback: { rating: 'aiFeedback.rating', createdAt: 'aiFeedback.createdAt' },
+  },
+}));
+
 import adminStatsRoute, { ADMIN_STATS_PROBE as routeProbe } from '../../api/admin/stats/route';
 
 describe('adminStats helpers', () => {

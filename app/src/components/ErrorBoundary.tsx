@@ -91,7 +91,10 @@ export class ErrorBoundary extends Component<Props, State> {
 
       return (
         <div className="flex min-h-screen items-center justify-center bg-slate-950 p-8">
-          <div className="max-w-md rounded-3xl border border-white/10 bg-black/30 p-8 text-center">
+          <div
+            role="alert"
+            className="max-w-md rounded-3xl border border-white/10 bg-black/30 p-8 text-center"
+          >
             <div className="text-6xl mb-4">😔</div>
             <h1 className="text-2xl font-bold text-white">Ceva nu a mers bine</h1>
             <p className="mt-3 text-slate-300">A apărut o eroare neașteptată.</p>
@@ -113,6 +116,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
             <div className="mt-6 flex flex-col gap-3">
               <button
+                type="button"
                 onClick={() => window.location.reload()}
                 className="rounded-2xl bg-amber-400 px-6 py-3 text-sm font-black text-black"
               >

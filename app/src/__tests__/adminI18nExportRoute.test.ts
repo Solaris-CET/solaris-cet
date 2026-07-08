@@ -42,6 +42,36 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select() {
+      return {
+        from() {
+          return {
+            where() {
+              return {
+                limit: async () => [
+                  { key: 'hello', value: 'Salut' },
+                  { key: 'bye', value: 'Pa' },
+                ],
+              };
+            },
+          };
+        },
+      };
+    },
+  }),
+  schema: {
+    cmsTranslations: {
+      key: 'cmsTranslations.key',
+      value: 'cmsTranslations.value',
+      locale: 'cmsTranslations.locale',
+      namespace: 'cmsTranslations.namespace',
+    },
+  },
+}));
+
 import adminI18nExportRoute, { ADMIN_I18N_EXPORT_PROBE as routeProbe } from '../../api/admin/i18n/export/route';
 import { writeAdminAudit } from '../../api/lib/adminAudit';
 

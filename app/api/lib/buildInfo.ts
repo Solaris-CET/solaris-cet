@@ -1,2 +1,2 @@
-export const BUILD_GIT_SHA = "5007fc0";
-export const BUILD_DATE = "2026-07-06";
+export const BUILD_GIT_SHA = "992bcfe8";
+export const BUILD_DATE = "2026-07-08";

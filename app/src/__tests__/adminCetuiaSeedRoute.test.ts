@@ -51,6 +51,35 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select(arg?: unknown) {
+      const isCount = arg && typeof arg === 'object' && 'c' in arg;
+      if (isCount) {
+        return {
+          from: async () => [{ c: adminMocks.tokenCount }],
+        };
+      }
+      return { from: async () => [] };
+    },
+    insert() {
+      return {
+        values() {
+          return {
+            onConflictDoNothing: async () => {
+              adminMocks.insertCalls += 1;
+            },
+          };
+        },
+      };
+    },
+  }),
+  schema: {
+    cetuiaTokens: { id: 'cetuiaTokens.id' },
+  },
+}));
+
 import adminCetuiaSeedRoute, { ADMIN_CETUIA_SEED_PROBE as routeProbe } from '../../api/admin/cetuia/seed/route';
 import { writeAdminAudit } from '../../api/lib/adminAudit';
 

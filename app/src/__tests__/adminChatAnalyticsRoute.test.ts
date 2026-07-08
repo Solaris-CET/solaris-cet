@@ -19,6 +19,7 @@ const adminMocks = vi.hoisted(() => ({
   authOk: true,
   role: 'viewer' as 'admin' | 'viewer',
   queryStep: 0,
+  countCall: 0,
   responses: [
     [{ id: 'sess-1', status: 'open', pageUrl: '/contact', createdAt: new Date('2026-03-01T10:00:00Z'), updatedAt: new Date('2026-03-01T11:00:00Z') }],
     [{ sender: 'user', body: 'Care este pretul?', createdAt: new Date('2026-03-01T10:05:00Z'), conversationId: 'sess-1' }],
@@ -100,6 +101,138 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select(arg?: unknown) {
+      const isCount = arg && typeof arg === 'object' && 'count' in arg;
+      const isRecentConv = arg && typeof arg === 'object' && 'id' in arg && 'createdAt' in arg;
+      const isRecentMsg =
+        arg && typeof arg === 'object' && 'conversationId' in arg && 'body' in arg && 'createdAt' in arg;
+      const listMode = adminMocks.queryStep >= 2;
+
+      if (isCount) {
+        return {
+          from() {
+            const resolveCount = async () => {
+              if (listMode) {
+                const counts = [[{ count: 1 }], [{ count: 0 }], [{ count: 1 }]];
+                return counts[adminMocks.countCall++ % counts.length] ?? [{ count: 0 }];
+              }
+              return nextDbResult();
+            };
+            return {
+              where: resolveCount,
+              then(onFulfilled: (rows: unknown[]) => void, onRejected?: (err: unknown) => void) {
+                return resolveCount().then(onFulfilled, onRejected);
+              },
+            };
+          },
+        };
+      }
+
+      if (isRecentConv) {
+        return {
+          from() {
+            return {
+              where: async () => [{ id: 'conv-1', createdAt: new Date('2026-03-01T09:00:00Z') }],
+            };
+          },
+        };
+      }
+
+      if (isRecentMsg) {
+        return {
+          from() {
+            return {
+              where: async () => [
+                { conversationId: 'conv-1', body: 'Vreau oferta pret', createdAt: new Date('2026-03-01T09:30:00Z') },
+              ],
+            };
+          },
+        };
+      }
+
+      return {
+        from() {
+          return {
+            where() {
+              if (listMode) {
+                const itemMessages = [
+                  {
+                    conversationId: 'conv-1',
+                    body: 'Vreau oferta pret',
+                    createdAt: new Date('2026-03-01T09:30:00Z'),
+                    sender: 'user',
+                  },
+                ];
+                return {
+                  orderBy() {
+                    return {
+                      limit() {
+                        return {
+                          offset: async () => [
+                            {
+                              id: 'conv-1',
+                              status: 'open',
+                              pageUrl: '/solar',
+                              createdAt: new Date('2026-03-01T09:00:00Z'),
+                              updatedAt: new Date('2026-03-01T12:00:00Z'),
+                            },
+                          ],
+                        };
+                      },
+                      then(onFulfilled: (rows: unknown[]) => void, onRejected?: (err: unknown) => void) {
+                        return Promise.resolve(itemMessages).then(onFulfilled, onRejected);
+                      },
+                    };
+                  },
+                };
+              }
+              return {
+                limit: async () => nextDbResult(),
+                orderBy() {
+                  return Promise.resolve(nextDbResult());
+                },
+              };
+            },
+            orderBy() {
+              return Promise.resolve(
+                listMode
+                  ? [
+                      {
+                        conversationId: 'conv-1',
+                        body: 'Vreau oferta pret',
+                        createdAt: new Date('2026-03-01T09:30:00Z'),
+                        sender: 'user',
+                      },
+                    ]
+                  : nextDbResult(),
+              );
+            },
+          };
+        },
+      };
+    },
+  }),
+  schema: {
+    crmConversations: {
+      id: 'crmConversations.id',
+      status: 'crmConversations.status',
+      pageUrl: 'crmConversations.pageUrl',
+      createdAt: 'crmConversations.createdAt',
+      updatedAt: 'crmConversations.updatedAt',
+    },
+    crmMessages: {
+      id: 'crmMessages.id',
+      sender: 'crmMessages.sender',
+      body: 'crmMessages.body',
+      createdAt: 'crmMessages.createdAt',
+      conversationId: 'crmMessages.conversationId',
+    },
+  },
+}));
+
 import adminChatAnalyticsRoute, { ADMIN_CHAT_ANALYTICS_PROBE as routeProbe } from '../../api/admin/chat-analytics/route';
 
 describe('adminChatAnalytics helpers', () => {
@@ -128,6 +261,7 @@ describe('/api/admin/chat-analytics e2e probe', () => {
     adminMocks.authOk = true;
     adminMocks.role = 'viewer';
     adminMocks.queryStep = 0;
+    adminMocks.countCall = 0;
   });
 
   it('is registered in server/index.cjs', () => {

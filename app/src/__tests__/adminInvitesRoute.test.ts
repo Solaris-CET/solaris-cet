@@ -98,6 +98,83 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+function makeDb(inviteSeed: { invites: InviteRow[] }) {
+  return {
+    select() {
+      return {
+        from() {
+          return {
+            orderBy() {
+              return {
+                limit() {
+                  return Promise.resolve(inviteSeed.invites);
+                },
+              };
+            },
+            where() {
+              return Promise.resolve(inviteSeed.invites.slice(0, 1));
+            },
+          };
+        },
+      };
+    },
+    insert() {
+      return {
+        values(values: Record<string, unknown>) {
+          const now = new Date();
+          const invite: InviteRow = {
+            id: '00000000-0000-4000-8000-000000000002',
+            role: String(values.role) as InviteRow['role'],
+            maxUses: Number(values.maxUses),
+            usedCount: 0,
+            expiresAt: values.expiresAt instanceof Date ? values.expiresAt : now,
+            revokedAt: null,
+            createdAt: now,
+          };
+          inviteSeed.invites.unshift(invite);
+          return {
+            returning() {
+              return Promise.resolve([invite]);
+            },
+          };
+        },
+      };
+    },
+    update() {
+      return {
+        set(values: Record<string, unknown>) {
+          if (inviteSeed.invites[0]) {
+            inviteSeed.invites[0].revokedAt = (values.revokedAt as Date) ?? new Date();
+          }
+          adminMocks.revokeCalls += 1;
+          return {
+            where() {
+              return Promise.resolve();
+            },
+          };
+        },
+      };
+    },
+  };
+}
+
+vi.mock('../../db/client', () => ({
+  getDb: () => makeDb(seed),
+  schema: {
+    adminInvites: {
+      id: 'id',
+      role: 'role',
+      maxUses: 'maxUses',
+      usedCount: 'usedCount',
+      expiresAt: 'expiresAt',
+      revokedAt: 'revokedAt',
+      createdAt: 'createdAt',
+      createdByAdminId: 'createdByAdminId',
+    },
+  },
+}));
+
 import adminInvitesRoute, { ADMIN_INVITES_PROBE as routeProbe } from '../../api/admin/invites/route';
 import { writeAdminAudit } from '../../api/lib/adminAudit';
 import { sha256Hex } from '../../api/lib/nodeCrypto';

@@ -71,6 +71,46 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select() {
+      return {
+        from() {
+          return {
+            where() {
+              return {
+                limit: async () => adminMocks.blocks,
+                then(onFulfilled: (rows: unknown[]) => void, onRejected?: (err: unknown) => void) {
+                  const rows = adminMocks.existingBlock ? [adminMocks.existingBlock] : [];
+                  return Promise.resolve(rows).then(onFulfilled, onRejected);
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+    update() {
+      adminMocks.updateCalls += 1;
+      return { set: () => ({ where: async () => undefined }) };
+    },
+    insert() {
+      adminMocks.insertCalls += 1;
+      return { values: async () => undefined };
+    },
+  }),
+  schema: {
+    cmsBlocks: {
+      id: 'cmsBlocks.id',
+      key: 'cmsBlocks.key',
+      locale: 'cmsBlocks.locale',
+      format: 'cmsBlocks.format',
+      content: 'cmsBlocks.content',
+    },
+  },
+}));
+
 import adminCmsBlocksRoute, { ADMIN_CMS_BLOCKS_PROBE as routeProbe } from '../../api/admin/cms/blocks/route';
 import { writeAdminAudit } from '../../api/lib/adminAudit';
 

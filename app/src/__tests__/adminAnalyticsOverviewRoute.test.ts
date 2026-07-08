@@ -100,6 +100,42 @@ vi.mock('../../api/lib/adminAuth', () => ({
     return { admin: { id: 'admin_1', role: adminMocks.role }, sessionId: 'sess_1' };
   },
 }));
+
+vi.mock('../../db/client', () => ({
+  getDb: () => ({
+    select() {
+      return {
+        from() {
+          return {
+            where() {
+              return terminalChain();
+            },
+            groupBy() {
+              return terminalChain();
+            },
+            then(onFulfilled: (rows: unknown[]) => void, onRejected?: (err: unknown) => void) {
+              return Promise.resolve(nextDbResult()).then(onFulfilled, onRejected);
+            },
+          };
+        },
+      };
+    },
+  }),
+  schema: {
+    analyticsEvents: {
+      anonId: 'analyticsEvents.anonId',
+      day: 'analyticsEvents.day',
+      createdAt: 'analyticsEvents.createdAt',
+      name: 'analyticsEvents.name',
+      sessionId: 'analyticsEvents.sessionId',
+    },
+    publicApiKeys: { userId: 'publicApiKeys.userId' },
+    transactions: { userId: 'transactions.userId', amount: 'transactions.amount' },
+    users: { id: 'users.id', walletAddress: 'users.walletAddress' },
+    aiQueryLogs: { userId: 'aiQueryLogs.userId', createdAt: 'aiQueryLogs.createdAt' },
+  },
+}));
+
 import adminAnalyticsOverviewRoute, { ADMIN_ANALYTICS_OVERVIEW_PROBE as routeProbe } from '../../api/admin/analytics/overview/route';
 
 describe('adminAnalyticsOverview helpers', () => {
