@@ -32,3 +32,6 @@ npm run verify:full # verify + test:e2e:stable (aligned with CI single-worker E2
 ## Cognitive modules (optional)
 
 Skills under `.claude/skills/` describe metacognition, active inference, tree search, and memory patterns. To load them in one go, run the **`/prime`** command or open `.claude/commands/prime.md`.
+# graphify
+- **graphify** (`.claude/skills/graphify/SKILL.md`) - any input to knowledge graph. Trigger: `/graphify`
+When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.

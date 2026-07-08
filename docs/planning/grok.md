@@ -490,3 +490,15 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 - Sursă publică: raw GitHub Pliny — vezi `FABLE5-LEAK-REFERENCE.md`
 - Implementat: `agent_harness.py` (effort, evidence packets, verifier loop) + routing în `claude.py`
 - Relevanță solar: poze + checklist DC/AC/ACM cu `evidence_photo_ids` — structură Fable pe DeepSeek/Fable tier
+
+---
+
+## Update 2026-07-08 — Graphify codebase map (all agents)
+
+**Livrat:**
+- `python -m pip install graphifyy` · skill instalat: Cursor (`.cursor/rules/graphify.mdc`), `.agents/skills/graphify/`, `.claude/skills/graphify/`
+- CLI: `npm run graphify:build` · `graphify:prime` · `graphify:update` · `graphify:install`
+- `.graphifyignore` — exclude docs/media (build code-only fără LLM key)
+- `graphify-out/graph.json` — hartă merged (survey-engine + app + contracts)
+
+**Regulă nouă (toți agenții):** `graphify query/path/explain` **înainte** de Read/Grep oarbă. După edit cod: `npm run graphify:update`.

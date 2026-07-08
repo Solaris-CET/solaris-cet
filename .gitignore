@@ -188,3 +188,20 @@ engine/farming-engine
 
 # AEP orchestrator run logs (local artifacts)
 docs/planning/aep-runs/
+
+# Graphify — generated graph artifacts (rebuild via npm run graphify:build)
+graphify-out/graph.json
+graphify-out/graph.html
+graphify-out/GRAPH_TREE.html
+graphify-out/*.graphml
+graphify-out/cypher.txt
+graphify-out/.graphify_*
+graphify-out/cache/
+graphify-out/memory/
+graphify-out/reflections/
+**/graphify-out/
+!graphify-out/GRAPH_REPORT.md
+!graphify-out/wiki/
+# Keep orientation docs for agents (small, committed after build):
+!graphify-out/GRAPH_REPORT.md
+!graphify-out/wiki/

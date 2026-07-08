@@ -27,7 +27,8 @@ Rules: 1 task per session · max 3 retries then stop and report · state lives i
 | # | Step | Action |
 |---|---|---|
 | 0 | Memory | `npm run stash:prime -- <topic>`; `stash search "<query>" --json` (AEP P0) |
-| 1 | Research + Plan | Read target code + callers, `docs/planning/global.md`, feature `design.md`; write success criterion + ≤5-step plan (AEP P1) |
+| 0b | Graph map | `npm run graphify:prime -- "<topic>"` or `python -m graphify query "…"` — **before** blind grep (AEP P0) |
+| 1 | Research + Plan | Graphify orients; then read target code + callers, `docs/planning/global.md`, feature `design.md`; write success criterion + ≤5-step plan (AEP P1) |
 | 2 | Build | Surgical diff; tests in the same pass (AEP P2) |
 | 3 | Verify | Invoke the `verify` skill — YOU run it, never the user (AEP P3) |
 | 4 | Self-attack | Invoke the `review` skill against your own diff; fix P0/P1 findings, re-verify (AEP P4) |

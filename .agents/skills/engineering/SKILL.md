@@ -12,7 +12,7 @@ Full doctrine: `docs/planning/AGENT-ENGINEERING.md`. The rule: **intelligence yo
 
 | # | Phase | Non-negotiable action |
 |---|---|---|
-| P0 | Context | Fresh context per task · `stash:prime` + planning docs first · targeted reads only · state in files |
+| P0 | Context | Fresh context per task · `stash:prime` + `graphify:prime` + planning docs · query graph before grep · state in files |
 | P1 | Plan | Write the success criterion in one sentence · decompose ≤5 verifiable steps · on design choices generate 2–3 candidates, score, pick |
 | P2 | Build | Read code + callers before editing · smallest diff · tests same pass · fail loud |
 | P3 | Verify | YOU run `npm run verify` + domain gate · trace one concrete input end-to-end · evidence over confidence |

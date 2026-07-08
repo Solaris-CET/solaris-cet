@@ -243,3 +243,18 @@
 **Source:** [CL4R1T4S / CLAUDE-FABLE-5.md](https://raw.githubusercontent.com/elder-plinius/CL4R1T4S/main/ANTHROPIC/CLAUDE-FABLE-5.md) — public, no DM funnel.
 
 **VERIFY:** pytest `test_agent_harness`
+
+## Graphify codebase map (all agents) — 2026-07-08 DONE
+
+| Componentă | Locație |
+|---|---|
+| Skill (agents) | `.agents/skills/graphify/SKILL.md` |
+| Skill (Claude) | `.claude/skills/graphify/SKILL.md` |
+| Cursor rule | `.cursor/rules/graphify.mdc` (`alwaysApply: true`) |
+| CLI prime | `npm run graphify:prime` · `graphify:build` · `graphify:update` |
+| Upstream | https://github.com/Graphify-Labs/graphify · PyPI `graphifyy` |
+
+**Workflow:** query graph **before** Read/Grep; `graphify update` after code edits (AST-only, no API cost).
+**Build:** code-only (`app` + `survey-engine` + `scripts` + `contracts`) — docs need LLM key for full semantic pass.
+
+**VERIFY:** `npm run graphify:prime` · `python -m graphify query "survey CRM"`

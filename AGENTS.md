@@ -12,7 +12,8 @@ Operate like a principal engineer: plan briefly, make surgical changes, and **ve
 | `contracts/` | Contract tooling (own package.json) |
 | `scripts/` | Auxiliary Node scripts (loops/stash/deploy tooling) |
 | `docs/planning/` | Source of truth for strategy: `SOLARIS-LOOPS-MASTER.md`, `HANDOFF.md`, `global.md`, `features/*/` |
-| `.agents/skills/` | Project skills you can invoke (verify, loops, review) |
+| `.agents/skills/` | Project skills you can invoke (verify, loops, review, **graphify**) |
+| `graphify-out/` | **Codebase knowledge graph** — `graph.json`, `GRAPH_REPORT.md`, `wiki/` (query before grep) |
 
 ## Production & git
 
@@ -47,6 +48,9 @@ npm run loops:next    # next unchecked task from tasks.md
 npm run loops:status  # epic progress
 npm run improve:next -- P0   # next improvement item from the 10k registry
 npm run stash:prime -- <topic>  # load memory/context for a feature
+npm run graphify:prime -- "<q>" # codebase map — query graph before Read/Grep
+npm run graphify:build          # (re)build code graph (AST-only, no API key)
+npm run graphify:update         # incremental AST refresh after edits
 npm run stash:sync    # mark task done in tasks.md
 npm run kimi:aep -- --task "…"   # AEP orchestrator: Kimi runs the task, script enforces gate + 3-retry + checkpoint log
 npm run kimi:aep -- --next       # same, pulling the next task from loops:next
@@ -65,10 +69,11 @@ one unforgivable failure mode.
 ## Task loop (strict order, every task)
 
 1. **Memory first** — `npm run stash:prime -- <topic>`; read `docs/planning/global.md` and the relevant `docs/planning/features/*/design.md` before touching code.
-2. **Research** — read the code you will change and its callers. Read before write, always.
-3. **Build** — surgical diff; add/update tests in the same pass as the code.
-4. **Verify yourself** — run `npm run verify` (app) or the domain gate; run smoke/curl checks yourself. A task without a passing verify is NOT done.
-5. **Retro** — `npm run stash:sync`; if the first attempt failed, follow `docs/planning/HANDOFF.md` recovery protocol (max 3 retries, then stop and report).
+2. **Graphify map** — `npm run graphify:prime -- "<topic>"` or `python -m graphify query "<question>"` **before** blind Read/Grep/Glob. Use `path` / `explain` for cross-file deps. After code edits: `npm run graphify:update`.
+3. **Research** — read the code you will change and its callers (graphify orients; Read confirms lines). Read before write, always.
+4. **Build** — surgical diff; add/update tests in the same pass as the code.
+5. **Verify yourself** — run `npm run verify` (app) or the domain gate; run smoke/curl checks yourself. A task without a passing verify is NOT done.
+6. **Retro** — `npm run stash:sync`; if the first attempt failed, follow `docs/planning/HANDOFF.md` recovery protocol (max 3 retries, then stop and report).
 
 **End every task with a checkpoint:**
 
@@ -99,3 +104,20 @@ BLOCKED: <blockers, or "-">
 The `stash` CLI is on PATH. Before starting work, search prior context:
 `stash search "<query>" --json` · `stash vfs "ls /"` · `npm run stash:prime -- <topic>`.
 Decisions and session history from other agents live there — check it before re-deriving anything.
+
+## Codebase map (Graphify)
+
+[Graphify](https://github.com/Graphify-Labs/graphify) turns the repo into a **queryable knowledge graph** (code = local AST, zero LLM cost).
+Skill: `.agents/skills/graphify/SKILL.md` · Cursor rule: `.cursor/rules/graphify.mdc` (always on).
+
+```bash
+python -m pip install graphifyy          # once per machine
+npm run graphify:build                 # code map: app + survey-engine + scripts + contracts
+npm run graphify:prime -- "admin auth" # orient before editing
+python -m graphify query "<question>"
+python -m graphify path "SurveyPage" "surveyCrm"
+python -m graphify explain "guardAdminRoute"
+npm run graphify:update                # after code changes (AST-only)
+```
+
+Install skill for new agents: `python -m graphify install --project --platform cursor` (also `agents`, `claude`).

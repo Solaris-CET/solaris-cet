@@ -22,6 +22,7 @@ Last consolidated: **2026-07-08** · Stash: **balabanc053** connected · `stash:
 | Local dev (final) | `dev:local` one command + `/api` proxy | 2026-07-06 session |
 | Fable 5 agent patterns | effort + verifier + evidence packets | `agent_harness.py` · `FABLE5-LEAK-REFERENCE.md` |
 | Admin test mocks | Mock `guardAdminRoute` directly, not `importOriginal` | 2026-07-08 Kimi/Grok handoff |
+| Graphify map | Query before grep; all agents have skill + Cursor rule | `npm run graphify:prime` · `.agents/skills/graphify/` |
 
 ---
 

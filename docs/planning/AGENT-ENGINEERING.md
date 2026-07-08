@@ -19,9 +19,11 @@ Cheaper models degrade fastest when context is wrong or bloated. Control it deli
 1. **Fresh context per task.** One task = one session. Never carry a failed task's context into the next.
 2. **Memory before motion.** `npm run stash:prime -- <topic>`, `stash search "<query>" --json`,
    read `docs/planning/global.md` + the feature's `design.md`. 5 minutes of recall saves an hour of rediscovery.
-3. **Targeted reads only.** Read the functions you change and their callers — not whole directories.
+3. **Graphify before grep.** `npm run graphify:prime -- "<topic>"` or `python -m graphify query/path/explain`.
+   The knowledge graph surfaces cross-file `INFERRED` edges that grep misses. After edits: `npm run graphify:update`.
+4. **Targeted reads only.** Graphify orients; then read the functions you change and their callers — not whole directories.
    Every token you load is paid twice: in money and in attention.
-4. **State lives in files, never in chat.** Progress → `tasks.md`. Decisions → `docs/planning/`.
+5. **State lives in files, never in chat.** Progress → `tasks.md`. Decisions → `docs/planning/`.
    Lessons → `docs/planning/agent-memory.md`. Assume your context evaporates at any moment.
 
 ## P1 — Plan (before the first edit)
