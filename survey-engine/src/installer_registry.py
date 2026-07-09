@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Optional
 
 from src.installer_auth import _load_keys
+from src.installer_budget import budget_status
 from src.report_registry import ReportRegistry, ReportRecord
 
 
@@ -70,10 +71,16 @@ def get_installer_profile(
                 "city": r.city,
                 "score": r.suitability_score,
                 "kwp": r.capacity_kwp,
+                "cost_usd": r.cost_usd,
+                "model_used": r.model_used,
+                "input_tokens": r.input_tokens,
+                "output_tokens": r.output_tokens,
+                "vision_calls": r.vision_calls,
                 "timestamp": r.timestamp,
             }
             for r in recent
         ],
+        "budget": budget_status(installer_id, registry=reg),
     }
 
 

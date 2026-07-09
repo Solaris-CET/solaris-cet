@@ -10,6 +10,7 @@ from src.twin_runtime import (
     EVENT_SCHEMA,
     list_twin_events,
     publish_twin_event,
+    replay_twin_events,
     runtime_status,
 )
 
@@ -37,6 +38,21 @@ def test_publish_and_list_events(tmp_path: Path, monkeypatch):
     rows = list_twin_events(report_id)
     assert len(rows) == 1
     assert rows[0]["payload"]["score"] == 88
+
+
+def test_replay_from_seq(tmp_path: Path, monkeypatch):
+    events_file = tmp_path / "output" / "twin_events.jsonl"
+    monkeypatch.setattr("src.twin_runtime.events_path", lambda: events_file)
+    publish_twin_event("SOL-R1", "twin_ready")
+    publish_twin_event("SOL-R1", "report_generated", payload={"n": 1})
+    publish_twin_event("SOL-R2", "twin_ready")
+    replayed = replay_twin_events(from_seq=1, report_id="SOL-R1")
+    assert len(replayed) == 1
+    assert replayed[0]["event_type"] == "report_generated"
+    assert replayed[0]["seq"] == 2
+    all_after_zero = replay_twin_events(from_seq=0)
+    assert len(all_after_zero) == 3
+    assert all_after_zero[0]["seq"] == 1
 
 
 def test_runtime_status(tmp_path: Path, monkeypatch):

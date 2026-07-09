@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "updated": "2026-07-09T21:08:50.290Z",
+  "skills": [
+    "engineering",
+    "loops",
+    "graphify",
+    "verify",
+    "review",
+    "superpowers",
+    "find-skills",
+    "memoria",
+    "observer",
+    "token-clock",
+    "unique-design",
+    "anti-hallucinatii"
+  ],
+  "docs": [
+    "docs/planning/find-skills.md",
+    "docs/planning/find-loops-skills.md",
+    "docs/planning/superpowers.md",
+    "docs/planning/superpowers-loops.md",
+    "docs/planning/memoria.md",
+    "docs/planning/loop-memory.md",
+    "docs/planning/unique-design.md",
+    "docs/planning/grok-observer.md",
+    "docs/planning/grok-loop-observer.md",
+    "docs/planning/token-clock.md",
+    "docs/planning/token-clock-loop.md",
+    "docs/planning/anti-halucinatii.md",
+    "docs/planning/anti-halucinatii-loop.md"
+  ],
+  "prime_command": "npm run skills:prime -- \"<topic>\""
+}

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { twinStreamUrl } from '@/lib/twinRuntimeApi';
+import { fetchTwinReplay, twinStreamUrl } from '@/lib/twinRuntimeApi';
 import type { TwinEvent, TwinStreamMessage } from '@/lib/twinRuntime';
 import type { TwinFeed } from '@/lib/twinFeed';
 
@@ -48,11 +48,25 @@ function parseSseChunk(raw: string): TwinStreamMessage | null {
   }
 }
 
+function mergeEvents(existing: TwinEvent[], incoming: TwinEvent[]): TwinEvent[] {
+  const seen = new Set(existing.map((e) => e.event_id));
+  const merged = [...existing];
+  for (const event of incoming) {
+    if (!event.event_id || seen.has(event.event_id)) continue;
+    seen.add(event.event_id);
+    merged.unshift(event);
+  }
+  return merged.slice(0, 20);
+}
+
 function applyMessage(s: State, msg: TwinStreamMessage): State {
   if (msg.type === 'snapshot') {
     return { ...s, feed: msg.feed, loading: false, connected: true };
   }
   if (msg.type === 'event') {
+    if (s.events.some((e) => e.event_id === msg.event.event_id)) {
+      return { ...s, loading: false, connected: true };
+    }
     const events = [msg.event, ...s.events].slice(0, 20);
     return { ...s, events, loading: false, connected: true };
   }
@@ -80,6 +94,7 @@ export function useTwinStream(reportId: string | null, options?: { persistent?: 
   const [state, setState] = useState<State>(INITIAL);
   const abortRef = useRef<AbortController | null>(null);
   const reconnectAttemptRef = useRef(0);
+  const lastSeqRef = useRef(0);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stableTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const connectRef = useRef<(() => Promise<void>) | null>(null);
@@ -114,6 +129,22 @@ export function useTwinStream(reportId: string | null, options?: { persistent?: 
     setState((s) => ({ ...s, loading: true, error: '', ready: false }));
 
     try {
+      if (reconnectAttemptRef.current > 0 && lastSeqRef.current > 0) {
+        const replayed = await fetchTwinReplay(reportId, lastSeqRef.current);
+        if (replayed.length > 0) {
+          setState((s) => ({
+            ...s,
+            events: mergeEvents(s.events, replayed.reverse()),
+            loading: true,
+          }));
+          for (const event of replayed) {
+            if (typeof event.seq === 'number') {
+              lastSeqRef.current = Math.max(lastSeqRef.current, event.seq);
+            }
+          }
+        }
+      }
+
       const res = await fetch(twinStreamUrl(reportId, persistent), { signal: controller.signal });
       if (!res.ok || !res.body) {
         throw new Error(`Twin stream HTTP ${res.status}`);
@@ -140,6 +171,9 @@ export function useTwinStream(reportId: string | null, options?: { persistent?: 
         for (const chunk of parts) {
           const msg = parseSseChunk(chunk);
           if (!msg) continue;
+          if (msg.type === 'event' && typeof msg.event.seq === 'number') {
+            lastSeqRef.current = Math.max(lastSeqRef.current, msg.event.seq);
+          }
           setState((s) => applyMessage(s, msg));
         }
       }
@@ -173,6 +207,7 @@ export function useTwinStream(reportId: string | null, options?: { persistent?: 
 
   useEffect(() => {
     reconnectAttemptRef.current = 0;
+    lastSeqRef.current = 0;
     void connect();
     return () => {
       abortRef.current?.abort();

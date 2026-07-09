@@ -66,8 +66,10 @@ describe('survey route registry', () => {
     const src = readServerIndex();
     const twinPaths = [
       '/api/survey/twin-events',
+      '/api/survey/twin-replay',
       '/api/survey/twin-stream',
       '/api/survey/twin-webhook',
+      '/api/survey/router/stats',
       '/api/survey/offline-manifest',
     ];
     const missing = missingPathsInSource(src, twinPaths);

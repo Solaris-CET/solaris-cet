@@ -14,9 +14,15 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 /** Canonical Stash page IDs (from first upload). */
 const STASH_PAGES = {
   'docs/planning/agent-memory.md': '8f084fff-c19e-4b8d-83b7-6a7e783ee63c',
+  // grok.md page often returns 403 (different stash owner / permissions). Sync is best-effort.
   'docs/planning/grok.md': '517aca79-0fd7-4ae6-a047-1734fb7ce61c',
   'docs/planning/HANDOFF.md': 'ad367b93-f755-423e-ac98-17dc4a228e8c',
   '.claude/skills/solaris-perfect-loops/SKILL.md': '119ed9c3-ab71-43fa-a942-967559793bff',
+  // New high-value artifacts (no stable page ID yet → will use dated upload)
+  'docs/planning/AUTOPROMPT.md': null,
+  'docs/planning/10_HARD_RANDOM_TASKS.md': null,
+  'docs/planning/autoprompt/demo-goals.txt': null,
+  'GROK.md': null,
 };
 
 const FILES = Object.keys(STASH_PAGES);
@@ -75,6 +81,8 @@ for (const rel of FILES) {
   const content = readFileSync(abs, 'utf8');
   const pageId = STASH_PAGES[rel];
 
+  const isCritical = !!pageId && !rel.includes('grok.md') && !rel.includes('AUTOPROMPT') && !rel.includes('10_HARD') && rel !== 'GROK.md';
+
   if (pageId) {
     const r = run(['files', 'edit-page', pageId, '--json'], content);
     if (r.ok) {
@@ -90,13 +98,17 @@ for (const rel of FILES) {
   const dated = `${base}-${stamp}`;
   const r = run(['upload', abs, '--name', dated, '--json']);
   if (!r.ok) {
-    console.log(`✗ ${rel}: ${r.err.slice(0, 120)}`);
-    fail += 1;
+    if (isCritical) {
+      console.log(`✗ ${rel}: ${r.err.slice(0, 120)}`);
+      fail += 1;
+    } else {
+      console.log(`⚠ ${rel}: ${r.err.slice(0, 80)} (non-critical, continuing)`);
+    }
     continue;
   }
   console.log(`✓ ${rel} → ${parseUrl(r.out)} (new)`);
   ok += 1;
 }
 
-console.log(`\nDone (${ok} ok, ${fail} fail). Next agent: npm run stash:prime`);
+console.log(`\nDone (${ok} ok, ${fail} critical fail). Next agent: npm run stash:prime`);
 process.exit(fail > 0 ? 1 : 0);

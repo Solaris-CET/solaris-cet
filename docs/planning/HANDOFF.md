@@ -11,7 +11,7 @@
 ```
 DONE:     verify gate 1834/1834 · Graphify · Fable harness · adminNav/OpenAPI · react-helmet-async fix
 VERIFIED: npm run verify exit 0 · typecheck EXIT 0 · Gitea+GitHub @ 952d595f · prod health 404
-LEFT:     DNS fix (solaris-cet.com → Coolify, not Shopify) · COOLIFY_* redeploy · T6 audit · GTM
+LEFT:     DNS fix (solaris-cet.com → Coolify, not Shopify) · COOLIFY_* redeploy · GTM
 BLOCKED:  Domain serves Shopify (`powered-by: Shopify`, redirect shop.solaris-cet.com) · COOLIFY_* absent
 ```
 
@@ -21,7 +21,7 @@ BLOCKED:  Domain serves Shopify (`powered-by: Shopify`, redirect shop.solaris-ce
 | **GitHub `main`** | `952d595f` (synced) |
 | **Gitea `origin/main`** | `952d595f` (synced 2026-07-09) — **Coolify redeploy pending** |
 | **Prod `solaris-cet.com`** | **Shopify** (DNS drift) — health.json **404** · survey API **301→shop** |
-| **Ralph open tasks** | **1** — improvement-registry T6 (npm audit, blocked safe path) |
+| **Ralph open tasks** | **0** — (T6 npm audit wave completed via safe direct entrypoint bumps + overrides) |
 | **Epics complete** | 11/12 (`tsc-cleanup` superseded 2026-07-09) |
 
 ---

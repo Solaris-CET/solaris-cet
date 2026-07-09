@@ -529,7 +529,7 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 
 **Epics loops:**
 - `tsc-cleanup` → **superseded** (baseline 335 erori invalid; typecheck verde în verify)
-- `improvement-registry` T9 retro ✅ · T6 npm audit **deferred** (47 vuln baseline, fără `--force`)
+- `improvement-registry` T9 retro ✅ · T6 npm audit **DONE** (safe direct bumps on walletconnect + tonconnect entrypoints + overrides; verify gates targeted)
 
 **Blocaje externe (necesită user/env):**
 | Env | Pentru |

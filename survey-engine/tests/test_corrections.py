@@ -34,6 +34,10 @@ def test_log_correction_creates_jsonl(tmp_path: Path):
 
 def test_corrections_endpoint(client: TestClient, tmp_path: Path, monkeypatch):
     monkeypatch.setattr("src.corrections.corrections_path", lambda custom=None: tmp_path / "corrections.jsonl")
+    # Prevent side effects from trying to load non-existent report (publish_agent_plan calls build_report_context)
+    monkeypatch.setattr("src.server.publish_agent_reassess", lambda *a, **k: {"ok": True})
+    monkeypatch.setattr("src.server.publish_agent_plan", lambda *a, **k: {"ok": True})
+
     res = client.post(
         "/corrections",
         json={

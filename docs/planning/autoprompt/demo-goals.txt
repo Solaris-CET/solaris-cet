@@ -1,0 +1,5 @@
+﻿# AUTOPROMPT Demo Goals
+
+1. Add a small improvement to the AUTOPROMPT runner (e.g. better state reporting)
+2. Document one of the HARD tasks as started using AUTOPROMPT
+3. Run a full verification cycle for the AUTOPROMPT system

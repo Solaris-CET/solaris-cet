@@ -50,6 +50,24 @@ describe('useTwinStream persistent', () => {
     );
   });
 
+  it('deduplicates events by event_id', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      body: sseBody([
+        'event: report_generated\ndata: {"schema":"solaris-twin-event-v1","event_id":"dup-1","seq":1,"report_id":"SOL-3","event_type":"report_generated","payload":{},"timestamp":"2026-01-01T00:00:00Z"}',
+        'event: report_generated\ndata: {"schema":"solaris-twin-event-v1","event_id":"dup-1","seq":1,"report_id":"SOL-3","event_type":"report_generated","payload":{},"timestamp":"2026-01-01T00:00:00Z"}',
+        'event: ready\ndata: {"report_id":"SOL-3"}',
+      ]),
+    });
+
+    const { result } = renderHook(() => useTwinStream('SOL-3', { persistent: false }));
+
+    await waitFor(() => {
+      expect(result.current.ready).toBe(true);
+      expect(result.current.events).toHaveLength(1);
+    });
+  });
+
   it('schedules reconnect when persistent stream ends', async () => {
     vi.useFakeTimers();
     fetchMock.mockResolvedValue({

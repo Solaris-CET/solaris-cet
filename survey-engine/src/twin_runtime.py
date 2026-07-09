@@ -40,17 +40,24 @@ def publish_twin_event(
     if event_type not in EVENT_TYPES:
         raise ValueError(f"Unknown twin event type: {event_type}")
     now = datetime.now(timezone.utc)
+    path = events_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    # Basic seq for HARD-001 prototype: line count + 1 (simple, not production durable)
+    seq = 0
+    if path.exists():
+        with path.open("r", encoding="utf-8") as handle:
+            seq = sum(1 for _ in handle)
+    seq += 1
     event = {
         "schema": EVENT_SCHEMA,
         "runtime_version": RUNTIME_VERSION,
         "event_id": f"{report_id}-{now.strftime('%Y%m%d%H%M%S%f')}",
+        "seq": seq,
         "report_id": report_id,
         "event_type": event_type,
         "payload": payload or {},
         "timestamp": now.isoformat(),
     }
-    path = events_path()
-    path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(event, ensure_ascii=False) + "\n")
     try:
@@ -60,6 +67,35 @@ def publish_twin_event(
     except Exception:
         pass
     return event
+
+
+def replay_twin_events(
+    *,
+    from_seq: int = 0,
+    report_id: Optional[str] = None,
+    limit: int = 50,
+) -> list[dict[str, Any]]:
+    """Return events with seq > from_seq in chronological order (HARD-001)."""
+    path = events_path()
+    if not path.exists():
+        return []
+    rows: list[dict[str, Any]] = []
+    floor = max(from_seq, 0)
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        seq = int(row.get("seq") or 0)
+        if seq <= floor:
+            continue
+        if report_id and row.get("report_id") != report_id:
+            continue
+        rows.append(row)
+    cap = min(max(limit, 1), 200)
+    return rows[:cap]
 
 
 def list_twin_events(

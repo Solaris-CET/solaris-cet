@@ -30,6 +30,19 @@ def test_log_and_list_deliveries(tmp_path: Path, monkeypatch):
     assert rows[0]["report_id"] == "SOL-WH-1"
 
 
+def test_outbound_idempotent_by_event_id(tmp_path: Path, monkeypatch):
+    deliveries_file = tmp_path / "output" / "twin_webhook_deliveries.jsonl"
+    monkeypatch.setattr("src.twin_webhook.deliveries_path", lambda: deliveries_file)
+    monkeypatch.delenv("TWIN_WEBHOOK_URL", raising=False)
+    event = {"report_id": "SOL-WH-ID", "event_type": "twin_ready", "event_id": "dup-1"}
+    first = dispatch_outbound_twin_webhook(event)
+    second = dispatch_outbound_twin_webhook(event)
+    assert first["status"] == "skipped"
+    assert second["status"] == "duplicate"
+    rows = list_deliveries(limit=10)
+    assert len(rows) == 2
+
+
 def test_outbound_skipped_without_url(tmp_path: Path, monkeypatch):
     deliveries_file = tmp_path / "output" / "twin_webhook_deliveries.jsonl"
     monkeypatch.setattr("src.twin_webhook.deliveries_path", lambda: deliveries_file)

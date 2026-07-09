@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fetchTwinEvents, twinStreamUrl } from '@/lib/twinRuntimeApi';
+import { fetchTwinEvents, fetchTwinReplay, twinStreamUrl } from '@/lib/twinRuntimeApi';
 
 describe('twinRuntimeApi', () => {
   const fetchMock = vi.fn();
@@ -34,5 +34,16 @@ describe('twinRuntimeApi', () => {
   it('twinStreamUrl adds persistent by default', () => {
     expect(twinStreamUrl('SOL-1')).toContain('persistent=1');
     expect(twinStreamUrl('SOL-1', false)).not.toContain('persistent=1');
+  });
+
+  it('fetchTwinReplay calls twin-replay with from_seq', async () => {
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ events: [{ event_id: 'e2', seq: 2, event_type: 'twin_ready' }] }),
+    });
+    const events = await fetchTwinReplay('SOL-1', 1);
+    expect(events).toHaveLength(1);
+    expect(fetchMock.mock.calls[0][0]).toContain('/api/survey/twin-replay');
+    expect(fetchMock.mock.calls[0][0]).toContain('from_seq=1');
   });
 });

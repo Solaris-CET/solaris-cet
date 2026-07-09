@@ -59,6 +59,27 @@ def log_delivery(
     return entry
 
 
+def _delivered_event_ids() -> set[str]:
+    """Event IDs already delivered outbound (idempotency for HARD-001)."""
+    ids: set[str] = set()
+    for row in list_deliveries(limit=200, direction="outbound"):
+        if row.get("status") not in ("delivered", "duplicate", "skipped"):
+            continue
+        payload = row.get("payload") or {}
+        event = payload.get("event") if isinstance(payload, dict) else {}
+        event_id = str((event or {}).get("event_id") or "").strip()
+        if event_id:
+            ids.add(event_id)
+    return ids
+
+
+def is_event_delivered(event_id: str) -> bool:
+    clean = (event_id or "").strip()
+    if not clean:
+        return False
+    return clean in _delivered_event_ids()
+
+
 def list_deliveries(
     *,
     limit: int = 50,
@@ -84,6 +105,16 @@ def dispatch_outbound_twin_webhook(event: dict[str, Any]) -> dict[str, Any]:
     url = _webhook_url()
     report_id = str(event.get("report_id", ""))
     event_type = str(event.get("event_type", "unknown"))
+    event_id = str(event.get("event_id", "")).strip()
+    if event_id and is_event_delivered(event_id):
+        return log_delivery(
+            direction="outbound",
+            status="duplicate",
+            event_type=event_type,
+            report_id=report_id,
+            detail=f"event_id {event_id} already delivered",
+            payload={"event": event},
+        )
     if not url:
         return log_delivery(
             direction="outbound",

@@ -189,6 +189,10 @@ engine/farming-engine
 # AEP orchestrator run logs (local artifacts)
 docs/planning/aep-runs/
 
+# Agent session runtime state (not source of truth)
+.autoprompt/
+.token-clock/
+
 # Graphify — generated graph artifacts (rebuild via npm run graphify:build)
 graphify-out/graph.json
 graphify-out/graph.html

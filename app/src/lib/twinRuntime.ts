@@ -20,6 +20,7 @@ export type TwinEvent = {
   schema: string;
   runtime_version: number;
   event_id: string;
+  seq?: number;
   report_id: string;
   event_type: TwinEventType;
   payload: Record<string, unknown>;

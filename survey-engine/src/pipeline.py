@@ -13,7 +13,9 @@ from src.api_clients.claude import ClaudeClient
 from src.api_clients.deepseek import DeepSeekClient
 from src.api_clients.kimi import KimiClient
 from src.jurisdictions import resolve_jurisdiction
-from src.model_router import VisionProvider, route_job
+from src.cost_attribution import line_count, summarize_usage_delta
+from src.model_router import VisionProvider
+from src.router import route_survey_job, vision_fallback_chain
 from src.photo_metadata import best_site_coordinates, extract_batch_geo
 from src.models import ChecklistItem, ChecklistStatus, PhotoAnalysis, SiteSurvey, project_root
 from src.photo_analyzer import PhotoAnalyzer, guess_category
@@ -91,7 +93,18 @@ def run_pipeline(
     claude_ok = ClaudeClient().configured
     kimi_client = KimiClient()
     ds_client = DeepSeekClient()
-    routing = route_job(len(photo_paths), premium, kimi_available=kimi_client.configured)
+    usage_before = line_count()
+    routing = route_survey_job(
+        len(photo_paths),
+        premium,
+        kimi_available=kimi_client.configured,
+        checklist_complexity=len(checklist),
+    )
+    _ = vision_fallback_chain(
+        routing,
+        kimi_available=kimi_client.configured,
+        deepseek_available=ds_client.configured,
+    )
     progress(0.1, routing.reason)
 
     work_dir = Path(tempfile.mkdtemp(prefix="solaris_"))
@@ -186,14 +199,19 @@ def run_pipeline(
         progress(0.92, "Generare PDF...")
         pdf_path = generate_report(survey, out)
 
-        total_cost = (
-            ds_client.cost_logger.total_cost()
-            + kimi_client.cost_logger.total_cost()
-            + ClaudeClient().cost_logger.total_cost()
-        )
+        attribution = summarize_usage_delta(usage_before)
+        total_cost = attribution["cost_usd"]
         ReportRegistry().register(
-            survey, pdf_path, ahj_path, cost_usd=total_cost, routing=routing.reason,
+            survey,
+            pdf_path,
+            ahj_path,
+            cost_usd=total_cost,
+            routing=routing.reason,
             installer_id=installer_id,
+            model_used=attribution["model_used"],
+            input_tokens=attribution["input_tokens"],
+            output_tokens=attribution["output_tokens"],
+            vision_calls=attribution["vision_calls"],
         )
 
         progress(1.0, "Gata!")

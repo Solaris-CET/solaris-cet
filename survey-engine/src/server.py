@@ -37,6 +37,7 @@ from src.twin_runtime import (
     iter_sse_stream,
     list_twin_events,
     publish_twin_event,
+    replay_twin_events,
     runtime_status,
 )
 from src.twin_agent import (
@@ -286,6 +287,13 @@ async def generate_survey(
 
         tech = installer_name.strip() or technician_name.strip() or "Tehnician"
         effective_installer = installer_id.strip() or auth_installer
+        from src.installer_budget import BudgetExceededError, assert_budget_available
+
+        try:
+            assert_budget_available(effective_installer)
+        except BudgetExceededError as exc:
+            raise HTTPException(402, str(exc)) from exc
+
         result = run_pipeline(
             photo_paths=stored,
             client_name=client_name,
@@ -504,6 +512,23 @@ def twin_feed(report_id: str, request: Request):
 def twin_events(report_id: Optional[str] = None, limit: int = 50):
     rows = list_twin_events(report_id.strip() if report_id else None, limit=min(limit, 200))
     return {"total": len(rows), "events": rows}
+
+
+@app.get("/twin-replay")
+def twin_replay(from_seq: int = 0, report_id: Optional[str] = None, limit: int = 50):
+    rows = replay_twin_events(
+        from_seq=max(from_seq, 0),
+        report_id=report_id.strip() if report_id else None,
+        limit=min(limit, 200),
+    )
+    return {"from_seq": max(from_seq, 0), "total": len(rows), "events": rows}
+
+
+@app.get("/router/stats")
+def router_stats():
+    from src.router import get_router_stats
+
+    return get_router_stats()
 
 
 @app.get("/twin-stream/{report_id}")

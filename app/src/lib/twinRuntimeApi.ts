@@ -30,3 +30,19 @@ export function twinStreamUrl(reportId: string, persistent = true): string {
   if (persistent) qs.set('persistent', '1');
   return `/api/survey/twin-stream?${qs}`;
 }
+
+export async function fetchTwinReplay(
+  reportId: string,
+  fromSeq: number,
+  limit = 50,
+): Promise<TwinEvent[]> {
+  const qs = new URLSearchParams({
+    report_id: reportId,
+    from_seq: String(Math.max(0, fromSeq)),
+    limit: String(limit),
+  });
+  const res = await fetch(`/api/survey/twin-replay?${qs}`);
+  const data = (await res.json()) as { events?: TwinEvent[]; error?: string };
+  if (!res.ok) throw new Error(data.error || 'Twin replay indisponibil');
+  return data.events ?? [];
+}

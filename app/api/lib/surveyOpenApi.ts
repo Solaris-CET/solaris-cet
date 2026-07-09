@@ -32,7 +32,9 @@ export const SURVEY_ROUTE_IDS = [
   'twin-feed',
   'installer-me',
   'twin-events',
+  'twin-replay',
   'twin-stream',
+  'router-stats',
   'twin-webhook',
   'twin-webhook-deliveries',
   'twin-agent',
@@ -87,7 +89,9 @@ const BRIDGE_PATH_OVERRIDES: Partial<Record<SurveyRouteId, string>> = {
   'installer-me': '/api/survey/installer/me',
   'twin-feed': '/api/survey/twin-feed',
   'twin-events': '/api/survey/twin-events',
+  'twin-replay': '/api/survey/twin-replay',
   'twin-stream': '/api/survey/twin-stream',
+  'router-stats': '/api/survey/router/stats',
   'twin-webhook': '/api/survey/twin-webhook',
   'twin-webhook-deliveries': '/api/survey/twin-webhook/deliveries',
   'twin-agent': '/api/survey/twin-agent',
@@ -289,6 +293,23 @@ export function buildSurveyOpenApiPaths(): Record<string, unknown> {
           { name: 'limit', in: 'query', schema: { type: 'integer' } },
         ],
         responses: { '200': jsonResponse },
+      },
+    },
+    '/api/survey/twin-replay': {
+      get: {
+        summary: 'Twin event replay from sequence (HARD-001)',
+        parameters: [
+          { name: 'from_seq', in: 'query', schema: { type: 'integer' } },
+          { name: 'report_id', in: 'query', schema: { type: 'string' } },
+          { name: 'limit', in: 'query', schema: { type: 'integer' } },
+        ],
+        responses: { '200': jsonResponse },
+      },
+    },
+    '/api/survey/router/stats': {
+      get: {
+        summary: 'Dynamic model router telemetry (HARD-004)',
+        responses: { '200': jsonResponse, '503': jsonResponse },
       },
     },
     '/api/survey/twin-stream': {

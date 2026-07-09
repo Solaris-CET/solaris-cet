@@ -23,6 +23,10 @@ class ReportRecord:
     suitability_score: int = 0
     premium_tier: bool = False
     cost_usd: float = 0.0
+    model_used: str = ""
+    input_tokens: int = 0
+    output_tokens: int = 0
+    vision_calls: int = 0
     routing: str = ""
     installer_id: str = ""
     technician_name: str = ""
@@ -41,6 +45,10 @@ class ReportRegistry:
         cost_usd: float = 0.0,
         routing: str = "",
         installer_id: str = "",
+        model_used: str = "",
+        input_tokens: int = 0,
+        output_tokens: int = 0,
+        vision_calls: int = 0,
     ) -> ReportRecord:
         record = ReportRecord(
             report_id=survey.metadata.report_id,
@@ -53,6 +61,10 @@ class ReportRegistry:
             suitability_score=survey.executive_summary.suitability_score,
             premium_tier=survey.metadata.premium_tier,
             cost_usd=cost_usd,
+            model_used=model_used,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            vision_calls=vision_calls,
             routing=routing,
             installer_id=installer_id,
             technician_name=survey.metadata.technician_name,

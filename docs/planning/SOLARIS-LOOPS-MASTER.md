@@ -302,6 +302,29 @@ Anti-pattern ledger: `docs/planning/agent-memory.md`
 
 ---
 
+## AUTOPROMPT v4.5 (2026-07-09)
+
+The most advanced autonomous prompting loop to date.
+
+**Location:** `docs/planning/AUTOPROMPT.md`
+
+Key innovations:
+- Graphify + Stash as zero-cost foundation
+- N-Best planning + Adversarial Critique (P4) in every micro-loop
+- Meta-learning (the loop improves its own prompts)
+- Extreme token efficiency
+- Designed for Grok 4.5 / frontier model maximum performance
+
+Recommended for hard, multi-hour autonomous work:
+
+```bash
+npm run autoprompt -- --goal "..." --mode max
+```
+
+This represents the current ceiling of the project's agentic capabilities.
+
+---
+
 ## Runtime loop hardening (applied)
 
 The following production loops were hardened to be fast, robust, terminable, and leak-free:
