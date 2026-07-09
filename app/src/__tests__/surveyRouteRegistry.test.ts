@@ -72,6 +72,7 @@ describe('survey route registry', () => {
       '/api/survey/router/stats',
       '/api/survey/offline-manifest',
       '/api/survey/draft-sync',
+      '/api/survey/traces',
     ];
     const missing = missingPathsInSource(src, twinPaths);
     expect(missing).toEqual([]);

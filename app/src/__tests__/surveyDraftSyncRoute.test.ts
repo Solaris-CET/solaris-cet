@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { clearDraftSyncStore } from '../../api/lib/surveyDraftSyncStore';
 import draftSyncRoute from '../../api/survey/draft-sync/route';
@@ -41,8 +41,13 @@ function version(clocks: Record<string, number>) {
 }
 
 describe('/api/survey/draft-sync', () => {
+  beforeEach(() => {
+    process.env.SURVEY_DRAFT_SYNC_MEMORY = '1';
+  });
+
   afterEach(() => {
     clearDraftSyncStore();
+    delete process.env.SURVEY_DRAFT_SYNC_MEMORY;
   });
 
   it('POST accepts first draft then reports conflict on overlapping edit', async () => {

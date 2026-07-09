@@ -27,6 +27,9 @@ terminals/
 __pycache__/
 *.pyc
 
+# Local draft sync store (HARD-003)
+.data/
+
 # Agent coordination files (created by the GitHub Copilot agent system)
 pulls/
 

@@ -202,6 +202,7 @@ class GenerateResponse(BaseModel):
     routing_reason: str
     cost_usd: float
     installer_id: str = ""
+    trace_id: str = ""
     orchestration: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -233,6 +234,21 @@ def _orchestration_for_survey(
         budget_alert=alert,
         budget_exceeded=exceeded,
     )
+
+
+@app.get("/traces")
+async def survey_traces(
+    report_id: Optional[str] = None,
+    trace_id: Optional[str] = None,
+    limit: int = 200,
+):
+    """Query jsonl spans by report_id or trace_id (HARD-005)."""
+    from src.survey_trace import TRACE_SCHEMA, query_traces, trace_summary_for_report
+
+    if report_id:
+        return {"schema": TRACE_SCHEMA, **trace_summary_for_report(report_id)}
+    rows = query_traces(trace_id=trace_id, limit=limit)
+    return {"schema": TRACE_SCHEMA, "spans": rows, "count": len(rows)}
 
 
 @app.post("/generate", response_model=GenerateResponse)
@@ -269,7 +285,10 @@ async def generate_survey(
     site_latitude: Optional[float] = Form(None),
     site_longitude: Optional[float] = Form(None),
 ):
+    from src.survey_trace import parse_traceparent, span
+
     auth_installer = _guard_api(request, x_installer_key)
+    trace_id, parent_span = parse_traceparent(request.headers.get("traceparent"))
     if not photos:
         raise HTTPException(400, "Încarcă cel puțin o poză")
     if len(photos) > MAX_PHOTOS:
@@ -294,34 +313,36 @@ async def generate_survey(
         except BudgetExceededError as exc:
             raise HTTPException(402, str(exc)) from exc
 
-        result = run_pipeline(
-            photo_paths=stored,
-            client_name=client_name,
-            client_address=client_address,
-            client_city=client_city,
-            client_postal=client_postal,
-            client_phone=client_phone,
-            client_email=client_email,
-            technician_name=tech,
-            roof_type=roof_type,
-            roof_orientation=roof_orientation,
-            roof_pitch=roof_pitch,
-            usable_area_m2=usable_area_m2,
-            annual_consumption_kwh=annual_consumption_kwh,
-            grid_connection=grid_connection,
-            shading_level=shading_level,
-            existing_solar=existing_solar,
-            structural_notes=structural_notes,
-            checklist=default_checklist(
-                chk_struct, chk_electric, chk_shading,
-                chk_access, chk_docs, chk_compliance,
-            ),
-            premium=premium,
-            installer_id=effective_installer,
-            jurisdiction_code=jurisdiction_code.strip(),
-            site_latitude=site_latitude,
-            site_longitude=site_longitude,
-        )
+        with span(trace_id, "generate_http", parent_span_id=parent_span, photo_count=len(stored)):
+            result = run_pipeline(
+                photo_paths=stored,
+                client_name=client_name,
+                client_address=client_address,
+                client_city=client_city,
+                client_postal=client_postal,
+                client_phone=client_phone,
+                client_email=client_email,
+                technician_name=tech,
+                roof_type=roof_type,
+                roof_orientation=roof_orientation,
+                roof_pitch=roof_pitch,
+                usable_area_m2=usable_area_m2,
+                annual_consumption_kwh=annual_consumption_kwh,
+                grid_connection=grid_connection,
+                shading_level=shading_level,
+                existing_solar=existing_solar,
+                structural_notes=structural_notes,
+                checklist=default_checklist(
+                    chk_struct, chk_electric, chk_shading,
+                    chk_access, chk_docs, chk_compliance,
+                ),
+                premium=premium,
+                installer_id=effective_installer,
+                jurisdiction_code=jurisdiction_code.strip(),
+                site_latitude=site_latitude,
+                site_longitude=site_longitude,
+                trace_id=trace_id,
+            )
         survey = result.survey
         publish_twin_event(
             survey.metadata.report_id,
@@ -352,6 +373,7 @@ async def generate_survey(
             routing_reason=result.routing_reason,
             cost_usd=round(result.cost_usd, 4),
             installer_id=effective_installer,
+            trace_id=trace_id,
             orchestration=_orchestration_for_survey(
                 request, survey,
                 jurisdiction_code=jurisdiction_code.strip(),

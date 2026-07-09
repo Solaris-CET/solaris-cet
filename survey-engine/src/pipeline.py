@@ -83,7 +83,11 @@ def run_pipeline(
     site_latitude: Optional[float] = None,
     site_longitude: Optional[float] = None,
     progress: ProgressFn = _noop_progress,
+    trace_id: Optional[str] = None,
 ) -> PipelineResult:
+    from src.survey_trace import new_trace_id, span
+
+    tid = trace_id or new_trace_id()
     if not photo_paths:
         raise ValueError("Încarcă cel puțin o poză")
     if len(photo_paths) > MAX_PHOTOS:
@@ -94,17 +98,18 @@ def run_pipeline(
     kimi_client = KimiClient()
     ds_client = DeepSeekClient()
     usage_before = line_count()
-    routing = route_survey_job(
-        len(photo_paths),
-        premium,
-        kimi_available=kimi_client.configured,
-        checklist_complexity=len(checklist),
-    )
-    _ = vision_fallback_chain(
-        routing,
-        kimi_available=kimi_client.configured,
-        deepseek_available=ds_client.configured,
-    )
+    with span(tid, "route_model", photo_count=len(photo_paths), premium=premium):
+        routing = route_survey_job(
+            len(photo_paths),
+            premium,
+            kimi_available=kimi_client.configured,
+            checklist_complexity=len(checklist),
+        )
+        _ = vision_fallback_chain(
+            routing,
+            kimi_available=kimi_client.configured,
+            deepseek_available=ds_client.configured,
+        )
     progress(0.1, routing.reason)
 
     work_dir = Path(tempfile.mkdtemp(prefix="solaris_"))
@@ -130,77 +135,92 @@ def run_pipeline(
         analyses: list[PhotoAnalysis] = []
         from src.photo_analyzer import load_prompt, parse_photo_analysis
 
-        if routing.vision == VisionProvider.KIMI and kimi_client.configured:
-            progress(0.2, "Analiză Kimi multi-image...")
-            prompt = load_prompt()
-            batch = kimi_client.analyze_images_batch(stored, prompt)
-            for i, (path, data) in enumerate(zip(stored, batch), 1):
-                if not isinstance(data, dict):
+        with span(tid, "vision_analysis", provider=routing.vision.value, photo_count=len(stored)):
+            if routing.vision == VisionProvider.KIMI and kimi_client.configured:
+                progress(0.2, "Analiză Kimi multi-image...")
+                prompt = load_prompt()
+                batch = kimi_client.analyze_images_batch(stored, prompt)
+                for i, (path, data) in enumerate(zip(stored, batch), 1):
+                    if not isinstance(data, dict):
+                        analyses.append(_mock_photo_analysis(path, f"P{i:03d}"))
+                        continue
+                    if "photo_id" not in data:
+                        data["photo_id"] = f"P{i:03d}"
+                    analyses.append(parse_photo_analysis(data, path))
+                while len(analyses) < len(stored):
+                    analyses.append(_mock_photo_analysis(stored[len(analyses)], f"P{len(analyses)+1:03d}"))
+            elif ds_client.configured:
+                analyzer = PhotoAnalyzer(ds_client)
+                for i, path in enumerate(stored, 1):
+                    pct = 0.15 + (i / len(stored)) * 0.50
+                    progress(pct, f"Analiză {path.name}...")
+                    data = ds_client.analyze_image(
+                        path, analyzer.prompt, f"P{i:03d}",
+                        report_id=None,
+                    )
+                    analyses.append(parse_photo_analysis(data, path))
+            else:
+                progress(0.3, "Mod demo — fără API vision")
+                for i, path in enumerate(stored, 1):
                     analyses.append(_mock_photo_analysis(path, f"P{i:03d}"))
-                    continue
-                if "photo_id" not in data:
-                    data["photo_id"] = f"P{i:03d}"
-                analyses.append(parse_photo_analysis(data, path))
-            while len(analyses) < len(stored):
-                analyses.append(_mock_photo_analysis(stored[len(analyses)], f"P{len(analyses)+1:03d}"))
-        elif ds_client.configured:
-            analyzer = PhotoAnalyzer(ds_client)
-            for i, path in enumerate(stored, 1):
-                pct = 0.15 + (i / len(stored)) * 0.50
-                progress(pct, f"Analiză {path.name}...")
-                data = ds_client.analyze_image(
-                    path, analyzer.prompt, f"P{i:03d}",
-                    report_id=None,
-                )
-                analyses.append(parse_photo_analysis(data, path))
-        else:
-            progress(0.3, "Mod demo — fără API vision")
-            for i, path in enumerate(stored, 1):
-                analyses.append(_mock_photo_analysis(path, f"P{i:03d}"))
 
         progress(0.68, "Construire raport...")
-        survey = build_survey(
-            client_name=client_name,
-            client_address=client_address,
-            client_city=client_city,
-            client_postal=client_postal,
-            client_phone=client_phone,
-            client_email=client_email,
-            technician_name=technician_name,
-            roof_type=roof_type,
-            roof_orientation=roof_orientation,
-            roof_pitch=roof_pitch,
-            usable_area_m2=usable_area_m2,
-            annual_consumption_kwh=annual_consumption_kwh,
-            grid_connection=grid_connection,
-            shading_level=shading_level,
-            existing_solar=existing_solar,
-            structural_notes=structural_notes,
-            checklist=checklist,
-            photo_analyses=analyses,
-            premium=premium,
-            jurisdiction_code=jurisdiction.code,
-            jurisdiction_name=jurisdiction.name,
-            grid_operator=jurisdiction.grid_operator,
-            site_latitude=lat,
-            site_longitude=lon,
-        )
+        with span(tid, "build_survey"):
+            survey = build_survey(
+                client_name=client_name,
+                client_address=client_address,
+                client_city=client_city,
+                client_postal=client_postal,
+                client_phone=client_phone,
+                client_email=client_email,
+                technician_name=technician_name,
+                roof_type=roof_type,
+                roof_orientation=roof_orientation,
+                roof_pitch=roof_pitch,
+                usable_area_m2=usable_area_m2,
+                annual_consumption_kwh=annual_consumption_kwh,
+                grid_connection=grid_connection,
+                shading_level=shading_level,
+                existing_solar=existing_solar,
+                structural_notes=structural_notes,
+                checklist=checklist,
+                photo_analyses=analyses,
+                premium=premium,
+                jurisdiction_code=jurisdiction.code,
+                jurisdiction_name=jurisdiction.name,
+                grid_operator=jurisdiction.grid_operator,
+                site_latitude=lat,
+                site_longitude=lon,
+            )
 
         if claude_ok:
             progress(0.78, "Scriere premium Claude...")
-            survey = enhance_survey_text(survey, premium=premium)
+            with span(tid, "llm_enhance", report_id=survey.metadata.report_id, premium=premium):
+                survey = enhance_survey_text(survey, premium=premium)
 
         out = output_dir or (project_root() / "output")
         out.mkdir(parents=True, exist_ok=True)
 
         progress(0.85, "Export AHJ...")
-        ahj_path = export_ahj_json(survey, out / f"AHJ_{survey.metadata.report_id}.json")
+        with span(tid, "export_ahj", report_id=survey.metadata.report_id):
+            ahj_path = export_ahj_json(survey, out / f"AHJ_{survey.metadata.report_id}.json")
 
         progress(0.92, "Generare PDF...")
-        pdf_path = generate_report(survey, out)
+        with span(tid, "generate_pdf", report_id=survey.metadata.report_id):
+            pdf_path = generate_report(survey, out)
 
         attribution = summarize_usage_delta(usage_before)
         total_cost = attribution["cost_usd"]
+        with span(
+            tid,
+            "cost_attribution",
+            report_id=survey.metadata.report_id,
+            cost_usd=total_cost,
+            model_used=attribution.get("model_used"),
+            input_tokens=attribution.get("input_tokens"),
+            output_tokens=attribution.get("output_tokens"),
+        ):
+            pass
         ReportRegistry().register(
             survey,
             pdf_path,

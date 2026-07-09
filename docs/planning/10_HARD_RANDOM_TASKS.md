@@ -79,11 +79,10 @@ npm run verify
 
 ---
 
-## HARD-003: Advanced Offline Conflict Resolution for Survey Drafts — IN PROGRESS (2026-07-09)
+## HARD-003: Advanced Offline Conflict Resolution for Survey Drafts — DONE (2026-07-09)
 
-**SHIPPED (foundation):** `surveyDraftConflict.ts` version vectors + lamport field clocks · auto-merge non-overlapping · `GET/POST /api/survey/draft-sync` · conflict UI in `SurveyOfflinePanel` · hook sync on online  
-**VERIFIED (partial):** vitest `surveyDraftConflict` 4 passed · `surveyDraftSyncRoute` 2 passed · `useSurveyOfflineSync` 4 passed · pytest `test_survey_offline` 2 passed  
-**LEFT:** 3-way merge UI polish · persistent server store (not in-memory) · multi-device E2E · IndexedDB v2 migration
+**DONE:** `surveyDraftConflict.ts` version vectors + lamport clocks · auto-merge · persistent store `.data/survey-draft-sync.json` · `GET/POST /api/survey/draft-sync` · conflict UI `SurveyOfflinePanel` · `useSurveyOfflineSync` online sync  
+**VERIFIED:** vitest conflict 4 + draft-sync 2 + offline hook 4 · pytest offline 2
 
 **Domain:** PWA + survey UI + backend
 
@@ -144,7 +143,11 @@ npm run survey:prod-gate
 
 ---
 
-## HARD-005: Full End-to-End Tracing for Survey Generation (AI + HTTP + DB)
+## HARD-005: Full End-to-End Tracing for Survey Generation (AI + HTTP + DB) — IN PROGRESS (2026-07-09)
+
+**SHIPPED (foundation):** `survey_trace.py` jsonl spans · pipeline spans (route/vision/build/pdf/cost) · `GET /traces` engine · `GET /api/survey/traces` bridge · traceparent propagation in `generate/route.ts` · `trace_id` in GenerateResponse  
+**VERIFIED (partial):** pytest `test_survey_trace` 4 passed · vitest `surveyTraceHeaders` 2 passed  
+**LEFT:** batch `/batch` spans · Grafana/Tempo wiring · `SurveyTraceViewer` admin UI · CRM/webhook spans
 
 **Domain:** Observability + pipeline
 

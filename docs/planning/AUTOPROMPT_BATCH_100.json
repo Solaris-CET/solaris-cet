@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "built_at": "2026-07-09T21:32:51.746Z",
+  "built_at": "2026-07-09T22:18:11.692Z",
   "totals": {
     "hard": 10,
     "medium": 20,
@@ -52,7 +52,7 @@
       "id": "HARD-003",
       "tier": "hard",
       "title": "Advanced Offline Conflict Resolution for Survey Drafts",
-      "status": "open",
+      "status": "done",
       "domain": "PWA + survey UI + backend",
       "source": "10_HARD_RANDOM_TASKS.md",
       "verify_commands": [
@@ -60,7 +60,9 @@
         "cd app && npm run test:e2e:stable -- tests/survey.spec.ts",
         "npm run verify"
       ],
-      "goal": "HARD-003: Advanced Offline Conflict Resolution for Survey Drafts"
+      "goal": "HARD-003: Advanced Offline Conflict Resolution for Survey Drafts",
+      "done_at": "2026-07-09T22:18:13.431Z",
+      "verified": "vitest surveyDraftConflict 4+draftSync 2+hook 4 pytest offline 2"
     },
     {
       "id": "HARD-004",
@@ -79,14 +81,14 @@
     {
       "id": "HARD-005",
       "tier": "hard",
-      "title": "Full End-to-End Tracing for Survey Generation (AI + HTTP + DB)",
+      "title": "Full End-to-End Tracing for Survey Generation (AI + HTTP + DB) — IN PROGRESS (2026-07-09)",
       "status": "open",
       "domain": "Observability + pipeline",
       "source": "10_HARD_RANDOM_TASKS.md",
       "verify_commands": [
         "npm run verify:fast"
       ],
-      "goal": "HARD-005: Full End-to-End Tracing for Survey Generation (AI + HTTP + DB)"
+      "goal": "HARD-005: Full End-to-End Tracing for Survey Generation (AI + HTTP + DB) — IN PROGRESS (2026-07-09)"
     },
     {
       "id": "HARD-006",

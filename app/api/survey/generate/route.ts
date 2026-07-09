@@ -1,4 +1,5 @@
 import { getAllowedOrigin } from '@/api/lib/cors';
+import { resolveOutboundTraceparent } from '@/api/lib/surveyTraceHeaders';
 import { dispatchSurveyWebhook } from '@/api/lib/surveyWebhook';
 import { dispatchTwinWebhook } from '@/api/lib/twinWebhook';
 
@@ -50,9 +51,17 @@ export default async function handler(req: Request): Promise<Response> {
     }
 
     const installerKey = req.headers.get('x-installer-key');
+    const { traceparent, traceId: bridgeTraceId } = resolveOutboundTraceparent(req);
+    const requestId = req.headers.get('x-request-id')?.trim() || crypto.randomUUID();
+    const headers: Record<string, string> = {
+      traceparent,
+      'x-request-id': requestId,
+    };
+    if (installerKey) headers['X-Installer-Key'] = installerKey;
+
     const res = await fetch(`${ENGINE.replace(/\/$/, '')}/generate`, {
       method: 'POST',
-      headers: installerKey ? { 'X-Installer-Key': installerKey } : undefined,
+      headers,
       body: engineForm,
       signal: AbortSignal.timeout(300_000),
     });
@@ -73,6 +82,7 @@ export default async function handler(req: Request): Promise<Response> {
       routing_reason: string;
       cost_usd: number;
       installer_id?: string;
+      trace_id?: string;
       orchestration?: Record<string, unknown>;
     };
 
@@ -96,6 +106,7 @@ export default async function handler(req: Request): Promise<Response> {
     return json(
       {
         ...payload,
+        trace_id: payload.trace_id || bridgeTraceId,
         pdf_url: `/api/survey/files?file=${encodeURIComponent(payload.pdf_filename)}`,
         ahj_url: `/api/survey/files?file=${encodeURIComponent(payload.ahj_filename)}`,
       },

@@ -1,3 +1,7 @@
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import {
   buildDraftPayload,
   mergeSurveyDrafts,
@@ -13,14 +17,60 @@ export type StoredServerDraft = SurveyDraftPayload & {
   storedAt: string;
 };
 
-const store = new Map<string, StoredServerDraft>();
+type StoreFile = Record<string, StoredServerDraft>;
+
+const memoryStore = new Map<string, StoredServerDraft>();
+
+function useMemoryStore(): boolean {
+  return process.env.SURVEY_DRAFT_SYNC_MEMORY === '1';
+}
+
+function resolveStorePath(): string {
+  if (process.env.SURVEY_DRAFT_SYNC_PATH) {
+    return process.env.SURVEY_DRAFT_SYNC_PATH;
+  }
+  const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+  return join(root, '.data', 'survey-draft-sync.json');
+}
+
+function loadStoreFile(): StoreFile {
+  const path = resolveStorePath();
+  if (!existsSync(path)) return {};
+  try {
+    return JSON.parse(readFileSync(path, 'utf8')) as StoreFile;
+  } catch {
+    return {};
+  }
+}
+
+function saveStoreFile(data: StoreFile): void {
+  const path = resolveStorePath();
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, JSON.stringify(data, null, 2), 'utf8');
+}
+
+function getEntry(key: string): StoredServerDraft | null {
+  if (useMemoryStore()) return memoryStore.get(key) ?? null;
+  const file = loadStoreFile();
+  return file[key] ?? null;
+}
+
+function setEntry(key: string, draft: StoredServerDraft): void {
+  if (useMemoryStore()) {
+    memoryStore.set(key, draft);
+    return;
+  }
+  const file = loadStoreFile();
+  file[key] = draft;
+  saveStoreFile(file);
+}
 
 export function draftSyncKey(draftId: string, installerId: string): string {
   return `${installerId || 'anon'}::${draftId}`;
 }
 
 export function getServerDraft(draftId: string, installerId: string): StoredServerDraft | null {
-  return store.get(draftSyncKey(draftId, installerId)) ?? null;
+  return getEntry(draftSyncKey(draftId, installerId));
 }
 
 export function upsertServerDraft(input: {
@@ -40,14 +90,14 @@ export function upsertServerDraft(input: {
     input.updatedAt,
   );
 
-  const existing = store.get(key);
+  const existing = getEntry(key);
   if (!existing) {
     const draft: StoredServerDraft = {
       ...incoming,
       draftId: input.draftId,
       storedAt: new Date().toISOString(),
     };
-    store.set(key, draft);
+    setEntry(key, draft);
     return { status: 'accepted', draft };
   }
 
@@ -69,7 +119,7 @@ export function upsertServerDraft(input: {
     version: merge.version,
     storedAt: new Date().toISOString(),
   };
-  store.set(key, draft);
+  setEntry(key, draft);
 
   return {
     status: merge.resolution === 'conflict' ? 'conflict' : 'merged',
@@ -78,7 +128,11 @@ export function upsertServerDraft(input: {
   };
 }
 
-/** Test-only */
+/** Test-only — clears memory or file store */
 export function clearDraftSyncStore(): void {
-  store.clear();
+  memoryStore.clear();
+  const path = resolveStorePath();
+  if (existsSync(path)) {
+    saveStoreFile({});
+  }
 }
