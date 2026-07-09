@@ -34,7 +34,8 @@
   - **DONE when:** tasks.md with baseline plan
 
 - [ ] **T6 — Pass 3 npm audit wave** *(deferred — safe path only; see baseline below)*
-  - **Baseline 2026-07-09:** root `npm audit --omit=dev` → **47 vuln** (30 moderate, 17 high); chain: `@reown/appkit-*`, `viem`, `@safe-global/safe-apps-*`
+  - **Baseline 2026-07-09:** root `npm audit --omit=dev` → **54 vuln** (1 critical, 33 moderate, 19 high); chain: `@reown/appkit-*`, `viem`, `@opentelemetry/*`
+  - **2026-07-09:** `npm audit fix` (fără `--force`) a început rescrierea lockfile → oprit; lockfile revertat
   - **NEVER:** `npm audit fix --force` on Windows (broke node_modules 2026-07-08)
   - **Recovery:** `cd app && npm ci` + root `npm ci` (~35 min total)
   - **Safe next:** manual lockfile bumps for direct deps only; re-audit after each bump

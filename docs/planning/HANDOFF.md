@@ -11,8 +11,8 @@
 ```
 DONE:     verify gate 1834/1834 · Graphify · Fable harness · adminNav/OpenAPI · react-helmet-async fix
 VERIFIED: npm run verify exit 0 · typecheck EXIT 0 · Gitea+GitHub @ 952d595f · prod health 404
-LEFT:     COOLIFY_* redeploy · T6 npm audit safe bumps · GTM execution · commit doc retro
-BLOCKED:  COOLIFY_API_TOKEN absent · prod health.json 404 until redeploy
+LEFT:     DNS fix (solaris-cet.com → Coolify, not Shopify) · COOLIFY_* redeploy · T6 audit · GTM
+BLOCKED:  Domain serves Shopify (`powered-by: Shopify`, redirect shop.solaris-cet.com) · COOLIFY_* absent
 ```
 
 | Metric | Value |
@@ -20,7 +20,7 @@ BLOCKED:  COOLIFY_API_TOKEN absent · prod health.json 404 until redeploy
 | **Git HEAD (local)** | `952d595f` |
 | **GitHub `main`** | `952d595f` (synced) |
 | **Gitea `origin/main`** | `952d595f` (synced 2026-07-09) — **Coolify redeploy pending** |
-| **Prod `solaris-cet.com`** | health.json **404** · `/api/survey/health` **404** (Coolify redeploy) |
+| **Prod `solaris-cet.com`** | **Shopify** (DNS drift) — health.json **404** · survey API **301→shop** |
 | **Ralph open tasks** | **1** — improvement-registry T6 (npm audit, blocked safe path) |
 | **Epics complete** | 11/12 (`tsc-cleanup` superseded 2026-07-09) |
 
@@ -33,7 +33,8 @@ BLOCKED:  COOLIFY_API_TOKEN absent · prod health.json 404 until redeploy
 | Gap | Impact | Deblocare |
 |---|---|---|
 | **Hetzner account lock** `L002DD869` | VPS/Coolify indisponibil sau parțial | Răspuns uman Hetzner + confirmare plată |
-| **Coolify redeploy** branch `main` | Prod nu servește `survey-engine` + rute Node noi | `npm run coolify:redeploy-survey` după Hetzner |
+| **DNS `solaris-cet.com` → Shopify** | `deploy:status` nu poate valida Coolify; health 404 pe Shopify | Repoint DNS la VPS/Coolify sau setează `SITE_URL` la hostul real |
+| **Coolify redeploy** branch `main` | După DNS fix, prod nu are SHA `ef648265` | `npm run coolify:redeploy-survey` cu `COOLIFY_*` |
 | **Gitea push 504** | Prod mirror `solaris-clean` în urmă față de GitHub | `npm run gitea:push-retry` (4× retry, 12s delay) |
 
 ### 1.2 Gap funcțional post-deploy (depinde de 1.1)

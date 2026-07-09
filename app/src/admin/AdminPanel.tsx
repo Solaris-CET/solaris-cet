@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 
 import { buildAdminNav, canAccessAdminSection } from './adminNav';
 import type { AdminRole, AdminSession } from './adminClient';
-import { adminApi, adminApiErr } from './adminClient';
+import { adminApi, adminApiErr, parseLeadsTotal } from './adminClient';
 import { AuditSection } from './sections/AuditSection';
 import LeadsSection from './sections/LeadsSection';
 import { BlocksSection } from './sections/BlocksSection';
@@ -88,11 +88,11 @@ export function AdminPanel() {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
-      .then((data) => setNewLeadsCount(data.total ?? 0))
+      .then((data: unknown) => setNewLeadsCount(parseLeadsTotal(data)))
       .catch(() => {});
   }, [token]);
 
-  const role = (admin?.role ?? 'viewer') as AdminRole;
+  const role: AdminRole = admin?.role ?? 'viewer';
   const items = useMemo(
     () => buildAdminNav(newLeadsCount).filter((i) => canAccessAdminSection(role, i.minRole)),
     [role, newLeadsCount],

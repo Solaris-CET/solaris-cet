@@ -29,10 +29,22 @@ function localSha() {
   return r.status === 0 ? r.stdout.trim() : 'unknown';
 }
 
+function responseHint(res) {
+  const poweredBy = res.headers.get('powered-by') ?? '';
+  if (/shopify/i.test(poweredBy)) {
+    return 'domain serves Shopify (DNS drift — not Coolify app)';
+  }
+  const location = res.headers.get('location') ?? '';
+  if (/shop\.solaris-cet\.com/i.test(location)) {
+    return 'redirects to shop.solaris-cet.com (Shopify)';
+  }
+  return null;
+}
+
 async function prodHealth() {
   try {
     const res = await fetch(`${SITE}/health.json`, { signal: AbortSignal.timeout(10_000) });
-    if (!res.ok) return { ok: false, status: res.status };
+    if (!res.ok) return { ok: false, status: res.status, hint: responseHint(res) };
     return { ok: true, json: await res.json() };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : String(e) };
@@ -41,12 +53,26 @@ async function prodHealth() {
 
 async function surveyHealth() {
   try {
-    const res = await fetch(`${SITE}/api/survey/health`, { signal: AbortSignal.timeout(10_000) });
-    if (!res.ok) return { ok: false, status: res.status };
+    const res = await fetch(`${SITE}/api/survey/health`, {
+      signal: AbortSignal.timeout(10_000),
+      redirect: 'manual',
+    });
+    if (res.status >= 300 && res.status < 400) {
+      return { ok: false, status: res.status, hint: responseHint(res) };
+    }
+    if (!res.ok) return { ok: false, status: res.status, hint: responseHint(res) };
     return { ok: true, json: await res.json() };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : String(e) };
   }
+}
+
+function formatFail(result, fallback) {
+  const parts = [];
+  if (result.status != null) parts.push(String(result.status));
+  if (result.error) parts.push(result.error);
+  if (result.hint) parts.push(result.hint);
+  return parts.length ? parts.join(' — ') : fallback;
 }
 
 const sha = localSha();
@@ -61,7 +87,7 @@ if (health.ok) {
   const v = health.json?.version ?? health.json?.gitSha ?? '—';
   console.log(`Prod health: OK — version=${v}`);
 } else {
-  console.log(`Prod health: FAIL — ${health.status ?? health.error}`);
+  console.log(`Prod health: FAIL — ${formatFail(health, 'unknown')}`);
 }
 
 if (survey.ok) {
@@ -69,7 +95,9 @@ if (survey.ok) {
   const keys = survey.json?.engine?.installer_keys_required;
   console.log(`Survey API:  ${engineOk ? 'OK' : 'DEGRADED'} — installer_keys_required=${keys}`);
 } else {
-  console.log(`Survey API:  FAIL — ${survey.status ?? survey.error} (Coolify redeploy needed?)`);
+  const detail = formatFail(survey, 'unreachable');
+  const suffix = survey.hint ? '' : ' (Coolify redeploy or SITE_URL?)';
+  console.log(`Survey API:  FAIL — ${detail}${suffix}`);
 }
 
 const aligned = health.ok && survey.ok;

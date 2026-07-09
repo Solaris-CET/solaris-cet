@@ -6,7 +6,7 @@
 {"id":"IMP-00006","status":"done","priority":"P2","category":"frontend","dimension":"i18n","path":"app/src/admin/adminClient.ts","done_at":"2026-07-07"}
 {"id":"IMP-00007","status":"done","priority":"P2","category":"frontend","dimension":"seo","path":"app/src/admin/adminClient.ts","done_at":"2026-07-07"}
 {"id":"IMP-00008","status":"done","priority":"P2","category":"frontend","dimension":"unit-test","path":"app/src/admin/AdminPanel.tsx","done_at":"2026-07-08"}
-{"id":"IMP-00009","status":"open","priority":"P2","category":"frontend","dimension":"type-safety","path":"app/src/admin/AdminPanel.tsx"}
+{"id":"IMP-00009","status":"done","priority":"P2","category":"frontend","dimension":"type-safety","path":"app/src/admin/AdminPanel.tsx","done_at":"2026-07-09"}
 {"id":"IMP-00010","status":"open","priority":"P2","category":"frontend","dimension":"a11y","path":"app/src/admin/AdminPanel.tsx"}
 {"id":"IMP-00011","status":"open","priority":"P2","category":"frontend","dimension":"perf","path":"app/src/admin/AdminPanel.tsx"}
 {"id":"IMP-00012","status":"open","priority":"P2","category":"frontend","dimension":"error-boundary","path":"app/src/admin/AdminPanel.tsx"}

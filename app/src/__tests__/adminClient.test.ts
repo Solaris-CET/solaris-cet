@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { adminApi, adminApiErr } from '@/admin/adminClient';
+import { adminApi, adminApiErr, parseLeadsTotal } from '@/admin/adminClient';
 
 describe('adminApi', () => {
   const fetchMock = vi.fn();
@@ -60,6 +60,12 @@ describe('adminApi', () => {
 
     expect(res.ok).toBe(false);
     if (!res.ok) expect(res.error).toBe('Server Error');
+  });
+
+  it('parseLeadsTotal accepts numeric total', () => {
+    expect(parseLeadsTotal({ total: 3 })).toBe(3);
+    expect(parseLeadsTotal({ total: 'x' })).toBe(0);
+    expect(parseLeadsTotal(null)).toBe(0);
   });
 
   it('adminApiErr returns null for success', async () => {

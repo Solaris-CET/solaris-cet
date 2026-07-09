@@ -11,10 +11,14 @@ vi.mock('@/admin/useAdminSession', () => ({
   useAdminSession: () => useAdminSessionMock(),
 }));
 
-vi.mock('@/admin/adminClient', () => ({
-  adminApi: (...args: unknown[]) => adminApiMock(...args),
-  adminApiErr: () => 'Request failed',
-}));
+vi.mock('@/admin/adminClient', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/admin/adminClient')>();
+  return {
+    ...actual,
+    adminApi: (...args: unknown[]) => adminApiMock(...args),
+    adminApiErr: () => 'Request failed',
+  };
+});
 
 vi.mock('@/admin/sections/DashboardSection', () => ({ DashboardSection: () => <div data-testid="dash" /> }));
 vi.mock('@/admin/sections/LeadsSection', () => ({ default: () => <div data-testid="leads" /> }));
@@ -69,7 +73,7 @@ describe('AdminPanel', () => {
     render(<AdminPanel />);
 
     expect(await screen.findByRole('button', { name: 'Dashboard' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: /Leads & Oferte \(2\)/ })).toBeTruthy();
+    expect(await screen.findByRole('button', { name: /Leads & Oferte \(2\)/ })).toBeTruthy();
     expect(screen.getByText(/viewer@test\.ro/)).toBeTruthy();
     expect(screen.getByTestId('dash')).toBeTruthy();
   });

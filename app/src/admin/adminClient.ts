@@ -22,6 +22,13 @@ export function adminApiErr<T>(res: AdminApiResult<T>): string | null {
   return res.ok === false ? res.error : null;
 }
 
+/** Parse `{ total }` from admin leads list JSON without unsafe casts. */
+export function parseLeadsTotal(payload: unknown): number {
+  if (!payload || typeof payload !== 'object') return 0;
+  const total = (payload as { total?: unknown }).total;
+  return typeof total === 'number' && Number.isFinite(total) ? total : 0;
+}
+
 export async function adminApi<T>(
   path: string,
   opts: {
