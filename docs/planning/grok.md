@@ -517,3 +517,24 @@ SITE_URL=https://solaris-cet.com npm run survey:post-deploy  # după VPS
 | L | tsc-cleanup lucide/R3F | ⏳ deferred (typecheck slow; epic T1–T3 open) |
 
 **VERIFY:** surveyOpenApi 14/14 · pytest agent_harness+offline 10/10 · adminNav pending vitest after npm ci
+
+---
+
+## Update 2026-07-09 — Pre-deploy audit (înainte de Gitea/Coolify)
+
+**Stare cod (verificată):**
+- `npm run verify` exit 0 — lint · typecheck · **1834/1834** Vitest · build + PWA @ `7fd3a36c`
+- `deploy:status` — local SHA OK · prod health **404** · survey API **404**
+- GitHub `main` + Gitea `origin` synced @ `952d595f` (pre-deploy retro commit)
+
+**Epics loops:**
+- `tsc-cleanup` → **superseded** (baseline 335 erori invalid; typecheck verde în verify)
+- `improvement-registry` T9 retro ✅ · T6 npm audit **deferred** (47 vuln baseline, fără `--force`)
+
+**Blocaje externe (necesită user/env):**
+| Env | Pentru |
+|---|---|
+| `GITEA_TOKEN` | `npm run gitea:push-retry` → Coolify mirror |
+| `COOLIFY_*` | `npm run deploy:p0` / `coolify:redeploy-survey` |
+
+**Regulă reconfirmată:** Pe Windows nu rula `npm audit fix --force` — folosește `npm ci` pentru recovery.

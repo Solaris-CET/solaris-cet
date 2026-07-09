@@ -9,20 +9,20 @@
 ## 0) Checkpoint instant (citește primul)
 
 ```
-DONE:     P0 scripts (deploy:p0, coolify-deploy.mjs Windows) · stash:sync · GitHub push
-VERIFIED: github main up-to-date · survey:prod-gate documents 5 hard / 6 soft 404 on prod
-LEFT:     COOLIFY_* env + Coolify redeploy · Gitea origin 504 · GTM execution
-BLOCKED:  COOLIFY_API_TOKEN absent locally · Gitea 504 · prod health.json 404
+DONE:     verify gate 1834/1834 · Graphify · Fable harness · adminNav/OpenAPI · react-helmet-async fix
+VERIFIED: npm run verify exit 0 · typecheck EXIT 0 · Gitea+GitHub @ 952d595f · prod health 404
+LEFT:     COOLIFY_* redeploy · T6 npm audit safe bumps · GTM execution · commit doc retro
+BLOCKED:  COOLIFY_API_TOKEN absent · prod health.json 404 until redeploy
 ```
 
 | Metric | Value |
 |---|---|
-| **Git HEAD (local)** | `a3a4222` |
-| **GitHub `main`** | `a3a4222` (push OK) |
-| **Gitea `origin/main`** | Poate fi în urmă — 504 la push |
-| **Prod `solaris-cet.com`** | health.json **404** · `/api/survey/health` **404** |
-| **Ralph open tasks** | **0** (`npm run loops:next` → none) |
-| **Epics complete** | 10/10 (`npm run loops:status`) |
+| **Git HEAD (local)** | `952d595f` |
+| **GitHub `main`** | `952d595f` (synced) |
+| **Gitea `origin/main`** | `952d595f` (synced 2026-07-09) — **Coolify redeploy pending** |
+| **Prod `solaris-cet.com`** | health.json **404** · `/api/survey/health` **404** (Coolify redeploy) |
+| **Ralph open tasks** | **1** — improvement-registry T6 (npm audit, blocked safe path) |
+| **Epics complete** | 11/12 (`tsc-cleanup` superseded 2026-07-09) |
 
 ---
 
@@ -54,7 +54,7 @@ BLOCKED:  COOLIFY_API_TOKEN absent locally · Gitea 504 · prod health.json 404
 | **Aider** `npm run aider` | Wrapper gata · **`pip install aider-chat` nefacut** |
 | **Stash CLI în PATH** | Unele shell-uri PowerShell: `stash` not recognized |
 | **Gmail MCP OAuth** | `gcp-oauth.keys.json` lipsă — user step |
-| **`tsc` global app** | Eșecuri pre-existente în fișiere **nefire** de epics recente |
+| **`tsc` global app** | ✅ `npm run typecheck` verde în verify gate (epic `tsc-cleanup` superseded) |
 
 ### 1.4 Definiție „DONE” pentru următorul agent
 
@@ -96,8 +96,8 @@ npm run loops:status     # 10 epics, 0 open
 ### 2.3 Prod vs local drift
 
 ```
-Local:  accd4e1 — full monorepo cu toate epics
-Prod:   unknown/404 — Coolify n-a redeployat sau serviciu survey lipsește
+Local:  7fd3a36c — verify 1834 green · Graphify · Fable harness · admin/OpenAPI tests
+Prod:   d0f6928c (stale) — Coolify n-a redeployat; health + survey API 404
 ```
 
 **Cauză probabilă:** `server/index.cjs` route registry + `survey-engine` container nu sunt pe VPS la SHA curent.

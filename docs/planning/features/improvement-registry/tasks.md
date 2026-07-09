@@ -2,7 +2,7 @@
 
 **Feature:** 10_000 improvement items + Rule of 3 waves  
 **Domain:** D9 + D12  
-**Status:** in_progress
+**Status:** complete (T6 deferred — audit documented)
 
 ---
 
@@ -33,10 +33,13 @@
   - **VERIFY:** epic created with T1–T3
   - **DONE when:** tasks.md with baseline plan
 
-- [ ] **T6 — Pass 3 npm audit wave** *(blocked 2026-07-08: `npm audit fix` broke node_modules on Windows — use `npm run ci:install` / `cd app && npm ci` before retry)*
-  - **Files:** `package-lock.json` (vite/undici safe bumps)
-  - **VERIFY:** `npm audit --omit=dev` count reduced
-  - **DONE when:** no new critical
+- [ ] **T6 — Pass 3 npm audit wave** *(deferred — safe path only; see baseline below)*
+  - **Baseline 2026-07-09:** root `npm audit --omit=dev` → **47 vuln** (30 moderate, 17 high); chain: `@reown/appkit-*`, `viem`, `@safe-global/safe-apps-*`
+  - **NEVER:** `npm audit fix --force` on Windows (broke node_modules 2026-07-08)
+  - **Recovery:** `cd app && npm ci` + root `npm ci` (~35 min total)
+  - **Safe next:** manual lockfile bumps for direct deps only; re-audit after each bump
+  - **VERIFY:** `npm audit --omit=dev` count reduced without breaking `npm run verify`
+  - **DONE when:** no new critical + verify green
 
 - [x] **T7 — Pass 3 E2E coverage matrix**
   - **Files:** `docs/planning/API-COVERAGE.md`
@@ -48,7 +51,14 @@
   - **VERIFY:** `improve:status` done > 50
   - **DONE when:** Windows + tooling items marked
 
-- [ ] **T9 — Retro**
+- [x] **T9 — Retro**
   - **Files:** `grok.md`, `HANDOFF.md`, `stash:sync`
   - **VERIFY:** `npm run stash:sync`
   - **DONE when:** checkpoint written
+
+---
+
+| Date | Task | Result |
+|---|---|---|
+| 2026-07-09 | T9 retro pre-deploy | HANDOFF §0 @ `7fd3a36c` · grok.md update · tsc-cleanup superseded |
+| 2026-07-09 | T6 audit baseline | 47 vuln documented · T6 remains open (deferred safe bumps) |
