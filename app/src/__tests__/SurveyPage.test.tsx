@@ -21,9 +21,11 @@ vi.mock('@/hooks/useSurveyOfflineSync', () => ({
     draftReady: true,
     stats: { total: 0, pending: 0, failed: 0, oldestAt: null },
     syncing: false,
+    draftConflicts: [],
     enqueueOffline: vi.fn(),
     syncPending: vi.fn(),
     refreshStats: vi.fn(),
+    resolveDraftConflict: vi.fn(),
   }),
 }));
 

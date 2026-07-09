@@ -1,6 +1,7 @@
 import { CloudOff, RefreshCw, WifiOff } from 'lucide-react';
 import { useMemo } from 'react';
 
+import type { DraftConflictField } from '@/lib/surveyDraftConflict';
 import type { SurveyQueueStats } from '@/lib/surveyOfflineQueue';
 import { cn } from '@/lib/utils';
 
@@ -14,6 +15,9 @@ const LABELS = {
   syncing: 'Se sincronizează...',
   syncAria: 'Sincronizează rapoartele din coada offline',
   panelAria: 'Stare survey offline și coadă de sincronizare',
+  conflictTitle: 'Conflict draft — alege versiunea',
+  keepLocal: 'Păstrează local',
+  keepRemote: 'Păstrează server',
 } as const;
 
 export type SurveyOfflinePanelProps = {
@@ -21,6 +25,8 @@ export type SurveyOfflinePanelProps = {
   draftSavedAt: string | null;
   stats: SurveyQueueStats;
   syncing: boolean;
+  conflicts?: DraftConflictField[];
+  onResolveConflict?: (path: string, choice: 'local' | 'remote') => void;
   onSync: () => void;
   className?: string;
 };
@@ -41,6 +47,8 @@ export function SurveyOfflinePanel({
   draftSavedAt,
   stats,
   syncing,
+  conflicts = [],
+  onResolveConflict,
   onSync,
   className,
 }: SurveyOfflinePanelProps) {
@@ -74,6 +82,36 @@ export function SurveyOfflinePanel({
           </span>
         ) : null}
       </div>
+
+      {conflicts.length > 0 ? (
+        <div
+          className="flex max-w-lg flex-col gap-2 rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-3"
+          role="alert"
+        >
+          <p className="text-sm font-semibold text-rose-100">{LABELS.conflictTitle}</p>
+          {conflicts.map((c) => (
+            <div key={c.path} className="flex flex-col gap-1 text-xs text-rose-50/90 sm:flex-row sm:items-center sm:justify-between">
+              <span className="font-mono">{c.path}</span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  className="rounded bg-white/10 px-2 py-1 hover:bg-white/20"
+                  onClick={() => onResolveConflict?.(c.path, 'local')}
+                >
+                  {LABELS.keepLocal}
+                </button>
+                <button
+                  type="button"
+                  className="rounded bg-white/10 px-2 py-1 hover:bg-white/20"
+                  onClick={() => onResolveConflict?.(c.path, 'remote')}
+                >
+                  {LABELS.keepRemote}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : null}
 
       {summary ? (
         <div className="flex max-w-md flex-col items-center gap-2 rounded-xl border border-amber-400/20 bg-amber-400/5 px-4 py-3 sm:flex-row">

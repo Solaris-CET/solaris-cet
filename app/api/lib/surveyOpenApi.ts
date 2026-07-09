@@ -41,6 +41,7 @@ export const SURVEY_ROUTE_IDS = [
   'twin-agent-execute',
   'twin-agent-decisions',
   'offline-manifest',
+  'draft-sync',
 ] as const;
 
 export type SurveyRouteId = (typeof SURVEY_ROUTE_IDS)[number];
@@ -98,6 +99,7 @@ const BRIDGE_PATH_OVERRIDES: Partial<Record<SurveyRouteId, string>> = {
   'twin-agent-execute': '/api/survey/twin-agent/execute',
   'twin-agent-decisions': '/api/survey/twin-agent/decisions',
   'offline-manifest': '/api/survey/offline-manifest',
+  'draft-sync': '/api/survey/draft-sync',
 };
 
 export function surveyBridgePath(id: SurveyRouteId): string {
@@ -365,6 +367,16 @@ export function buildSurveyOpenApiPaths(): Record<string, unknown> {
     '/api/survey/offline-manifest': {
       get: {
         summary: 'Survey offline PWA manifest (precache + queue)',
+        responses: { '200': jsonResponse },
+      },
+    },
+    '/api/survey/draft-sync': {
+      get: {
+        summary: 'Fetch server-side survey draft for conflict sync',
+        responses: { '200': jsonResponse },
+      },
+      post: {
+        summary: 'Push survey draft with version vector merge',
         responses: { '200': jsonResponse },
       },
     },

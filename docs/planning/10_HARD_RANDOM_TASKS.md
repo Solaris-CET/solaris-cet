@@ -79,7 +79,11 @@ npm run verify
 
 ---
 
-## HARD-003: Advanced Offline Conflict Resolution for Survey Drafts
+## HARD-003: Advanced Offline Conflict Resolution for Survey Drafts — IN PROGRESS (2026-07-09)
+
+**SHIPPED (foundation):** `surveyDraftConflict.ts` version vectors + lamport field clocks · auto-merge non-overlapping · `GET/POST /api/survey/draft-sync` · conflict UI in `SurveyOfflinePanel` · hook sync on online  
+**VERIFIED (partial):** vitest `surveyDraftConflict` 4 passed · `surveyDraftSyncRoute` 2 passed · `useSurveyOfflineSync` 4 passed · pytest `test_survey_offline` 2 passed  
+**LEFT:** 3-way merge UI polish · persistent server store (not in-memory) · multi-device E2E · IndexedDB v2 migration
 
 **Domain:** PWA + survey UI + backend
 

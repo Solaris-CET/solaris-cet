@@ -158,8 +158,10 @@ export default function SurveyPage() {
     draftSavedAt,
     stats,
     syncing,
+    draftConflicts,
     enqueueOffline,
     syncPending,
+    resolveDraftConflict,
   } = useSurveyOfflineSync({
     form,
     installer,
@@ -456,6 +458,8 @@ export default function SurveyPage() {
             draftSavedAt={draftSavedAt}
             stats={stats}
             syncing={syncing}
+            conflicts={draftConflicts}
+            onResolveConflict={(path, choice) => void resolveDraftConflict(path, choice)}
             onSync={() => void syncPending()}
             className="mt-3"
           />

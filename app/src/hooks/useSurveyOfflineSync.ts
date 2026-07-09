@@ -4,6 +4,15 @@ import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import type { InstallerProfile, SurveyFormData } from '@/lib/surveyApi';
 import { generateSurveyReport } from '@/lib/surveyApi';
 import {
+  buildDraftPayload,
+  mergeStoredPhotos,
+  mergeSurveyDrafts,
+  resolveConflictChoice,
+  type DraftConflictField,
+  type DraftMergeResult,
+} from '@/lib/surveyDraftConflict';
+import {
+  buildSurveyDraftId,
   clearSurveyDraft,
   enqueuePendingReport,
   listPendingReports,
@@ -14,6 +23,10 @@ import {
   updatePendingReport,
   type SurveyDraftRecord,
 } from '@/lib/surveyDraftStorage';
+import {
+  fetchServerSurveyDraft,
+  pushSurveyDraftSync,
+} from '@/lib/surveyDraftSyncClient';
 import { getSurveyQueueStats, type SurveyQueueStats } from '@/lib/surveyOfflineQueue';
 import { prefetchSurveyOfflineAssets } from '@/lib/surveyOfflinePrefetch';
 
@@ -39,9 +52,12 @@ export type UseSurveyOfflineSyncResult = {
   draftReady: boolean;
   stats: SurveyQueueStats;
   syncing: boolean;
+  draftConflicts: DraftConflictField[];
+  draftMergeResolution: DraftMergeResult['resolution'] | null;
   enqueueOffline: () => Promise<void>;
   syncPending: () => Promise<void>;
   refreshStats: () => Promise<void>;
+  resolveDraftConflict: (path: string, choice: 'local' | 'remote') => Promise<void>;
 };
 
 function toErrorMessage(err: unknown, fallback: string): string {
@@ -66,9 +82,14 @@ export function useSurveyOfflineSync({
     oldestAt: null,
   });
   const [syncing, setSyncing] = useState(false);
+  const [draftConflicts, setDraftConflicts] = useState<DraftConflictField[]>([]);
+  const [draftMergeResolution, setDraftMergeResolution] = useState<DraftMergeResult['resolution'] | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wasOfflineRef = useRef(false);
   const autoSyncStartedRef = useRef(false);
+  const localDraftRef = useRef<SurveyDraftRecord | null>(null);
+  const remoteDraftRef = useRef<ReturnType<typeof buildDraftPayload> | null>(null);
+  const mergeBaseRef = useRef<DraftMergeResult | null>(null);
 
   const refreshStats = useCallback(async () => {
     const s = await getSurveyQueueStats();
@@ -122,14 +143,107 @@ export function useSurveyOfflineSync({
     void prefetchSurveyOfflineAssets();
   }, []);
 
+  const pullRemoteDraft = useCallback(async (local: SurveyDraftRecord | null) => {
+    if (!online || !local?.draftId) return;
+    try {
+      const { draft: remote } = await fetchServerSurveyDraft(local.draftId, local.installer.installerId);
+      if (!remote?.version) return;
+      const localPayload = buildDraftPayload(
+        local.form,
+        local.installer,
+        local.photos,
+        local.version ?? { deviceId: 'local', clock: 1, fieldClocks: {} },
+        local.updatedAt,
+      );
+      const remotePayload = buildDraftPayload(
+        remote.form,
+        remote.installer,
+        remote.photoNames.map((name) => ({ name, type: 'image/jpeg', blob: new Blob() })),
+        remote.version,
+        remote.updatedAt,
+      );
+      remoteDraftRef.current = remotePayload;
+      const merge = mergeSurveyDrafts(localPayload, remotePayload);
+      mergeBaseRef.current = merge;
+      setDraftConflicts(merge.conflicts);
+      setDraftMergeResolution(merge.resolution);
+      if (merge.resolution !== 'conflict') {
+        const mergedRecord: SurveyDraftRecord = {
+          ...local,
+          form: merge.form,
+          installer: merge.installer,
+          photos: mergeStoredPhotos(local.photos, local.photos),
+          version: merge.version,
+          updatedAt: new Date().toISOString(),
+        };
+        localDraftRef.current = mergedRecord;
+        await saveSurveyDraft(mergedRecord.form, mergedRecord.installer, storedToPhotos(mergedRecord.photos), local);
+        onDraftLoaded?.(mergedRecord);
+      }
+    } catch {
+      void 0;
+    }
+  }, [online, onDraftLoaded]);
+
+  const resolveDraftConflict = useCallback(
+    async (path: string, choice: 'local' | 'remote') => {
+      const base = mergeBaseRef.current;
+      const localPayload = localDraftRef.current
+        ? buildDraftPayload(
+            localDraftRef.current.form,
+            localDraftRef.current.installer,
+            localDraftRef.current.photos,
+            localDraftRef.current.version ?? { deviceId: 'local', clock: 1, fieldClocks: {} },
+            localDraftRef.current.updatedAt,
+          )
+        : null;
+      const remotePayload = remoteDraftRef.current;
+      if (!base || !localPayload || !remotePayload) return;
+      const resolved = resolveConflictChoice(base, path, choice, localPayload, remotePayload);
+      mergeBaseRef.current = resolved;
+      setDraftConflicts(resolved.conflicts);
+      setDraftMergeResolution(resolved.resolution);
+      if (resolved.conflicts.length === 0 && localDraftRef.current) {
+        const mergedRecord: SurveyDraftRecord = {
+          ...localDraftRef.current,
+          form: resolved.form,
+          installer: resolved.installer,
+          version: resolved.version,
+          updatedAt: new Date().toISOString(),
+        };
+        localDraftRef.current = mergedRecord;
+        await saveSurveyDraft(
+          mergedRecord.form,
+          mergedRecord.installer,
+          storedToPhotos(mergedRecord.photos),
+          localDraftRef.current,
+        );
+        onDraftLoaded?.(mergedRecord);
+        if (online && mergedRecord.draftId && mergedRecord.version) {
+          await pushSurveyDraftSync({
+            draftId: mergedRecord.draftId,
+            form: mergedRecord.form,
+            installer: mergedRecord.installer,
+            photoNames: mergedRecord.photos.map((p) => p.name),
+            updatedAt: mergedRecord.updatedAt,
+            version: mergedRecord.version,
+          });
+        }
+      }
+    },
+    [online, onDraftLoaded],
+  );
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const draft = await loadSurveyDraft();
       if (cancelled) return;
+      localDraftRef.current = draft;
       if (draft) {
         setDraftSavedAt(draft.updatedAt);
         onDraftLoaded?.(draft);
+        await pullRemoteDraft(draft);
       }
       setDraftReady(true);
     })();
@@ -137,15 +251,34 @@ export function useSurveyOfflineSync({
     return () => {
       cancelled = true;
     };
-  }, [refreshStats, onDraftLoaded]);
+  }, [refreshStats, onDraftLoaded, pullRemoteDraft]);
 
   useEffect(() => {
     if (!draftReady) return;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
-      void saveSurveyDraft(form, installer, photos)
-        .then(() => setDraftSavedAt(new Date().toISOString()))
-        .catch(() => void 0);
+      void (async () => {
+        try {
+          const prev = localDraftRef.current;
+          const nextRecord = await saveSurveyDraft(form, installer, photos, prev);
+          setDraftSavedAt(nextRecord.updatedAt);
+          localDraftRef.current = nextRecord;
+          if (online && nextRecord.version && nextRecord.draftId) {
+            const syncRes = await pushSurveyDraftSync({
+              draftId: nextRecord.draftId,
+              form: nextRecord.form,
+              installer: nextRecord.installer,
+              photoNames: photos.map((p) => p.name || 'photo.jpg'),
+              updatedAt: nextRecord.updatedAt,
+              version: nextRecord.version,
+            });
+            setDraftConflicts(syncRes.merge?.conflicts ?? []);
+            setDraftMergeResolution(syncRes.merge?.resolution ?? (syncRes.status === 'accepted' ? 'clean' : null));
+          }
+        } catch {
+          void 0;
+        }
+      })();
     }, DRAFT_AUTOSAVE_MS);
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
@@ -175,8 +308,11 @@ export function useSurveyOfflineSync({
     draftReady,
     stats,
     syncing,
+    draftConflicts,
+    draftMergeResolution,
     enqueueOffline,
     syncPending: handleSyncPending,
     refreshStats,
+    resolveDraftConflict,
   };
 }

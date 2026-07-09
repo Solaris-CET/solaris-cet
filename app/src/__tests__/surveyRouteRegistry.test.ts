@@ -71,6 +71,7 @@ describe('survey route registry', () => {
       '/api/survey/twin-webhook',
       '/api/survey/router/stats',
       '/api/survey/offline-manifest',
+      '/api/survey/draft-sync',
     ];
     const missing = missingPathsInSource(src, twinPaths);
     expect(missing).toEqual([]);

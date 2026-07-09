@@ -664,6 +664,7 @@ const apiRoutes = new Map([
   ['/api/survey/twin-agent/execute', 'api/survey/twin-agent/execute/route.js'],
   ['/api/survey/twin-agent/decisions', 'api/survey/twin-agent/decisions/route.js'],
   ['/api/survey/offline-manifest', 'api/survey/offline-manifest/route.js'],
+  ['/api/survey/draft-sync', 'api/survey/draft-sync/route.js'],
   ['/api/survey/installer/me', 'api/survey/installer/me/route.js'],
   ['/api/openapi/survey', 'api/openapi/survey/route.js'],
   ['/api/admin/surveys', 'api/admin/surveys/route.js'],

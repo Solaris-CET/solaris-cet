@@ -1,0 +1,1598 @@
+{
+  "version": "1.0",
+  "built_at": "2026-07-09T21:32:51.746Z",
+  "totals": {
+    "hard": 10,
+    "medium": 20,
+    "small": 70,
+    "all": 100
+  },
+  "tiers": [
+    "hard",
+    "medium",
+    "small"
+  ],
+  "tier_order": [
+    "hard",
+    "medium",
+    "small"
+  ],
+  "tasks": [
+    {
+      "id": "HARD-001",
+      "tier": "hard",
+      "title": "Twin Runtime Event Replay & Durable Log",
+      "status": "done",
+      "domain": "survey-engine + frontend twin",
+      "source": "10_HARD_RANDOM_TASKS.md",
+      "verify_commands": [
+        "npm run survey:smoke",
+        "npm run survey:bridge-smoke",
+        "cd app && npm run test -- src/__tests__/twin*.test.*",
+        "npm run verify"
+      ],
+      "goal": "HARD-001: Twin Runtime Event Replay & Durable Log"
+    },
+    {
+      "id": "HARD-002",
+      "tier": "hard",
+      "title": "Per-Installer AI Cost Attribution + Hard Budget Enforcement",
+      "status": "done",
+      "domain": "AI routing + CRM + billing",
+      "source": "10_HARD_RANDOM_TASKS.md",
+      "verify_commands": [
+        "npm run survey:prod-gate",
+        "npm run survey:test",
+        "cd app && npm run test -- src/__tests__/*installer* src/__tests__/*cost*",
+        "npm run verify"
+      ],
+      "goal": "HARD-002: Per-Installer AI Cost Attribution + Hard Budget Enforcement"
+    },
+    {
+      "id": "HARD-003",
+      "tier": "hard",
+      "title": "Advanced Offline Conflict Resolution for Survey Drafts",
+      "status": "open",
+      "domain": "PWA + survey UI + backend",
+      "source": "10_HARD_RANDOM_TASKS.md",
+      "verify_commands": [
+        "npm run survey:smoke",
+        "cd app && npm run test:e2e:stable -- tests/survey.spec.ts",
+        "npm run verify"
+      ],
+      "goal": "HARD-003: Advanced Offline Conflict Resolution for Survey Drafts"
+    },
+    {
+      "id": "HARD-004",
+      "tier": "hard",
+      "title": "Dynamic Multi-Model Router with Quality Scoring + Automatic Fallback",
+      "status": "done",
+      "domain": "survey-engine AI layer",
+      "source": "10_HARD_RANDOM_TASKS.md",
+      "verify_commands": [
+        "cd survey-engine && python -m pytest tests/test_router* -q",
+        "npm run survey:smoke",
+        "npm run survey:prod-gate"
+      ],
+      "goal": "HARD-004: Dynamic Multi-Model Router with Quality Scoring + Automatic Fallback"
+    },
+    {
+      "id": "HARD-005",
+      "tier": "hard",
+      "title": "Full End-to-End Tracing for Survey Generation (AI + HTTP + DB)",
+      "status": "open",
+      "domain": "Observability + pipeline",
+      "source": "10_HARD_RANDOM_TASKS.md",
+      "verify_commands": [
+        "npm run verify:fast"
+      ],
+      "goal": "HARD-005: Full End-to-End Tracing for Survey Generation (AI + HTTP + DB)"
+    },
+    {
+      "id": "HARD-006",
+      "tier": "hard",
+      "title": "Secure Installer API Key Lifecycle (Rotation, Scoping, Revocation, Audit)",
+      "status": "open",
+      "domain": "Security + installer SaaS",
+      "source": "10_HARD_RANDOM_TASKS.md",
+      "verify_commands": [
+        "npm run survey:bridge-smoke",
+        "npm run verify"
+      ],
+      "goal": "HARD-006: Secure Installer API Key Lifecycle (Rotation, Scoping, Revocation, Audit)"
+    },
+    {
+      "id": "HARD-007",
+      "tier": "hard",
+      "title": "High-Performance Parallel Vision + LLM Pipeline with Smart Batching",
+      "status": "open",
+      "domain": "survey-engine performance",
+      "source": "10_HARD_RANDOM_TASKS.md",
+      "verify_commands": [
+        "cd survey-engine && python -m src.cli demo --photos 12 --measure-time",
+        "npm run survey:test"
+      ],
+      "goal": "HARD-007: High-Performance Parallel Vision + LLM Pipeline with Smart Batching"
+    },
+    {
+      "id": "HARD-008",
+      "tier": "hard",
+      "title": "Versioned Report Templates + Multi-AHJ PDF Engine",
+      "status": "open",
+      "domain": "PDF generation + AHJ",
+      "source": "10_HARD_RANDOM_TASKS.md",
+      "verify_commands": [
+        "npm run survey:prod-gate",
+        "cd survey-engine && python -m pytest tests/test_ahj* -q"
+      ],
+      "goal": "HARD-008: Versioned Report Templates + Multi-AHJ PDF Engine"
+    },
+    {
+      "id": "HARD-009",
+      "tier": "hard",
+      "title": "Graphify-Powered \"Related Code\" Suggestions in Dev Workflow",
+      "status": "done",
+      "domain": "Agent tooling + DX",
+      "source": "10_HARD_RANDOM_TASKS.md",
+      "verify_commands": [
+        "npm run graphify:build",
+        "node scripts/graphify-suggest.mjs \"twin stream\"",
+        "npm run verify:fast"
+      ],
+      "goal": "HARD-009: Graphify-Powered \"Related Code\" Suggestions in Dev Workflow"
+    },
+    {
+      "id": "HARD-010",
+      "tier": "hard",
+      "title": "Resilient Multi-Region / Multi-Instance Survey Engine with Leader Election for Twin",
+      "status": "open",
+      "domain": "Infra + twin runtime (very hard)",
+      "source": "10_HARD_RANDOM_TASKS.md",
+      "verify_commands": [
+        "docker compose -f docker/docker-compose.survey.yml up --scale survey-engine=2",
+        "npm run survey:prod-gate"
+      ],
+      "goal": "HARD-010: Resilient Multi-Region / Multi-Instance Survey Engine with Leader Election for Twin"
+    },
+    {
+      "id": "IMP-05753",
+      "tier": "medium",
+      "title": "type-hint on survey-engine/src/ahj_export.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/ahj_export.py",
+      "dimension": "type-hint",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05753: type-hint improvement at survey-engine/src/ahj_export.py (P1)"
+    },
+    {
+      "id": "IMP-05754",
+      "tier": "medium",
+      "title": "docstring on survey-engine/src/ahj_export.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/ahj_export.py",
+      "dimension": "docstring",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05754: docstring improvement at survey-engine/src/ahj_export.py (P1)"
+    },
+    {
+      "id": "IMP-05755",
+      "tier": "medium",
+      "title": "error-handling on survey-engine/src/ahj_export.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/ahj_export.py",
+      "dimension": "error-handling",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05755: error-handling improvement at survey-engine/src/ahj_export.py (P1)"
+    },
+    {
+      "id": "IMP-05756",
+      "tier": "medium",
+      "title": "logging on survey-engine/src/ahj_export.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/ahj_export.py",
+      "dimension": "logging",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05756: logging improvement at survey-engine/src/ahj_export.py (P1)"
+    },
+    {
+      "id": "IMP-05757",
+      "tier": "medium",
+      "title": "fixture on survey-engine/src/ahj_export.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/ahj_export.py",
+      "dimension": "fixture",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05757: fixture improvement at survey-engine/src/ahj_export.py (P1)"
+    },
+    {
+      "id": "IMP-05758",
+      "tier": "medium",
+      "title": "golden on survey-engine/src/ahj_export.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/ahj_export.py",
+      "dimension": "golden",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05758: golden improvement at survey-engine/src/ahj_export.py (P1)"
+    },
+    {
+      "id": "IMP-05759",
+      "tier": "medium",
+      "title": "perf on survey-engine/src/ahj_export.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/ahj_export.py",
+      "dimension": "perf",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05759: perf improvement at survey-engine/src/ahj_export.py (P1)"
+    },
+    {
+      "id": "IMP-05760",
+      "tier": "medium",
+      "title": "security on survey-engine/src/ahj_export.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/ahj_export.py",
+      "dimension": "security",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05760: security improvement at survey-engine/src/ahj_export.py (P1)"
+    },
+    {
+      "id": "IMP-05761",
+      "tier": "medium",
+      "title": "offline on survey-engine/src/ahj_export.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/ahj_export.py",
+      "dimension": "offline",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05761: offline improvement at survey-engine/src/ahj_export.py (P1)"
+    },
+    {
+      "id": "IMP-05763",
+      "tier": "medium",
+      "title": "type-hint on survey-engine/src/api_clients/claude.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/api_clients/claude.py",
+      "dimension": "type-hint",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05763: type-hint improvement at survey-engine/src/api_clients/claude.py (P1)"
+    },
+    {
+      "id": "IMP-05764",
+      "tier": "medium",
+      "title": "docstring on survey-engine/src/api_clients/claude.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/api_clients/claude.py",
+      "dimension": "docstring",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05764: docstring improvement at survey-engine/src/api_clients/claude.py (P1)"
+    },
+    {
+      "id": "IMP-05765",
+      "tier": "medium",
+      "title": "error-handling on survey-engine/src/api_clients/claude.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/api_clients/claude.py",
+      "dimension": "error-handling",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05765: error-handling improvement at survey-engine/src/api_clients/claude.py (P1)"
+    },
+    {
+      "id": "IMP-05766",
+      "tier": "medium",
+      "title": "logging on survey-engine/src/api_clients/claude.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/api_clients/claude.py",
+      "dimension": "logging",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05766: logging improvement at survey-engine/src/api_clients/claude.py (P1)"
+    },
+    {
+      "id": "IMP-05767",
+      "tier": "medium",
+      "title": "fixture on survey-engine/src/api_clients/claude.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/api_clients/claude.py",
+      "dimension": "fixture",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05767: fixture improvement at survey-engine/src/api_clients/claude.py (P1)"
+    },
+    {
+      "id": "IMP-05768",
+      "tier": "medium",
+      "title": "golden on survey-engine/src/api_clients/claude.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/api_clients/claude.py",
+      "dimension": "golden",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05768: golden improvement at survey-engine/src/api_clients/claude.py (P1)"
+    },
+    {
+      "id": "IMP-05769",
+      "tier": "medium",
+      "title": "perf on survey-engine/src/api_clients/claude.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/api_clients/claude.py",
+      "dimension": "perf",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05769: perf improvement at survey-engine/src/api_clients/claude.py (P1)"
+    },
+    {
+      "id": "IMP-05770",
+      "tier": "medium",
+      "title": "security on survey-engine/src/api_clients/claude.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/api_clients/claude.py",
+      "dimension": "security",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05770: security improvement at survey-engine/src/api_clients/claude.py (P1)"
+    },
+    {
+      "id": "IMP-05771",
+      "tier": "medium",
+      "title": "offline on survey-engine/src/api_clients/claude.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/api_clients/claude.py",
+      "dimension": "offline",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05771: offline improvement at survey-engine/src/api_clients/claude.py (P1)"
+    },
+    {
+      "id": "IMP-05773",
+      "tier": "medium",
+      "title": "type-hint on survey-engine/src/api_clients/cost_logger.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/api_clients/cost_logger.py",
+      "dimension": "type-hint",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05773: type-hint improvement at survey-engine/src/api_clients/cost_logger.py (P1)"
+    },
+    {
+      "id": "IMP-05774",
+      "tier": "medium",
+      "title": "docstring on survey-engine/src/api_clients/cost_logger.py",
+      "status": "open",
+      "domain": "survey-engine",
+      "source": "improvements/registry.jsonl",
+      "path": "survey-engine/src/api_clients/cost_logger.py",
+      "dimension": "docstring",
+      "priority": "P1",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-05774: docstring improvement at survey-engine/src/api_clients/cost_logger.py (P1)"
+    },
+    {
+      "id": "IMP-00309",
+      "tier": "small",
+      "title": "unit-test on app/src/components/animations/ClientJourneyAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/ClientJourneyAnimation.tsx",
+      "dimension": "unit-test",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00309: unit-test improvement at app/src/components/animations/ClientJourneyAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00310",
+      "tier": "small",
+      "title": "type-safety on app/src/components/animations/ClientJourneyAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/ClientJourneyAnimation.tsx",
+      "dimension": "type-safety",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00310: type-safety improvement at app/src/components/animations/ClientJourneyAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00311",
+      "tier": "small",
+      "title": "a11y on app/src/components/animations/ClientJourneyAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/ClientJourneyAnimation.tsx",
+      "dimension": "a11y",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00311: a11y improvement at app/src/components/animations/ClientJourneyAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00312",
+      "tier": "small",
+      "title": "perf on app/src/components/animations/ClientJourneyAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/ClientJourneyAnimation.tsx",
+      "dimension": "perf",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00312: perf improvement at app/src/components/animations/ClientJourneyAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00313",
+      "tier": "small",
+      "title": "error-boundary on app/src/components/animations/ClientJourneyAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/ClientJourneyAnimation.tsx",
+      "dimension": "error-boundary",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00313: error-boundary improvement at app/src/components/animations/ClientJourneyAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00314",
+      "tier": "small",
+      "title": "i18n on app/src/components/animations/ClientJourneyAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/ClientJourneyAnimation.tsx",
+      "dimension": "i18n",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00314: i18n improvement at app/src/components/animations/ClientJourneyAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00315",
+      "tier": "small",
+      "title": "seo on app/src/components/animations/ClientJourneyAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/ClientJourneyAnimation.tsx",
+      "dimension": "seo",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00315: seo improvement at app/src/components/animations/ClientJourneyAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00316",
+      "tier": "small",
+      "title": "unit-test on app/src/components/animations/EnergyFlowAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/EnergyFlowAnimation.tsx",
+      "dimension": "unit-test",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00316: unit-test improvement at app/src/components/animations/EnergyFlowAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00317",
+      "tier": "small",
+      "title": "type-safety on app/src/components/animations/EnergyFlowAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/EnergyFlowAnimation.tsx",
+      "dimension": "type-safety",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00317: type-safety improvement at app/src/components/animations/EnergyFlowAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00318",
+      "tier": "small",
+      "title": "a11y on app/src/components/animations/EnergyFlowAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/EnergyFlowAnimation.tsx",
+      "dimension": "a11y",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00318: a11y improvement at app/src/components/animations/EnergyFlowAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00319",
+      "tier": "small",
+      "title": "perf on app/src/components/animations/EnergyFlowAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/EnergyFlowAnimation.tsx",
+      "dimension": "perf",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00319: perf improvement at app/src/components/animations/EnergyFlowAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00320",
+      "tier": "small",
+      "title": "error-boundary on app/src/components/animations/EnergyFlowAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/EnergyFlowAnimation.tsx",
+      "dimension": "error-boundary",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00320: error-boundary improvement at app/src/components/animations/EnergyFlowAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00321",
+      "tier": "small",
+      "title": "i18n on app/src/components/animations/EnergyFlowAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/EnergyFlowAnimation.tsx",
+      "dimension": "i18n",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00321: i18n improvement at app/src/components/animations/EnergyFlowAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00322",
+      "tier": "small",
+      "title": "seo on app/src/components/animations/EnergyFlowAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/EnergyFlowAnimation.tsx",
+      "dimension": "seo",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00322: seo improvement at app/src/components/animations/EnergyFlowAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00323",
+      "tier": "small",
+      "title": "unit-test on app/src/components/animations/FacadeMetalAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/FacadeMetalAnimation.tsx",
+      "dimension": "unit-test",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00323: unit-test improvement at app/src/components/animations/FacadeMetalAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00324",
+      "tier": "small",
+      "title": "type-safety on app/src/components/animations/FacadeMetalAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/FacadeMetalAnimation.tsx",
+      "dimension": "type-safety",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00324: type-safety improvement at app/src/components/animations/FacadeMetalAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00325",
+      "tier": "small",
+      "title": "a11y on app/src/components/animations/FacadeMetalAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/FacadeMetalAnimation.tsx",
+      "dimension": "a11y",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00325: a11y improvement at app/src/components/animations/FacadeMetalAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00326",
+      "tier": "small",
+      "title": "perf on app/src/components/animations/FacadeMetalAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/FacadeMetalAnimation.tsx",
+      "dimension": "perf",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00326: perf improvement at app/src/components/animations/FacadeMetalAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00327",
+      "tier": "small",
+      "title": "error-boundary on app/src/components/animations/FacadeMetalAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/FacadeMetalAnimation.tsx",
+      "dimension": "error-boundary",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00327: error-boundary improvement at app/src/components/animations/FacadeMetalAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00328",
+      "tier": "small",
+      "title": "i18n on app/src/components/animations/FacadeMetalAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/FacadeMetalAnimation.tsx",
+      "dimension": "i18n",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00328: i18n improvement at app/src/components/animations/FacadeMetalAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00329",
+      "tier": "small",
+      "title": "seo on app/src/components/animations/FacadeMetalAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/FacadeMetalAnimation.tsx",
+      "dimension": "seo",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00329: seo improvement at app/src/components/animations/FacadeMetalAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00330",
+      "tier": "small",
+      "title": "unit-test on app/src/components/animations/FinancingAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/FinancingAnimation.tsx",
+      "dimension": "unit-test",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00330: unit-test improvement at app/src/components/animations/FinancingAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00331",
+      "tier": "small",
+      "title": "type-safety on app/src/components/animations/FinancingAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/FinancingAnimation.tsx",
+      "dimension": "type-safety",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00331: type-safety improvement at app/src/components/animations/FinancingAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00332",
+      "tier": "small",
+      "title": "a11y on app/src/components/animations/FinancingAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/FinancingAnimation.tsx",
+      "dimension": "a11y",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00332: a11y improvement at app/src/components/animations/FinancingAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00333",
+      "tier": "small",
+      "title": "perf on app/src/components/animations/FinancingAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/FinancingAnimation.tsx",
+      "dimension": "perf",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00333: perf improvement at app/src/components/animations/FinancingAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00334",
+      "tier": "small",
+      "title": "error-boundary on app/src/components/animations/FinancingAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/FinancingAnimation.tsx",
+      "dimension": "error-boundary",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00334: error-boundary improvement at app/src/components/animations/FinancingAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00335",
+      "tier": "small",
+      "title": "i18n on app/src/components/animations/FinancingAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/FinancingAnimation.tsx",
+      "dimension": "i18n",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00335: i18n improvement at app/src/components/animations/FinancingAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00336",
+      "tier": "small",
+      "title": "seo on app/src/components/animations/FinancingAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/FinancingAnimation.tsx",
+      "dimension": "seo",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00336: seo improvement at app/src/components/animations/FinancingAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00337",
+      "tier": "small",
+      "title": "unit-test on app/src/components/animations/IndustrialSolarAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/IndustrialSolarAnimation.tsx",
+      "dimension": "unit-test",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00337: unit-test improvement at app/src/components/animations/IndustrialSolarAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00338",
+      "tier": "small",
+      "title": "type-safety on app/src/components/animations/IndustrialSolarAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/IndustrialSolarAnimation.tsx",
+      "dimension": "type-safety",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00338: type-safety improvement at app/src/components/animations/IndustrialSolarAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00339",
+      "tier": "small",
+      "title": "a11y on app/src/components/animations/IndustrialSolarAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/IndustrialSolarAnimation.tsx",
+      "dimension": "a11y",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00339: a11y improvement at app/src/components/animations/IndustrialSolarAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00340",
+      "tier": "small",
+      "title": "perf on app/src/components/animations/IndustrialSolarAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/IndustrialSolarAnimation.tsx",
+      "dimension": "perf",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00340: perf improvement at app/src/components/animations/IndustrialSolarAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00341",
+      "tier": "small",
+      "title": "error-boundary on app/src/components/animations/IndustrialSolarAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/IndustrialSolarAnimation.tsx",
+      "dimension": "error-boundary",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00341: error-boundary improvement at app/src/components/animations/IndustrialSolarAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00342",
+      "tier": "small",
+      "title": "i18n on app/src/components/animations/IndustrialSolarAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/IndustrialSolarAnimation.tsx",
+      "dimension": "i18n",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00342: i18n improvement at app/src/components/animations/IndustrialSolarAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00343",
+      "tier": "small",
+      "title": "seo on app/src/components/animations/IndustrialSolarAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/IndustrialSolarAnimation.tsx",
+      "dimension": "seo",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00343: seo improvement at app/src/components/animations/IndustrialSolarAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00344",
+      "tier": "small",
+      "title": "unit-test on app/src/components/animations/InstallationTimelapse.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/InstallationTimelapse.tsx",
+      "dimension": "unit-test",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00344: unit-test improvement at app/src/components/animations/InstallationTimelapse.tsx (P3)"
+    },
+    {
+      "id": "IMP-00345",
+      "tier": "small",
+      "title": "type-safety on app/src/components/animations/InstallationTimelapse.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/InstallationTimelapse.tsx",
+      "dimension": "type-safety",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00345: type-safety improvement at app/src/components/animations/InstallationTimelapse.tsx (P3)"
+    },
+    {
+      "id": "IMP-00346",
+      "tier": "small",
+      "title": "a11y on app/src/components/animations/InstallationTimelapse.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/InstallationTimelapse.tsx",
+      "dimension": "a11y",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00346: a11y improvement at app/src/components/animations/InstallationTimelapse.tsx (P3)"
+    },
+    {
+      "id": "IMP-00347",
+      "tier": "small",
+      "title": "perf on app/src/components/animations/InstallationTimelapse.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/InstallationTimelapse.tsx",
+      "dimension": "perf",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00347: perf improvement at app/src/components/animations/InstallationTimelapse.tsx (P3)"
+    },
+    {
+      "id": "IMP-00348",
+      "tier": "small",
+      "title": "error-boundary on app/src/components/animations/InstallationTimelapse.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/InstallationTimelapse.tsx",
+      "dimension": "error-boundary",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00348: error-boundary improvement at app/src/components/animations/InstallationTimelapse.tsx (P3)"
+    },
+    {
+      "id": "IMP-00349",
+      "tier": "small",
+      "title": "i18n on app/src/components/animations/InstallationTimelapse.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/InstallationTimelapse.tsx",
+      "dimension": "i18n",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00349: i18n improvement at app/src/components/animations/InstallationTimelapse.tsx (P3)"
+    },
+    {
+      "id": "IMP-00350",
+      "tier": "small",
+      "title": "seo on app/src/components/animations/InstallationTimelapse.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/InstallationTimelapse.tsx",
+      "dimension": "seo",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00350: seo improvement at app/src/components/animations/InstallationTimelapse.tsx (P3)"
+    },
+    {
+      "id": "IMP-00351",
+      "tier": "small",
+      "title": "unit-test on app/src/components/animations/Lazy3DAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/Lazy3DAnimation.tsx",
+      "dimension": "unit-test",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00351: unit-test improvement at app/src/components/animations/Lazy3DAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00352",
+      "tier": "small",
+      "title": "type-safety on app/src/components/animations/Lazy3DAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/Lazy3DAnimation.tsx",
+      "dimension": "type-safety",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00352: type-safety improvement at app/src/components/animations/Lazy3DAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00353",
+      "tier": "small",
+      "title": "a11y on app/src/components/animations/Lazy3DAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/Lazy3DAnimation.tsx",
+      "dimension": "a11y",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00353: a11y improvement at app/src/components/animations/Lazy3DAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00354",
+      "tier": "small",
+      "title": "perf on app/src/components/animations/Lazy3DAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/Lazy3DAnimation.tsx",
+      "dimension": "perf",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00354: perf improvement at app/src/components/animations/Lazy3DAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00355",
+      "tier": "small",
+      "title": "error-boundary on app/src/components/animations/Lazy3DAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/Lazy3DAnimation.tsx",
+      "dimension": "error-boundary",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00355: error-boundary improvement at app/src/components/animations/Lazy3DAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00356",
+      "tier": "small",
+      "title": "i18n on app/src/components/animations/Lazy3DAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/Lazy3DAnimation.tsx",
+      "dimension": "i18n",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00356: i18n improvement at app/src/components/animations/Lazy3DAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00357",
+      "tier": "small",
+      "title": "seo on app/src/components/animations/Lazy3DAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/Lazy3DAnimation.tsx",
+      "dimension": "seo",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00357: seo improvement at app/src/components/animations/Lazy3DAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00358",
+      "tier": "small",
+      "title": "unit-test on app/src/components/animations/MetalTileRoofAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/MetalTileRoofAnimation.tsx",
+      "dimension": "unit-test",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00358: unit-test improvement at app/src/components/animations/MetalTileRoofAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00359",
+      "tier": "small",
+      "title": "type-safety on app/src/components/animations/MetalTileRoofAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/MetalTileRoofAnimation.tsx",
+      "dimension": "type-safety",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00359: type-safety improvement at app/src/components/animations/MetalTileRoofAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00360",
+      "tier": "small",
+      "title": "a11y on app/src/components/animations/MetalTileRoofAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/MetalTileRoofAnimation.tsx",
+      "dimension": "a11y",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00360: a11y improvement at app/src/components/animations/MetalTileRoofAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00361",
+      "tier": "small",
+      "title": "perf on app/src/components/animations/MetalTileRoofAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/MetalTileRoofAnimation.tsx",
+      "dimension": "perf",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00361: perf improvement at app/src/components/animations/MetalTileRoofAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00362",
+      "tier": "small",
+      "title": "error-boundary on app/src/components/animations/MetalTileRoofAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/MetalTileRoofAnimation.tsx",
+      "dimension": "error-boundary",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00362: error-boundary improvement at app/src/components/animations/MetalTileRoofAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00363",
+      "tier": "small",
+      "title": "i18n on app/src/components/animations/MetalTileRoofAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/MetalTileRoofAnimation.tsx",
+      "dimension": "i18n",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00363: i18n improvement at app/src/components/animations/MetalTileRoofAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00364",
+      "tier": "small",
+      "title": "seo on app/src/components/animations/MetalTileRoofAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/MetalTileRoofAnimation.tsx",
+      "dimension": "seo",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00364: seo improvement at app/src/components/animations/MetalTileRoofAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00365",
+      "tier": "small",
+      "title": "unit-test on app/src/components/animations/RoofComparisonAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/RoofComparisonAnimation.tsx",
+      "dimension": "unit-test",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00365: unit-test improvement at app/src/components/animations/RoofComparisonAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00366",
+      "tier": "small",
+      "title": "type-safety on app/src/components/animations/RoofComparisonAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/RoofComparisonAnimation.tsx",
+      "dimension": "type-safety",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00366: type-safety improvement at app/src/components/animations/RoofComparisonAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00367",
+      "tier": "small",
+      "title": "a11y on app/src/components/animations/RoofComparisonAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/RoofComparisonAnimation.tsx",
+      "dimension": "a11y",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00367: a11y improvement at app/src/components/animations/RoofComparisonAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00368",
+      "tier": "small",
+      "title": "perf on app/src/components/animations/RoofComparisonAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/RoofComparisonAnimation.tsx",
+      "dimension": "perf",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00368: perf improvement at app/src/components/animations/RoofComparisonAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00369",
+      "tier": "small",
+      "title": "error-boundary on app/src/components/animations/RoofComparisonAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/RoofComparisonAnimation.tsx",
+      "dimension": "error-boundary",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00369: error-boundary improvement at app/src/components/animations/RoofComparisonAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00370",
+      "tier": "small",
+      "title": "i18n on app/src/components/animations/RoofComparisonAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/RoofComparisonAnimation.tsx",
+      "dimension": "i18n",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00370: i18n improvement at app/src/components/animations/RoofComparisonAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00371",
+      "tier": "small",
+      "title": "seo on app/src/components/animations/RoofComparisonAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/RoofComparisonAnimation.tsx",
+      "dimension": "seo",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00371: seo improvement at app/src/components/animations/RoofComparisonAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00372",
+      "tier": "small",
+      "title": "unit-test on app/src/components/animations/RoofCrossSectionAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/RoofCrossSectionAnimation.tsx",
+      "dimension": "unit-test",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00372: unit-test improvement at app/src/components/animations/RoofCrossSectionAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00373",
+      "tier": "small",
+      "title": "type-safety on app/src/components/animations/RoofCrossSectionAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/RoofCrossSectionAnimation.tsx",
+      "dimension": "type-safety",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00373: type-safety improvement at app/src/components/animations/RoofCrossSectionAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00374",
+      "tier": "small",
+      "title": "a11y on app/src/components/animations/RoofCrossSectionAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/RoofCrossSectionAnimation.tsx",
+      "dimension": "a11y",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00374: a11y improvement at app/src/components/animations/RoofCrossSectionAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00375",
+      "tier": "small",
+      "title": "perf on app/src/components/animations/RoofCrossSectionAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/RoofCrossSectionAnimation.tsx",
+      "dimension": "perf",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00375: perf improvement at app/src/components/animations/RoofCrossSectionAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00376",
+      "tier": "small",
+      "title": "error-boundary on app/src/components/animations/RoofCrossSectionAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/RoofCrossSectionAnimation.tsx",
+      "dimension": "error-boundary",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00376: error-boundary improvement at app/src/components/animations/RoofCrossSectionAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00377",
+      "tier": "small",
+      "title": "i18n on app/src/components/animations/RoofCrossSectionAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/RoofCrossSectionAnimation.tsx",
+      "dimension": "i18n",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00377: i18n improvement at app/src/components/animations/RoofCrossSectionAnimation.tsx (P3)"
+    },
+    {
+      "id": "IMP-00378",
+      "tier": "small",
+      "title": "seo on app/src/components/animations/RoofCrossSectionAnimation.tsx",
+      "status": "open",
+      "domain": "frontend",
+      "source": "improvements/registry.jsonl",
+      "path": "app/src/components/animations/RoofCrossSectionAnimation.tsx",
+      "dimension": "seo",
+      "priority": "P3",
+      "verify_commands": [
+        "npm run improve:verify",
+        "npm run verify:fast"
+      ],
+      "goal": "IMP IMP-00378: seo improvement at app/src/components/animations/RoofCrossSectionAnimation.tsx (P3)"
+    }
+  ]
+}

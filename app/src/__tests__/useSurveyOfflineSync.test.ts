@@ -93,6 +93,11 @@ vi.mock('@/lib/surveyOfflinePrefetch', () => ({
   prefetchSurveyOfflineAssets: (...args: unknown[]) => prefetchSurveyOfflineAssetsMock(...args),
 }));
 
+vi.mock('@/lib/surveyDraftSyncClient', () => ({
+  fetchServerSurveyDraft: vi.fn().mockResolvedValue({ draft: null }),
+  pushSurveyDraftSync: vi.fn().mockResolvedValue({ status: 'accepted', schema: 'v1' }),
+}));
+
 describe('useSurveyOfflineSync', () => {
   beforeEach(() => {
     getSurveyQueueStatsMock.mockResolvedValue({
@@ -102,7 +107,12 @@ describe('useSurveyOfflineSync', () => {
       oldestAt: null,
     });
     loadSurveyDraftMock.mockResolvedValue(draft);
-    saveSurveyDraftMock.mockResolvedValue(undefined);
+    saveSurveyDraftMock.mockImplementation(async () => ({
+      ...draft,
+      updatedAt: new Date().toISOString(),
+      draftId: 'inst-1:test',
+      version: { deviceId: 'dev-test', clock: 1, fieldClocks: {} },
+    }));
     enqueuePendingReportMock.mockResolvedValue(undefined);
     listPendingReportsMock.mockResolvedValue([]);
     updatePendingReportMock.mockResolvedValue(undefined);
@@ -150,7 +160,11 @@ describe('useSurveyOfflineSync', () => {
 
     await waitFor(
       () => {
-        expect(saveSurveyDraftMock).toHaveBeenCalledWith(form, installer, []);
+        expect(saveSurveyDraftMock).toHaveBeenCalled();
+        const last = saveSurveyDraftMock.mock.calls.at(-1);
+        expect(last?.[0]).toEqual(form);
+        expect(last?.[1]).toEqual(installer);
+        expect(last?.[2]).toEqual([]);
       },
       { timeout: 3000 },
     );

@@ -1,7 +1,14 @@
 import type { InstallerProfile, SurveyFormData } from '@/lib/surveyApi';
+import {
+  bumpFieldClocks,
+  createDraftVersionVector,
+  draftFieldPaths,
+  type DraftVersionVector,
+} from '@/lib/surveyDraftConflict';
 import { SURVEY_INDEXEDDB_NAME } from '@/lib/surveyOfflineManifest';
 
-export const SURVEY_DRAFT_SCHEMA = 'solaris-survey-draft-v1';
+export const SURVEY_DRAFT_SCHEMA = 'solaris-survey-draft-v2';
+export const SURVEY_DEVICE_ID_KEY = 'solaris_survey_device_id';
 export const SURVEY_DB_NAME = SURVEY_INDEXEDDB_NAME;
 export const SURVEY_DB_VERSION = 1;
 export const SURVEY_DRAFT_KEY = 'current';
@@ -31,6 +38,8 @@ export type SurveyDraftRecord = {
   installer: InstallerProfile;
   photos: StoredPhoto[];
   updatedAt: string;
+  version?: DraftVersionVector;
+  draftId?: string;
 };
 
 export type PendingReportStatus = (typeof PENDING_REPORT_STATUSES)[number];
@@ -111,19 +120,45 @@ export function storedToPhotos(stored: StoredPhoto[]): File[] {
   return stored.map((item) => new File([item.blob], item.name, { type: item.type }));
 }
 
+export function getOrCreateSurveyDeviceId(): string {
+  try {
+    const existing = localStorage.getItem(SURVEY_DEVICE_ID_KEY);
+    if (existing) return existing;
+    const id = `dev-${crypto.randomUUID().slice(0, 8)}`;
+    localStorage.setItem(SURVEY_DEVICE_ID_KEY, id);
+    return id;
+  } catch {
+    return 'dev-unknown';
+  }
+}
+
+export function buildSurveyDraftId(form: SurveyFormData, installer: InstallerProfile): string {
+  const base = `${installer.installerId || 'anon'}:${form.clientName}:${form.clientAddress}`.toLowerCase();
+  return base.replace(/\s+/g, '-').slice(0, 120) || 'draft-anon';
+}
+
 export async function saveSurveyDraft(
   form: SurveyFormData,
   installer: InstallerProfile,
   photos: File[],
-): Promise<void> {
+  prev?: SurveyDraftRecord | null,
+): Promise<SurveyDraftRecord> {
+  const deviceId = getOrCreateSurveyDeviceId();
+  const paths = draftFieldPaths(form, installer);
+  let version = createDraftVersionVector(deviceId, prev?.version);
+  version = bumpFieldClocks(version, paths, version.clock);
+
   const record: SurveyDraftRecord = {
     key: SURVEY_DRAFT_KEY,
     form,
     installer,
     photos: photosToStored(photos),
     updatedAt: new Date().toISOString(),
+    version,
+    draftId: buildSurveyDraftId(form, installer),
   };
   await tx(DRAFT_STORE, 'readwrite', (store) => store.put(record));
+  return record;
 }
 
 export async function loadSurveyDraft(): Promise<SurveyDraftRecord | null> {
