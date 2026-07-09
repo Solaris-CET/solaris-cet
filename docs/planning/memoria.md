@@ -1,99 +1,135 @@
-# Memoria — Memorie durabilă multi-agent (Grok 4.5)
+# Memoria — Memorie durabilă multi-agent (v2.0 Mature)
 
-**Skill:** `.agents/skills/memoria/SKILL.md`  
-**Loop:** `loop-memory.md`  
-**Surse:** Stash · `agent-memory.md` · `grok.md` · `HANDOFF.md` · MAPLE/Synapse (`.claude/skills/memory/`)
+**Versiune:** 2.0 Mature · **Skill:** `.agents/skills/memoria/SKILL.md` · **Loop:** `loop-memory.md`
 
 ---
 
-## Teza
+## §0 — Adult brief
 
-Contextul LLM e **RAM volatilă**. Memoria proiectului e **fișiere + Stash + graf**.
+Memoria nu e „summary de chat”. E **sistemul de fișiere + Stash** care supraviețuiește când Grok Code închide terminalul, Kimi pierde contextul, sau Fable 5 costă $50/1M output.
 
-Un agent care „își amintește” din training **halucinează istoric**. Un agent care citește Memoria **moștenește munca echipei**.
-
----
-
-## Cele 3 straturi
-
-| Strat | Durată | Unde | Ce stochezi |
-|---|---|---|---|
-| **Episodic** | Sesiune | chat, checkpoint | ce ai făcut azi, output comenzi |
-| **Semantic** | Luni | `agent-memory.md`, Stash | decizii arhitectură, anti-pattern |
-| **Procedural** | Permanent | skills, `tasks.md` | cum se lucrează (loops, superpowers) |
-
-**Regulă:** episodic → nu copia în agent-memory decât dacă e lecție permanentă.
+**Regulă:** training-ul modelului = ipoteză. `agent-memory.md` + `git diff` = probă.
 
 ---
 
-## Protocol Retrieve (P0)
+## §1 — Straturi (cu TTL și owner)
+
+| Strat | TTL | Locație | Owner | Exemplu SOLARIS |
+|---|---|---|---|---|
+| Episodic | Sesiune | checkpoint chat | worker | „pytest 142 passed 21:08” |
+| Working | Zile | `git diff`, `.autoprompt/` | worker | diff necommitat Grok Code |
+| Semantic | Luni+ | `agent-memory.md`, Stash | echipă | „Prod remote = Gitea solaris-clean” |
+| Procedural | Permanent | skills, `AGENTS.md` | maintainers | Pre-Flight obligatoriu |
+| BLOCKER extern | Până la human | `HANDOFF.md` §1 | PM | DNS Shopify, Hetzner L002DD869 |
+
+**Nu promova episodic → semantic** decât dacă: (a) verify verde, (b) repetat 2× sau impact arhitectură.
+
+---
+
+## §2 — Retrieve runbook (P0)
 
 ```bash
+npm run skills:prime -- "<topic>"
 npm run stash:prime -- "<topic>"
 stash search "<topic>" --json
 ```
 
-Citește în ordine:
-1. `HANDOFF.md` (primele 60 linii) — BLOCKER extern
-2. `agent-memory.md` — anti-pattern
-3. `grok.md` — PM decisions
-4. `features/<slug>/design.md` — dacă există
+### Ordine de citire (fixă)
+
+1. **`HANDOFF.md` liniile 1–80** — BLOCKER care nu se rezolvă din cod
+2. **`agent-memory.md`** — anti-pattern (tabel „did BADLY”)
+3. **`grok.md`** — ultimele 2 update-uri PM
+4. **`global.md`** — routing modele, bridge survey
+5. **`features/<slug>/design.md`** — dacă există epic
+6. **`10_HARD_RANDOM_TASKS.md`** — dacă `loops:next` = 0 tasks
+
+### Output obligatoriu
+
+```
+MEMORY_PRIME:
+  handoff_blockers: [DNS Shopify, Coolify redeploy pending, …]
+  anti_patterns_relevant: [wrong git remote, told user to test, …]
+  stash_hits: [file/session ids]
+  open_questions: [max 3]
+```
 
 ---
 
-## Protocol Store (P6)
+## §3 — Store runbook (P6)
 
 ```bash
 npm run stash:sync
 ```
 
-Actualizează `agent-memory.md` **doar** pentru:
-- anti-pattern nou confirmat (2+ agenți sau 1 cu verify)
-- decizie arhitectură care nu se renegociază
+### Ce scrii în `agent-memory.md` (criterii stricte)
 
-**Nu stoca:** output pytest, path-uri temp, status git nepersistent.
-
----
-
-## Consolidare MAPLE (meta)
-
-După task DONE:
-1. Episod: `trigger → acțiune → outcome → verify`
-2. Dacă similar cu skill existent → întărește skill, nu duplică doc
-3. Dacă unic → propune 1 linie în `agent-memory.md` sau skill patch
-
----
-
-## Memoria vs anti-halucinație
-
-| Memoria spune | Anti-halucinația cere |
+| Da | Nu |
 |---|---|
-| „În trecut am folosit Coolify” | Dovadă `deploy:status` **acum** |
-| „Epic X e done” | `loops:status` **acum** |
-| „Grok Code a lucrat la twin” | `git diff` **acum** |
+| „Push doar pe Gitea origin” | Output pytest din sesiune |
+| „surveyRouteRegistry prinde rute lipsă” | Listă 50 fișiere citite |
+| „Windows: npm run ci:install nu paralel” | Opinii despre calitate cod |
 
-Memoria = **ipoteze de încercat**, nu adevăr final.
+### Stash 409 (pagină există)
+
+Folosește `stash files edit-page <id>` — vezi `stash-sync.mjs`. Nu repeta upload orb.
 
 ---
 
-## Recovery sesiune întreruptă
+## §4 — Recovery Grok Code / sesiune întreruptă
+
+**Caz real 2026-07-09:** 101 fișiere modificate, 0 commit, terminal închis.
 
 ```bash
 git status --short
 git diff --stat
-ls .autoprompt/ .token-clock/ 2>/dev/null
-npm run stash:prime -- "recovery"
+git log -1 --oneline
+npm run stash:prime -- "recovery interrupted"
+cat docs/planning/HANDOFF.md | head -60
 ```
 
-Scrie în checkpoint: `RECOVERED_FROM: <tool> · diff lines: N`
+| Situație | Acțiune adultă |
+|---|---|
+| Diff bun, teste necunoscute | Rulează gate din task, apoi commit |
+| Diff parțial, teste fail | Diagnostic, nu reîncepe de la zero |
+| Duplicate cu alt agent | `git diff` + reconcile, nu suprascrie orb |
+
+Checkpoint:
+```
+RECOVERED_FROM: Grok Code interrupted
+EVIDENCE: git diff --stat · pytest/vitest output this session
+```
 
 ---
 
-## Comenzi
+## §5 — Memoria vs anti-halucinație (matrice)
+
+| Afirmație | Memoria | Verificare obligatorie acum |
+|---|---|---|
+| „Coolify deployează main” | HANDOFF: pending | `deploy:status` |
+| „62+ pytest” | agent-memory | `cd survey-engine && pytest tests/ -q` |
+| „Epics done” | loops history | `npm run loops:status` |
+| „Push făcut” | — | `git log origin/main -1` |
+
+---
+
+## §6 — MAPLE consolidation (episod → skill)
+
+După task verify-verde:
+
+```
+EPISODE: trigger=HARD-001 · action=twin-replay bridge · outcome=10+8 tests · verify=pytest+vitest
+LESSON: Every new /api/survey/* needs index.cjs tuple + surveyOpenApi SURVEY_ROUTE_IDS
+STORE: agent-memory (one row) OR superpowers.md GATE_PLAN template
+```
+
+---
+
+## §7 — Comenzi
 
 ```bash
 npm run stash:prime -- "<topic>"
 npm run stash:sync
 npm run stash:verify
-stash search "<q>" --json
+stash search "coolify deploy" --json
+stash vfs "rg 'twin replay' /"
 ```

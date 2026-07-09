@@ -2,29 +2,40 @@
 name: superpowers
 description: SOLARIS-advanced superpowers — mandatory plan-and-verify-before-code discipline for agents and orchestrators. Supersedes naive "jump to coding". Based on obra/superpowers but hardened for AEP + AUTOPROMPT.
 whenToUse: Before ANY code change; user says superpowers, TDD, verify-before-done, or orchestrator starts a task.
+version: "2.0"
 ---
 
-# Superpowers — SOLARIS CET (Grok 4.5+)
+# Superpowers — SOLARIS CET (v2.0 Mature)
 
 Full: `docs/planning/superpowers.md` · Loop: `docs/planning/superpowers-loops.md`
 
-## Pre-Flight (NON-NEGOTIABLE — before first Read of product code)
+## Pre-Flight (NON-NEGOTIABLE — Loop 1, before first Read of product code)
 
-1. **SPEC** — one sentence success criterion + exact verify command
-2. **N-BEST** — 2–3 approaches, score Verifiability first
-3. **BLAST RADIUS** — list files you will touch (from graphify, not memory)
-4. **PRE-MORTEM** — one paragraph: "This will fail because…"
-5. **GATE PLAN** — gate after every edit, not only at end
+1. **SPEC** — one sentence + exact verify command
+2. **N-BEST** — 2–3 approaches; Verifiability ×2 weight
+3. **BLAST_RADIUS** — from graphify (max 15 paths)
+4. **PRE-MORTEM** — "This will fail because…"
+5. **GATE_PLAN** — gate after **every** edit
 
-Only after Pre-Flight PASS → may call Read/Write on `app/`, `survey-engine/`, etc.
+Artifact:
+```
+PRE-FLIGHT: PASS
+SPEC: ...
+APPROACH: ...
+BLAST_RADIUS: ...
+PRE-MORTEM: ...
+GATE_PLAN: ...
+```
 
-## Superpowers laws
+Only after PASS → Read/Write on `app/`, `survey-engine/`.
 
-- **No code before plan artifact** (even mental — must be written in checkpoint)
-- **TDD when behavior changes** — test first or same pass
-- **Subagent = one atomic subtask** with its own verify command
-- **Orchestrator never trusts worker DONE** without gate output
+## Loop integration
 
-## Orchestrator rejection criteria
+- Loop 0: memoria before Pre-Flight
+- Loop 2: execute GATE_PLAN live (not only at end)
+- Loop 5: subagent gets copy of Pre-Flight packet only
+- AUTOPROMPT: EXECUTE blocked without `pre_flight: pass` in state
 
-Reject worker output if missing: `SPEC`, `VERIFIED` with literal command output, `PRE-MORTEM` addressed.
+## Orchestrator rejection
+
+Reject if missing: `PRE-FLIGHT: PASS`, `VERIFIED` with literal output, edits outside BLAST_RADIUS.

@@ -1,32 +1,51 @@
 ---
 name: memoria
 description: SOLARIS CET durable memory — Stash + agent-memory + episodic consolidation for loops. Load before motion; sync after retro.
-whenToUse: Loop 0 Memory; session start; before re-deriving architecture; after task complete.
+whenToUse: Loop 0 Memory; session start; before re-deriving architecture; after task complete; recovery.
+version: "2.0"
 ---
 
-# Memoria — SOLARIS CET
+# Memoria — SOLARIS CET (v2.0 Mature)
 
 Full: `docs/planning/memoria.md` · Loop: `docs/planning/loop-memory.md`
 
-## Retrieve (P0)
+## Loop 0 — Retrieve (P0)
 
 ```bash
+npm run skills:prime -- "<topic>"
 npm run stash:prime -- "<topic>"
+npm run graphify:prime -- "<topic>"
 stash search "<topic>" --json
 ```
 
-Read: `agent-memory.md` · `grok.md` · `HANDOFF.md` · feature `design.md`
+Read order: `HANDOFF.md` → `agent-memory.md` → `grok.md` → `global.md` → feature `design.md`
 
-## Store (P6)
+**Output required before Loop 1:**
+```
+MEMORY_PRIME:
+  handoff_blockers: [...]
+  stash_hits: [...]
+  graph_nodes: [5-12 paths]
+  open_questions: [max 3]
+```
+
+## Loop 7 — Store (P6)
 
 ```bash
 npm run stash:sync
 ```
 
-Update `agent-memory.md` only for **durable anti-patterns** or **architecture decisions**.
+Promote to `agent-memory.md` only: durable anti-patterns, architecture decisions — after verify green.
 
-## Consolidation rule
+## Recovery
 
-Episodic (this session) → checkpoint. Semantic (forever) → agent-memory or Stash page.
+```bash
+git status --short && git diff --stat
+npm run stash:prime -- "recovery interrupted session"
+```
 
-Never store: command outputs, temp paths, unverified claims.
+Never trust prior chat DONE — trust `git diff` + gates run now.
+
+## Consolidation
+
+Episodic → checkpoint. Semantic → agent-memory or Stash. Never store unverified claims.

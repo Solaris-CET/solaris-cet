@@ -71,7 +71,7 @@ for (const name of available) {
 }
 
 const manifest = {
-  version: '1.0',
+  version: '2.0',
   updated: new Date().toISOString(),
   skills: CORE_SKILLS.filter((n) => existsSync(join(source, n, 'SKILL.md'))),
   docs: [

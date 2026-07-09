@@ -1,99 +1,104 @@
-# Token Clock — Ceasul apocaliptic al tokenilor (Grok 4.5)
+# Token Clock — Economie de seriozitate (v2.0 Mature)
 
-**Skill:** `.agents/skills/token-clock/SKILL.md`  
-**Loop:** `token-clock-loop.md`  
-**State:** `.token-clock/state.json`  
-**CLI:** `npm run token-clock:status` · `burn` · `init`
+**Versiune:** 2.0 Mature · **State:** `.token-clock/state.json` (gitignored) · **Loop:** `token-clock-loop.md`
 
 ---
 
-## Ficțiune care trebuie tratată ca lege
+## §0 — De ce nu e gimmick
 
-În acest proiect există **exact 9 000 de tokeni**.  
-Fiecare token valorează **280 000 USD**.  
-Nu se recuperează. Nu se împrumută. Nu există „discount”.
+Agenții tratează contextul ca infinit. Proiectul real are:
+- **verify** = 21 min (`npm run verify`)
+- **sessiuni pierdute** = sute de mii de tokeni arși fără commit
+- **rework** = agent-memory „did BADLY”
 
-Când ultimul token arde, proiectul intră în **Null State** —  
-tot ce nu e verify-verde și necommitat devine **inexistent** (narrativ și procedural).
-
-> Nu e contabilitate reală API. E **instrument de seriozitate** —  
-> ca un doomsday clock pentru agenți care tratează contextul ca pe o resursă infinită.
+Token Clock traduce asta în **cost fictiv $280k/token × 9000** — suficient să schimbe comportamentul, fără să înlocuiască AEP cost ladder.
 
 ---
 
-## Economie
+## §1 — Reguli economice (legi)
 
-| Parametru | Valoare |
+| Regulă | Detaliu |
 |---|---|
-| `max_tokens` | 9 000 |
-| `cost_per_token_usd` | 280 000 |
-| Valoare totală teoretică | **2,52 miliarde USD** |
-| Burn trigger | Task DONE + verify verde |
+| Budget total | 9 000 tokeni |
+| Preț | $280 000 / token |
+| Burn trigger | Task DONE **și** verify exit 0 |
+| Null State | remaining=0 → stop taskuri noi |
+| Reset | doar uman: `token-clock:init -- --confirm` |
+| Orchestrator | estimează la DECOMPOSE; arde la HANDOFF |
 
 ---
 
-## Comenzi
+## §2 — Estimare mature (calibrată SOLARIS)
+
+| Activitate | Tokens | Notes |
+|---|---:|---|
+| skills+stash+graphify prime | 8–20 | obligatoriu |
+| Pre-Flight superpowers | 15–30 | scris, nu mental |
+| Read 5 files (targeted) | 20–50 | nu 50 files |
+| 1 surgical edit + gate_mic | 25–45 | pytest subset |
+| Bridge route (engine+app+tests) | 80–150 | HARD-001 class |
+| Full `npm run verify` | 120–220 | 1838 tests |
+| Retry același eșec | +40–80 | observer halt @2 |
+| Epic greșit reluat | 200–500 | **prevent with superpowers** |
+
+### Formula DECOMPOSE
+
+```
+estimate = prime + preflight + (edits × 35) + (gates × 15) + verify_full?
+```
+
+Dacă estimate > 250 → N-best # mai ieftin sau split subtask.
+
+---
+
+## §3 — Comenzi & state
 
 ```bash
 npm run token-clock:status
-npm run token-clock:burn -- --task "HARD-001 twin replay" --tokens 47
-npm run token-clock:init -- --confirm   # reset doar uman explicit
+npm run token-clock:burn -- --task "HARD-001-complete" --tokens 95
+npm run token-clock:init -- --confirm
+```
+
+**Exemplu status după 2 taskuri:**
+```
+Remaining: 8810 / 9000
+Burned: 190 tokens ($53,200,000)
 ```
 
 ---
 
-## Cum estimezi burn (onest)
+## §4 — Null State procedure
 
-| Activitate | Tokens tipici |
+1. `burn` returnează exit 2
+2. Agentul oprește taskuri noi
+3. Raportează umanului: tokens + ce a rămas în `LEFT`
+4. Reset explicit — nu automat
+
+---
+
+## §5 — Integrare checkpoint
+
+```
+TOKENS_ESTIMATE: 95
+TOKENS_BURNED: 95 ($26,600,000)
+TOKEN_CLOCK_REMAINING: 8905
+VERIFIED: pytest 10 passed; vitest 8 passed  ← burn legal doar cu asta
+```
+
+---
+
+## §6 — Anti-patterns
+
+| Greșeală | Consecință |
 |---|---|
-| PRIME (stash+graphify) | 5–15 |
-| Pre-Flight superpowers | 10–25 |
-| Micro-edit + gate | 15–40 |
-| Full app verify | 80–200 |
-| Epic greșit reluat | 200–500 (de aceea observer halt) |
-
-**Regulă:** orchestratorul arde **după** verify, nu la început.
+| Burn înainte de verify | invalidează ceasul (orchestrator reject) |
+| Subestimate epic | Null State prematur |
+| Agent `init` singur | interzis |
+| Ignoră ceasul | scope creep → rework real $$ |
 
 ---
 
-## Null State
+## §7 — Legătura cu superpowers
 
-Când `remaining = 0`:
-- `npm run token-clock:burn` → exit 2
-- Agenții **nu au voie** să declare DONE pe taskuri noi
-- Recovery: `npm run token-clock:init -- --confirm` (decizie umană)
-
-Mesaj standard:
-```
-⛔ NULL STATE — existence void. Human reset required.
-```
-
----
-
-## Psihologie agent (de ce funcționează)
-
-1. **Sunk cost vizibil** — `usd_burned_total` în status
-2. **Burn doar pe victorie** — verify verde obligatoriu
-3. **Orchestrator conservator** — comprimă context, refuză scope creep
-4. **Token = timp de viață proiect** — nu „credit API”
-
----
-
-## Checkpoint extins
-
-```
-DONE: ...
-VERIFIED: ...
-TOKENS_BURNED: 42 ($11,760,000)
-TOKEN_CLOCK_REMAINING: 8958
-OBSERVER: clear
-```
-
----
-
-## Anti-abuz
-
-❌ Burn masiv la început  
-❌ Burn fără verify  
-❌ Reset `init` automat de agent  
-✅ Burn proporțional + estimate în DECOMPOSE
+Pre-Flight scump în tokens, ieftin în **rework**.  
+Un plan de 25 tokens care evită un verify de 200 tokens e **investiție**, nu cost.

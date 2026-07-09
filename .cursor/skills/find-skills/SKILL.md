@@ -2,11 +2,12 @@
 name: find-skills
 description: Discover and load the correct SOLARIS CET skills and planning docs for any task before touching code. Triggers on new session, new task, "which skill", "prime", or before EXECUTE phase.
 whenToUse: Start of every session; orchestrator routing; before any file edit.
+version: "2.0"
 ---
 
-# Find Skills — SOLARIS CET
+# Find Skills — SOLARIS CET (v2.0 Mature)
 
-Full doc: `docs/planning/find-skills.md`
+Full doc: `docs/planning/find-skills.md` · Loop map: `docs/planning/find-loops-skills.md`
 
 ## 30-second protocol
 
@@ -17,13 +18,22 @@ npm run stash:prime -- "<goal>"
 npm run graphify:prime -- "<goal>"
 ```
 
-## Skill map (default stack)
+## Checkpoint (obligatoriu)
+
+```
+SKILLS_LOADED: ...
+DOCS_READ: find-skills.md, ...
+GRAPH_NODES: <5-12 real paths>
+```
+
+## Skill map (canonical 12)
 
 | Need | Skill | Doc |
 |---|---|---|
+| Routing / session | `find-skills` | `find-skills.md` |
 | Any nontrivial task | `engineering` | `AGENT-ENGINEERING.md` |
-| Loops / epics | `loops` | `SOLARIS-LOOPS-MASTER.md` |
-| Codebase map | `graphify` | `GRAPH_REPORT.md` |
+| Loops / epics | `loops` | `find-loops-skills.md` |
+| Codebase map | `graphify` | `graphify-out/` |
 | Plan before code | `superpowers` | `superpowers.md` |
 | Honest claims | `anti-hallucinatii` | `anti-halucinatii.md` |
 | Self-check | `verify` + `review` | verify skill |
@@ -34,4 +44,4 @@ npm run graphify:prime -- "<goal>"
 
 ## Rule
 
-**No skill loaded = no code touched.** Orchestrator rejects EXECUTE without PRIME checklist.
+**No skill loaded = no code touched.** Orchestrator rejects EXECUTE without SKILLS_LOADED + Pre-Flight (`superpowers.md`).

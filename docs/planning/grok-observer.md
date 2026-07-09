@@ -1,68 +1,76 @@
-# Grok Observer — Audit continuu micro-puls (Grok 4.5)
+# Grok Observer — Audit continuu (v2.0 Mature)
 
-**Skill:** `.agents/skills/observer/SKILL.md`  
-**Loop:** `grok-loop-observer.md`
-
----
-
-## Teza
-
-Verificarea doar la final = **compound hallucination**.  
-Observerul rulează la **fiecare decizie** — secundă cu secundă, tool-call cu tool-call.
-
-Nu înlocuiește verify. **Prinde driftul înainte să coste 2000 tokens greșiti.**
+**Versiune:** 2.0 Mature · **Loop:** `grok-loop-observer.md`
 
 ---
 
-## Micro-puls (după fiecare batch de acțiuni)
+## §0 — Adult brief
 
-| # | Semnal | Severitate | Acțiune |
+Verify la final e autopsie. Observer e **preventiv** — la fiecare 1–3 acțiuni.
+
+Țintă: prinde drift înainte să ajungă la `npm run verify` (21 min) sau la push pe remote greșit.
+
+---
+
+## §1 — Cele 8 semnale (cu acțiune fixă)
+
+| # | Semnal | Severitate | Acțiune imediată |
 |---:|---|---|---|
-| 1 | Fișier editat ∉ BLAST_RADIUS | HALT | revert sau update plan |
-| 2 | Claim fără citare/comandă | HALT | Read sau run gate |
-| 3 | A 2-a retry aceeași comandă | WARN | schimbă strategie |
-| 4 | >15 fișiere în diff | WARN | scope review |
-| 5 | 3+ turns fără verify | HALT | gate acum |
-| 6 | PRE-FLIGHT lipsă | HALT | superpowers |
-| 7 | token-clock <500 | WARN | comprimă context |
-| 8 | git status surpriză | WARN | recovery memoria |
+| S1 | Edit ∉ BLAST_RADIUS | **HALT** | revert sau amend Pre-Flight |
+| S2 | Claim fără EVIDENCE | **HALT** | Read sau run command |
+| S3 | Retry #2 aceeași comandă | **WARN** | schimbă strategie (DARS) |
+| S4 | >15 files în diff | **WARN** | scope review / split task |
+| S5 | 3 turns fără gate | **HALT** | run gate_mic acum |
+| S6 | Lipsește PRE-FLIGHT | **HALT** | superpowers |
+| S7 | tokens remaining <500 | **WARN** | compress context |
+| S8 | `git status` surpriză | **WARN** | memoria recovery |
 
 ---
 
-## Verdict Observer
+## §2 — Verdict format
 
 ```
 OBSERVER: clear
-OBSERVER: warn — <reason>
-OBSERVER: halt — <reason> — <recovery step>
+OBSERVER: warn — retry #2 same pytest without code change
+OBSERVER: halt — edited app/package.json not in BLAST_RADIUS
 ```
 
-**Orchestrator:** `halt` = stop subagent, nu merge la DONE.
+Orchestrator: **halt** nesters = stop; nu accepta DONE.
 
 ---
 
-## Moduri
+## §3 — Moduri
 
-| Mod | Când | Cost |
+| Mod | Când | Input judge |
 |---|---|---|
-| **Lite** | Fiecare turn — checklist mental 8 semnale | 0 tokens extra |
-| **Full** | Înainte de DONE — Haiku judge pe diff+VERIFIED | cheap tier |
-| **Forensic** | După sesiune Grok Code întreruptă | git diff + pytest |
+| Lite | fiecare turn | last 3 actions + diff stat |
+| Full | pre-DONE | diff + VERIFIED + PRE-FLIGHT |
+| Forensic | post Grok Code crash | git diff + test rerun |
 
----
-
-## Integrare anti-halucinație
-
-Observer = **execuția** legilor din `anti-halucinatii.md`.  
-Nu raporta DONE dacă `OBSERVER: halt` nerezolvat în sesiune.
-
----
-
-## Prompt observer (judge)
+### Full judge prompt (Haiku / Sonnet)
 
 ```markdown
-You are Grok Observer — hostile to drift.
-Given: PRE-FLIGHT, diff summary, last 3 actions, VERIFIED claims.
-Apply 8 signals table from grok-observer.md.
-Output only: OBSERVER: clear|warn|halt + one line reason.
+Role: Grok Observer hostile reviewer.
+Input: PRE-FLIGHT, BLAST_RADIUS, files changed, VERIFIED claims.
+Apply signals S1-S8. Output OBSERVER: clear|warn|halt + one line.
+Reject ACCEPT if any claim lacks command output.
 ```
+
+---
+
+## §4 — Exemple SOLARIS
+
+**clear:** HARD-001 — 8 files in radius, pytest 10, vitest 8, route in index.cjs  
+**warn:** 3rd attempt `npm run verify` fără code change între ele  
+**halt:** added `mcps/` drive-by while task was twin-replay  
+
+---
+
+## §5 — Metrici (opțional)
+
+Append `.observer/metrics.jsonl`:
+```json
+{"ts":"2026-07-09T21:00:00Z","phase":"EXECUTE","verdict":"warn","reason":"S5 no gate 3 turns"}
+```
+
+Retro: care fază produce cele mai multe halt-uri?
